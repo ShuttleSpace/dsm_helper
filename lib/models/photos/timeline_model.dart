@@ -11,23 +11,24 @@ class TimelineModel {
     this.days,
     this.offset,
   });
-  static Future<List<TimelineModel>> fetch({bool isTeam = false, String type, int geocodingId, int generalTagId, bool recentlyAdd: false, List<int> itemTypes = const []}) async {
+  static Future<List<TimelineModel>> fetch(
+      {bool isTeam = false,
+      String? type,
+      int? geocodingId,
+      int? generalTagId,
+      bool recentlyAdd = false,
+      List<int> itemTypes = const []}) async {
     Map<String, dynamic> data = {
       "timeline_group_unit": "day",
-      "api": "SYNO.Foto${isTeam ? 'Team' : ''}.Browse.${recentlyAdd ? 'RecentlyAdded' : 'Timeline'}",
+      "api":
+          "SYNO.Foto${isTeam ? 'Team' : ''}.Browse.${recentlyAdd ? 'RecentlyAdded' : 'Timeline'}",
       "method": recentlyAdd ? "get_timeline" : 'get',
       "version": 2,
       "_sid": Util.sid,
     };
-    if (type != null) {
-      data['type'] = type;
-    }
-    if (geocodingId != null) {
-      data['geocoding_id'] = geocodingId;
-    }
-    if (generalTagId != null) {
-      data['general_tag_id'] = generalTagId;
-    }
+    data['type'] = type;
+    data['geocoding_id'] = geocodingId;
+    data['general_tag_id'] = generalTagId;
     // if (itemTypes != null && itemTypes.length > 0) {
     //   data['item_type'] = jsonEncode(itemTypes);
     //   data['method'] = "get_with_filter";
@@ -52,18 +53,18 @@ class TimelineModel {
     if (json['list'] != null) {
       days = [];
       json['list'].forEach((v) {
-        days.add(Day.fromJson(v));
+        days?.add(Day.fromJson(v));
       });
     }
     offset = json['offset'];
   }
-  num limit;
-  List<Day> days;
-  num offset;
+  num? limit;
+  List<Day>? days;
+  num? offset;
   TimelineModel copyWith({
-    num limit,
-    List<List> list,
-    num offset,
+    num? limit,
+    List<Day>? list,
+    num? offset,
   }) =>
       TimelineModel(
         limit: limit ?? this.limit,
@@ -74,7 +75,7 @@ class TimelineModel {
     final map = <String, dynamic>{};
     map['limit'] = limit;
     if (days != null) {
-      map['list'] = days.map((v) => v.toJson()).toList();
+      map['list'] = days?.map((v) => v.toJson()).toList();
     }
     map['offset'] = offset;
     return map;
@@ -100,40 +101,43 @@ class Day {
     month = json['month'];
     year = json['year'];
   }
-  num day;
-  num itemCount;
-  num month;
-  num year;
-  num startPosition;
-  num endPosition;
-  List<PhotoModel> photos;
+  num? day;
+  num? itemCount;
+  num? month;
+  num? year;
+  num? startPosition;
+  num? endPosition;
+  List<PhotoModel>? photos;
 
-  Future fetchPhotos({bool isTeam = false, String type, int geocodingId, int generalTagId, bool recentlyAdd: false, List<int> itemTypes = const []}) async {
+  Future fetchPhotos(
+      {bool isTeam = false,
+      String? type,
+      int? geocodingId,
+      int? generalTagId,
+      bool recentlyAdd = false,
+      List<int> itemTypes = const []}) async {
     Map<String, dynamic> data = {
       "offset": 0,
       "limit": itemCount,
-      "additional": '["thumbnail","resolution","orientation","video_convert","video_meta","address"]',
-      "api": "SYNO.Foto${isTeam ? 'Team' : ''}.Browse.${recentlyAdd ? 'RecentlyAdded' : 'Item'}",
+      "additional":
+          '["thumbnail","resolution","orientation","video_convert","video_meta","address"]',
+      "api":
+          "SYNO.Foto${isTeam ? 'Team' : ''}.Browse.${recentlyAdd ? 'RecentlyAdded' : 'Item'}",
       "method": 'list',
       "version": 1,
       "_sid": Util.sid,
       "timeline_group_unit": "day",
     };
-    if (type != null) {
-      data['type'] = type;
-    }
-    if (geocodingId != null) {
-      data['geocoding_id'] = geocodingId;
-    }
-    if (generalTagId != null) {
-      data['general_tag_id'] = generalTagId;
-    }
+    data['type'] = type;
+    data['geocoding_id'] = geocodingId;
+    data['general_tag_id'] = generalTagId;
     // if (itemTypes != null && itemTypes.length > 0) {
     //   data['item_type'] = jsonEncode(itemTypes);
     //   data['method'] = "list_with_filter";
     // }
     if (year != null && month != null && day != null) {
-      int start = DateTime(year, month, day, 8).secondsSinceEpoch;
+      int start = DateTime(year!.toInt(), month!.toInt(), day!.toInt(), 8)
+          .secondsSinceEpoch;
       int end = start + 60 * 60 * 24 - 1;
       data['start_time'] = start;
       data['end_time'] = end;
@@ -148,7 +152,7 @@ class Day {
     if (res['success']) {
       photos = [];
       res['data']['list'].forEach((e) {
-        photos.add(PhotoModel.fromJson(e));
+        photos?.add(PhotoModel.fromJson(e));
       });
     } else {
       throw Exception();
@@ -171,10 +175,10 @@ class Day {
   }
 
   Day copyWith({
-    num day,
-    num itemCount,
-    num month,
-    num year,
+    num? day,
+    num? itemCount,
+    num? month,
+    num? year,
   }) =>
       Day(
         day: day ?? this.day,

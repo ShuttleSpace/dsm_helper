@@ -27,7 +27,14 @@ class PhotoModel {
     this.type,
     this.additional,
   });
-  static Future<List<PhotoModel>> fetch({List<String> additional = const [], bool isTeam = false, int albumId, int geocodingId, String folderId, String type, int limit}) async {
+  static Future<List<PhotoModel>> fetch(
+      {List<String> additional = const [],
+      bool isTeam = false,
+      int? albumId,
+      int? geocodingId,
+      String? folderId,
+      String? type,
+      int? limit}) async {
     Map<String, dynamic> data = {
       "api": 'SYNO.Foto${isTeam ? 'Team' : ''}.Browse.Item',
       "method": 'list',
@@ -39,18 +46,10 @@ class PhotoModel {
       "offset": 0,
       "limit": limit ?? 5000,
     };
-    if (albumId != null) {
-      data['album_id'] = albumId;
-    }
-    if (geocodingId != null) {
-      data['geocoding_id'] = geocodingId;
-    }
-    if (folderId != null) {
-      data['folderId'] = folderId;
-    }
-    if (type != null) {
-      data['type'] = type;
-    }
+    data['album_id'] = albumId;
+    data['geocoding_id'] = geocodingId;
+    data['folderId'] = folderId;
+    data['type'] = type;
     var res = await Util.post("entry.cgi", data: data);
     if (res['success']) {
       List list = res['data']['list'];
@@ -64,7 +63,12 @@ class PhotoModel {
     }
   }
 
-  static Future<List<PhotoModel>> recentlyAdd({List<String> additional = const [], bool isTeam = false, String folderId, String type, int limit}) async {
+  static Future<List<PhotoModel>> recentlyAdd(
+      {List<String> additional = const [],
+      bool isTeam = false,
+      String? folderId,
+      String? type,
+      int? limit}) async {
     Map<String, dynamic> data = {
       "api": 'SYNO.Foto${isTeam ? 'Team' : ''}.Browse.RecentlyAdded',
       "method": 'list',
@@ -98,36 +102,38 @@ class PhotoModel {
     ownerUserId = json['owner_user_id'];
     folderId = json['folder_id'];
     type = json['type'];
-    additional = json['additional'] != null ? PhotoAdditional.fromJson(json['additional']) : null;
+    additional = json['additional'] != null
+        ? PhotoAdditional.fromJson(json['additional'])
+        : null;
   }
-  num id;
-  String filename;
-  num filesize;
-  num time;
-  num indexedTime;
-  num ownerUserId;
-  num folderId;
-  String type;
-  PhotoAdditional additional;
+  num? id;
+  String? filename;
+  num? filesize;
+  num? time;
+  num? indexedTime;
+  num? ownerUserId;
+  num? folderId;
+  String? type;
+  PhotoAdditional? additional;
 
   String videoUrl({bool isTeam = false}) {
     return '${Util.baseUrl}/webapi/entry.cgi?item_id=%5B$id%5D&api=%22SYNO.Foto${isTeam ? 'Team' : ''}.Download%22&method=%22download%22&version=1&_sid=${Util.sid}';
   }
 
   String thumbUrl({String size = 'sm', bool isTeam = false}) {
-    return '${Util.baseUrl}/webapi/entry.cgi?id=${additional.thumbnail.unitId}&cache_key="${additional.thumbnail.cacheKey}"&type="unit"&size="$size"&api="SYNO.Foto${isTeam ? 'Team' : ''}.Thumbnail"&method="get"&version=1&_sid=${Util.sid}';
+    return '${Util.baseUrl}/webapi/entry.cgi?id=${additional!.thumbnail?.unitId}&cache_key="${additional?.thumbnail?.cacheKey}"&type="unit"&size="$size"&api="SYNO.Foto${isTeam ? 'Team' : ''}.Thumbnail"&method="get"&version=1&_sid=${Util.sid}';
   }
 
   PhotoModel copyWith({
-    num id,
-    String filename,
-    num filesize,
-    num time,
-    num indexedTime,
-    num ownerUserId,
-    num folderId,
-    String type,
-    PhotoAdditional additional,
+    num? id,
+    String? filename,
+    num? filesize,
+    num? time,
+    num? indexedTime,
+    num? ownerUserId,
+    num? folderId,
+    String? type,
+    PhotoAdditional? additional,
   }) =>
       PhotoModel(
         id: id ?? this.id,
@@ -150,9 +156,7 @@ class PhotoModel {
     map['owner_user_id'] = ownerUserId;
     map['folder_id'] = folderId;
     map['type'] = type;
-    if (additional != null) {
-      map['additional'] = additional.toJson();
-    }
+    map['additional'] = additional?.toJson();
     return map;
   }
 }
@@ -175,37 +179,46 @@ class PhotoAdditional {
   });
 
   PhotoAdditional.fromJson(dynamic json) {
-    resolution = json['resolution'] != null ? Resolution.fromJson(json['resolution']) : null;
+    resolution = json['resolution'] != null
+        ? Resolution.fromJson(json['resolution'])
+        : null;
     orientation = json['orientation'];
     orientationOriginal = json['orientation_original'];
-    thumbnail = json['thumbnail'] != null ? ThumbnailModel.fromJson(json['thumbnail']) : null;
-    address = json['address'] != null ? Address.fromJson(json['address']) : null;
-    videoMeta = json['video_meta'] != null ? VideoMeta.fromJson(json['video_meta']) : null;
-    sharingInfo = json['sharing_info'] != null ? SharingInfo.fromJson(json['sharing_info']) : null;
+    thumbnail = json['thumbnail'] != null
+        ? ThumbnailModel.fromJson(json['thumbnail'])
+        : null;
+    address =
+        json['address'] != null ? Address.fromJson(json['address']) : null;
+    videoMeta = json['video_meta'] != null
+        ? VideoMeta.fromJson(json['video_meta'])
+        : null;
+    sharingInfo = json['sharing_info'] != null
+        ? SharingInfo.fromJson(json['sharing_info'])
+        : null;
     if (json['video_convert'] != null) {
       videoConvert = [];
       json['video_convert'].forEach((e) {
-        videoConvert.add(VideoConvert.fromJson(e));
+        videoConvert?.add(VideoConvert.fromJson(e));
       });
     }
   }
-  SharingInfo sharingInfo;
-  Resolution resolution;
-  num orientation;
-  num orientationOriginal;
-  ThumbnailModel thumbnail;
-  Address address;
-  VideoMeta videoMeta;
-  List<VideoConvert> videoConvert;
+  SharingInfo? sharingInfo;
+  Resolution? resolution;
+  num? orientation;
+  num? orientationOriginal;
+  ThumbnailModel? thumbnail;
+  Address? address;
+  VideoMeta? videoMeta;
+  List<VideoConvert>? videoConvert;
   PhotoAdditional copyWith({
-    SharingInfo sharingInfo,
-    Resolution resolution,
-    num orientation,
-    num orientationOriginal,
-    ThumbnailModel thumbnail,
-    Address address,
-    VideoMeta videoMeta,
-    List<VideoConvert> videoConvert,
+    SharingInfo? sharingInfo,
+    Resolution? resolution,
+    num? orientation,
+    num? orientationOriginal,
+    ThumbnailModel? thumbnail,
+    Address? address,
+    VideoMeta? videoMeta,
+    List<VideoConvert>? videoConvert,
   }) =>
       PhotoAdditional(
         sharingInfo: sharingInfo ?? this.sharingInfo,
@@ -219,14 +232,10 @@ class PhotoAdditional {
       );
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
-    if (resolution != null) {
-      map['resolution'] = resolution.toJson();
-    }
+    map['resolution'] = resolution?.toJson();
     map['orientation'] = orientation;
     map['orientation_original'] = orientationOriginal;
-    if (thumbnail != null) {
-      map['thumbnail'] = thumbnail.toJson();
-    }
+    map['thumbnail'] = thumbnail?.toJson();
     return map;
   }
 }
@@ -244,11 +253,11 @@ class Resolution {
     width = json['width'];
     height = json['height'];
   }
-  num width;
-  num height;
+  num? width;
+  num? height;
   Resolution copyWith({
-    num width,
-    num height,
+    num? width,
+    num? height,
   }) =>
       Resolution(
         width: width ?? this.width,
@@ -304,24 +313,24 @@ class Address {
     landmark = json['landmark'];
     landmarkId = json['landmark_id'];
   }
-  String country;
-  String countryId;
-  String state;
-  String stateId;
-  String county;
-  String countyId;
-  String city;
-  String cityId;
-  String town;
-  String townId;
-  String district;
-  String districtId;
-  String village;
-  String villageId;
-  String route;
-  String routeId;
-  String landmark;
-  String landmarkId;
+  String? country;
+  String? countryId;
+  String? state;
+  String? stateId;
+  String? county;
+  String? countyId;
+  String? city;
+  String? cityId;
+  String? town;
+  String? townId;
+  String? district;
+  String? districtId;
+  String? village;
+  String? villageId;
+  String? route;
+  String? routeId;
+  String? landmark;
+  String? landmarkId;
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
@@ -355,17 +364,16 @@ class VideoConvert {
 
   VideoConvert.fromJson(dynamic json) {
     quality = json['quality'];
-    metadata = json['metadata'] != null ? Metadata.fromJson(json['metadata']) : null;
+    metadata =
+        json['metadata'] != null ? Metadata.fromJson(json['metadata']) : null;
   }
-  String quality;
-  Metadata metadata;
+  String? quality;
+  Metadata? metadata;
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
     map['quality'] = quality;
-    if (metadata != null) {
-      map['metadata'] = metadata.toJson();
-    }
+    map['metadata'] = metadata?.toJson();
     return map;
   }
 }
@@ -406,21 +414,21 @@ class Metadata {
     audioFrequency = json['audio_frequency'];
     audioChannel = json['audio_channel'];
   }
-  int duration;
-  int orientation;
-  int frameBitrate;
-  int videoBitrate;
-  int audioBitrate;
-  double framerate;
-  int resolutionX;
-  int resolutionY;
-  String videoCodec;
-  String audioCodec;
-  String containerType;
-  int videoProfile;
-  int videoLevel;
-  int audioFrequency;
-  int audioChannel;
+  int? duration;
+  int? orientation;
+  int? frameBitrate;
+  int? videoBitrate;
+  int? audioBitrate;
+  double? framerate;
+  int? resolutionX;
+  int? resolutionY;
+  String? videoCodec;
+  String? audioCodec;
+  String? containerType;
+  int? videoProfile;
+  int? videoLevel;
+  int? audioFrequency;
+  int? audioChannel;
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
@@ -495,40 +503,40 @@ class VideoMeta {
     audioFrequency = json['audio_frequency'];
     audioChannel = json['audio_channel'];
   }
-  num duration;
-  int get hours => duration ~/ 1000 ~/ 60 ~/ 60;
-  int get minutes => duration ~/ 1000 ~/ 60 % 60;
-  int get seconds => duration ~/ 1000 % 60;
-  num orientation;
-  num frameBitrate;
-  num videoBitrate;
-  num audioBitrate;
-  num framerate;
-  num resolutionX;
-  num resolutionY;
-  String videoCodec;
-  String audioCodec;
-  String containerType;
-  num videoProfile;
-  num videoLevel;
-  num audioFrequency;
-  num audioChannel;
+  num? duration;
+  int? get hours => duration! ~/ 1000 ~/ 60 ~/ 60;
+  int? get minutes => duration! ~/ 1000 ~/ 60 % 60;
+  int? get seconds => duration! ~/ 1000 % 60;
+  num? orientation;
+  num? frameBitrate;
+  num? videoBitrate;
+  num? audioBitrate;
+  num? framerate;
+  num? resolutionX;
+  num? resolutionY;
+  String? videoCodec;
+  String? audioCodec;
+  String? containerType;
+  num? videoProfile;
+  num? videoLevel;
+  num? audioFrequency;
+  num? audioChannel;
   VideoMeta copyWith({
-    num duration,
-    num orientation,
-    num frameBitrate,
-    num videoBitrate,
-    num audioBitrate,
-    num framerate,
-    num resolutionX,
-    num resolutionY,
-    String videoCodec,
-    String audioCodec,
-    String containerType,
-    num videoProfile,
-    num videoLevel,
-    num audioFrequency,
-    num audioChannel,
+    num? duration,
+    num? orientation,
+    num? frameBitrate,
+    num? videoBitrate,
+    num? audioBitrate,
+    num? framerate,
+    num? resolutionX,
+    num? resolutionY,
+    String? videoCodec,
+    String? audioCodec,
+    String? containerType,
+    num? videoProfile,
+    num? videoLevel,
+    num? audioFrequency,
+    num? audioChannel,
   }) =>
       VideoMeta(
         duration: duration ?? this.duration,

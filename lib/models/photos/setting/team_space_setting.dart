@@ -27,19 +27,21 @@ class TeamSpaceSetting {
     allowRootFolderPublic = json['allow_root_folder_public'];
     enablePerson = json['enable_person'];
     enabled = json['enabled'];
-    teamSpaceDisabledByShareFolderDisabled = json['team_space_disabled_by_share_folder_disabled'];
+    teamSpaceDisabledByShareFolderDisabled =
+        json['team_space_disabled_by_share_folder_disabled'];
   }
-  bool allowRootFolderPublic;
-  bool enablePerson;
-  bool enabled;
-  bool teamSpaceDisabledByShareFolderDisabled;
+  bool? allowRootFolderPublic;
+  bool? enablePerson;
+  bool? enabled;
+  bool? teamSpaceDisabledByShareFolderDisabled;
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
     map['allow_root_folder_public'] = allowRootFolderPublic;
     map['enable_person'] = enablePerson;
     map['enabled'] = enabled;
-    map['team_space_disabled_by_share_folder_disabled'] = teamSpaceDisabledByShareFolderDisabled;
+    map['team_space_disabled_by_share_folder_disabled'] =
+        teamSpaceDisabledByShareFolderDisabled;
     return map;
   }
 }

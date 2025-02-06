@@ -22,7 +22,8 @@ class VipRecordModel {
   });
   static Future<List<VipRecordModel>> fetch() async {
     String userToken = await Util.getStorage("user_token");
-    var res = await Util.post("${Util.appUrl}/vip/record", data: {"token": userToken});
+    var res = await Util.post("${Util.appUrl}/vip/record",
+        data: {"token": userToken});
     if (res['code'] == 1) {
       List<VipRecordModel> records = [];
       res['data'].forEach((e) {
@@ -45,23 +46,23 @@ class VipRecordModel {
     isForever = json['is_forever'];
     activityId = json['activity_id'];
   }
-  num id;
-  num userId;
-  String startTime;
-  String endTime;
-  String cost;
-  num type;
-  num isForever;
-  num activityId;
-  String createTime;
+  num? id;
+  num? userId;
+  String? startTime;
+  String? endTime;
+  String? cost;
+  num? type;
+  num? isForever;
+  num? activityId;
+  String? createTime;
   VipRecordModel copyWith({
-    num id,
-    num userId,
-    String startTime,
-    String endTime,
-    String cost,
-    num type,
-    String createTime,
+    num? id,
+    num? userId,
+    String? startTime,
+    String? endTime,
+    String? cost,
+    num? type,
+    String? createTime,
   }) =>
       VipRecordModel(
         id: id ?? this.id,
