@@ -7,15 +7,15 @@ typedef CallBack = Function(int);
 class NeuPicker extends StatefulWidget {
   final int value;
   final List<String> data;
-  final CallBack onConfirm;
-  NeuPicker(this.data, {this.value: 0, this.onConfirm});
+  final CallBack? onConfirm;
+  NeuPicker(this.data, {this.value = 0, this.onConfirm});
   @override
   _NeuPickerState createState() => _NeuPickerState();
 }
 
 class _NeuPickerState extends State<NeuPicker> {
-  FixedExtentScrollController _controller;
-  int value;
+  late FixedExtentScrollController _controller;
+  int value = 0;
   @override
   void initState() {
     value = widget.value ?? 0;
@@ -61,7 +61,7 @@ class _NeuPickerState extends State<NeuPicker> {
                     ),
                     bevel: 10,
                     onPressed: () {
-                      widget.onConfirm(value);
+                      widget.onConfirm?.call(value);
                       Navigator.of(context).pop();
                     },
                     child: Text("确定"),

@@ -12,7 +12,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class AlbumTab extends StatefulWidget {
-  const AlbumTab(this.isTeam, {Key key}) : super(key: key);
+  const AlbumTab(
+    this.isTeam,
+  );
   final bool isTeam;
   @override
   State<AlbumTab> createState() => AlbumTabState();
@@ -25,7 +27,7 @@ class AlbumTabState extends State<AlbumTab> {
   List<PhotoModel> videos = [];
   List<GeocodingModel> geocodings = [];
   List<GeneralTagModel> generalTags = [];
-  double albumWidth;
+  double albumWidth = 0;
   @override
   void initState() {
     isTeam = widget.isTeam;
@@ -34,7 +36,7 @@ class AlbumTabState extends State<AlbumTab> {
     super.initState();
   }
 
-  getData({bool isTeam: false}) {
+  getData({bool isTeam = false}) {
     this.isTeam = isTeam;
     setState(() {
       recentlyAdds = [];
@@ -49,41 +51,43 @@ class AlbumTabState extends State<AlbumTab> {
   }
 
   getAlbum() async {
-    albums = await AlbumModel.fetch(additional: ["sharing_info", "thumbnail"], limit: 100, isTeam: isTeam);
+    albums = await AlbumModel.fetch(
+        additional: ["sharing_info", "thumbnail"], limit: 100, isTeam: isTeam);
     debugPrint("相册：${albums.length}");
     setState(() {});
   }
 
   getRecently() async {
-    recentlyAdds = await PhotoModel.recentlyAdd(limit: 4, isTeam: isTeam, additional: ['thumbnail'], type: 'photo');
+    recentlyAdds = await PhotoModel.recentlyAdd(
+        limit: 4, isTeam: isTeam, additional: ['thumbnail'], type: 'photo');
     debugPrint("最近添加：${recentlyAdds.length}");
     setState(() {});
   }
 
   getVideos() async {
-    videos = await PhotoModel.fetch(limit: 4, isTeam: isTeam, additional: ['thumbnail'], type: 'video');
+    videos = await PhotoModel.fetch(
+        limit: 4, isTeam: isTeam, additional: ['thumbnail'], type: 'video');
     debugPrint("视频：${recentlyAdds.length}");
     setState(() {});
   }
 
   getShares() async {}
   getGeocoding() async {
-    geocodings = await GeocodingModel.fetch(limit: 4, isTeam: isTeam, additional: ['thumbnail']);
+    geocodings = await GeocodingModel.fetch(
+        limit: 4, isTeam: isTeam, additional: ['thumbnail']);
     debugPrint("位置：${recentlyAdds.length}");
     setState(() {});
   }
 
   getGeneral() async {
-    generalTags = await GeneralTagModel.fetch(limit: 4, isTeam: isTeam, additional: ['thumbnail']);
+    generalTags = await GeneralTagModel.fetch(
+        limit: 4, isTeam: isTeam, additional: ['thumbnail']);
     debugPrint("标签：${recentlyAdds.length}");
     setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
-    if (albumWidth == null) {
-      albumWidth = (MediaQuery.of(context).size.width - 82) / 3;
-    }
     return ListView(
       padding: EdgeInsets.all(20),
       children: [
@@ -93,7 +97,8 @@ class AlbumTabState extends State<AlbumTab> {
           children: [
             GestureDetector(
               onTap: () {
-                Navigator.of(context).push(CupertinoPageRoute(builder: (context) {
+                Navigator.of(context)
+                    .push(CupertinoPageRoute(builder: (context) {
                   return GeocodingPage(isTeam);
                 }));
               },
@@ -102,7 +107,12 @@ class AlbumTabState extends State<AlbumTab> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   ThumbnailCard(
-                    geocodings.map((e) => e.additional.thumbnail).toList(),
+                    geocodings
+                        .takeWhile((t) =>
+                            t.additional != null &&
+                            t.additional!.thumbnail != null)
+                        .map((e) => e.additional!.thumbnail!)
+                        .toList(),
                     width: albumWidth,
                     isTeam: isTeam,
                   ),
@@ -120,7 +130,8 @@ class AlbumTabState extends State<AlbumTab> {
             ),
             GestureDetector(
               onTap: () {
-                Navigator.of(context).push(CupertinoPageRoute(builder: (context) {
+                Navigator.of(context)
+                    .push(CupertinoPageRoute(builder: (context) {
                   return GeneralTagPage(isTeam);
                 }));
               },
@@ -129,7 +140,12 @@ class AlbumTabState extends State<AlbumTab> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   ThumbnailCard(
-                    generalTags.map((e) => e.additional.thumbnail).toList(),
+                    generalTags
+                        .takeWhile((t) =>
+                            t.additional != null &&
+                            t.additional!.thumbnail != null)
+                        .map((e) => e.additional!.thumbnail!)
+                        .toList(),
                     width: albumWidth,
                     isTeam: isTeam,
                   ),
@@ -147,15 +163,22 @@ class AlbumTabState extends State<AlbumTab> {
             ),
             GestureDetector(
               onTap: () {
-                Navigator.of(context).push(CupertinoPageRoute(builder: (context) {
-                  return TimelinePage(title: "视频", type: 'video', isTeam: widget.isTeam);
+                Navigator.of(context)
+                    .push(CupertinoPageRoute(builder: (context) {
+                  return TimelinePage(
+                      title: "视频", type: 'video', isTeam: widget.isTeam);
                 }));
               },
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   ThumbnailCard(
-                    videos.map((e) => e.additional.thumbnail).toList(),
+                    videos
+                        .takeWhile((t) =>
+                            t.additional != null &&
+                            t.additional!.thumbnail != null)
+                        .map((e) => e.additional!.thumbnail!)
+                        .toList(),
                     width: albumWidth,
                     isTeam: isTeam,
                   ),
@@ -173,15 +196,22 @@ class AlbumTabState extends State<AlbumTab> {
             ),
             GestureDetector(
               onTap: () {
-                Navigator.of(context).push(CupertinoPageRoute(builder: (context) {
-                  return TimelinePage(title: "最近添加", isTeam: widget.isTeam, recentlyAdd: true);
+                Navigator.of(context)
+                    .push(CupertinoPageRoute(builder: (context) {
+                  return TimelinePage(
+                      title: "最近添加", isTeam: widget.isTeam, recentlyAdd: true);
                 }));
               },
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   ThumbnailCard(
-                    recentlyAdds.map((e) => e.additional.thumbnail).toList(),
+                    recentlyAdds
+                        .takeWhile((t) =>
+                            t.additional != null &&
+                            t.additional!.thumbnail != null)
+                        .map((e) => e.additional!.thumbnail!)
+                        .toList(),
                     width: albumWidth,
                     isTeam: isTeam,
                   ),
@@ -219,9 +249,9 @@ class AlbumTabState extends State<AlbumTab> {
                 child: Stack(
                   children: [
                     Hero(
-                      tag: e.additional.thumbnail,
+                      tag: e.additional?.thumbnail ?? '',
                       child: CupertinoExtendedImage(
-                        e.additional.thumbnail.thumbUrl(),
+                        e.additional?.thumbnail?.thumbUrl() ?? '',
                         width: MediaQuery.of(context).size.width - 40,
                         height: 200,
                         fit: BoxFit.cover,
@@ -250,13 +280,15 @@ class AlbumTabState extends State<AlbumTab> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                e.name,
+                                e.name ?? '',
                                 style: TextStyle(fontSize: 16),
                               ),
                               Row(
                                 children: [
-                                  if (e.shared) ...[
-                                    if (e.additional.sharingInfo.enablePassword)
+                                  if (e.shared == true) ...[
+                                    if (e.additional?.sharingInfo
+                                            ?.enablePassword ==
+                                        true)
                                       Icon(
                                         CupertinoIcons.lock,
                                         color: Colors.white,

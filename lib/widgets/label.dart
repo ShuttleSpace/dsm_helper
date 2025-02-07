@@ -6,7 +6,8 @@
 import 'package:flutter/material.dart';
 
 class Label extends StatelessWidget {
-  Label(this.name, this.color, {this.fill: false, this.fontSize, this.height});
+  Label(this.name, this.color,
+      {this.fill = false, this.fontSize = 12, this.height = 24});
   final String name;
   final Color color;
   final bool fill;
@@ -24,7 +25,8 @@ class Label extends StatelessWidget {
       padding: EdgeInsets.symmetric(horizontal: 5, vertical: 2),
       child: Text(
         name,
-        style: TextStyle(color: fill ? Colors.white : color, fontSize: fontSize ?? 12),
+        style: TextStyle(
+            color: fill ? Colors.white : color, fontSize: fontSize ?? 12),
       ),
     );
   }

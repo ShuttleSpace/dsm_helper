@@ -1,10 +1,13 @@
+import 'dart:nativewrappers/_internal/vm/lib/ffi_allocation_patch.dart';
+
 import 'package:flutter/material.dart';
 import 'package:xterm/xterm.dart';
 
 import 'terminal_button.dart';
 
 class VirtualKeyboardView extends StatefulWidget {
-  const VirtualKeyboardView(this.keyboard, this.terminal, {key}) : super(key: key);
+  const VirtualKeyboardView(this.keyboard, this.terminal, {key})
+      : super(key: key);
 
   final VirtualKeyboard keyboard;
   final Terminal terminal;
@@ -35,7 +38,7 @@ class _VirtualKeyboardViewState extends State<VirtualKeyboardView> {
                   ),
                   TerminalButton(
                     onPressed: () {
-                      widget.terminal.onOutput('/');
+                      widget.terminal.onOutput?.call('/');
                     },
                     child: Text("/"),
                   ),
@@ -219,9 +222,10 @@ class VirtualKeyboard extends TerminalInputHandler with ChangeNotifier {
   @override
   String call(TerminalKeyboardEvent event) {
     return _inputHandler.call(event.copyWith(
-      ctrl: event.ctrl || _ctrl,
-      shift: event.shift || _shift,
-      alt: event.alt || _alt,
-    ));
+          ctrl: event.ctrl || _ctrl,
+          shift: event.shift || _shift,
+          alt: event.alt || _alt,
+        )) ??
+        '';
   }
 }

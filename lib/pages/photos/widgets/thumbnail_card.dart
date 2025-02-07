@@ -3,8 +3,9 @@ import 'package:dsm_helper/widgets/cupertino_image.dart';
 import 'package:flutter/material.dart';
 
 class ThumbnailCard extends StatelessWidget {
-  const ThumbnailCard(this.thumbnails, {@required this.width, this.folderId, this.isTeam: false, Key key}) : super(key: key);
-  final int folderId;
+  const ThumbnailCard(this.thumbnails,
+      {required this.width, this.folderId, this.isTeam = false});
+  final int? folderId;
   final List<ThumbnailModel> thumbnails;
   final double width;
   final bool isTeam;
@@ -19,7 +20,7 @@ class ThumbnailCard extends StatelessWidget {
           color: Colors.white,
           borderRadius: BorderRadius.circular(5),
         ),
-        child: thumbnails == null || thumbnails.length == 0
+        child: thumbnails.length == 0
             ? Container(
                 color: Color(0xffE9E9E9),
                 child: Center(

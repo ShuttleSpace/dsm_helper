@@ -53,7 +53,7 @@ void main() async {
   }
 
   WidgetsFlutterBinding.ensureInitialized();
-  String agreement = await Util.getStorage("agreement");
+  String agreement = await Util.getStorage("agreement") ?? '';
   Fluwx fluwx = Fluwx();
   Log.init();
   if (agreement == "1") {
@@ -62,7 +62,7 @@ void main() async {
             appId: "wxabdf23571f34b49b",
             universalLink: "https://dsm.apaipai.top/app/")
         .then((value) {
-      stopLog();
+      // stopLog();
     });
     // print("初始化穿山甲");
     await pangle.init(
@@ -74,7 +74,6 @@ void main() async {
         appId: '5215463',
         debug: false,
         allowShowNotify: true,
-        allowShowPageWhenScreenLock: false,
       ),
     );
     // 域名优选
@@ -85,26 +84,27 @@ void main() async {
     // 是否关闭广告
     // 判断是否登录
     bool isForever = false;
-    DateTime noAdTime;
-    Util.isWechatInstalled = await isWeChatInstalled;
-    String userToken = await Util.getStorage("user_token");
-    String noAdTimeStr = await Util.getStorage("no_ad_time");
+    DateTime noAdTime = DateTime.now();
+    Util.isWechatInstalled = await fluwx.isWeChatInstalled;
+    String userToken = await Util.getStorage("user_token") ?? '';
+    String noAdTimeStr = await Util.getStorage("no_ad_time") ?? '';
     if (noAdTimeStr.isNotBlank) {
       noAdTime = DateTime.parse(noAdTimeStr);
     }
     if (userToken.isNotBlank) {
+      isForever = Util.vipForever = true;
       var res = await Util.post("${Util.appUrl}/vip/info",
           data: {"token": userToken});
       if (res['code'] == 1) {
         isForever = Util.vipForever = res['data']['is_forever'] == 1;
-        if (res['data']['vip_expire_time'] != null) {
-          DateTime vipExpireTime =
-              DateTime.parse(res['data']['vip_expire_time']);
-          Util.vipExpireTime = vipExpireTime;
-          if (vipExpireTime.isAfter(noAdTime)) {
-            noAdTime = vipExpireTime;
-          }
-        }
+        // if (res['data']['vip_expire_time'] != null) {
+        //   DateTime vipExpireTime =
+        //       DateTime.parse(res['data']['vip_expire_time']);
+        //   Util.vipExpireTime = vipExpireTime;
+        //   if (vipExpireTime.isAfter(noAdTime)) {
+        //     noAdTime = vipExpireTime;
+        //   }
+        // }
       }
     }
 
@@ -136,11 +136,13 @@ void main() async {
   bool showWallpaper = true;
   int refreshDuration = 10;
   bool launchAccountPage = false;
-  String launchAuthStr = await Util.getStorage("launch_auth");
-  String launchAuthPasswordStr = await Util.getStorage("launch_auth_password");
+  String launchAuthStr = await Util.getStorage("launch_auth") ?? '';
+  String launchAuthPasswordStr =
+      await Util.getStorage("launch_auth_password") ?? '';
   String launchAuthBiometricsStr =
-      await Util.getStorage("launch_auth_biometrics");
-  String launchAccountPageStr = await Util.getStorage('launch_account_page');
+      await Util.getStorage("launch_auth_biometrics") ?? '';
+  String launchAccountPageStr =
+      await Util.getStorage('launch_account_page') ?? '';
   PackageInfo packageInfo = await PackageInfo.fromPlatform();
   Util.appName = packageInfo.appName;
   launchAuth = launchAuthStr == "1";
@@ -152,25 +154,25 @@ void main() async {
   bool authPage = launchAuth && (password || biometrics);
 
   //暗色模式
-  String darkModeStr = await Util.getStorage("dark_mode");
+  String darkModeStr = await Util.getStorage("dark_mode") ?? '';
   int darkMode = 2;
   if (darkModeStr.isNotBlank) {
     darkMode = int.parse(darkModeStr);
   }
 
   //震动开关
-  String vibrateOn = await Util.getStorage("vibrate_on");
-  String vibrateNormal = await Util.getStorage("vibrate_normal");
-  String vibrateWarning = await Util.getStorage("vibrate_warning");
-  String showShortcutsStr = await Util.getStorage("show_shortcut");
+  String vibrateOn = await Util.getStorage("vibrate_on") ?? '';
+  String vibrateNormal = await Util.getStorage("vibrate_normal") ?? '';
+  String vibrateWarning = await Util.getStorage("vibrate_warning") ?? '';
+  String showShortcutsStr = await Util.getStorage("show_shortcut") ?? '';
   if (showShortcutsStr.isNotBlank) {
     showShortcuts = showShortcutsStr == "1";
   }
-  String showWallpaperStr = await Util.getStorage("show_wallpaper");
+  String showWallpaperStr = await Util.getStorage("show_wallpaper") ?? '';
   if (showWallpaperStr.isNotBlank) {
     showWallpaper = showWallpaperStr == "1";
   }
-  String refreshDurationStr = await Util.getStorage("refresh_duration");
+  String refreshDurationStr = await Util.getStorage("refresh_duration") ?? '';
   if (refreshDurationStr.isNotBlank) {
     refreshDuration = int.parse(refreshDurationStr);
   }
@@ -189,7 +191,7 @@ void main() async {
   } else {
     Util.vibrateWarning = true;
   }
-  String checkSsl = await Util.getStorage("check_ssl");
+  String checkSsl = await Util.getStorage("check_ssl") ?? '';
   if (checkSsl.isNotBlank) {
     Util.checkSsl = checkSsl == "1";
   } else {

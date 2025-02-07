@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:neumorphic/neumorphic.dart';
 
 class ShareTab extends StatefulWidget {
-  const ShareTab({Key key}) : super(key: key);
+  const ShareTab();
 
   @override
   State<ShareTab> createState() => _ShareTabState();
@@ -22,7 +22,10 @@ class _ShareTabState extends State<ShareTab> {
   }
 
   getData() async {
-    albums = await AlbumModel.fetch(additional: ["thumbnail", "sharing_info"], shared: true, sortBy: 'share_modify_time');
+    albums = await AlbumModel.fetch(
+        additional: ["thumbnail", "sharing_info"],
+        shared: true,
+        sortBy: 'share_modify_time');
     setState(() {
       loading = false;
     });
@@ -51,7 +54,8 @@ class _ShareTabState extends State<ShareTab> {
               AlbumModel e = albums[i];
               return GestureDetector(
                 onTap: () {
-                  Navigator.of(context).push(CupertinoPageRoute(builder: (context) {
+                  Navigator.of(context)
+                      .push(CupertinoPageRoute(builder: (context) {
                     return AlbumPage(e);
                   }));
                 },
@@ -62,9 +66,9 @@ class _ShareTabState extends State<ShareTab> {
                     child: Stack(
                       children: [
                         Hero(
-                          tag: e.additional.thumbnail,
+                          tag: e.additional?.thumbnail ?? '',
                           child: CupertinoExtendedImage(
-                            e.additional.thumbnail.thumbUrl(),
+                            e.additional?.thumbnail?.thumbUrl() ?? '',
                             width: MediaQuery.of(context).size.width - 40,
                             height: 200,
                             fit: BoxFit.cover,
@@ -93,13 +97,15 @@ class _ShareTabState extends State<ShareTab> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    e.name,
+                                    e.name ?? '',
                                     style: TextStyle(fontSize: 16),
                                   ),
                                   Row(
                                     children: [
-                                      if (e.shared) ...[
-                                        if (e.additional.sharingInfo.enablePassword)
+                                      if (e.shared == true) ...[
+                                        if (e.additional?.sharingInfo
+                                                ?.enablePassword ==
+                                            true)
                                           Icon(
                                             CupertinoIcons.lock,
                                             color: Colors.white,

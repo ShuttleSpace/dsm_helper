@@ -82,10 +82,9 @@ class ExpansionContainer extends StatefulWidget {
   /// the tile to reveal or hide the [children]. The [initiallyExpanded] property must
   /// be non-null.
   const ExpansionContainer({
-    Key key,
     this.leading,
-    @required this.title,
-    this.showFirst: false,
+    required this.title,
+    this.showFirst = false,
     this.first,
     this.subtitle,
     this.onExpansionChanged,
@@ -104,15 +103,12 @@ class ExpansionContainer extends StatefulWidget {
     this.iconColor,
     this.collapsedIconColor,
     this.controlAffinity,
-    this.bottomTitle: false,
-  })  : assert(initiallyExpanded != null),
-        assert(maintainState != null),
-        assert(
+    this.bottomTitle = false,
+  }) : assert(
           expandedCrossAxisAlignment != CrossAxisAlignment.baseline,
           'CrossAxisAlignment.baseline is not supported since the expanded children '
           'are aligned in a column, not a row. Try to use another constant.',
-        ),
-        super(key: key);
+        );
 
   /// A widget to display before the title.
   ///
@@ -120,7 +116,7 @@ class ExpansionContainer extends StatefulWidget {
   ///
   /// Note that depending on the value of [controlAffinity], the [leading] widget
   /// may replace the rotating expansion arrow icon.
-  final Widget leading;
+  final Widget? leading;
 
   /// The primary content of the list item.
   ///
@@ -130,45 +126,45 @@ class ExpansionContainer extends StatefulWidget {
   /// Additional content displayed below the title.
   ///
   /// Typically a [Text] widget.
-  final Widget subtitle;
+  final Widget? subtitle;
 
-  final Widget first;
+  final Widget? first;
 
-  final bool showFirst;
+  final bool? showFirst;
 
   /// Called when the tile expands or collapses.
   ///
   /// When the tile starts expanding, this function is called with the value
   /// true. When the tile starts collapsing, this function is called with
   /// the value false.
-  final ValueChanged<bool> onExpansionChanged;
+  final ValueChanged<bool>? onExpansionChanged;
 
   /// The widgets that are displayed when the tile expands.
   ///
   /// Typically [ListTile] widgets.
-  final List<Widget> children;
+  final List<Widget>? children;
 
   /// The color to display behind the sublist when expanded.
-  final Color backgroundColor;
+  final Color? backgroundColor;
 
   /// When not null, defines the background color of tile when the sublist is collapsed.
-  final Color collapsedBackgroundColor;
+  final Color? collapsedBackgroundColor;
 
   /// A widget to display after the title.
   ///
   /// Note that depending on the value of [controlAffinity], the [trailing] widget
   /// may replace the rotating expansion arrow icon.
-  final Widget trailing;
+  final Widget? trailing;
 
   /// Specifies if the list tile is initially expanded (true) or collapsed (false, the default).
-  final bool initiallyExpanded;
+  final bool? initiallyExpanded;
 
   /// Specifies whether the state of the children is maintained when the tile expands and collapses.
   ///
   /// When true, the children are kept in the tree while the tile is collapsed.
   /// When false (default), the children are removed from the tree when the tile is
   /// collapsed and recreated upon expansion.
-  final bool maintainState;
+  final bool? maintainState;
 
   /// Specifies padding for the [ListTile].
   ///
@@ -177,7 +173,7 @@ class ExpansionContainer extends StatefulWidget {
   /// the expanded [children] widgets.
   ///
   /// When the value is null, the tile's padding is `EdgeInsets.symmetric(horizontal: 16.0)`.
-  final EdgeInsetsGeometry tilePadding;
+  final EdgeInsetsGeometry? tilePadding;
 
   /// Specifies the alignment of [children], which are arranged in a column when
   /// the tile is expanded.
@@ -193,7 +189,7 @@ class ExpansionContainer extends StatefulWidget {
   /// The width of the column is the width of the widest child widget in [children].
   ///
   /// When the value is null, the value of `expandedAlignment` is [Alignment.center].
-  final Alignment expandedAlignment;
+  final Alignment? expandedAlignment;
 
   /// Specifies the alignment of each child within [children] when the tile is expanded.
   ///
@@ -209,57 +205,61 @@ class ExpansionContainer extends StatefulWidget {
   /// instead.
   ///
   /// When the value is null, the value of `expandedCrossAxisAlignment` is [CrossAxisAlignment.center].
-  final CrossAxisAlignment expandedCrossAxisAlignment;
+  final CrossAxisAlignment? expandedCrossAxisAlignment;
 
   /// Specifies padding for [children].
   ///
   /// When the value is null, the value of `childrenPadding` is [EdgeInsets.zero].
-  final EdgeInsetsGeometry childrenPadding;
+  final EdgeInsetsGeometry? childrenPadding;
 
   /// The icon color of tile's expansion arrow icon when the sublist is expanded.
   ///
   /// Used to override to the [ListTileTheme.iconColor].
-  final Color iconColor;
+  final Color? iconColor;
 
   /// The icon color of tile's expansion arrow icon when the sublist is collapsed.
   ///
   /// Used to override to the [ListTileTheme.iconColor].
-  final Color collapsedIconColor;
+  final Color? collapsedIconColor;
 
   /// The color of the tile's titles when the sublist is expanded.
   ///
   /// Used to override to the [ListTileTheme.textColor].
-  final Color textColor;
+  final Color? textColor;
 
   /// The color of the tile's titles when the sublist is collapsed.
   ///
   /// Used to override to the [ListTileTheme.textColor].
-  final Color collapsedTextColor;
+  final Color? collapsedTextColor;
 
   /// Typically used to force the expansion arrow icon to the tile's leading or trailing edge.
   ///
   /// By default, the value of `controlAffinity` is [ListTileControlAffinity.platform],
   /// which means that the expansion arrow icon will appear on the tile's trailing edge.
-  final ListTileControlAffinity controlAffinity;
+  final ListTileControlAffinity? controlAffinity;
   final bool bottomTitle;
   @override
   State<ExpansionContainer> createState() => _ExpansionContainerState();
 }
 
-class _ExpansionContainerState extends State<ExpansionContainer> with SingleTickerProviderStateMixin {
-  static final Animatable<double> _easeOutTween = CurveTween(curve: Curves.easeOut);
-  static final Animatable<double> _easeInTween = CurveTween(curve: Curves.easeIn);
-  static final Animatable<double> _halfTween = Tween<double>(begin: 0.0, end: 0.5);
+class _ExpansionContainerState extends State<ExpansionContainer>
+    with SingleTickerProviderStateMixin {
+  static final Animatable<double> _easeOutTween =
+      CurveTween(curve: Curves.easeOut);
+  static final Animatable<double> _easeInTween =
+      CurveTween(curve: Curves.easeIn);
+  static final Animatable<double> _halfTween =
+      Tween<double>(begin: 0.0, end: 0.5);
 
   final ColorTween _borderColorTween = ColorTween();
   final ColorTween _headerColorTween = ColorTween();
   final ColorTween _iconColorTween = ColorTween();
   final ColorTween _backgroundColorTween = ColorTween();
 
-  AnimationController _controller;
-  Animation<double> _iconTurns;
-  Animation<double> _heightFactor;
-  Animation<Color> _backgroundColor;
+  late AnimationController _controller;
+  late Animation<double> _iconTurns;
+  late Animation<double> _heightFactor;
+  late Animation<Color?> _backgroundColor;
 
   bool _isExpanded = false;
 
@@ -269,9 +269,10 @@ class _ExpansionContainerState extends State<ExpansionContainer> with SingleTick
     _controller = AnimationController(duration: _kExpand, vsync: this);
     _heightFactor = _controller.drive(_easeInTween);
     _iconTurns = _controller.drive(_halfTween.chain(_easeInTween));
-    _backgroundColor = _controller.drive(_backgroundColorTween.chain(_easeOutTween));
+    _backgroundColor =
+        _controller.drive(_backgroundColorTween.chain(_easeOutTween));
 
-    _isExpanded = PageStorage.of(context)?.readState(context) as bool ?? widget.initiallyExpanded;
+    _isExpanded = PageStorage.of(context).readState(context) as bool;
     if (_isExpanded) _controller.value = 1.0;
   }
 
@@ -294,14 +295,15 @@ class _ExpansionContainerState extends State<ExpansionContainer> with SingleTick
           });
         });
       }
-      PageStorage.of(context)?.writeState(context, _isExpanded);
+      PageStorage.of(context).writeState(context, _isExpanded);
     });
     widget.onExpansionChanged?.call(_isExpanded);
   }
 
   // Platform or null affinity defaults to trailing.
-  ListTileControlAffinity _effectiveAffinity(ListTileControlAffinity affinity) {
-    switch (affinity ?? ListTileControlAffinity.trailing) {
+  ListTileControlAffinity _effectiveAffinity(
+      ListTileControlAffinity? affinity) {
+    switch (affinity) {
       case ListTileControlAffinity.leading:
         return ListTileControlAffinity.leading;
       case ListTileControlAffinity.trailing:
@@ -324,12 +326,13 @@ class _ExpansionContainerState extends State<ExpansionContainer> with SingleTick
   //   return _buildIcon(context);
   // }
 
-  Widget _buildTrailingIcon(BuildContext context) {
-    if (_effectiveAffinity(widget.controlAffinity) != ListTileControlAffinity.trailing) return null;
+  Widget? _buildTrailingIcon(BuildContext context) {
+    if (_effectiveAffinity(widget.controlAffinity) !=
+        ListTileControlAffinity.trailing) return null;
     return _buildIcon(context);
   }
 
-  Widget _buildChildren(BuildContext context, Widget child) {
+  Widget _buildChildren(BuildContext context, Widget? child) {
     Widget children = ClipRect(
       child: Align(
         alignment: widget.expandedAlignment ?? Alignment.center,
@@ -351,19 +354,22 @@ class _ExpansionContainerState extends State<ExpansionContainer> with SingleTick
                 behavior: HitTestBehavior.opaque,
                 onTap: _handleTap,
                 child: Container(
-                  padding: widget.tilePadding ?? EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+                  padding: widget.tilePadding ??
+                      EdgeInsets.symmetric(horizontal: 15, vertical: 10),
                   child: Row(
                     children: [
                       Expanded(child: widget.title),
                       SizedBox(
                         width: 5,
                       ),
-                      widget.trailing ?? _buildTrailingIcon(context)
+                      widget.trailing ??
+                          _buildTrailingIcon(context) ??
+                          Container()
                     ],
                   ),
                 ),
               ),
-              if (widget.showFirst && widget.first != null) widget.first,
+              if (widget.showFirst == true) widget.first ?? Container(),
             ],
           ),
           if (!widget.bottomTitle) children,
@@ -378,7 +384,7 @@ class _ExpansionContainerState extends State<ExpansionContainer> with SingleTick
     final ColorScheme colorScheme = theme.colorScheme;
     _borderColorTween.end = theme.dividerColor;
     _headerColorTween
-      ..begin = widget.collapsedTextColor ?? theme.textTheme.subtitle1.color
+      ..begin = widget.collapsedTextColor ?? theme.textTheme.titleMedium?.color
       ..end = widget.textColor ?? colorScheme.primary;
     _iconColorTween
       ..begin = widget.collapsedIconColor ?? theme.unselectedWidgetColor
@@ -392,7 +398,7 @@ class _ExpansionContainerState extends State<ExpansionContainer> with SingleTick
   @override
   Widget build(BuildContext context) {
     final bool closed = !_isExpanded && _controller.isDismissed;
-    final bool shouldRemoveChildren = closed && !widget.maintainState;
+    final bool shouldRemoveChildren = closed && (widget.maintainState == false);
 
     final Widget result = Offstage(
       offstage: closed,
@@ -401,8 +407,11 @@ class _ExpansionContainerState extends State<ExpansionContainer> with SingleTick
         child: Padding(
           padding: widget.childrenPadding ?? EdgeInsets.zero,
           child: Column(
-            crossAxisAlignment: widget.expandedCrossAxisAlignment ?? CrossAxisAlignment.center,
-            children: widget.children.sublist(widget.showFirst ? 1 : 0),
+            crossAxisAlignment:
+                widget.expandedCrossAxisAlignment ?? CrossAxisAlignment.center,
+            children:
+                widget.children?.sublist(widget.showFirst == true ? 1 : 0) ??
+                    [],
           ),
         ),
       ),

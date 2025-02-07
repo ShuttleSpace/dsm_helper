@@ -7,7 +7,7 @@ import 'package:neumorphic/neumorphic.dart';
 
 class AddServer extends StatefulWidget {
   final int index;
-  AddServer({this.index});
+  AddServer({this.index = 0});
   @override
   _AddServerState createState() => _AddServerState();
 }
@@ -32,20 +32,18 @@ class _AddServerState extends State<AddServer> {
   }
 
   getData() async {
-    String str = await Util.getStorage("terminal_servers");
+    String str = await Util.getStorage("terminal_servers") ?? '';
     setState(() {
       if (str.isNotBlank) {
         servers = json.decode(str);
-        if (widget.index != null) {
-          host = servers[widget.index]['host'];
-          _hostController.text = host;
-          account = servers[widget.index]['account'];
-          _accountController.text = account;
-          password = servers[widget.index]['password'];
-          _passwordController.text = password;
-          port = servers[widget.index]['port'];
-          _portController.text = port;
-        }
+        host = servers[widget.index]['host'];
+        _hostController.text = host;
+        account = servers[widget.index]['account'];
+        _accountController.text = account;
+        password = servers[widget.index]['password'];
+        _passwordController.text = password;
+        port = servers[widget.index]['port'];
+        _portController.text = port;
       } else {
         servers = [];
       }
@@ -61,11 +59,7 @@ class _AddServerState extends State<AddServer> {
       "password": password,
     };
     //添加服务器记录
-    if (widget.index == null) {
-      servers.add(server);
-    } else {
-      servers[widget.index] = server;
-    }
+    servers[widget.index] = server;
 
     // print(servers);
     Util.setStorage("terminal_servers", jsonEncode(servers));

@@ -10,9 +10,13 @@ import 'package:flutter/material.dart';
 import 'package:neumorphic/neumorphic.dart';
 
 class Timeline extends StatefulWidget {
-  const Timeline(this.isTeam, {this.type, this.geocodingId, this.generalTagId, this.recentlyAdd: false, Key key}) : super(key: key);
+  const Timeline(this.isTeam,
+      {this.type,
+      this.geocodingId = 0,
+      this.generalTagId = 0,
+      this.recentlyAdd = false});
   final bool isTeam;
-  final String type;
+  final String? type;
   final int geocodingId;
   final int generalTagId;
   final bool recentlyAdd;
@@ -23,7 +27,7 @@ class Timeline extends StatefulWidget {
 class TimelineState extends State<Timeline> {
   ScrollController _scrollController = ScrollController();
   bool loading = true;
-  double photoWidth;
+  double photoWidth = 0;
   List<TimelineModel> timelines = [];
   List<Day> days = [];
   List<int> itemTypes = [];
@@ -35,7 +39,7 @@ class TimelineState extends State<Timeline> {
     super.initState();
   }
 
-  Future getData({bool isTeam}) async {
+  Future getData({bool isTeam = false}) async {
     setState(() {
       this.isTeam = isTeam;
       loading = true;
@@ -50,13 +54,13 @@ class TimelineState extends State<Timeline> {
       recentlyAdd: widget.recentlyAdd,
     );
     for (var timeline in timelines) {
-      days.addAll(timeline.days);
+      days.addAll(timeline.days as Iterable<Day>);
     }
     for (int i = 0; i < days.length; i++) {
-      int rowCount = (days[i].itemCount / 4).ceil();
+      int rowCount = (days[i].itemCount ?? 0 / 4).ceil();
       double height = 40 + rowCount * photoWidth + (rowCount - 1) * 2;
       days[i].startPosition = i == 0 ? 0 : days[i - 1].endPosition;
-      days[i].endPosition = days[i].startPosition + height;
+      days[i].endPosition = days[i].startPosition ?? 0 + height;
     }
     setState(() {
       loading = false;
@@ -65,9 +69,6 @@ class TimelineState extends State<Timeline> {
 
   @override
   Widget build(BuildContext context) {
-    if (photoWidth == null) {
-      photoWidth = (MediaQuery.of(context).size.width - 6) / 4;
-    }
     return loading
         ? Center(
             child: NeuCard(
@@ -86,7 +87,11 @@ class TimelineState extends State<Timeline> {
         : days.length > 0
             ? DraggableScrollbar.semicircle(
                 labelTextBuilder: (position) {
-                  var line = days.where((day) => day.startPosition <= position && day.endPosition >= position).toList();
+                  var line = days
+                      .where((day) =>
+                          (day.startPosition ?? 0) <= position &&
+                          (day.endPosition ?? 0) >= position)
+                      .toList();
                   if (line.length > 0) {
                     return Container(
                       padding: EdgeInsets.symmetric(horizontal: 20),
@@ -100,7 +105,8 @@ class TimelineState extends State<Timeline> {
                           Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Text("${line[0].day.toString().padLeft(2, "0")}日"),
+                              Text(
+                                  "${line[0].day.toString().padLeft(2, "0")}日"),
                               Text("${line[0].year}"),
                             ],
                           )
@@ -108,10 +114,15 @@ class TimelineState extends State<Timeline> {
                       ),
                     );
                   } else {
-                    return null;
+                    return Placeholder(
+                      child: Center(
+                        child: Text('[x]'),
+                      ),
+                    );
                   }
                 },
-                labelConstraints: BoxConstraints(minHeight: 60, maxHeight: 60, minWidth: 140, maxWidth: 140),
+                labelConstraints: BoxConstraints(
+                    minHeight: 60, maxHeight: 60, minWidth: 140, maxWidth: 140),
                 controller: _scrollController,
                 child: ListView.builder(
                   controller: _scrollController,
@@ -163,16 +174,17 @@ class TimelineState extends State<Timeline> {
           spacing: 2,
           runSpacing: 2,
           children: day.photos == null
-              ? List.generate(day.itemCount, (index) {
+              ? List.generate(day.itemCount?.toInt() ?? 0, (index) {
                   return Container(
                     color: Color(0xffE9E9E9),
                     width: photoWidth,
                     height: photoWidth,
                   );
                 })
-              : day.photos.map((item) {
-                  return _buildPhotoItem(item, day.photos);
-                }).toList(),
+              : day.photos?.map((item) {
+                    return _buildPhotoItem(item, day.photos ?? []);
+                  }).toList() ??
+                  [],
         ),
       ],
     );
@@ -192,7 +204,9 @@ class TimelineState extends State<Timeline> {
           Navigator.of(context).push(TransparentPageRoute(
             pageBuilder: (context, _, __) {
               return ImagePreview(
-                photos.map((photo) => photo.thumbUrl(size: 'xl', isTeam: isTeam)).toList(),
+                photos
+                    .map((photo) => photo.thumbUrl(size: 'xl', isTeam: isTeam))
+                    .toList(),
                 photos.indexOf(photo),
                 tag: photo,
               );
@@ -232,7 +246,7 @@ class TimelineState extends State<Timeline> {
                     ),
                     SizedBox(height: 5),
                     Text(
-                      "${photo.additional.videoMeta.hours.toString().padLeft(2, "0")}:${photo.additional.videoMeta.minutes.toString().padLeft(2, "0")}:${photo.additional.videoMeta.seconds.toString().padLeft(2, "0")}",
+                      "${photo.additional?.videoMeta?.hours.toString().padLeft(2, "0")}:${photo.additional?.videoMeta?.minutes.toString().padLeft(2, "0")}:${photo.additional?.videoMeta?.seconds.toString().padLeft(2, "0")}",
                       style: TextStyle(color: Colors.white, fontSize: 12),
                     ),
                   ],

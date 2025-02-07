@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:neumorphic/neumorphic.dart';
 
 class VipLogin extends StatefulWidget {
-  const VipLogin({Key key}) : super(key: key);
+  const VipLogin();
 
   @override
   State<VipLogin> createState() => _VipLoginState();

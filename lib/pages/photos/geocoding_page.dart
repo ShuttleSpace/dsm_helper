@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:neumorphic/neumorphic.dart';
 
 class GeocodingPage extends StatefulWidget {
-  const GeocodingPage(this.isTeam, {Key key}) : super(key: key);
+  const GeocodingPage(this.isTeam);
   final bool isTeam;
   @override
   State<GeocodingPage> createState() => _GeocodingPageState();
@@ -15,7 +15,7 @@ class GeocodingPage extends StatefulWidget {
 
 class _GeocodingPageState extends State<GeocodingPage> {
   bool loading = true;
-  double photoWidth;
+  double photoWidth = 0;
   List<GeocodingModel> geocodings = [];
   Map<String, List<GeocodingModel>> geocodingGroups = {};
   @override
@@ -25,12 +25,13 @@ class _GeocodingPageState extends State<GeocodingPage> {
   }
 
   Future getData() async {
-    geocodings = await GeocodingModel.fetch(additional: ['thumbnail'], isTeam: widget.isTeam);
+    geocodings = await GeocodingModel.fetch(
+        additional: ['thumbnail'], isTeam: widget.isTeam);
     geocodings.forEach((element) {
       if (geocodingGroups[element.country] == null) {
-        geocodingGroups[element.country] = [];
+        geocodingGroups[element.country ?? ''] = [];
       }
-      geocodingGroups[element.country].add(element);
+      geocodingGroups[element.country]?.add(element);
     });
     setState(() {
       loading = false;
@@ -39,9 +40,6 @@ class _GeocodingPageState extends State<GeocodingPage> {
 
   @override
   Widget build(BuildContext context) {
-    if (photoWidth == null) {
-      photoWidth = (MediaQuery.of(context).size.width - 81) / 3;
-    }
     return Scaffold(
       appBar: AppBar(
         leading: AppBackButton(context),
@@ -65,7 +63,8 @@ class _GeocodingPageState extends State<GeocodingPage> {
           : ListView.builder(
               padding: EdgeInsets.symmetric(horizontal: 20),
               itemBuilder: (context, i) {
-                MapEntry<String, List<GeocodingModel>> entry = geocodingGroups.entries.toList()[i];
+                MapEntry<String, List<GeocodingModel>> entry =
+                    geocodingGroups.entries.toList()[i];
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -79,12 +78,12 @@ class _GeocodingPageState extends State<GeocodingPage> {
                       children: entry.value.map((geocoding) {
                         return GestureDetector(
                           onTap: () {
-                            Navigator.of(context).push(CupertinoPageRoute(builder: (context) {
+                            Navigator.of(context)
+                                .push(CupertinoPageRoute(builder: (context) {
                               return TimelinePage(
-                                title: geocoding.name,
-                                isTeam: widget.isTeam,
-                                geocodingId: geocoding.id,
-                              );
+                                  title: geocoding.name ?? '',
+                                  isTeam: widget.isTeam,
+                                  geocodingId: geocoding.id?.toInt() ?? 0);
                             }));
                           },
                           child: SizedBox(
@@ -92,7 +91,9 @@ class _GeocodingPageState extends State<GeocodingPage> {
                             child: Column(
                               children: [
                                 ExtendedImage.network(
-                                  geocoding.additional.thumbnail.thumbUrl(size: 'sm', isTeam: widget.isTeam),
+                                  geocoding.additional?.thumbnail?.thumbUrl(
+                                          size: 'sm', isTeam: widget.isTeam) ??
+                                      '',
                                   width: photoWidth,
                                   height: photoWidth,
                                   shape: BoxShape.rectangle,
@@ -100,7 +101,7 @@ class _GeocodingPageState extends State<GeocodingPage> {
                                   borderRadius: BorderRadius.circular(10),
                                 ),
                                 Text(
-                                  geocoding.name,
+                                  geocoding.name ?? '',
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                 ),

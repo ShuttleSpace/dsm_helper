@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:neumorphic/neumorphic.dart';
 
 class GeneralTagPage extends StatefulWidget {
-  const GeneralTagPage(this.isTeam, {Key key}) : super(key: key);
+  const GeneralTagPage(this.isTeam);
   final bool isTeam;
   @override
   State<GeneralTagPage> createState() => _GeneralTagPageState();
@@ -15,7 +15,7 @@ class GeneralTagPage extends StatefulWidget {
 
 class _GeneralTagPageState extends State<GeneralTagPage> {
   bool loading = true;
-  double photoWidth;
+  double photoWidth = 0;
 
   List<GeneralTagModel> tags = [];
   @override
@@ -25,7 +25,8 @@ class _GeneralTagPageState extends State<GeneralTagPage> {
   }
 
   Future getData() async {
-    tags = await GeneralTagModel.fetch(additional: ['thumbnail'], isTeam: widget.isTeam);
+    tags = await GeneralTagModel.fetch(
+        additional: ['thumbnail'], isTeam: widget.isTeam);
     setState(() {
       loading = false;
     });
@@ -33,9 +34,6 @@ class _GeneralTagPageState extends State<GeneralTagPage> {
 
   @override
   Widget build(BuildContext context) {
-    if (photoWidth == null) {
-      photoWidth = (MediaQuery.of(context).size.width - 81) / 3;
-    }
     return Scaffold(
       appBar: AppBar(
         leading: AppBackButton(context),
@@ -64,11 +62,12 @@ class _GeneralTagPageState extends State<GeneralTagPage> {
                 children: tags.map((tag) {
                   return GestureDetector(
                     onTap: () {
-                      Navigator.of(context).push(CupertinoPageRoute(builder: (context) {
+                      Navigator.of(context)
+                          .push(CupertinoPageRoute(builder: (context) {
                         return TimelinePage(
-                          title: tag.name,
+                          title: tag.name ?? '',
                           isTeam: widget.isTeam,
-                          generalTagId: tag.id,
+                          generalTagId: tag.id ?? 0,
                         );
                       }));
                     },
@@ -77,7 +76,9 @@ class _GeneralTagPageState extends State<GeneralTagPage> {
                       child: Column(
                         children: [
                           ExtendedImage.network(
-                            tag.additional.thumbnail.thumbUrl(size: 'sm', isTeam: widget.isTeam),
+                            tag.additional!.thumbnail?.thumbUrl(
+                                    size: 'sm', isTeam: widget.isTeam) ??
+                                '',
                             width: photoWidth,
                             height: photoWidth,
                             shape: BoxShape.rectangle,
@@ -85,7 +86,7 @@ class _GeneralTagPageState extends State<GeneralTagPage> {
                             borderRadius: BorderRadius.circular(10),
                           ),
                           Text(
-                            tag.name,
+                            tag.name ?? '',
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                           ),

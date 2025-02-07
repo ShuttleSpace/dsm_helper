@@ -35,12 +35,17 @@ class _NotifyState extends State<Notify> {
             Map msgMap = json.decode(content);
             String replaceContent = Util.notifyStrings[notify['title']]['msg'];
 
-            replaceContent = replaceContent.replaceAll("%LINK_BEGIN%", "").replaceAll("%LINK_END%", "").replaceAll("%PRE_APP_LINK%", "").replaceAll("%POST_APP_LINK%", "");
+            replaceContent = replaceContent
+                .replaceAll("%LINK_BEGIN%", "")
+                .replaceAll("%LINK_END%", "")
+                .replaceAll("%PRE_APP_LINK%", "")
+                .replaceAll("%POST_APP_LINK%", "");
 
             if (replaceContent.contains("<a")) {
               var document = parse(replaceContent);
 
-              replaceContent = parse(document.body.text).documentElement.text;
+              replaceContent =
+                  parse(document.body?.text).documentElement?.text ?? '';
             }
 
             msgMap.forEach((key, value) {
@@ -50,26 +55,33 @@ class _NotifyState extends State<Notify> {
           }
         } else {
           print("未找到");
-          title = notify['className'] == "" ? notify['title'] : notify['className'];
+          title =
+              notify['className'] == "" ? notify['title'] : notify['className'];
           msgContent = msgs;
         }
       } else {
         //判断是否在string内
-        if (webManagerStrings[titles[0]] != null && webManagerStrings[titles[0]][titles[1]] != null) {
+        if (webManagerStrings[titles[0]] != null &&
+            webManagerStrings[titles[0]][titles[1]] != null) {
           if (webManagerStrings[titles[0]][titles[1]] != null) {
             title = webManagerStrings[titles[0]][titles[1]];
           }
           msgContent = msgs;
         } else if (Util.strings[notify['className']] != null) {
-          if (Util.strings[notify['className']][titles[0]] != null && Util.strings[notify['className']][titles[0]][titles[1]] != null) {
+          if (Util.strings[notify['className']][titles[0]] != null &&
+              Util.strings[notify['className']][titles[0]][titles[1]] != null) {
             title = Util.strings[notify['className']][titles[0]][titles[1]];
-          } else if (Util.strings[notify['className']] != null && Util.strings[notify['className']]['common'] != null && Util.strings[notify['className']]['common']['displayname'] != null) {
+          } else if (Util.strings[notify['className']] != null &&
+              Util.strings[notify['className']]['common'] != null &&
+              Util.strings[notify['className']]['common']['displayname'] !=
+                  null) {
             title = Util.strings[notify['className']]['common']['displayname'];
           }
           msgContent = msgs;
         } else {
           print("未找到");
-          title = notify['className'] == "" ? notify['title'] : notify['className'];
+          title =
+              notify['className'] == "" ? notify['title'] : notify['className'];
           msgContent = msgs;
         }
       }
@@ -77,7 +89,7 @@ class _NotifyState extends State<Notify> {
       if (notifyGroups[title] == null) {
         notifyGroups[title] = [notify];
       } else {
-        notifyGroups[title].add(notify);
+        notifyGroups[title]?.add(notify);
       }
     });
     setState(() {});
@@ -149,13 +161,14 @@ class _NotifyState extends State<Notify> {
             child: widget.notifies.length > 0
                 ? ListView(
                     children: notifyGroups.keys.map((key) {
-                      return _buildNotifyGroup(key, notifyGroups[key]);
+                      return _buildNotifyGroup(key, notifyGroups[key] ?? []);
                     }).toList(),
                   )
                 : Center(
                     child: Text(
                       "暂无消息",
-                      style: TextStyle(color: AppTheme.of(context).placeholderColor),
+                      style: TextStyle(
+                          color: AppTheme.of(context).placeholderColor),
                     ),
                   ),
           ),

@@ -9,7 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:neumorphic/neumorphic.dart';
 
 class Photos extends StatefulWidget {
-  const Photos({Key key}) : super(key: key);
+  const Photos();
 
   @override
   State<Photos> createState() => _PhotosState();
@@ -64,7 +64,10 @@ class _PhotosState extends State<Photos> {
                           // padding: EdgeInsets.all(22),
                           bevel: 5,
                           curveType: CurveType.emboss,
-                          decoration: NeumorphicDecoration(color: Theme.of(context).scaffoldBackgroundColor, borderRadius: BorderRadius.vertical(top: Radius.circular(22))),
+                          decoration: NeumorphicDecoration(
+                              color: Theme.of(context).scaffoldBackgroundColor,
+                              borderRadius: BorderRadius.vertical(
+                                  top: Radius.circular(22))),
                           child: SafeArea(
                             top: false,
                             child: Padding(
@@ -78,15 +81,19 @@ class _PhotosState extends State<Photos> {
                                         isTeam = !isTeam;
                                       });
                                       if (isTimeline) {
-                                        timelineKey.currentState.getData(isTeam: isTeam);
+                                        timelineKey.currentState
+                                            ?.getData(isTeam: isTeam);
                                       } else {
-                                        folderKey.currentState.getData(isTeam: isTeam);
+                                        folderKey.currentState
+                                            ?.getData(isTeam: isTeam);
                                       }
-                                      albumTabKey.currentState.getData(isTeam: isTeam);
+                                      albumTabKey.currentState
+                                          ?.getData(isTeam: isTeam);
                                       Navigator.of(context).pop();
                                     },
                                     decoration: NeumorphicDecoration(
-                                      color: Theme.of(context).scaffoldBackgroundColor,
+                                      color: Theme.of(context)
+                                          .scaffoldBackgroundColor,
                                       borderRadius: BorderRadius.circular(25),
                                     ),
                                     bevel: 5,
@@ -107,17 +114,21 @@ class _PhotosState extends State<Photos> {
                                           isTimeline = !isTimeline;
                                         });
                                         if (isTimeline) {
-                                          timelineKey.currentState.getData(isTeam: isTeam);
+                                          timelineKey.currentState
+                                              ?.getData(isTeam: isTeam);
                                         } else {
-                                          folderKey.currentState.getData(isTeam: isTeam);
+                                          folderKey.currentState
+                                              ?.getData(isTeam: isTeam);
                                         }
                                       },
                                       decoration: NeumorphicDecoration(
-                                        color: Theme.of(context).scaffoldBackgroundColor,
+                                        color: Theme.of(context)
+                                            .scaffoldBackgroundColor,
                                         borderRadius: BorderRadius.circular(25),
                                       ),
                                       bevel: 5,
-                                      padding: EdgeInsets.symmetric(vertical: 10),
+                                      padding:
+                                          EdgeInsets.symmetric(vertical: 10),
                                       child: Text(
                                         "切换到${isTimeline ? '文件夹' : '时间线'}视图",
                                         style: TextStyle(fontSize: 18),
@@ -132,7 +143,8 @@ class _PhotosState extends State<Photos> {
                                       Navigator.of(context).pop();
                                     },
                                     decoration: NeumorphicDecoration(
-                                      color: Theme.of(context).scaffoldBackgroundColor,
+                                      color: Theme.of(context)
+                                          .scaffoldBackgroundColor,
                                       borderRadius: BorderRadius.circular(25),
                                     ),
                                     bevel: 5,
@@ -183,7 +195,6 @@ class _PhotosState extends State<Photos> {
                 ),
                 AlbumTab(
                   isTeam,
-                  key: albumTabKey,
                 ),
                 ShareTab(),
               ],

@@ -8,14 +8,14 @@ import 'package:flutter/material.dart';
 
 class Photos extends StatefulWidget {
   final Map album;
-  final Object tag;
+  final Object? tag;
   Photos(this.album, {this.tag});
   @override
   _PhotosState createState() => _PhotosState();
 }
 
 class _PhotosState extends State<Photos> {
-  double photoWidth;
+  double photoWidth = 0;
   List photos = [];
   @override
   void initState() {
@@ -33,7 +33,8 @@ class _PhotosState extends State<Photos> {
   }
 
   Widget _buildPhotoItem(photo) {
-    String thumbUrl = '${Util.baseUrl}/webapi/entry.cgi?id=${photo['additional']['thumbnail']['unit_id']}&cache_key="${photo['additional']['thumbnail']['cache_key']}"&type="unit"&size="sm"&api="SYNO.${Util.version == 7 ? "Foto" : "Photo"}.Thumbnail"&method="get"&version=1&_sid=${Util.sid}';
+    String thumbUrl =
+        '${Util.baseUrl}/webapi/entry.cgi?id=${photo['additional']['thumbnail']['unit_id']}&cache_key="${photo['additional']['thumbnail']['cache_key']}"&type="unit"&size="sm"&api="SYNO.${Util.version == 7 ? "Foto" : "Photo"}.Thumbnail"&method="get"&version=1&_sid=${Util.sid}';
     return GestureDetector(
       onTap: () {
         Navigator.of(context).push(TransparentPageRoute(
@@ -96,9 +97,6 @@ class _PhotosState extends State<Photos> {
 
   @override
   Widget build(BuildContext context) {
-    if (photoWidth == null) {
-      photoWidth = (MediaQuery.of(context).size.width - 6) / 4;
-    }
     return Scaffold(
       body: NestedScrollView(
         headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
@@ -113,11 +111,19 @@ class _PhotosState extends State<Photos> {
               flexibleSpace: FlexibleSpaceBar(
                 title: Text(
                   "${widget.album['name']}",
-                  style: TextStyle(color: Theme.of(context).textTheme.headline6.color, shadows: [BoxShadow(color: Colors.white, offset: Offset(1, 1), blurRadius: 5, spreadRadius: 5)]),
+                  style: TextStyle(
+                      color: Theme.of(context).textTheme.titleLarge?.color,
+                      shadows: [
+                        BoxShadow(
+                            color: Colors.white,
+                            offset: Offset(1, 1),
+                            blurRadius: 5,
+                            spreadRadius: 5)
+                      ]),
                 ),
                 centerTitle: true,
                 background: Hero(
-                  tag: widget.tag,
+                  tag: widget.tag ?? '',
                   child: CupertinoExtendedImage(
                     '${Util.baseUrl}/webapi/entry.cgi?id=${widget.album['additional']['thumbnail']['unit_id']}&cache_key="${widget.album['additional']['thumbnail']['cache_key']}"&type="unit"&size="xl"&api="SYNO.${Util.version == 7 ? "Foto" : "Photo"}.Thumbnail"&method="get"&version=1&_sid=${Util.sid}',
                     fit: BoxFit.cover,

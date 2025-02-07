@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:neumorphic/neumorphic.dart';
 
 class Feedback extends StatefulWidget {
-  const Feedback({Key key}) : super(key: key);
+  const Feedback();
 
   @override
   _FeedbackState createState() => _FeedbackState();

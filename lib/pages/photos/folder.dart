@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:neumorphic/neumorphic.dart';
 
 class Folder extends StatefulWidget {
-  const Folder(this.isTeam, {Key key}) : super(key: key);
+  const Folder(this.isTeam);
   final bool isTeam;
   @override
   State<Folder> createState() => FolderState();
@@ -17,7 +17,7 @@ class FolderState extends State<Folder> {
   bool loading = true;
   List<FolderModel> folders = [];
   bool isTeam = false;
-  double folderWidth;
+  double folderWidth = 0;
   @override
   void initState() {
     isTeam = widget.isTeam;
@@ -25,15 +25,16 @@ class FolderState extends State<Folder> {
     super.initState();
   }
 
-  Future getData({bool isTeam: false}) async {
+  Future getData({bool isTeam = false}) async {
     this.isTeam = isTeam;
     try {
       folders = [];
-      FolderModel root = await FolderModel.fetch(additional: ['access_permission'], isTeam: isTeam);
+      FolderModel root = await FolderModel.fetch(
+          additional: ['access_permission'], isTeam: isTeam);
       folders.add(root);
       fetchFolderDetail(root);
     } catch (e) {
-      debugPrint(e);
+      debugPrint(e.toString());
     }
   }
 
@@ -42,12 +43,30 @@ class FolderState extends State<Folder> {
       loading = true;
     });
     await Future.wait([
-      folder.fetchFolders(additional: isTeam ? ["sharing_info", "access_permission", "thumbnail", "password_verified"] : ["thumbnail"], isTeam: isTeam),
-      folder.fetchPhotos(additional: ["thumbnail", "resolution", "orientation", "video_convert", "video_meta"], isTeam: isTeam),
+      folder.fetchFolders(
+          additional: isTeam
+              ? [
+                  "sharing_info",
+                  "access_permission",
+                  "thumbnail",
+                  "password_verified"
+                ]
+              : ["thumbnail"],
+          isTeam: isTeam),
+      folder.fetchPhotos(additional: [
+        "thumbnail",
+        "resolution",
+        "orientation",
+        "video_convert",
+        "video_meta"
+      ], isTeam: isTeam),
     ]);
     Future.delayed(Duration(milliseconds: 200)).then((_) {
       print(pathScrollController.position.maxScrollExtent);
-      pathScrollController.animateTo(pathScrollController.position.maxScrollExtent, duration: Duration(milliseconds: 200), curve: Curves.ease);
+      pathScrollController.animateTo(
+          pathScrollController.position.maxScrollExtent,
+          duration: Duration(milliseconds: 200),
+          curve: Curves.ease);
     });
     setState(() {
       loading = false;
@@ -56,9 +75,6 @@ class FolderState extends State<Folder> {
 
   @override
   Widget build(BuildContext context) {
-    if (folderWidth == null) {
-      folderWidth = (MediaQuery.of(context).size.width - 82) / 3;
-    }
     return Stack(
       children: [
         if (folders.length > 0)
@@ -79,8 +95,14 @@ class FolderState extends State<Folder> {
                         });
                       },
                       child: Text(
-                        folders[i].lastName == "/" ? "全部" : folders[i].lastName,
-                        style: TextStyle(color: Color(0xff212121), fontWeight: i == folders.length - 1 ? FontWeight.bold : FontWeight.normal),
+                        folders[i].lastName == "/"
+                            ? "全部"
+                            : folders[i].lastName ?? '',
+                        style: TextStyle(
+                            color: Color(0xff212121),
+                            fontWeight: i == folders.length - 1
+                                ? FontWeight.bold
+                                : FontWeight.normal),
                       ),
                     );
                   },
@@ -152,9 +174,9 @@ class FolderState extends State<Folder> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             ThumbnailCard(
-              folder.additional.thumbnail,
+              folder.additional?.thumbnail ?? [],
               width: folderWidth,
-              folderId: folder.id,
+              folderId: folder.id?.toInt(),
               isTeam: isTeam,
             ),
             SizedBox(

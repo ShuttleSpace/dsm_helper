@@ -19,7 +19,7 @@ class About extends StatefulWidget {
 
 class _AboutState extends State<About> {
   bool checking = false;
-  PackageInfo packageInfo;
+  PackageInfo? packageInfo;
   TapGestureRecognizer _licenseRecognizer = TapGestureRecognizer();
   TapGestureRecognizer _privacyRecognizer = TapGestureRecognizer();
   @override
@@ -78,7 +78,7 @@ class _AboutState extends State<About> {
                         ),
                         if (packageInfo != null)
                           Text(
-                            "v${packageInfo.version} build:${packageInfo.buildNumber}",
+                            "v${packageInfo?.version} build:${packageInfo?.buildNumber}",
                             style: TextStyle(
                               color: Colors.grey,
                               fontSize: 18,
@@ -125,11 +125,14 @@ class _AboutState extends State<About> {
                             children: [
                               TextSpan(
                                 text: "用户协议",
-                                style: TextStyle(decoration: TextDecoration.underline, color: Colors.blue),
+                                style: TextStyle(
+                                    decoration: TextDecoration.underline,
+                                    color: Colors.blue),
                                 recognizer: _licenseRecognizer
                                   ..onTap = () {
                                     FocusScope.of(context).unfocus();
-                                    Navigator.of(context).push(CupertinoPageRoute(builder: (context) {
+                                    Navigator.of(context).push(
+                                        CupertinoPageRoute(builder: (context) {
                                       return License();
                                     }));
                                   },
@@ -137,11 +140,14 @@ class _AboutState extends State<About> {
                               TextSpan(text: "    "),
                               TextSpan(
                                 text: "隐私政策",
-                                style: TextStyle(decoration: TextDecoration.underline, color: Colors.blue),
+                                style: TextStyle(
+                                    decoration: TextDecoration.underline,
+                                    color: Colors.blue),
                                 recognizer: _privacyRecognizer
                                   ..onTap = () {
                                     FocusScope.of(context).unfocus();
-                                    Navigator.of(context).push(CupertinoPageRoute(builder: (context) {
+                                    Navigator.of(context).push(
+                                        CupertinoPageRoute(builder: (context) {
                                       return Browser(
                                         url: '${Util.appUrl}/privacy',
                                         title: "隐私政策",
@@ -171,38 +177,44 @@ class _AboutState extends State<About> {
                     child: Padding(
                         padding: EdgeInsets.all(15),
                         child: Column(
-                          children: Util.groups.channel.map((e) {
-                            return Padding(
-                              padding: EdgeInsets.symmetric(vertical: 5),
-                              child: Row(
-                                children: [
-                                  Image.asset(
-                                    "assets/icons/qq.png",
-                                    width: 20,
+                          children: Util.groups.channel?.map((e) {
+                                return Padding(
+                                  padding: EdgeInsets.symmetric(vertical: 5),
+                                  child: Row(
+                                    children: [
+                                      Image.asset(
+                                        "assets/icons/qq.png",
+                                        width: 20,
+                                      ),
+                                      SizedBox(
+                                        width: 10,
+                                      ),
+                                      Text(
+                                        e.displayName,
+                                        style: TextStyle(fontSize: 16),
+                                      ),
+                                      Spacer(),
+                                      NeuButton(
+                                        decoration: NeumorphicDecoration(
+                                          color: Theme.of(context)
+                                              .scaffoldBackgroundColor,
+                                          borderRadius:
+                                              BorderRadius.circular(20),
+                                        ),
+                                        padding: EdgeInsets.symmetric(
+                                            horizontal: 20, vertical: 5),
+                                        onPressed: () {
+                                          launchUrlString(e.key ?? '',
+                                              mode: LaunchMode
+                                                  .externalApplication);
+                                        },
+                                        child: Text("加入"),
+                                      ),
+                                    ],
                                   ),
-                                  SizedBox(
-                                    width: 10,
-                                  ),
-                                  Text(
-                                    e.displayName,
-                                    style: TextStyle(fontSize: 16),
-                                  ),
-                                  Spacer(),
-                                  NeuButton(
-                                    decoration: NeumorphicDecoration(
-                                      color: Theme.of(context).scaffoldBackgroundColor,
-                                      borderRadius: BorderRadius.circular(20),
-                                    ),
-                                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-                                    onPressed: () {
-                                      launchUrlString(e.key, mode: LaunchMode.externalApplication);
-                                    },
-                                    child: Text("加入"),
-                                  ),
-                                ],
-                              ),
-                            );
-                          }).toList(),
+                                );
+                              }).toList() ??
+                              [],
                         )),
                   ),
                   SizedBox(
@@ -218,38 +230,43 @@ class _AboutState extends State<About> {
                     child: Padding(
                         padding: EdgeInsets.all(15),
                         child: Column(
-                          children: Util.groups.qq.map((e) {
-                            return Padding(
-                              padding: EdgeInsets.symmetric(vertical: 5),
-                              child: Row(
-                                children: [
-                                  Image.asset(
-                                    "assets/icons/qq.png",
-                                    width: 20,
+                          children: Util.groups.qq?.map((e) {
+                                return Padding(
+                                  padding: EdgeInsets.symmetric(vertical: 5),
+                                  child: Row(
+                                    children: [
+                                      Image.asset(
+                                        "assets/icons/qq.png",
+                                        width: 20,
+                                      ),
+                                      SizedBox(
+                                        width: 10,
+                                      ),
+                                      Text(
+                                        e.displayName,
+                                        style: TextStyle(fontSize: 16),
+                                      ),
+                                      Spacer(),
+                                      NeuButton(
+                                        decoration: NeumorphicDecoration(
+                                          color: Theme.of(context)
+                                              .scaffoldBackgroundColor,
+                                          borderRadius:
+                                              BorderRadius.circular(20),
+                                        ),
+                                        padding: EdgeInsets.symmetric(
+                                            horizontal: 20, vertical: 5),
+                                        onPressed: () {
+                                          launchUrlString(
+                                              'mqqopensdkapi://bizAgent/qm/qr?url=http%3A%2F%2Fqm.qq.com%2Fcgi-bin%2Fqm%2Fqr%3Ffrom%3Dapp%26p%3Dandroid%26jump_from%3Dwebapi%26k%3D${e.key}');
+                                        },
+                                        child: Text("加群"),
+                                      ),
+                                    ],
                                   ),
-                                  SizedBox(
-                                    width: 10,
-                                  ),
-                                  Text(
-                                    e.displayName,
-                                    style: TextStyle(fontSize: 16),
-                                  ),
-                                  Spacer(),
-                                  NeuButton(
-                                    decoration: NeumorphicDecoration(
-                                      color: Theme.of(context).scaffoldBackgroundColor,
-                                      borderRadius: BorderRadius.circular(20),
-                                    ),
-                                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-                                    onPressed: () {
-                                      launchUrlString('mqqopensdkapi://bizAgent/qm/qr?url=http%3A%2F%2Fqm.qq.com%2Fcgi-bin%2Fqm%2Fqr%3Ffrom%3Dapp%26p%3Dandroid%26jump_from%3Dwebapi%26k%3D${e.key}');
-                                    },
-                                    child: Text("加群"),
-                                  ),
-                                ],
-                              ),
-                            );
-                          }).toList(),
+                                );
+                              }).toList() ??
+                              [],
                         )),
                   ),
                   SizedBox(
@@ -265,40 +282,44 @@ class _AboutState extends State<About> {
                     child: Padding(
                       padding: EdgeInsets.all(15),
                       child: Column(
-                        children: Util.groups.wechat.map((e) {
-                          return Padding(
-                            padding: EdgeInsets.symmetric(vertical: 5),
-                            child: Row(
-                              children: [
-                                Image.asset(
-                                  "assets/icons/wechat.png",
-                                  width: 20,
+                        children: Util.groups.wechat?.map((e) {
+                              return Padding(
+                                padding: EdgeInsets.symmetric(vertical: 5),
+                                child: Row(
+                                  children: [
+                                    Image.asset(
+                                      "assets/icons/wechat.png",
+                                      width: 20,
+                                    ),
+                                    SizedBox(
+                                      width: 10,
+                                    ),
+                                    Text(
+                                      e.displayName,
+                                      style: TextStyle(fontSize: 16),
+                                    ),
+                                    Spacer(),
+                                    NeuButton(
+                                      decoration: NeumorphicDecoration(
+                                        color: Theme.of(context)
+                                            .scaffoldBackgroundColor,
+                                        borderRadius: BorderRadius.circular(20),
+                                      ),
+                                      padding: EdgeInsets.symmetric(
+                                          horizontal: 20, vertical: 5),
+                                      onPressed: () {
+                                        ClipboardData data = new ClipboardData(
+                                            text: e.name ?? '');
+                                        Clipboard.setData(data);
+                                        Util.toast("已复制到剪贴板");
+                                      },
+                                      child: Text("复制"),
+                                    ),
+                                  ],
                                 ),
-                                SizedBox(
-                                  width: 10,
-                                ),
-                                Text(
-                                  e.displayName,
-                                  style: TextStyle(fontSize: 16),
-                                ),
-                                Spacer(),
-                                NeuButton(
-                                  decoration: NeumorphicDecoration(
-                                    color: Theme.of(context).scaffoldBackgroundColor,
-                                    borderRadius: BorderRadius.circular(20),
-                                  ),
-                                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-                                  onPressed: () {
-                                    ClipboardData data = new ClipboardData(text: e.name);
-                                    Clipboard.setData(data);
-                                    Util.toast("已复制到剪贴板");
-                                  },
-                                  child: Text("复制"),
-                                ),
-                              ],
-                            ),
-                          );
-                        }).toList(),
+                              );
+                            }).toList() ??
+                            [],
                       ),
                     ),
                   ),
@@ -334,9 +355,11 @@ class _AboutState extends State<About> {
                             color: Theme.of(context).scaffoldBackgroundColor,
                             borderRadius: BorderRadius.circular(20),
                           ),
-                          padding: EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+                          padding:
+                              EdgeInsets.symmetric(horizontal: 20, vertical: 5),
                           onPressed: () {
-                            Navigator.of(context).push(CupertinoPageRoute(builder: (context) {
+                            Navigator.of(context)
+                                .push(CupertinoPageRoute(builder: (context) {
                               return Browser(
                                 url: "https://gitee.com/apaipai/dsm_helper",
                               );
@@ -378,7 +401,8 @@ class _AboutState extends State<About> {
                             color: Theme.of(context).scaffoldBackgroundColor,
                             borderRadius: BorderRadius.circular(20),
                           ),
-                          padding: EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+                          padding:
+                              EdgeInsets.symmetric(horizontal: 20, vertical: 5),
                           onPressed: () {
                             Navigator.of(context).push(
                               CupertinoPageRoute(builder: (context) {
@@ -426,7 +450,8 @@ class _AboutState extends State<About> {
                             color: Theme.of(context).scaffoldBackgroundColor,
                             borderRadius: BorderRadius.circular(20),
                           ),
-                          padding: EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+                          padding:
+                              EdgeInsets.symmetric(horizontal: 20, vertical: 5),
                           onPressed: () {
                             Navigator.of(context).push(
                               CupertinoPageRoute(

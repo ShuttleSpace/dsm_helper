@@ -3,7 +3,7 @@ import 'package:dsm_helper/widgets/neu_back_button.dart';
 import 'package:flutter/material.dart';
 
 class License extends StatefulWidget {
-  const License({Key key}) : super(key: key);
+  const License();
 
   @override
   _LicenseState createState() => _LicenseState();

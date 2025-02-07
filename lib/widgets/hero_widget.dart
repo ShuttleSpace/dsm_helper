@@ -4,9 +4,9 @@ import 'package:extended_image/extended_image.dart';
 /// make hero better when slide out
 class HeroWidget extends StatefulWidget {
   const HeroWidget({
-    @required this.child,
-    @required this.tag,
-    @required this.slidePagekey,
+    required this.child,
+    required this.tag,
+    required this.slidePagekey,
     this.slideType = SlideType.onlyImage,
   });
   final Widget child;
@@ -18,26 +18,34 @@ class HeroWidget extends StatefulWidget {
 }
 
 class _HeroWidgetState extends State<HeroWidget> {
-  RectTween _rectTween;
+  RectTween? _rectTween;
   @override
   Widget build(BuildContext context) {
     return Hero(
       tag: widget.tag,
-      createRectTween: (Rect begin, Rect end) {
+      createRectTween: (Rect? begin, Rect? end) {
         _rectTween = RectTween(begin: begin, end: end);
-        return _rectTween;
+        return _rectTween as Tween<Rect?>;
       },
       // make hero better when slide out
-      flightShuttleBuilder: (BuildContext flightContext, Animation<double> animation, HeroFlightDirection flightDirection, BuildContext fromHeroContext, BuildContext toHeroContext) {
+      flightShuttleBuilder: (BuildContext flightContext,
+          Animation<double> animation,
+          HeroFlightDirection flightDirection,
+          BuildContext fromHeroContext,
+          BuildContext toHeroContext) {
         // make hero more smoothly
-        final Hero hero = (flightDirection == HeroFlightDirection.pop ? fromHeroContext.widget : toHeroContext.widget) as Hero;
+        final Hero hero = (flightDirection == HeroFlightDirection.pop
+            ? fromHeroContext.widget
+            : toHeroContext.widget) as Hero;
         if (flightDirection == HeroFlightDirection.pop) {
-          final bool fixTransform = widget.slideType == SlideType.onlyImage && (widget.slidePagekey.currentState?.offset != Offset.zero || widget.slidePagekey.currentState?.scale != 1.0);
+          final bool fixTransform = widget.slideType == SlideType.onlyImage &&
+              (widget.slidePagekey.currentState?.offset != Offset.zero ||
+                  widget.slidePagekey.currentState?.scale != 1.0);
 
           final Widget toHeroWidget = (toHeroContext.widget as Hero).child;
           return AnimatedBuilder(
             animation: animation,
-            builder: (BuildContext buildContext, Widget child) {
+            builder: (BuildContext buildContext, Widget? child) {
               Widget animatedBuilderChild = hero.child;
 
               // make hero more smoothly
@@ -64,9 +72,12 @@ class _HeroWidgetState extends State<HeroWidget> {
 
               // fix transform when slide out
               if (fixTransform) {
-                final Tween<Offset> offsetTween = Tween<Offset>(begin: Offset.zero, end: widget.slidePagekey.currentState?.offset);
+                final Tween<Offset> offsetTween = Tween<Offset>(
+                    begin: Offset.zero,
+                    end: widget.slidePagekey.currentState?.offset);
 
-                final Tween<double> scaleTween = Tween<double>(begin: 1.0, end: widget.slidePagekey.currentState?.scale);
+                final Tween<double> scaleTween = Tween<double>(
+                    begin: 1.0, end: widget.slidePagekey.currentState?.scale);
                 animatedBuilderChild = Transform.translate(
                   offset: offsetTween.evaluate(animation),
                   child: Transform.scale(

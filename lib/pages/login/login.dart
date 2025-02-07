@@ -6,20 +6,22 @@ import 'package:dsm_helper/pages/common/browser.dart';
 import 'package:dsm_helper/pages/login/accounts.dart';
 import 'package:dsm_helper/pages/setting/license.dart';
 import 'package:dsm_helper/pages/update/update.dart';
+import 'package:dsm_helper/providers/flux_provider.dart';
 import 'package:dsm_helper/util/function.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_vibrate/flutter_vibrate.dart';
 import 'package:fluwx/fluwx.dart';
 import 'package:neumorphic/neumorphic.dart';
 import 'package:package_info_plus/package_info_plus.dart';
-import 'package:vibrate/vibrate.dart';
+import 'package:provider/provider.dart';
 
 class Login extends StatefulWidget {
-  final Map server;
-  final String type;
+  final Map? server;
+  final String? type;
   Login({this.server, this.type = "login"});
   @override
   _LoginState createState() => _LoginState();
@@ -28,7 +30,7 @@ class Login extends StatefulWidget {
 class _LoginState extends State<Login> {
   TapGestureRecognizer _licenseRecognizer = TapGestureRecognizer();
   TapGestureRecognizer _privacyRecognizer = TapGestureRecognizer();
-  Map updateInfo;
+  Map updateInfo = {};
   String host = "";
   String baseUrl = '';
   String account = "";
@@ -58,7 +60,7 @@ class _LoginState extends State<Login> {
   @override
   initState() {
     Util.getStorage("read").then((value) {
-      if (value.isNotBlank && value == "1") {
+      if (value != null && value.isNotBlank && value == "1") {
         setState(() {
           read = true;
         });
@@ -73,20 +75,20 @@ class _LoginState extends State<Login> {
       });
     }
     Util.getStorage("servers").then((serverString) {
-      if (serverString.isNotBlank) {
+      if (serverString != null && serverString.isNotBlank) {
         servers = jsonDecode(serverString);
       }
       if (widget.server != null) {
         setState(() {
-          https = widget.server['https'];
-          host = widget.server['host'];
-          port = widget.server['port'];
-          account = widget.server['account'];
-          note = widget.server['note'] ?? '';
-          password = widget.server['password'];
-          autoLogin = widget.server['auto_login'];
-          rememberPassword = widget.server['remember_password'];
-          checkSsl = widget.server['check_ssl'];
+          https = widget.server?['https'];
+          host = widget.server?['host'];
+          port = widget.server?['port'];
+          account = widget.server?['account'];
+          note = widget.server?['note'] ?? '';
+          password = widget.server?['password'];
+          autoLogin = widget.server?['auto_login'];
+          rememberPassword = widget.server?['remember_password'];
+          checkSsl = widget.server?['check_ssl'];
           if (host.isNotBlank) {
             _hostController.value = TextEditingValue(text: host);
           }
@@ -103,9 +105,9 @@ class _LoginState extends State<Login> {
             _passwordController.value = TextEditingValue(text: password);
           }
         });
-        Util.cookie = widget.server['cookie'];
-        Util.sid = widget.server['sid'];
-        if (widget.server['action'] == "login") {
+        Util.cookie = widget.server?['cookie'];
+        Util.sid = widget.server?['sid'];
+        if (widget.server?['action'] == "login") {
           _login();
         }
       } else {
@@ -121,8 +123,8 @@ class _LoginState extends State<Login> {
   }
 
   checkAgreement() async {
-    String agreement = await Util.getStorage("agreement");
-    if (agreement == null || agreement != '1') {
+    String agreement = await Util.getStorage("agreement") ?? '';
+    if (agreement != '1') {
       showCupertinoDialog(
         context: context,
         builder: (context) {
@@ -151,18 +153,25 @@ class _LoginState extends State<Login> {
                           ),
                           bevel: 20,
                           curveType: CurveType.flat,
-                          padding: EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+                          padding:
+                              EdgeInsets.symmetric(horizontal: 20, vertical: 5),
                           child: Text.rich(
                             TextSpan(
                               children: [
-                                TextSpan(text: "感谢您使用${Util.appName}，为保护您的个人信息安全，我们将依据${Util.appName}的"),
+                                TextSpan(
+                                    text:
+                                        "感谢您使用${Util.appName}，为保护您的个人信息安全，我们将依据${Util.appName}的"),
                                 TextSpan(
                                   text: "用户协议",
-                                  style: TextStyle(decoration: TextDecoration.underline, color: Colors.blue),
+                                  style: TextStyle(
+                                      decoration: TextDecoration.underline,
+                                      color: Colors.blue),
                                   recognizer: _licenseRecognizer
                                     ..onTap = () {
                                       FocusScope.of(context).unfocus();
-                                      Navigator.of(context).push(CupertinoPageRoute(builder: (context) {
+                                      Navigator.of(context).push(
+                                          CupertinoPageRoute(
+                                              builder: (context) {
                                         return License();
                                       }));
                                     },
@@ -170,11 +179,15 @@ class _LoginState extends State<Login> {
                                 TextSpan(text: " 和 "),
                                 TextSpan(
                                   text: "隐私政策",
-                                  style: TextStyle(decoration: TextDecoration.underline, color: Colors.blue),
+                                  style: TextStyle(
+                                      decoration: TextDecoration.underline,
+                                      color: Colors.blue),
                                   recognizer: _privacyRecognizer
                                     ..onTap = () {
                                       FocusScope.of(context).unfocus();
-                                      Navigator.of(context).push(CupertinoPageRoute(builder: (context) {
+                                      Navigator.of(context).push(
+                                          CupertinoPageRoute(
+                                              builder: (context) {
                                         return Browser(
                                           url: '${Util.appUrl}/privacy',
                                           title: "隐私政策",
@@ -182,15 +195,21 @@ class _LoginState extends State<Login> {
                                       }));
                                     },
                                 ),
-                                TextSpan(text: "来帮助您了解：我们如何收集个人信息、如何使用及存储个人信息以及您享有的相关权利\n"),
+                                TextSpan(
+                                    text:
+                                        "来帮助您了解：我们如何收集个人信息、如何使用及存储个人信息以及您享有的相关权利\n"),
                                 TextSpan(text: "在您使用${Util.appName}前，请务必仔细阅读"),
                                 TextSpan(
                                   text: "用户协议",
-                                  style: TextStyle(decoration: TextDecoration.underline, color: Colors.blue),
+                                  style: TextStyle(
+                                      decoration: TextDecoration.underline,
+                                      color: Colors.blue),
                                   recognizer: _licenseRecognizer
                                     ..onTap = () {
                                       FocusScope.of(context).unfocus();
-                                      Navigator.of(context).push(CupertinoPageRoute(builder: (context) {
+                                      Navigator.of(context).push(
+                                          CupertinoPageRoute(
+                                              builder: (context) {
                                         return License();
                                       }));
                                     },
@@ -198,11 +217,15 @@ class _LoginState extends State<Login> {
                                 TextSpan(text: "和 "),
                                 TextSpan(
                                   text: "隐私政策",
-                                  style: TextStyle(decoration: TextDecoration.underline, color: Colors.blue),
+                                  style: TextStyle(
+                                      decoration: TextDecoration.underline,
+                                      color: Colors.blue),
                                   recognizer: _privacyRecognizer
                                     ..onTap = () {
                                       FocusScope.of(context).unfocus();
-                                      Navigator.of(context).push(CupertinoPageRoute(builder: (context) {
+                                      Navigator.of(context).push(
+                                          CupertinoPageRoute(
+                                              builder: (context) {
                                         return Browser(
                                           url: '${Util.appUrl}/privacy',
                                           title: "隐私政策",
@@ -210,7 +233,8 @@ class _LoginState extends State<Login> {
                                       }));
                                     },
                                 ),
-                                TextSpan(text: "以了解详细内容，如您同意，请点击'同意并继续'开始使用我们的服务"),
+                                TextSpan(
+                                    text: "以了解详细内容，如您同意，请点击'同意并继续'开始使用我们的服务"),
                               ],
                             ),
                           ),
@@ -225,11 +249,16 @@ class _LoginState extends State<Login> {
                                 onPressed: () async {
                                   Navigator.of(context).pop();
                                   Util.setStorage("read", "1");
-                                  Util.setStorage("agreement", read ? "1" : "0");
-                                  registerWxApi(appId: "wxabdf23571f34b49b", universalLink: "https://dsm.apaipai.top/app/");
+                                  Util.setStorage(
+                                      "agreement", read ? "1" : "0");
+                                  context.read<FluwxProvider>().wx.registerApi(
+                                      appId: "wxabdf23571f34b49b",
+                                      universalLink:
+                                          "https://dsm.apaipai.top/app/");
                                 },
                                 decoration: NeumorphicDecoration(
-                                  color: Theme.of(context).scaffoldBackgroundColor,
+                                  color:
+                                      Theme.of(context).scaffoldBackgroundColor,
                                   borderRadius: BorderRadius.circular(25),
                                 ),
                                 bevel: 20,
@@ -249,7 +278,8 @@ class _LoginState extends State<Login> {
                                   SystemNavigator.pop();
                                 },
                                 decoration: NeumorphicDecoration(
-                                  color: Theme.of(context).scaffoldBackgroundColor,
+                                  color:
+                                      Theme.of(context).scaffoldBackgroundColor,
                                   borderRadius: BorderRadius.circular(25),
                                 ),
                                 bevel: 20,
@@ -298,19 +328,20 @@ class _LoginState extends State<Login> {
   }
 
   getInfo() async {
-    sid = await Util.getStorage("sid");
-    smid = await Util.getStorage("smid");
-    String httpsString = await Util.getStorage("https");
+    sid = await Util.getStorage("sid") ?? '';
+    smid = await Util.getStorage("smid") ?? '';
+    String httpsString = await Util.getStorage("https") ?? '';
     host = await Util.getStorage("host") ?? "";
-    baseUrl = await Util.getStorage("base_url");
-    String portString = await Util.getStorage("port");
-    account = await Util.getStorage("account");
-    note = await Util.getStorage("note");
-    password = await Util.getStorage("password");
-    String autoLoginString = await Util.getStorage("auto_login");
+    baseUrl = await Util.getStorage("base_url") ?? '';
+    String portString = await Util.getStorage("port") ?? '';
+    account = await Util.getStorage("account") ?? '';
+    note = await Util.getStorage("note") ?? '';
+    password = await Util.getStorage("password") ?? '';
+    String autoLoginString = await Util.getStorage("auto_login") ?? '';
 
-    String rememberPasswordString = await Util.getStorage("remember_password");
-    String checkSslString = await Util.getStorage("check_ssl");
+    String rememberPasswordString =
+        await Util.getStorage("remember_password") ?? '';
+    String checkSslString = await Util.getStorage("check_ssl") ?? '';
     Util.cookie = smid;
 
     if (httpsString.isNotBlank) {
@@ -356,7 +387,7 @@ class _LoginState extends State<Login> {
 
   checkLogin() async {
     Util.account = account;
-    if (https != null && sid.isNotBlank && host.isNotBlank) {
+    if (sid.isNotBlank && host.isNotBlank) {
       if (baseUrl.isNotBlank) {
         Util.baseUrl = baseUrl;
       } else {
@@ -385,7 +416,8 @@ class _LoginState extends State<Login> {
           }
         } else {
           //登录有效，进入首页
-          Navigator.of(context).pushNamedAndRemoveUntil("/home", (route) => false);
+          Navigator.of(context)
+              .pushNamedAndRemoveUntil("/home", (route) => false);
         }
       }
     }
@@ -406,7 +438,8 @@ class _LoginState extends State<Login> {
       login = true;
     });
     if (host.contains(".") || host.contains(':')) {
-      String baseUri = "${https ? "https" : "http"}://${host.trim()}:${port.trim()}";
+      String baseUri =
+          "${https ? "https" : "http"}://${host.trim()}:${port.trim()}";
       debugPrint(baseUri);
       doLogin(baseUri);
     } else {
@@ -414,7 +447,7 @@ class _LoginState extends State<Login> {
     }
   }
 
-  qcLogin({String qcHost: "global.quickconnect.cn"}) async {
+  qcLogin({String qcHost = "global.quickconnect.cn"}) async {
     debugPrint("QuickConnectID:$host");
     var res = await Api.quickConnect(host, baseUrl: qcHost);
     if (res['errno'] == 0) {
@@ -422,29 +455,36 @@ class _LoginState extends State<Login> {
         qcAddresses.add("http://${res['server']['fqdn']}/");
       }
       if (res['server']['external']["ip"] != null) {
-        qcAddresses.add("http://${res['server']['external']["ip"]}:${res['service']['ext_port']}/");
+        qcAddresses.add(
+            "http://${res['server']['external']["ip"]}:${res['service']['ext_port']}/");
       }
       if (res['service']['relay_ip'] != null) {
-        qcAddresses.add("http://${res['service']['relay_ip']}:${res['service']['relay_port']}/");
+        qcAddresses.add(
+            "http://${res['service']['relay_ip']}:${res['service']['relay_port']}/");
       }
       if (res['server']['ddns'] != "NULL") {
-        qcAddresses.add("http://${res['server']['ddns']}:${res['service']['ext_port']}/");
+        qcAddresses.add(
+            "http://${res['server']['ddns']}:${res['service']['ext_port']}/");
       }
       if (res['server']['interface'].length > 0) {
         for (var interface in res['server']['interface']) {
-          qcAddresses.add("http://${interface['ip']}:${res['service']['port']}/");
+          qcAddresses
+              .add("http://${interface['ip']}:${res['service']['port']}/");
           if (interface['ipv6'].length > 0) {
             for (var v6 in interface['ipv6']) {
-              qcAddresses.add("http://[${v6['address']}]:${res['service']['port']}/");
+              qcAddresses
+                  .add("http://[${v6['address']}]:${res['service']['port']}/");
             }
           }
         }
       }
       if (res['service']['relay_ip'] == null) {
-        var cnRes = await Api.quickConnectCn(host, baseUrl: res['env']['control_host']);
+        var cnRes =
+            await Api.quickConnectCn(host, baseUrl: res['env']['control_host']);
         if (cnRes['errno'] == 0) {
           if (cnRes['service']['relay_ip'] != null) {
-            qcAddresses.add("http://${cnRes['service']['relay_ip']}:${cnRes['service']['relay_port']}/");
+            qcAddresses.add(
+                "http://${cnRes['service']['relay_ip']}:${cnRes['service']['relay_port']}/");
           }
         }
       }
@@ -463,7 +503,9 @@ class _LoginState extends State<Login> {
           }
         });
       }
-    } else if (res['errno'] == 4 && res['errinfo'].startsWith("get_server_info.go") && res['sites'].length > 0) {
+    } else if (res['errno'] == 4 &&
+        res['errinfo'].startsWith("get_server_info.go") &&
+        res['sites'].length > 0) {
       qcLogin(qcHost: res['sites'][0]);
     } else {
       Util.toast("无法连接到服务器，请检查QuickConnect ID是否正确");
@@ -474,7 +516,13 @@ class _LoginState extends State<Login> {
   }
 
   doLogin(String baseUri) async {
-    var res = await Api.login(host: baseUri, account: account, password: password, otpCode: otpCode, cancelToken: cancelToken, rememberDevice: rememberDevice);
+    var res = await Api.login(
+        host: baseUri,
+        account: account,
+        password: password,
+        otpCode: otpCode,
+        cancelToken: cancelToken,
+        rememberDevice: rememberDevice);
     setState(() {
       login = false;
     });
@@ -505,7 +553,10 @@ class _LoginState extends State<Login> {
       //添加服务器记录
       bool exist = false;
       for (int i = 0; i < servers.length; i++) {
-        if (servers[i]['https'] == https && servers[i]['host'] == host && servers[i]['port'] == port && servers[i]['account'] == account) {
+        if (servers[i]['https'] == https &&
+            servers[i]['host'] == host &&
+            servers[i]['port'] == port &&
+            servers[i]['account'] == account) {
           debugPrint("账号已存在，更新信息");
           if (rememberPassword) {
             servers[i]['password'] = password;
@@ -547,7 +598,8 @@ class _LoginState extends State<Login> {
       }
       Util.setStorage("servers", jsonEncode(servers));
       if (widget.type == "login") {
-        Navigator.of(context).pushNamedAndRemoveUntil("/home", (route) => false);
+        Navigator.of(context)
+            .pushNamedAndRemoveUntil("/home", (route) => false);
       } else {
         Navigator.of(context).pop(true);
       }
@@ -613,7 +665,8 @@ class _LoginState extends State<Login> {
                   padding: EdgeInsets.all(10),
                   bevel: 5,
                   onPressed: () {
-                    Navigator.of(context).push(CupertinoPageRoute(builder: (context) {
+                    Navigator.of(context)
+                        .push(CupertinoPageRoute(builder: (context) {
                       return Update(updateInfo);
                     }));
                   },
@@ -658,7 +711,8 @@ class _LoginState extends State<Login> {
                 padding: EdgeInsets.all(10),
                 bevel: 5,
                 onPressed: () {
-                  Navigator.of(context).push(CupertinoPageRoute(builder: (context) {
+                  Navigator.of(context)
+                      .push(CupertinoPageRoute(builder: (context) {
                     return Accounts();
                   }));
                 },
@@ -699,10 +753,12 @@ class _LoginState extends State<Login> {
                           https = !https;
                           if (https && port == "5000") {
                             port = "5001";
-                            _portController.value = TextEditingValue(text: port);
+                            _portController.value =
+                                TextEditingValue(text: port);
                           } else if (!https && port == "5001") {
                             port = "5000";
-                            _portController.value = TextEditingValue(text: port);
+                            _portController.value =
+                                TextEditingValue(text: port);
                           }
                         });
                       },
@@ -714,7 +770,8 @@ class _LoginState extends State<Login> {
                           ),
                           Text(
                             "协议",
-                            style: TextStyle(fontSize: 12, color: Colors.grey, height: 1),
+                            style: TextStyle(
+                                fontSize: 12, color: Colors.grey, height: 1),
                           ),
                           Text(
                             https ? "https" : "http",
@@ -861,7 +918,8 @@ class _LoginState extends State<Login> {
                       ),
                       bevel: 12,
                       curveType: CurveType.flat,
-                      padding: EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 20, vertical: 5),
                       child: TextField(
                         controller: _otpController,
                         onChanged: (v) => otpCode = v,
@@ -893,10 +951,12 @@ class _LoginState extends State<Login> {
                           color: Theme.of(context).scaffoldBackgroundColor,
                           borderRadius: BorderRadius.circular(20),
                         ),
-                        curveType: rememberDevice ? CurveType.emboss : CurveType.flat,
+                        curveType:
+                            rememberDevice ? CurveType.emboss : CurveType.flat,
                         bevel: 12,
                         height: 68,
-                        padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                         child: Row(
                           children: [
                             Text("记住设备"),
@@ -934,10 +994,12 @@ class _LoginState extends State<Login> {
                         color: Theme.of(context).scaffoldBackgroundColor,
                         borderRadius: BorderRadius.circular(20),
                       ),
-                      curveType: rememberPassword ? CurveType.emboss : CurveType.flat,
+                      curveType:
+                          rememberPassword ? CurveType.emboss : CurveType.flat,
                       bevel: 12,
                       height: 60,
-                      padding: EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 20, vertical: 5),
                       child: Row(
                         children: [
                           Text("记住密码"),
@@ -973,7 +1035,8 @@ class _LoginState extends State<Login> {
                       curveType: autoLogin ? CurveType.emboss : CurveType.flat,
                       bevel: 12,
                       height: 60,
-                      padding: EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 20, vertical: 5),
                       child: Row(
                         children: [
                           Text("自动登录"),
@@ -1042,7 +1105,7 @@ class _LoginState extends State<Login> {
                   return;
                 }
                 if (login) {
-                  cancelToken?.cancel("取消登录");
+                  cancelToken.cancel("取消登录");
                   cancelToken = CancelToken();
                   setState(() {
                     login = false;
@@ -1091,7 +1154,8 @@ class _LoginState extends State<Login> {
                       decoration: BoxDecoration(
                         color: Theme.of(context).scaffoldBackgroundColor,
                         borderRadius: BorderRadius.circular(5),
-                        border: Border.all(color: read ? Color(0xffff9813) : Colors.grey),
+                        border: Border.all(
+                            color: read ? Color(0xffff9813) : Colors.grey),
                       ),
                       height: 20,
                       width: 20,
@@ -1113,11 +1177,15 @@ class _LoginState extends State<Login> {
                           TextSpan(text: "我已阅读并同意 ${Util.appName}"),
                           TextSpan(
                             text: "用户协议",
-                            style: TextStyle(decoration: TextDecoration.underline, color: Colors.blue, fontSize: 12),
+                            style: TextStyle(
+                                decoration: TextDecoration.underline,
+                                color: Colors.blue,
+                                fontSize: 12),
                             recognizer: _licenseRecognizer
                               ..onTap = () {
                                 FocusScope.of(context).unfocus();
-                                Navigator.of(context).push(CupertinoPageRoute(builder: (context) {
+                                Navigator.of(context).push(
+                                    CupertinoPageRoute(builder: (context) {
                                   return License();
                                 }));
                               },
@@ -1125,11 +1193,15 @@ class _LoginState extends State<Login> {
                           TextSpan(text: "和 "),
                           TextSpan(
                             text: "隐私政策",
-                            style: TextStyle(decoration: TextDecoration.underline, color: Colors.blue, fontSize: 12),
+                            style: TextStyle(
+                                decoration: TextDecoration.underline,
+                                color: Colors.blue,
+                                fontSize: 12),
                             recognizer: _privacyRecognizer
                               ..onTap = () {
                                 FocusScope.of(context).unfocus();
-                                Navigator.of(context).push(CupertinoPageRoute(builder: (context) {
+                                Navigator.of(context).push(
+                                    CupertinoPageRoute(builder: (context) {
                                   return Browser(
                                     url: '${Util.appUrl}/privacy',
                                     title: "隐私政策",

@@ -7,12 +7,13 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class PhotoItemWidget extends StatelessWidget {
-  const PhotoItemWidget(this.photo, this.photos, {this.isTeam, this.showName: true, @required this.width, Key key}) : super(key: key);
+  const PhotoItemWidget(this.photo, this.photos,
+      {this.isTeam, this.showName = true, required this.width});
   final PhotoModel photo;
   final List<PhotoModel> photos;
-  final bool isTeam;
+  final bool? isTeam;
   final double width;
-  final bool showName;
+  final bool? showName;
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -20,15 +21,18 @@ class PhotoItemWidget extends StatelessWidget {
         if (photo.type == 'video') {
           Navigator.of(context).push(CupertinoPageRoute(builder: (context) {
             return VideoPlayer(
-              url: photo.videoUrl(isTeam: isTeam),
-              cover: photo.thumbUrl(isTeam: isTeam),
+              url: photo.videoUrl(isTeam: isTeam ?? false),
+              cover: photo.thumbUrl(isTeam: isTeam ?? false),
             );
           }));
         } else {
           Navigator.of(context).push(TransparentPageRoute(
             pageBuilder: (context, _, __) {
               return ImagePreview(
-                photos.map((photo) => photo.thumbUrl(size: 'xl', isTeam: isTeam)).toList(),
+                photos
+                    .map((photo) =>
+                        photo.thumbUrl(size: 'xl', isTeam: isTeam ?? false))
+                    .toList(),
                 photos.indexOf(photo),
                 tag: photo,
               );
@@ -46,7 +50,7 @@ class PhotoItemWidget extends StatelessWidget {
                 Hero(
                   tag: photo,
                   child: CupertinoExtendedImage(
-                    photo.thumbUrl(isTeam: isTeam),
+                    photo.thumbUrl(isTeam: isTeam ?? false),
                     width: width,
                     height: width,
                     fit: BoxFit.cover,
@@ -70,7 +74,7 @@ class PhotoItemWidget extends StatelessWidget {
                         ),
                         SizedBox(height: 5),
                         Text(
-                          "${photo.additional.videoMeta.hours.toString().padLeft(2, "0")}:${photo.additional.videoMeta.minutes.toString().padLeft(2, "0")}:${photo.additional.videoMeta.seconds.toString().padLeft(2, "0")}",
+                          "${photo.additional?.videoMeta?.hours.toString().padLeft(2, "0")}:${photo.additional?.videoMeta?.minutes.toString().padLeft(2, "0")}:${photo.additional?.videoMeta?.seconds.toString().padLeft(2, "0")}",
                           style: TextStyle(color: Colors.white, fontSize: 12),
                         ),
                       ],
@@ -78,9 +82,9 @@ class PhotoItemWidget extends StatelessWidget {
                   )
               ],
             ),
-            if (showName)
+            if (showName == true)
               Text(
-                photo.filename,
+                photo.filename ?? '',
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),

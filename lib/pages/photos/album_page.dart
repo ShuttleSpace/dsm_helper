@@ -6,7 +6,7 @@ import 'package:dsm_helper/widgets/neu_back_button.dart';
 import 'package:flutter/material.dart';
 
 class AlbumPage extends StatefulWidget {
-  const AlbumPage(this.album, {this.isTeam: false, Key key}) : super(key: key);
+  const AlbumPage(this.album, {this.isTeam = false});
   final AlbumModel album;
   final bool isTeam;
   @override
@@ -14,7 +14,7 @@ class AlbumPage extends StatefulWidget {
 }
 
 class _AlbumPageState extends State<AlbumPage> {
-  double photoWidth;
+  double photoWidth = 0;
   List<PhotoModel> photos = [];
   @override
   void initState() {
@@ -24,17 +24,21 @@ class _AlbumPageState extends State<AlbumPage> {
 
   getData() async {
     photos = await PhotoModel.fetch(
-      additional: ["thumbnail", "resolution", "orientation", "video_convert", "video_meta", "provider_user_id"],
-      albumId: widget.album.id,
+      additional: [
+        "thumbnail",
+        "resolution",
+        "orientation",
+        "video_convert",
+        "video_meta",
+        "provider_user_id"
+      ],
+      albumId: widget.album.id?.toInt(),
     );
     setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
-    if (photoWidth == null) {
-      photoWidth = (MediaQuery.of(context).size.width - 16) / 4;
-    }
     return Scaffold(
       body: NestedScrollView(
         headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
@@ -49,17 +53,29 @@ class _AlbumPageState extends State<AlbumPage> {
               flexibleSpace: FlexibleSpaceBar(
                 title: Text(
                   "${widget.album.name}",
-                  style: TextStyle(color: Theme.of(context).appBarTheme.titleTextStyle.color, shadows: [BoxShadow(color: Colors.white, offset: Offset(1, 1), blurRadius: 5, spreadRadius: 5)]),
+                  style: TextStyle(
+                      color:
+                          Theme.of(context).appBarTheme.titleTextStyle?.color,
+                      shadows: [
+                        BoxShadow(
+                            color: Colors.white,
+                            offset: Offset(1, 1),
+                            blurRadius: 5,
+                            spreadRadius: 5)
+                      ]),
                 ),
                 centerTitle: true,
                 background: Hero(
-                  tag: widget.album.additional.thumbnail,
+                  tag: widget.album.additional?.thumbnail ?? '',
                   child: CupertinoExtendedImage(
-                    widget.album.additional.thumbnail.thumbUrl(size: 'lg'),
+                    widget.album.additional?.thumbnail?.thumbUrl(size: 'lg') ??
+                        '',
                     fit: BoxFit.cover,
                     height: 200,
                     placeholder: CupertinoExtendedImage(
-                      widget.album.additional.thumbnail.thumbUrl(size: 'sm'),
+                      widget.album.additional?.thumbnail
+                              ?.thumbUrl(size: 'sm') ??
+                          '',
                       fit: BoxFit.cover,
                     ),
                   ),
@@ -71,7 +87,8 @@ class _AlbumPageState extends State<AlbumPage> {
         },
         body: GridView.builder(
           padding: EdgeInsets.symmetric(horizontal: 5, vertical: 10),
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 4, mainAxisSpacing: 2, crossAxisSpacing: 2),
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 4, mainAxisSpacing: 2, crossAxisSpacing: 2),
           itemBuilder: (context, i) {
             if (photos.length > 0) {
               return PhotoItemWidget(
@@ -89,7 +106,9 @@ class _AlbumPageState extends State<AlbumPage> {
               );
             }
           },
-          itemCount: photos.length > 0 ? photos.length : widget.album.itemCount,
+          itemCount: photos.length > 0
+              ? photos.length.toInt()
+              : widget.album.itemCount?.toInt(),
         ),
         // body: ListView(
         //   padding: EdgeInsets.symmetric(horizontal: 5, vertical: 10),

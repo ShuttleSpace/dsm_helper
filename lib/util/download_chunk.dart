@@ -7,16 +7,17 @@ import 'package:flutter/cupertino.dart';
 class DioDownload {
   final downloadDio = Dio();
   int _getContentLength(Response<ResponseBody> response) {
-    return int.parse(response.headers.value(Headers.contentLengthHeader) ?? '-1');
+    return int.parse(
+        response.headers.value(Headers.contentLengthHeader) ?? '-1');
   }
 
   Future<void> downloadFile({
-    @required String url,
-    @required String savePath,
-    @required CancelToken cancelToken,
-    ProgressCallback onReceiveProgress,
-    void Function() done,
-    void Function(Exception) failed,
+    required String url,
+    required String savePath,
+    required CancelToken cancelToken,
+    ProgressCallback? onReceiveProgress,
+    void Function()? done,
+    void Function(Exception)? failed,
   }) async {
     savePath = savePath + ".dsdownloading";
     print("保存目录：${savePath}");
@@ -47,9 +48,9 @@ class DioDownload {
       RandomAccessFile raf = file.openSync(mode: FileMode.append);
       int received = downloadStart;
       int total = _getContentLength(response);
-      Stream<Uint8List> stream = response.data.stream;
-      StreamSubscription<Uint8List> subscription;
-      subscription = stream.listen(
+      Stream<Uint8List>? stream = response.data?.stream;
+      StreamSubscription<Uint8List>? subscription;
+      subscription = stream?.listen(
         (data) {
           /// Write files must be synchronized
           raf.writeFromSync(data);
@@ -71,7 +72,7 @@ class DioDownload {
         await subscription?.cancel();
         await raf.close();
       });
-    } on DioError catch (error) {
+    } on DioException catch (error) {
       if (CancelToken.isCancel(error)) {
         print("Download cancelled");
       } else {

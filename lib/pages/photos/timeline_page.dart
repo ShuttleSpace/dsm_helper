@@ -3,9 +3,16 @@ import 'package:dsm_helper/widgets/neu_back_button.dart';
 import 'package:flutter/material.dart';
 
 class TimelinePage extends StatefulWidget {
-  const TimelinePage({this.title, this.type, this.geocodingId, this.generalTagId, this.isTeam: false, this.recentlyAdd: false, Key key}) : super(key: key);
-  final String title;
-  final String type;
+  const TimelinePage({
+    this.title,
+    this.type,
+    this.geocodingId = 0,
+    this.generalTagId = 0,
+    this.isTeam = false,
+    this.recentlyAdd = false,
+  });
+  final String? title;
+  final String? type;
   final int geocodingId;
   final bool isTeam;
   final int generalTagId;
@@ -20,11 +27,11 @@ class _TimelinePageState extends State<TimelinePage> {
     return Scaffold(
       appBar: AppBar(
         leading: AppBackButton(context),
-        title: Text(widget.title),
+        title: Text(widget.title ?? ''),
       ),
       body: Timeline(
         widget.isTeam,
-        type: widget.type,
+        type: widget.type ?? '',
         geocodingId: widget.geocodingId,
         generalTagId: widget.generalTagId,
         recentlyAdd: widget.recentlyAdd,

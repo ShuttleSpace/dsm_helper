@@ -10,14 +10,14 @@ import 'package:neumorphic/neumorphic.dart';
 class Album extends StatefulWidget {
   final bool shared;
   final String title;
-  Album(this.title, {this.shared: false});
+  Album(this.title, {this.shared = false});
   @override
   _AlbumState createState() => _AlbumState();
 }
 
 class _AlbumState extends State<Album> {
   bool loadingAlbum = true;
-  double albumWidth;
+  double albumWidth = 0;
   List album = [];
   @override
   void initState() {
@@ -36,7 +36,8 @@ class _AlbumState extends State<Album> {
   }
 
   Widget _buildAlbumItem(album) {
-    String thumbUrl = '${Util.baseUrl}/webapi/entry.cgi?id=${album['additional']['thumbnail']['unit_id']}&cache_key="${album['additional']['thumbnail']['cache_key']}"&type="unit"&size="sm"&api="SYNO.${Util.version == 7 ? "Foto" : "Photo"}.Thumbnail"&method="get"&version=1&_sid=${Util.sid}';
+    String thumbUrl =
+        '${Util.baseUrl}/webapi/entry.cgi?id=${album['additional']['thumbnail']['unit_id']}&cache_key="${album['additional']['thumbnail']['cache_key']}"&type="unit"&size="sm"&api="SYNO.${Util.version == 7 ? "Foto" : "Photo"}.Thumbnail"&method="get"&version=1&_sid=${Util.sid}';
     String tag = "album-${album['additional']['thumbnail']['unit_id']}";
     return GestureDetector(
       onTap: () {
@@ -88,9 +89,6 @@ class _AlbumState extends State<Album> {
 
   @override
   Widget build(BuildContext context) {
-    if (albumWidth == null) {
-      albumWidth = (MediaQuery.of(context).size.width - 80) / 3;
-    }
     return Scaffold(
       appBar: AppBar(
         leading: AppBackButton(
