@@ -12,15 +12,15 @@ import 'package:dsm_helper/widgets/neu_back_button.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_vibrate/flutter_vibrate.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:neumorphic/neumorphic.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:vibrate/vibrate.dart';
 import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 
 class Upload extends StatefulWidget {
   final String path;
-  final List<String> selectedFilesPath;
+  final List<String>? selectedFilesPath;
   Upload(this.path, {this.selectedFilesPath});
   @override
   _UploadState createState() => _UploadState();
@@ -33,8 +33,12 @@ class UploadItem {
   int fileSize;
   int uploadSize;
   UploadStatus status;
-  CancelToken cancelToken;
-  UploadItem(this.path, this.name, {this.subPath: "", this.fileSize = 0, this.uploadSize = 0, this.status = UploadStatus.wait}) {
+  CancelToken? cancelToken;
+  UploadItem(this.path, this.name,
+      {this.subPath = "",
+      this.fileSize = 0,
+      this.uploadSize = 0,
+      this.status = UploadStatus.wait}) {
     cancelToken = CancelToken();
   }
 }
@@ -47,17 +51,16 @@ class _UploadState extends State<Upload> {
     setState(() {
       savePath = widget.path ?? "";
     });
-    if (widget.selectedFilesPath != null) {
-      uploads = widget.selectedFilesPath.map((filePath) {
-        File file = File(filePath);
-        return UploadItem(
-          filePath,
-          filePath.split("/").last,
-          fileSize: file.lengthSync(),
-        );
-      }).toList();
-      setState(() {});
-    }
+    uploads = widget.selectedFilesPath?.map((filePath) {
+          File file = File(filePath);
+          return UploadItem(
+            filePath,
+            filePath.split("/").last,
+            fileSize: file.lengthSync(),
+          );
+        }).toList() ??
+        [];
+    setState(() {});
     super.initState();
   }
 
@@ -111,7 +114,8 @@ class _UploadState extends State<Upload> {
     FileTypeEnum fileType = Util.fileType(upload.path);
     // String path = file['path'];
     return Padding(
-      padding: const EdgeInsets.only(top: 10.0, bottom: 10.0, left: 20, right: 20),
+      padding:
+          const EdgeInsets.only(top: 10.0, bottom: 10.0, left: 20, right: 20),
       child: NeuButton(
         onPressed: () async {},
         // margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
@@ -150,7 +154,9 @@ class _UploadState extends State<Upload> {
                   if (upload.subPath.isNotBlank)
                     Text(
                       upload.subPath,
-                      style: TextStyle(fontSize: 12, color: AppTheme.of(context).placeholderColor),
+                      style: TextStyle(
+                          fontSize: 12,
+                          color: AppTheme.of(context).placeholderColor),
                     ),
                   SizedBox(
                     height: 5,
@@ -176,7 +182,10 @@ class _UploadState extends State<Upload> {
                           padding: EdgeInsets.all(22),
                           bevel: 5,
                           curveType: CurveType.emboss,
-                          decoration: NeumorphicDecoration(color: Theme.of(context).scaffoldBackgroundColor, borderRadius: BorderRadius.vertical(top: Radius.circular(22))),
+                          decoration: NeumorphicDecoration(
+                              color: Theme.of(context).scaffoldBackgroundColor,
+                              borderRadius: BorderRadius.vertical(
+                                  top: Radius.circular(22))),
                           child: SafeArea(
                             top: false,
                             child: Column(
@@ -184,7 +193,10 @@ class _UploadState extends State<Upload> {
                               children: <Widget>[
                                 Text(
                                   "选择操作",
-                                  style: TextStyle(fontSize: 20, color: Colors.black, fontWeight: FontWeight.w500),
+                                  style: TextStyle(
+                                      fontSize: 20,
+                                      color: Colors.black,
+                                      fontWeight: FontWeight.w500),
                                 ),
                                 if (upload.status == UploadStatus.failed) ...[
                                   SizedBox(
@@ -198,7 +210,8 @@ class _UploadState extends State<Upload> {
                                       Navigator.of(context).pop();
                                     },
                                     decoration: NeumorphicDecoration(
-                                      color: Theme.of(context).scaffoldBackgroundColor,
+                                      color: Theme.of(context)
+                                          .scaffoldBackgroundColor,
                                       borderRadius: BorderRadius.circular(25),
                                     ),
                                     bevel: 5,
@@ -220,14 +233,16 @@ class _UploadState extends State<Upload> {
                                     Navigator.of(context).pop();
                                   },
                                   decoration: NeumorphicDecoration(
-                                    color: Theme.of(context).scaffoldBackgroundColor,
+                                    color: Theme.of(context)
+                                        .scaffoldBackgroundColor,
                                     borderRadius: BorderRadius.circular(25),
                                   ),
                                   bevel: 5,
                                   padding: EdgeInsets.symmetric(vertical: 10),
                                   child: Text(
                                     "取消上传",
-                                    style: TextStyle(fontSize: 18, color: Colors.redAccent),
+                                    style: TextStyle(
+                                        fontSize: 18, color: Colors.redAccent),
                                   ),
                                 ),
                                 SizedBox(
@@ -238,7 +253,8 @@ class _UploadState extends State<Upload> {
                                     Navigator.of(context).pop();
                                   },
                                   decoration: NeumorphicDecoration(
-                                    color: Theme.of(context).scaffoldBackgroundColor,
+                                    color: Theme.of(context)
+                                        .scaffoldBackgroundColor,
                                     borderRadius: BorderRadius.circular(25),
                                   ),
                                   bevel: 5,
@@ -343,7 +359,8 @@ class _UploadState extends State<Upload> {
                 : Center(
                     child: Text(
                       "暂无待上传文件",
-                      style: TextStyle(color: AppTheme.of(context).placeholderColor),
+                      style: TextStyle(
+                          color: AppTheme.of(context).placeholderColor),
                     ),
                   ),
           ),
@@ -369,7 +386,11 @@ class _UploadState extends State<Upload> {
                                 padding: EdgeInsets.all(22),
                                 bevel: 5,
                                 curveType: CurveType.emboss,
-                                decoration: NeumorphicDecoration(color: Theme.of(context).scaffoldBackgroundColor, borderRadius: BorderRadius.vertical(top: Radius.circular(22))),
+                                decoration: NeumorphicDecoration(
+                                    color: Theme.of(context)
+                                        .scaffoldBackgroundColor,
+                                    borderRadius: BorderRadius.vertical(
+                                        top: Radius.circular(22))),
                                 child: SafeArea(
                                   top: false,
                                   child: Column(
@@ -377,7 +398,9 @@ class _UploadState extends State<Upload> {
                                     children: <Widget>[
                                       Text(
                                         "选择添加方式",
-                                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
+                                        style: TextStyle(
+                                            fontSize: 20,
+                                            fontWeight: FontWeight.w500),
                                       ),
                                       SizedBox(
                                         height: 12,
@@ -385,12 +408,25 @@ class _UploadState extends State<Upload> {
                                       NeuButton(
                                         onPressed: () async {
                                           Navigator.of(context).pop();
-                                          final List<AssetEntity> assets = await AssetPicker.pickAssets(context, pickerConfig: AssetPickerConfig(maxAssets: 1000));
-                                          if (assets != null && assets.length > 0) {
+                                          final List<AssetEntity>? assets =
+                                              await AssetPicker.pickAssets(
+                                                  context,
+                                                  pickerConfig:
+                                                      AssetPickerConfig(
+                                                          maxAssets: 1000));
+                                          if (assets != null &&
+                                              assets.isNotEmpty) {
                                             assets.forEach((asset) {
                                               asset.file.then((file) {
+                                                if (file == null) {
+                                                  return;
+                                                }
                                                 setState(() {
-                                                  uploads.add(UploadItem(file.path, file.path.split("/").last));
+                                                  uploads.add(UploadItem(
+                                                      file.path,
+                                                      file.path
+                                                          .split("/")
+                                                          .last));
                                                 });
                                               });
                                             });
@@ -399,11 +435,14 @@ class _UploadState extends State<Upload> {
                                           }
                                         },
                                         decoration: NeumorphicDecoration(
-                                          color: Theme.of(context).scaffoldBackgroundColor,
-                                          borderRadius: BorderRadius.circular(25),
+                                          color: Theme.of(context)
+                                              .scaffoldBackgroundColor,
+                                          borderRadius:
+                                              BorderRadius.circular(25),
                                         ),
                                         bevel: 5,
-                                        padding: EdgeInsets.symmetric(vertical: 10),
+                                        padding:
+                                            EdgeInsets.symmetric(vertical: 10),
                                         child: Text(
                                           "上传图片",
                                           style: TextStyle(fontSize: 18),
@@ -415,25 +454,35 @@ class _UploadState extends State<Upload> {
                                       NeuButton(
                                         onPressed: () async {
                                           Navigator.of(context).pop();
-                                          DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+                                          DeviceInfoPlugin deviceInfo =
+                                              DeviceInfoPlugin();
                                           if (Platform.isAndroid) {
-                                            AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
-                                            if (androidInfo.version.sdkInt >= 30) {
+                                            AndroidDeviceInfo androidInfo =
+                                                await deviceInfo.androidInfo;
+                                            if (androidInfo.version.sdkInt >=
+                                                30) {
                                               bool permission = false;
-                                              permission = await Permission.manageExternalStorage.request().isGranted;
+                                              permission = await Permission
+                                                  .manageExternalStorage
+                                                  .request()
+                                                  .isGranted;
                                               if (!permission) {
                                                 Util.toast("安卓11需授权文件管理权限");
                                                 return;
                                               }
                                             } else {
                                               bool permission = false;
-                                              permission = await Permission.storage.request().isGranted;
+                                              permission = await Permission
+                                                  .storage
+                                                  .request()
+                                                  .isGranted;
                                               if (!permission) {
                                                 Util.toast("请先授权APP访问存储权限");
                                                 return;
                                               }
                                             }
-                                            showCupertinoModalBottomSheet<List<FileSystemEntity>>(
+                                            showCupertinoModalBottomSheet<
+                                                List<FileSystemEntity>>(
                                               context: context,
                                               builder: (context) {
                                                 return SelectLocalFolder(
@@ -442,20 +491,48 @@ class _UploadState extends State<Upload> {
                                                 );
                                               },
                                             ).then((res) {
-                                              if (res != null && res.length > 0) {
+                                              if (res != null &&
+                                                  res.length > 0) {
                                                 res.forEach((entry) {
-                                                  if (FileSystemEntity.isFileSync(entry.path)) {
+                                                  if (FileSystemEntity
+                                                      .isFileSync(entry.path)) {
                                                     setState(() {
-                                                      uploads.add(UploadItem(entry.path, entry.path.split("/").last));
+                                                      uploads.add(UploadItem(
+                                                          entry.path,
+                                                          entry.path
+                                                              .split("/")
+                                                              .last));
                                                     });
                                                   } else {
-                                                    Directory directory = Directory(entry.path);
-                                                    directory.list(recursive: true).forEach((element) {
-                                                      if (!element.path.split("/").last.startsWith(".")) {
-                                                        if (FileSystemEntity.isFileSync(element.path)) {
-                                                          List<String> slice = element.path.replaceFirst("${entry.path}/", "").split("/");
+                                                    Directory directory =
+                                                        Directory(entry.path);
+                                                    directory
+                                                        .list(recursive: true)
+                                                        .forEach((element) {
+                                                      if (!element.path
+                                                          .split("/")
+                                                          .last
+                                                          .startsWith(".")) {
+                                                        if (FileSystemEntity
+                                                            .isFileSync(
+                                                                element.path)) {
+                                                          List<String> slice =
+                                                              element.path
+                                                                  .replaceFirst(
+                                                                      "${entry.path}/",
+                                                                      "")
+                                                                  .split("/");
                                                           setState(() {
-                                                            uploads.add(UploadItem(element.path, slice.last, subPath: slice.getRange(0, slice.length - 1).join("/")));
+                                                            uploads.add(UploadItem(
+                                                                element.path,
+                                                                slice.last,
+                                                                subPath: slice
+                                                                    .getRange(
+                                                                        0,
+                                                                        slice.length -
+                                                                            1)
+                                                                    .join(
+                                                                        "/")));
                                                           });
                                                         }
                                                       }
@@ -472,25 +549,35 @@ class _UploadState extends State<Upload> {
                                               // }
                                             });
                                           } else {
-                                            FilePickerResult result = await FilePicker.platform.pickFiles(allowMultiple: true);
-
-                                            if (result != null) {
-                                              setState(() {
-                                                uploads.addAll(result.files.map((file) {
-                                                  return UploadItem(file.path, file.name, fileSize: file.size);
-                                                }).toList());
-                                              });
-                                            } else {
-                                              // User canceled the picker
+                                            FilePickerResult? result =
+                                                await FilePicker.platform
+                                                    .pickFiles(
+                                                        allowMultiple: true);
+                                            if (result == null) {
+                                              Util.toast('选择文件为空!');
+                                              return;
                                             }
+                                            setState(() {
+                                              uploads.addAll(result.files
+                                                  .takeWhile(
+                                                      (t) => t.path != null)
+                                                  .map((file) {
+                                                return UploadItem(
+                                                    file.path!, file.name,
+                                                    fileSize: file.size);
+                                              }).toList());
+                                            });
                                           }
                                         },
                                         decoration: NeumorphicDecoration(
-                                          color: Theme.of(context).scaffoldBackgroundColor,
-                                          borderRadius: BorderRadius.circular(25),
+                                          color: Theme.of(context)
+                                              .scaffoldBackgroundColor,
+                                          borderRadius:
+                                              BorderRadius.circular(25),
                                         ),
                                         bevel: 5,
-                                        padding: EdgeInsets.symmetric(vertical: 10),
+                                        padding:
+                                            EdgeInsets.symmetric(vertical: 10),
                                         child: Text(
                                           "上传文件",
                                           style: TextStyle(fontSize: 18),
@@ -504,11 +591,14 @@ class _UploadState extends State<Upload> {
                                           Navigator.of(context).pop();
                                         },
                                         decoration: NeumorphicDecoration(
-                                          color: Theme.of(context).scaffoldBackgroundColor,
-                                          borderRadius: BorderRadius.circular(25),
+                                          color: Theme.of(context)
+                                              .scaffoldBackgroundColor,
+                                          borderRadius:
+                                              BorderRadius.circular(25),
                                         ),
                                         bevel: 5,
-                                        padding: EdgeInsets.symmetric(vertical: 10),
+                                        padding:
+                                            EdgeInsets.symmetric(vertical: 10),
                                         child: Text(
                                           "取消",
                                           style: TextStyle(fontSize: 18),
@@ -554,7 +644,10 @@ class _UploadState extends State<Upload> {
                             upload.status = UploadStatus.running;
                           });
                           // print("上传路径：$savePath${upload.subPath.isNotBlank ? "/${upload.subPath}" : ""}");
-                          var res = await Api.upload("$savePath${upload.subPath.isNotBlank ? "/${upload.subPath}" : ""}", upload.path, upload.cancelToken, (progress, total) {
+                          var res = await Api.upload(
+                              "$savePath${upload.subPath.isNotBlank ? "/${upload.subPath}" : ""}",
+                              upload.path,
+                              upload.cancelToken, (progress, total) {
                             setState(() {
                               upload.uploadSize = progress;
                               upload.fileSize = total;

@@ -8,7 +8,8 @@ import 'package:dsm_helper/util/function.dart';
 /// status : ""
 
 class GroupsModel {
-  GroupsModel({this.qq, this.wechat, this.channel});
+  GroupsModel({this.qq, this.wechat, this.channel, this.key});
+  String? key;
   List<GroupModel>? qq;
   List<GroupModel>? wechat;
   List<GroupModel>? channel;

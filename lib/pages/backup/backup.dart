@@ -11,7 +11,7 @@ import 'package:dsm_helper/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:neumorphic/neumorphic.dart';
-import 'package:vibrate/vibrate.dart';
+import 'package:flutter_vibrate/flutter_vibrate.dart';
 import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 
 import '../file/select_folder.dart';
@@ -22,15 +22,18 @@ class Backup extends StatefulWidget {
 }
 
 class UploadItem {
-  File file;
-  int fileSize;
-  int uploadSize;
-  UploadStatus status;
-  AssetType type;
-  DateTime modifyTime;
+  File? file;
+  int? fileSize;
+  int? uploadSize;
+  UploadStatus? status;
+  AssetType? type;
+  DateTime? modifyTime;
 
-  CancelToken cancelToken;
-  UploadItem(this.file, this.modifyTime, this.type, {this.fileSize = 0, this.uploadSize = 0, this.status = UploadStatus.wait}) {
+  late CancelToken cancelToken;
+  UploadItem(this.file, this.modifyTime, this.type,
+      {this.fileSize = 0,
+      this.uploadSize = 0,
+      this.status = UploadStatus.wait}) {
     cancelToken = CancelToken();
   }
 
@@ -44,8 +47,8 @@ class _BackupState extends State<Backup> {
   List<AssetEntity> uploads = [];
   List<AssetPathEntity> albums = [];
   String backupFolder = "";
-  DateTime lastBackupTime = DateTime.now().add(Duration(days: -5));
-  UploadItem uploading;
+  DateTime? lastBackupTime = DateTime.now().add(Duration(days: -5));
+  UploadItem? uploading;
   bool cancel = false;
   bool continueBackup = true;
   @override
@@ -55,14 +58,17 @@ class _BackupState extends State<Backup> {
   }
 
   getData() async {
-    String last = await Util.getStorage("last_backup_time");
+    String last = await Util.getStorage("last_backup_time") ?? '';
 
-    lastBackupTime = last.isNotBlank ? DateTime.fromMillisecondsSinceEpoch(int.parse(last)) : null;
-    backupFolder = await Util.getStorage("backup_folder") ?? "";
+    lastBackupTime = last.isNotBlank
+        ? DateTime.fromMillisecondsSinceEpoch(int.parse(last))
+        : null;
+    backupFolder = await Util.getStorage("backup_folder") ?? '';
     setState(() {});
-    String backupAlbumStr = await Util.getStorage("backup_album");
+    String backupAlbumStr = await Util.getStorage("backup_album") ?? '';
     List backupAlbums = [];
-    if (await PhotoManager.requestPermissionExtend() == PermissionState.authorized) {
+    if (await PhotoManager.requestPermissionExtend() ==
+        PermissionState.authorized) {
       if (backupAlbumStr.isNotBlank) {
         backupAlbums = json.decode(backupAlbumStr);
 
@@ -122,7 +128,8 @@ class _BackupState extends State<Backup> {
       // path.filterOption.copyWith(orders: [OrderOption(type: OrderOptionType.createDate, asc: true)]);
       // var length = await path.assetCountAsync;
       // if (length > 0) {
-      List<AssetEntity> assetList = await path.getAssetListRange(start: 0, end: 100000000);
+      List<AssetEntity> assetList =
+          await path.getAssetListRange(start: 0, end: 100000000);
       setState(() {
         uploads.addAll(assetList);
       });
@@ -171,7 +178,8 @@ class _BackupState extends State<Backup> {
               },
               child: Text(
                 "清理缓存",
-                style: TextStyle(color: Theme.of(context).textTheme.bodyText1.color),
+                style: TextStyle(
+                    color: Theme.of(context).textTheme.bodyLarge?.color),
               ),
             ),
           ),
@@ -180,7 +188,7 @@ class _BackupState extends State<Backup> {
       body: ListView(
         padding: EdgeInsets.all(20),
         children: [
-          if (uploading != null) ...[
+          ...[
             NeuCard(
               decoration: NeumorphicDecoration(
                 color: Theme.of(context).scaffoldBackgroundColor,
@@ -190,7 +198,12 @@ class _BackupState extends State<Backup> {
               child: Stack(
                 children: [
                   Container(
-                    width: (MediaQuery.of(context).size.width - 40) * (uploading.uploadSize / (uploading.fileSize == 0 ? 1 : uploading.fileSize)),
+                    width: (MediaQuery.of(context).size.width - 40) *
+                        (uploading?.uploadSize ??
+                            0 /
+                                (uploading?.fileSize == 0
+                                    ? 1
+                                    : (uploading?.fileSize ?? 0))),
                     height: 70,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(20),
@@ -198,12 +211,13 @@ class _BackupState extends State<Backup> {
                     ),
                   ),
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 20, vertical: 15),
                     child: Row(
                       children: [
-                        uploading.type == AssetType.image
+                        uploading?.type == AssetType.image
                             ? Image.file(
-                                uploading.file,
+                                uploading!.file!,
                                 height: 40,
                                 width: 40,
                               )
@@ -216,7 +230,8 @@ class _BackupState extends State<Backup> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                uploading.file.path.split("/").last,
+                                uploading?.file?.path.split("/").last ??
+                                    '[Wrong State]',
                                 overflow: TextOverflow.ellipsis,
                                 maxLines: 2,
                                 style: TextStyle(fontSize: 13),
@@ -225,10 +240,11 @@ class _BackupState extends State<Backup> {
                                 height: 5,
                               ),
                               Text(
-                                uploading.file.parent.path,
+                                uploading?.file?.parent.path ?? '[Wrong State]',
                                 overflow: TextOverflow.ellipsis,
                                 maxLines: 1,
-                                style: TextStyle(fontSize: 12, color: Colors.grey),
+                                style:
+                                    TextStyle(fontSize: 12, color: Colors.grey),
                               ),
                             ],
                           ),
@@ -367,11 +383,13 @@ class _BackupState extends State<Backup> {
                           style: TextStyle(fontSize: 18),
                         ),
                         Text(
-                          lastBackupTime != null ? lastBackupTime.format("Y-m-d H:i:s") : "从未备份过",
+                          lastBackupTime != null
+                              ? lastBackupTime?.format("Y-m-d H:i:s") ?? ''
+                              : "从未备份过",
                           style: TextStyle(fontSize: 16, color: Colors.grey),
                         ),
                         Text(
-                          "${uploads.where((AssetEntity upload) => (lastBackupTime == null || upload.modifiedDateTime.millisecondsSinceEpoch > lastBackupTime.millisecondsSinceEpoch) && upload.type == AssetType.image).length}张照片 ${uploads.where((upload) => (lastBackupTime == null || upload.modifiedDateTime.millisecondsSinceEpoch > lastBackupTime.millisecondsSinceEpoch) && upload.type == AssetType.video).length}个视频",
+                          "${uploads.where((AssetEntity upload) => (upload.modifiedDateTime.millisecondsSinceEpoch > (lastBackupTime?.millisecondsSinceEpoch ?? 0)) && upload.type == AssetType.image).length}张照片 ${uploads.where((upload) => (upload.modifiedDateTime.millisecondsSinceEpoch > (lastBackupTime?.millisecondsSinceEpoch ?? 0)) && upload.type == AssetType.video).length}个视频",
                           style: TextStyle(fontSize: 16, color: Colors.grey),
                         ),
                       ],
@@ -493,14 +511,19 @@ class _BackupState extends State<Backup> {
                       return;
                     }
                     List<AssetEntity> tasks;
-                    if (lastBackupTime != null && continueBackup) {
-                      tasks = uploads.where((element) => element.modifiedDateTime.millisecondsSinceEpoch > lastBackupTime.millisecondsSinceEpoch).toList();
+                    if (continueBackup) {
+                      tasks = uploads
+                          .where((element) =>
+                              element.modifiedDateTime.millisecondsSinceEpoch >
+                              (lastBackupTime?.millisecondsSinceEpoch ?? 0))
+                          .toList();
                     } else {
                       tasks = uploads;
                     }
                     //对待备份文件进行排序
                     tasks.sort((a, b) {
-                      return a.modifiedDateTime.isAtSameMomentAs(b.modifiedDateTime)
+                      return a.modifiedDateTime
+                              .isAtSameMomentAs(b.modifiedDateTime)
                           ? 0
                           : a.modifiedDateTime.isBefore(b.modifiedDateTime)
                               ? -1
@@ -515,36 +538,43 @@ class _BackupState extends State<Backup> {
                         Util.toast("备份任务已暂停");
                         break;
                       }
-                      uploading = UploadItem(await tasks[i].originFile, tasks[i].modifiedDateTime, tasks[i].type);
+                      uploading = UploadItem(await tasks[i].originFile,
+                          tasks[i].modifiedDateTime, tasks[i].type);
 
-                      if (uploading.status != UploadStatus.wait) {
+                      if (uploading!.status != UploadStatus.wait) {
                         continue;
                       }
                       //上传文件
                       setState(() {
-                        uploading.status = UploadStatus.running;
+                        uploading?.status = UploadStatus.running;
                       });
-                      var res = await Api.upload(backupFolder, uploading.file.path, uploading.cancelToken, (progress, total) {
+                      var res = await Api.upload(
+                          backupFolder,
+                          uploading!.file!.path,
+                          uploading!.cancelToken, (progress, total) {
                         // print("$progress,$total");
                         setState(() {
-                          uploading.uploadSize = progress;
-                          uploading.fileSize = total;
+                          uploading!.uploadSize = progress;
+                          uploading!.fileSize = total;
                         });
                       });
                       if (res['success']) {
                         if (Platform.isIOS) {
                           // 仅在iOS删除源文件（iOS非真实源文件）
-                          uploading.file.deleteSync();
+                          uploading!.file!.deleteSync();
                         }
 
-                        Util.setStorage("last_backup_time", uploading.modifyTime.millisecondsSinceEpoch.toString());
+                        Util.setStorage(
+                            "last_backup_time",
+                            uploading!.modifyTime!.millisecondsSinceEpoch
+                                .toString());
                         setState(() {
-                          lastBackupTime = uploading.modifyTime;
-                          uploading.status = UploadStatus.complete;
+                          lastBackupTime = uploading!.modifyTime;
+                          uploading!.status = UploadStatus.complete;
                         });
                       } else {
                         setState(() {
-                          uploading.status = UploadStatus.failed;
+                          uploading!.status = UploadStatus.failed;
                         });
                       }
                       if (i == tasks.length - 1) {

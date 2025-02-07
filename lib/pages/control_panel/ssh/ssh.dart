@@ -4,22 +4,23 @@ import 'package:dsm_helper/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_vibrate/flutter_vibrate.dart';
 import 'package:neumorphic/neumorphic.dart';
-import 'package:vibrate/vibrate.dart';
 
 class SshSetting extends StatefulWidget {
   @override
   _SshSettingState createState() => _SshSettingState();
 }
 
-class _SshSettingState extends State<SshSetting> with SingleTickerProviderStateMixin {
-  TabController _tabController;
+class _SshSettingState extends State<SshSetting>
+    with SingleTickerProviderStateMixin {
+  late TabController _tabController;
   TextEditingController _portController = TextEditingController();
   bool loading = true;
-  bool ssh;
-  bool telnet;
+  bool ssh = false;
+  bool telnet = false;
 
-  String sshPort;
+  String sshPort = '';
   @override
   void initState() {
     _tabController = TabController(length: 2, vsync: this);
@@ -34,7 +35,7 @@ class _SshSettingState extends State<SshSetting> with SingleTickerProviderStateM
         loading = false;
         ssh = res['data']['enable_ssh'];
         telnet = res['data']['enable_telnet'];
-        sshPort = res['data']['ssh_port'].toString() ?? "";
+        sshPort = res['data']['ssh_port'].toString();
         _portController.value = TextEditingValue(text: sshPort);
       });
     } else {
@@ -80,19 +81,24 @@ class _SshSettingState extends State<SshSetting> with SingleTickerProviderStateM
                     isScrollable: false,
                     controller: _tabController,
                     indicatorSize: TabBarIndicatorSize.label,
-                    labelColor: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black,
+                    labelColor: Theme.of(context).brightness == Brightness.dark
+                        ? Colors.white
+                        : Colors.black,
                     unselectedLabelColor: Colors.grey,
                     indicator: BubbleTabIndicator(
                       indicatorColor: Theme.of(context).scaffoldBackgroundColor,
-                      shadowColor: Util.getAdjustColor(Theme.of(context).scaffoldBackgroundColor, -20),
+                      shadowColor: Util.getAdjustColor(
+                          Theme.of(context).scaffoldBackgroundColor, -20),
                     ),
                     tabs: [
                       Padding(
-                        padding: EdgeInsets.symmetric(vertical: 10, horizontal: 5),
+                        padding:
+                            EdgeInsets.symmetric(vertical: 10, horizontal: 5),
                         child: Text("终端机"),
                       ),
                       Padding(
-                        padding: EdgeInsets.symmetric(vertical: 10, horizontal: 5),
+                        padding:
+                            EdgeInsets.symmetric(vertical: 10, horizontal: 5),
                         child: Text("SNMP"),
                       ),
                     ],
@@ -113,10 +119,12 @@ class _SshSettingState extends State<SshSetting> with SingleTickerProviderStateM
                             },
                             child: NeuCard(
                               decoration: NeumorphicDecoration(
-                                color: Theme.of(context).scaffoldBackgroundColor,
+                                color:
+                                    Theme.of(context).scaffoldBackgroundColor,
                                 borderRadius: BorderRadius.circular(20),
                               ),
-                              curveType: telnet ? CurveType.emboss : CurveType.flat,
+                              curveType:
+                                  telnet ? CurveType.emboss : CurveType.flat,
                               bevel: 20,
                               child: Padding(
                                 padding: EdgeInsets.all(20),
@@ -148,10 +156,12 @@ class _SshSettingState extends State<SshSetting> with SingleTickerProviderStateM
                             },
                             child: NeuCard(
                               decoration: NeumorphicDecoration(
-                                color: Theme.of(context).scaffoldBackgroundColor,
+                                color:
+                                    Theme.of(context).scaffoldBackgroundColor,
                                 borderRadius: BorderRadius.circular(20),
                               ),
-                              curveType: ssh ? CurveType.emboss : CurveType.flat,
+                              curveType:
+                                  ssh ? CurveType.emboss : CurveType.flat,
                               bevel: 20,
                               child: Padding(
                                 padding: EdgeInsets.all(20),
@@ -182,7 +192,8 @@ class _SshSettingState extends State<SshSetting> with SingleTickerProviderStateM
                             ),
                             bevel: 20,
                             curveType: CurveType.flat,
-                            padding: EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 20, vertical: 5),
                             child: TextField(
                               controller: _portController,
                               keyboardType: TextInputType.number,
@@ -200,13 +211,15 @@ class _SshSettingState extends State<SshSetting> with SingleTickerProviderStateM
                             height: 20,
                           ),
                           NeuButton(
-                            padding: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 20, vertical: 20),
                             decoration: NeumorphicDecoration(
                               color: Theme.of(context).scaffoldBackgroundColor,
                               borderRadius: BorderRadius.circular(20),
                             ),
                             onPressed: () async {
-                              var res = await Api.setTerminal(ssh, telnet, sshPort);
+                              var res =
+                                  await Api.setTerminal(ssh, telnet, sshPort);
                               if (res['success']) {
                                 Util.vibrate(FeedbackType.light);
                                 Util.toast("应用成功");

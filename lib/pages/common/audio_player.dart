@@ -10,7 +10,10 @@ import 'package:neumorphic/neumorphic.dart';
 import 'package:provider/provider.dart';
 
 class AudioPlayer extends StatefulWidget {
-  AudioPlayer({this.name, this.url, Key key}) : super(key: key);
+  AudioPlayer({
+    required this.name,
+    required this.url,
+  });
   final String name;
   final String url;
   @override
@@ -24,14 +27,10 @@ class _AudioPlayerState extends State<AudioPlayer> {
   void initState() {
     var audioPlayerProvider = context.read<AudioPlayerProvider>();
     player = audioPlayerProvider.player;
-    if (widget.url != null) {
-      title = widget.name ?? "";
-      if (audioPlayerProvider.url != widget.url) {
-        audioPlayerProvider.setUrl(widget.url, title);
-        setSource();
-      }
-    } else {
-      title = audioPlayerProvider.name;
+    title = widget.name;
+    if (audioPlayerProvider.url != widget.url) {
+      audioPlayerProvider.setUrl(widget.url, title);
+      setSource();
     }
     setState(() {});
     super.initState();
@@ -105,18 +104,20 @@ class PositionData {
 class ControlButtons extends StatelessWidget {
   final ja.AudioPlayer player;
 
-  const ControlButtons(this.player, {Key key}) : super(key: key);
+  const ControlButtons(
+    this.player,
+  );
   void showSliderDialog({
-    @required BuildContext context,
-    @required String title,
-    @required int divisions,
-    @required double min,
-    @required double max,
+    required BuildContext context,
+    required String title,
+    required int divisions,
+    required double min,
+    required double max,
     String valueSuffix = '',
     // TODO: Replace these two by ValueStream.
-    @required double value,
-    @required Stream<double> stream,
-    @required ValueChanged<double> onChanged,
+    required double value,
+    required Stream<double> stream,
+    required ValueChanged<double> onChanged,
   }) {
     showDialog<void>(
       context: context,
@@ -128,7 +129,11 @@ class ControlButtons extends StatelessWidget {
             height: 100.0,
             child: Column(
               children: [
-                Text('${snapshot.data?.toStringAsFixed(1)}$valueSuffix', style: const TextStyle(fontFamily: 'Fixed', fontWeight: FontWeight.bold, fontSize: 24.0)),
+                Text('${snapshot.data?.toStringAsFixed(1)}$valueSuffix',
+                    style: const TextStyle(
+                        fontFamily: 'Fixed',
+                        fontWeight: FontWeight.bold,
+                        fontSize: 24.0)),
                 Slider(
                   divisions: divisions,
                   min: min,
@@ -185,7 +190,8 @@ class ControlButtons extends StatelessWidget {
             final playerState = snapshot.data;
             final processingState = playerState?.processingState;
             final playing = playerState?.playing;
-            if (processingState == ja.ProcessingState.loading || processingState == ja.ProcessingState.buffering) {
+            if (processingState == ja.ProcessingState.loading ||
+                processingState == ja.ProcessingState.buffering) {
               return NeuButton(
                 child: const CupertinoActivityIndicator(
                   radius: 32,
@@ -234,7 +240,8 @@ class ControlButtons extends StatelessWidget {
                   color: Theme.of(context).scaffoldBackgroundColor,
                 ),
                 bevel: 10,
-                onPressed: () => player.seek(Duration.zero, index: player.effectiveIndices.first),
+                onPressed: () => player.seek(Duration.zero,
+                    index: player.effectiveIndices?.first),
               );
             }
           },
@@ -252,7 +259,8 @@ class ControlButtons extends StatelessWidget {
         StreamBuilder<double>(
           stream: player.speedStream,
           builder: (context, snapshot) => NeuButton(
-            child: Text("${snapshot.data?.toStringAsFixed(1)}x", style: const TextStyle(fontWeight: FontWeight.bold)),
+            child: Text("${snapshot.data?.toStringAsFixed(1)}x",
+                style: const TextStyle(fontWeight: FontWeight.bold)),
             decoration: NeumorphicDecoration(
               shape: BoxShape.circle,
               color: Theme.of(context).scaffoldBackgroundColor,
@@ -279,15 +287,14 @@ class ControlButtons extends StatelessWidget {
 
 class SeekBar extends StatefulWidget {
   final ja.AudioPlayer player;
-  final ValueChanged<Duration> onChanged;
-  final ValueChanged<Duration> onChangeEnd;
+  final ValueChanged<Duration>? onChanged;
+  final ValueChanged<Duration>? onChangeEnd;
 
   const SeekBar({
-    Key key,
-    @required this.player,
+    required this.player,
     this.onChanged,
     this.onChangeEnd,
-  }) : super(key: key);
+  });
 
   @override
   SeekBarState createState() => SeekBarState();
@@ -301,22 +308,22 @@ class HiddenThumbComponentShape extends SliderComponentShape {
   void paint(
     PaintingContext context,
     Offset center, {
-    @required Animation<double> activationAnimation,
-    @required Animation<double> enableAnimation,
-    @required bool isDiscrete,
-    @required TextPainter labelPainter,
-    @required RenderBox parentBox,
-    @required SliderThemeData sliderTheme,
-    @required TextDirection textDirection,
-    @required double value,
-    @required double textScaleFactor,
-    @required Size sizeWithOverflow,
+    required Animation<double> activationAnimation,
+    required Animation<double> enableAnimation,
+    required bool isDiscrete,
+    required TextPainter labelPainter,
+    required RenderBox parentBox,
+    required SliderThemeData sliderTheme,
+    required TextDirection textDirection,
+    required double value,
+    required double textScaleFactor,
+    required Size sizeWithOverflow,
   }) {}
 }
 
 class SeekBarState extends State<SeekBar> {
-  double _dragValue;
-  SliderThemeData _sliderThemeData;
+  double? _dragValue;
+  SliderThemeData? _sliderThemeData;
 
   @override
   void didChangeDependencies() {
@@ -332,29 +339,34 @@ class SeekBarState extends State<SeekBar> {
     return Stack(
       children: [
         SliderTheme(
-          data: _sliderThemeData.copyWith(
-            thumbShape: HiddenThumbComponentShape(),
-            activeTrackColor: Colors.blue.shade100,
-            inactiveTrackColor: Colors.grey.shade300,
-          ),
+          data: _sliderThemeData?.copyWith(
+                thumbShape: HiddenThumbComponentShape(),
+                activeTrackColor: Colors.blue.shade100,
+                inactiveTrackColor: Colors.grey.shade300,
+              ) ??
+              SliderThemeData(),
           child: ExcludeSemantics(
             child: StreamBuilder(
               stream: widget.player.bufferedPositionStream,
-              builder: (BuildContext context, AsyncSnapshot<Duration> snapshot) {
+              builder:
+                  (BuildContext context, AsyncSnapshot<Duration> snapshot) {
                 Duration _duration = widget.player.duration ?? Duration.zero;
                 Duration _position = snapshot.data ?? Duration.zero;
                 return Slider(
                   min: 0.0,
                   max: _duration.inMilliseconds.toDouble(),
-                  value: min(_position.inMilliseconds.toDouble(), _duration.inMilliseconds.toDouble()),
+                  value: min(_position.inMilliseconds.toDouble(),
+                      _duration.inMilliseconds.toDouble()),
                   onChanged: (value) {
                     setState(() {
                       _dragValue = value;
                     });
-                    widget.onChanged?.call(Duration(milliseconds: value.round()));
+                    widget.onChanged
+                        ?.call(Duration(milliseconds: value.round()));
                   },
                   onChangeEnd: (value) {
-                    widget.onChangeEnd?.call(Duration(milliseconds: value.round()));
+                    widget.onChangeEnd
+                        ?.call(Duration(milliseconds: value.round()));
                     _dragValue = null;
                   },
                 );
@@ -373,15 +385,18 @@ class SeekBarState extends State<SeekBar> {
                 Slider(
                   min: 0.0,
                   max: _duration.inMilliseconds.toDouble(),
-                  value: min(_dragValue ?? _position.inMilliseconds.toDouble(), _duration.inMilliseconds.toDouble()),
+                  value: min(_dragValue ?? _position.inMilliseconds.toDouble(),
+                      _duration.inMilliseconds.toDouble()),
                   onChanged: (value) {
                     setState(() {
                       _dragValue = value;
                     });
-                    widget.onChanged?.call(Duration(milliseconds: value.round()));
+                    widget.onChanged
+                        ?.call(Duration(milliseconds: value.round()));
                   },
                   onChangeEnd: (value) {
-                    widget.onChangeEnd?.call(Duration(milliseconds: value.round()));
+                    widget.onChangeEnd
+                        ?.call(Duration(milliseconds: value.round()));
                     _dragValue = null;
                   },
                 ),
@@ -390,8 +405,22 @@ class SeekBarState extends State<SeekBar> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(RegExp(r'((^0*[1-9]\d*:)?\d{2}:\d{2})\.\d+$').firstMatch("$_position")?.group(1) ?? '$_position', style: TextStyle(color: AppTheme.of(context).placeholderColor, fontSize: 12)),
-                      Text(RegExp(r'((^0*[1-9]\d*:)?\d{2}:\d{2})\.\d+$').firstMatch("$_remaining")?.group(1) ?? '$_remaining', style: TextStyle(color: AppTheme.of(context).placeholderColor, fontSize: 12))
+                      Text(
+                          RegExp(r'((^0*[1-9]\d*:)?\d{2}:\d{2})\.\d+$')
+                                  .firstMatch("$_position")
+                                  ?.group(1) ??
+                              '$_position',
+                          style: TextStyle(
+                              color: AppTheme.of(context).placeholderColor,
+                              fontSize: 12)),
+                      Text(
+                          RegExp(r'((^0*[1-9]\d*:)?\d{2}:\d{2})\.\d+$')
+                                  .firstMatch("$_remaining")
+                                  ?.group(1) ??
+                              '$_remaining',
+                          style: TextStyle(
+                              color: AppTheme.of(context).placeholderColor,
+                              fontSize: 12))
                     ],
                   ),
                 )

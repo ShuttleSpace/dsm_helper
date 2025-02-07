@@ -5,11 +5,11 @@ import 'package:dsm_helper/widgets/neu_back_button.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_vibrate/flutter_vibrate.dart';
 import 'package:neumorphic/neumorphic.dart';
-import 'package:vibrate/vibrate.dart';
 
 class AddDownloadTask extends StatefulWidget {
-  final String torrentPath;
+  final String? torrentPath;
   AddDownloadTask({this.torrentPath});
   @override
   _AddDownloadTaskState createState() => _AddDownloadTaskState();
@@ -21,11 +21,9 @@ class _AddDownloadTaskState extends State<AddDownloadTask> {
   String url = "";
   @override
   void initState() {
-    if (widget.torrentPath != null) {
-      setState(() {
-        torrentPath = widget.torrentPath;
-      });
-    }
+    setState(() {
+      torrentPath = widget.torrentPath ?? '';
+    });
     getData();
     super.initState();
   }
@@ -122,9 +120,14 @@ class _AddDownloadTaskState extends State<AddDownloadTask> {
           NeuButton(
             onPressed: () async {
               FocusScope.of(context).unfocus();
-              FilePickerResult _pickedFile = await FilePicker.platform.pickFiles();
+              FilePickerResult? _pickedFile =
+                  await FilePicker.platform.pickFiles();
               if (_pickedFile != null && _pickedFile.count > 0) {
-                String path = _pickedFile.paths[0];
+                String? path = _pickedFile.paths[0];
+                if (path == null) {
+                  Util.toast('文件路径为空!');
+                  return;
+                }
                 String ext = path.split(".").last;
                 if (["torrent", "nbz", "txt"].contains(ext)) {
                   setState(() {
@@ -181,9 +184,11 @@ class _AddDownloadTaskState extends State<AddDownloadTask> {
               }
               var res;
               if (torrentPath != "") {
-                res = await Api.downloadTaskCreate(saveFolder, "file", filePath: torrentPath);
+                res = await Api.downloadTaskCreate(saveFolder, "file",
+                    filePath: torrentPath);
                 if (res['success']) {
-                  Navigator.of(context).push(CupertinoPageRoute(builder: (context) {
+                  Navigator.of(context)
+                      .push(CupertinoPageRoute(builder: (context) {
                     return SelectFile(res['data']['list_id'], saveFolder);
                   }));
                 } else {

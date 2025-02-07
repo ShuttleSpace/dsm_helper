@@ -18,20 +18,23 @@ class DownloadStation extends StatefulWidget {
 
 class _DownloadStationState extends State<DownloadStation> {
   bool loading = true;
-  Timer timer;
+  late Timer timer;
   List tasks = [];
   int downloadRate = 0;
   int uploadRate = 0;
   Map<String, bool> pauseLoading = {};
   @override
   void initState() {
+    timer = Timer.periodic(Duration(seconds: 10), (timer) {
+      getData();
+    });
     getData();
     super.initState();
   }
 
   @override
   void dispose() {
-    timer?.cancel();
+    timer.cancel();
     super.dispose();
   }
 
@@ -39,11 +42,6 @@ class _DownloadStationState extends State<DownloadStation> {
     var res = await Api.downloadStationInfo();
     if (!mounted) {
       return;
-    }
-    if (timer == null) {
-      timer = Timer.periodic(Duration(seconds: 10), (timer) {
-        getData();
-      });
     }
     setState(() {
       loading = false;
@@ -119,13 +117,17 @@ class _DownloadStationState extends State<DownloadStation> {
                   ),
                   SizedBox(
                     width: 35,
-                    child: download['status'] == 2 || download['status'] == 3 || download['status'] > 100
+                    child: download['status'] == 2 ||
+                            download['status'] == 3 ||
+                            download['status'] > 100
                         ? GestureDetector(
                             onTap: () async {
                               setState(() {
                                 pauseLoading[download['id']] = true;
                               });
-                              var res = await Api.downloadTaskAction([download['id']], download['status'] == 2 ? "pause" : "resume");
+                              var res = await Api.downloadTaskAction(
+                                  [download['id']],
+                                  download['status'] == 2 ? "pause" : "resume");
                               setState(() {
                                 pauseLoading[download['id']] = false;
                               });
@@ -138,16 +140,23 @@ class _DownloadStationState extends State<DownloadStation> {
                               // margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                               // padding: EdgeInsets.symmetric(vertical: 20),
                               decoration: NeumorphicDecoration(
-                                color: Theme.of(context).scaffoldBackgroundColor,
+                                color:
+                                    Theme.of(context).scaffoldBackgroundColor,
                                 borderRadius: BorderRadius.circular(20),
                               ),
-                              curveType: download['status'] == 2 ? CurveType.emboss : CurveType.flat,
+                              curveType: download['status'] == 2
+                                  ? CurveType.emboss
+                                  : CurveType.flat,
                               bevel: 20,
-                              child: pauseLoading[download['id']]
+                              child: pauseLoading[download['id']] == true
                                   ? CupertinoActivityIndicator()
                                   : Icon(
-                                      download['status'] == 2 ? Icons.pause_circle_outline_sharp : Icons.play_circle_outline_sharp,
-                                      color: download['status'] == 2 ? Colors.red : Colors.green,
+                                      download['status'] == 2
+                                          ? Icons.pause_circle_outline_sharp
+                                          : Icons.play_circle_outline_sharp,
+                                      color: download['status'] == 2
+                                          ? Colors.red
+                                          : Colors.green,
                                     ),
                             ),
                           )
@@ -169,8 +178,10 @@ class _DownloadStationState extends State<DownloadStation> {
                         children: [
                           if (download['status'] != 5)
                             TextSpan(
-                              text: "${Util.formatSize(download['additional']['transfer']['size_downloaded'])} / ",
-                              style: TextStyle(fontSize: 12, color: Colors.lightBlueAccent),
+                              text:
+                                  "${Util.formatSize(download['additional']['transfer']['size_downloaded'])} / ",
+                              style: TextStyle(
+                                  fontSize: 12, color: Colors.lightBlueAccent),
                             ),
                           TextSpan(
                             text: "${Util.formatSize(download['size'])}",
@@ -198,67 +209,104 @@ class _DownloadStationState extends State<DownloadStation> {
                         : download['status'] == 2
                             ? Text(
                                 "${Util.formatSize(download['additional']['transfer']['speed_download'])}/s",
-                                style: TextStyle(fontSize: 12, color: Colors.lightBlueAccent),
+                                style: TextStyle(
+                                    fontSize: 12,
+                                    color: Colors.lightBlueAccent),
                                 textAlign: TextAlign.right,
                               )
                             : download['status'] == 3
                                 ? Text(
                                     "已暂停",
-                                    style: TextStyle(fontSize: 12, color: Colors.grey),
+                                    style: TextStyle(
+                                        fontSize: 12, color: Colors.grey),
                                     textAlign: TextAlign.right,
                                   )
                                 : download['status'] == 5
                                     ? Text(
                                         "已完成",
-                                        style: TextStyle(fontSize: 12, color: Colors.green),
+                                        style: TextStyle(
+                                            fontSize: 12, color: Colors.green),
                                         textAlign: TextAlign.right,
                                       )
                                     : download['status'] == 6
                                         ? Text(
                                             "检查中",
-                                            style: TextStyle(fontSize: 12, color: Colors.grey),
+                                            style: TextStyle(
+                                                fontSize: 12,
+                                                color: Colors.grey),
                                             textAlign: TextAlign.right,
                                           )
                                         : download['status'] == 8
                                             ? Text(
                                                 "做种中",
-                                                style: TextStyle(fontSize: 12, color: Colors.greenAccent),
+                                                style: TextStyle(
+                                                    fontSize: 12,
+                                                    color: Colors.greenAccent),
                                                 textAlign: TextAlign.right,
                                               )
                                             : download['status'] == 11
                                                 ? Text(
                                                     "等待中",
-                                                    style: TextStyle(fontSize: 12, color: Colors.blue),
+                                                    style: TextStyle(
+                                                        fontSize: 12,
+                                                        color: Colors.blue),
                                                     textAlign: TextAlign.right,
                                                   )
                                                 : download['status'] == 12
                                                     ? Text(
                                                         "下载中",
-                                                        style: TextStyle(fontSize: 12, color: Colors.blue),
-                                                        textAlign: TextAlign.right,
+                                                        style: TextStyle(
+                                                            fontSize: 12,
+                                                            color: Colors.blue),
+                                                        textAlign:
+                                                            TextAlign.right,
                                                       )
                                                     : download['status'] == 101
                                                         ? Text(
                                                             "错误",
-                                                            style: TextStyle(fontSize: 12, color: Colors.red),
-                                                            textAlign: TextAlign.right,
+                                                            style: TextStyle(
+                                                                fontSize: 12,
+                                                                color:
+                                                                    Colors.red),
+                                                            textAlign:
+                                                                TextAlign.right,
                                                           )
-                                                        : download['status'] == 105
+                                                        : download['status'] ==
+                                                                105
                                                             ? Text(
                                                                 "空间不足",
-                                                                style: TextStyle(fontSize: 12, color: Colors.red),
-                                                                textAlign: TextAlign.right,
+                                                                style: TextStyle(
+                                                                    fontSize:
+                                                                        12,
+                                                                    color: Colors
+                                                                        .red),
+                                                                textAlign:
+                                                                    TextAlign
+                                                                        .right,
                                                               )
-                                                            : download['status'] == 113
+                                                            : download['status'] ==
+                                                                    113
                                                                 ? Text(
                                                                     "重复的任务",
-                                                                    style: TextStyle(fontSize: 12, color: Colors.red),
-                                                                    textAlign: TextAlign.right,
+                                                                    style: TextStyle(
+                                                                        fontSize:
+                                                                            12,
+                                                                        color: Colors
+                                                                            .red),
+                                                                    textAlign:
+                                                                        TextAlign
+                                                                            .right,
                                                                   )
                                                                 : Text(
                                                                     "代码：${download['status']}",
-                                                                    style: TextStyle(fontSize: 12, color: Colors.red),
-                                                                    textAlign: TextAlign.right,
+                                                                    style: TextStyle(
+                                                                        fontSize:
+                                                                            12,
+                                                                        color: Colors
+                                                                            .red),
+                                                                    textAlign:
+                                                                        TextAlign
+                                                                            .right,
                                                                   ),
                   ),
                 ],
@@ -270,7 +318,12 @@ class _DownloadStationState extends State<DownloadStation> {
                 backgroundColor: Color(0xffE0E0E0),
                 progressColor: Colors.blue,
                 size: 6,
-                currentValue: download['size'] == 0 ? 0 : (download['additional']['transfer']['size_downloaded'] / download['size'] * 100).ceil(),
+                currentValue: download['size'] == 0
+                    ? 0
+                    : (download['additional']['transfer']['size_downloaded'] /
+                            download['size'] *
+                            100)
+                        .ceil(),
               )
               // download['status'] == 5
               //     ? Label("完成", Colors.green)
@@ -390,7 +443,8 @@ class _DownloadStationState extends State<DownloadStation> {
               : Center(
                   child: Text(
                     "暂无下载任务",
-                    style: TextStyle(color: AppTheme.of(context).placeholderColor),
+                    style:
+                        TextStyle(color: AppTheme.of(context).placeholderColor),
                   ),
                 ),
     );

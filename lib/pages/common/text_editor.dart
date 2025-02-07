@@ -7,14 +7,14 @@ import 'package:flutter_highlight/themes/github.dart';
 class TextEditor extends StatefulWidget {
   final String fileName;
   final String content;
-  TextEditor({this.fileName, this.content});
+  TextEditor({required this.fileName, required this.content});
   @override
   _TextEditorState createState() => _TextEditorState();
 }
 
 class _TextEditorState extends State<TextEditor> {
   ScrollController _scrollController = ScrollController();
-  String language;
+  late String language;
   @override
   void initState() {
     String ext = widget.fileName.split(".").last;

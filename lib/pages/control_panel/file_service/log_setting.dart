@@ -3,7 +3,7 @@ import 'package:dsm_helper/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:neumorphic/neumorphic.dart';
-import 'package:vibrate/vibrate.dart';
+import 'package:flutter_vibrate/flutter_vibrate.dart';
 
 class LogSetting extends StatefulWidget {
   final String protocol;
@@ -13,7 +13,7 @@ class LogSetting extends StatefulWidget {
 }
 
 class _LogSettingState extends State<LogSetting> {
-  Map setting;
+  Map setting = {};
   bool loading = true;
   @override
   void initState() {
@@ -65,16 +65,20 @@ class _LogSettingState extends State<LogSetting> {
                       GestureDetector(
                         onTap: () async {
                           setState(() {
-                            setting['create'] = setting['create'] == "1" ? "0" : "1";
+                            setting['create'] =
+                                setting['create'] == "1" ? "0" : "1";
                           });
                         },
                         child: NeuCard(
-                          padding: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+                          padding: EdgeInsets.symmetric(
+                              horizontal: 20, vertical: 20),
                           decoration: NeumorphicDecoration(
                             color: Theme.of(context).scaffoldBackgroundColor,
                             borderRadius: BorderRadius.circular(20),
                           ),
-                          curveType: setting['create'] == "1" ? CurveType.emboss : CurveType.flat,
+                          curveType: setting['create'] == "1"
+                              ? CurveType.emboss
+                              : CurveType.flat,
                           child: Row(
                             children: [
                               Text(
@@ -97,16 +101,20 @@ class _LogSettingState extends State<LogSetting> {
                       GestureDetector(
                         onTap: () async {
                           setState(() {
-                            setting['write'] = setting['write'] == "1" ? "0" : "1";
+                            setting['write'] =
+                                setting['write'] == "1" ? "0" : "1";
                           });
                         },
                         child: NeuCard(
-                          padding: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+                          padding: EdgeInsets.symmetric(
+                              horizontal: 20, vertical: 20),
                           decoration: NeumorphicDecoration(
                             color: Theme.of(context).scaffoldBackgroundColor,
                             borderRadius: BorderRadius.circular(20),
                           ),
-                          curveType: setting['write'] == "1" ? CurveType.emboss : CurveType.flat,
+                          curveType: setting['write'] == "1"
+                              ? CurveType.emboss
+                              : CurveType.flat,
                           child: Row(
                             children: [
                               Text(
@@ -129,16 +137,20 @@ class _LogSettingState extends State<LogSetting> {
                       GestureDetector(
                         onTap: () async {
                           setState(() {
-                            setting['move'] = setting['move'] == "1" ? "0" : "1";
+                            setting['move'] =
+                                setting['move'] == "1" ? "0" : "1";
                           });
                         },
                         child: NeuCard(
-                          padding: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+                          padding: EdgeInsets.symmetric(
+                              horizontal: 20, vertical: 20),
                           decoration: NeumorphicDecoration(
                             color: Theme.of(context).scaffoldBackgroundColor,
                             borderRadius: BorderRadius.circular(20),
                           ),
-                          curveType: setting['move'] == "1" ? CurveType.emboss : CurveType.flat,
+                          curveType: setting['move'] == "1"
+                              ? CurveType.emboss
+                              : CurveType.flat,
                           child: Row(
                             children: [
                               Text(
@@ -161,16 +173,20 @@ class _LogSettingState extends State<LogSetting> {
                       GestureDetector(
                         onTap: () async {
                           setState(() {
-                            setting['delete'] = setting['delete'] == "1" ? "0" : "1";
+                            setting['delete'] =
+                                setting['delete'] == "1" ? "0" : "1";
                           });
                         },
                         child: NeuCard(
-                          padding: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+                          padding: EdgeInsets.symmetric(
+                              horizontal: 20, vertical: 20),
                           decoration: NeumorphicDecoration(
                             color: Theme.of(context).scaffoldBackgroundColor,
                             borderRadius: BorderRadius.circular(20),
                           ),
-                          curveType: setting['delete'] == "1" ? CurveType.emboss : CurveType.flat,
+                          curveType: setting['delete'] == "1"
+                              ? CurveType.emboss
+                              : CurveType.flat,
                           child: Row(
                             children: [
                               Text(
@@ -193,16 +209,20 @@ class _LogSettingState extends State<LogSetting> {
                       GestureDetector(
                         onTap: () async {
                           setState(() {
-                            setting['read'] = setting['read'] == "1" ? "0" : "1";
+                            setting['read'] =
+                                setting['read'] == "1" ? "0" : "1";
                           });
                         },
                         child: NeuCard(
-                          padding: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+                          padding: EdgeInsets.symmetric(
+                              horizontal: 20, vertical: 20),
                           decoration: NeumorphicDecoration(
                             color: Theme.of(context).scaffoldBackgroundColor,
                             borderRadius: BorderRadius.circular(20),
                           ),
-                          curveType: setting['read'] == "1" ? CurveType.emboss : CurveType.flat,
+                          curveType: setting['read'] == "1"
+                              ? CurveType.emboss
+                              : CurveType.flat,
                           child: Row(
                             children: [
                               Text(
@@ -225,16 +245,20 @@ class _LogSettingState extends State<LogSetting> {
                       GestureDetector(
                         onTap: () async {
                           setState(() {
-                            setting['rename'] = setting['rename'] == "1" ? "0" : "1";
+                            setting['rename'] =
+                                setting['rename'] == "1" ? "0" : "1";
                           });
                         },
                         child: NeuCard(
-                          padding: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+                          padding: EdgeInsets.symmetric(
+                              horizontal: 20, vertical: 20),
                           decoration: NeumorphicDecoration(
                             color: Theme.of(context).scaffoldBackgroundColor,
                             borderRadius: BorderRadius.circular(20),
                           ),
-                          curveType: setting['rename'] == "1" ? CurveType.emboss : CurveType.flat,
+                          curveType: setting['rename'] == "1"
+                              ? CurveType.emboss
+                              : CurveType.flat,
                           child: Row(
                             children: [
                               Text(
@@ -266,7 +290,8 @@ class _LogSettingState extends State<LogSetting> {
                       borderRadius: BorderRadius.circular(20),
                     ),
                     onPressed: () async {
-                      var res = await Api.fileServiceLogSave(widget.protocol, setting);
+                      var res = await Api.fileServiceLogSave(
+                          widget.protocol, setting);
                       print(res);
                       if (res['success']) {
                         Util.vibrate(FeedbackType.light);

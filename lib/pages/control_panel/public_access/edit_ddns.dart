@@ -5,14 +5,14 @@ import 'package:dsm_helper/widgets/label.dart';
 import 'package:dsm_helper/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_vibrate/flutter_vibrate.dart';
 import 'package:neumorphic/neumorphic.dart';
-import 'package:vibrate/vibrate.dart';
 
 class EditDdns extends StatefulWidget {
-  final Map ddns;
+  final Map? ddns;
   final List extIp;
   final List providers;
-  const EditDdns(this.providers, {this.extIp: const [], this.ddns, Key key}) : super(key: key);
+  EditDdns(this.providers, {this.extIp = const [], this.ddns});
 
   @override
   _EditDdnsState createState() => _EditDdnsState();
@@ -30,19 +30,13 @@ class _EditDdnsState extends State<EditDdns> {
   };
   @override
   void initState() {
-    if (widget.ddns != null) {
-      setState(() {
-        ddns.addAll(widget.ddns);
-      });
-      _hostnameController.value = TextEditingValue(text: ddns['hostname']);
-      _usernameController.value = TextEditingValue(text: ddns['username']);
-    } else {
-      ddns = {"enable": true, "heartbeat": false, "net": "DEFAULT", "ip": "-", "ipv6": "-"};
-      if (widget.extIp.length > 0) {
-        ddns['ip'] = widget.extIp.first['ip'];
-        ddns['ipv6'] = widget.extIp.first['ipv6'];
+    setState(() {
+      if (widget.ddns != null) {
+        ddns.addAll(widget.ddns!);
       }
-    }
+    });
+    _hostnameController.value = TextEditingValue(text: ddns['hostname']);
+    _usernameController.value = TextEditingValue(text: ddns['username']);
     if (ddns['ip'] == "0.0.0.0") {
       ddns["ip"] = "-";
     }
@@ -64,7 +58,9 @@ class _EditDdnsState extends State<EditDdns> {
             padding: EdgeInsets.all(22),
             bevel: 5,
             curveType: CurveType.emboss,
-            decoration: NeumorphicDecoration(color: Theme.of(context).scaffoldBackgroundColor, borderRadius: BorderRadius.vertical(top: Radius.circular(22))),
+            decoration: NeumorphicDecoration(
+                color: Theme.of(context).scaffoldBackgroundColor,
+                borderRadius: BorderRadius.vertical(top: Radius.circular(22))),
             child: SafeArea(
               top: false,
               child: Column(
@@ -89,8 +85,12 @@ class _EditDdnsState extends State<EditDdns> {
                       Expanded(
                         child: NeuButton(
                           onPressed: () async {
+                            if (widget.ddns == null) {
+                              Util.toast('ddns 为空!');
+                              return;
+                            }
                             Navigator.of(context).pop();
-                            var res = await Api.ddnsDelete(widget.ddns['id']);
+                            var res = await Api.ddnsDelete(widget.ddns!['id']);
                             print(res);
                             if (res['success']) {
                               Util.toast("DDNS删除成功");
@@ -107,7 +107,8 @@ class _EditDdnsState extends State<EditDdns> {
                           padding: EdgeInsets.symmetric(vertical: 10),
                           child: Text(
                             "确认删除",
-                            style: TextStyle(fontSize: 18, color: Colors.redAccent),
+                            style: TextStyle(
+                                fontSize: 18, color: Colors.redAccent),
                           ),
                         ),
                       ),
@@ -155,7 +156,8 @@ class _EditDdnsState extends State<EditDdns> {
     } else if (ddns['username'] == null || ddns['username'] == "") {
       Util.toast("请输入用户名/电子邮件");
       return false;
-    } else if (widget.ddns == null && (ddns['passwd'] == null || ddns['passwd'] == "")) {
+    } else if (widget.ddns == null &&
+        (ddns['passwd'] == null || ddns['passwd'] == "")) {
       Util.toast("请输入密码/密钥");
       return false;
     }
@@ -170,23 +172,22 @@ class _EditDdnsState extends State<EditDdns> {
         leading: AppBackButton(context),
         title: Text("DDNS"),
         actions: [
-          if (widget.ddns != null)
-            Padding(
-              padding: EdgeInsets.only(right: 10, top: 8, bottom: 8),
-              child: NeuButton(
-                decoration: NeumorphicDecoration(
-                  color: Theme.of(context).scaffoldBackgroundColor,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                padding: EdgeInsets.all(10),
-                bevel: 5,
-                onPressed: deleteDdns,
-                child: Image.asset(
-                  "assets/icons/delete.png",
-                  width: 30,
-                ),
+          Padding(
+            padding: EdgeInsets.only(right: 10, top: 8, bottom: 8),
+            child: NeuButton(
+              decoration: NeumorphicDecoration(
+                color: Theme.of(context).scaffoldBackgroundColor,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              padding: EdgeInsets.all(10),
+              bevel: 5,
+              onPressed: deleteDdns,
+              child: Image.asset(
+                "assets/icons/delete.png",
+                width: 30,
               ),
             ),
+          ),
         ],
       ),
       body: Column(
@@ -195,7 +196,7 @@ class _EditDdnsState extends State<EditDdns> {
             child: ListView(
               padding: EdgeInsets.all(20),
               children: [
-                if (widget.ddns != null) ...[
+                ...[
                   GestureDetector(
                     onTap: () async {
                       setState(() {
@@ -209,7 +210,8 @@ class _EditDdnsState extends State<EditDdns> {
                       ),
                       padding: EdgeInsets.all(20),
                       bevel: 20,
-                      curveType: ddns['enable'] ? CurveType.emboss : CurveType.flat,
+                      curveType:
+                          ddns['enable'] ? CurveType.emboss : CurveType.flat,
                       child: Row(
                         children: [
                           Text("启用支持DDNS"),
@@ -231,18 +233,20 @@ class _EditDdnsState extends State<EditDdns> {
                 GestureDetector(
                   onTap: () {
                     FocusScope.of(context).unfocus();
-                    if (widget.ddns != null) {
-                      return;
-                    }
+                    return;
                     showCupertinoModalPopup(
                       context: context,
                       builder: (context) {
                         return NeuPicker(
-                          widget.providers.map((e) => e['provider'] as String).toList(),
-                          value: widget.providers.indexWhere((element) => element['provider'] == ddns['provider']),
+                          widget.providers
+                              .map((e) => e['provider'] as String)
+                              .toList(),
+                          value: widget.providers.indexWhere((element) =>
+                              element['provider'] == ddns['provider']),
                           onConfirm: (v) {
                             setState(() {
-                              ddns['provider'] = widget.providers[v]['provider'];
+                              ddns['provider'] =
+                                  widget.providers[v]['provider'];
                               print(ddns['provider']);
                             });
                           },
@@ -257,12 +261,14 @@ class _EditDdnsState extends State<EditDdns> {
                     ),
                     padding: EdgeInsets.all(20),
                     bevel: 20,
-                    curveType: widget.ddns == null ? CurveType.flat : CurveType.convex,
+                    curveType:
+                        widget.ddns == null ? CurveType.flat : CurveType.convex,
                     child: Row(
                       children: [
                         Text("服务供应商"),
                         Spacer(),
-                        Text("${ddns['provider'] != null && ddns['provider'] != "" ? widget.providers.where((element) => element['provider'] == ddns['provider']).first['provider'] : "请选择"}"),
+                        Text(
+                            "${ddns['provider'] != null && ddns['provider'] != "" ? widget.providers.where((element) => element['provider'] == ddns['provider']).first['provider'] : "请选择"}"),
                       ],
                     ),
                   ),
@@ -388,7 +394,9 @@ class _EditDdnsState extends State<EditDdns> {
                             if (ddns['status'] != null)
                               Label(
                                 statusStr[ddns['status']] ?? ddns['status'],
-                                ddns['status'] == "service_ddns_normal" ? Colors.green : Colors.red,
+                                ddns['status'] == "service_ddns_normal"
+                                    ? Colors.green
+                                    : Colors.red,
                                 fill: true,
                               ),
                           ],
@@ -401,7 +409,11 @@ class _EditDdnsState extends State<EditDdns> {
                     NeuButton(
                       onPressed: () async {
                         if (checkForm()) {
-                          var hide = showWeuiLoadingToast(context: context, message: Text("测试中，请稍后"), backButtonClose: true, alignment: Alignment.center);
+                          var hide = showWeuiLoadingToast(
+                              context: context,
+                              message: Text("测试中，请稍后"),
+                              backButtonClose: true,
+                              alignment: Alignment.center);
                           var res = await Api.ddnsTest(ddns);
                           hide();
                           print(res);
@@ -410,7 +422,8 @@ class _EditDdnsState extends State<EditDdns> {
                               ddns['status'] = res['data']['status'];
                             });
                           } else {
-                            Util.toast("测试失败，${res['error']['errors']},code:${res['error']['code']}");
+                            Util.toast(
+                                "测试失败，${res['error']['errors']},code:${res['error']['code']}");
                           }
                         }
                       },

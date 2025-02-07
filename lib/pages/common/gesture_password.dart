@@ -1,21 +1,19 @@
 import 'package:dsm_helper/util/function.dart';
 import 'package:dsm_helper/widgets/neu_back_button.dart';
 import 'package:flutter/material.dart';
-import 'package:gesture_password/gesture_password.dart';
-import 'package:gesture_password/mini_gesture_password.dart';
-import 'package:vibrate/vibrate.dart';
+import 'package:gesture_password_widget/gesture_password_widget.dart';
+import 'package:flutter_vibrate/flutter_vibrate.dart';
 
 class GesturePasswordPage extends StatefulWidget {
-  GesturePasswordPage({Key key, this.title}) : super(key: key);
+  GesturePasswordPage({this.title});
 
-  final String title;
+  final String? title;
 
   @override
   _GesturePasswordPageState createState() => new _GesturePasswordPageState();
 }
 
 class _GesturePasswordPageState extends State<GesturePasswordPage> {
-  GlobalKey<MiniGesturePasswordState> miniGesturePassword = new GlobalKey<MiniGesturePasswordState>();
   int step = 1;
   String newPassword = "";
 
@@ -24,7 +22,7 @@ class _GesturePasswordPageState extends State<GesturePasswordPage> {
     return Scaffold(
       appBar: AppBar(
         leading: AppBackButton(context),
-        title: Text('设置密码'),
+        title: Text(widget.title ?? '设置密码'),
       ),
       body: Center(
         child: Column(
@@ -41,21 +39,23 @@ class _GesturePasswordPageState extends State<GesturePasswordPage> {
               height: 80,
             ),
             Center(
-              child: GesturePassword(
-                width: MediaQuery.of(context).size.width * 0.9,
-                height: MediaQuery.of(context).size.width * 0.9,
-                attribute: ItemAttribute(normalColor: Colors.grey, selectedColor: Colors.blue, lineStrokeWidth: 4),
-                successCallback: (s) {
+              child: GesturePasswordWidget(
+                lineColor: Colors.white,
+                errorLineColor: Colors.redAccent,
+                singleLineCount: 4,
+                identifySize: 80.0,
+                minLength: 4,
+                onComplete: (s) {
                   if (step == 1) {
                     Util.vibrate(FeedbackType.light);
                     setState(() {
-                      newPassword = s;
+                      newPassword = s.join('');
                       step = 2;
                     });
                   } else if (step == 2) {
                     if (s == newPassword) {
                       Util.vibrate(FeedbackType.success);
-                      Util.setStorage("gesture_password", s);
+                      Util.setStorage("gesture_password", s.join(''));
                       Navigator.of(context).pop(true);
                     } else {
                       Util.toast("两次图案不一致，请重新设置");
@@ -67,14 +67,14 @@ class _GesturePasswordPageState extends State<GesturePasswordPage> {
                     }
                   }
                 },
-                failCallback: () {
-                  Util.toast("至少连接4个点");
-                  Util.vibrate(FeedbackType.warning);
-                  miniGesturePassword.currentState?.setSelected('');
-                },
-                selectedCallback: (str) {
-                  miniGesturePassword.currentState?.setSelected(str);
-                },
+                // failCallback: () {
+                //   Util.toast("至少连接4个点");
+                //   Util.vibrate(FeedbackType.warning);
+                //   miniGesturePassword.currentState?.setSelected('');
+                // },
+                // selectedCallback: (str) {
+                //   miniGesturePassword.currentState?.setSelected(str);
+                // },
               ),
             ),
           ],

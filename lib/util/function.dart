@@ -14,16 +14,15 @@ import 'package:extended_image/extended_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
-import 'package:gallery_saver/gallery_saver.dart';
+import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:oktoast/oktoast.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:vibrate/vibrate.dart';
+import 'package:flutter_vibrate/flutter_vibrate.dart';
 
 export 'package:dsm_helper/extensions/datetime.dart';
-export 'package:dsm_helper/extensions/int.dart';
 export 'package:dsm_helper/extensions/int.dart';
 export 'package:dsm_helper/extensions/string.dart';
 export 'package:dsm_helper/util/api.dart';
@@ -58,12 +57,29 @@ enum UploadStatus {
 class Util {
   static GroupsModel groups = GroupsModel(
     qq: [
-      GroupModel(name: "交流群①", no: "240557031", key: "4woOsiYfPZO4lZ08fX4el43n926mj1r5", status: "已满"),
-      GroupModel(name: "交流群②", no: "97137990", key: "qp8XE0Ts1b_qR4wt5PThPJqhdWkBT2u5", status: "已满"),
-      GroupModel(name: "交流群③", no: "133302624", key: "rOqv_Fq8g4W_Xaa95B7f0AmN_xxlvHu-", status: ""),
+      GroupModel(
+          name: "交流群①",
+          no: "240557031",
+          key: "4woOsiYfPZO4lZ08fX4el43n926mj1r5",
+          status: "已满"),
+      GroupModel(
+          name: "交流群②",
+          no: "97137990",
+          key: "qp8XE0Ts1b_qR4wt5PThPJqhdWkBT2u5",
+          status: "已满"),
+      GroupModel(
+          name: "交流群③",
+          no: "133302624",
+          key: "rOqv_Fq8g4W_Xaa95B7f0AmN_xxlvHu-",
+          status: ""),
     ],
     channel: [
-      GroupModel(name: "QQ频道", no: "群晖助手交流反馈", key: "https://qun.qq.com/qqweb/qunpro/share?_wv=3&_wwv=128&appChannel=share&biz=ka&businessType=5&from=246611&inviteCode=206Vc8vi4fl&mainSourceId=qr_code&subSourceId=pic4&jumpsource=shorturl#/out", status: ""),
+      GroupModel(
+          name: "QQ频道",
+          no: "群晖助手交流反馈",
+          key:
+              "https://qun.qq.com/qqweb/qunpro/share?_wv=3&_wwv=128&appChannel=share&biz=ka&businessType=5&from=246611&inviteCode=206Vc8vi4fl&mainSourceId=qr_code&subSourceId=pic4&jumpsource=shorturl#/out",
+          status: ""),
     ],
     wechat: [
       GroupModel(name: "群晖助手", no: "", key: "", status: "受限"),
@@ -95,7 +111,9 @@ class Util {
 
   static bool get notReviewAccount => account != "jinx";
   static toast(String text) {
-    showToast(text ?? "", dismissOtherToast: true, textPadding: EdgeInsets.symmetric(horizontal: 15, vertical: 8));
+    showToast(text ?? "",
+        dismissOtherToast: true,
+        textPadding: EdgeInsets.symmetric(horizontal: 15, vertical: 8));
   }
 
   static String systemVersion(String version) {
@@ -122,40 +140,18 @@ class Util {
   }
 
   static int versionCompare(String v1, String v2) {
-    String versionName1;
-    String buildNumber1;
-    String versionName2;
-    String buildNumber2;
+    String buildNumber1 = '';
+    String buildNumber2 = '';
     List version1 = v1.split("-");
-    versionName1 = version1[0];
     if (version1.length > 1) {
       buildNumber1 = version1[1];
     }
     List version2 = v2.split("-");
-    versionName2 = version2[0];
     if (version2.length > 1) {
       buildNumber2 = version2[1];
     }
     //对比build
-    if (buildNumber1 != null && buildNumber2 != null) {
-      return int.parse(buildNumber1).compareTo(int.parse(buildNumber2));
-    } else {
-      //对比version
-      List versionNames1 = versionName1.split(".");
-      List versionNames2 = versionName2.split(".");
-      int minLength = min(versionNames1.length, versionNames2.length);
-      int position = 0;
-      int diff = 0;
-
-      while (position < minLength) {
-        diff = int.parse(versionNames1[position]) - int.parse(versionNames2[position]);
-        if (diff != 0) {
-          break;
-        }
-        position++;
-      }
-      return diff;
-    }
+    return int.parse(buildNumber1).compareTo(int.parse(buildNumber2));
   }
 
   static String parseOpTime(String optime) {
@@ -185,7 +181,11 @@ class Util {
   }
 
   static Color getAdjustColor(Color baseColor, double amount) {
-    Map<String, int> colors = {'r': baseColor.red, 'g': baseColor.green, 'b': baseColor.blue};
+    Map<String, int> colors = {
+      'r': baseColor.red,
+      'g': baseColor.green,
+      'b': baseColor.blue
+    };
 
     colors = colors.map((key, value) {
       if (value + amount < 0) {
@@ -196,11 +196,21 @@ class Util {
       }
       return MapEntry(key, (value + amount).floor());
     });
-    return Color.fromRGBO(colors['r'], colors['g'], colors['b'], 1);
+    return Color.fromRGBO(
+        colors['r'] ?? 0, colors['g'] ?? 0, colors['b'] ?? 0, 1);
   }
 
   static FileTypeEnum fileType(String name) {
-    List<String> image = ["png", "jpg", "jpeg", "gif", "bmp", "ico", "tiff", "tif"];
+    List<String> image = [
+      "png",
+      "jpg",
+      "jpeg",
+      "gif",
+      "bmp",
+      "ico",
+      "tiff",
+      "tif"
+    ];
     List<String> movie = [
       "3gp",
       "3g2",
@@ -242,7 +252,38 @@ class Util {
       "swf",
       "f4v"
     ];
-    List<String> music = ["aac", "flac", "m4a", "m4b", "aif", "ogg", "pcm", "wav", "cda", "mid", "mp2", "mka", "mpc", "ape", "ra", "ac3", "dts", "wma", "mp3", "mp1", "mp2", "mpa", "ram", "m4p", "aiff", "dsf", "dff", "m3u", "wpl", "aiff"];
+    List<String> music = [
+      "aac",
+      "flac",
+      "m4a",
+      "m4b",
+      "aif",
+      "ogg",
+      "pcm",
+      "wav",
+      "cda",
+      "mid",
+      "mp2",
+      "mka",
+      "mpc",
+      "ape",
+      "ra",
+      "ac3",
+      "dts",
+      "wma",
+      "mp3",
+      "mp1",
+      "mp2",
+      "mpa",
+      "ram",
+      "m4p",
+      "aiff",
+      "dsf",
+      "dff",
+      "m3u",
+      "wpl",
+      "aiff"
+    ];
     List<String> ps = ["psd"];
     List<String> html = ["html", "htm", "shtml", "url"];
     List<String> word = ["doc", "docx"];
@@ -250,7 +291,23 @@ class Util {
     List<String> excel = ["xls", "xlsx"];
     List<String> text = ["txt", "log"];
     List<String> zip = ["zip", "gz", "tar", "tgz", "tbz", "bz2", "rar", "7z"];
-    List<String> code = ["py", "php", "c", "java", "jsp", "js", "css", "sql", "nfo", "xml", "kt", "conf", "json", "md", "sh"];
+    List<String> code = [
+      "py",
+      "php",
+      "c",
+      "java",
+      "jsp",
+      "js",
+      "css",
+      "sql",
+      "nfo",
+      "xml",
+      "kt",
+      "conf",
+      "json",
+      "md",
+      "sh"
+    ];
     List<String> pdf = ["pdf"];
     List<String> apk = ["apk"];
     List<String> iso = ["iso"];
@@ -288,11 +345,21 @@ class Util {
     }
   }
 
-  static Future<dynamic> get(String url, {Map<String, dynamic> data, bool login: true, String host, Map<String, dynamic> headers, CancelToken cancelToken, bool checkSsl, String cookie, int timeout = 20, bool decode: true}) async {
+  static Future<dynamic> get(String url,
+      {Map<String, dynamic>? data,
+      bool login = true,
+      String? host,
+      Map<String, dynamic>? headers,
+      CancelToken? cancelToken,
+      bool? checkSsl,
+      String? cookie,
+      int timeout = 20,
+      bool decode = true}) async {
     headers = headers ?? {};
     headers['Cookie'] = cookie ?? Util.cookie;
 
-    headers["Accept-Language"] = "zh-CN,zh;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6,zh-TW;q=0.5";
+    headers["Accept-Language"] =
+        "zh-CN,zh;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6,zh-TW;q=0.5";
     headers['origin'] = host ?? baseUrl;
     headers['referer'] = host ?? baseUrl;
     Dio dio = new Dio(
@@ -312,7 +379,8 @@ class Util {
     // }
     //忽略Https校验
     if (!(checkSsl ?? Util.checkSsl)) {
-      (dio.httpClientAdapter as IOHttpClientAdapter).onHttpClientCreate = (client) {
+      (dio.httpClientAdapter as IOHttpClientAdapter).onHttpClientCreate =
+          (client) {
         client.badCertificateCallback = (cert, host, port) {
           return true;
         };
@@ -322,13 +390,15 @@ class Util {
 
     Response response;
     try {
-      response = await dio.get(url, queryParameters: data, cancelToken: cancelToken);
+      response =
+          await dio.get(url, queryParameters: data, cancelToken: cancelToken);
       if (url == "auth.cgi") {
-        if (response.headers.map['set-cookie'] != null && response.headers.map['set-cookie'].length > 0) {
+        if (response.headers.map['set-cookie'] != null &&
+            response.headers.map['set-cookie']!.length > 0) {
           List cookies = [];
           //从原始cookie中提取did
           String did = "";
-          if (Util.cookie != null && Util.cookie != '') {
+          if (Util.cookie != '') {
             List originCookies = Util.cookie.split("; ");
             for (int i = 0; i < originCookies.length; i++) {
               Cookie cookie = Cookie.fromSetCookieValue(originCookies[i]);
@@ -338,8 +408,9 @@ class Util {
             }
           }
           bool haveDid = false;
-          for (int i = 0; i < response.headers.map['set-cookie'].length; i++) {
-            Cookie cookie = Cookie.fromSetCookieValue(response.headers.map['set-cookie'][i]);
+          for (int i = 0; i < response.headers.map['set-cookie']!.length; i++) {
+            Cookie cookie = Cookie.fromSetCookieValue(
+                response.headers.map['set-cookie']![i]);
             cookies.add("${cookie.name}=${cookie.value}");
             if (cookie.name == "did") {
               haveDid = true;
@@ -366,12 +437,13 @@ class Util {
       } else {
         return response.data;
       }
-    } on DioError catch (error) {
+    } on DioException catch (error) {
       String code = "";
-      if (error.message != null && error.message.contains("CERTIFICATE_VERIFY_FAILED")) {
+      if (error.message != null &&
+          error.message!.contains("CERTIFICATE_VERIFY_FAILED")) {
         code = "SSL/HTTPS证书有误";
       } else {
-        code = error.message;
+        code = error.message ?? '';
       }
       print("请求出错:${headers['origin']} $url");
       return {
@@ -395,10 +467,19 @@ class Util {
     Log.logger.info(obj);
   }
 
-  static Future<dynamic> post(String url, {Map<String, dynamic> data, bool login: true, String host, CancelToken cancelToken, Map<String, dynamic> headers, bool checkSsl, String cookie, int timeout = 20}) async {
+  static Future<dynamic> post(String url,
+      {Map<String, dynamic>? data,
+      bool login = true,
+      String? host,
+      CancelToken? cancelToken,
+      Map<String, dynamic>? headers,
+      bool? checkSsl,
+      String? cookie,
+      int timeout = 20}) async {
     headers = headers ?? {};
     headers['Cookie'] = cookie ?? Util.cookie;
-    headers["Accept-Language"] = "zh-CN,zh;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6,zh-TW;q=0.5";
+    headers["Accept-Language"] =
+        "zh-CN,zh;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6,zh-TW;q=0.5";
     headers['origin'] = host ?? baseUrl;
     headers['referer'] = host ?? baseUrl;
     Dio dio = new Dio(
@@ -432,7 +513,8 @@ class Util {
     //   logPrint: logPrint,
     // ));
     if (!(checkSsl ?? Util.checkSsl)) {
-      (dio.httpClientAdapter as IOHttpClientAdapter).onHttpClientCreate = (client) {
+      (dio.httpClientAdapter as IOHttpClientAdapter).onHttpClientCreate =
+          (client) {
         client.badCertificateCallback = (cert, host, port) {
           return true;
         };
@@ -444,7 +526,7 @@ class Util {
       response = await dio.post(url, data: data, cancelToken: cancelToken);
 
       return response.data;
-    } on DioError catch (error) {
+    } on DioException catch (error) {
       debugPrint("请求出错:${headers['origin']} $url 请求内容:$data");
       return {
         "success": false,
@@ -454,7 +536,14 @@ class Util {
     }
   }
 
-  static Future<dynamic> upload(String url, {Map<String, dynamic> params, Map<String, dynamic> data, bool login: true, String host, CancelToken cancelToken, Function(int, int) onSendProgress, Map<String, dynamic> headers}) async {
+  static Future<dynamic> upload(String url,
+      {Map<String, dynamic>? params,
+      required Map<String, dynamic> data,
+      bool login = true,
+      String? host,
+      CancelToken? cancelToken,
+      Function(int, int)? onSendProgress,
+      Map<String, dynamic>? headers}) async {
     headers = headers ?? {};
     headers['Cookie'] = Util.cookie;
     headers['Accept-Encoding'] = "gzip, deflate";
@@ -480,7 +569,8 @@ class Util {
     // };
     //忽略Https校验
     if (!checkSsl) {
-      (dio.httpClientAdapter as IOHttpClientAdapter).onHttpClientCreate = (client) {
+      (dio.httpClientAdapter as IOHttpClientAdapter).onHttpClientCreate =
+          (client) {
         client.badCertificateCallback = (cert, host, port) {
           return true;
         };
@@ -502,7 +592,7 @@ class Util {
       } else if (response.data is Map) {
         return response.data;
       }
-    } on DioError catch (error) {
+    } on DioException catch (error) {
       debugPrint("请求出错:$baseUrl/$url 请求内容:$data msg:${error.message}");
       return {
         "success": false,
@@ -512,7 +602,7 @@ class Util {
     }
   }
 
-  static Future<String> fileExist(String fileName) async {
+  static Future<String?> fileExist(String fileName) async {
     Directory tempDir = await getTemporaryDirectory();
     String tempPath = tempDir.path;
     if (await File(tempPath + "/" + fileName).exists()) {
@@ -540,18 +630,27 @@ class Util {
     }
   }
 
-  static Future<dynamic> downloadPkg(String saveName, String url, onReceiveProgress, CancelToken cancelToken) async {
+  static Future<dynamic> downloadPkg(String saveName, String url,
+      onReceiveProgress, CancelToken cancelToken) async {
     Dio dio = new Dio();
     Directory tempDir = await getTemporaryDirectory();
     String tempPath = tempDir.path;
     Response response;
 
     try {
-      response = await dio.download(url, tempPath + Platform.pathSeparator + saveName, deleteOnError: true, onReceiveProgress: onReceiveProgress, cancelToken: cancelToken);
-      return {"code": 1, "msg": "下载完成", "data": tempPath + Platform.pathSeparator + saveName};
-    } on DioError catch (error) {
+      response = await dio.download(
+          url, tempPath + Platform.pathSeparator + saveName,
+          deleteOnError: true,
+          onReceiveProgress: onReceiveProgress,
+          cancelToken: cancelToken);
+      return {
+        "code": 1,
+        "msg": "下载完成",
+        "data": tempPath + Platform.pathSeparator + saveName
+      };
+    } on DioException catch (error) {
       debugPrint("请求出错:$url");
-      if (error.type == DioErrorType.cancel) {
+      if (error.type == DioExceptionType.cancel) {
         return {"code": 0, "msg": "下载已取消", "data": null};
       } else {
         return {"code": 0, "msg": "网络错误", "data": null};
@@ -562,7 +661,7 @@ class Util {
   static String getUniqueName(String path, String name) {
     bool unique = true;
     int num = 0;
-    String uniqueName;
+    String uniqueName = '';
     String ext = name.split(".").last;
     String fullPath = "";
     while (unique) {
@@ -584,7 +683,7 @@ class Util {
     // return fullPath;
   }
 
-  static Future<String> download(String saveName, String url) async {
+  static Future<String?> download(String saveName, String url) async {
     //检查权限
     // bool permission = false;
     // permission = await Permission.storage.request().isGranted;
@@ -607,11 +706,17 @@ class Util {
     debugPrint(saveName);
     // CancelToken cancelToken = CancelToken();
     // DioDownload().downloadFile(url: url, savePath: saveName, cancelToken: cancelToken);
-    String taskId = await FlutterDownloader.enqueue(url: url, fileName: saveName, savedDir: savePath, showNotification: true, openFileFromNotification: true);
+    String? taskId = await FlutterDownloader.enqueue(
+        url: url,
+        fileName: saveName,
+        savedDir: savePath,
+        showNotification: true,
+        openFileFromNotification: true);
     return taskId;
   }
 
-  static String formatSize(num size, {int format = 1024, int fixed = 2, bool showByte = false}) {
+  static String formatSize(num size,
+      {int format = 1024, int fixed = 2, bool showByte = false}) {
     if (size == 0) {
       return "0${showByte ? 'Bytes' : ''}";
     } else if (size < format) {
@@ -667,7 +772,7 @@ class Util {
     return prefs.setString(name, value ?? "");
   }
 
-  static Future<String> getStorage(String name) async {
+  static Future<String?> getStorage(String name) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     return prefs.getString(name);
   }
@@ -677,7 +782,8 @@ class Util {
     return prefs.remove(name);
   }
 
-  static Future<Map> saveImage(String url, {BuildContext context, bool showLoading: true}) async {
+  static Future<Map> saveImage(String url,
+      {required BuildContext context, bool showLoading = true}) async {
     var hide;
     try {
       bool permission = false;
@@ -696,14 +802,22 @@ class Util {
       if (showLoading) {
         hide = showWeuiLoadingToast(context: context, message: Text("保存中"));
       }
-      File save;
+      File? save;
       if (url.startsWith("http")) {
-        File image = await getCachedImageFile(url);
-        save = await image.copy(image.path + DateTime.now().millisecondsSinceEpoch.toString() + ".png");
+        File? image = await getCachedImageFile(url);
+        save = await image?.copy(image.path +
+            DateTime.now().millisecondsSinceEpoch.toString() +
+            ".png");
       } else {
         save = File(url);
       }
-      bool result = await GallerySaver.saveImage(save.path, albumName: Util.appName);
+      bool result = false;
+      if (save != null) {
+        result = await ImageGallerySaver.saveImage(save.readAsBytesSync(),
+            name: Util.appName);
+      } else {
+        toast('获取缓存文件失败!');
+      }
       if (showLoading) {
         hide();
       }
@@ -734,13 +848,15 @@ class Util {
     return r.toString();
   }
 
-  static checkUpdate(bool showMsg, BuildContext context, {bool force = false}) async {
+  static checkUpdate(bool showMsg, BuildContext context,
+      {bool force = false}) async {
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
     String buildNumber = packageInfo.buildNumber;
     if (kDebugMode) {
       buildNumber = '1';
     }
-    var res = await Api.update(buildNumber, force: force); //packageInfo.buildNumber
+    var res =
+        await Api.update(buildNumber, force: force); //packageInfo.buildNumber
     if (res['code'] == 1) {
       Navigator.of(context).push(CupertinoPageRoute(
           builder: (context) {

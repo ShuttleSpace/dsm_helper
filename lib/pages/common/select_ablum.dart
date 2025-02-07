@@ -6,7 +6,7 @@ import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 class SelectAlbum extends StatefulWidget {
   final bool multi;
   final bool folder;
-  final List<AssetPathEntity> selected;
+  final List<AssetPathEntity>? selected;
   SelectAlbum({this.multi = false, this.folder = true, this.selected});
   @override
   _SelectAlbumState createState() => _SelectAlbumState();
@@ -20,7 +20,7 @@ class _SelectAlbumState extends State<SelectAlbum> {
   void initState() {
     if (widget.selected != null) {
       setState(() {
-        selectedAlbums = widget.selected;
+        selectedAlbums = widget.selected!;
       });
     }
     getData();
@@ -46,7 +46,9 @@ class _SelectAlbumState extends State<SelectAlbum> {
                 if (album.isAll) {
                   selectedAlbums = [album];
                 } else {
-                  selectedAlbums = selectedAlbums.where((element) => !element.isAll).toList();
+                  selectedAlbums = selectedAlbums
+                      .where((element) => !element.isAll)
+                      .toList();
                   if (selectedAlbums.contains(album)) {
                     selectedAlbums.remove(album);
                   } else {
@@ -146,7 +148,8 @@ class _SelectAlbumState extends State<SelectAlbum> {
                           borderRadius: BorderRadius.circular(20),
                         ),
                         bevel: 5,
-                        padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                         child: Text(
                           "完成",
                           style: TextStyle(fontSize: 12, color: Colors.blue),

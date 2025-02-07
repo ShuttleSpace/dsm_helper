@@ -3,12 +3,12 @@ import 'dart:io';
 import 'package:dsm_helper/util/function.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:gesture_password/gesture_password.dart';
+import 'package:flutter_vibrate/flutter_vibrate.dart';
+import 'package:gesture_password_widget/widget/gesture_password_widget.dart';
 import 'package:local_auth/error_codes.dart' as auth_error;
 import 'package:local_auth/local_auth.dart';
-import 'package:local_auth_ios/local_auth_ios.dart';
 import 'package:local_auth_android/local_auth_android.dart';
-import 'package:vibrate/vibrate.dart';
+import 'package:local_auth_darwin/local_auth_darwin.dart';
 
 class AuthPage extends StatefulWidget {
   final bool launch;
@@ -21,7 +21,7 @@ class AuthPage extends StatefulWidget {
 class _AuthPageState extends State<AuthPage> {
   final LocalAuthentication auth = LocalAuthentication();
   bool canCheckBiometrics = false;
-  DateTime lastPopTime;
+  DateTime lastPopTime = DateTime.now();
   BiometricType biometricsType = BiometricType.fingerprint;
   int errorCount = 0;
   String password = "";
@@ -45,19 +45,22 @@ class _AuthPageState extends State<AuthPage> {
   }
 
   getData() async {
-    String pass = await Util.getStorage("gesture_password");
+    String pass = await Util.getStorage("gesture_password") ?? '';
     password = pass ?? "";
-    String launchAuthBiometricsStr = await Util.getStorage("launch_auth_biometrics");
+    String launchAuthBiometricsStr =
+        await Util.getStorage("launch_auth_biometrics") ?? '';
     if (launchAuthBiometricsStr == "1") {
       canCheckBiometrics = await auth.canCheckBiometrics;
       setState(() {});
       if (canCheckBiometrics) {
-        List<BiometricType> availableBiometrics = await auth.getAvailableBiometrics();
+        List<BiometricType> availableBiometrics =
+            await auth.getAvailableBiometrics();
         if (Platform.isIOS) {
           setState(() {
             if (availableBiometrics.contains(BiometricType.face)) {
               biometricsType = BiometricType.face;
-            } else if (availableBiometrics.contains(BiometricType.fingerprint)) {
+            } else if (availableBiometrics
+                .contains(BiometricType.fingerprint)) {
               biometricsType = BiometricType.fingerprint;
             } else if (availableBiometrics.contains(BiometricType.iris)) {
               biometricsType = BiometricType.iris;
@@ -78,7 +81,8 @@ class _AuthPageState extends State<AuthPage> {
             IOSAuthMessages(
               lockOut: "认证失败次数过多，请稍后再试",
               goToSettingsButton: "设置",
-              goToSettingsDescription: "系统未设置${biometricTypeName[biometricsType]}，点击设置按钮前往系统设置页面",
+              goToSettingsDescription:
+                  "系统未设置${biometricTypeName[biometricsType]}，点击设置按钮前往系统设置页面",
               cancelButton: "取消",
             ),
             AndroidAuthMessages(
@@ -116,7 +120,7 @@ class _AuthPageState extends State<AuthPage> {
         } else if (e.code == auth_error.lockedOut) {
           Util.toast("认证失败次数过多，请使用图形密码登录");
         } else {
-          Util.toast(e.message);
+          Util.toast(e.message ?? '');
         }
       }
     }
@@ -124,7 +128,7 @@ class _AuthPageState extends State<AuthPage> {
 
   Future<bool> onWillPop() {
     Util.vibrate(FeedbackType.light);
-    if (lastPopTime == null || DateTime.now().difference(lastPopTime) > Duration(seconds: 2)) {
+    if (DateTime.now().difference(lastPopTime) > Duration(seconds: 2)) {
       lastPopTime = DateTime.now();
       Util.toast('再按一次退出${Util.appName}');
     } else {
@@ -159,16 +163,14 @@ class _AuthPageState extends State<AuthPage> {
                 height: 80,
               ),
               Center(
-                child: GesturePassword(
-                  width: MediaQuery.of(context).size.width * 0.9,
-                  height: MediaQuery.of(context).size.width * 0.9,
-                  attribute: ItemAttribute(normalColor: Colors.grey, selectedColor: Colors.blue, lineStrokeWidth: 4),
-                  successCallback: (s) {
+                child: GesturePasswordWidget(
+                  onComplete: (s) {
                     if (s == password) {
                       //密码验证通过
                       if (widget.launch) {
                         if (widget.launchAccountPage) {
-                          Navigator.of(context).pushReplacementNamed("/accounts");
+                          Navigator.of(context)
+                              .pushReplacementNamed("/accounts");
                         } else {
                           Navigator.of(context).pushReplacementNamed("/login");
                         }
@@ -199,11 +201,11 @@ class _AuthPageState extends State<AuthPage> {
                       }
                     }
                   },
-                  failCallback: () {
-                    Util.toast("至少连接4个点");
-                    Util.vibrate(FeedbackType.warning);
-                  },
-                  selectedCallback: (str) {},
+                  // failCallback: () {
+                  //   Util.toast("至少连接4个点");
+                  //   Util.vibrate(FeedbackType.warning);
+                  // },
+                  // selectedCallback: (str) {},
                 ),
               ),
             ],

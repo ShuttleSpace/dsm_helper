@@ -6,8 +6,8 @@ import 'package:webview_flutter/webview_flutter.dart';
 
 class Browser extends StatefulWidget {
   final String url;
-  final String title;
-  Browser({this.url, this.title});
+  final String? title;
+  Browser({required this.url, this.title});
   @override
   _BrowserState createState() => _BrowserState();
 }
@@ -48,11 +48,11 @@ Page resource error:
     return Scaffold(
       appBar: AppBar(
         leading: AppBackButton(context),
-        title: FutureBuilder<String>(
+        title: FutureBuilder<String?>(
           future: _webviewController.platform.getTitle(),
           builder: (context, snapshot) {
             if (snapshot.hasData) {
-              return Text(snapshot?.data ?? widget.title ?? "加载中……");
+              return Text(snapshot.data ?? widget.title ?? "加载中……");
             } else {
               return SizedBox();
             }
@@ -69,7 +69,8 @@ Page resource error:
               padding: EdgeInsets.all(10),
               bevel: 5,
               onPressed: () {
-                launchUrlString(widget.url, mode: LaunchMode.externalApplication);
+                launchUrlString(widget.url,
+                    mode: LaunchMode.externalApplication);
               },
               child: Image.asset(
                 "assets/icons/browser.png",

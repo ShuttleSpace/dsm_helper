@@ -9,9 +9,9 @@ import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:neumorphic/neumorphic.dart';
 
 class Share extends StatefulWidget {
-  final List<String> paths;
-  final Map link;
-  final bool fileRequest;
+  final List<String>? paths;
+  final Map? link;
+  final bool? fileRequest;
   Share({this.paths, this.link, this.fileRequest = false});
   @override
   _ShareState createState() => _ShareState();
@@ -19,17 +19,17 @@ class Share extends StatefulWidget {
 
 class _ShareState extends State<Share> {
   bool loading = true;
-  Map link;
-  DateTime startTime;
-  DateTime endTime;
+  Map link = {};
+  DateTime? startTime;
+  DateTime? endTime;
   String times = "0";
   String requestName = "";
   String requestInfo = "";
-  TextEditingController timesController;
-  TextEditingController endTimeController;
-  TextEditingController startTimeController;
-  TextEditingController requestNameController;
-  TextEditingController requestInfoController;
+  late TextEditingController timesController;
+  late TextEditingController endTimeController;
+  late TextEditingController startTimeController;
+  late TextEditingController requestNameController;
+  late TextEditingController requestInfoController;
 
   @override
   void initState() {
@@ -38,24 +38,31 @@ class _ShareState extends State<Share> {
     } else {
       setState(() {
         loading = false;
-        link = widget.link;
-        times = link['expire_times'] == 0 ? "" : link['expire_times'].toString();
+        link = widget.link ?? {};
+        times =
+            link['expire_times'] == 0 ? "" : link['expire_times'].toString();
         if (link['date_expired'] != "") {
           endTime = DateTime.parse(link['date_expired']);
         }
         if (link['date_available'] != "") {
           startTime = DateTime.parse(link['date_available']);
         }
-        String endTimeStr = endTime == null ? "" : endTime.format("Y-m-d H:i");
-        String startTimeStr = startTime == null ? "" : startTime.format("Y-m-d H:i");
-        timesController = TextEditingController.fromValue(TextEditingValue(text: times));
-        endTimeController = TextEditingController.fromValue(TextEditingValue(text: endTimeStr));
-        startTimeController = TextEditingController.fromValue(TextEditingValue(text: startTimeStr));
+        String endTimeStr = endTime == null ? "" : endTime!.format("Y-m-d H:i");
+        String startTimeStr =
+            startTime == null ? "" : startTime!.format("Y-m-d H:i");
+        timesController =
+            TextEditingController.fromValue(TextEditingValue(text: times));
+        endTimeController =
+            TextEditingController.fromValue(TextEditingValue(text: endTimeStr));
+        startTimeController = TextEditingController.fromValue(
+            TextEditingValue(text: startTimeStr));
         if (link['enable_upload']) {
           requestName = link['request_name'];
-          requestNameController = TextEditingController.fromValue(TextEditingValue(text: requestName));
+          requestNameController = TextEditingController.fromValue(
+              TextEditingValue(text: requestName));
           requestInfo = link['request_info'];
-          requestInfoController = TextEditingController.fromValue(TextEditingValue(text: requestInfo));
+          requestInfoController = TextEditingController.fromValue(
+              TextEditingValue(text: requestInfo));
         }
       });
     }
@@ -72,16 +79,24 @@ class _ShareState extends State<Share> {
   }
 
   getData() async {
-    if (widget.fileRequest) {
-      requestName = await Util.getStorage("account");
+    if (widget.fileRequest == true) {
+      requestName = await Util.getStorage("account") ?? '';
       requestInfo = "嗨，我的朋友！请将文件上传到此处。";
     }
-    var res = await Api.createShare(widget.paths, fileRequest: widget.fileRequest, requestName: requestName, requestInfo: requestInfo);
+    if (widget.paths == null || widget.paths!.isEmpty) {
+      return;
+    }
+    var res = await Api.createShare(widget.paths!,
+        fileRequest: widget.fileRequest ?? false,
+        requestName: requestName,
+        requestInfo: requestInfo);
     if (res['success']) {
       setState(() {
         loading = false;
         link = res['data']['links'][0];
-        times = res['data']['links'][0]['expire_times'] == 0 ? "" : res['data']['links'][0]['expire_times'].toString();
+        times = res['data']['links'][0]['expire_times'] == 0
+            ? ""
+            : res['data']['links'][0]['expire_times'].toString();
         if (link['date_expired'] != "") {
           endTime = DateTime.parse(link['date_expired']);
         }
@@ -90,14 +105,19 @@ class _ShareState extends State<Share> {
         }
         String endTimeStr = endTime?.format("Y-m-d H:i") ?? "";
         String startTimeStr = startTime?.format("Y-m-d H:i") ?? "";
-        timesController = TextEditingController.fromValue(TextEditingValue(text: times));
-        endTimeController = TextEditingController.fromValue(TextEditingValue(text: endTimeStr));
-        startTimeController = TextEditingController.fromValue(TextEditingValue(text: startTimeStr));
+        timesController =
+            TextEditingController.fromValue(TextEditingValue(text: times));
+        endTimeController =
+            TextEditingController.fromValue(TextEditingValue(text: endTimeStr));
+        startTimeController = TextEditingController.fromValue(
+            TextEditingValue(text: startTimeStr));
         if (link['enable_upload']) {
           requestName = link['request_name'];
-          requestNameController = TextEditingController.fromValue(TextEditingValue(text: requestName));
+          requestNameController = TextEditingController.fromValue(
+              TextEditingValue(text: requestName));
           requestInfo = link['request_info'];
-          requestInfoController = TextEditingController.fromValue(TextEditingValue(text: requestInfo));
+          requestInfoController = TextEditingController.fromValue(
+              TextEditingValue(text: requestInfo));
         }
       });
     }
@@ -195,7 +215,7 @@ class _ShareState extends State<Share> {
                   setState(() {
                     endTime = date;
                   });
-                  endTimeController.text = endTime.format("Y-m-d H:i");
+                  endTimeController.text = endTime?.format("Y-m-d H:i") ?? '';
                 },
                 currentTime: endTime ?? DateTime.now(),
                 locale: LocaleType.zh,
@@ -232,7 +252,8 @@ class _ShareState extends State<Share> {
                   setState(() {
                     startTime = date;
                   });
-                  startTimeController.text = startTime.format("Y-m-d H:i");
+                  startTimeController.text =
+                      startTime?.format("Y-m-d H:i") ?? '';
                 },
                 currentTime: startTime ?? DateTime.now(),
                 locale: LocaleType.zh,
@@ -376,7 +397,11 @@ class _ShareState extends State<Share> {
                               List<String> url = [];
                               id.add(link['id']);
                               url.add(link['url']);
-                              var res = await Api.editShare(link['path'], id, url, endTime, startTime, times, fileRequest: link['enable_upload'], requestName: requestName, requestInfo: requestInfo);
+                              var res = await Api.editShare(link['path'], id,
+                                  url, endTime, startTime, times,
+                                  fileRequest: link['enable_upload'],
+                                  requestName: requestName,
+                                  requestInfo: requestInfo);
                               if (res['success']) {
                                 Util.toast("保存成功");
                               }
@@ -404,7 +429,11 @@ class _ShareState extends State<Share> {
                                       padding: EdgeInsets.all(22),
                                       bevel: 5,
                                       curveType: CurveType.emboss,
-                                      decoration: NeumorphicDecoration(color: Theme.of(context).scaffoldBackgroundColor, borderRadius: BorderRadius.vertical(top: Radius.circular(22))),
+                                      decoration: NeumorphicDecoration(
+                                          color: Theme.of(context)
+                                              .scaffoldBackgroundColor,
+                                          borderRadius: BorderRadius.vertical(
+                                              top: Radius.circular(22))),
                                       child: SafeArea(
                                         top: false,
                                         child: Column(
@@ -412,14 +441,18 @@ class _ShareState extends State<Share> {
                                           children: <Widget>[
                                             Text(
                                               "确认取消",
-                                              style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
+                                              style: TextStyle(
+                                                  fontSize: 20,
+                                                  fontWeight: FontWeight.w500),
                                             ),
                                             SizedBox(
                                               height: 12,
                                             ),
                                             Text(
                                               "确认要取消此共享链接？",
-                                              style: TextStyle(fontSize: 20, fontWeight: FontWeight.w400),
+                                              style: TextStyle(
+                                                  fontSize: 20,
+                                                  fontWeight: FontWeight.w400),
                                             ),
                                             SizedBox(
                                               height: 22,
@@ -429,18 +462,28 @@ class _ShareState extends State<Share> {
                                                 Expanded(
                                                   child: NeuButton(
                                                     onPressed: () async {
-                                                      Navigator.of(context).pop();
+                                                      Navigator.of(context)
+                                                          .pop();
                                                       deleteShare();
                                                     },
-                                                    decoration: NeumorphicDecoration(
-                                                      color: Theme.of(context).scaffoldBackgroundColor,
-                                                      borderRadius: BorderRadius.circular(25),
+                                                    decoration:
+                                                        NeumorphicDecoration(
+                                                      color: Theme.of(context)
+                                                          .scaffoldBackgroundColor,
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              25),
                                                     ),
                                                     bevel: 5,
-                                                    padding: EdgeInsets.symmetric(vertical: 10),
+                                                    padding:
+                                                        EdgeInsets.symmetric(
+                                                            vertical: 10),
                                                     child: Text(
                                                       "取消共享",
-                                                      style: TextStyle(fontSize: 18, color: Colors.redAccent),
+                                                      style: TextStyle(
+                                                          fontSize: 18,
+                                                          color:
+                                                              Colors.redAccent),
                                                     ),
                                                   ),
                                                 ),
@@ -450,17 +493,25 @@ class _ShareState extends State<Share> {
                                                 Expanded(
                                                   child: NeuButton(
                                                     onPressed: () async {
-                                                      Navigator.of(context).pop();
+                                                      Navigator.of(context)
+                                                          .pop();
                                                     },
-                                                    decoration: NeumorphicDecoration(
-                                                      color: Theme.of(context).scaffoldBackgroundColor,
-                                                      borderRadius: BorderRadius.circular(25),
+                                                    decoration:
+                                                        NeumorphicDecoration(
+                                                      color: Theme.of(context)
+                                                          .scaffoldBackgroundColor,
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              25),
                                                     ),
                                                     bevel: 5,
-                                                    padding: EdgeInsets.symmetric(vertical: 10),
+                                                    padding:
+                                                        EdgeInsets.symmetric(
+                                                            vertical: 10),
                                                     child: Text(
                                                       "取消",
-                                                      style: TextStyle(fontSize: 18),
+                                                      style: TextStyle(
+                                                          fontSize: 18),
                                                     ),
                                                   ),
                                                 ),

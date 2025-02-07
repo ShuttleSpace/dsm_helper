@@ -21,7 +21,7 @@ class VipRecordModel {
     this.activityId,
   });
   static Future<List<VipRecordModel>> fetch() async {
-    String userToken = await Util.getStorage("user_token");
+    String userToken = await Util.getStorage("user_token") ?? '';
     var res = await Util.post("${Util.appUrl}/vip/record",
         data: {"token": userToken});
     if (res['code'] == 1) {
