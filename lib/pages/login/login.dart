@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
-import 'package:dsm_helper/pages/common/browser.dart';
+import 'package:dsm_helper/pages/common/browser.dart' as dsm;
 import 'package:dsm_helper/pages/login/accounts.dart';
 import 'package:dsm_helper/pages/setting/license.dart';
 import 'package:dsm_helper/pages/update/update.dart';
@@ -188,7 +188,7 @@ class _LoginState extends State<Login> {
                                       Navigator.of(context).push(
                                           CupertinoPageRoute(
                                               builder: (context) {
-                                        return Browser(
+                                        return dsm.Browser(
                                           url: '${Util.appUrl}/privacy',
                                           title: "隐私政策",
                                         );
@@ -226,7 +226,7 @@ class _LoginState extends State<Login> {
                                       Navigator.of(context).push(
                                           CupertinoPageRoute(
                                               builder: (context) {
-                                        return Browser(
+                                        return dsm.Browser(
                                           url: '${Util.appUrl}/privacy',
                                           title: "隐私政策",
                                         );
@@ -1202,7 +1202,7 @@ class _LoginState extends State<Login> {
                                 FocusScope.of(context).unfocus();
                                 Navigator.of(context).push(
                                     CupertinoPageRoute(builder: (context) {
-                                  return Browser(
+                                  return dsm.Browser(
                                     url: '${Util.appUrl}/privacy',
                                     title: "隐私政策",
                                   );
