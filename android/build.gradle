@@ -1,46 +1,48 @@
 buildscript {
-    ext.kotlin_version = '1.8.0'
+    ext.kotlin_version = '1.7.22'
     repositories {
         google()
         mavenCentral()
-//        maven { url 'https://repo1.maven.org/maven2/' }
-//        maven { url 'https://maven.aliyun.com/repository/google' }
-//        maven { url 'https://maven.aliyun.com/repository/jcenter' }
-//        maven { url 'https://maven.aliyun.com/nexus/content/groups/public' }
-//        maven { url "https://download.flutter.io" }
-//        jcenter()
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:4.1.0'
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        classpath 'com.android.tools.build:gradle:8.3.1'
     }
 }
-
 allprojects {
     repositories {
         google()
         mavenCentral()
-        flatDir {
-            dirs "$rootProject.projectDir/aars"
-        }
-//        maven { url 'https://repo1.maven.org/maven2/' }
-//        maven { url 'https://maven.aliyun.com/repository/google' }
-//        maven { url 'https://maven.aliyun.com/repository/jcenter' }
-//        maven { url 'https://maven.aliyun.com/nexus/content/groups/public' }
-//        maven { url "https://download.flutter.io" }
-//        jcenter()
     }
 }
 
-rootProject.buildDir = '../build'
+rootProject.buildDir = "../build"
+/*
+* What went wrong:
+Execution failed for task ':easy_app_installer:verifyReleaseResources'.
+> A failure occurred while executing com.android.build.gradle.tasks.VerifyLibraryResourcesTask$Action
+   > Android resource linking failed
+     ERROR: /Users/humphrey/Project/Fork/Flutter/dsm_helper/build/easy_app_installer/intermediates/merged_res/release/mergeReleaseResources/values/values.xml:6124: AAPT: error: resource android:attr/lStar not found.
+*/
+subprojects {
+    project.afterEvaluate { project ->
+        if (project.plugins.hasPlugin("com.android.application") ||
+                project.plugins.hasPlugin("com.android.library")) {
+            project.android {
+                compileSdkVersion flutter.compileSdkVersion
+                buildToolsVersion "34.0.0"
+            }
+        }
+    }
+}
 subprojects {
     project.buildDir = "${rootProject.buildDir}/${project.name}"
 }
 subprojects {
-    project.evaluationDependsOn(':app')
+    project.evaluationDependsOn(":app")
 }
 
-task clean(type: Delete) {
+
+tasks.register("clean", Delete) {
     delete rootProject.buildDir
 }
