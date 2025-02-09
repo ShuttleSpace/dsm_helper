@@ -46,14 +46,14 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
     FlutterSharingIntent.instance
         .getInitialSharing()
         .then((List<SharedFile> value) {
-      print("Shared: getInitialMedia ${value.map((f) => f.path).join(",")}");
+      print("Shared: getInitialMedia ${value.map((f) => f.value).join(",")}");
       handleFiles(value);
     });
     // For sharing images coming from outside the app while the app is in the memory
     FlutterSharingIntent.instance.getMediaStream().listen(
         (List<SharedFile> value) {
       handleFiles(value);
-      print("Shared: getMediaStream ${value.map((f) => f.path).join(",")}");
+      print("Shared: getMediaStream ${value.map((f) => f.value).join(",")}");
     }, onError: (err) {
       print("getIntentDataStream error: $err");
     });
@@ -91,13 +91,15 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
     _sharedFiles = files;
     if (_sharedFiles.length > 0) {
       if (_sharedFiles.length == 1 &&
-          _sharedFiles.first.path!.endsWith(".torrent")) {
+          _sharedFiles.first.value!.endsWith(".torrent")) {
         String filePath = '';
         if (Platform.isAndroid) {
-          filePath = await FlutterSharingIntent.getAbsolutePath(
-              _sharedFiles.first.path ?? '');
+          filePath = (await FlutterSharingIntent().getMediaStream().first)
+                  .first
+                  .value ??
+              '';
         } else {
-          filePath = _sharedFiles.first.path ?? '';
+          filePath = _sharedFiles.first.value ?? '';
         }
         Navigator.of(context).push(CupertinoPageRoute(builder: (context) {
           return AddDownloadTask(
@@ -115,8 +117,8 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
           return Upload(
             "",
             selectedFilesPath: _sharedFiles
-                .takeWhile((t) => t.path != null)
-                .map((e) => e.path!)
+                .takeWhile((t) => t.value != null)
+                .map((e) => e.value!)
                 .toList(),
           );
         }));

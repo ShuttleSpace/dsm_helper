@@ -25,7 +25,6 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:fluwx/fluwx.dart';
 import 'package:oktoast/oktoast.dart';
 import 'package:package_info_plus/package_info_plus.dart';
-import 'package:pangle_flutter/pangle_flutter.dart';
 import 'package:provider/provider.dart';
 import '/providers/dark_mode.dart';
 
@@ -64,26 +63,16 @@ void main() async {
         .then((value) {
       // stopLog();
     });
-    // print("初始化穿山甲");
-    await pangle.init(
-      iOS: IOSConfig(
-        appId: '5215470',
-        logLevel: PangleLogLevel.error,
-      ),
-      android: AndroidConfig(
-        appId: '5215463',
-        debug: false,
-        allowShowNotify: true,
-      ),
-    );
     // 域名优选
     Util.appUrl = await getBestDomain([
       'http://dsm.apaipai.top/index/check',
       'http://dsm.flutter.fit/index/check'
     ]);
+    Util.appUrl = '';
+    Util.baseUrl = '';
     // 是否关闭广告
     // 判断是否登录
-    bool isForever = false;
+    bool isForever = true;
     DateTime noAdTime = DateTime.now();
     Util.isWechatInstalled = await fluwx.isWeChatInstalled;
     String userToken = await Util.getStorage("user_token") ?? '';
@@ -93,19 +82,6 @@ void main() async {
     }
     if (userToken.isNotBlank) {
       isForever = Util.vipForever = true;
-      var res = await Util.post("${Util.appUrl}/vip/info",
-          data: {"token": userToken});
-      if (res['code'] == 1) {
-        isForever = Util.vipForever = res['data']['is_forever'] == 1;
-        // if (res['data']['vip_expire_time'] != null) {
-        //   DateTime vipExpireTime =
-        //       DateTime.parse(res['data']['vip_expire_time']);
-        //   Util.vipExpireTime = vipExpireTime;
-        //   if (vipExpireTime.isAfter(noAdTime)) {
-        //     noAdTime = vipExpireTime;
-        //   }
-        // }
-      }
     }
 
     if (isForever || (noAdTime.isAfter(DateTime.now()))) {
@@ -115,10 +91,6 @@ void main() async {
       }
     } else {
       Util.removeStorage("no_ad_time");
-      pangle.loadSplashAd(
-        iOS: IOSSplashConfig(slotId: '887561543'),
-        android: AndroidSplashConfig(slotId: '887561531', isExpress: false),
-      );
     }
   }
   await FlutterDownloader.initialize(debug: true, ignoreSsl: true);

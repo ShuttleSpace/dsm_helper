@@ -13,7 +13,7 @@ class FileIcon extends StatelessWidget {
   final double height;
   final BoxFit fit;
   FileIcon(this.fileType,
-      {required this.thumb,
+      {this.thumb = '',
       this.network = true,
       this.width = 40,
       this.height = 40,
