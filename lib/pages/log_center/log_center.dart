@@ -4,7 +4,6 @@ import 'package:dsm_helper/widgets/label.dart';
 import 'package:dsm_helper/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:neumorphic/neumorphic.dart';
 
 class LogCenter extends StatefulWidget {
   @override
@@ -76,13 +75,7 @@ class _LogCenterState extends State<LogCenter>
   }
 
   Widget _buildRecentLogItem(log) {
-    return NeuCard(
-      curveType: CurveType.flat,
-      decoration: NeumorphicDecoration(
-        color: Theme.of(context).scaffoldBackgroundColor,
-        borderRadius: BorderRadius.circular(20),
-      ),
-      bevel: 20,
+    return Card(
       child: Padding(
         padding: EdgeInsets.all(20),
         child: Column(
@@ -122,13 +115,7 @@ class _LogCenterState extends State<LogCenter>
   }
 
   Widget _buildHistoryItem(log) {
-    return NeuCard(
-      curveType: CurveType.flat,
-      decoration: NeumorphicDecoration(
-        color: Theme.of(context).scaffoldBackgroundColor,
-        borderRadius: BorderRadius.circular(20),
-      ),
-      bevel: 20,
+    return Card(
       child: Padding(
         padding: EdgeInsets.all(20),
         child: Column(
@@ -168,13 +155,7 @@ class _LogCenterState extends State<LogCenter>
   }
 
   Widget _buildLogItem(log) {
-    return NeuCard(
-      curveType: CurveType.flat,
-      decoration: NeumorphicDecoration(
-        color: Theme.of(context).scaffoldBackgroundColor,
-        borderRadius: BorderRadius.circular(20),
-      ),
-      bevel: 20,
+    return Card(
       child: Padding(
         padding: EdgeInsets.all(20),
         child: Column(
@@ -239,58 +220,55 @@ class _LogCenterState extends State<LogCenter>
       ),
       body: Column(
         children: [
-          NeuCard(
-            width: double.infinity,
-            decoration: NeumorphicDecoration(
-              color: Theme.of(context).scaffoldBackgroundColor,
-              borderRadius: BorderRadius.circular(20),
-            ),
+          Card(
             margin: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-            curveType: CurveType.flat,
-            bevel: 10,
-            child: TabBar(
-              isScrollable: true,
-              controller: _tabController,
-              indicatorSize: TabBarIndicatorSize.label,
-              labelColor: Theme.of(context).brightness == Brightness.dark
-                  ? Colors.white
-                  : Colors.black,
-              unselectedLabelColor: Colors.grey,
-              indicator: BubbleTabIndicator(
-                indicatorColor: Theme.of(context).scaffoldBackgroundColor,
-                shadowColor: Util.getAdjustColor(
-                    Theme.of(context).scaffoldBackgroundColor, -20),
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: TabBar(
+                dividerHeight: 0,
+                isScrollable: true,
+                controller: _tabController,
+                indicatorSize: TabBarIndicatorSize.label,
+                labelColor: Theme.of(context).brightness == Brightness.dark
+                    ? Colors.white
+                    : Colors.black,
+                unselectedLabelColor: Colors.grey,
+                indicator: BubbleTabIndicator(
+                  indicatorColor: Theme.of(context).scaffoldBackgroundColor,
+                  shadowColor: Util.getAdjustColor(
+                      Theme.of(context).scaffoldBackgroundColor, -20),
+                ),
+                tabs: [
+                  Padding(
+                    padding: EdgeInsets.symmetric(vertical: 10, horizontal: 5),
+                    child: Text("概述"),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.symmetric(vertical: 10, horizontal: 5),
+                    child: Text("日志"),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.symmetric(vertical: 10, horizontal: 5),
+                    child: Text("设置历史记录"),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.symmetric(vertical: 10, horizontal: 5),
+                    child: Text("通知"),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.symmetric(vertical: 10, horizontal: 5),
+                    child: Text("归档设置"),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.symmetric(vertical: 10, horizontal: 5),
+                    child: Text("日志发送"),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.symmetric(vertical: 10, horizontal: 5),
+                    child: Text("接收日志"),
+                  ),
+                ],
               ),
-              tabs: [
-                Padding(
-                  padding: EdgeInsets.symmetric(vertical: 10, horizontal: 5),
-                  child: Text("概述"),
-                ),
-                Padding(
-                  padding: EdgeInsets.symmetric(vertical: 10, horizontal: 5),
-                  child: Text("日志"),
-                ),
-                Padding(
-                  padding: EdgeInsets.symmetric(vertical: 10, horizontal: 5),
-                  child: Text("设置历史记录"),
-                ),
-                Padding(
-                  padding: EdgeInsets.symmetric(vertical: 10, horizontal: 5),
-                  child: Text("通知"),
-                ),
-                Padding(
-                  padding: EdgeInsets.symmetric(vertical: 10, horizontal: 5),
-                  child: Text("归档设置"),
-                ),
-                Padding(
-                  padding: EdgeInsets.symmetric(vertical: 10, horizontal: 5),
-                  child: Text("日志发送"),
-                ),
-                Padding(
-                  padding: EdgeInsets.symmetric(vertical: 10, horizontal: 5),
-                  child: Text("接收日志"),
-                ),
-              ],
             ),
           ),
           Expanded(
@@ -299,17 +277,8 @@ class _LogCenterState extends State<LogCenter>
               children: [
                 loadingRecent
                     ? Center(
-                        child: NeuCard(
-                          padding: EdgeInsets.all(50),
-                          curveType: CurveType.flat,
-                          decoration: NeumorphicDecoration(
-                            color: Theme.of(context).scaffoldBackgroundColor,
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          bevel: 20,
-                          child: CupertinoActivityIndicator(
-                            radius: 14,
-                          ),
+                        child: CupertinoActivityIndicator(
+                          radius: 14,
                         ),
                       )
                     : Column(
@@ -317,17 +286,12 @@ class _LogCenterState extends State<LogCenter>
                           SizedBox(
                             height: 20,
                           ),
-                          NeuCard(
-                            width: double.infinity,
+                          Card(
                             margin: EdgeInsets.symmetric(horizontal: 20),
-                            padding: EdgeInsets.all(20),
-                            curveType: CurveType.flat,
-                            decoration: NeumorphicDecoration(
-                              color: Theme.of(context).scaffoldBackgroundColor,
-                              borderRadius: BorderRadius.circular(20),
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text("上50个日志"),
                             ),
-                            bevel: 10,
-                            child: Text("上50个日志"),
                           ),
                           SizedBox(
                             height: 20,
@@ -350,17 +314,8 @@ class _LogCenterState extends State<LogCenter>
                       ),
                 loadingLogs
                     ? Center(
-                        child: NeuCard(
-                          padding: EdgeInsets.all(50),
-                          curveType: CurveType.flat,
-                          decoration: NeumorphicDecoration(
-                            color: Theme.of(context).scaffoldBackgroundColor,
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          bevel: 20,
-                          child: CupertinoActivityIndicator(
-                            radius: 14,
-                          ),
+                        child: CupertinoActivityIndicator(
+                          radius: 14,
                         ),
                       )
                     : Column(
@@ -368,54 +323,49 @@ class _LogCenterState extends State<LogCenter>
                           SizedBox(
                             height: 20,
                           ),
-                          NeuCard(
-                            width: double.infinity,
+                          Card(
                             margin: EdgeInsets.symmetric(horizontal: 20),
-                            padding: EdgeInsets.all(20),
-                            curveType: CurveType.flat,
-                            decoration: NeumorphicDecoration(
-                              color: Theme.of(context).scaffoldBackgroundColor,
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            bevel: 10,
-                            child: Row(
-                              children: [
-                                Icon(
-                                  Icons.info,
-                                  color: Colors.lightBlueAccent,
-                                  size: 20,
-                                ),
-                                SizedBox(
-                                  width: 5,
-                                ),
-                                Text("$infoCount"),
-                                SizedBox(
-                                  width: 10,
-                                ),
-                                Icon(
-                                  Icons.warning,
-                                  color: Colors.orange,
-                                  size: 20,
-                                ),
-                                SizedBox(
-                                  width: 5,
-                                ),
-                                Text("$warnCount"),
-                                SizedBox(
-                                  width: 10,
-                                ),
-                                Icon(
-                                  Icons.cancel,
-                                  color: Colors.red,
-                                  size: 20,
-                                ),
-                                SizedBox(
-                                  width: 5,
-                                ),
-                                Text("$errorCount"),
-                                Spacer(),
-                                Text("共$totalCount项"),
-                              ],
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    Icons.info,
+                                    color: Colors.lightBlueAccent,
+                                    size: 20,
+                                  ),
+                                  SizedBox(
+                                    width: 5,
+                                  ),
+                                  Text("$infoCount"),
+                                  SizedBox(
+                                    width: 10,
+                                  ),
+                                  Icon(
+                                    Icons.warning,
+                                    color: Colors.orange,
+                                    size: 20,
+                                  ),
+                                  SizedBox(
+                                    width: 5,
+                                  ),
+                                  Text("$warnCount"),
+                                  SizedBox(
+                                    width: 10,
+                                  ),
+                                  Icon(
+                                    Icons.cancel,
+                                    color: Colors.red,
+                                    size: 20,
+                                  ),
+                                  SizedBox(
+                                    width: 5,
+                                  ),
+                                  Text("$errorCount"),
+                                  Spacer(),
+                                  Text("共$totalCount项"),
+                                ],
+                              ),
                             ),
                           ),
                           SizedBox(
@@ -439,17 +389,8 @@ class _LogCenterState extends State<LogCenter>
                       ),
                 loadingHistory
                     ? Center(
-                        child: NeuCard(
-                          padding: EdgeInsets.all(50),
-                          curveType: CurveType.flat,
-                          decoration: NeumorphicDecoration(
-                            color: Theme.of(context).scaffoldBackgroundColor,
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          bevel: 20,
-                          child: CupertinoActivityIndicator(
-                            radius: 14,
-                          ),
+                        child: CupertinoActivityIndicator(
+                          radius: 14,
                         ),
                       )
                     : ListView.separated(

@@ -8,7 +8,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:neumorphic/neumorphic.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
@@ -53,18 +52,15 @@ class _AboutState extends State<About> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    NeuCard(
-                      bevel: 20,
-                      curveType: CurveType.flat,
-                      decoration: NeumorphicDecoration(
-                        color: Theme.of(context).scaffoldBackgroundColor,
-                        borderRadius: BorderRadius.circular(60),
-                      ),
-                      child: CircleAvatar(
-                        backgroundImage: AssetImage(
-                          "assets/logo.png",
+                    Card(
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: CircleAvatar(
+                          backgroundImage: AssetImage(
+                            "assets/logo.png",
+                          ),
+                          radius: 40,
                         ),
-                        radius: 40,
                       ),
                     ),
                     SizedBox(
@@ -91,13 +87,8 @@ class _AboutState extends State<About> {
                 SizedBox(
                   height: 20,
                 ),
-                NeuCard(
+                Card(
                   margin: EdgeInsets.symmetric(horizontal: 20),
-                  decoration: NeumorphicDecoration(
-                    color: Theme.of(context).scaffoldBackgroundColor,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  curveType: CurveType.flat,
                   child: Padding(
                     padding: EdgeInsets.all(20),
                     child: Column(
@@ -167,13 +158,8 @@ class _AboutState extends State<About> {
                   SizedBox(
                     height: 20,
                   ),
-                  NeuCard(
+                  Card(
                     margin: EdgeInsets.symmetric(horizontal: 20),
-                    decoration: NeumorphicDecoration(
-                      color: Theme.of(context).scaffoldBackgroundColor,
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    curveType: CurveType.flat,
                     child: Padding(
                         padding: EdgeInsets.all(15),
                         child: Column(
@@ -194,15 +180,7 @@ class _AboutState extends State<About> {
                                         style: TextStyle(fontSize: 16),
                                       ),
                                       Spacer(),
-                                      NeuButton(
-                                        decoration: NeumorphicDecoration(
-                                          color: Theme.of(context)
-                                              .scaffoldBackgroundColor,
-                                          borderRadius:
-                                              BorderRadius.circular(20),
-                                        ),
-                                        padding: EdgeInsets.symmetric(
-                                            horizontal: 20, vertical: 5),
+                                      OutlinedButton(
                                         onPressed: () {
                                           launchUrlString(e.key ?? '',
                                               mode: LaunchMode
@@ -220,13 +198,8 @@ class _AboutState extends State<About> {
                   SizedBox(
                     height: 20,
                   ),
-                  NeuCard(
+                  Card(
                     margin: EdgeInsets.symmetric(horizontal: 20),
-                    decoration: NeumorphicDecoration(
-                      color: Theme.of(context).scaffoldBackgroundColor,
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    curveType: CurveType.flat,
                     child: Padding(
                         padding: EdgeInsets.all(15),
                         child: Column(
@@ -247,15 +220,7 @@ class _AboutState extends State<About> {
                                         style: TextStyle(fontSize: 16),
                                       ),
                                       Spacer(),
-                                      NeuButton(
-                                        decoration: NeumorphicDecoration(
-                                          color: Theme.of(context)
-                                              .scaffoldBackgroundColor,
-                                          borderRadius:
-                                              BorderRadius.circular(20),
-                                        ),
-                                        padding: EdgeInsets.symmetric(
-                                            horizontal: 20, vertical: 5),
+                                      OutlinedButton(
                                         onPressed: () {
                                           launchUrlString(
                                               'mqqopensdkapi://bizAgent/qm/qr?url=http%3A%2F%2Fqm.qq.com%2Fcgi-bin%2Fqm%2Fqr%3Ffrom%3Dapp%26p%3Dandroid%26jump_from%3Dwebapi%26k%3D${e.key}');
@@ -272,13 +237,8 @@ class _AboutState extends State<About> {
                   SizedBox(
                     height: 20,
                   ),
-                  NeuCard(
+                  Card(
                     margin: EdgeInsets.symmetric(horizontal: 20),
-                    decoration: NeumorphicDecoration(
-                      color: Theme.of(context).scaffoldBackgroundColor,
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    curveType: CurveType.flat,
                     child: Padding(
                       padding: EdgeInsets.all(15),
                       child: Column(
@@ -299,14 +259,7 @@ class _AboutState extends State<About> {
                                       style: TextStyle(fontSize: 16),
                                     ),
                                     Spacer(),
-                                    NeuButton(
-                                      decoration: NeumorphicDecoration(
-                                        color: Theme.of(context)
-                                            .scaffoldBackgroundColor,
-                                        borderRadius: BorderRadius.circular(20),
-                                      ),
-                                      padding: EdgeInsets.symmetric(
-                                          horizontal: 20, vertical: 5),
+                                    OutlinedButton(
                                       onPressed: () {
                                         ClipboardData data = new ClipboardData(
                                             text: e.name ?? '');
@@ -327,13 +280,8 @@ class _AboutState extends State<About> {
                 SizedBox(
                   height: 20,
                 ),
-                NeuCard(
+                Card(
                   margin: EdgeInsets.symmetric(horizontal: 20),
-                  decoration: NeumorphicDecoration(
-                    color: Theme.of(context).scaffoldBackgroundColor,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  curveType: CurveType.flat,
                   child: Padding(
                     padding: EdgeInsets.all(20),
                     child: Row(
@@ -350,13 +298,7 @@ class _AboutState extends State<About> {
                           style: TextStyle(fontSize: 16),
                         ),
                         Spacer(),
-                        NeuButton(
-                          decoration: NeumorphicDecoration(
-                            color: Theme.of(context).scaffoldBackgroundColor,
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          padding:
-                              EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+                        OutlinedButton(
                           onPressed: () {
                             Navigator.of(context)
                                 .push(CupertinoPageRoute(builder: (context) {
@@ -374,13 +316,8 @@ class _AboutState extends State<About> {
                 SizedBox(
                   height: 20,
                 ),
-                NeuCard(
+                Card(
                   margin: EdgeInsets.symmetric(horizontal: 20),
-                  decoration: NeumorphicDecoration(
-                    color: Theme.of(context).scaffoldBackgroundColor,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  curveType: CurveType.flat,
                   child: Padding(
                     padding: EdgeInsets.all(20),
                     child: Row(
@@ -396,13 +333,7 @@ class _AboutState extends State<About> {
                           style: TextStyle(fontSize: 16),
                         ),
                         Spacer(),
-                        NeuButton(
-                          decoration: NeumorphicDecoration(
-                            color: Theme.of(context).scaffoldBackgroundColor,
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          padding:
-                              EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+                        OutlinedButton(
                           onPressed: () {
                             Navigator.of(context).push(
                               CupertinoPageRoute(builder: (context) {
@@ -422,13 +353,8 @@ class _AboutState extends State<About> {
                 SizedBox(
                   height: 20,
                 ),
-                NeuCard(
+                Card(
                   margin: EdgeInsets.symmetric(horizontal: 20),
-                  decoration: NeumorphicDecoration(
-                    color: Theme.of(context).scaffoldBackgroundColor,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  curveType: CurveType.flat,
                   child: Padding(
                     padding: EdgeInsets.all(20),
                     child: Row(
@@ -445,13 +371,7 @@ class _AboutState extends State<About> {
                           style: TextStyle(fontSize: 16),
                         ),
                         Spacer(),
-                        NeuButton(
-                          decoration: NeumorphicDecoration(
-                            color: Theme.of(context).scaffoldBackgroundColor,
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          padding:
-                              EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+                        OutlinedButton(
                           onPressed: () {
                             Navigator.of(context).push(
                               CupertinoPageRoute(
@@ -476,7 +396,7 @@ class _AboutState extends State<About> {
           if (Platform.isAndroid)
             Padding(
               padding: EdgeInsets.all(20),
-              child: NeuButton(
+              child: OutlinedButton(
                 onPressed: () async {
                   if (checking) {
                     return;
@@ -490,12 +410,6 @@ class _AboutState extends State<About> {
                   });
                 },
                 // margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                padding: EdgeInsets.symmetric(vertical: 20),
-                decoration: NeumorphicDecoration(
-                  color: Theme.of(context).scaffoldBackgroundColor,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                bevel: 20,
                 child: checking
                     ? Center(
                         child: CupertinoActivityIndicator(

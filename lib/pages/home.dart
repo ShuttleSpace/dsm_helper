@@ -13,7 +13,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_sharing_intent/flutter_sharing_intent.dart';
 import 'package:flutter_sharing_intent/model/sharing_file.dart';
 import 'package:flutter_vibrate/flutter_vibrate.dart';
-import 'package:neumorphic/neumorphic.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
 import 'dashborad/dashboard.dart';
@@ -238,84 +237,51 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
           ],
           index: _currentIndex,
         ),
-        bottomNavigationBar: NeuSwitch(
+        bottomNavigationBar: BottomNavigationBar(
           backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-          thumbColor: Theme.of(context).scaffoldBackgroundColor,
-          // padding: EdgeInsets.symmetric(vertical: 5),
-          onValueChanged: (v) {
+          type: BottomNavigationBarType.fixed,
+          selectedItemColor: Colors.blue,
+          onTap: (v) {
+            print('[selected] $v');
             setState(() {
               _currentIndex = v;
             });
           },
-          groupValue: _currentIndex,
-          padding:
-              EdgeInsets.only(bottom: MediaQuery.of(context).padding.bottom),
-          children: {
-            0: Padding(
-              padding: EdgeInsets.symmetric(vertical: 6),
-              child: Column(
-                children: [
-                  Image.asset(
-                    "assets/tabbar/meter.png",
-                    width: 30,
-                    height: 30,
-                  ),
-                  Text(
-                    "控制台",
-                    style: TextStyle(fontSize: 12),
-                  ),
-                ],
+          currentIndex: _currentIndex,
+          items: [
+            BottomNavigationBarItem(
+              label: "控制台",
+              icon: Image.asset(
+                "assets/tabbar/meter.png",
+                width: 30,
+                height: 30,
               ),
             ),
-            1: Padding(
-              padding: EdgeInsets.symmetric(vertical: 6),
-              child: Column(
-                children: [
-                  Image.asset(
-                    "assets/tabbar/folder.png",
-                    width: 30,
-                    height: 30,
-                  ),
-                  Text(
-                    "文件",
-                    style: TextStyle(fontSize: 12),
-                  ),
-                ],
+            BottomNavigationBarItem(
+              icon: Image.asset(
+                "assets/tabbar/folder.png",
+                width: 30,
+                height: 30,
               ),
+              label: "文件",
             ),
-            2: Padding(
-              padding: EdgeInsets.symmetric(vertical: 6),
-              child: Column(
-                children: [
-                  Image.asset(
-                    "assets/tabbar/save.png",
-                    width: 30,
-                    height: 30,
-                  ),
-                  Text(
-                    "下载",
-                    style: TextStyle(fontSize: 12),
-                  ),
-                ],
+            BottomNavigationBarItem(
+              icon: Image.asset(
+                "assets/tabbar/save.png",
+                width: 30,
+                height: 30,
               ),
+              label: '下载',
             ),
-            3: Padding(
-              padding: EdgeInsets.symmetric(vertical: 6),
-              child: Column(
-                children: [
-                  Image.asset(
-                    "assets/tabbar/setting.png",
-                    width: 30,
-                    height: 30,
-                  ),
-                  Text(
-                    "设置",
-                    style: TextStyle(fontSize: 12),
-                  ),
-                ],
+            BottomNavigationBarItem(
+              icon: Image.asset(
+                "assets/tabbar/setting.png",
+                width: 30,
+                height: 30,
               ),
+              label: '设置',
             ),
-          },
+          ],
         ),
       ),
     );

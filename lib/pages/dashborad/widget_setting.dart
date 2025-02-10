@@ -4,7 +4,6 @@ import 'package:dsm_helper/util/function.dart';
 import 'package:dsm_helper/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:neumorphic/neumorphic.dart';
 import 'package:provider/provider.dart';
 
 class WidgetSetting extends StatefulWidget {
@@ -82,13 +81,7 @@ class _WidgetSettingState extends State<WidgetSetting> {
         actions: [
           Padding(
             padding: EdgeInsets.only(right: 10, top: 8, bottom: 8),
-            child: NeuButton(
-              decoration: NeumorphicDecoration(
-                color: Theme.of(context).scaffoldBackgroundColor,
-                borderRadius: BorderRadius.circular(10),
-              ),
-              padding: EdgeInsets.all(10),
-              bevel: 5,
+            child: OutlinedButton(
               onPressed: () async {
                 List saveWidgets = [];
                 showWidgets.forEach((widget) {
@@ -126,17 +119,12 @@ class _WidgetSettingState extends State<WidgetSetting> {
                 setState(() {
                   setState(() {
                     showShortcut = !showShortcut;
-                    Provider.of<ShortcutProvider>(context, listen: false).changeMode(showShortcut);
+                    Provider.of<ShortcutProvider>(context, listen: false)
+                        .changeMode(showShortcut);
                   });
                 });
               },
-              child: NeuCard(
-                decoration: NeumorphicDecoration(
-                  color: Theme.of(context).scaffoldBackgroundColor,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                curveType: showShortcut ? CurveType.emboss : CurveType.flat,
-                bevel: 20,
+              child: Card(
                 child: Padding(
                   padding: EdgeInsets.all(20),
                   child: Column(
@@ -175,17 +163,12 @@ class _WidgetSettingState extends State<WidgetSetting> {
                 setState(() {
                   setState(() {
                     showWallpaper = !showWallpaper;
-                    Provider.of<WallpaperProvider>(context, listen: false).changeMode(showWallpaper);
+                    Provider.of<WallpaperProvider>(context, listen: false)
+                        .changeMode(showWallpaper);
                   });
                 });
               },
-              child: NeuCard(
-                decoration: NeumorphicDecoration(
-                  color: Theme.of(context).scaffoldBackgroundColor,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                curveType: showWallpaper ? CurveType.emboss : CurveType.flat,
-                bevel: 20,
+              child: Card(
                 child: Padding(
                   padding: EdgeInsets.all(20),
                   child: Column(
@@ -235,14 +218,8 @@ class _WidgetSettingState extends State<WidgetSetting> {
                       print(showWidgets);
                     });
                   },
-                  child: NeuCard(
+                  child: Card(
                     margin: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-                    curveType: CurveType.flat,
-                    decoration: NeumorphicDecoration(
-                      color: Theme.of(context).scaffoldBackgroundColor,
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    bevel: 20,
                     child: Padding(
                       padding: EdgeInsets.all(20),
                       child: Row(
@@ -253,14 +230,7 @@ class _WidgetSettingState extends State<WidgetSetting> {
                               style: TextStyle(fontSize: 16),
                             ),
                           ),
-                          NeuCard(
-                            decoration: NeumorphicDecoration(
-                              color: Theme.of(context).scaffoldBackgroundColor,
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            curveType: selectedWidgets.contains(widget) ? CurveType.emboss : CurveType.flat,
-                            padding: EdgeInsets.all(5),
-                            bevel: 5,
+                          Card(
                             child: SizedBox(
                               width: 20,
                               height: 20,

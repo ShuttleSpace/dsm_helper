@@ -17,7 +17,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fluwx/fluwx.dart';
-import 'package:neumorphic/neumorphic.dart';
 import 'package:provider/provider.dart';
 
 class SettingButton extends StatelessWidget {
@@ -33,15 +32,9 @@ class SettingButton extends StatelessWidget {
     double width = (MediaQuery.of(context).size.width - 81) / 3;
     return SizedBox(
       width: width,
-      child: NeuButton(
+      child: OutlinedButton(
         onPressed: onPressed,
         // margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-        padding: EdgeInsets.symmetric(vertical: 20),
-        decoration: NeumorphicDecoration(
-          color: Theme.of(context).scaffoldBackgroundColor,
-          borderRadius: BorderRadius.circular(20),
-        ),
-        bevel: 20,
         child: Column(
           children: [
             loading
@@ -72,17 +65,11 @@ class ThemeButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return NeuButton(
+    return OutlinedButton(
       onPressed: () {
         Navigator.of(context).pop();
         Provider.of<DarkModeProvider>(context, listen: false).changeMode(type);
       },
-      decoration: NeumorphicDecoration(
-        color: Theme.of(context).scaffoldBackgroundColor,
-        borderRadius: BorderRadius.circular(25),
-      ),
-      bevel: 5,
-      padding: EdgeInsets.symmetric(vertical: 10),
       child: Column(
         children: [
           Padding(
@@ -206,14 +193,7 @@ class _SettingState extends State<Setting> {
           builder: (context) {
             return Material(
               color: Colors.transparent,
-              child: NeuCard(
-                width: double.infinity,
-                bevel: 5,
-                curveType: CurveType.emboss,
-                decoration: NeumorphicDecoration(
-                    color: Theme.of(context).scaffoldBackgroundColor,
-                    borderRadius:
-                        BorderRadius.vertical(top: Radius.circular(22))),
+              child: Card(
                 child: SafeArea(
                   top: false,
                   child: Padding(
@@ -240,18 +220,11 @@ class _SettingState extends State<Setting> {
                         Row(
                           children: [
                             Expanded(
-                              child: NeuButton(
+                              child: OutlinedButton(
                                 onPressed: () async {
                                   Navigator.of(context).pop();
                                   power(type, true);
                                 },
-                                decoration: NeumorphicDecoration(
-                                  color:
-                                      Theme.of(context).scaffoldBackgroundColor,
-                                  borderRadius: BorderRadius.circular(25),
-                                ),
-                                bevel: 5,
-                                padding: EdgeInsets.symmetric(vertical: 10),
                                 child: Text(
                                   "强制${type == "shutdown" ? "关机" : "重启"}",
                                   style: TextStyle(
@@ -263,17 +236,10 @@ class _SettingState extends State<Setting> {
                               width: 16,
                             ),
                             Expanded(
-                              child: NeuButton(
+                              child: OutlinedButton(
                                 onPressed: () async {
                                   Navigator.of(context).pop();
                                 },
-                                decoration: NeumorphicDecoration(
-                                  color:
-                                      Theme.of(context).scaffoldBackgroundColor,
-                                  borderRadius: BorderRadius.circular(25),
-                                ),
-                                bevel: 5,
-                                padding: EdgeInsets.symmetric(vertical: 10),
                                 child: Text(
                                   "取消",
                                   style: TextStyle(fontSize: 18),
@@ -308,13 +274,7 @@ class _SettingState extends State<Setting> {
       builder: (context) {
         return Material(
           color: Colors.transparent,
-          child: NeuCard(
-            width: double.infinity,
-            bevel: 5,
-            curveType: CurveType.emboss,
-            decoration: NeumorphicDecoration(
-                color: Theme.of(context).scaffoldBackgroundColor,
-                borderRadius: BorderRadius.vertical(top: Radius.circular(22))),
+          child: Card(
             child: SafeArea(
               top: false,
               child: Padding(
@@ -341,17 +301,11 @@ class _SettingState extends State<Setting> {
                     Row(
                       children: [
                         Expanded(
-                          child: NeuButton(
+                          child: OutlinedButton(
                             onPressed: () async {
                               Navigator.of(context).pop();
                               power("shutdown", false);
                             },
-                            decoration: NeumorphicDecoration(
-                              color: Theme.of(context).scaffoldBackgroundColor,
-                              borderRadius: BorderRadius.circular(25),
-                            ),
-                            bevel: 5,
-                            padding: EdgeInsets.symmetric(vertical: 10),
                             child: Text(
                               "确认关机",
                               style: TextStyle(
@@ -363,16 +317,10 @@ class _SettingState extends State<Setting> {
                           width: 16,
                         ),
                         Expanded(
-                          child: NeuButton(
+                          child: OutlinedButton(
                             onPressed: () async {
                               Navigator.of(context).pop();
                             },
-                            decoration: NeumorphicDecoration(
-                              color: Theme.of(context).scaffoldBackgroundColor,
-                              borderRadius: BorderRadius.circular(25),
-                            ),
-                            bevel: 5,
-                            padding: EdgeInsets.symmetric(vertical: 10),
                             child: Text(
                               "取消",
                               style: TextStyle(fontSize: 18),
@@ -403,13 +351,7 @@ class _SettingState extends State<Setting> {
       builder: (context) {
         return Material(
           color: Colors.transparent,
-          child: NeuCard(
-            width: double.infinity,
-            bevel: 5,
-            curveType: CurveType.emboss,
-            decoration: NeumorphicDecoration(
-                color: Theme.of(context).scaffoldBackgroundColor,
-                borderRadius: BorderRadius.vertical(top: Radius.circular(22))),
+          child: Card(
             child: SafeArea(
               top: false,
               child: Padding(
@@ -436,17 +378,11 @@ class _SettingState extends State<Setting> {
                     Row(
                       children: [
                         Expanded(
-                          child: NeuButton(
+                          child: OutlinedButton(
                             onPressed: () async {
                               Navigator.of(context).pop();
                               power("reboot", false);
                             },
-                            decoration: NeumorphicDecoration(
-                              color: Theme.of(context).scaffoldBackgroundColor,
-                              borderRadius: BorderRadius.circular(25),
-                            ),
-                            bevel: 5,
-                            padding: EdgeInsets.symmetric(vertical: 10),
                             child: Text(
                               "确认重启",
                               style: TextStyle(
@@ -458,16 +394,10 @@ class _SettingState extends State<Setting> {
                           width: 16,
                         ),
                         Expanded(
-                          child: NeuButton(
+                          child: OutlinedButton(
                             onPressed: () async {
                               Navigator.of(context).pop();
                             },
-                            decoration: NeumorphicDecoration(
-                              color: Theme.of(context).scaffoldBackgroundColor,
-                              borderRadius: BorderRadius.circular(25),
-                            ),
-                            bevel: 5,
-                            padding: EdgeInsets.symmetric(vertical: 10),
                             child: Text(
                               "取消",
                               style: TextStyle(fontSize: 18),
@@ -495,13 +425,7 @@ class _SettingState extends State<Setting> {
       builder: (context) {
         return Material(
           color: Colors.transparent,
-          child: NeuCard(
-            width: double.infinity,
-            bevel: 5,
-            curveType: CurveType.emboss,
-            decoration: NeumorphicDecoration(
-                color: Theme.of(context).scaffoldBackgroundColor,
-                borderRadius: BorderRadius.vertical(top: Radius.circular(22))),
+          child: Card(
             child: SafeArea(
               top: false,
               child: Padding(
@@ -539,16 +463,10 @@ class _SettingState extends State<Setting> {
                     SizedBox(
                       height: 20,
                     ),
-                    NeuButton(
+                    OutlinedButton(
                       onPressed: () async {
                         Navigator.of(context).pop();
                       },
-                      decoration: NeumorphicDecoration(
-                        color: Theme.of(context).scaffoldBackgroundColor,
-                        borderRadius: BorderRadius.circular(25),
-                      ),
-                      bevel: 5,
-                      padding: EdgeInsets.symmetric(vertical: 10),
                       child: Text(
                         "取消",
                         style: TextStyle(fontSize: 18),
@@ -578,13 +496,7 @@ class _SettingState extends State<Setting> {
         actions: [
           Padding(
             padding: EdgeInsets.only(right: 10, top: 8, bottom: 8),
-            child: NeuButton(
-              decoration: NeumorphicDecoration(
-                color: Theme.of(context).scaffoldBackgroundColor,
-                borderRadius: BorderRadius.circular(10),
-              ),
-              padding: EdgeInsets.all(10),
-              bevel: 5,
+            child: OutlinedButton(
               onPressed: () {
                 Navigator.of(context)
                     .push(
@@ -628,13 +540,7 @@ class _SettingState extends State<Setting> {
                 }
               });
             },
-            child: NeuCard(
-              decoration: NeumorphicDecoration(
-                color: Theme.of(context).scaffoldBackgroundColor,
-                borderRadius: BorderRadius.circular(20),
-              ),
-              bevel: 20,
-              curveType: CurveType.flat,
+            child: Card(
               child: Padding(
                 padding: EdgeInsets.all(20.0),
                 child: Row(
@@ -667,7 +573,7 @@ class _SettingState extends State<Setting> {
                         ],
                       ),
                     ),
-                    NeuButton(
+                    OutlinedButton(
                       onPressed: () {
                         showCupertinoModalPopup(
                           context: context,
@@ -677,12 +583,6 @@ class _SettingState extends State<Setting> {
                         );
                       },
                       // margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                      padding: EdgeInsets.all(10),
-                      decoration: NeumorphicDecoration(
-                        color: Theme.of(context).scaffoldBackgroundColor,
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      bevel: 20,
                       child: Image.asset(
                         "assets/icons/exit.png",
                         width: 16,
@@ -691,7 +591,7 @@ class _SettingState extends State<Setting> {
                     SizedBox(
                       width: 10,
                     ),
-                    NeuButton(
+                    OutlinedButton(
                       onPressed: () {
                         Navigator.of(context)
                             .push(CupertinoPageRoute(builder: (context) {
@@ -699,12 +599,6 @@ class _SettingState extends State<Setting> {
                         }));
                       },
                       // margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                      padding: EdgeInsets.all(10),
-                      decoration: NeumorphicDecoration(
-                        color: Theme.of(context).scaffoldBackgroundColor,
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      bevel: 20,
                       child: Image.asset(
                         "assets/icons/change.png",
                         width: 16,
@@ -743,15 +637,7 @@ class _SettingState extends State<Setting> {
                       builder: (context) {
                         return Material(
                           color: Colors.transparent,
-                          child: NeuCard(
-                            width: double.infinity,
-                            bevel: 5,
-                            curveType: CurveType.emboss,
-                            decoration: NeumorphicDecoration(
-                                color:
-                                    Theme.of(context).scaffoldBackgroundColor,
-                                borderRadius: BorderRadius.vertical(
-                                    top: Radius.circular(22))),
+                          child: Card(
                             child: SafeArea(
                               top: false,
                               child: Padding(
@@ -780,7 +666,7 @@ class _SettingState extends State<Setting> {
                                     Row(
                                       children: [
                                         Expanded(
-                                          child: NeuButton(
+                                          child: OutlinedButton(
                                             onPressed: () async {
                                               Navigator.of(context).pop();
                                               setState(() {
@@ -795,15 +681,6 @@ class _SettingState extends State<Setting> {
                                               }
                                               await getData();
                                             },
-                                            decoration: NeumorphicDecoration(
-                                              color: Theme.of(context)
-                                                  .scaffoldBackgroundColor,
-                                              borderRadius:
-                                                  BorderRadius.circular(25),
-                                            ),
-                                            bevel: 5,
-                                            padding: EdgeInsets.symmetric(
-                                                vertical: 10),
                                             child: Text(
                                               "确认${ssh ? '关闭' : '开启'}SSH",
                                               style: TextStyle(
@@ -816,19 +693,10 @@ class _SettingState extends State<Setting> {
                                           width: 16,
                                         ),
                                         Expanded(
-                                          child: NeuButton(
+                                          child: OutlinedButton(
                                             onPressed: () async {
                                               Navigator.of(context).pop();
                                             },
-                                            decoration: NeumorphicDecoration(
-                                              color: Theme.of(context)
-                                                  .scaffoldBackgroundColor,
-                                              borderRadius:
-                                                  BorderRadius.circular(25),
-                                            ),
-                                            bevel: 5,
-                                            padding: EdgeInsets.symmetric(
-                                                vertical: 10),
                                             child: Text(
                                               "取消",
                                               style: TextStyle(fontSize: 18),
@@ -856,24 +724,16 @@ class _SettingState extends State<Setting> {
                         },
                         settings: RouteSettings(name: "ssh_setting")));
                   },
-                  child: NeuCard(
+                  child: Card(
                     // margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                    padding: EdgeInsets.symmetric(vertical: 20),
-                    decoration: NeumorphicDecoration(
-                      color: Theme.of(context).scaffoldBackgroundColor,
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    curveType: ssh == null
-                        ? CurveType.convex
-                        : ssh
-                            ? CurveType.emboss
-                            : CurveType.flat,
-                    bevel: 20,
                     child: Column(
                       children: [
                         sshLoading
-                            ? CupertinoActivityIndicator(
-                                radius: 20,
+                            ? Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: CupertinoActivityIndicator(
+                                  radius: 20,
+                                ),
                               )
                             : Image.asset(
                                 "assets/icons/ssh.png",
@@ -928,15 +788,7 @@ class _SettingState extends State<Setting> {
                       builder: (context) {
                         return Material(
                           color: Colors.transparent,
-                          child: NeuCard(
-                            width: double.infinity,
-                            bevel: 5,
-                            curveType: CurveType.emboss,
-                            decoration: NeumorphicDecoration(
-                                color:
-                                    Theme.of(context).scaffoldBackgroundColor,
-                                borderRadius: BorderRadius.vertical(
-                                    top: Radius.circular(22))),
+                          child: Card(
                             child: SafeArea(
                               top: false,
                               child: Padding(
@@ -956,7 +808,7 @@ class _SettingState extends State<Setting> {
                                     Row(
                                       children: [
                                         Expanded(
-                                          child: NeuButton(
+                                          child: OutlinedButton(
                                             onPressed: () async {
                                               Navigator.of(context).pop();
                                               context
@@ -967,15 +819,6 @@ class _SettingState extends State<Setting> {
                                                           username:
                                                               'gh_6c07712ef0fb'));
                                             },
-                                            decoration: NeumorphicDecoration(
-                                              color: Theme.of(context)
-                                                  .scaffoldBackgroundColor,
-                                              borderRadius:
-                                                  BorderRadius.circular(25),
-                                            ),
-                                            bevel: 5,
-                                            padding: EdgeInsets.symmetric(
-                                                vertical: 10),
                                             child: Text(
                                               "进入小程序",
                                               style: TextStyle(
@@ -988,19 +831,10 @@ class _SettingState extends State<Setting> {
                                           width: 16,
                                         ),
                                         Expanded(
-                                          child: NeuButton(
+                                          child: OutlinedButton(
                                             onPressed: () async {
                                               Navigator.of(context).pop();
                                             },
-                                            decoration: NeumorphicDecoration(
-                                              color: Theme.of(context)
-                                                  .scaffoldBackgroundColor,
-                                              borderRadius:
-                                                  BorderRadius.circular(25),
-                                            ),
-                                            bevel: 5,
-                                            padding: EdgeInsets.symmetric(
-                                                vertical: 10),
                                             child: Text(
                                               "取消",
                                               style: TextStyle(fontSize: 18),

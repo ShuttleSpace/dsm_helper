@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:neumorphic/neumorphic.dart';
 
 class AppBackButton extends StatefulWidget {
   final BuildContext context;
@@ -28,18 +27,11 @@ class _AppBackButtonState extends State<AppBackButton> {
     return canPop
         ? Padding(
             padding: EdgeInsets.only(left: 10, top: 8, bottom: 8),
-            child: NeuButton(
-              decoration: NeumorphicDecoration(
-                color:
-                    widget.color ?? Theme.of(context).scaffoldBackgroundColor,
-                borderRadius: BorderRadius.circular(10),
-              ),
-              padding: EdgeInsets.all(10),
-              bevel: widget.bevel,
+            child: IconButton(
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: Icon(
+              icon: Icon(
                 Icons.arrow_back_ios_outlined,
                 size: 22,
                 color: widget.iconColor,

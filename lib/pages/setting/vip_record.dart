@@ -6,7 +6,6 @@ import 'package:dsm_helper/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:neumorphic/neumorphic.dart';
 
 class VipRecord extends StatefulWidget {
   const VipRecord();
@@ -76,15 +75,8 @@ class _VipRecordState extends State<VipRecord> {
   }
 
   Widget _buildRecordItem(VipRecordModel record) {
-    return NeuCard(
+    return Card(
       margin: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
-      bevel: 20,
-      curveType: CurveType.flat,
-      decoration: NeumorphicDecoration(
-        color: Theme.of(context).scaffoldBackgroundColor,
-        borderRadius: BorderRadius.circular(20),
-      ),
-      padding: EdgeInsets.all(20),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -101,7 +93,7 @@ class _VipRecordState extends State<VipRecord> {
             ),
           ),
           if (record.activityId != null && (record.activityId ?? 0) > 0)
-            NeuButton(
+            OutlinedButton(
               onPressed: () async {
                 var hide = showWeuiLoadingToast(context: context);
                 String userToken = await Util.getStorage("user_token") ?? '';
@@ -120,16 +112,8 @@ class _VipRecordState extends State<VipRecord> {
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            NeuCard(
-                              width: double.infinity,
+                            Card(
                               margin: EdgeInsets.symmetric(horizontal: 50),
-                              curveType: CurveType.emboss,
-                              bevel: 5,
-                              decoration: NeumorphicDecoration(
-                                color:
-                                    Theme.of(context).scaffoldBackgroundColor,
-                                borderRadius: BorderRadius.circular(25),
-                              ),
                               child: Padding(
                                 padding: EdgeInsets.all(20),
                                 child: Column(
@@ -143,16 +127,7 @@ class _VipRecordState extends State<VipRecord> {
                                     SizedBox(
                                       height: 16,
                                     ),
-                                    NeuCard(
-                                      decoration: NeumorphicDecoration(
-                                        color: Theme.of(context)
-                                            .scaffoldBackgroundColor,
-                                        borderRadius: BorderRadius.circular(20),
-                                      ),
-                                      bevel: 20,
-                                      curveType: CurveType.flat,
-                                      padding: EdgeInsets.symmetric(
-                                          horizontal: 20, vertical: 10),
+                                    Card(
                                       child: Text("${res['data']['code']}"),
                                     ),
                                     SizedBox(
@@ -161,19 +136,10 @@ class _VipRecordState extends State<VipRecord> {
                                     Row(
                                       children: [
                                         Expanded(
-                                          child: NeuButton(
+                                          child: OutlinedButton(
                                             onPressed: () {
                                               Navigator.of(context).pop();
                                             },
-                                            decoration: NeumorphicDecoration(
-                                              color: Theme.of(context)
-                                                  .scaffoldBackgroundColor,
-                                              borderRadius:
-                                                  BorderRadius.circular(25),
-                                            ),
-                                            bevel: 20,
-                                            padding: EdgeInsets.symmetric(
-                                                vertical: 10),
                                             child: Text(
                                               "关闭",
                                               style: TextStyle(fontSize: 18),
@@ -184,21 +150,12 @@ class _VipRecordState extends State<VipRecord> {
                                           width: 16,
                                         ),
                                         Expanded(
-                                          child: NeuButton(
+                                          child: OutlinedButton(
                                             onPressed: () async {
                                               Clipboard.setData(ClipboardData(
                                                   text: res['data']['code']));
                                               Util.toast("兑换码已复制到剪贴板");
                                             },
-                                            decoration: NeumorphicDecoration(
-                                              color: Theme.of(context)
-                                                  .scaffoldBackgroundColor,
-                                              borderRadius:
-                                                  BorderRadius.circular(25),
-                                            ),
-                                            bevel: 20,
-                                            padding: EdgeInsets.symmetric(
-                                                vertical: 10),
                                             child: Text(
                                               "复制",
                                               style: TextStyle(fontSize: 18),
@@ -218,12 +175,6 @@ class _VipRecordState extends State<VipRecord> {
                   );
                 }
               },
-              decoration: NeumorphicDecoration(
-                color: Theme.of(context).scaffoldBackgroundColor,
-                borderRadius: BorderRadius.circular(20),
-              ),
-              bevel: 5,
-              padding: EdgeInsets.symmetric(horizontal: 15, vertical: 7),
               child: Text(
                 "领取兑换码",
                 style: TextStyle(fontSize: 12),

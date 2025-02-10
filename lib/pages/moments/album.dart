@@ -5,7 +5,6 @@ import 'package:dsm_helper/widgets/cupertino_image.dart';
 import 'package:dsm_helper/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:neumorphic/neumorphic.dart';
 
 class Album extends StatefulWidget {
   final bool shared;
@@ -98,17 +97,8 @@ class _AlbumState extends State<Album> {
       ),
       body: loadingAlbum
           ? Center(
-              child: NeuCard(
-                padding: EdgeInsets.all(50),
-                curveType: CurveType.flat,
-                decoration: NeumorphicDecoration(
-                  color: Theme.of(context).scaffoldBackgroundColor,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                bevel: 20,
-                child: CupertinoActivityIndicator(
-                  radius: 14,
-                ),
+              child: CupertinoActivityIndicator(
+                radius: 14,
               ),
             )
           : album.length > 0

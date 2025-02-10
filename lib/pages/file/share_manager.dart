@@ -5,7 +5,6 @@ import 'package:dsm_helper/widgets/label.dart';
 import 'package:dsm_helper/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:neumorphic/neumorphic.dart';
 
 class ShareManager extends StatefulWidget {
   @override
@@ -36,7 +35,7 @@ class _ShareManagerState extends State<ShareManager> {
     FileTypeEnum fileType = Util.fileType(link['path']);
     return Padding(
       padding: EdgeInsets.symmetric(vertical: 10),
-      child: NeuButton(
+      child: OutlinedButton(
         onPressed: () {
           Navigator.of(context)
               .push(CupertinoPageRoute(
@@ -53,12 +52,6 @@ class _ShareManagerState extends State<ShareManager> {
             getData();
           });
         },
-        padding: EdgeInsets.all(22),
-        bevel: 20,
-        decoration: NeumorphicDecoration(
-          color: Theme.of(context).scaffoldBackgroundColor,
-          borderRadius: BorderRadius.circular(22),
-        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -129,17 +122,8 @@ class _ShareManagerState extends State<ShareManager> {
       ),
       body: loading
           ? Center(
-              child: NeuCard(
-                padding: EdgeInsets.all(50),
-                curveType: CurveType.flat,
-                decoration: NeumorphicDecoration(
-                  color: Theme.of(context).scaffoldBackgroundColor,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                bevel: 20,
-                child: CupertinoActivityIndicator(
-                  radius: 14,
-                ),
+              child: CupertinoActivityIndicator(
+                radius: 14,
               ),
             )
           : ListView.builder(

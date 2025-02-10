@@ -8,7 +8,6 @@ import 'package:dsm_helper/widgets/neu_back_button.dart';
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
 import 'package:fplayer/fplayer.dart';
-import 'package:neumorphic/neumorphic.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import 'package:xml2json/xml2json.dart';
 
@@ -183,13 +182,7 @@ class _VideoPlayerState extends State<VideoPlayer> {
         actions: [
           Padding(
             padding: EdgeInsets.only(left: 0, top: 8, bottom: 8, right: 8),
-            child: NeuButton(
-              decoration: NeumorphicDecoration(
-                color: Theme.of(context).scaffoldBackgroundColor,
-                borderRadius: BorderRadius.circular(10),
-              ),
-              padding: EdgeInsets.all(10),
-              bevel: 5,
+            child: OutlinedButton(
               onPressed: () async {
                 // player.pause();
                 if (Platform.isAndroid) {

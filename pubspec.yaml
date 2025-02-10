@@ -89,9 +89,9 @@ dependencies:
   xterm: ^4.0.0
   draggable_scrollbar:
     git: https://gitee.com/dsm_bay/draggable_scrollbar.git
-  neumorphic:
-    git: 
-      url: https://gitee.com/dsm_bay/neumorphic.git
+  # neumorphic:
+  #   git: 
+  #     url: https://gitee.com/dsm_bay/neumorphic.git
 #  receive_sharing_intent:
 #    git: https://gitee.com/apaipai/receive_sharing_intent.git
   flutter_sharing_intent:

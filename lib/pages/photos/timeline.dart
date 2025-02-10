@@ -7,7 +7,6 @@ import 'package:dsm_helper/widgets/cupertino_image.dart';
 import 'package:dsm_helper/widgets/transparent_router.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:neumorphic/neumorphic.dart';
 
 class Timeline extends StatefulWidget {
   const Timeline(this.isTeam,
@@ -71,17 +70,8 @@ class TimelineState extends State<Timeline> {
   Widget build(BuildContext context) {
     return loading
         ? Center(
-            child: NeuCard(
-              padding: EdgeInsets.all(50),
-              curveType: CurveType.flat,
-              decoration: NeumorphicDecoration(
-                color: Theme.of(context).scaffoldBackgroundColor,
-                borderRadius: BorderRadius.circular(20),
-              ),
-              bevel: 20,
-              child: CupertinoActivityIndicator(
-                radius: 14,
-              ),
+            child: CupertinoActivityIndicator(
+              radius: 14,
             ),
           )
         : days.length > 0

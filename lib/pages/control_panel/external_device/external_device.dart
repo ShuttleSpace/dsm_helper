@@ -5,7 +5,6 @@ import 'package:dsm_helper/widgets/label.dart';
 import 'package:dsm_helper/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:neumorphic/neumorphic.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 
 class ExternalDevice extends StatefulWidget {
@@ -55,150 +54,135 @@ class _ExternalDeviceState extends State<ExternalDevice>
   }
 
   Widget _buildPartitionItem(partition) {
-    return NeuCard(
-      curveType: CurveType.flat,
-      decoration: NeumorphicDecoration(
-        color: Theme.of(context).scaffoldBackgroundColor,
-        borderRadius: BorderRadius.circular(20),
-      ),
+    return Card(
       margin: EdgeInsets.only(top: 20),
-      bevel: 20,
-      padding: EdgeInsets.all(20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Text("${partition['partition_title']}"),
-              SizedBox(
-                width: 10,
-              ),
-              partition['status'] == "normal"
-                  ? Label(
-                      "正常",
-                      Colors.green,
-                      fill: true,
-                    )
-                  : partition['status'] == "background"
-                      ? Label(
-                          "正在检查硬盘",
-                          Colors.lightBlueAccent,
-                          fill: true,
-                        )
-                      : Label(
-                          partition['status'],
-                          Colors.red,
-                          fill: true,
-                        ),
-            ],
-          ),
-          SizedBox(
-            height: 10,
-          ),
-          Row(
-            children: [
-              NeuCard(
-                curveType: CurveType.flat,
-                margin: EdgeInsets.all(10),
-                decoration: NeumorphicDecoration(
-                  color: Theme.of(context).scaffoldBackgroundColor,
-                  borderRadius: BorderRadius.circular(80),
-                  // color: Colors.red,
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Text("${partition['partition_title']}"),
+                SizedBox(
+                  width: 10,
                 ),
-                padding: EdgeInsets.all(5),
-                bevel: 8,
-                child: CircularPercentIndicator(
-                  radius: 40,
-                  // progressColor: Colors.lightBlueAccent,
-                  animation: true,
-                  linearGradient: LinearGradient(
-                    colors: partition['used_size_mb'] /
-                                partition['total_size_mb'] <=
-                            0.9
-                        ? [
-                            Colors.blue,
-                            Colors.blueAccent,
-                          ]
-                        : [
+                partition['status'] == "normal"
+                    ? Label(
+                        "正常",
+                        Colors.green,
+                        fill: true,
+                      )
+                    : partition['status'] == "background"
+                        ? Label(
+                            "正在检查硬盘",
+                            Colors.lightBlueAccent,
+                            fill: true,
+                          )
+                        : Label(
+                            partition['status'],
                             Colors.red,
-                            Colors.orangeAccent,
-                          ],
-                  ),
-                  animateFromLastPercent: true,
-                  circularStrokeCap: CircularStrokeCap.round,
-                  lineWidth: 12,
-                  backgroundColor: Colors.black12,
-                  percent:
-                      partition['used_size_mb'] / partition['total_size_mb'],
-                  center: Text(
-                    "${(partition['used_size_mb'] / partition['total_size_mb'] * 100).toStringAsFixed(0)}%",
-                    style: TextStyle(
-                        color: partition['used_size_mb'] /
+                            fill: true,
+                          ),
+              ],
+            ),
+            SizedBox(
+              height: 10,
+            ),
+            Row(
+              children: [
+                Card(
+                  margin: EdgeInsets.all(10),
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: CircularPercentIndicator(
+                      radius: 40,
+                      // progressColor: Colors.lightBlueAccent,
+                      animation: true,
+                      linearGradient: LinearGradient(
+                        colors: partition['used_size_mb'] /
                                     partition['total_size_mb'] <=
                                 0.9
-                            ? Colors.blue
-                            : Colors.red,
-                        fontSize: 22),
+                            ? [
+                                Colors.blue,
+                                Colors.blueAccent,
+                              ]
+                            : [
+                                Colors.red,
+                                Colors.orangeAccent,
+                              ],
+                      ),
+                      animateFromLastPercent: true,
+                      circularStrokeCap: CircularStrokeCap.round,
+                      lineWidth: 12,
+                      backgroundColor: Colors.black12,
+                      percent: partition['used_size_mb'] /
+                          partition['total_size_mb'],
+                      center: Text(
+                        "${(partition['used_size_mb'] / partition['total_size_mb'] * 100).toStringAsFixed(0)}%",
+                        style: TextStyle(
+                            color: partition['used_size_mb'] /
+                                        partition['total_size_mb'] <=
+                                    0.9
+                                ? Colors.blue
+                                : Colors.red,
+                            fontSize: 22),
+                      ),
+                    ),
                   ),
                 ),
-              ),
-              SizedBox(
-                width: 10,
-              ),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Text(
-                          "${partition['share_name']}",
-                          style: TextStyle(fontWeight: FontWeight.w600),
-                        ),
-                        SizedBox(
-                          width: 10,
-                        ),
-                        Label(
-                          partition['filesystem'] ?? partition['dev_fstype'],
-                          Colors.blue,
-                          fill: true,
-                        )
-                      ],
-                    ),
-                    SizedBox(
-                      height: 5,
-                    ),
-                    Text(
-                        "已用：${Util.formatSize(partition['used_size_mb'] * 1024 * 1024)}"),
-                    SizedBox(
-                      height: 5,
-                    ),
-                    Text(
-                        "可用：${Util.formatSize(partition['total_size_mb'] * 1024 * 1024 - partition['used_size_mb'] * 1024 * 1024)}"),
-                    SizedBox(
-                      height: 5,
-                    ),
-                    Text(
-                        "容量：${Util.formatSize(partition['total_size_mb'] * 1024 * 1024)}"),
-                  ],
+                SizedBox(
+                  width: 10,
                 ),
-              )
-            ],
-          )
-        ],
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Text(
+                            "${partition['share_name']}",
+                            style: TextStyle(fontWeight: FontWeight.w600),
+                          ),
+                          SizedBox(
+                            width: 10,
+                          ),
+                          Label(
+                            partition['filesystem'] ?? partition['dev_fstype'],
+                            Colors.blue,
+                            fill: true,
+                          )
+                        ],
+                      ),
+                      SizedBox(
+                        height: 5,
+                      ),
+                      Text(
+                          "已用：${Util.formatSize(partition['used_size_mb'] * 1024 * 1024)}"),
+                      SizedBox(
+                        height: 5,
+                      ),
+                      Text(
+                          "可用：${Util.formatSize(partition['total_size_mb'] * 1024 * 1024 - partition['used_size_mb'] * 1024 * 1024)}"),
+                      SizedBox(
+                        height: 5,
+                      ),
+                      Text(
+                          "容量：${Util.formatSize(partition['total_size_mb'] * 1024 * 1024)}"),
+                    ],
+                  ),
+                )
+              ],
+            )
+          ],
+        ),
       ),
     );
   }
 
   Widget _buildESataItem(esata) {
     List partitions = esata['partitions'];
-    return NeuCard(
-      curveType: CurveType.flat,
-      decoration: NeumorphicDecoration(
-        color: Theme.of(context).scaffoldBackgroundColor,
-        borderRadius: BorderRadius.circular(20),
-      ),
-      bevel: 20,
+    return Card(
       child: Padding(
         padding: EdgeInsets.all(20),
         child: Column(
@@ -228,7 +212,7 @@ class _ExternalDeviceState extends State<ExternalDevice>
                   width: 10,
                 ),
                 Spacer(),
-                NeuButton(
+                OutlinedButton(
                   onPressed: () async {
                     var res = await Api.ejectEsata(esata['dev_id']);
                     if (res['success']) {
@@ -238,12 +222,6 @@ class _ExternalDeviceState extends State<ExternalDevice>
                       Util.toast("设备退出失败，代码${res['error']['code']}");
                     }
                   },
-                  decoration: NeumorphicDecoration(
-                    color: Theme.of(context).scaffoldBackgroundColor,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  padding: EdgeInsets.all(5),
-                  bevel: 5,
                   child: SizedBox(
                     width: 20,
                     height: 20,
@@ -272,38 +250,35 @@ class _ExternalDeviceState extends State<ExternalDevice>
       ),
       body: Column(
         children: [
-          NeuCard(
-            width: double.infinity,
-            decoration: NeumorphicDecoration(
-              color: Theme.of(context).scaffoldBackgroundColor,
-              borderRadius: BorderRadius.circular(20),
-            ),
+          Card(
             margin: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-            curveType: CurveType.flat,
-            bevel: 10,
-            child: TabBar(
-              isScrollable: false,
-              controller: _tabController,
-              indicatorSize: TabBarIndicatorSize.label,
-              labelColor: Theme.of(context).brightness == Brightness.dark
-                  ? Colors.white
-                  : Colors.black,
-              unselectedLabelColor: Colors.grey,
-              indicator: BubbleTabIndicator(
-                indicatorColor: Theme.of(context).scaffoldBackgroundColor,
-                shadowColor: Util.getAdjustColor(
-                    Theme.of(context).scaffoldBackgroundColor, -20),
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: TabBar(
+                dividerHeight: 0,
+                isScrollable: false,
+                controller: _tabController,
+                indicatorSize: TabBarIndicatorSize.label,
+                labelColor: Theme.of(context).brightness == Brightness.dark
+                    ? Colors.white
+                    : Colors.black,
+                unselectedLabelColor: Colors.grey,
+                indicator: BubbleTabIndicator(
+                  indicatorColor: Theme.of(context).scaffoldBackgroundColor,
+                  shadowColor: Util.getAdjustColor(
+                      Theme.of(context).scaffoldBackgroundColor, -20),
+                ),
+                tabs: [
+                  Padding(
+                    padding: EdgeInsets.symmetric(vertical: 10, horizontal: 5),
+                    child: Text("外接设备"),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.symmetric(vertical: 10, horizontal: 5),
+                    child: Text("打印机"),
+                  ),
+                ],
               ),
-              tabs: [
-                Padding(
-                  padding: EdgeInsets.symmetric(vertical: 10, horizontal: 5),
-                  child: Text("外接设备"),
-                ),
-                Padding(
-                  padding: EdgeInsets.symmetric(vertical: 10, horizontal: 5),
-                  child: Text("打印机"),
-                ),
-              ],
             ),
           ),
           Expanded(
@@ -312,17 +287,8 @@ class _ExternalDeviceState extends State<ExternalDevice>
               children: [
                 loading
                     ? Center(
-                        child: NeuCard(
-                          padding: EdgeInsets.all(50),
-                          curveType: CurveType.flat,
-                          decoration: NeumorphicDecoration(
-                            color: Theme.of(context).scaffoldBackgroundColor,
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          bevel: 20,
-                          child: CupertinoActivityIndicator(
-                            radius: 14,
-                          ),
+                        child: CupertinoActivityIndicator(
+                          radius: 14,
                         ),
                       )
                     : (esatas + usbs).length > 0

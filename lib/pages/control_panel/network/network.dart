@@ -5,7 +5,6 @@ import 'package:dsm_helper/widgets/label.dart';
 import 'package:dsm_helper/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:neumorphic/neumorphic.dart';
 
 class Network extends StatefulWidget {
   const Network();
@@ -103,31 +102,16 @@ class _NetworkState extends State<Network> with SingleTickerProviderStateMixin {
       ),
       body: loading
           ? Center(
-              child: NeuCard(
-                padding: EdgeInsets.all(50),
-                curveType: CurveType.flat,
-                decoration: NeumorphicDecoration(
-                  color: Theme.of(context).scaffoldBackgroundColor,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                bevel: 20,
-                child: CupertinoActivityIndicator(
-                  radius: 14,
-                ),
+              child: CupertinoActivityIndicator(
+                radius: 14,
               ),
             )
           : Column(
               children: [
-                NeuCard(
-                  width: double.infinity,
-                  decoration: NeumorphicDecoration(
-                    color: Theme.of(context).scaffoldBackgroundColor,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
+                Card(
                   margin: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-                  curveType: CurveType.flat,
-                  bevel: 10,
                   child: TabBar(
+                    dividerHeight: 0,
                     isScrollable: true,
                     controller: _tabController,
                     indicatorSize: TabBarIndicatorSize.label,
@@ -175,15 +159,9 @@ class _NetworkState extends State<Network> with SingleTickerProviderStateMixin {
                     children: [
                       ListView(
                         children: [
-                          NeuCard(
-                            decoration: NeumorphicDecoration(
-                              color: Theme.of(context).scaffoldBackgroundColor,
-                              borderRadius: BorderRadius.circular(20),
-                            ),
+                          Card(
                             margin:
                                 EdgeInsets.only(top: 20, left: 20, right: 20),
-                            bevel: 10,
-                            curveType: CurveType.flat,
                             child: Padding(
                               padding: const EdgeInsets.all(20.0),
                               child: Column(
@@ -202,23 +180,17 @@ class _NetworkState extends State<Network> with SingleTickerProviderStateMixin {
                                   SizedBox(
                                     height: 20,
                                   ),
-                                  NeuCard(
-                                    decoration: NeumorphicDecoration(
-                                      color: Theme.of(context)
-                                          .scaffoldBackgroundColor,
-                                      borderRadius: BorderRadius.circular(20),
-                                    ),
-                                    bevel: 20,
-                                    curveType: CurveType.flat,
-                                    padding: EdgeInsets.symmetric(
-                                        horizontal: 20, vertical: 5),
-                                    child: TextField(
-                                      controller: _serverNameController,
-                                      onChanged: (v) =>
-                                          network['server_name'] = v,
-                                      decoration: InputDecoration(
-                                        border: InputBorder.none,
-                                        labelText: '系统名称',
+                                  Card(
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: TextField(
+                                        controller: _serverNameController,
+                                        onChanged: (v) =>
+                                            network['server_name'] = v,
+                                        decoration: InputDecoration(
+                                          border: InputBorder.none,
+                                          labelText: '系统名称',
+                                        ),
                                       ),
                                     ),
                                   ),
@@ -242,81 +214,57 @@ class _NetworkState extends State<Network> with SingleTickerProviderStateMixin {
                                             !network['dns_manual'];
                                       });
                                     },
-                                    child: NeuCard(
-                                      decoration: NeumorphicDecoration(
-                                        color: Theme.of(context)
-                                            .scaffoldBackgroundColor,
-                                        borderRadius: BorderRadius.circular(10),
-                                      ),
-                                      curveType: network['dns_manual']
-                                          ? CurveType.emboss
-                                          : CurveType.flat,
-                                      bevel: 12,
-                                      padding: EdgeInsets.symmetric(
-                                          horizontal: 20, vertical: 10),
-                                      child: Row(
-                                        children: [
-                                          Text("手动配置DNS服务器"),
-                                          Spacer(),
-                                          if (network['dns_manual'])
-                                            Icon(
-                                              CupertinoIcons.checkmark_alt,
-                                              color: Color(0xffff9813),
-                                              size: 22,
-                                            ),
-                                        ],
+                                    child: Card(
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Row(
+                                          children: [
+                                            Text("手动配置DNS服务器"),
+                                            Spacer(),
+                                            if (network['dns_manual'])
+                                              Icon(
+                                                CupertinoIcons.checkmark_alt,
+                                                color: Color(0xffff9813),
+                                                size: 22,
+                                              ),
+                                          ],
+                                        ),
                                       ),
                                     ),
                                   ),
                                   SizedBox(
                                     height: 20,
                                   ),
-                                  NeuCard(
-                                    decoration: NeumorphicDecoration(
-                                      color: Theme.of(context)
-                                          .scaffoldBackgroundColor,
-                                      borderRadius: BorderRadius.circular(20),
-                                    ),
-                                    bevel: 20,
-                                    curveType: network['dns_manual']
-                                        ? CurveType.flat
-                                        : CurveType.concave,
-                                    padding: EdgeInsets.symmetric(
-                                        horizontal: 20, vertical: 5),
-                                    child: TextField(
-                                      controller: _dnsPrimaryController,
-                                      enabled: network['dns_manual'],
-                                      onChanged: (v) =>
-                                          network['dns_primary'] = v,
-                                      decoration: InputDecoration(
-                                        border: InputBorder.none,
-                                        labelText: '首选DNS服务器',
+                                  Card(
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: TextField(
+                                        controller: _dnsPrimaryController,
+                                        enabled: network['dns_manual'],
+                                        onChanged: (v) =>
+                                            network['dns_primary'] = v,
+                                        decoration: InputDecoration(
+                                          border: InputBorder.none,
+                                          labelText: '首选DNS服务器',
+                                        ),
                                       ),
                                     ),
                                   ),
                                   SizedBox(
                                     height: 20,
                                   ),
-                                  NeuCard(
-                                    decoration: NeumorphicDecoration(
-                                      color: Theme.of(context)
-                                          .scaffoldBackgroundColor,
-                                      borderRadius: BorderRadius.circular(20),
-                                    ),
-                                    bevel: 20,
-                                    curveType: network['dns_manual']
-                                        ? CurveType.flat
-                                        : CurveType.concave,
-                                    padding: EdgeInsets.symmetric(
-                                        horizontal: 20, vertical: 5),
-                                    child: TextField(
-                                      controller: _dnsSecondaryController,
-                                      enabled: network['dns_manual'],
-                                      onChanged: (v) =>
-                                          network['dns_secondary'] = v,
-                                      decoration: InputDecoration(
-                                        border: InputBorder.none,
-                                        labelText: '备用DNS服务器',
+                                  Card(
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: TextField(
+                                        controller: _dnsSecondaryController,
+                                        enabled: network['dns_manual'],
+                                        onChanged: (v) =>
+                                            network['dns_secondary'] = v,
+                                        decoration: InputDecoration(
+                                          border: InputBorder.none,
+                                          labelText: '备用DNS服务器',
+                                        ),
                                       ),
                                     ),
                                   ),
@@ -327,15 +275,9 @@ class _NetworkState extends State<Network> with SingleTickerProviderStateMixin {
                           SizedBox(
                             height: 20,
                           ),
-                          NeuCard(
-                            decoration: NeumorphicDecoration(
-                              color: Theme.of(context).scaffoldBackgroundColor,
-                              borderRadius: BorderRadius.circular(20),
-                            ),
+                          Card(
                             margin:
                                 EdgeInsets.only(top: 20, left: 20, right: 20),
-                            bevel: 10,
-                            curveType: CurveType.flat,
                             child: Padding(
                               padding: const EdgeInsets.all(20.0),
                               child: Column(
@@ -357,79 +299,57 @@ class _NetworkState extends State<Network> with SingleTickerProviderStateMixin {
                                         proxy['enable'] = !proxy['enable'];
                                       });
                                     },
-                                    child: NeuCard(
-                                      decoration: NeumorphicDecoration(
-                                        color: Theme.of(context)
-                                            .scaffoldBackgroundColor,
-                                        borderRadius: BorderRadius.circular(10),
-                                      ),
-                                      curveType: proxy['enable']
-                                          ? CurveType.emboss
-                                          : CurveType.flat,
-                                      bevel: 12,
-                                      padding: EdgeInsets.symmetric(
-                                          horizontal: 20, vertical: 10),
-                                      child: Row(
-                                        children: [
-                                          Text("手动配置DNS服务器"),
-                                          Spacer(),
-                                          if (proxy['enable'])
-                                            Icon(
-                                              CupertinoIcons.checkmark_alt,
-                                              color: Color(0xffff9813),
-                                              size: 22,
-                                            ),
-                                        ],
+                                    child: Card(
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Row(
+                                          children: [
+                                            Text("手动配置DNS服务器"),
+                                            Spacer(),
+                                            if (proxy['enable'])
+                                              Icon(
+                                                CupertinoIcons.checkmark_alt,
+                                                color: Color(0xffff9813),
+                                                size: 22,
+                                              ),
+                                          ],
+                                        ),
                                       ),
                                     ),
                                   ),
                                   SizedBox(
                                     height: 20,
                                   ),
-                                  NeuCard(
-                                    decoration: NeumorphicDecoration(
-                                      color: Theme.of(context)
-                                          .scaffoldBackgroundColor,
-                                      borderRadius: BorderRadius.circular(20),
-                                    ),
-                                    bevel: 20,
-                                    curveType: proxy['enable']
-                                        ? CurveType.flat
-                                        : CurveType.concave,
-                                    padding: EdgeInsets.symmetric(
-                                        horizontal: 20, vertical: 5),
-                                    child: TextField(
-                                      controller: _proxyHttpHostController,
-                                      enabled: proxy['enable'],
-                                      onChanged: (v) => proxy['http_host'] = v,
-                                      decoration: InputDecoration(
-                                        border: InputBorder.none,
-                                        labelText: '地址',
+                                  Card(
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: TextField(
+                                        controller: _proxyHttpHostController,
+                                        enabled: proxy['enable'],
+                                        onChanged: (v) =>
+                                            proxy['http_host'] = v,
+                                        decoration: InputDecoration(
+                                          border: InputBorder.none,
+                                          labelText: '地址',
+                                        ),
                                       ),
                                     ),
                                   ),
                                   SizedBox(
                                     height: 20,
                                   ),
-                                  NeuCard(
-                                    decoration: NeumorphicDecoration(
-                                      color: Theme.of(context)
-                                          .scaffoldBackgroundColor,
-                                      borderRadius: BorderRadius.circular(20),
-                                    ),
-                                    bevel: 20,
-                                    curveType: proxy['enable']
-                                        ? CurveType.flat
-                                        : CurveType.concave,
-                                    padding: EdgeInsets.symmetric(
-                                        horizontal: 20, vertical: 5),
-                                    child: TextField(
-                                      controller: _proxyHttpPortController,
-                                      enabled: proxy['enable'],
-                                      onChanged: (v) => proxy['http_port'] = v,
-                                      decoration: InputDecoration(
-                                        border: InputBorder.none,
-                                        labelText: '端口',
+                                  Card(
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: TextField(
+                                        controller: _proxyHttpPortController,
+                                        enabled: proxy['enable'],
+                                        onChanged: (v) =>
+                                            proxy['http_port'] = v,
+                                        decoration: InputDecoration(
+                                          border: InputBorder.none,
+                                          labelText: '端口',
+                                        ),
                                       ),
                                     ),
                                   ),
@@ -445,16 +365,9 @@ class _NetworkState extends State<Network> with SingleTickerProviderStateMixin {
                       ListView(
                         children: [
                           ...ethernets.map((ethernet) {
-                            return NeuCard(
-                              decoration: NeumorphicDecoration(
-                                color:
-                                    Theme.of(context).scaffoldBackgroundColor,
-                                borderRadius: BorderRadius.circular(10),
-                              ),
+                            return Card(
                               margin:
                                   EdgeInsets.only(left: 20, right: 20, top: 20),
-                              bevel: 10,
-                              curveType: CurveType.flat,
                               // padding: EdgeInsets.symmetric(horizontal: 20),
                               child: ExpansionContainer(
                                 title: Column(
@@ -570,16 +483,9 @@ class _NetworkState extends State<Network> with SingleTickerProviderStateMixin {
                             );
                           }).toList(),
                           ...pppoes.map((pppoe) {
-                            return NeuCard(
-                              decoration: NeumorphicDecoration(
-                                color:
-                                    Theme.of(context).scaffoldBackgroundColor,
-                                borderRadius: BorderRadius.circular(10),
-                              ),
+                            return Card(
                               margin:
                                   EdgeInsets.only(left: 20, right: 20, top: 20),
-                              bevel: 10,
-                              curveType: CurveType.flat,
                               // padding: EdgeInsets.symmetric(horizontal: 20),
                               child: ExpansionContainer(
                                 title: Column(

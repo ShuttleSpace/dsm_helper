@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:dsm_helper/util/function.dart';
 import 'package:dsm_helper/widgets/neu_back_button.dart';
 import 'package:flutter/material.dart';
-import 'package:neumorphic/neumorphic.dart';
 
 class AddServer extends StatefulWidget {
   final int index;
@@ -83,80 +82,68 @@ class _AddServerState extends State<AddServer> {
             SizedBox(
               height: 20,
             ),
-            NeuCard(
-              decoration: NeumorphicDecoration(
-                color: Theme.of(context).scaffoldBackgroundColor,
-                borderRadius: BorderRadius.circular(20),
-              ),
-              bevel: 20,
-              curveType: CurveType.flat,
-              padding: EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-              child: Row(
-                children: [
-                  Expanded(
-                    flex: 4,
-                    child: TextField(
-                      controller: _hostController,
-                      onChanged: (v) => host = v,
-                      autocorrect: false,
-                      decoration: InputDecoration(
-                        border: InputBorder.none,
-                        labelText: '网址/IP',
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  children: [
+                    Expanded(
+                      flex: 4,
+                      child: TextField(
+                        controller: _hostController,
+                        onChanged: (v) => host = v,
+                        autocorrect: false,
+                        decoration: InputDecoration(
+                          border: InputBorder.none,
+                          labelText: '网址/IP',
+                        ),
                       ),
                     ),
-                  ),
-                  Expanded(
-                    flex: 1,
-                    child: TextField(
-                      onChanged: (v) => port = v,
-                      controller: _portController,
-                      decoration: InputDecoration(
-                        border: InputBorder.none,
-                        labelText: '端口',
+                    Expanded(
+                      flex: 1,
+                      child: TextField(
+                        onChanged: (v) => port = v,
+                        controller: _portController,
+                        decoration: InputDecoration(
+                          border: InputBorder.none,
+                          labelText: '端口',
+                        ),
                       ),
                     ),
-                  ),
-                ],
-              ),
-            ),
-            SizedBox(
-              height: 20,
-            ),
-            NeuCard(
-              decoration: NeumorphicDecoration(
-                color: Theme.of(context).scaffoldBackgroundColor,
-                borderRadius: BorderRadius.circular(20),
-              ),
-              bevel: 20,
-              curveType: CurveType.flat,
-              padding: EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-              child: TextField(
-                controller: _accountController,
-                onChanged: (v) => account = v,
-                decoration: InputDecoration(
-                  border: InputBorder.none,
-                  labelText: '账号',
+                  ],
                 ),
               ),
             ),
             SizedBox(
               height: 20,
             ),
-            NeuCard(
-              decoration: NeumorphicDecoration(
-                color: Theme.of(context).scaffoldBackgroundColor,
-                borderRadius: BorderRadius.circular(20),
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: TextField(
+                  controller: _accountController,
+                  onChanged: (v) => account = v,
+                  decoration: InputDecoration(
+                    border: InputBorder.none,
+                    labelText: '账号',
+                  ),
+                ),
               ),
-              bevel: 12,
-              curveType: CurveType.flat,
-              padding: EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-              child: TextField(
-                controller: _passwordController,
-                onChanged: (v) => password = v,
-                obscureText: true,
-                decoration: InputDecoration(
-                  border: InputBorder.none,
-                  labelText: '密码',
+            ),
+            SizedBox(
+              height: 20,
+            ),
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: TextField(
+                  controller: _passwordController,
+                  onChanged: (v) => password = v,
+                  obscureText: true,
+                  decoration: InputDecoration(
+                    border: InputBorder.none,
+                    labelText: '密码',
+                  ),
                 ),
               ),
             ),
@@ -166,12 +153,7 @@ class _AddServerState extends State<AddServer> {
             // SizedBox(
             //   height: 20,
             // ),
-            NeuButton(
-              padding: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-              decoration: NeumorphicDecoration(
-                color: Theme.of(context).scaffoldBackgroundColor,
-                borderRadius: BorderRadius.circular(20),
-              ),
+            OutlinedButton(
               onPressed: _save,
               child: Text(
                 ' 保存 ',

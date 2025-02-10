@@ -4,7 +4,6 @@ import 'package:dsm_helper/pages/resource_monitor/users.dart';
 import 'package:dsm_helper/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:neumorphic/neumorphic.dart';
 
 class ResourceMonitor extends StatefulWidget {
   ResourceMonitor({this.tabIndex = 0});
@@ -13,7 +12,8 @@ class ResourceMonitor extends StatefulWidget {
   _ResourceMonitorState createState() => _ResourceMonitorState();
 }
 
-class _ResourceMonitorState extends State<ResourceMonitor> with SingleTickerProviderStateMixin {
+class _ResourceMonitorState extends State<ResourceMonitor>
+    with SingleTickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -25,7 +25,7 @@ class _ResourceMonitorState extends State<ResourceMonitor> with SingleTickerProv
         children: [
           Padding(
             padding: const EdgeInsets.only(top: 20.0, left: 20, right: 20),
-            child: NeuButton(
+            child: OutlinedButton(
               onPressed: () {
                 Navigator.of(context).push(
                   CupertinoPageRoute(
@@ -36,12 +36,6 @@ class _ResourceMonitorState extends State<ResourceMonitor> with SingleTickerProv
                   ),
                 );
               },
-              padding: EdgeInsets.zero,
-              decoration: NeumorphicDecoration(
-                color: Theme.of(context).scaffoldBackgroundColor,
-                borderRadius: BorderRadius.circular(20),
-              ),
-              bevel: 20,
               child: Padding(
                 padding: EdgeInsets.symmetric(vertical: 20),
                 child: Row(
@@ -59,7 +53,8 @@ class _ResourceMonitorState extends State<ResourceMonitor> with SingleTickerProv
                     Expanded(
                       child: Text(
                         "性能",
-                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+                        style: TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.w600),
                       ),
                     ),
                     SizedBox(
@@ -72,7 +67,7 @@ class _ResourceMonitorState extends State<ResourceMonitor> with SingleTickerProv
           ),
           Padding(
             padding: const EdgeInsets.only(top: 20.0, left: 20, right: 20),
-            child: NeuButton(
+            child: OutlinedButton(
               onPressed: () {
                 Navigator.of(context).push(
                   CupertinoPageRoute(
@@ -83,12 +78,6 @@ class _ResourceMonitorState extends State<ResourceMonitor> with SingleTickerProv
                   ),
                 );
               },
-              padding: EdgeInsets.zero,
-              decoration: NeumorphicDecoration(
-                color: Theme.of(context).scaffoldBackgroundColor,
-                borderRadius: BorderRadius.circular(20),
-              ),
-              bevel: 20,
               child: Padding(
                 padding: EdgeInsets.symmetric(vertical: 20),
                 child: Row(
@@ -106,7 +95,8 @@ class _ResourceMonitorState extends State<ResourceMonitor> with SingleTickerProv
                     Expanded(
                       child: Text(
                         "任务管理器",
-                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+                        style: TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.w600),
                       ),
                     ),
                     SizedBox(
@@ -119,7 +109,7 @@ class _ResourceMonitorState extends State<ResourceMonitor> with SingleTickerProv
           ),
           Padding(
             padding: const EdgeInsets.only(top: 20.0, left: 20, right: 20),
-            child: NeuButton(
+            child: OutlinedButton(
               onPressed: () {
                 Navigator.of(context).push(
                   CupertinoPageRoute(
@@ -130,12 +120,6 @@ class _ResourceMonitorState extends State<ResourceMonitor> with SingleTickerProv
                   ),
                 );
               },
-              padding: EdgeInsets.zero,
-              decoration: NeumorphicDecoration(
-                color: Theme.of(context).scaffoldBackgroundColor,
-                borderRadius: BorderRadius.circular(20),
-              ),
-              bevel: 20,
               child: Padding(
                 padding: EdgeInsets.symmetric(vertical: 20),
                 child: Row(
@@ -153,7 +137,8 @@ class _ResourceMonitorState extends State<ResourceMonitor> with SingleTickerProv
                     Expanded(
                       child: Text(
                         "目前连接用户",
-                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+                        style: TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.w600),
                       ),
                     ),
                     SizedBox(

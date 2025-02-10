@@ -2,7 +2,6 @@ import 'package:dsm_helper/util/function.dart';
 import 'package:dsm_helper/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:neumorphic/neumorphic.dart';
 
 class VipLogin extends StatefulWidget {
   const VipLogin();
@@ -94,14 +93,7 @@ class _VipLoginState extends State<VipLogin> {
             Row(
               children: [
                 Expanded(
-                  child: NeuCard(
-                    decoration: NeumorphicDecoration(
-                      color: Theme.of(context).scaffoldBackgroundColor,
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    bevel: 20,
-                    curveType: CurveType.flat,
-                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+                  child: Card(
                     child: TextField(
                       autocorrect: false,
                       keyboardAppearance: Brightness.light,
@@ -122,18 +114,12 @@ class _VipLoginState extends State<VipLogin> {
             SizedBox(
               height: 20,
             ),
-            NeuCard(
-              decoration: NeumorphicDecoration(
-                color: Theme.of(context).scaffoldBackgroundColor,
-                borderRadius: BorderRadius.circular(20),
-              ),
-              bevel: 12,
-              curveType: CurveType.flat,
-              padding: EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+            Card(
               child: TextField(
                 onChanged: (v) => password = v,
                 obscureText: true,
-                textInputAction: isRegister ? TextInputAction.next : TextInputAction.done,
+                textInputAction:
+                    isRegister ? TextInputAction.next : TextInputAction.done,
                 onEditingComplete: () {
                   FocusScope.of(context).unfocus();
                 },
@@ -147,14 +133,7 @@ class _VipLoginState extends State<VipLogin> {
               height: 20,
             ),
             if (isRegister) ...[
-              NeuCard(
-                decoration: NeumorphicDecoration(
-                  color: Theme.of(context).scaffoldBackgroundColor,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                bevel: 12,
-                curveType: CurveType.flat,
-                padding: EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+              Card(
                 child: TextField(
                   onChanged: (v) => confirmPassword = v,
                   obscureText: true,
@@ -172,12 +151,7 @@ class _VipLoginState extends State<VipLogin> {
                 height: 20,
               ),
             ],
-            NeuButton(
-              padding: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-              decoration: NeumorphicDecoration(
-                color: Theme.of(context).scaffoldBackgroundColor,
-                borderRadius: BorderRadius.circular(20),
-              ),
+            OutlinedButton(
               onPressed: () {
                 if (isRegister) {
                   _register();

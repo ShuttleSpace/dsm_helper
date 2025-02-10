@@ -6,7 +6,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
-import 'package:neumorphic/neumorphic.dart';
 
 class Share extends StatefulWidget {
   final List<String>? paths;
@@ -131,17 +130,13 @@ class _ShareState extends State<Share> {
           SizedBox(
             height: 20,
           ),
-          NeuCard(
-            padding: EdgeInsets.all(20),
-            curveType: CurveType.flat,
-            decoration: NeumorphicDecoration(
-              color: Theme.of(context).scaffoldBackgroundColor,
-              borderRadius: BorderRadius.circular(20),
-            ),
-            bevel: 20,
-            child: Image.memory(
-              Base64Decoder().convert(link['qrcode'].split(",")[1]),
-              height: 150,
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Image.memory(
+                Base64Decoder().convert(link['qrcode'].split(",")[1]),
+                height: 150,
+              ),
             ),
           ),
           SizedBox(
@@ -157,13 +152,7 @@ class _ShareState extends State<Share> {
           SizedBox(
             height: 20,
           ),
-          NeuCard(
-            decoration: NeumorphicDecoration(
-              color: Theme.of(context).scaffoldBackgroundColor,
-              borderRadius: BorderRadius.circular(20),
-            ),
-            curveType: CurveType.flat,
-            bevel: 20,
+          Card(
             child: Padding(
               padding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
               child: Row(
@@ -176,18 +165,12 @@ class _ShareState extends State<Share> {
                   SizedBox(
                     width: 10,
                   ),
-                  NeuButton(
+                  OutlinedButton(
                     onPressed: () async {
                       ClipboardData data = new ClipboardData(text: link['url']);
                       Clipboard.setData(data);
                       Util.toast("已复制到剪贴板");
                     },
-                    decoration: NeumorphicDecoration(
-                      color: Theme.of(context).scaffoldBackgroundColor,
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    padding: EdgeInsets.all(5),
-                    bevel: 5,
                     child: SizedBox(
                       width: 20,
                       height: 20,
@@ -221,20 +204,16 @@ class _ShareState extends State<Share> {
                 locale: LocaleType.zh,
               );
             },
-            child: NeuCard(
-              decoration: NeumorphicDecoration(
-                color: Theme.of(context).scaffoldBackgroundColor,
-                borderRadius: BorderRadius.circular(20),
-              ),
-              bevel: 12,
-              curveType: CurveType.flat,
-              padding: EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-              child: TextField(
-                controller: endTimeController,
-                decoration: InputDecoration(
-                  enabled: false,
-                  border: InputBorder.none,
-                  labelText: "设置停止时间",
+            child: Card(
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: TextField(
+                  controller: endTimeController,
+                  decoration: InputDecoration(
+                    enabled: false,
+                    border: InputBorder.none,
+                    labelText: "设置停止时间",
+                  ),
                 ),
               ),
             ),
@@ -259,20 +238,16 @@ class _ShareState extends State<Share> {
                 locale: LocaleType.zh,
               );
             },
-            child: NeuCard(
-              decoration: NeumorphicDecoration(
-                color: Theme.of(context).scaffoldBackgroundColor,
-                borderRadius: BorderRadius.circular(20),
-              ),
-              bevel: 12,
-              curveType: CurveType.flat,
-              padding: EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-              child: TextField(
-                controller: startTimeController,
-                decoration: InputDecoration(
-                  enabled: false,
-                  border: InputBorder.none,
-                  labelText: "设置开始时间",
+            child: Card(
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: TextField(
+                  controller: startTimeController,
+                  decoration: InputDecoration(
+                    enabled: false,
+                    border: InputBorder.none,
+                    labelText: "设置开始时间",
+                  ),
                 ),
               ),
             ),
@@ -280,21 +255,17 @@ class _ShareState extends State<Share> {
           SizedBox(
             height: 20,
           ),
-          NeuCard(
-            decoration: NeumorphicDecoration(
-              color: Theme.of(context).scaffoldBackgroundColor,
-              borderRadius: BorderRadius.circular(20),
-            ),
-            bevel: 12,
-            curveType: CurveType.flat,
-            padding: EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-            child: TextField(
-              controller: timesController,
-              keyboardType: TextInputType.number,
-              onChanged: (v) => times = v,
-              decoration: InputDecoration(
-                border: InputBorder.none,
-                labelText: '允许访问的数量',
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: TextField(
+                controller: timesController,
+                keyboardType: TextInputType.number,
+                onChanged: (v) => times = v,
+                decoration: InputDecoration(
+                  border: InputBorder.none,
+                  labelText: '允许访问的数量',
+                ),
               ),
             ),
           ),
@@ -302,40 +273,32 @@ class _ShareState extends State<Share> {
             SizedBox(
               height: 20,
             ),
-            NeuCard(
-              decoration: NeumorphicDecoration(
-                color: Theme.of(context).scaffoldBackgroundColor,
-                borderRadius: BorderRadius.circular(20),
-              ),
-              bevel: 12,
-              curveType: CurveType.flat,
-              padding: EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-              child: TextField(
-                controller: requestNameController,
-                onChanged: (v) => requestName = v,
-                decoration: InputDecoration(
-                  border: InputBorder.none,
-                  labelText: '您的姓名',
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: TextField(
+                  controller: requestNameController,
+                  onChanged: (v) => requestName = v,
+                  decoration: InputDecoration(
+                    border: InputBorder.none,
+                    labelText: '您的姓名',
+                  ),
                 ),
               ),
             ),
             SizedBox(
               height: 20,
             ),
-            NeuCard(
-              decoration: NeumorphicDecoration(
-                color: Theme.of(context).scaffoldBackgroundColor,
-                borderRadius: BorderRadius.circular(20),
-              ),
-              bevel: 12,
-              curveType: CurveType.flat,
-              padding: EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-              child: TextField(
-                controller: requestInfoController,
-                onChanged: (v) => requestInfo = v,
-                decoration: InputDecoration(
-                  border: InputBorder.none,
-                  labelText: '信息',
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: TextField(
+                  controller: requestInfoController,
+                  onChanged: (v) => requestInfo = v,
+                  decoration: InputDecoration(
+                    border: InputBorder.none,
+                    labelText: '信息',
+                  ),
                 ),
               ),
             ),
@@ -360,17 +323,8 @@ class _ShareState extends State<Share> {
         },
         child: loading
             ? Center(
-                child: NeuCard(
-                  padding: EdgeInsets.all(50),
-                  curveType: CurveType.flat,
-                  decoration: NeumorphicDecoration(
-                    color: Theme.of(context).scaffoldBackgroundColor,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  bevel: 20,
-                  child: CupertinoActivityIndicator(
-                    radius: 14,
-                  ),
+                child: CupertinoActivityIndicator(
+                  radius: 14,
                 ),
               )
             : Column(
@@ -387,11 +341,7 @@ class _ShareState extends State<Share> {
                     child: Row(
                       children: [
                         Expanded(
-                          child: NeuButton(
-                            decoration: NeumorphicDecoration(
-                              color: Theme.of(context).scaffoldBackgroundColor,
-                              borderRadius: BorderRadius.circular(50),
-                            ),
+                          child: OutlinedButton(
                             onPressed: () async {
                               List<String> id = [];
                               List<String> url = [];
@@ -413,114 +363,82 @@ class _ShareState extends State<Share> {
                           width: 20,
                         ),
                         Expanded(
-                          child: NeuButton(
-                            decoration: NeumorphicDecoration(
-                              color: Theme.of(context).scaffoldBackgroundColor,
-                              borderRadius: BorderRadius.circular(50),
-                            ),
+                          child: OutlinedButton(
                             onPressed: () async {
                               showCupertinoModalPopup(
                                 context: context,
                                 builder: (context) {
                                   return Material(
                                     color: Colors.transparent,
-                                    child: NeuCard(
-                                      width: double.infinity,
-                                      padding: EdgeInsets.all(22),
-                                      bevel: 5,
-                                      curveType: CurveType.emboss,
-                                      decoration: NeumorphicDecoration(
-                                          color: Theme.of(context)
-                                              .scaffoldBackgroundColor,
-                                          borderRadius: BorderRadius.vertical(
-                                              top: Radius.circular(22))),
+                                    child: Card(
                                       child: SafeArea(
                                         top: false,
-                                        child: Column(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: <Widget>[
-                                            Text(
-                                              "确认取消",
-                                              style: TextStyle(
-                                                  fontSize: 20,
-                                                  fontWeight: FontWeight.w500),
-                                            ),
-                                            SizedBox(
-                                              height: 12,
-                                            ),
-                                            Text(
-                                              "确认要取消此共享链接？",
-                                              style: TextStyle(
-                                                  fontSize: 20,
-                                                  fontWeight: FontWeight.w400),
-                                            ),
-                                            SizedBox(
-                                              height: 22,
-                                            ),
-                                            Row(
-                                              children: [
-                                                Expanded(
-                                                  child: NeuButton(
-                                                    onPressed: () async {
-                                                      Navigator.of(context)
-                                                          .pop();
-                                                      deleteShare();
-                                                    },
-                                                    decoration:
-                                                        NeumorphicDecoration(
-                                                      color: Theme.of(context)
-                                                          .scaffoldBackgroundColor,
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              25),
-                                                    ),
-                                                    bevel: 5,
-                                                    padding:
-                                                        EdgeInsets.symmetric(
-                                                            vertical: 10),
-                                                    child: Text(
-                                                      "取消共享",
-                                                      style: TextStyle(
-                                                          fontSize: 18,
-                                                          color:
-                                                              Colors.redAccent),
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: Column(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: <Widget>[
+                                              Text(
+                                                "确认取消",
+                                                style: TextStyle(
+                                                    fontSize: 20,
+                                                    fontWeight:
+                                                        FontWeight.w500),
+                                              ),
+                                              SizedBox(
+                                                height: 12,
+                                              ),
+                                              Text(
+                                                "确认要取消此共享链接？",
+                                                style: TextStyle(
+                                                    fontSize: 20,
+                                                    fontWeight:
+                                                        FontWeight.w400),
+                                              ),
+                                              SizedBox(
+                                                height: 22,
+                                              ),
+                                              Row(
+                                                children: [
+                                                  Expanded(
+                                                    child: OutlinedButton(
+                                                      onPressed: () async {
+                                                        Navigator.of(context)
+                                                            .pop();
+                                                        deleteShare();
+                                                      },
+                                                      child: Text(
+                                                        "取消共享",
+                                                        style: TextStyle(
+                                                            fontSize: 18,
+                                                            color: Colors
+                                                                .redAccent),
+                                                      ),
                                                     ),
                                                   ),
-                                                ),
-                                                SizedBox(
-                                                  width: 16,
-                                                ),
-                                                Expanded(
-                                                  child: NeuButton(
-                                                    onPressed: () async {
-                                                      Navigator.of(context)
-                                                          .pop();
-                                                    },
-                                                    decoration:
-                                                        NeumorphicDecoration(
-                                                      color: Theme.of(context)
-                                                          .scaffoldBackgroundColor,
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              25),
-                                                    ),
-                                                    bevel: 5,
-                                                    padding:
-                                                        EdgeInsets.symmetric(
-                                                            vertical: 10),
-                                                    child: Text(
-                                                      "取消",
-                                                      style: TextStyle(
-                                                          fontSize: 18),
+                                                  SizedBox(
+                                                    width: 16,
+                                                  ),
+                                                  Expanded(
+                                                    child: OutlinedButton(
+                                                      onPressed: () async {
+                                                        Navigator.of(context)
+                                                            .pop();
+                                                      },
+                                                      child: Text(
+                                                        "取消",
+                                                        style: TextStyle(
+                                                            fontSize: 18),
+                                                      ),
                                                     ),
                                                   ),
-                                                ),
-                                              ],
-                                            ),
-                                            SizedBox(
-                                              height: 8,
-                                            ),
-                                          ],
+                                                ],
+                                              ),
+                                              SizedBox(
+                                                height: 8,
+                                              ),
+                                            ],
+                                          ),
                                         ),
                                       ),
                                     ),

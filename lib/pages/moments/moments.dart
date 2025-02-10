@@ -10,7 +10,6 @@ import 'package:dsm_helper/widgets/neu_back_button.dart';
 import 'package:dsm_helper/widgets/transparent_router.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:neumorphic/neumorphic.dart';
 
 class Moments extends StatefulWidget {
   @override
@@ -387,18 +386,16 @@ class _MomentsState extends State<Moments> {
     return Scaffold(
       appBar: AppBar(
         leading: AppBackButton(context),
-        title: NeuSwitch(
-          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-          thumbColor: Theme.of(context).scaffoldBackgroundColor,
-          children: {
-            0: Text("图片"),
-            1: Text("相册"),
-            2: Text("共享"),
-          },
-          groupValue: currentIndex,
-          onValueChanged: (v) {
+        title: DropdownMenu(
+          initialSelection: currentIndex,
+          dropdownMenuEntries: [
+            DropdownMenuEntry(value: 0, label: '图片'),
+            DropdownMenuEntry(value: 1, label: '相册'),
+            DropdownMenuEntry(value: 2, label: '共享'),
+          ],
+          onSelected: (value) {
             setState(() {
-              currentIndex = v;
+              currentIndex = value ?? 0;
             });
           },
         ),
@@ -408,17 +405,8 @@ class _MomentsState extends State<Moments> {
         children: [
           loadingTimeline
               ? Center(
-                  child: NeuCard(
-                    padding: EdgeInsets.all(50),
-                    curveType: CurveType.flat,
-                    decoration: NeumorphicDecoration(
-                      color: Theme.of(context).scaffoldBackgroundColor,
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    bevel: 20,
-                    child: CupertinoActivityIndicator(
-                      radius: 14,
-                    ),
+                  child: CupertinoActivityIndicator(
+                    radius: 14,
                   ),
                 )
               : timeline.length > 0
@@ -477,17 +465,8 @@ class _MomentsState extends State<Moments> {
                     ),
           loadingAlbum
               ? Center(
-                  child: NeuCard(
-                    padding: EdgeInsets.all(50),
-                    curveType: CurveType.flat,
-                    decoration: NeumorphicDecoration(
-                      color: Theme.of(context).scaffoldBackgroundColor,
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    bevel: 20,
-                    child: CupertinoActivityIndicator(
-                      radius: 14,
-                    ),
+                  child: CupertinoActivityIndicator(
+                    radius: 14,
                   ),
                 )
               : Container(
@@ -753,17 +732,8 @@ class _MomentsState extends State<Moments> {
                 ),
           loadingShares
               ? Center(
-                  child: NeuCard(
-                    padding: EdgeInsets.all(50),
-                    curveType: CurveType.flat,
-                    decoration: NeumorphicDecoration(
-                      color: Theme.of(context).scaffoldBackgroundColor,
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    bevel: 20,
-                    child: CupertinoActivityIndicator(
-                      radius: 14,
-                    ),
+                  child: CupertinoActivityIndicator(
+                    radius: 14,
                   ),
                 )
               : shares.length > 0

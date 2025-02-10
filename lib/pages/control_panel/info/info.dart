@@ -4,7 +4,6 @@ import 'package:dsm_helper/widgets/label.dart';
 import 'package:dsm_helper/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:neumorphic/neumorphic.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 
 class SystemInfo extends StatefulWidget {
@@ -75,141 +74,122 @@ class _SystemInfoState extends State<SystemInfo>
   }
 
   Widget _buildNifItem(nif) {
-    return NeuCard(
-      decoration: NeumorphicDecoration(
-        color: Theme.of(context).scaffoldBackgroundColor,
-        borderRadius: BorderRadius.circular(20),
-      ),
+    return Card(
       margin: EdgeInsets.only(top: 20, left: 20, right: 20),
-      bevel: 10,
-      curveType: CurveType.flat,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: EdgeInsets.only(top: 20, left: 20),
-            child: Text(
-              "局域网 ${nifs.indexOf(nif) + 1}",
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: EdgeInsets.only(top: 20, left: 20),
+              child: Text(
+                "局域网 ${nifs.indexOf(nif) + 1}",
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+              ),
             ),
-          ),
-          NeuCard(
-            decoration: NeumorphicDecoration(
-              color: Theme.of(context).scaffoldBackgroundColor,
-              borderRadius: BorderRadius.circular(10),
-            ),
-            padding: EdgeInsets.all(10),
-            margin: EdgeInsets.only(top: 20, left: 20, right: 20),
-            bevel: 10,
-            curveType: CurveType.flat,
-            child: Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    "MAC 地址",
-                    overflow: TextOverflow.ellipsis,
-                  ),
+            Card(
+              margin: EdgeInsets.only(top: 20, left: 20, right: 20),
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        "MAC 地址",
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    Expanded(
+                      flex: 2,
+                      child: Text(
+                        "${nif['mac']}",
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
                 ),
-                Expanded(
-                  flex: 2,
-                  child: Text(
-                    "${nif['mac']}",
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-              ],
+              ),
             ),
-          ),
-          NeuCard(
-            decoration: NeumorphicDecoration(
-              color: Theme.of(context).scaffoldBackgroundColor,
-              borderRadius: BorderRadius.circular(10),
-            ),
-            padding: EdgeInsets.all(10),
-            margin: EdgeInsets.only(top: 20, left: 20, right: 20),
-            bevel: 10,
-            curveType: CurveType.flat,
-            child: Row(
-              children: [
-                Expanded(
-                  flex: 1,
-                  child: Text(
-                    "IP 地址",
-                    overflow: TextOverflow.ellipsis,
-                  ),
+            Card(
+              margin: EdgeInsets.only(top: 20, left: 20, right: 20),
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  children: [
+                    Expanded(
+                      flex: 1,
+                      child: Text(
+                        "IP 地址",
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    Expanded(
+                      flex: 2,
+                      child: Text(
+                        "${nif['addr']}",
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
                 ),
-                Expanded(
-                  flex: 2,
-                  child: Text(
-                    "${nif['addr']}",
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-              ],
+              ),
             ),
-          ),
-          NeuCard(
-            decoration: NeumorphicDecoration(
-              color: Theme.of(context).scaffoldBackgroundColor,
-              borderRadius: BorderRadius.circular(10),
-            ),
-            padding: EdgeInsets.all(10),
-            margin: EdgeInsets.only(top: 20, left: 20, right: 20),
-            bevel: 10,
-            curveType: CurveType.flat,
-            child: Row(
-              children: [
-                Expanded(
-                  flex: 1,
-                  child: Text(
-                    "子网掩码",
-                    overflow: TextOverflow.ellipsis,
-                  ),
+            Card(
+              margin: EdgeInsets.only(top: 20, left: 20, right: 20),
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  children: [
+                    Expanded(
+                      flex: 1,
+                      child: Text(
+                        "子网掩码",
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    Expanded(
+                      flex: 2,
+                      child: Text(
+                        "${nif['mask']}",
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
                 ),
-                Expanded(
-                  flex: 2,
-                  child: Text(
-                    "${nif['mask']}",
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-              ],
+              ),
             ),
-          ),
-          SizedBox(
-            height: 20,
-          ),
-        ],
+            SizedBox(
+              height: 20,
+            ),
+          ],
+        ),
       ),
     );
   }
 
   Widget _buildDevItem(dev) {
-    return NeuCard(
-      decoration: NeumorphicDecoration(
-        color: Theme.of(context).scaffoldBackgroundColor,
-        borderRadius: BorderRadius.circular(10),
-      ),
-      padding: EdgeInsets.all(10),
+    return Card(
       margin: EdgeInsets.only(top: 20, left: 20, right: 20),
-      bevel: 10,
-      curveType: CurveType.flat,
-      child: Row(
-        children: [
-          Expanded(
-            child: Text(
-              dev['cls'] == "hub" ? "USB集线器" : dev['cls'],
-              overflow: TextOverflow.ellipsis,
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Row(
+          children: [
+            Expanded(
+              child: Text(
+                dev['cls'] == "hub" ? "USB集线器" : dev['cls'],
+                overflow: TextOverflow.ellipsis,
+              ),
             ),
-          ),
-          Expanded(
-            flex: 2,
-            child: Text(
-              "${dev['product']}${dev['producer']}",
-              overflow: TextOverflow.ellipsis,
+            Expanded(
+              flex: 2,
+              child: Text(
+                "${dev['product']}${dev['producer']}",
+                overflow: TextOverflow.ellipsis,
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -217,53 +197,35 @@ class _SystemInfoState extends State<SystemInfo>
   Widget _buildVolumeItem(volume) {
     double percent =
         int.parse(volume['size']['used']) / int.parse(volume['size']['total']);
-    return NeuCard(
-      decoration: NeumorphicDecoration(
-        color: Theme.of(context).scaffoldBackgroundColor,
-        borderRadius: BorderRadius.circular(20),
-      ),
-      curveType: CurveType.flat,
-      padding: EdgeInsets.all(10),
+    return Card(
       margin: EdgeInsets.only(top: 20, left: 20, right: 20),
-      bevel: 10,
       child: Row(
         children: [
-          NeuCard(
-            curveType: CurveType.flat,
-            margin: EdgeInsets.all(10),
-            decoration: NeumorphicDecoration(
-              color: Theme.of(context).scaffoldBackgroundColor,
-              borderRadius: BorderRadius.circular(80),
-              // color: Colors.red,
+          CircularPercentIndicator(
+            radius: 40,
+            // progressColor: Colors.lightBlueAccent,
+            animation: true,
+            linearGradient: LinearGradient(
+              colors: percent <= 0.9
+                  ? [
+                      Colors.blue,
+                      Colors.blueAccent,
+                    ]
+                  : [
+                      Colors.red,
+                      Colors.orangeAccent,
+                    ],
             ),
-            padding: EdgeInsets.all(5),
-            bevel: 8,
-            child: CircularPercentIndicator(
-              radius: 40,
-              // progressColor: Colors.lightBlueAccent,
-              animation: true,
-              linearGradient: LinearGradient(
-                colors: percent <= 0.9
-                    ? [
-                        Colors.blue,
-                        Colors.blueAccent,
-                      ]
-                    : [
-                        Colors.red,
-                        Colors.orangeAccent,
-                      ],
-              ),
-              animateFromLastPercent: true,
-              circularStrokeCap: CircularStrokeCap.round,
-              lineWidth: 12,
-              backgroundColor: Colors.black12,
-              percent: percent,
-              center: Text(
-                "${(percent * 100).toStringAsFixed(0)}%",
-                style: TextStyle(
-                    color: percent <= 0.9 ? Colors.blue : Colors.red,
-                    fontSize: 22),
-              ),
+            animateFromLastPercent: true,
+            circularStrokeCap: CircularStrokeCap.round,
+            lineWidth: 12,
+            backgroundColor: Colors.black12,
+            percent: percent,
+            center: Text(
+              "${(percent * 100).toStringAsFixed(0)}%",
+              style: TextStyle(
+                  color: percent <= 0.9 ? Colors.blue : Colors.red,
+                  fontSize: 22),
             ),
           ),
           SizedBox(
@@ -325,28 +287,18 @@ class _SystemInfoState extends State<SystemInfo>
   }
 
   Widget _buildDiskItem(disk) {
-    return NeuCard(
-      decoration: NeumorphicDecoration(
-        color: Theme.of(context).scaffoldBackgroundColor,
-        borderRadius: BorderRadius.circular(20),
-      ),
-      curveType: CurveType.flat,
-      padding: EdgeInsets.all(10),
+    return Card(
       margin: EdgeInsets.only(top: 20, left: 20, right: 20),
-      bevel: 10,
       child: Row(
         children: [
-          NeuCard(
-            curveType: CurveType.flat,
+          Card(
             margin: EdgeInsets.all(10),
-            decoration: NeumorphicDecoration(
-              color: Theme.of(context).scaffoldBackgroundColor,
-              // color: Colors.red,
-            ),
-            bevel: 8,
-            child: Image.asset(
-              disk['isSsd'] ? "assets/icons/ssd.png" : "assets/icons/hdd.png",
-              width: 40,
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Image.asset(
+                disk['isSsd'] ? "assets/icons/ssd.png" : "assets/icons/hdd.png",
+                width: 40,
+              ),
             ),
           ),
           SizedBox(
@@ -408,16 +360,10 @@ class _SystemInfoState extends State<SystemInfo>
       ),
       body: Column(
         children: [
-          NeuCard(
-            width: double.infinity,
-            decoration: NeumorphicDecoration(
-              color: Theme.of(context).scaffoldBackgroundColor,
-              borderRadius: BorderRadius.circular(20),
-            ),
+          Card(
             margin: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-            curveType: CurveType.flat,
-            bevel: 10,
             child: TabBar(
+              dividerHeight: 0,
               isScrollable: true,
               controller: _tabController,
               indicatorSize: TabBarIndicatorSize.label,
@@ -465,403 +411,351 @@ class _SystemInfoState extends State<SystemInfo>
                 ListView(
                   padding: EdgeInsets.symmetric(vertical: 20),
                   children: [
-                    NeuCard(
-                      decoration: NeumorphicDecoration(
-                        color: Theme.of(context).scaffoldBackgroundColor,
-                        borderRadius: BorderRadius.circular(20),
-                      ),
+                    Card(
                       margin: EdgeInsets.only(left: 20, right: 20),
-                      bevel: 10,
-                      curveType: CurveType.flat,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Padding(
-                            padding: EdgeInsets.only(top: 20, left: 20),
-                            child: Text(
-                              "基本信息",
-                              style: TextStyle(
-                                  fontSize: 18, fontWeight: FontWeight.w600),
-                            ),
-                          ),
-                          NeuCard(
-                            decoration: NeumorphicDecoration(
-                              color: Theme.of(context).scaffoldBackgroundColor,
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            padding: EdgeInsets.all(10),
-                            margin:
-                                EdgeInsets.only(top: 20, left: 20, right: 20),
-                            bevel: 10,
-                            curveType: CurveType.flat,
-                            child: Row(
-                              children: [
-                                Expanded(
-                                  child: Text(
-                                    "产品序列号",
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ),
-                                Expanded(
-                                  flex: 2,
-                                  child: Text(
-                                    "${widget.system['serial']}",
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          NeuCard(
-                            decoration: NeumorphicDecoration(
-                              color: Theme.of(context).scaffoldBackgroundColor,
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            padding: EdgeInsets.all(10),
-                            margin:
-                                EdgeInsets.only(top: 20, left: 20, right: 20),
-                            bevel: 10,
-                            curveType: CurveType.flat,
-                            child: Row(
-                              children: [
-                                Expanded(
-                                  child: Text(
-                                    "产品型号",
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ),
-                                Expanded(
-                                  flex: 2,
-                                  child: Text(
-                                    "${widget.system['model']}",
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          NeuCard(
-                            decoration: NeumorphicDecoration(
-                              color: Theme.of(context).scaffoldBackgroundColor,
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            padding: EdgeInsets.all(10),
-                            margin:
-                                EdgeInsets.only(top: 20, left: 20, right: 20),
-                            bevel: 10,
-                            curveType: CurveType.flat,
-                            child: Row(
-                              children: [
-                                Expanded(
-                                  child: Text(
-                                    "CPU",
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ),
-                                Expanded(
-                                  flex: 2,
-                                  child: Text(
-                                    "${widget.system['cpu_vendor']} ${widget.system['cpu_family']} ${widget.system['cpu_series']}",
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          NeuCard(
-                            decoration: NeumorphicDecoration(
-                              color: Theme.of(context).scaffoldBackgroundColor,
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            padding: EdgeInsets.all(10),
-                            margin:
-                                EdgeInsets.only(top: 20, left: 20, right: 20),
-                            bevel: 10,
-                            curveType: CurveType.flat,
-                            child: Row(
-                              children: [
-                                Expanded(
-                                  child: Text(
-                                    "CPU核心",
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ),
-                                Expanded(
-                                  flex: 2,
-                                  child: Text(
-                                    "${widget.system['cpu_cores']}核 @ ${(widget.system['cpu_clock_speed'] / 1000).toStringAsFixed(2)}GHz",
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          NeuCard(
-                            decoration: NeumorphicDecoration(
-                              color: Theme.of(context).scaffoldBackgroundColor,
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            padding: EdgeInsets.all(10),
-                            margin:
-                                EdgeInsets.only(top: 20, left: 20, right: 20),
-                            bevel: 10,
-                            curveType: CurveType.flat,
-                            child: Row(
-                              children: [
-                                Expanded(
-                                  child: Text(
-                                    "物理内存",
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ),
-                                Expanded(
-                                  flex: 2,
-                                  child: Text(
-                                    "${widget.system['ram_size']}MB",
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          NeuCard(
-                            decoration: NeumorphicDecoration(
-                              color: Theme.of(context).scaffoldBackgroundColor,
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            padding: EdgeInsets.all(10),
-                            margin:
-                                EdgeInsets.only(top: 20, left: 20, right: 20),
-                            bevel: 10,
-                            curveType: CurveType.flat,
-                            child: Row(
-                              children: [
-                                Expanded(
-                                  child: Text(
-                                    "DSM版本",
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ),
-                                Expanded(
-                                  flex: 2,
-                                  child: Text(
-                                    "${widget.system['firmware_ver']}",
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          NeuCard(
-                            decoration: NeumorphicDecoration(
-                              color: Theme.of(context).scaffoldBackgroundColor,
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            padding: EdgeInsets.all(10),
-                            margin:
-                                EdgeInsets.only(top: 20, left: 20, right: 20),
-                            bevel: 10,
-                            curveType: CurveType.flat,
-                            child: Row(
-                              children: [
-                                Expanded(
-                                  child: Text(
-                                    "系统时间",
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ),
-                                Expanded(
-                                  flex: 2,
-                                  child: Text(
-                                    "${widget.system['time']}",
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          NeuCard(
-                            decoration: NeumorphicDecoration(
-                              color: Theme.of(context).scaffoldBackgroundColor,
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            padding: EdgeInsets.all(10),
-                            margin:
-                                EdgeInsets.only(top: 20, left: 20, right: 20),
-                            bevel: 10,
-                            curveType: CurveType.flat,
-                            child: Row(
-                              children: [
-                                Expanded(
-                                  child: Text(
-                                    "运行时间",
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ),
-                                Expanded(
-                                  flex: 2,
-                                  child: Text(
-                                    "${Util.parseOpTime(widget.system['up_time'])}",
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          if (widget.system['sys_temp'] != null)
-                            NeuCard(
-                              decoration: NeumorphicDecoration(
-                                color:
-                                    Theme.of(context).scaffoldBackgroundColor,
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              padding: EdgeInsets.all(10),
-                              margin:
-                                  EdgeInsets.only(top: 20, left: 20, right: 20),
-                              bevel: 10,
-                              curveType: CurveType.flat,
-                              child: Row(
-                                children: [
-                                  Expanded(
-                                    child: Text(
-                                      "散热状态",
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                  ),
-                                  Expanded(
-                                    flex: 2,
-                                    child: Text(
-                                      "${widget.system['sys_temp']}℃ ${widget.system['temperature_warning'] == null ? (widget.system['sys_temp'] > 80 ? "警告" : "正常") : (widget.system['temperature_warning'] ? "警告" : "正常")}",
-                                      style: TextStyle(
-                                          color: widget.system[
-                                                      'temperature_warning'] ==
-                                                  null
-                                              ? (widget.system['sys_temp'] > 80
-                                                  ? Colors.red
-                                                  : Colors.green)
-                                              : (widget.system[
-                                                      'temperature_warning']
-                                                  ? Colors.red
-                                                  : Colors.green)),
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          SizedBox(
-                            height: 20,
-                          ),
-                        ],
-                      ),
-                    ),
-                    NeuCard(
-                      decoration: NeumorphicDecoration(
-                        color: Theme.of(context).scaffoldBackgroundColor,
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      margin: EdgeInsets.only(top: 20, left: 20, right: 20),
-                      bevel: 10,
-                      curveType: CurveType.flat,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Padding(
-                            padding: EdgeInsets.only(top: 20, left: 20),
-                            child: Text(
-                              "时间信息",
-                              style: TextStyle(
-                                  fontSize: 18, fontWeight: FontWeight.w600),
-                            ),
-                          ),
-                          NeuCard(
-                            decoration: NeumorphicDecoration(
-                              color: Theme.of(context).scaffoldBackgroundColor,
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            padding: EdgeInsets.all(10),
-                            margin:
-                                EdgeInsets.only(top: 20, left: 20, right: 20),
-                            bevel: 10,
-                            curveType: CurveType.flat,
-                            child: Row(
-                              children: [
-                                Expanded(
-                                  child: Text(
-                                    "服务器地址",
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ),
-                                Expanded(
-                                  flex: 2,
-                                  child: Text(
-                                    "${widget.system['ntp_server']} ${widget.system['enabled_ntp'] ? "" : "(暂未启用)"}",
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          NeuCard(
-                            decoration: NeumorphicDecoration(
-                              color: Theme.of(context).scaffoldBackgroundColor,
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            padding: EdgeInsets.all(10),
-                            margin:
-                                EdgeInsets.only(top: 20, left: 20, right: 20),
-                            bevel: 10,
-                            curveType: CurveType.flat,
-                            child: Row(
-                              children: [
-                                Expanded(
-                                  flex: 1,
-                                  child: Text(
-                                    "时区",
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ),
-                                Expanded(
-                                  flex: 2,
-                                  child: Text(
-                                    "${widget.system['time_zone_desc']}",
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          SizedBox(
-                            height: 20,
-                          ),
-                        ],
-                      ),
-                    ),
-                    if (usbDev.length > 0)
-                      NeuCard(
-                        decoration: NeumorphicDecoration(
-                          color: Theme.of(context).scaffoldBackgroundColor,
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        margin: EdgeInsets.only(top: 20, left: 20, right: 20),
-                        bevel: 10,
-                        curveType: CurveType.flat,
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Padding(
                               padding: EdgeInsets.only(top: 20, left: 20),
                               child: Text(
-                                "外接设备",
+                                "基本信息",
                                 style: TextStyle(
                                     fontSize: 18, fontWeight: FontWeight.w600),
                               ),
                             ),
-                            ...usbDev.map(_buildDevItem).toList(),
+                            Card(
+                              margin:
+                                  EdgeInsets.only(top: 20, left: 20, right: 20),
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Row(
+                                  children: [
+                                    Expanded(
+                                      child: Text(
+                                        "产品序列号",
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                    Expanded(
+                                      flex: 2,
+                                      child: Text(
+                                        "${widget.system['serial']}",
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            Card(
+                              margin:
+                                  EdgeInsets.only(top: 20, left: 20, right: 20),
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Row(
+                                  children: [
+                                    Expanded(
+                                      child: Text(
+                                        "产品型号",
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                    Expanded(
+                                      flex: 2,
+                                      child: Text(
+                                        "${widget.system['model']}",
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            Card(
+                              margin:
+                                  EdgeInsets.only(top: 20, left: 20, right: 20),
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Row(
+                                  children: [
+                                    Expanded(
+                                      child: Text(
+                                        "CPU",
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                    Expanded(
+                                      flex: 2,
+                                      child: Text(
+                                        "${widget.system['cpu_vendor']} ${widget.system['cpu_family']} ${widget.system['cpu_series']}",
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            Card(
+                              margin:
+                                  EdgeInsets.only(top: 20, left: 20, right: 20),
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Row(
+                                  children: [
+                                    Expanded(
+                                      child: Text(
+                                        "CPU核心",
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                    Expanded(
+                                      flex: 2,
+                                      child: Text(
+                                        "${widget.system['cpu_cores']}核 @ ${(widget.system['cpu_clock_speed'] / 1000).toStringAsFixed(2)}GHz",
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            Card(
+                              margin:
+                                  EdgeInsets.only(top: 20, left: 20, right: 20),
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Row(
+                                  children: [
+                                    Expanded(
+                                      child: Text(
+                                        "物理内存",
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                    Expanded(
+                                      flex: 2,
+                                      child: Text(
+                                        "${widget.system['ram_size']}MB",
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            Card(
+                              margin:
+                                  EdgeInsets.only(top: 20, left: 20, right: 20),
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Row(
+                                  children: [
+                                    Expanded(
+                                      child: Text(
+                                        "DSM版本",
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                    Expanded(
+                                      flex: 2,
+                                      child: Text(
+                                        "${widget.system['firmware_ver']}",
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            Card(
+                              margin:
+                                  EdgeInsets.only(top: 20, left: 20, right: 20),
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Row(
+                                  children: [
+                                    Expanded(
+                                      child: Text(
+                                        "系统时间",
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                    Expanded(
+                                      flex: 2,
+                                      child: Text(
+                                        "${widget.system['time']}",
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            Card(
+                              margin:
+                                  EdgeInsets.only(top: 20, left: 20, right: 20),
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Row(
+                                  children: [
+                                    Expanded(
+                                      child: Text(
+                                        "运行时间",
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                    Expanded(
+                                      flex: 2,
+                                      child: Text(
+                                        "${Util.parseOpTime(widget.system['up_time'])}",
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            if (widget.system['sys_temp'] != null)
+                              Card(
+                                margin: EdgeInsets.only(
+                                    top: 20, left: 20, right: 20),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Row(
+                                    children: [
+                                      Expanded(
+                                        child: Text(
+                                          "散热状态",
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ),
+                                      Expanded(
+                                        flex: 2,
+                                        child: Text(
+                                          "${widget.system['sys_temp']}℃ ${widget.system['temperature_warning'] == null ? (widget.system['sys_temp'] > 80 ? "警告" : "正常") : (widget.system['temperature_warning'] ? "警告" : "正常")}",
+                                          style: TextStyle(
+                                              color: widget.system[
+                                                          'temperature_warning'] ==
+                                                      null
+                                                  ? (widget.system['sys_temp'] >
+                                                          80
+                                                      ? Colors.red
+                                                      : Colors.green)
+                                                  : (widget.system[
+                                                          'temperature_warning']
+                                                      ? Colors.red
+                                                      : Colors.green)),
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
                             SizedBox(
                               height: 20,
                             ),
                           ],
+                        ),
+                      ),
+                    ),
+                    Card(
+                      margin: EdgeInsets.only(top: 20, left: 20, right: 20),
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Padding(
+                              padding: EdgeInsets.only(top: 20, left: 20),
+                              child: Text(
+                                "时间信息",
+                                style: TextStyle(
+                                    fontSize: 18, fontWeight: FontWeight.w600),
+                              ),
+                            ),
+                            Card(
+                              margin:
+                                  EdgeInsets.only(top: 20, left: 20, right: 20),
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Row(
+                                  children: [
+                                    Expanded(
+                                      child: Text(
+                                        "服务器地址",
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                    Expanded(
+                                      flex: 2,
+                                      child: Text(
+                                        "${widget.system['ntp_server']} ${widget.system['enabled_ntp'] ? "" : "(暂未启用)"}",
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            Card(
+                              margin:
+                                  EdgeInsets.only(top: 20, left: 20, right: 20),
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Row(
+                                  children: [
+                                    Expanded(
+                                      flex: 1,
+                                      child: Text(
+                                        "时区",
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                    Expanded(
+                                      flex: 2,
+                                      child: Text(
+                                        "${widget.system['time_zone_desc']}",
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            SizedBox(
+                              height: 20,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    if (usbDev.length > 0)
+                      Card(
+                        margin: EdgeInsets.only(top: 20, left: 20, right: 20),
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Padding(
+                                padding: EdgeInsets.only(top: 20, left: 20),
+                                child: Text(
+                                  "外接设备",
+                                  style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w600),
+                                ),
+                              ),
+                              ...usbDev.map(_buildDevItem).toList(),
+                              SizedBox(
+                                height: 20,
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                   ],
@@ -872,150 +766,127 @@ class _SystemInfoState extends State<SystemInfo>
                       )
                     : ListView(
                         children: [
-                          NeuCard(
-                            decoration: NeumorphicDecoration(
-                              color: Theme.of(context).scaffoldBackgroundColor,
-                              borderRadius: BorderRadius.circular(20),
-                            ),
+                          Card(
                             margin:
                                 EdgeInsets.only(top: 20, left: 20, right: 20),
-                            bevel: 10,
-                            curveType: CurveType.flat,
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Padding(
-                                  padding: EdgeInsets.only(top: 20, left: 20),
-                                  child: Text(
-                                    "基本信息",
-                                    style: TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.w600),
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Padding(
+                                    padding: EdgeInsets.only(top: 20, left: 20),
+                                    child: Text(
+                                      "基本信息",
+                                      style: TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.w600),
+                                    ),
                                   ),
-                                ),
-                                NeuCard(
-                                  decoration: NeumorphicDecoration(
-                                    color: Theme.of(context)
-                                        .scaffoldBackgroundColor,
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                  padding: EdgeInsets.all(10),
-                                  margin: EdgeInsets.only(
-                                      top: 20, left: 20, right: 20),
-                                  bevel: 10,
-                                  curveType: CurveType.flat,
-                                  child: Row(
-                                    children: [
-                                      Expanded(
-                                        child: Text(
-                                          "系统名称",
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
+                                  Card(
+                                    margin: EdgeInsets.only(
+                                        top: 20, left: 20, right: 20),
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Row(
+                                        children: [
+                                          Expanded(
+                                            child: Text(
+                                              "系统名称",
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          ),
+                                          Expanded(
+                                            flex: 2,
+                                            child: Text(
+                                              "${network['hostname']}",
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          ),
+                                        ],
                                       ),
-                                      Expanded(
-                                        flex: 2,
-                                        child: Text(
-                                          "${network['hostname']}",
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                      ),
-                                    ],
+                                    ),
                                   ),
-                                ),
-                                NeuCard(
-                                  decoration: NeumorphicDecoration(
-                                    color: Theme.of(context)
-                                        .scaffoldBackgroundColor,
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                  padding: EdgeInsets.all(10),
-                                  margin: EdgeInsets.only(
-                                      top: 20, left: 20, right: 20),
-                                  bevel: 10,
-                                  curveType: CurveType.flat,
-                                  child: Row(
-                                    children: [
-                                      Expanded(
-                                        flex: 1,
-                                        child: Text(
-                                          "DNS",
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
+                                  Card(
+                                    margin: EdgeInsets.only(
+                                        top: 20, left: 20, right: 20),
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Row(
+                                        children: [
+                                          Expanded(
+                                            flex: 1,
+                                            child: Text(
+                                              "DNS",
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          ),
+                                          Expanded(
+                                            flex: 2,
+                                            child: Text(
+                                              "${network['dns']}",
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          ),
+                                        ],
                                       ),
-                                      Expanded(
-                                        flex: 2,
-                                        child: Text(
-                                          "${network['dns']}",
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                      ),
-                                    ],
+                                    ),
                                   ),
-                                ),
-                                NeuCard(
-                                  decoration: NeumorphicDecoration(
-                                    color: Theme.of(context)
-                                        .scaffoldBackgroundColor,
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                  padding: EdgeInsets.all(10),
-                                  margin: EdgeInsets.only(
-                                      top: 20, left: 20, right: 20),
-                                  bevel: 10,
-                                  curveType: CurveType.flat,
-                                  child: Row(
-                                    children: [
-                                      Expanded(
-                                        flex: 1,
-                                        child: Text(
-                                          "默认网关",
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
+                                  Card(
+                                    margin: EdgeInsets.only(
+                                        top: 20, left: 20, right: 20),
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Row(
+                                        children: [
+                                          Expanded(
+                                            flex: 1,
+                                            child: Text(
+                                              "默认网关",
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          ),
+                                          Expanded(
+                                            flex: 2,
+                                            child: Text(
+                                              "${network['gateway']}",
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          ),
+                                        ],
                                       ),
-                                      Expanded(
-                                        flex: 2,
-                                        child: Text(
-                                          "${network['gateway']}",
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                      ),
-                                    ],
+                                    ),
                                   ),
-                                ),
-                                NeuCard(
-                                  decoration: NeumorphicDecoration(
-                                    color: Theme.of(context)
-                                        .scaffoldBackgroundColor,
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                  padding: EdgeInsets.all(10),
-                                  margin: EdgeInsets.only(
-                                      top: 20, left: 20, right: 20),
-                                  bevel: 10,
-                                  curveType: CurveType.flat,
-                                  child: Row(
-                                    children: [
-                                      Expanded(
-                                        flex: 1,
-                                        child: Text(
-                                          "工作群组",
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
+                                  Card(
+                                    margin: EdgeInsets.only(
+                                        top: 20, left: 20, right: 20),
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Row(
+                                        children: [
+                                          Expanded(
+                                            flex: 1,
+                                            child: Text(
+                                              "工作群组",
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          ),
+                                          Expanded(
+                                            flex: 2,
+                                            child: Text(
+                                              "${network['workgroup']}",
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          ),
+                                        ],
                                       ),
-                                      Expanded(
-                                        flex: 2,
-                                        child: Text(
-                                          "${network['workgroup']}",
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                      ),
-                                    ],
+                                    ),
                                   ),
-                                ),
-                                SizedBox(
-                                  height: 20,
-                                ),
-                              ],
+                                  SizedBox(
+                                    height: 20,
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                           ...nifs.map(_buildNifItem).toList(),
@@ -1023,75 +894,60 @@ class _SystemInfoState extends State<SystemInfo>
                       ),
                 loadingDisks
                     ? Center(
-                        child: NeuCard(
-                          padding: EdgeInsets.all(50),
-                          curveType: CurveType.flat,
-                          decoration: NeumorphicDecoration(
-                            color: Theme.of(context).scaffoldBackgroundColor,
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          bevel: 20,
-                          child: CupertinoActivityIndicator(
-                            radius: 14,
-                          ),
+                        child: CupertinoActivityIndicator(
+                          radius: 14,
                         ),
                       )
                     : ListView(
                         children: [
-                          NeuCard(
+                          Card(
                             margin: EdgeInsets.symmetric(
                                 horizontal: 20, vertical: 15),
-                            curveType: CurveType.flat,
-                            bevel: 20,
-                            decoration: NeumorphicDecoration(
-                              color: Theme.of(context).scaffoldBackgroundColor,
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Padding(
-                                  padding: EdgeInsets.only(left: 20, top: 20),
-                                  child: Text(
-                                    "存储空间",
-                                    style: TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.w600),
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Padding(
+                                    padding: EdgeInsets.only(left: 20, top: 20),
+                                    child: Text(
+                                      "存储空间",
+                                      style: TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.w600),
+                                    ),
                                   ),
-                                ),
-                                ...volumes.map(_buildVolumeItem).toList(),
-                                SizedBox(
-                                  height: 20,
-                                ),
-                              ],
+                                  ...volumes.map(_buildVolumeItem).toList(),
+                                  SizedBox(
+                                    height: 20,
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
-                          NeuCard(
+                          Card(
                             margin: EdgeInsets.symmetric(
                                 horizontal: 20, vertical: 15),
-                            curveType: CurveType.flat,
-                            bevel: 20,
-                            decoration: NeumorphicDecoration(
-                              color: Theme.of(context).scaffoldBackgroundColor,
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Padding(
-                                  padding: EdgeInsets.only(left: 20, top: 20),
-                                  child: Text(
-                                    "硬盘",
-                                    style: TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.w600),
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Padding(
+                                    padding: EdgeInsets.only(left: 20, top: 20),
+                                    child: Text(
+                                      "硬盘",
+                                      style: TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.w600),
+                                    ),
                                   ),
-                                ),
-                                ...disks.map(_buildDiskItem).toList(),
-                                SizedBox(
-                                  height: 20,
-                                ),
-                              ],
+                                  ...disks.map(_buildDiskItem).toList(),
+                                  SizedBox(
+                                    height: 20,
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                         ],

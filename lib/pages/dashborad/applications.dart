@@ -14,7 +14,6 @@ import 'package:dsm_helper/util/badge.dart';
 import 'package:dsm_helper/util/function.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart' hide Badge;
-import 'package:neumorphic/neumorphic.dart';
 
 class ApplicationList extends StatelessWidget {
   final List applications;
@@ -67,44 +66,39 @@ class ApplicationList extends StatelessWidget {
                     },
                     settings: RouteSettings(name: "control_panel")));
               },
-              child: NeuCard(
-                width: (MediaQuery.of(context).size.width * 0.8 - 60) / 2,
-                padding: EdgeInsets.symmetric(vertical: 20),
-                curveType: CurveType.flat,
-                decoration: NeumorphicDecoration(
-                  color: Theme.of(context).scaffoldBackgroundColor,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                bevel: 20,
-                child: Stack(
-                  children: [
-                    Align(
-                      alignment: Alignment.center,
-                      child: Column(
-                        children: [
-                          Image.asset(
-                            "assets/applications/${Util.version}/control_panel.png",
-                            height: 45,
-                            width: 45,
-                            fit: BoxFit.contain,
-                          ),
-                          SizedBox(
-                            height: 5,
-                          ),
-                          Text("控制面板"),
-                        ],
-                      ),
-                    ),
-                    if (appNotify['SYNO.SDS.AdminCenter.Application'] != null)
-                      Positioned(
-                        right: 30,
-                        child: Badge(
-                          appNotify['SYNO.SDS.AdminCenter.Application']
-                              ['unread'],
-                          size: 20,
+              child: Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Stack(
+                    children: [
+                      Align(
+                        alignment: Alignment.center,
+                        child: Column(
+                          children: [
+                            Image.asset(
+                              "assets/applications/${Util.version}/control_panel.png",
+                              height: 45,
+                              width: 45,
+                              fit: BoxFit.contain,
+                            ),
+                            SizedBox(
+                              height: 5,
+                            ),
+                            Text("控制面板"),
+                          ],
                         ),
                       ),
-                  ],
+                      if (appNotify['SYNO.SDS.AdminCenter.Application'] != null)
+                        Positioned(
+                          right: 30,
+                          child: Badge(
+                            appNotify['SYNO.SDS.AdminCenter.Application']
+                                ['unread'],
+                            size: 20,
+                          ),
+                        ),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -121,43 +115,38 @@ class ApplicationList extends StatelessWidget {
                     },
                     settings: RouteSettings(name: "packages")));
               },
-              child: NeuCard(
-                width: (MediaQuery.of(context).size.width * 0.8 - 60) / 2,
-                curveType: CurveType.flat,
-                decoration: NeumorphicDecoration(
-                  color: Theme.of(context).scaffoldBackgroundColor,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                bevel: 20,
-                padding: EdgeInsets.symmetric(vertical: 20),
-                child: Stack(
-                  children: [
-                    Align(
-                      alignment: Alignment.center,
-                      child: Column(
-                        children: [
-                          Image.asset(
-                            "assets/applications/${Util.version}/package_center.png",
-                            height: 45,
-                            width: 45,
-                            fit: BoxFit.contain,
-                          ),
-                          SizedBox(
-                            height: 5,
-                          ),
-                          Text("套件中心"),
-                        ],
-                      ),
-                    ),
-                    if (appNotify['SYNO.SDS.PkgManApp.Instance'] != null)
-                      Positioned(
-                        right: 30,
-                        child: Badge(
-                          appNotify['SYNO.SDS.PkgManApp.Instance']['unread'],
-                          size: 20,
+              child: Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Stack(
+                    children: [
+                      Align(
+                        alignment: Alignment.center,
+                        child: Column(
+                          children: [
+                            Image.asset(
+                              "assets/applications/${Util.version}/package_center.png",
+                              height: 45,
+                              width: 45,
+                              fit: BoxFit.contain,
+                            ),
+                            SizedBox(
+                              height: 5,
+                            ),
+                            Text("套件中心"),
+                          ],
                         ),
                       ),
-                  ],
+                      if (appNotify['SYNO.SDS.PkgManApp.Instance'] != null)
+                        Positioned(
+                          right: 30,
+                          child: Badge(
+                            appNotify['SYNO.SDS.PkgManApp.Instance']['unread'],
+                            size: 20,
+                          ),
+                        ),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -174,28 +163,23 @@ class ApplicationList extends StatelessWidget {
                     },
                     settings: RouteSettings(name: "resource_monitor")));
               },
-              child: NeuCard(
-                width: (MediaQuery.of(context).size.width * 0.8 - 60) / 2,
-                curveType: CurveType.flat,
-                decoration: NeumorphicDecoration(
-                  color: Theme.of(context).scaffoldBackgroundColor,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                bevel: 20,
-                padding: EdgeInsets.symmetric(vertical: 20),
-                child: Column(
-                  children: [
-                    Image.asset(
-                      "assets/applications/${Util.version}/resource_monitor.png",
-                      height: 45,
-                      width: 45,
-                      fit: BoxFit.contain,
-                    ),
-                    SizedBox(
-                      height: 5,
-                    ),
-                    Text("资源监控"),
-                  ],
+              child: Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Column(
+                    children: [
+                      Image.asset(
+                        "assets/applications/${Util.version}/resource_monitor.png",
+                        height: 45,
+                        width: 45,
+                        fit: BoxFit.contain,
+                      ),
+                      SizedBox(
+                        height: 5,
+                      ),
+                      Text("资源监控"),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -212,28 +196,23 @@ class ApplicationList extends StatelessWidget {
                     },
                     settings: RouteSettings(name: "storage_manager")));
               },
-              child: NeuCard(
-                width: (MediaQuery.of(context).size.width * 0.8 - 60) / 2,
-                curveType: CurveType.flat,
-                decoration: NeumorphicDecoration(
-                  color: Theme.of(context).scaffoldBackgroundColor,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                bevel: 20,
-                padding: EdgeInsets.symmetric(vertical: 20),
-                child: Column(
-                  children: [
-                    Image.asset(
-                      "assets/applications/${Util.version}/storage_manager.png",
-                      height: 45,
-                      width: 45,
-                      fit: BoxFit.contain,
-                    ),
-                    SizedBox(
-                      height: 5,
-                    ),
-                    Text("存储空间管理员"),
-                  ],
+              child: Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Column(
+                    children: [
+                      Image.asset(
+                        "assets/applications/${Util.version}/storage_manager.png",
+                        height: 45,
+                        width: 45,
+                        fit: BoxFit.contain,
+                      ),
+                      SizedBox(
+                        height: 5,
+                      ),
+                      Text("存储空间管理员"),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -250,28 +229,23 @@ class ApplicationList extends StatelessWidget {
                     },
                     settings: RouteSettings(name: "log_center")));
               },
-              child: NeuCard(
-                width: (MediaQuery.of(context).size.width * 0.8 - 60) / 2,
-                curveType: CurveType.flat,
-                decoration: NeumorphicDecoration(
-                  color: Theme.of(context).scaffoldBackgroundColor,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                bevel: 20,
-                padding: EdgeInsets.symmetric(vertical: 20),
-                child: Column(
-                  children: [
-                    Image.asset(
-                      "assets/applications/${Util.version}/log_center.png",
-                      height: 45,
-                      width: 45,
-                      fit: BoxFit.contain,
-                    ),
-                    SizedBox(
-                      height: 5,
-                    ),
-                    Text("日志中心"),
-                  ],
+              child: Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Column(
+                    children: [
+                      Image.asset(
+                        "assets/applications/${Util.version}/log_center.png",
+                        height: 45,
+                        width: 45,
+                        fit: BoxFit.contain,
+                      ),
+                      SizedBox(
+                        height: 5,
+                      ),
+                      Text("日志中心"),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -290,43 +264,39 @@ class ApplicationList extends StatelessWidget {
                       settings: RouteSettings(name: "security_scan")),
                 );
               },
-              child: NeuCard(
-                width: (MediaQuery.of(context).size.width * 0.8 - 60) / 2,
-                curveType: CurveType.flat,
-                decoration: NeumorphicDecoration(
-                  color: Theme.of(context).scaffoldBackgroundColor,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                bevel: 20,
-                padding: EdgeInsets.symmetric(vertical: 20),
-                child: Stack(
-                  children: [
-                    Align(
-                      alignment: Alignment.center,
-                      child: Column(
-                        children: [
-                          Image.asset(
-                            "assets/applications/${Util.version}/security_scan.png",
-                            height: 45,
-                            width: 45,
-                            fit: BoxFit.contain,
-                          ),
-                          SizedBox(
-                            height: 5,
-                          ),
-                          Text("安全顾问"),
-                        ],
-                      ),
-                    ),
-                    if (appNotify['SYNO.SDS.SecurityScan.Instance'] != null)
-                      Positioned(
-                        right: 30,
-                        child: Badge(
-                          appNotify['SYNO.SDS.SecurityScan.Instance']['unread'],
-                          size: 20,
+              child: Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Stack(
+                    children: [
+                      Align(
+                        alignment: Alignment.center,
+                        child: Column(
+                          children: [
+                            Image.asset(
+                              "assets/applications/${Util.version}/security_scan.png",
+                              height: 45,
+                              width: 45,
+                              fit: BoxFit.contain,
+                            ),
+                            SizedBox(
+                              height: 5,
+                            ),
+                            Text("安全顾问"),
+                          ],
                         ),
                       ),
-                  ],
+                      if (appNotify['SYNO.SDS.SecurityScan.Instance'] != null)
+                        Positioned(
+                          right: 30,
+                          child: Badge(
+                            appNotify['SYNO.SDS.SecurityScan.Instance']
+                                ['unread'],
+                            size: 20,
+                          ),
+                        ),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -345,28 +315,23 @@ class ApplicationList extends StatelessWidget {
                   }),
                 );
               },
-              child: NeuCard(
-                width: (MediaQuery.of(context).size.width * 0.8 - 60) / 2,
-                curveType: CurveType.flat,
-                decoration: NeumorphicDecoration(
-                  color: Theme.of(context).scaffoldBackgroundColor,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                bevel: 20,
-                padding: EdgeInsets.symmetric(vertical: 20),
-                child: Column(
-                  children: [
-                    Image.asset(
-                      "assets/applications/xunlei.png",
-                      height: 45,
-                      width: 45,
-                      fit: BoxFit.contain,
-                    ),
-                    SizedBox(
-                      height: 5,
-                    ),
-                    Text("迅雷"),
-                  ],
+              child: Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Column(
+                    children: [
+                      Image.asset(
+                        "assets/applications/xunlei.png",
+                        height: 45,
+                        width: 45,
+                        fit: BoxFit.contain,
+                      ),
+                      SizedBox(
+                        height: 5,
+                      ),
+                      Text("迅雷"),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -384,33 +349,28 @@ class ApplicationList extends StatelessWidget {
                   settings: RouteSettings(name: "virtual_machine_manager"),
                 ));
               },
-              child: NeuCard(
-                width: (MediaQuery.of(context).size.width * 0.8 - 60) / 2,
-                curveType: CurveType.flat,
-                decoration: NeumorphicDecoration(
-                  color: Theme.of(context).scaffoldBackgroundColor,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                bevel: 20,
-                padding: EdgeInsets.symmetric(vertical: 20),
-                child: Column(
-                  children: [
-                    Image.asset(
-                      "assets/applications/${Util.version}/virtual_machine.png",
-                      height: 45,
-                      width: 45,
-                      fit: BoxFit.contain,
-                    ),
-                    SizedBox(
-                      height: 5,
-                    ),
-                    Text(
-                      "Virtual Machine Manager",
-                      maxLines: 1,
-                      textAlign: TextAlign.center,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
+              child: Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Column(
+                    children: [
+                      Image.asset(
+                        "assets/applications/${Util.version}/virtual_machine.png",
+                        height: 45,
+                        width: 45,
+                        fit: BoxFit.contain,
+                      ),
+                      SizedBox(
+                        height: 5,
+                      ),
+                      Text(
+                        "Virtual Machine Manager",
+                        maxLines: 1,
+                        textAlign: TextAlign.center,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -428,33 +388,28 @@ class ApplicationList extends StatelessWidget {
                   settings: RouteSettings(name: "docker"),
                 ));
               },
-              child: NeuCard(
-                width: (MediaQuery.of(context).size.width * 0.8 - 60) / 2,
-                curveType: CurveType.flat,
-                decoration: NeumorphicDecoration(
-                  color: Theme.of(context).scaffoldBackgroundColor,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                bevel: 20,
-                padding: EdgeInsets.symmetric(vertical: 20),
-                child: Column(
-                  children: [
-                    Image.asset(
-                      "assets/applications/docker.png",
-                      height: 45,
-                      width: 45,
-                      fit: BoxFit.contain,
-                    ),
-                    SizedBox(
-                      height: 5,
-                    ),
-                    Text(
-                      "Docker",
-                      maxLines: 1,
-                      textAlign: TextAlign.center,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
+              child: Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Column(
+                    children: [
+                      Image.asset(
+                        "assets/applications/docker.png",
+                        height: 45,
+                        width: 45,
+                        fit: BoxFit.contain,
+                      ),
+                      SizedBox(
+                        height: 5,
+                      ),
+                      Text(
+                        "Docker",
+                        maxLines: 1,
+                        textAlign: TextAlign.center,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -472,31 +427,27 @@ class ApplicationList extends StatelessWidget {
                   settings: RouteSettings(name: "Container Manager"),
                 ));
               },
-              child: NeuCard(
-                width: (MediaQuery.of(context).size.width * 0.8 - 60) / 2,
-                curveType: CurveType.flat,
-                decoration: NeumorphicDecoration(
-                  color: Theme.of(context).scaffoldBackgroundColor,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                bevel: 20,
-                padding: EdgeInsets.symmetric(vertical: 20),
+              child: Card(
                 child: Column(
                   children: [
-                    Image.asset(
-                      "assets/applications/container_manager.png",
-                      height: 45,
-                      width: 45,
-                      fit: BoxFit.contain,
-                    ),
-                    SizedBox(
-                      height: 5,
-                    ),
-                    Text(
-                      "Container Manager",
-                      maxLines: 1,
-                      textAlign: TextAlign.center,
-                      overflow: TextOverflow.ellipsis,
+                    Column(
+                      children: [
+                        Image.asset(
+                          "assets/applications/container_manager.png",
+                          height: 45,
+                          width: 45,
+                          fit: BoxFit.contain,
+                        ),
+                        SizedBox(
+                          height: 5,
+                        ),
+                        Text(
+                          "Container Manager",
+                          maxLines: 1,
+                          textAlign: TextAlign.center,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
                     ),
                   ],
                 ),
@@ -516,33 +467,28 @@ class ApplicationList extends StatelessWidget {
                   settings: RouteSettings(name: "download_station"),
                 ));
               },
-              child: NeuCard(
-                width: (MediaQuery.of(context).size.width * 0.8 - 60) / 2,
-                curveType: CurveType.flat,
-                decoration: NeumorphicDecoration(
-                  color: Theme.of(context).scaffoldBackgroundColor,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                bevel: 20,
-                padding: EdgeInsets.symmetric(vertical: 20),
-                child: Column(
-                  children: [
-                    Image.asset(
-                      "assets/applications/download_station.png",
-                      height: 45,
-                      width: 45,
-                      fit: BoxFit.contain,
-                    ),
-                    SizedBox(
-                      height: 5,
-                    ),
-                    Text(
-                      "Download Station",
-                      maxLines: 1,
-                      textAlign: TextAlign.center,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
+              child: Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Column(
+                    children: [
+                      Image.asset(
+                        "assets/applications/download_station.png",
+                        height: 45,
+                        width: 45,
+                        fit: BoxFit.contain,
+                      ),
+                      SizedBox(
+                        height: 5,
+                      ),
+                      Text(
+                        "Download Station",
+                        maxLines: 1,
+                        textAlign: TextAlign.center,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -560,33 +506,28 @@ class ApplicationList extends StatelessWidget {
                   settings: RouteSettings(name: "moments"),
                 ));
               },
-              child: NeuCard(
-                width: (MediaQuery.of(context).size.width * 0.8 - 60) / 2,
-                curveType: CurveType.flat,
-                decoration: NeumorphicDecoration(
-                  color: Theme.of(context).scaffoldBackgroundColor,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                bevel: 20,
-                padding: EdgeInsets.symmetric(vertical: 20),
-                child: Column(
-                  children: [
-                    Image.asset(
-                      "assets/applications/6/moments.png",
-                      height: 45,
-                      width: 45,
-                      fit: BoxFit.contain,
-                    ),
-                    SizedBox(
-                      height: 5,
-                    ),
-                    Text(
-                      "Moments",
-                      maxLines: 1,
-                      textAlign: TextAlign.center,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
+              child: Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Column(
+                    children: [
+                      Image.asset(
+                        "assets/applications/6/moments.png",
+                        height: 45,
+                        width: 45,
+                        fit: BoxFit.contain,
+                      ),
+                      SizedBox(
+                        height: 5,
+                      ),
+                      Text(
+                        "Moments",
+                        maxLines: 1,
+                        textAlign: TextAlign.center,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -604,33 +545,28 @@ class ApplicationList extends StatelessWidget {
                   settings: RouteSettings(name: "photos"),
                 ));
               },
-              child: NeuCard(
-                width: (MediaQuery.of(context).size.width * 0.8 - 60) / 2,
-                curveType: CurveType.flat,
-                decoration: NeumorphicDecoration(
-                  color: Theme.of(context).scaffoldBackgroundColor,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                bevel: 20,
-                padding: EdgeInsets.symmetric(vertical: 20),
-                child: Column(
-                  children: [
-                    Image.asset(
-                      "assets/applications/7/synology_photos.png",
-                      height: 45,
-                      width: 45,
-                      fit: BoxFit.contain,
-                    ),
-                    SizedBox(
-                      height: 5,
-                    ),
-                    Text(
-                      "Synology Photos",
-                      maxLines: 1,
-                      textAlign: TextAlign.center,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
+              child: Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Column(
+                    children: [
+                      Image.asset(
+                        "assets/applications/7/synology_photos.png",
+                        height: 45,
+                        width: 45,
+                        fit: BoxFit.contain,
+                      ),
+                      SizedBox(
+                        height: 5,
+                      ),
+                      Text(
+                        "Synology Photos",
+                        maxLines: 1,
+                        textAlign: TextAlign.center,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),

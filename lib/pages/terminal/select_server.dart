@@ -4,7 +4,6 @@ import 'package:dsm_helper/util/function.dart';
 import 'package:dsm_helper/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:neumorphic/neumorphic.dart';
 import 'add_server.dart';
 import 'ssh.dart';
 
@@ -39,7 +38,7 @@ class _SelectServerState extends State<SelectServer> {
     var server = servers[index];
     return Padding(
       padding: EdgeInsets.only(bottom: 20),
-      child: NeuButton(
+      child: OutlinedButton(
         onPressed: () async {
           Navigator.of(context).push(CupertinoPageRoute(
               builder: (context) {
@@ -48,12 +47,6 @@ class _SelectServerState extends State<SelectServer> {
               },
               settings: RouteSettings(name: "ssh_client")));
         },
-        decoration: NeumorphicDecoration(
-          color: Theme.of(context).scaffoldBackgroundColor,
-          borderRadius: BorderRadius.circular(20),
-        ),
-        padding: EdgeInsets.zero,
-        bevel: 20,
         child: Container(
           padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
           child: Row(
@@ -76,7 +69,7 @@ class _SelectServerState extends State<SelectServer> {
                   ],
                 ),
               ),
-              NeuButton(
+              OutlinedButton(
                 onPressed: () {
                   Navigator.of(context)
                       .push(CupertinoPageRoute(
@@ -88,12 +81,6 @@ class _SelectServerState extends State<SelectServer> {
                     getData();
                   });
                 },
-                decoration: NeumorphicDecoration(
-                  color: Theme.of(context).scaffoldBackgroundColor,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                bevel: 20,
-                padding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
                 child: Image.asset(
                   "assets/icons/edit.png",
                   width: 20,
@@ -102,7 +89,7 @@ class _SelectServerState extends State<SelectServer> {
               SizedBox(
                 width: 10,
               ),
-              NeuButton(
+              OutlinedButton(
                 onPressed: () {
                   setState(() {
                     servers.remove(server);
@@ -111,12 +98,6 @@ class _SelectServerState extends State<SelectServer> {
                   Util.setStorage("terminal_servers", jsonEncode(servers));
                   Util.toast("删除成功");
                 },
-                decoration: NeumorphicDecoration(
-                  color: Theme.of(context).scaffoldBackgroundColor,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                bevel: 20,
-                padding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
                 child: Image.asset(
                   "assets/icons/delete.png",
                   width: 20,
@@ -138,13 +119,7 @@ class _SelectServerState extends State<SelectServer> {
         actions: [
           Padding(
             padding: EdgeInsets.only(right: 10, top: 8, bottom: 8),
-            child: NeuButton(
-              decoration: NeumorphicDecoration(
-                color: Theme.of(context).scaffoldBackgroundColor,
-                borderRadius: BorderRadius.circular(10),
-              ),
-              padding: EdgeInsets.all(10),
-              bevel: 5,
+            child: OutlinedButton(
               onPressed: () {
                 Navigator.of(context)
                     .push(CupertinoPageRoute(
@@ -163,17 +138,8 @@ class _SelectServerState extends State<SelectServer> {
       ),
       body: loading
           ? Center(
-              child: NeuCard(
-                padding: EdgeInsets.all(50),
-                curveType: CurveType.flat,
-                decoration: NeumorphicDecoration(
-                  color: Theme.of(context).scaffoldBackgroundColor,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                bevel: 20,
-                child: CupertinoActivityIndicator(
-                  radius: 14,
-                ),
+              child: CupertinoActivityIndicator(
+                radius: 14,
               ),
             )
           : servers.length > 0
@@ -196,14 +162,7 @@ class _SelectServerState extends State<SelectServer> {
                       ),
                       SizedBox(
                         width: 200,
-                        child: NeuButton(
-                          padding: EdgeInsets.symmetric(
-                              horizontal: 10, vertical: 10),
-                          decoration: NeumorphicDecoration(
-                            color: Theme.of(context).scaffoldBackgroundColor,
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          bevel: 5,
+                        child: OutlinedButton(
                           onPressed: () {
                             Navigator.of(context)
                                 .push(CupertinoPageRoute(

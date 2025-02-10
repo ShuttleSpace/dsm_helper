@@ -4,7 +4,6 @@ import 'package:dsm_helper/widgets/animation_progress_bar.dart';
 import 'package:dsm_helper/widgets/neu_back_button.dart';
 import 'package:easy_app_installer/easy_app_installer.dart';
 import 'package:flutter/material.dart';
-import 'package:neumorphic/neumorphic.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
 class Update extends StatefulWidget {
@@ -77,13 +76,7 @@ class _UpdateState extends State<Update> {
                   height: 50,
                 ),
                 Center(
-                  child: NeuCard(
-                    bevel: 20,
-                    curveType: CurveType.flat,
-                    decoration: NeumorphicDecoration(
-                      color: Theme.of(context).scaffoldBackgroundColor,
-                      borderRadius: BorderRadius.circular(60),
-                    ),
+                  child: Card(
                     child: CircleAvatar(
                       backgroundImage: AssetImage(
                         "assets/logo.png",
@@ -106,30 +99,27 @@ class _UpdateState extends State<Update> {
                 SizedBox(
                   height: 40,
                 ),
-                NeuCard(
-                  padding: EdgeInsets.symmetric(vertical: 20, horizontal: 25),
+                Card(
                   margin: EdgeInsets.symmetric(horizontal: 20),
-                  curveType: CurveType.flat,
-                  decoration: NeumorphicDecoration(
-                    color: Theme.of(context).scaffoldBackgroundColor,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      Text(
-                        "更新日志：",
-                        style: TextStyle(fontSize: 16),
-                      ),
-                      SizedBox(
-                        height: 10,
-                      ),
-                      Text(
-                        "${widget.data['buildUpdateDescription'] ?? "暂无更新日志"}",
-                        style: TextStyle(
-                            color: AppTheme.of(context).placeholderColor),
-                      ),
-                    ],
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Text(
+                          "更新日志：",
+                          style: TextStyle(fontSize: 16),
+                        ),
+                        SizedBox(
+                          height: 10,
+                        ),
+                        Text(
+                          "${widget.data['buildUpdateDescription'] ?? "暂无更新日志"}",
+                          style: TextStyle(
+                              color: AppTheme.of(context).placeholderColor),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ],
@@ -154,17 +144,11 @@ class _UpdateState extends State<Update> {
           if (!downloading)
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 20),
-              child: NeuButton(
+              child: OutlinedButton(
                 onPressed: () {
                   download();
                 },
                 // margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                padding: EdgeInsets.symmetric(vertical: 20),
-                decoration: NeumorphicDecoration(
-                  color: Theme.of(context).scaffoldBackgroundColor,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                bevel: 20,
                 child: Text(
                   "开始下载",
                   style: TextStyle(fontSize: 18),
@@ -174,24 +158,21 @@ class _UpdateState extends State<Update> {
           if (downloading)
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 20),
-              child: NeuCard(
-                curveType: CurveType.flat,
-                bevel: 10,
-                decoration: NeumorphicDecoration(
-                  color: Theme.of(context).scaffoldBackgroundColor,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(20),
-                  child: FAProgressBar(
-                    backgroundColor: Colors.transparent,
-                    progressColor: Colors.blue,
-                    currentValue: (progress * 100).ceil(),
-                    size: 64,
+              child: Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: ClipRRect(
                     borderRadius: BorderRadius.circular(20),
-                    displayText: '%',
-                    displayTextStyle:
-                        TextStyle(fontSize: 18, color: Colors.white),
+                    child: FAProgressBar(
+                      backgroundColor: Colors.transparent,
+                      progressColor: Colors.blue,
+                      currentValue: (progress * 100).ceil(),
+                      size: 64,
+                      borderRadius: BorderRadius.circular(20),
+                      displayText: '%',
+                      displayTextStyle:
+                          TextStyle(fontSize: 18, color: Colors.white),
+                    ),
                   ),
                 ),
               ),

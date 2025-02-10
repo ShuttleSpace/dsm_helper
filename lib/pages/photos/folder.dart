@@ -3,7 +3,6 @@ import 'package:dsm_helper/pages/photos/widgets/photo_item_widget.dart';
 import 'package:dsm_helper/pages/photos/widgets/thumbnail_card.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:neumorphic/neumorphic.dart';
 
 class Folder extends StatefulWidget {
   const Folder(this.isTeam);
@@ -143,17 +142,8 @@ class FolderState extends State<Folder> {
           ),
         if (loading)
           Center(
-            child: NeuCard(
-              padding: EdgeInsets.all(50),
-              curveType: CurveType.flat,
-              decoration: NeumorphicDecoration(
-                color: Theme.of(context).scaffoldBackgroundColor,
-                borderRadius: BorderRadius.circular(20),
-              ),
-              bevel: 20,
-              child: CupertinoActivityIndicator(
-                radius: 14,
-              ),
+            child: CupertinoActivityIndicator(
+              radius: 14,
             ),
           )
       ],

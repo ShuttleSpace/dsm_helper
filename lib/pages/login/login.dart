@@ -14,8 +14,6 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_vibrate/flutter_vibrate.dart';
-import 'package:fluwx/fluwx.dart';
-import 'package:neumorphic/neumorphic.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
 
@@ -66,9 +64,9 @@ class _LoginState extends State<Login> {
         });
       }
     });
-    checkAgreement();
+    // checkAgreement();
     if (Platform.isAndroid) {
-      checkUpdate();
+      // checkUpdate();
     } else {
       setState(() {
         read = true;
@@ -133,109 +131,98 @@ class _LoginState extends State<Login> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                NeuCard(
-                  width: double.infinity,
+                Card(
                   margin: EdgeInsets.symmetric(horizontal: 50),
-                  curveType: CurveType.emboss,
-                  bevel: 5,
-                  decoration: NeumorphicDecoration(
-                    color: Theme.of(context).scaffoldBackgroundColor,
-                    borderRadius: BorderRadius.circular(25),
-                  ),
                   child: Padding(
                     padding: EdgeInsets.all(20),
                     child: Column(
                       children: [
-                        NeuCard(
-                          decoration: NeumorphicDecoration(
-                            color: Theme.of(context).scaffoldBackgroundColor,
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          bevel: 20,
-                          curveType: CurveType.flat,
-                          padding:
-                              EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-                          child: Text.rich(
-                            TextSpan(
-                              children: [
-                                TextSpan(
-                                    text:
-                                        "感谢您使用${Util.appName}，为保护您的个人信息安全，我们将依据${Util.appName}的"),
-                                TextSpan(
-                                  text: "用户协议",
-                                  style: TextStyle(
-                                      decoration: TextDecoration.underline,
-                                      color: Colors.blue),
-                                  recognizer: _licenseRecognizer
-                                    ..onTap = () {
-                                      FocusScope.of(context).unfocus();
-                                      Navigator.of(context).push(
-                                          CupertinoPageRoute(
-                                              builder: (context) {
-                                        return License();
-                                      }));
-                                    },
-                                ),
-                                TextSpan(text: " 和 "),
-                                TextSpan(
-                                  text: "隐私政策",
-                                  style: TextStyle(
-                                      decoration: TextDecoration.underline,
-                                      color: Colors.blue),
-                                  recognizer: _privacyRecognizer
-                                    ..onTap = () {
-                                      FocusScope.of(context).unfocus();
-                                      Navigator.of(context).push(
-                                          CupertinoPageRoute(
-                                              builder: (context) {
-                                        return dsm.Browser(
-                                          url: '${Util.appUrl}/privacy',
-                                          title: "隐私政策",
-                                        );
-                                      }));
-                                    },
-                                ),
-                                TextSpan(
-                                    text:
-                                        "来帮助您了解：我们如何收集个人信息、如何使用及存储个人信息以及您享有的相关权利\n"),
-                                TextSpan(text: "在您使用${Util.appName}前，请务必仔细阅读"),
-                                TextSpan(
-                                  text: "用户协议",
-                                  style: TextStyle(
-                                      decoration: TextDecoration.underline,
-                                      color: Colors.blue),
-                                  recognizer: _licenseRecognizer
-                                    ..onTap = () {
-                                      FocusScope.of(context).unfocus();
-                                      Navigator.of(context).push(
-                                          CupertinoPageRoute(
-                                              builder: (context) {
-                                        return License();
-                                      }));
-                                    },
-                                ),
-                                TextSpan(text: "和 "),
-                                TextSpan(
-                                  text: "隐私政策",
-                                  style: TextStyle(
-                                      decoration: TextDecoration.underline,
-                                      color: Colors.blue),
-                                  recognizer: _privacyRecognizer
-                                    ..onTap = () {
-                                      FocusScope.of(context).unfocus();
-                                      Navigator.of(context).push(
-                                          CupertinoPageRoute(
-                                              builder: (context) {
-                                        return dsm.Browser(
-                                          url: '${Util.appUrl}/privacy',
-                                          title: "隐私政策",
-                                        );
-                                      }));
-                                    },
-                                ),
-                                TextSpan(
-                                    text: "以了解详细内容，如您同意，请点击'同意并继续'开始使用我们的服务"),
-                              ],
+                        Card(
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Text.rich(
+                              TextSpan(
+                                children: [
+                                  TextSpan(
+                                      text:
+                                          "感谢您使用${Util.appName}，为保护您的个人信息安全，我们将依据${Util.appName}的"),
+                                  TextSpan(
+                                    text: "用户协议",
+                                    style: TextStyle(
+                                        decoration: TextDecoration.underline,
+                                        color: Colors.blue),
+                                    recognizer: _licenseRecognizer
+                                      ..onTap = () {
+                                        FocusScope.of(context).unfocus();
+                                        Navigator.of(context).push(
+                                            CupertinoPageRoute(
+                                                builder: (context) {
+                                          return License();
+                                        }));
+                                      },
+                                  ),
+                                  TextSpan(text: " 和 "),
+                                  TextSpan(
+                                    text: "隐私政策",
+                                    style: TextStyle(
+                                        decoration: TextDecoration.underline,
+                                        color: Colors.blue),
+                                    recognizer: _privacyRecognizer
+                                      ..onTap = () {
+                                        FocusScope.of(context).unfocus();
+                                        Navigator.of(context).push(
+                                            CupertinoPageRoute(
+                                                builder: (context) {
+                                          return dsm.Browser(
+                                            url: '${Util.appUrl}/privacy',
+                                            title: "隐私政策",
+                                          );
+                                        }));
+                                      },
+                                  ),
+                                  TextSpan(
+                                      text:
+                                          "来帮助您了解：我们如何收集个人信息、如何使用及存储个人信息以及您享有的相关权利\n"),
+                                  TextSpan(
+                                      text: "在您使用${Util.appName}前，请务必仔细阅读"),
+                                  TextSpan(
+                                    text: "用户协议",
+                                    style: TextStyle(
+                                        decoration: TextDecoration.underline,
+                                        color: Colors.blue),
+                                    recognizer: _licenseRecognizer
+                                      ..onTap = () {
+                                        FocusScope.of(context).unfocus();
+                                        Navigator.of(context).push(
+                                            CupertinoPageRoute(
+                                                builder: (context) {
+                                          return License();
+                                        }));
+                                      },
+                                  ),
+                                  TextSpan(text: "和 "),
+                                  TextSpan(
+                                    text: "隐私政策",
+                                    style: TextStyle(
+                                        decoration: TextDecoration.underline,
+                                        color: Colors.blue),
+                                    recognizer: _privacyRecognizer
+                                      ..onTap = () {
+                                        FocusScope.of(context).unfocus();
+                                        Navigator.of(context).push(
+                                            CupertinoPageRoute(
+                                                builder: (context) {
+                                          return dsm.Browser(
+                                            url: '${Util.appUrl}/privacy',
+                                            title: "隐私政策",
+                                          );
+                                        }));
+                                      },
+                                  ),
+                                  TextSpan(
+                                      text: "以了解详细内容，如您同意，请点击'同意并继续'开始使用我们的服务"),
+                                ],
+                              ),
                             ),
                           ),
                         ),
@@ -245,7 +232,7 @@ class _LoginState extends State<Login> {
                         Row(
                           children: [
                             Expanded(
-                              child: NeuButton(
+                              child: OutlinedButton(
                                 onPressed: () async {
                                   Navigator.of(context).pop();
                                   Util.setStorage("read", "1");
@@ -256,13 +243,6 @@ class _LoginState extends State<Login> {
                                       universalLink:
                                           "https://dsm.apaipai.top/app/");
                                 },
-                                decoration: NeumorphicDecoration(
-                                  color:
-                                      Theme.of(context).scaffoldBackgroundColor,
-                                  borderRadius: BorderRadius.circular(25),
-                                ),
-                                bevel: 20,
-                                padding: EdgeInsets.symmetric(vertical: 10),
                                 child: Text(
                                   "同意并继续",
                                   style: TextStyle(fontSize: 18),
@@ -273,17 +253,10 @@ class _LoginState extends State<Login> {
                               width: 16,
                             ),
                             Expanded(
-                              child: NeuButton(
+                              child: OutlinedButton(
                                 onPressed: () async {
                                   SystemNavigator.pop();
                                 },
-                                decoration: NeumorphicDecoration(
-                                  color:
-                                      Theme.of(context).scaffoldBackgroundColor,
-                                  borderRadius: BorderRadius.circular(25),
-                                ),
-                                bevel: 20,
-                                padding: EdgeInsets.symmetric(vertical: 10),
                                 child: Text(
                                   "不同意",
                                   style: TextStyle(fontSize: 18),
@@ -654,31 +627,22 @@ class _LoginState extends State<Login> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: updateInfo != null
-            ? Padding(
-                padding: EdgeInsets.only(left: 10, top: 8, bottom: 8),
-                child: NeuButton(
-                  decoration: NeumorphicDecoration(
-                    color: Theme.of(context).scaffoldBackgroundColor,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  padding: EdgeInsets.all(10),
-                  bevel: 5,
-                  onPressed: () {
-                    Navigator.of(context)
-                        .push(CupertinoPageRoute(builder: (context) {
-                      return Update(updateInfo);
-                    }));
-                  },
-                  child: Image.asset(
-                    "assets/icons/update.png",
-                    width: 20,
-                    height: 20,
-                    color: Colors.redAccent,
-                  ),
-                ),
-              )
-            : null,
+        leading: Padding(
+          padding: EdgeInsets.only(left: 10, top: 8, bottom: 8),
+          child: OutlinedButton(
+            onPressed: () {
+              Navigator.of(context).push(CupertinoPageRoute(builder: (context) {
+                return Update(updateInfo);
+              }));
+            },
+            child: Image.asset(
+              "assets/icons/update.png",
+              width: 20,
+              height: 20,
+              color: Colors.redAccent,
+            ),
+          ),
+        ),
         title: Text(
           widget.type == "login" ? "账号登录" : "添加账号",
         ),
@@ -703,13 +667,7 @@ class _LoginState extends State<Login> {
           if (servers.length > 0)
             Padding(
               padding: EdgeInsets.only(right: 10, top: 8, bottom: 8),
-              child: NeuButton(
-                decoration: NeumorphicDecoration(
-                  color: Theme.of(context).scaffoldBackgroundColor,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                padding: EdgeInsets.all(10),
-                bevel: 5,
+              child: OutlinedButton(
                 onPressed: () {
                   Navigator.of(context)
                       .push(CupertinoPageRoute(builder: (context) {
@@ -735,89 +693,85 @@ class _LoginState extends State<Login> {
             SizedBox(
               height: 20,
             ),
-            NeuCard(
-              decoration: NeumorphicDecoration(
-                color: Theme.of(context).scaffoldBackgroundColor,
-                borderRadius: BorderRadius.circular(20),
-              ),
-              bevel: 20,
-              curveType: CurveType.flat,
-              padding: EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-              child: Row(
-                children: [
-                  SizedBox(
-                    width: 60,
-                    child: GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          https = !https;
-                          if (https && port == "5000") {
-                            port = "5001";
-                            _portController.value =
-                                TextEditingValue(text: port);
-                          } else if (!https && port == "5001") {
-                            port = "5000";
-                            _portController.value =
-                                TextEditingValue(text: port);
-                          }
-                        });
-                      },
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          SizedBox(
-                            height: 4,
-                          ),
-                          Text(
-                            "协议",
-                            style: TextStyle(
-                                fontSize: 12, color: Colors.grey, height: 1),
-                          ),
-                          Text(
-                            https ? "https" : "http",
-                            style: TextStyle(fontSize: 16),
-                          ),
-                        ],
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                child: Row(
+                  children: [
+                    SizedBox(
+                      width: 60,
+                      child: GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            https = !https;
+                            if (https && port == "5000") {
+                              port = "5001";
+                              _portController.value =
+                                  TextEditingValue(text: port);
+                            } else if (!https && port == "5001") {
+                              port = "5000";
+                              _portController.value =
+                                  TextEditingValue(text: port);
+                            }
+                          });
+                        },
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            SizedBox(
+                              height: 4,
+                            ),
+                            Text(
+                              "协议",
+                              style: TextStyle(
+                                  fontSize: 12, color: Colors.grey, height: 1),
+                            ),
+                            Text(
+                              https ? "https" : "http",
+                              style: TextStyle(fontSize: 16),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
-                  ),
-                  Expanded(
-                    flex: 3,
-                    child: TextField(
-                      autocorrect: false,
-                      controller: _hostController,
-                      onChanged: (v) {
-                        setState(() {
-                          host = v;
-                        });
-                      },
-                      textInputAction: TextInputAction.next,
-                      onEditingComplete: () {
-                        FocusScope.of(context).nextFocus();
-                      },
-                      decoration: InputDecoration(
-                        border: InputBorder.none,
-                        labelText: '网址/IP/QuickConnect ID',
-                      ),
-                    ),
-                  ),
-                  if (host.contains(".") || host.contains(":"))
                     Expanded(
-                      flex: 1,
+                      flex: 3,
                       child: TextField(
-                        onChanged: (v) => port = v,
-                        controller: _portController,
+                        autocorrect: false,
+                        controller: _hostController,
+                        onChanged: (v) {
+                          setState(() {
+                            host = v;
+                          });
+                        },
                         textInputAction: TextInputAction.next,
                         onEditingComplete: () {
                           FocusScope.of(context).nextFocus();
                         },
                         decoration: InputDecoration(
                           border: InputBorder.none,
-                          labelText: '端口',
+                          labelText: '网址/IP/QuickConnect ID',
                         ),
                       ),
                     ),
-                ],
+                    if (host.contains(".") || host.contains(":"))
+                      Expanded(
+                        flex: 1,
+                        child: TextField(
+                          onChanged: (v) => port = v,
+                          controller: _portController,
+                          textInputAction: TextInputAction.next,
+                          onEditingComplete: () {
+                            FocusScope.of(context).nextFocus();
+                          },
+                          decoration: InputDecoration(
+                            border: InputBorder.none,
+                            labelText: '端口',
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
               ),
             ),
             SizedBox(
@@ -826,26 +780,22 @@ class _LoginState extends State<Login> {
             Row(
               children: [
                 Expanded(
-                  child: NeuCard(
-                    decoration: NeumorphicDecoration(
-                      color: Theme.of(context).scaffoldBackgroundColor,
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    bevel: 20,
-                    curveType: CurveType.flat,
-                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-                    child: TextField(
-                      autocorrect: false,
-                      keyboardAppearance: Brightness.light,
-                      controller: _accountController,
-                      onChanged: (v) => account = v,
-                      textInputAction: TextInputAction.next,
-                      onEditingComplete: () {
-                        FocusScope.of(context).nextFocus();
-                      },
-                      decoration: InputDecoration(
-                        border: InputBorder.none,
-                        labelText: '账号',
+                  child: Card(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                      child: TextField(
+                        autocorrect: false,
+                        keyboardAppearance: Brightness.light,
+                        controller: _accountController,
+                        onChanged: (v) => account = v,
+                        textInputAction: TextInputAction.next,
+                        onEditingComplete: () {
+                          FocusScope.of(context).nextFocus();
+                        },
+                        decoration: InputDecoration(
+                          border: InputBorder.none,
+                          labelText: '账号',
+                        ),
                       ),
                     ),
                   ),
@@ -854,25 +804,21 @@ class _LoginState extends State<Login> {
                   width: 20,
                 ),
                 Expanded(
-                  child: NeuCard(
-                    decoration: NeumorphicDecoration(
-                      color: Theme.of(context).scaffoldBackgroundColor,
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    bevel: 20,
-                    curveType: CurveType.flat,
-                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-                    child: TextField(
-                      keyboardAppearance: Brightness.light,
-                      controller: _noteController,
-                      onChanged: (v) => note = v,
-                      textInputAction: TextInputAction.next,
-                      onEditingComplete: () {
-                        FocusScope.of(context).nextFocus();
-                      },
-                      decoration: InputDecoration(
-                        border: InputBorder.none,
-                        labelText: '备注',
+                  child: Card(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                      child: TextField(
+                        keyboardAppearance: Brightness.light,
+                        controller: _noteController,
+                        onChanged: (v) => note = v,
+                        textInputAction: TextInputAction.next,
+                        onEditingComplete: () {
+                          FocusScope.of(context).nextFocus();
+                        },
+                        decoration: InputDecoration(
+                          border: InputBorder.none,
+                          labelText: '备注',
+                        ),
                       ),
                     ),
                   ),
@@ -882,25 +828,21 @@ class _LoginState extends State<Login> {
             SizedBox(
               height: 20,
             ),
-            NeuCard(
-              decoration: NeumorphicDecoration(
-                color: Theme.of(context).scaffoldBackgroundColor,
-                borderRadius: BorderRadius.circular(20),
-              ),
-              bevel: 12,
-              curveType: CurveType.flat,
-              padding: EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-              child: TextField(
-                controller: _passwordController,
-                onChanged: (v) => password = v,
-                obscureText: true,
-                textInputAction: TextInputAction.done,
-                onEditingComplete: () {
-                  FocusScope.of(context).unfocus();
-                },
-                decoration: InputDecoration(
-                  border: InputBorder.none,
-                  labelText: '密码',
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                child: TextField(
+                  controller: _passwordController,
+                  onChanged: (v) => password = v,
+                  obscureText: true,
+                  textInputAction: TextInputAction.done,
+                  onEditingComplete: () {
+                    FocusScope.of(context).unfocus();
+                  },
+                  decoration: InputDecoration(
+                    border: InputBorder.none,
+                    labelText: '密码',
+                  ),
                 ),
               ),
             ),
@@ -911,26 +853,21 @@ class _LoginState extends State<Login> {
               Row(
                 children: [
                   Expanded(
-                    child: NeuCard(
-                      decoration: NeumorphicDecoration(
-                        color: Theme.of(context).scaffoldBackgroundColor,
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      bevel: 12,
-                      curveType: CurveType.flat,
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-                      child: TextField(
-                        controller: _otpController,
-                        onChanged: (v) => otpCode = v,
-                        keyboardType: TextInputType.number,
-                        textInputAction: TextInputAction.done,
-                        onEditingComplete: () {
-                          FocusScope.of(context).unfocus();
-                        },
-                        decoration: InputDecoration(
-                          border: InputBorder.none,
-                          labelText: '二步验证代码',
+                    child: Card(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                        child: TextField(
+                          controller: _otpController,
+                          onChanged: (v) => otpCode = v,
+                          keyboardType: TextInputType.number,
+                          textInputAction: TextInputAction.done,
+                          onEditingComplete: () {
+                            FocusScope.of(context).unfocus();
+                          },
+                          decoration: InputDecoration(
+                            border: InputBorder.none,
+                            labelText: '二步验证代码',
+                          ),
                         ),
                       ),
                     ),
@@ -946,27 +883,20 @@ class _LoginState extends State<Login> {
                           rememberDevice = !rememberDevice;
                         });
                       },
-                      child: NeuCard(
-                        decoration: NeumorphicDecoration(
-                          color: Theme.of(context).scaffoldBackgroundColor,
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        curveType:
-                            rememberDevice ? CurveType.emboss : CurveType.flat,
-                        bevel: 12,
-                        height: 68,
-                        padding:
-                            EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                        child: Row(
-                          children: [
-                            Text("记住设备"),
-                            Spacer(),
-                            if (rememberDevice)
-                              Icon(
-                                CupertinoIcons.checkmark_alt,
-                                color: Color(0xffff9813),
-                              ),
-                          ],
+                      child: Card(
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Row(
+                            children: [
+                              Text("记住设备"),
+                              Spacer(),
+                              if (rememberDevice)
+                                Icon(
+                                  CupertinoIcons.checkmark_alt,
+                                  color: Color(0xffff9813),
+                                ),
+                            ],
+                          ),
                         ),
                       ),
                     ),
@@ -989,27 +919,20 @@ class _LoginState extends State<Login> {
                         }
                       });
                     },
-                    child: NeuCard(
-                      decoration: NeumorphicDecoration(
-                        color: Theme.of(context).scaffoldBackgroundColor,
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      curveType:
-                          rememberPassword ? CurveType.emboss : CurveType.flat,
-                      bevel: 12,
-                      height: 60,
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-                      child: Row(
-                        children: [
-                          Text("记住密码"),
-                          Spacer(),
-                          if (rememberPassword)
-                            Icon(
-                              CupertinoIcons.checkmark_alt,
-                              color: Color(0xffff9813),
-                            ),
-                        ],
+                    child: Card(
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Row(
+                          children: [
+                            Text("记住密码"),
+                            Spacer(),
+                            if (rememberPassword)
+                              Icon(
+                                CupertinoIcons.checkmark_alt,
+                                color: Color(0xffff9813),
+                              ),
+                          ],
+                        ),
                       ),
                     ),
                   ),
@@ -1027,26 +950,20 @@ class _LoginState extends State<Login> {
                         }
                       });
                     },
-                    child: NeuCard(
-                      decoration: NeumorphicDecoration(
-                        color: Theme.of(context).scaffoldBackgroundColor,
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      curveType: autoLogin ? CurveType.emboss : CurveType.flat,
-                      bevel: 12,
-                      height: 60,
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-                      child: Row(
-                        children: [
-                          Text("自动登录"),
-                          Spacer(),
-                          if (autoLogin)
-                            Icon(
-                              CupertinoIcons.checkmark_alt,
-                              color: Color(0xffff9813),
-                            ),
-                        ],
+                    child: Card(
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Row(
+                          children: [
+                            Text("自动登录"),
+                            Spacer(),
+                            if (autoLogin)
+                              Icon(
+                                CupertinoIcons.checkmark_alt,
+                                color: Color(0xffff9813),
+                              ),
+                          ],
+                        ),
                       ),
                     ),
                   ),
@@ -1065,25 +982,20 @@ class _LoginState extends State<Login> {
                       checkSsl = !checkSsl;
                     });
                   },
-                  child: NeuCard(
-                    decoration: NeumorphicDecoration(
-                      color: Theme.of(context).scaffoldBackgroundColor,
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    curveType: checkSsl ? CurveType.emboss : CurveType.flat,
-                    bevel: 12,
-                    height: 60,
-                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-                    child: Row(
-                      children: [
-                        Text("验证SSL证书"),
-                        Spacer(),
-                        if (checkSsl)
-                          Icon(
-                            CupertinoIcons.checkmark_alt,
-                            color: Color(0xffff9813),
-                          ),
-                      ],
+                  child: Card(
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Row(
+                        children: [
+                          Text("验证SSL证书"),
+                          Spacer(),
+                          if (checkSsl)
+                            Icon(
+                              CupertinoIcons.checkmark_alt,
+                              color: Color(0xffff9813),
+                            ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
@@ -1092,12 +1004,7 @@ class _LoginState extends State<Login> {
             //   height: 20,
             // ),
 
-            NeuButton(
-              padding: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-              decoration: NeumorphicDecoration(
-                color: Theme.of(context).scaffoldBackgroundColor,
-                borderRadius: BorderRadius.circular(20),
-              ),
+            OutlinedButton(
               onPressed: () {
                 print(login);
                 if (!read) {
@@ -1136,86 +1043,6 @@ class _LoginState extends State<Login> {
                       style: TextStyle(fontSize: 18),
                     ),
             ),
-            SizedBox(
-              height: 20,
-            ),
-            if (Platform.isAndroid)
-              GestureDetector(
-                onTap: () {
-                  setState(() {
-                    read = !read;
-                    Util.setStorage("read", read ? "1" : "0");
-                  });
-                },
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Container(
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).scaffoldBackgroundColor,
-                        borderRadius: BorderRadius.circular(5),
-                        border: Border.all(
-                            color: read ? Color(0xffff9813) : Colors.grey),
-                      ),
-                      height: 20,
-                      width: 20,
-                      alignment: Alignment.center,
-                      child: read
-                          ? Icon(
-                              CupertinoIcons.checkmark_alt,
-                              color: Color(0xffff9813),
-                              size: 16,
-                            )
-                          : SizedBox(),
-                    ),
-                    SizedBox(
-                      width: 10,
-                    ),
-                    Text.rich(
-                      TextSpan(
-                        children: [
-                          TextSpan(text: "我已阅读并同意 ${Util.appName}"),
-                          TextSpan(
-                            text: "用户协议",
-                            style: TextStyle(
-                                decoration: TextDecoration.underline,
-                                color: Colors.blue,
-                                fontSize: 12),
-                            recognizer: _licenseRecognizer
-                              ..onTap = () {
-                                FocusScope.of(context).unfocus();
-                                Navigator.of(context).push(
-                                    CupertinoPageRoute(builder: (context) {
-                                  return License();
-                                }));
-                              },
-                          ),
-                          TextSpan(text: "和 "),
-                          TextSpan(
-                            text: "隐私政策",
-                            style: TextStyle(
-                                decoration: TextDecoration.underline,
-                                color: Colors.blue,
-                                fontSize: 12),
-                            recognizer: _privacyRecognizer
-                              ..onTap = () {
-                                FocusScope.of(context).unfocus();
-                                Navigator.of(context).push(
-                                    CupertinoPageRoute(builder: (context) {
-                                  return dsm.Browser(
-                                    url: '${Util.appUrl}/privacy',
-                                    title: "隐私政策",
-                                  );
-                                }));
-                              },
-                          ),
-                        ],
-                        style: TextStyle(fontSize: 12),
-                      ),
-                    ),
-                  ],
-                ),
-              )
           ],
         ),
       ),

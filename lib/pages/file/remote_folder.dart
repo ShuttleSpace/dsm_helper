@@ -5,7 +5,6 @@ import 'package:dsm_helper/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_vibrate/flutter_vibrate.dart';
-import 'package:neumorphic/neumorphic.dart';
 
 class RemoteFolder extends StatefulWidget {
   @override
@@ -35,16 +34,10 @@ class _RemoteFolderState extends State<RemoteFolder>
       ),
       body: Column(
         children: [
-          NeuCard(
-            width: double.infinity,
-            decoration: NeumorphicDecoration(
-              color: Theme.of(context).scaffoldBackgroundColor,
-              borderRadius: BorderRadius.circular(20),
-            ),
+          Card(
             margin: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-            curveType: CurveType.flat,
-            bevel: 10,
             child: TabBar(
+              dividerHeight: 0,
               controller: _tabController,
               indicatorSize: TabBarIndicatorSize.label,
               labelColor: Theme.of(context).brightness == Brightness.dark
@@ -75,67 +68,52 @@ class _RemoteFolderState extends State<RemoteFolder>
                 ListView(
                   padding: EdgeInsets.all(20),
                   children: [
-                    NeuCard(
-                      decoration: NeumorphicDecoration(
-                        color: Theme.of(context).scaffoldBackgroundColor,
-                        borderRadius: BorderRadius.circular(20),
+                    Card(
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: TextField(
+                          onChanged: (v) => serverIp = v,
+                          decoration: InputDecoration(
+                              border: InputBorder.none,
+                              labelText: '远程文件夹',
+                              hintText: r"示例:\\192.168.1.1\share"),
+                        ),
                       ),
-                      bevel: 20,
-                      curveType: CurveType.flat,
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-                      child: TextField(
-                        onChanged: (v) => serverIp = v,
-                        decoration: InputDecoration(
+                    ),
+                    SizedBox(
+                      height: 20,
+                    ),
+                    Card(
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: TextField(
+                          onChanged: (v) => account = v,
+                          decoration: InputDecoration(
                             border: InputBorder.none,
-                            labelText: '远程文件夹',
-                            hintText: r"示例:\\192.168.1.1\share"),
-                      ),
-                    ),
-                    SizedBox(
-                      height: 20,
-                    ),
-                    NeuCard(
-                      decoration: NeumorphicDecoration(
-                        color: Theme.of(context).scaffoldBackgroundColor,
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      bevel: 20,
-                      curveType: CurveType.flat,
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-                      child: TextField(
-                        onChanged: (v) => account = v,
-                        decoration: InputDecoration(
-                          border: InputBorder.none,
-                          labelText: '账号',
+                            labelText: '账号',
+                          ),
                         ),
                       ),
                     ),
                     SizedBox(
                       height: 20,
                     ),
-                    NeuCard(
-                      decoration: NeumorphicDecoration(
-                        color: Theme.of(context).scaffoldBackgroundColor,
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      bevel: 20,
-                      curveType: CurveType.flat,
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-                      child: TextField(
-                        onChanged: (v) => passwd = v,
-                        decoration: InputDecoration(
-                          border: InputBorder.none,
-                          labelText: '密码',
+                    Card(
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: TextField(
+                          onChanged: (v) => passwd = v,
+                          decoration: InputDecoration(
+                            border: InputBorder.none,
+                            labelText: '密码',
+                          ),
                         ),
                       ),
                     ),
                     SizedBox(
                       height: 20,
                     ),
-                    NeuButton(
+                    OutlinedButton(
                       onPressed: () {
                         FocusScope.of(context).unfocus();
                         showCupertinoModalPopup(
@@ -153,10 +131,6 @@ class _RemoteFolderState extends State<RemoteFolder>
                           }
                         });
                       },
-                      decoration: NeumorphicDecoration(
-                        color: Theme.of(context).scaffoldBackgroundColor,
-                        borderRadius: BorderRadius.circular(20),
-                      ),
                       child: Row(
                         children: [
                           Expanded(
@@ -193,40 +167,27 @@ class _RemoteFolderState extends State<RemoteFolder>
                           autoMount = !autoMount;
                         });
                       },
-                      child: NeuCard(
-                        decoration: NeumorphicDecoration(
-                          color: Theme.of(context).scaffoldBackgroundColor,
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        curveType:
-                            autoMount ? CurveType.emboss : CurveType.flat,
-                        bevel: 12,
-                        height: 60,
-                        padding:
-                            EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-                        child: Row(
-                          children: [
-                            Text("开机时自动装载"),
-                            Spacer(),
-                            if (autoMount)
-                              Icon(
-                                CupertinoIcons.checkmark_alt,
-                                color: Color(0xffff9813),
-                              ),
-                          ],
+                      child: Card(
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Row(
+                            children: [
+                              Text("开机时自动装载"),
+                              Spacer(),
+                              if (autoMount)
+                                Icon(
+                                  CupertinoIcons.checkmark_alt,
+                                  color: Color(0xffff9813),
+                                ),
+                            ],
+                          ),
                         ),
                       ),
                     ),
                     SizedBox(
                       height: 20,
                     ),
-                    NeuButton(
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-                      decoration: NeumorphicDecoration(
-                        color: Theme.of(context).scaffoldBackgroundColor,
-                        borderRadius: BorderRadius.circular(20),
-                      ),
+                    OutlinedButton(
                       onPressed: () async {
                         if (mountPoint == "") {
                           Util.toast("请选择保存位置");

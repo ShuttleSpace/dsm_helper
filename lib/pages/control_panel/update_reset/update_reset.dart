@@ -5,7 +5,6 @@ import 'package:dsm_helper/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:neumorphic/neumorphic.dart';
 
 class UpdateReset extends StatefulWidget {
   @override
@@ -68,16 +67,10 @@ class _UpdateResetState extends State<UpdateReset>
       ),
       body: Column(
         children: [
-          NeuCard(
-            width: double.infinity,
-            decoration: NeumorphicDecoration(
-              color: Theme.of(context).scaffoldBackgroundColor,
-              borderRadius: BorderRadius.circular(20),
-            ),
+          Card(
             margin: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-            curveType: CurveType.flat,
-            bevel: 10,
             child: TabBar(
+              dividerHeight: 0,
               isScrollable: true,
               controller: _tabController,
               indicatorSize: TabBarIndicatorSize.label,
@@ -120,84 +113,76 @@ class _UpdateResetState extends State<UpdateReset>
                     SizedBox(
                       height: 20,
                     ),
-                    NeuCard(
-                      curveType: CurveType.flat,
-                      decoration: NeumorphicDecoration(
-                        color: Theme.of(context).scaffoldBackgroundColor,
-                        borderRadius: BorderRadius.circular(20),
+                    Card(
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text("产品型号: $model"),
                       ),
-                      bevel: 20,
-                      padding: EdgeInsets.all(20),
-                      child: Text("产品型号: $model"),
                     ),
                     SizedBox(
                       height: 20,
                     ),
-                    NeuCard(
-                      curveType: CurveType.flat,
-                      decoration: NeumorphicDecoration(
-                        color: Theme.of(context).scaffoldBackgroundColor,
-                        borderRadius: BorderRadius.circular(20),
+                    Card(
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text("DSM 版本: $firmwareVer"),
                       ),
-                      bevel: 20,
-                      padding: EdgeInsets.all(20),
-                      child: Text("DSM 版本: $firmwareVer"),
                     ),
                     SizedBox(
                       height: 20,
                     ),
-                    NeuCard(
-                      curveType: CurveType.flat,
-                      decoration: NeumorphicDecoration(
-                        color: Theme.of(context).scaffoldBackgroundColor,
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      bevel: 20,
-                      padding: EdgeInsets.all(20),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text("状态: "),
-                          Expanded(
-                            child: checking
-                                ? CupertinoActivityIndicator()
-                                : update != null &&
-                                        (update?['available'] ?? true)
-                                    ? Text.rich(TextSpan(
-                                        children: [
-                                          TextSpan(
-                                            text: "${update?['version']}版本可下载",
-                                            style:
-                                                TextStyle(color: Colors.green),
-                                          ),
-                                          TextSpan(
-                                              text: " (说明)",
-                                              style:
-                                                  TextStyle(color: Colors.blue),
-                                              recognizer: _updateNoteRecognizer
-                                                ..onTap = () {
-                                                  String url =
-                                                      "http://update.synology.com/autoupdate/whatsnew.php?model=${Uri.encodeComponent(model)}&update_version=${update?['version_details']['buildnumber']}-0";
-                                                  Navigator.of(context)
-                                                      .push(CupertinoPageRoute(
-                                                    builder: (context) {
-                                                      return Browser(
-                                                        url: url,
-                                                        title:
-                                                            "${update?['version']}版本更新说明",
-                                                      );
-                                                    },
-                                                    settings: RouteSettings(
-                                                        name: "browser"),
-                                                  ));
-                                                }),
-                                        ],
-                                      ))
-                                    : Text(
-                                        "无更新",
-                                      ),
-                          ),
-                        ],
+                    Card(
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text("状态: "),
+                            Expanded(
+                              child: checking
+                                  ? CupertinoActivityIndicator()
+                                  : update != null &&
+                                          (update?['available'] ?? true)
+                                      ? Text.rich(TextSpan(
+                                          children: [
+                                            TextSpan(
+                                              text:
+                                                  "${update?['version']}版本可下载",
+                                              style: TextStyle(
+                                                  color: Colors.green),
+                                            ),
+                                            TextSpan(
+                                                text: " (说明)",
+                                                style: TextStyle(
+                                                    color: Colors.blue),
+                                                recognizer:
+                                                    _updateNoteRecognizer
+                                                      ..onTap = () {
+                                                        String url =
+                                                            "http://update.synology.com/autoupdate/whatsnew.php?model=${Uri.encodeComponent(model)}&update_version=${update?['version_details']['buildnumber']}-0";
+                                                        Navigator.of(context).push(
+                                                            CupertinoPageRoute(
+                                                          builder: (context) {
+                                                            return Browser(
+                                                              url: url,
+                                                              title:
+                                                                  "${update?['version']}版本更新说明",
+                                                            );
+                                                          },
+                                                          settings:
+                                                              RouteSettings(
+                                                                  name:
+                                                                      "browser"),
+                                                        ));
+                                                      }),
+                                          ],
+                                        ))
+                                      : Text(
+                                          "无更新",
+                                        ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                     SizedBox(

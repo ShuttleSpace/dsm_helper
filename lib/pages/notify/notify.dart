@@ -8,7 +8,6 @@ import 'package:dsm_helper/widgets/expansion_container.dart';
 import 'package:dsm_helper/widgets/neu_back_button.dart';
 import 'package:flutter/material.dart';
 import 'package:html/parser.dart';
-import 'package:neumorphic/neumorphic.dart';
 
 class Notify extends StatefulWidget {
   final List notifies;
@@ -97,51 +96,44 @@ class _NotifyState extends State<Notify> {
   }
 
   Widget _buildNotifyGroup(groupName, List group) {
-    return NeuCard(
-      decoration: NeumorphicDecoration(
-        color: Theme.of(context).scaffoldBackgroundColor,
-        borderRadius: BorderRadius.circular(10),
-      ),
+    return Card(
       margin: EdgeInsets.only(left: 20, right: 20, top: 20),
-      bevel: 10,
-      curveType: CurveType.flat,
-      child: ExpansionContainer(
-        title: Text(
-          "$groupName （${group.length}）",
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
-          overflow: TextOverflow.ellipsis,
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: ExpansionContainer(
+          title: Text(
+            "$groupName （${group.length}）",
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+            overflow: TextOverflow.ellipsis,
+          ),
+          showFirst: true,
+          first: _buildNotifyItem(group.first),
+          children: group.map((_buildNotifyItem)).toList(),
         ),
-        showFirst: true,
-        first: _buildNotifyItem(group.first),
-        children: group.map((_buildNotifyItem)).toList(),
       ),
     );
   }
 
   Widget _buildNotifyItem(notify) {
-    return NeuCard(
-      width: double.infinity,
-      decoration: NeumorphicDecoration(
-        color: Theme.of(context).scaffoldBackgroundColor,
-        borderRadius: BorderRadius.circular(10),
-      ),
+    return Card(
       margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-      padding: EdgeInsets.all(15),
-      bevel: 10,
-      curveType: CurveType.flat,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            DateTime.fromMillisecondsSinceEpoch(notify['time'] * 1000).timeAgo,
-            style: TextStyle(fontSize: 14, color: Colors.grey),
-          ),
-          Column(
-            children: (notify['contents'] as List).map((msg) {
-              return Text(msg);
-            }).toList(),
-          ),
-        ],
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              DateTime.fromMillisecondsSinceEpoch(notify['time'] * 1000)
+                  .timeAgo,
+              style: TextStyle(fontSize: 14, color: Colors.grey),
+            ),
+            Column(
+              children: (notify['contents'] as List).map((msg) {
+                return Text(msg);
+              }).toList(),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -177,11 +169,7 @@ class _NotifyState extends State<Notify> {
             child: Row(
               children: [
                 Expanded(
-                  child: NeuButton(
-                    decoration: NeumorphicDecoration(
-                      color: Theme.of(context).scaffoldBackgroundColor,
-                      borderRadius: BorderRadius.circular(50),
-                    ),
+                  child: OutlinedButton(
                     onPressed: () async {
                       var res = await Api.clearNotify();
                       if (res['success']) {

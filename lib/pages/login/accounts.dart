@@ -7,7 +7,6 @@ import 'package:dsm_helper/widgets/label.dart';
 import 'package:dsm_helper/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:neumorphic/neumorphic.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 
 class Accounts extends StatefulWidget {
@@ -198,13 +197,7 @@ class _AccountsState extends State<Accounts> {
           }));
         }
       },
-      child: NeuCard(
-        curveType: CurveType.flat,
-        decoration: NeumorphicDecoration(
-          color: Theme.of(context).scaffoldBackgroundColor,
-          borderRadius: BorderRadius.circular(20),
-        ),
-        bevel: 20,
+      child: Card(
         child: Padding(
           padding: EdgeInsets.all(20),
           child: Row(
@@ -261,7 +254,7 @@ class _AccountsState extends State<Accounts> {
                         SizedBox(
                           width: 10,
                         ),
-                        NeuButton(
+                        OutlinedButton(
                           onPressed: () {
                             print(server);
                             server['action'] = "edit";
@@ -270,13 +263,6 @@ class _AccountsState extends State<Accounts> {
                               return Login(server: server);
                             }));
                           },
-                          decoration: NeumorphicDecoration(
-                            color: Theme.of(context).scaffoldBackgroundColor,
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          bevel: 20,
-                          padding: EdgeInsets.symmetric(
-                              vertical: 10, horizontal: 10),
                           child: Image.asset(
                             "assets/icons/edit.png",
                             width: 20,
@@ -285,7 +271,7 @@ class _AccountsState extends State<Accounts> {
                         SizedBox(
                           width: 10,
                         ),
-                        NeuButton(
+                        OutlinedButton(
                           onPressed: () {
                             setState(() {
                               servers.remove(server);
@@ -294,13 +280,6 @@ class _AccountsState extends State<Accounts> {
                             saveAccounts();
                             Util.toast("删除成功");
                           },
-                          decoration: NeumorphicDecoration(
-                            color: Theme.of(context).scaffoldBackgroundColor,
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          bevel: 20,
-                          padding: EdgeInsets.symmetric(
-                              vertical: 10, horizontal: 10),
                           child: Image.asset(
                             "assets/icons/delete.png",
                             width: 20,
@@ -313,47 +292,41 @@ class _AccountsState extends State<Accounts> {
                         children: [
                           Column(
                             children: [
-                              NeuCard(
-                                curveType: CurveType.flat,
+                              Card(
                                 margin: EdgeInsets.only(top: 10, right: 10),
-                                decoration: NeumorphicDecoration(
-                                  color:
-                                      Theme.of(context).scaffoldBackgroundColor,
-                                  borderRadius: BorderRadius.circular(60),
-                                  // color: Colors.red,
-                                ),
-                                padding: EdgeInsets.all(5),
-                                bevel: 8,
-                                child: CircularPercentIndicator(
-                                  radius: 30,
-                                  // progressColor: Colors.lightBlueAccent,
-                                  animation: true,
-                                  linearGradient: LinearGradient(
-                                    colors: server['cpu'] <= 90
-                                        ? [
-                                            Colors.blue,
-                                            Colors.blueAccent,
-                                          ]
-                                        : [
-                                            Colors.red,
-                                            Colors.orangeAccent,
-                                          ],
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: CircularPercentIndicator(
+                                    radius: 30,
+                                    // progressColor: Colors.lightBlueAccent,
+                                    animation: true,
+                                    linearGradient: LinearGradient(
+                                      colors: server['cpu'] <= 90
+                                          ? [
+                                              Colors.blue,
+                                              Colors.blueAccent,
+                                            ]
+                                          : [
+                                              Colors.red,
+                                              Colors.orangeAccent,
+                                            ],
+                                    ),
+                                    animateFromLastPercent: true,
+                                    circularStrokeCap: CircularStrokeCap.round,
+                                    lineWidth: 8,
+                                    backgroundColor: Colors.black12,
+                                    percent: server['cpu'] / 100,
+                                    center: server['loading']
+                                        ? CupertinoActivityIndicator()
+                                        : Text(
+                                            "${server['cpu']}%",
+                                            style: TextStyle(
+                                                color: server['cpu'] <= 90
+                                                    ? Colors.blue
+                                                    : Colors.red,
+                                                fontSize: 16),
+                                          ),
                                   ),
-                                  animateFromLastPercent: true,
-                                  circularStrokeCap: CircularStrokeCap.round,
-                                  lineWidth: 8,
-                                  backgroundColor: Colors.black12,
-                                  percent: server['cpu'] / 100,
-                                  center: server['loading']
-                                      ? CupertinoActivityIndicator()
-                                      : Text(
-                                          "${server['cpu']}%",
-                                          style: TextStyle(
-                                              color: server['cpu'] <= 90
-                                                  ? Colors.blue
-                                                  : Colors.red,
-                                              fontSize: 16),
-                                        ),
                                 ),
                               ),
                               SizedBox(
@@ -364,48 +337,41 @@ class _AccountsState extends State<Accounts> {
                           ),
                           Column(
                             children: [
-                              NeuCard(
-                                curveType: CurveType.flat,
+                              Card(
                                 margin: EdgeInsets.only(top: 10, right: 10),
-                                decoration: NeumorphicDecoration(
-                                  color:
-                                      Theme.of(context).scaffoldBackgroundColor,
-                                  borderRadius: BorderRadius.circular(60),
-                                  // color: Colors.red,
-                                ),
-                                // width: ,
-                                padding: EdgeInsets.all(5),
-                                bevel: 8,
-                                child: CircularPercentIndicator(
-                                  radius: 30,
-                                  // progressColor: Colors.lightBlueAccent,
-                                  animation: true,
-                                  linearGradient: LinearGradient(
-                                    colors: server['ram'] <= 90
-                                        ? [
-                                            Colors.blue,
-                                            Colors.blueAccent,
-                                          ]
-                                        : [
-                                            Colors.red,
-                                            Colors.orangeAccent,
-                                          ],
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: CircularPercentIndicator(
+                                    radius: 30,
+                                    // progressColor: Colors.lightBlueAccent,
+                                    animation: true,
+                                    linearGradient: LinearGradient(
+                                      colors: server['ram'] <= 90
+                                          ? [
+                                              Colors.blue,
+                                              Colors.blueAccent,
+                                            ]
+                                          : [
+                                              Colors.red,
+                                              Colors.orangeAccent,
+                                            ],
+                                    ),
+                                    animateFromLastPercent: true,
+                                    circularStrokeCap: CircularStrokeCap.round,
+                                    lineWidth: 8,
+                                    backgroundColor: Colors.black12,
+                                    percent: server['ram'] / 100,
+                                    center: server['loading']
+                                        ? CupertinoActivityIndicator()
+                                        : Text(
+                                            "${server['ram']}%",
+                                            style: TextStyle(
+                                                color: server['ram'] <= 90
+                                                    ? Colors.blue
+                                                    : Colors.red,
+                                                fontSize: 16),
+                                          ),
                                   ),
-                                  animateFromLastPercent: true,
-                                  circularStrokeCap: CircularStrokeCap.round,
-                                  lineWidth: 8,
-                                  backgroundColor: Colors.black12,
-                                  percent: server['ram'] / 100,
-                                  center: server['loading']
-                                      ? CupertinoActivityIndicator()
-                                      : Text(
-                                          "${server['ram']}%",
-                                          style: TextStyle(
-                                              color: server['ram'] <= 90
-                                                  ? Colors.blue
-                                                  : Colors.red,
-                                              fontSize: 16),
-                                        ),
                                 ),
                               ),
                               SizedBox(
@@ -526,29 +492,19 @@ class _AccountsState extends State<Accounts> {
                   visible = !visible;
                 });
               },
-              child: NeuCard(
-                decoration: NeumorphicDecoration(
-                  color: Theme.of(context).scaffoldBackgroundColor,
-                  borderRadius: BorderRadius.circular(10),
+              child: Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Icon(visible
+                      ? CupertinoIcons.eye_slash_fill
+                      : CupertinoIcons.eye_fill),
                 ),
-                curveType: visible ? CurveType.flat : CurveType.concave,
-                padding: EdgeInsets.all(10),
-                bevel: 5,
-                child: Icon(visible
-                    ? CupertinoIcons.eye_slash_fill
-                    : CupertinoIcons.eye_fill),
               ),
             ),
           ),
           Padding(
             padding: EdgeInsets.only(right: 10, top: 8, bottom: 8),
-            child: NeuButton(
-              decoration: NeumorphicDecoration(
-                color: Theme.of(context).scaffoldBackgroundColor,
-                borderRadius: BorderRadius.circular(10),
-              ),
-              padding: EdgeInsets.all(10),
-              bevel: 5,
+            child: OutlinedButton(
               onPressed: () {
                 Navigator.of(context)
                     .push(CupertinoPageRoute(builder: (context) {

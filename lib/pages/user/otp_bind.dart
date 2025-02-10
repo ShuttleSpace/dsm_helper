@@ -6,7 +6,6 @@ import 'package:dsm_helper/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:neumorphic/neumorphic.dart';
 
 class OtpBind extends StatefulWidget {
   final String username;
@@ -50,32 +49,23 @@ class _OtpBindState extends State<OtpBind> {
             SizedBox(
               height: 20,
             ),
-            NeuCard(
-              decoration: NeumorphicDecoration(
-                color: Theme.of(context).scaffoldBackgroundColor,
-                borderRadius: BorderRadius.circular(20),
-              ),
-              bevel: 12,
-              curveType: CurveType.flat,
-              padding: EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-              child: TextField(
-                controller: _emailController,
-                onChanged: (v) => email = v,
-                decoration: InputDecoration(
-                  border: InputBorder.none,
-                  labelText: '电子邮件',
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: TextField(
+                  controller: _emailController,
+                  onChanged: (v) => email = v,
+                  decoration: InputDecoration(
+                    border: InputBorder.none,
+                    labelText: '电子邮件',
+                  ),
                 ),
               ),
             ),
             SizedBox(
               height: 20,
             ),
-            NeuButton(
-              padding: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-              decoration: NeumorphicDecoration(
-                color: Theme.of(context).scaffoldBackgroundColor,
-                borderRadius: BorderRadius.circular(20),
-              ),
+            OutlinedButton(
               onPressed: () async {
                 if (email.isBlank) {
                   Util.toast("请输入邮箱");
@@ -129,13 +119,7 @@ class _OtpBindState extends State<OtpBind> {
             SizedBox(
               height: 20,
             ),
-            NeuCard(
-              decoration: NeumorphicDecoration(
-                color: Theme.of(context).scaffoldBackgroundColor,
-                borderRadius: BorderRadius.circular(20),
-              ),
-              curveType: CurveType.flat,
-              bevel: 20,
+            Card(
               child: Padding(
                 padding: EdgeInsets.all(20),
                 child: Row(
@@ -145,19 +129,13 @@ class _OtpBindState extends State<OtpBind> {
                         "账号：${widget.username}@${Util.hostname}",
                       ),
                     ),
-                    NeuButton(
+                    OutlinedButton(
                       onPressed: () async {
                         ClipboardData data = new ClipboardData(
                             text: "${widget.username}@${Util.hostname}");
                         Clipboard.setData(data);
                         Util.toast("已复制到剪贴板");
                       },
-                      decoration: NeumorphicDecoration(
-                        color: Theme.of(context).scaffoldBackgroundColor,
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      padding: EdgeInsets.all(5),
-                      bevel: 5,
                       child: SizedBox(
                         width: 20,
                         height: 20,
@@ -175,13 +153,7 @@ class _OtpBindState extends State<OtpBind> {
             SizedBox(
               height: 20,
             ),
-            NeuCard(
-              decoration: NeumorphicDecoration(
-                color: Theme.of(context).scaffoldBackgroundColor,
-                borderRadius: BorderRadius.circular(20),
-              ),
-              curveType: CurveType.flat,
-              bevel: 20,
+            Card(
               child: Padding(
                 padding: EdgeInsets.all(20),
                 child: Row(
@@ -191,18 +163,12 @@ class _OtpBindState extends State<OtpBind> {
                         "秘钥：$key",
                       ),
                     ),
-                    NeuButton(
+                    OutlinedButton(
                       onPressed: () async {
                         ClipboardData data = new ClipboardData(text: "$key");
                         Clipboard.setData(data);
                         Util.toast("已复制到剪贴板");
                       },
-                      decoration: NeumorphicDecoration(
-                        color: Theme.of(context).scaffoldBackgroundColor,
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      padding: EdgeInsets.all(5),
-                      bevel: 5,
                       child: SizedBox(
                         width: 20,
                         height: 20,
@@ -220,31 +186,22 @@ class _OtpBindState extends State<OtpBind> {
             SizedBox(
               height: 20,
             ),
-            NeuCard(
-              decoration: NeumorphicDecoration(
-                color: Theme.of(context).scaffoldBackgroundColor,
-                borderRadius: BorderRadius.circular(20),
-              ),
-              bevel: 12,
-              curveType: CurveType.flat,
-              padding: EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-              child: TextField(
-                onChanged: (v) => code = v,
-                decoration: InputDecoration(
-                  border: InputBorder.none,
-                  labelText: '6位验证代码',
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: TextField(
+                  onChanged: (v) => code = v,
+                  decoration: InputDecoration(
+                    border: InputBorder.none,
+                    labelText: '6位验证代码',
+                  ),
                 ),
               ),
             ),
             SizedBox(
               height: 20,
             ),
-            NeuButton(
-              padding: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-              decoration: NeumorphicDecoration(
-                color: Theme.of(context).scaffoldBackgroundColor,
-                borderRadius: BorderRadius.circular(20),
-              ),
+            OutlinedButton(
               onPressed: () async {
                 if (code.isBlank) {
                   Util.toast("请输入6位验证代码");
@@ -282,12 +239,7 @@ class _OtpBindState extends State<OtpBind> {
             Text(
                 "两步骤验证设置完成。下次登录 DSM 时，将提示您输入验证器应用程序生成的验证代码。两步骤验证对于用某些移动应用程序进行登录有影响。为避免遇到任何难题，请确认您已安装任何需要登录 DSM 的移动应用程序的最新版本。"),
             Text("注意：您可在“帐户活动” &gt; “记住的设备”中管理最常用的设备。"),
-            NeuButton(
-              padding: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-              decoration: NeumorphicDecoration(
-                color: Theme.of(context).scaffoldBackgroundColor,
-                borderRadius: BorderRadius.circular(20),
-              ),
+            OutlinedButton(
               onPressed: () async {
                 Navigator.of(context).pop(true);
               },

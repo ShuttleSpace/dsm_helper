@@ -2,7 +2,6 @@ import 'package:dsm_helper/util/function.dart';
 import 'package:dsm_helper/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:neumorphic/neumorphic.dart';
 import 'dart:async';
 
 class MediaIndex extends StatefulWidget {
@@ -69,14 +68,8 @@ class _MediaIndexState extends State<MediaIndex> {
       ),
       body: ListView(
         children: [
-          NeuCard(
-            decoration: NeumorphicDecoration(
-              color: Theme.of(context).scaffoldBackgroundColor,
-              borderRadius: BorderRadius.circular(20),
-            ),
+          Card(
             margin: EdgeInsets.only(top: 20, left: 20, right: 20),
-            bevel: 10,
-            curveType: CurveType.flat,
             child: Padding(
               padding: const EdgeInsets.all(20.0),
               child: Column(
@@ -126,12 +119,7 @@ class _MediaIndexState extends State<MediaIndex> {
                       SizedBox(
                         height: 10,
                       ),
-                      NeuButton(
-                        decoration: NeumorphicDecoration(
-                          color: Theme.of(context).scaffoldBackgroundColor,
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        bevel: 10,
+                      OutlinedButton(
                         onPressed: () async {
                           if (mediaIndexing) {
                             return;
@@ -154,14 +142,8 @@ class _MediaIndexState extends State<MediaIndex> {
               ),
             ),
           ),
-          NeuCard(
-            decoration: NeumorphicDecoration(
-              color: Theme.of(context).scaffoldBackgroundColor,
-              borderRadius: BorderRadius.circular(20),
-            ),
+          Card(
             margin: EdgeInsets.only(top: 20, left: 20, right: 20),
-            bevel: 10,
-            curveType: CurveType.flat,
             child: Padding(
               padding: const EdgeInsets.all(20.0),
               child: Column(
@@ -199,27 +181,20 @@ class _MediaIndexState extends State<MediaIndex> {
                                     thumbnailQuality, mobileEnabled);
                                 getData();
                               },
-                              child: NeuCard(
-                                decoration: NeumorphicDecoration(
-                                  color:
-                                      Theme.of(context).scaffoldBackgroundColor,
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                padding: EdgeInsets.all(10),
-                                bevel: 10,
-                                curveType: thumbnailQuality == "normal"
-                                    ? CurveType.emboss
-                                    : CurveType.flat,
-                                child: Row(
-                                  children: [
-                                    Text("一般品质"),
-                                    Spacer(),
-                                    if (thumbnailQuality == "normal")
-                                      Icon(
-                                        CupertinoIcons.checkmark_alt,
-                                        color: Color(0xffff9813),
-                                      ),
-                                  ],
+                              child: Card(
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Row(
+                                    children: [
+                                      Text("一般品质"),
+                                      Spacer(),
+                                      if (thumbnailQuality == "normal")
+                                        Icon(
+                                          CupertinoIcons.checkmark_alt,
+                                          color: Color(0xffff9813),
+                                        ),
+                                    ],
+                                  ),
                                 ),
                               ),
                             ),
@@ -237,27 +212,20 @@ class _MediaIndexState extends State<MediaIndex> {
                                     thumbnailQuality, mobileEnabled);
                                 getData();
                               },
-                              child: NeuCard(
-                                decoration: NeumorphicDecoration(
-                                  color:
-                                      Theme.of(context).scaffoldBackgroundColor,
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                padding: EdgeInsets.all(10),
-                                bevel: 10,
-                                curveType: thumbnailQuality == "high"
-                                    ? CurveType.emboss
-                                    : CurveType.flat,
-                                child: Row(
-                                  children: [
-                                    Text("高品质"),
-                                    Spacer(),
-                                    if (thumbnailQuality == "high")
-                                      Icon(
-                                        CupertinoIcons.checkmark_alt,
-                                        color: Color(0xffff9813),
-                                      ),
-                                  ],
+                              child: Card(
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Row(
+                                    children: [
+                                      Text("高品质"),
+                                      Spacer(),
+                                      if (thumbnailQuality == "high")
+                                        Icon(
+                                          CupertinoIcons.checkmark_alt,
+                                          color: Color(0xffff9813),
+                                        ),
+                                    ],
+                                  ),
                                 ),
                               ),
                             ),
@@ -270,14 +238,8 @@ class _MediaIndexState extends State<MediaIndex> {
               ),
             ),
           ),
-          NeuCard(
-            decoration: NeumorphicDecoration(
-              color: Theme.of(context).scaffoldBackgroundColor,
-              borderRadius: BorderRadius.circular(20),
-            ),
+          Card(
             margin: EdgeInsets.only(top: 20, left: 20, right: 20),
-            bevel: 10,
-            curveType: CurveType.flat,
             child: Padding(
               padding: const EdgeInsets.all(20.0),
               child: Column(
@@ -311,25 +273,20 @@ class _MediaIndexState extends State<MediaIndex> {
                               thumbnailQuality, mobileEnabled);
                           getData();
                         },
-                        child: NeuCard(
-                          decoration: NeumorphicDecoration(
-                            color: Theme.of(context).scaffoldBackgroundColor,
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          padding: EdgeInsets.all(10),
-                          bevel: 10,
-                          curveType:
-                              mobileEnabled ? CurveType.emboss : CurveType.flat,
-                          child: Row(
-                            children: [
-                              Text("启用移动设备视频转换"),
-                              Spacer(),
-                              if (mobileEnabled)
-                                Icon(
-                                  CupertinoIcons.checkmark_alt,
-                                  color: Color(0xffff9813),
-                                ),
-                            ],
+                        child: Card(
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Row(
+                              children: [
+                                Text("启用移动设备视频转换"),
+                                Spacer(),
+                                if (mobileEnabled)
+                                  Icon(
+                                    CupertinoIcons.checkmark_alt,
+                                    color: Color(0xffff9813),
+                                  ),
+                              ],
+                            ),
                           ),
                         ),
                       ),

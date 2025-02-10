@@ -8,7 +8,6 @@ import 'package:dsm_helper/widgets/neu_back_button.dart';
 import 'package:extended_text/extended_text.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:neumorphic/neumorphic.dart';
 
 class Docker extends StatefulWidget {
   final String title;
@@ -114,101 +113,85 @@ class _DockerState extends State<Docker> with SingleTickerProviderStateMixin {
         builder: (context) {
           return Material(
             color: Colors.transparent,
-            child: NeuCard(
-              width: double.infinity,
-              padding: EdgeInsets.all(22),
-              bevel: 5,
-              curveType: CurveType.emboss,
-              decoration: NeumorphicDecoration(
-                  color: Theme.of(context).scaffoldBackgroundColor,
-                  borderRadius:
-                      BorderRadius.vertical(top: Radius.circular(22))),
+            child: Card(
               child: SafeArea(
                 top: false,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: <Widget>[
-                    Text(
-                      "确认操作",
-                      style:
-                          TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
-                    ),
-                    SizedBox(
-                      height: 12,
-                    ),
-                    Text(
-                      action == "signal"
-                          ? "是否确定要强制停止容器？所有未保存的数据将丢失！"
-                          : preserveProfile
-                              ? "容器 ${container['name']} 将被清除。清除后，容器中的所有数据将丢失。是否确定继续？"
-                              : "容器 ${container['name']} 将被删除。删除后，容器中的所有数据将丢失。是否确定继续？",
-                      style:
-                          TextStyle(fontSize: 20, fontWeight: FontWeight.w400),
-                    ),
-                    SizedBox(
-                      height: 22,
-                    ),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: NeuButton(
-                            onPressed: () async {
-                              Navigator.of(context).pop();
-                              setState(() {
-                                powerLoading[container['id']] = true;
-                              });
-                              var res = await Api.dockerPower(
-                                  container['name'], action,
-                                  preserveProfile: preserveProfile);
-                              if (res['success']) {
-                                Util.toast("请求发送成功");
-                                getContainer();
-                              } else {
-                                Util.toast("请求发送失败，代码：${res['error']['code']}");
-                              }
-                              setState(() {
-                                powerLoading[container['id']] = false;
-                              });
-                            },
-                            decoration: NeumorphicDecoration(
-                              color: Theme.of(context).scaffoldBackgroundColor,
-                              borderRadius: BorderRadius.circular(25),
-                            ),
-                            bevel: 5,
-                            padding: EdgeInsets.symmetric(vertical: 10),
-                            child: Text(
-                              "确认",
-                              style: TextStyle(
-                                  fontSize: 18, color: Colors.redAccent),
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      Text(
+                        "确认操作",
+                        style: TextStyle(
+                            fontSize: 20, fontWeight: FontWeight.w500),
+                      ),
+                      SizedBox(
+                        height: 12,
+                      ),
+                      Text(
+                        action == "signal"
+                            ? "是否确定要强制停止容器？所有未保存的数据将丢失！"
+                            : preserveProfile
+                                ? "容器 ${container['name']} 将被清除。清除后，容器中的所有数据将丢失。是否确定继续？"
+                                : "容器 ${container['name']} 将被删除。删除后，容器中的所有数据将丢失。是否确定继续？",
+                        style: TextStyle(
+                            fontSize: 20, fontWeight: FontWeight.w400),
+                      ),
+                      SizedBox(
+                        height: 22,
+                      ),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: OutlinedButton(
+                              onPressed: () async {
+                                Navigator.of(context).pop();
+                                setState(() {
+                                  powerLoading[container['id']] = true;
+                                });
+                                var res = await Api.dockerPower(
+                                    container['name'], action,
+                                    preserveProfile: preserveProfile);
+                                if (res['success']) {
+                                  Util.toast("请求发送成功");
+                                  getContainer();
+                                } else {
+                                  Util.toast(
+                                      "请求发送失败，代码：${res['error']['code']}");
+                                }
+                                setState(() {
+                                  powerLoading[container['id']] = false;
+                                });
+                              },
+                              child: Text(
+                                "确认",
+                                style: TextStyle(
+                                    fontSize: 18, color: Colors.redAccent),
+                              ),
                             ),
                           ),
-                        ),
-                        SizedBox(
-                          width: 16,
-                        ),
-                        Expanded(
-                          child: NeuButton(
-                            onPressed: () async {
-                              Navigator.of(context).pop();
-                            },
-                            decoration: NeumorphicDecoration(
-                              color: Theme.of(context).scaffoldBackgroundColor,
-                              borderRadius: BorderRadius.circular(25),
-                            ),
-                            bevel: 5,
-                            padding: EdgeInsets.symmetric(vertical: 10),
-                            child: Text(
-                              "取消",
-                              style: TextStyle(fontSize: 18),
+                          SizedBox(
+                            width: 16,
+                          ),
+                          Expanded(
+                            child: OutlinedButton(
+                              onPressed: () async {
+                                Navigator.of(context).pop();
+                              },
+                              child: Text(
+                                "取消",
+                                style: TextStyle(fontSize: 18),
+                              ),
                             ),
                           ),
-                        ),
-                      ],
-                    ),
-                    SizedBox(
-                      height: 8,
-                    ),
-                  ],
+                        ],
+                      ),
+                      SizedBox(
+                        height: 8,
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -244,13 +227,7 @@ class _DockerState extends State<Docker> with SingleTickerProviderStateMixin {
             },
             settings: RouteSettings(name: "docker_container_detail")));
       },
-      child: NeuCard(
-        curveType: CurveType.flat,
-        decoration: NeumorphicDecoration(
-          color: Theme.of(context).scaffoldBackgroundColor,
-          borderRadius: BorderRadius.circular(20),
-        ),
-        bevel: 20,
+      child: Card(
         margin: EdgeInsets.only(bottom: 20),
         child: Padding(
           padding: EdgeInsets.all(20),
@@ -319,175 +296,115 @@ class _DockerState extends State<Docker> with SingleTickerProviderStateMixin {
                         builder: (context) {
                           return Material(
                             color: Colors.transparent,
-                            child: NeuCard(
-                              width: double.infinity,
-                              padding: EdgeInsets.all(22),
-                              bevel: 5,
-                              curveType: CurveType.emboss,
-                              decoration: NeumorphicDecoration(
-                                  color:
-                                      Theme.of(context).scaffoldBackgroundColor,
-                                  borderRadius: BorderRadius.vertical(
-                                      top: Radius.circular(22))),
+                            child: Card(
                               child: SafeArea(
                                 top: false,
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: <Widget>[
-                                    Text(
-                                      "选择操作",
-                                      style: TextStyle(
-                                          fontSize: 20,
-                                          fontWeight: FontWeight.w500),
-                                    ),
-                                    SizedBox(
-                                      height: 12,
-                                    ),
-                                    if (container['status'] == "stopped") ...[
-                                      NeuButton(
-                                        onPressed: () async {
-                                          Navigator.of(context).pop();
-                                          power(container, "start");
-                                        },
-                                        decoration: NeumorphicDecoration(
-                                          color: Theme.of(context)
-                                              .scaffoldBackgroundColor,
-                                          borderRadius:
-                                              BorderRadius.circular(25),
-                                        ),
-                                        bevel: 5,
-                                        padding:
-                                            EdgeInsets.symmetric(vertical: 10),
-                                        child: Text(
-                                          "启动",
-                                          style: TextStyle(fontSize: 18),
-                                        ),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: <Widget>[
+                                      Text(
+                                        "选择操作",
+                                        style: TextStyle(
+                                            fontSize: 20,
+                                            fontWeight: FontWeight.w500),
                                       ),
                                       SizedBox(
-                                        height: 22,
+                                        height: 12,
                                       ),
-                                      NeuButton(
-                                        onPressed: () async {
-                                          Navigator.of(context).pop();
-                                          power(container, "delete",
-                                              preserveProfile: true);
-                                        },
-                                        decoration: NeumorphicDecoration(
-                                          color: Theme.of(context)
-                                              .scaffoldBackgroundColor,
-                                          borderRadius:
-                                              BorderRadius.circular(25),
+                                      if (container['status'] == "stopped") ...[
+                                        OutlinedButton(
+                                          onPressed: () async {
+                                            Navigator.of(context).pop();
+                                            power(container, "start");
+                                          },
+                                          child: Text(
+                                            "启动",
+                                            style: TextStyle(fontSize: 18),
+                                          ),
                                         ),
-                                        bevel: 5,
-                                        padding:
-                                            EdgeInsets.symmetric(vertical: 10),
-                                        child: Text(
-                                          "清除",
-                                          style: TextStyle(
-                                              fontSize: 18,
-                                              color: Colors.redAccent),
+                                        SizedBox(
+                                          height: 22,
                                         ),
-                                      ),
+                                        OutlinedButton(
+                                          onPressed: () async {
+                                            Navigator.of(context).pop();
+                                            power(container, "delete",
+                                                preserveProfile: true);
+                                          },
+                                          child: Text(
+                                            "清除",
+                                            style: TextStyle(
+                                                fontSize: 18,
+                                                color: Colors.redAccent),
+                                          ),
+                                        ),
+                                        SizedBox(
+                                          height: 22,
+                                        ),
+                                        OutlinedButton(
+                                          onPressed: () async {
+                                            Navigator.of(context).pop();
+                                            power(container, "delete",
+                                                preserveProfile: false);
+                                          },
+                                          child: Text(
+                                            "删除",
+                                            style: TextStyle(
+                                                fontSize: 18,
+                                                color: Colors.redAccent),
+                                          ),
+                                        ),
+                                      ] else ...[
+                                        OutlinedButton(
+                                          onPressed: () async {
+                                            Navigator.of(context).pop();
+                                            power(container, "stop");
+                                          },
+                                          child: Text(
+                                            "停止",
+                                            style: TextStyle(
+                                                fontSize: 18,
+                                                color: Colors.redAccent),
+                                          ),
+                                        ),
+                                        SizedBox(
+                                          height: 22,
+                                        ),
+                                        OutlinedButton(
+                                          onPressed: () async {
+                                            Navigator.of(context).pop();
+                                            power(container, "signal");
+                                          },
+                                          child: Text(
+                                            "强制停止",
+                                            style: TextStyle(
+                                                fontSize: 18,
+                                                color: Colors.redAccent),
+                                          ),
+                                        ),
+                                        SizedBox(
+                                          height: 22,
+                                        ),
+                                        OutlinedButton(
+                                          onPressed: () async {
+                                            Navigator.of(context).pop();
+                                            power(container, "restart");
+                                          },
+                                          child: Text(
+                                            "重新启动",
+                                            style: TextStyle(
+                                                fontSize: 18,
+                                                color: Colors.redAccent),
+                                          ),
+                                        ),
+                                      ],
                                       SizedBox(
-                                        height: 22,
-                                      ),
-                                      NeuButton(
-                                        onPressed: () async {
-                                          Navigator.of(context).pop();
-                                          power(container, "delete",
-                                              preserveProfile: false);
-                                        },
-                                        decoration: NeumorphicDecoration(
-                                          color: Theme.of(context)
-                                              .scaffoldBackgroundColor,
-                                          borderRadius:
-                                              BorderRadius.circular(25),
-                                        ),
-                                        bevel: 5,
-                                        padding:
-                                            EdgeInsets.symmetric(vertical: 10),
-                                        child: Text(
-                                          "删除",
-                                          style: TextStyle(
-                                              fontSize: 18,
-                                              color: Colors.redAccent),
-                                        ),
-                                      ),
-                                    ] else ...[
-                                      NeuButton(
-                                        onPressed: () async {
-                                          Navigator.of(context).pop();
-                                          power(container, "stop");
-                                        },
-                                        decoration: NeumorphicDecoration(
-                                          color: Theme.of(context)
-                                              .scaffoldBackgroundColor,
-                                          borderRadius:
-                                              BorderRadius.circular(25),
-                                        ),
-                                        bevel: 5,
-                                        padding:
-                                            EdgeInsets.symmetric(vertical: 10),
-                                        child: Text(
-                                          "停止",
-                                          style: TextStyle(
-                                              fontSize: 18,
-                                              color: Colors.redAccent),
-                                        ),
-                                      ),
-                                      SizedBox(
-                                        height: 22,
-                                      ),
-                                      NeuButton(
-                                        onPressed: () async {
-                                          Navigator.of(context).pop();
-                                          power(container, "signal");
-                                        },
-                                        decoration: NeumorphicDecoration(
-                                          color: Theme.of(context)
-                                              .scaffoldBackgroundColor,
-                                          borderRadius:
-                                              BorderRadius.circular(25),
-                                        ),
-                                        bevel: 5,
-                                        padding:
-                                            EdgeInsets.symmetric(vertical: 10),
-                                        child: Text(
-                                          "强制停止",
-                                          style: TextStyle(
-                                              fontSize: 18,
-                                              color: Colors.redAccent),
-                                        ),
-                                      ),
-                                      SizedBox(
-                                        height: 22,
-                                      ),
-                                      NeuButton(
-                                        onPressed: () async {
-                                          Navigator.of(context).pop();
-                                          power(container, "restart");
-                                        },
-                                        decoration: NeumorphicDecoration(
-                                          color: Theme.of(context)
-                                              .scaffoldBackgroundColor,
-                                          borderRadius:
-                                              BorderRadius.circular(25),
-                                        ),
-                                        bevel: 5,
-                                        padding:
-                                            EdgeInsets.symmetric(vertical: 10),
-                                        child: Text(
-                                          "重新启动",
-                                          style: TextStyle(
-                                              fontSize: 18,
-                                              color: Colors.redAccent),
-                                        ),
+                                        height: 8,
                                       ),
                                     ],
-                                    SizedBox(
-                                      height: 8,
-                                    ),
-                                  ],
+                                  ),
                                 ),
                               ),
                             ),
@@ -495,18 +412,7 @@ class _DockerState extends State<Docker> with SingleTickerProviderStateMixin {
                         },
                       );
                     },
-                    child: NeuCard(
-                      padding: EdgeInsets.all(10),
-                      // margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                      // padding: EdgeInsets.symmetric(vertical: 20),
-                      decoration: NeumorphicDecoration(
-                        color: Theme.of(context).scaffoldBackgroundColor,
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      curveType: container['status'] == "running"
-                          ? CurveType.emboss
-                          : CurveType.flat,
-                      bevel: 20,
+                    child: Card(
                       child: powerLoading[container['id']] == true
                           ? CupertinoActivityIndicator()
                           : Image.asset(
@@ -541,22 +447,14 @@ class _DockerState extends State<Docker> with SingleTickerProviderStateMixin {
                           SizedBox(
                             height: 10,
                           ),
-                          NeuCard(
-                            curveType: CurveType.flat,
-                            bevel: 10,
-                            decoration: NeumorphicDecoration(
-                              color: Theme.of(context).scaffoldBackgroundColor,
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: FAProgressBar(
-                              backgroundColor: Colors.transparent,
-                              changeColorValue: 90,
-                              changeProgressColor: Colors.red,
-                              progressColor: Colors.blue,
-                              size: 20,
-                              displayText: "%",
-                              currentValue: (container['cpu']).ceil(),
-                            ),
+                          FAProgressBar(
+                            backgroundColor: Colors.transparent,
+                            changeColorValue: 90,
+                            changeProgressColor: Colors.red,
+                            progressColor: Colors.blue,
+                            size: 20,
+                            displayText: "%",
+                            currentValue: (container['cpu']).ceil(),
                           ),
                         ],
                       ),
@@ -582,22 +480,14 @@ class _DockerState extends State<Docker> with SingleTickerProviderStateMixin {
                           SizedBox(
                             height: 10,
                           ),
-                          NeuCard(
-                            curveType: CurveType.flat,
-                            bevel: 10,
-                            decoration: NeumorphicDecoration(
-                              color: Theme.of(context).scaffoldBackgroundColor,
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: FAProgressBar(
-                              backgroundColor: Colors.transparent,
-                              changeColorValue: 90,
-                              changeProgressColor: Colors.red,
-                              progressColor: Colors.green,
-                              size: 20,
-                              displayText: "%",
-                              currentValue: container['memoryPercent'].ceil(),
-                            ),
+                          FAProgressBar(
+                            backgroundColor: Colors.transparent,
+                            changeColorValue: 90,
+                            changeProgressColor: Colors.red,
+                            progressColor: Colors.green,
+                            size: 20,
+                            displayText: "%",
+                            currentValue: container['memoryPercent'].ceil(),
                           ),
                         ],
                       ),
@@ -613,13 +503,7 @@ class _DockerState extends State<Docker> with SingleTickerProviderStateMixin {
   }
 
   Widget _buildImageItem(image) {
-    return NeuCard(
-      curveType: CurveType.flat,
-      decoration: NeumorphicDecoration(
-        color: Theme.of(context).scaffoldBackgroundColor,
-        borderRadius: BorderRadius.circular(20),
-      ),
-      bevel: 20,
+    return Card(
       child: Padding(
         padding: EdgeInsets.all(20),
         child: Column(
@@ -675,16 +559,10 @@ class _DockerState extends State<Docker> with SingleTickerProviderStateMixin {
       ),
       body: Column(
         children: [
-          NeuCard(
-            width: double.infinity,
-            decoration: NeumorphicDecoration(
-              color: Theme.of(context).scaffoldBackgroundColor,
-              borderRadius: BorderRadius.circular(20),
-            ),
+          Card(
             margin: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-            curveType: CurveType.flat,
-            bevel: 10,
             child: TabBar(
+              dividerHeight: 0,
               isScrollable: false,
               controller: _tabController,
               indicatorSize: TabBarIndicatorSize.label,
@@ -719,17 +597,8 @@ class _DockerState extends State<Docker> with SingleTickerProviderStateMixin {
               children: [
                 containerLoading
                     ? Center(
-                        child: NeuCard(
-                          padding: EdgeInsets.all(50),
-                          curveType: CurveType.flat,
-                          decoration: NeumorphicDecoration(
-                            color: Theme.of(context).scaffoldBackgroundColor,
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          bevel: 20,
-                          child: CupertinoActivityIndicator(
-                            radius: 14,
-                          ),
+                        child: CupertinoActivityIndicator(
+                          radius: 14,
                         ),
                       )
                     : ListView(
@@ -738,14 +607,7 @@ class _DockerState extends State<Docker> with SingleTickerProviderStateMixin {
                           Row(
                             children: [
                               Expanded(
-                                child: NeuCard(
-                                  curveType: CurveType.flat,
-                                  decoration: NeumorphicDecoration(
-                                    color: Theme.of(context)
-                                        .scaffoldBackgroundColor,
-                                    borderRadius: BorderRadius.circular(20),
-                                  ),
-                                  bevel: 20,
+                                child: Card(
                                   child: Padding(
                                     padding: const EdgeInsets.all(20.0),
                                     child: Column(
@@ -772,26 +634,15 @@ class _DockerState extends State<Docker> with SingleTickerProviderStateMixin {
                                         SizedBox(
                                           height: 10,
                                         ),
-                                        NeuCard(
-                                          curveType: CurveType.flat,
-                                          bevel: 10,
-                                          decoration: NeumorphicDecoration(
-                                            color: Theme.of(context)
-                                                .scaffoldBackgroundColor,
-                                            borderRadius:
-                                                BorderRadius.circular(8),
-                                          ),
-                                          child: FAProgressBar(
-                                            backgroundColor: Colors.transparent,
-                                            changeColorValue: 90,
-                                            changeProgressColor: Colors.red,
-                                            progressColor: Colors.blue,
-                                            currentValue: utilization['cpu']
-                                                    ['user_load'] +
-                                                utilization['cpu']
-                                                    ['system_load'],
-                                            displayText: '%',
-                                          ),
+                                        FAProgressBar(
+                                          backgroundColor: Colors.transparent,
+                                          changeColorValue: 90,
+                                          changeProgressColor: Colors.red,
+                                          progressColor: Colors.blue,
+                                          currentValue: utilization['cpu']
+                                                  ['user_load'] +
+                                              utilization['cpu']['system_load'],
+                                          displayText: '%',
                                         ),
                                       ],
                                     ),
@@ -802,14 +653,7 @@ class _DockerState extends State<Docker> with SingleTickerProviderStateMixin {
                                 width: 20,
                               ),
                               Expanded(
-                                child: NeuCard(
-                                  curveType: CurveType.flat,
-                                  decoration: NeumorphicDecoration(
-                                    color: Theme.of(context)
-                                        .scaffoldBackgroundColor,
-                                    borderRadius: BorderRadius.circular(20),
-                                  ),
-                                  bevel: 20,
+                                child: Card(
                                   child: Padding(
                                     padding: EdgeInsets.all(20),
                                     child: Column(
@@ -836,24 +680,14 @@ class _DockerState extends State<Docker> with SingleTickerProviderStateMixin {
                                         SizedBox(
                                           height: 10,
                                         ),
-                                        NeuCard(
-                                          curveType: CurveType.flat,
-                                          bevel: 10,
-                                          decoration: NeumorphicDecoration(
-                                            color: Theme.of(context)
-                                                .scaffoldBackgroundColor,
-                                            borderRadius:
-                                                BorderRadius.circular(8),
-                                          ),
-                                          child: FAProgressBar(
-                                            backgroundColor: Colors.transparent,
-                                            changeColorValue: 90,
-                                            changeProgressColor: Colors.red,
-                                            progressColor: Colors.blue,
-                                            currentValue: utilization['memory']
-                                                ['real_usage'],
-                                            displayText: '%',
-                                          ),
+                                        FAProgressBar(
+                                          backgroundColor: Colors.transparent,
+                                          changeColorValue: 90,
+                                          changeProgressColor: Colors.red,
+                                          progressColor: Colors.blue,
+                                          currentValue: utilization['memory']
+                                              ['real_usage'],
+                                          displayText: '%',
                                         ),
                                       ],
                                     ),
@@ -870,17 +704,8 @@ class _DockerState extends State<Docker> with SingleTickerProviderStateMixin {
                       ),
                 imageLoading
                     ? Center(
-                        child: NeuCard(
-                          padding: EdgeInsets.all(50),
-                          curveType: CurveType.flat,
-                          decoration: NeumorphicDecoration(
-                            color: Theme.of(context).scaffoldBackgroundColor,
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          bevel: 20,
-                          child: CupertinoActivityIndicator(
-                            radius: 14,
-                          ),
+                        child: CupertinoActivityIndicator(
+                          radius: 14,
                         ),
                       )
                     : ListView.separated(

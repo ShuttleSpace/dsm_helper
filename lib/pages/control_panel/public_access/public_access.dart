@@ -6,7 +6,6 @@ import 'package:dsm_helper/widgets/label.dart';
 import 'package:dsm_helper/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:neumorphic/neumorphic.dart';
 
 class PublicAccess extends StatefulWidget {
   const PublicAccess();
@@ -100,58 +99,54 @@ class _PublicAccessState extends State<PublicAccess>
           }
         });
       },
-      child: NeuCard(
-        decoration: NeumorphicDecoration(
-          color: Theme.of(context).scaffoldBackgroundColor,
-          borderRadius: BorderRadius.circular(20),
-        ),
-        curveType: CurveType.flat,
-        padding: EdgeInsets.all(10),
+      child: Card(
         margin: EdgeInsets.only(top: 20, left: 20, right: 20),
-        bevel: 10,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Text(
-                  "${ddns['provider']}",
-                  style: TextStyle(fontWeight: FontWeight.w600),
-                ),
-                SizedBox(
-                  width: 5,
-                ),
-                Label(
-                  statusStr[ddns['status']] ?? ddns['status'],
-                  ddns['status'] == "service_ddns_normal"
-                      ? Colors.green
-                      : Colors.red,
-                  fill: true,
-                ),
-              ],
-            ),
-            SizedBox(
-              height: 5,
-            ),
-            Row(
-              children: [
-                Text("${ddns['hostname']}"),
-                SizedBox(
-                  width: 10,
-                ),
-                Text("${ddns['ip']}"),
-              ],
-            ),
-            SizedBox(
-              height: 5,
-            ),
-            Row(
-              children: [
-                Text(
-                    "上次：${ddns['lastupdated'] == "disabled" ? "已停用" : ddns['lastupdated']}"),
-              ],
-            ),
-          ],
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Text(
+                    "${ddns['provider']}",
+                    style: TextStyle(fontWeight: FontWeight.w600),
+                  ),
+                  SizedBox(
+                    width: 5,
+                  ),
+                  Label(
+                    statusStr[ddns['status']] ?? ddns['status'],
+                    ddns['status'] == "service_ddns_normal"
+                        ? Colors.green
+                        : Colors.red,
+                    fill: true,
+                  ),
+                ],
+              ),
+              SizedBox(
+                height: 5,
+              ),
+              Row(
+                children: [
+                  Text("${ddns['hostname']}"),
+                  SizedBox(
+                    width: 10,
+                  ),
+                  Text("${ddns['ip']}"),
+                ],
+              ),
+              SizedBox(
+                height: 5,
+              ),
+              Row(
+                children: [
+                  Text(
+                      "上次：${ddns['lastupdated'] == "disabled" ? "已停用" : ddns['lastupdated']}"),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -166,13 +161,7 @@ class _PublicAccessState extends State<PublicAccess>
         actions: [
           Padding(
             padding: EdgeInsets.only(right: 10, top: 8, bottom: 8),
-            child: NeuButton(
-              decoration: NeumorphicDecoration(
-                color: Theme.of(context).scaffoldBackgroundColor,
-                borderRadius: BorderRadius.circular(10),
-              ),
-              padding: EdgeInsets.all(10),
-              bevel: 5,
+            child: OutlinedButton(
               onPressed: () async {
                 Navigator.of(context)
                     .push(CupertinoPageRoute(builder: (context) {
@@ -187,13 +176,7 @@ class _PublicAccessState extends State<PublicAccess>
           ),
           Padding(
             padding: EdgeInsets.only(right: 10, top: 8, bottom: 8),
-            child: NeuButton(
-              decoration: NeumorphicDecoration(
-                color: Theme.of(context).scaffoldBackgroundColor,
-                borderRadius: BorderRadius.circular(10),
-              ),
-              padding: EdgeInsets.all(10),
-              bevel: 5,
+            child: OutlinedButton(
               onPressed: () async {
                 await Api.ddnsUpdate();
                 getData();

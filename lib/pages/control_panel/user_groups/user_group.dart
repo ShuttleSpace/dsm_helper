@@ -2,7 +2,6 @@ import 'package:dsm_helper/util/function.dart';
 import 'package:dsm_helper/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:neumorphic/neumorphic.dart';
 
 class UserGroups extends StatefulWidget {
   @override
@@ -32,14 +31,8 @@ class _UserGroupsState extends State<UserGroups> {
   }
 
   Widget _buildGroupItem(group) {
-    return NeuCard(
-      curveType: CurveType.flat,
-      decoration: NeumorphicDecoration(
-        color: Theme.of(context).scaffoldBackgroundColor,
-        borderRadius: BorderRadius.circular(20),
-      ),
+    return Card(
       margin: EdgeInsets.symmetric(vertical: 10),
-      bevel: 20,
       child: Padding(
         padding: EdgeInsets.all(20),
         child: Row(
@@ -82,17 +75,8 @@ class _UserGroupsState extends State<UserGroups> {
               height: MediaQuery.of(context).size.height,
               color: Theme.of(context).scaffoldBackgroundColor.withOpacity(0.7),
               child: Center(
-                child: NeuCard(
-                  padding: EdgeInsets.all(50),
-                  curveType: CurveType.flat,
-                  decoration: NeumorphicDecoration(
-                    color: Theme.of(context).scaffoldBackgroundColor,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  bevel: 20,
-                  child: CupertinoActivityIndicator(
-                    radius: 14,
-                  ),
+                child: CupertinoActivityIndicator(
+                  radius: 14,
                 ),
               ),
             )

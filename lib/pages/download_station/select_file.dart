@@ -3,7 +3,6 @@ import 'package:dsm_helper/widgets/file_icon.dart';
 import 'package:dsm_helper/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:neumorphic/neumorphic.dart';
 
 class SelectFile extends StatefulWidget {
   final List listId;
@@ -54,13 +53,7 @@ class _SelectFileState extends State<SelectFile> {
           });
         }
       },
-      child: NeuCard(
-        curveType: CurveType.flat,
-        bevel: 20,
-        decoration: NeumorphicDecoration(
-          color: Theme.of(context).scaffoldBackgroundColor,
-          borderRadius: BorderRadius.circular(25),
-        ),
+      child: Card(
         child: Padding(
           padding: EdgeInsets.symmetric(vertical: 20),
           child: Row(
@@ -97,23 +90,19 @@ class _SelectFileState extends State<SelectFile> {
               SizedBox(
                 width: 10,
               ),
-              NeuCard(
-                decoration: NeumorphicDecoration(
-                  color: Theme.of(context).scaffoldBackgroundColor,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                curveType: selectedFiles.contains(file['index']) ? CurveType.emboss : CurveType.flat,
-                padding: EdgeInsets.all(5),
-                bevel: 5,
-                child: SizedBox(
-                  width: 20,
-                  height: 20,
-                  child: selectedFiles.contains(file['index'])
-                      ? Icon(
-                          CupertinoIcons.checkmark_alt,
-                          color: Color(0xffff9813),
-                        )
-                      : null,
+              Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: selectedFiles.contains(file['index'])
+                        ? Icon(
+                            CupertinoIcons.checkmark_alt,
+                            color: Color(0xffff9813),
+                          )
+                        : null,
+                  ),
                 ),
               ),
               SizedBox(
@@ -138,27 +127,23 @@ class _SelectFileState extends State<SelectFile> {
           SizedBox(
             height: 20,
           ),
-          NeuCard(
-            curveType: CurveType.flat,
-            bevel: 20,
+          Card(
             margin: EdgeInsets.symmetric(horizontal: 20),
-            decoration: NeumorphicDecoration(
-              color: Theme.of(context).scaffoldBackgroundColor,
-              borderRadius: BorderRadius.circular(25),
-            ),
-            padding: EdgeInsets.all(20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text("$title"),
-                SizedBox(
-                  height: 10,
-                ),
-                Text(
-                  "${Util.formatSize(size)}",
-                  style: TextStyle(fontSize: 12, color: Colors.grey),
-                ),
-              ],
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text("$title"),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  Text(
+                    "${Util.formatSize(size)}",
+                    style: TextStyle(fontSize: 12, color: Colors.grey),
+                  ),
+                ],
+              ),
             ),
           ),
           SizedBox(
@@ -229,10 +214,11 @@ class _SelectFileState extends State<SelectFile> {
           ),
           Padding(
             padding: EdgeInsets.all(20),
-            child: NeuButton(
+            child: OutlinedButton(
               onPressed: () async {
                 if (selectedFiles.length > 0) {
-                  var res = await Api.downloadCreate(widget.listId[0], widget.destination, selectedFiles);
+                  var res = await Api.downloadCreate(
+                      widget.listId[0], widget.destination, selectedFiles);
                   if (res['success']) {
                     Util.toast("下载任务创建成功");
                     Navigator.of(context).pop();
@@ -243,12 +229,6 @@ class _SelectFileState extends State<SelectFile> {
                 }
               },
               // margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-              padding: EdgeInsets.symmetric(vertical: 20),
-              decoration: NeumorphicDecoration(
-                color: Theme.of(context).scaffoldBackgroundColor,
-                borderRadius: BorderRadius.circular(20),
-              ),
-              bevel: 20,
               child: Text(
                 "开始下载",
                 style: TextStyle(fontSize: 18),

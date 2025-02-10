@@ -35,22 +35,6 @@ void main() async {
     return true;
   };
 
-  Future<String> getBestDomain(List<String> domains) async {
-    final completer = Completer<String>();
-    for (String domain in domains) {
-      try {
-        Util.get(domain).then((res) {
-          if (res != null && res['code'] == 1) {
-            if (!completer.isCompleted) {
-              completer.complete("http://${res['data']}");
-            }
-          }
-        });
-      } catch (e) {}
-    }
-    return completer.future;
-  }
-
   WidgetsFlutterBinding.ensureInitialized();
   String agreement = await Util.getStorage("agreement") ?? '';
   Fluwx fluwx = Fluwx();
@@ -63,11 +47,6 @@ void main() async {
         .then((value) {
       // stopLog();
     });
-    // 域名优选
-    Util.appUrl = await getBestDomain([
-      'http://dsm.apaipai.top/index/check',
-      'http://dsm.flutter.fit/index/check'
-    ]);
     Util.appUrl = '';
     Util.baseUrl = '';
     // 是否关闭广告

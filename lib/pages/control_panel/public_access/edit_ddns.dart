@@ -6,7 +6,6 @@ import 'package:dsm_helper/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_vibrate/flutter_vibrate.dart';
-import 'package:neumorphic/neumorphic.dart';
 
 class EditDdns extends StatefulWidget {
   final Map? ddns;
@@ -53,91 +52,78 @@ class _EditDdnsState extends State<EditDdns> {
       builder: (context) {
         return Material(
           color: Colors.transparent,
-          child: NeuCard(
-            width: double.infinity,
-            padding: EdgeInsets.all(22),
-            bevel: 5,
-            curveType: CurveType.emboss,
-            decoration: NeumorphicDecoration(
-                color: Theme.of(context).scaffoldBackgroundColor,
-                borderRadius: BorderRadius.vertical(top: Radius.circular(22))),
+          child: Card(
             child: SafeArea(
               top: false,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  Text(
-                    "确认删除",
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
-                  ),
-                  SizedBox(
-                    height: 12,
-                  ),
-                  Text(
-                    "确认要删除以下DDNS？",
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.w400),
-                  ),
-                  SizedBox(
-                    height: 22,
-                  ),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: NeuButton(
-                          onPressed: () async {
-                            if (widget.ddns == null) {
-                              Util.toast('ddns 为空!');
-                              return;
-                            }
-                            Navigator.of(context).pop();
-                            var res = await Api.ddnsDelete(widget.ddns!['id']);
-                            print(res);
-                            if (res['success']) {
-                              Util.toast("DDNS删除成功");
-                              Navigator.of(context).pop(true);
-                            } else {
-                              Util.toast("删除失败，代码:${res['error']['code']}");
-                            }
-                          },
-                          decoration: NeumorphicDecoration(
-                            color: Theme.of(context).scaffoldBackgroundColor,
-                            borderRadius: BorderRadius.circular(25),
-                          ),
-                          bevel: 5,
-                          padding: EdgeInsets.symmetric(vertical: 10),
-                          child: Text(
-                            "确认删除",
-                            style: TextStyle(
-                                fontSize: 18, color: Colors.redAccent),
-                          ),
-                        ),
-                      ),
-                      SizedBox(
-                        width: 20,
-                      ),
-                      Expanded(
-                        child: NeuButton(
-                          onPressed: () async {
-                            Navigator.of(context).pop();
-                          },
-                          decoration: NeumorphicDecoration(
-                            color: Theme.of(context).scaffoldBackgroundColor,
-                            borderRadius: BorderRadius.circular(25),
-                          ),
-                          bevel: 5,
-                          padding: EdgeInsets.symmetric(vertical: 10),
-                          child: Text(
-                            "取消",
-                            style: TextStyle(fontSize: 18),
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    Text(
+                      "确认删除",
+                      style:
+                          TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
+                    ),
+                    SizedBox(
+                      height: 12,
+                    ),
+                    Text(
+                      "确认要删除以下DDNS？",
+                      style:
+                          TextStyle(fontSize: 20, fontWeight: FontWeight.w400),
+                    ),
+                    SizedBox(
+                      height: 22,
+                    ),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: OutlinedButton(
+                            onPressed: () async {
+                              if (widget.ddns == null) {
+                                Util.toast('ddns 为空!');
+                                return;
+                              }
+                              Navigator.of(context).pop();
+                              var res =
+                                  await Api.ddnsDelete(widget.ddns!['id']);
+                              print(res);
+                              if (res['success']) {
+                                Util.toast("DDNS删除成功");
+                                Navigator.of(context).pop(true);
+                              } else {
+                                Util.toast("删除失败，代码:${res['error']['code']}");
+                              }
+                            },
+                            child: Text(
+                              "确认删除",
+                              style: TextStyle(
+                                  fontSize: 18, color: Colors.redAccent),
+                            ),
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(
-                    height: 8,
-                  ),
-                ],
+                        SizedBox(
+                          width: 20,
+                        ),
+                        Expanded(
+                          child: OutlinedButton(
+                            onPressed: () async {
+                              Navigator.of(context).pop();
+                            },
+                            child: Text(
+                              "取消",
+                              style: TextStyle(fontSize: 18),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(
+                      height: 8,
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
@@ -174,13 +160,7 @@ class _EditDdnsState extends State<EditDdns> {
         actions: [
           Padding(
             padding: EdgeInsets.only(right: 10, top: 8, bottom: 8),
-            child: NeuButton(
-              decoration: NeumorphicDecoration(
-                color: Theme.of(context).scaffoldBackgroundColor,
-                borderRadius: BorderRadius.circular(10),
-              ),
-              padding: EdgeInsets.all(10),
-              bevel: 5,
+            child: OutlinedButton(
               onPressed: deleteDdns,
               child: Image.asset(
                 "assets/icons/delete.png",
@@ -203,26 +183,21 @@ class _EditDdnsState extends State<EditDdns> {
                         ddns['enable'] = !ddns['enable'];
                       });
                     },
-                    child: NeuCard(
-                      decoration: NeumorphicDecoration(
-                        color: Theme.of(context).scaffoldBackgroundColor,
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      padding: EdgeInsets.all(20),
-                      bevel: 20,
-                      curveType:
-                          ddns['enable'] ? CurveType.emboss : CurveType.flat,
-                      child: Row(
-                        children: [
-                          Text("启用支持DDNS"),
-                          Spacer(),
-                          if (ddns['enable'])
-                            Icon(
-                              CupertinoIcons.checkmark_alt,
-                              color: Color(0xffff9813),
-                              size: 22,
-                            ),
-                        ],
+                    child: Card(
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Row(
+                          children: [
+                            Text("启用支持DDNS"),
+                            Spacer(),
+                            if (ddns['enable'])
+                              Icon(
+                                CupertinoIcons.checkmark_alt,
+                                color: Color(0xffff9813),
+                                size: 22,
+                              ),
+                          ],
+                        ),
                       ),
                     ),
                   ),
@@ -254,21 +229,78 @@ class _EditDdnsState extends State<EditDdns> {
                       },
                     );
                   },
-                  child: NeuCard(
-                    decoration: NeumorphicDecoration(
-                      color: Theme.of(context).scaffoldBackgroundColor,
-                      borderRadius: BorderRadius.circular(20),
+                  child: Card(
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Row(
+                        children: [
+                          Text("服务供应商"),
+                          Spacer(),
+                          Text(
+                              "${ddns['provider'] != null && ddns['provider'] != "" ? widget.providers.where((element) => element['provider'] == ddns['provider']).first['provider'] : "请选择"}"),
+                        ],
+                      ),
                     ),
-                    padding: EdgeInsets.all(20),
-                    bevel: 20,
-                    curveType:
-                        widget.ddns == null ? CurveType.flat : CurveType.convex,
+                  ),
+                ),
+                SizedBox(
+                  height: 20,
+                ),
+                Card(
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: TextField(
+                      controller: _hostnameController,
+                      onChanged: (v) => ddns['hostname'] = v,
+                      decoration: InputDecoration(
+                        border: InputBorder.none,
+                        labelText: '主机名称',
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  height: 20,
+                ),
+                Card(
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: TextField(
+                      controller: _usernameController,
+                      onChanged: (v) => ddns['username'] = v,
+                      decoration: InputDecoration(
+                        border: InputBorder.none,
+                        labelText: '用户名/电子邮件',
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  height: 20,
+                ),
+                Card(
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: TextField(
+                      onChanged: (v) => ddns['passwd'] = v,
+                      decoration: InputDecoration(
+                        border: InputBorder.none,
+                        labelText: '密码/密钥',
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  height: 20,
+                ),
+                Card(
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
                     child: Row(
                       children: [
-                        Text("服务供应商"),
+                        Text("外部地址(ipv4):"),
                         Spacer(),
-                        Text(
-                            "${ddns['provider'] != null && ddns['provider'] != "" ? widget.providers.where((element) => element['provider'] == ddns['provider']).first['provider'] : "请选择"}"),
+                        Text("${ddns['ip']}"),
                       ],
                     ),
                   ),
@@ -276,98 +308,16 @@ class _EditDdnsState extends State<EditDdns> {
                 SizedBox(
                   height: 20,
                 ),
-                NeuCard(
-                  decoration: NeumorphicDecoration(
-                    color: Theme.of(context).scaffoldBackgroundColor,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  bevel: 20,
-                  curveType: CurveType.flat,
-                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-                  child: TextField(
-                    controller: _hostnameController,
-                    onChanged: (v) => ddns['hostname'] = v,
-                    decoration: InputDecoration(
-                      border: InputBorder.none,
-                      labelText: '主机名称',
+                Card(
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Row(
+                      children: [
+                        Text("外部地址(ipv6):"),
+                        Spacer(),
+                        Text("${ddns['ipv6']}"),
+                      ],
                     ),
-                  ),
-                ),
-                SizedBox(
-                  height: 20,
-                ),
-                NeuCard(
-                  decoration: NeumorphicDecoration(
-                    color: Theme.of(context).scaffoldBackgroundColor,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  bevel: 20,
-                  curveType: CurveType.flat,
-                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-                  child: TextField(
-                    controller: _usernameController,
-                    onChanged: (v) => ddns['username'] = v,
-                    decoration: InputDecoration(
-                      border: InputBorder.none,
-                      labelText: '用户名/电子邮件',
-                    ),
-                  ),
-                ),
-                SizedBox(
-                  height: 20,
-                ),
-                NeuCard(
-                  decoration: NeumorphicDecoration(
-                    color: Theme.of(context).scaffoldBackgroundColor,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  bevel: 20,
-                  curveType: CurveType.flat,
-                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-                  child: TextField(
-                    onChanged: (v) => ddns['passwd'] = v,
-                    decoration: InputDecoration(
-                      border: InputBorder.none,
-                      labelText: '密码/密钥',
-                    ),
-                  ),
-                ),
-                SizedBox(
-                  height: 20,
-                ),
-                NeuCard(
-                  decoration: NeumorphicDecoration(
-                    color: Theme.of(context).scaffoldBackgroundColor,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  padding: EdgeInsets.all(20),
-                  bevel: 20,
-                  curveType: CurveType.flat,
-                  child: Row(
-                    children: [
-                      Text("外部地址(ipv4):"),
-                      Spacer(),
-                      Text("${ddns['ip']}"),
-                    ],
-                  ),
-                ),
-                SizedBox(
-                  height: 20,
-                ),
-                NeuCard(
-                  decoration: NeumorphicDecoration(
-                    color: Theme.of(context).scaffoldBackgroundColor,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  padding: EdgeInsets.all(20),
-                  bevel: 20,
-                  curveType: CurveType.flat,
-                  child: Row(
-                    children: [
-                      Text("外部地址(ipv6):"),
-                      Spacer(),
-                      Text("${ddns['ipv6']}"),
-                    ],
                   ),
                 ),
                 //statusStr[ddns['status']] ?? ddns['status']
@@ -377,36 +327,32 @@ class _EditDdnsState extends State<EditDdns> {
                 Row(
                   children: [
                     Expanded(
-                      child: NeuCard(
-                        decoration: NeumorphicDecoration(
-                          color: Theme.of(context).scaffoldBackgroundColor,
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        padding: EdgeInsets.all(20),
-                        bevel: 20,
-                        curveType: CurveType.flat,
-                        child: Row(
-                          children: [
-                            Text("状态:"),
-                            SizedBox(
-                              width: 10,
-                            ),
-                            if (ddns['status'] != null)
-                              Label(
-                                statusStr[ddns['status']] ?? ddns['status'],
-                                ddns['status'] == "service_ddns_normal"
-                                    ? Colors.green
-                                    : Colors.red,
-                                fill: true,
+                      child: Card(
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Row(
+                            children: [
+                              Text("状态:"),
+                              SizedBox(
+                                width: 10,
                               ),
-                          ],
+                              if (ddns['status'] != null)
+                                Label(
+                                  statusStr[ddns['status']] ?? ddns['status'],
+                                  ddns['status'] == "service_ddns_normal"
+                                      ? Colors.green
+                                      : Colors.red,
+                                  fill: true,
+                                ),
+                            ],
+                          ),
                         ),
                       ),
                     ),
                     SizedBox(
                       width: 20,
                     ),
-                    NeuButton(
+                    OutlinedButton(
                       onPressed: () async {
                         if (checkForm()) {
                           var hide = showWeuiLoadingToast(
@@ -427,12 +373,6 @@ class _EditDdnsState extends State<EditDdns> {
                           }
                         }
                       },
-                      decoration: NeumorphicDecoration(
-                        color: Theme.of(context).scaffoldBackgroundColor,
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      padding: EdgeInsets.all(20),
-                      bevel: 20,
                       child: Text("测试联机"),
                     ),
                   ],
@@ -443,12 +383,7 @@ class _EditDdnsState extends State<EditDdns> {
           SafeArea(
             child: Padding(
               padding: EdgeInsets.all(20),
-              child: NeuButton(
-                padding: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-                decoration: NeumorphicDecoration(
-                  color: Theme.of(context).scaffoldBackgroundColor,
-                  borderRadius: BorderRadius.circular(20),
-                ),
+              child: OutlinedButton(
                 onPressed: () async {
                   if (checkForm()) {
                     var res = await Api.ddnsSave(ddns);

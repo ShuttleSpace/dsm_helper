@@ -3,7 +3,6 @@ import 'package:dsm_helper/util/function.dart';
 import 'package:dsm_helper/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:neumorphic/neumorphic.dart';
 
 class UserSetting extends StatefulWidget {
   @override
@@ -58,57 +57,40 @@ class _UserSettingState extends State<UserSetting> {
       ),
       body: loading
           ? Center(
-              child: NeuCard(
-                padding: EdgeInsets.all(50),
-                curveType: CurveType.flat,
-                decoration: NeumorphicDecoration(
-                  color: Theme.of(context).scaffoldBackgroundColor,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                bevel: 20,
-                child: CupertinoActivityIndicator(
-                  radius: 14,
-                ),
+              child: CupertinoActivityIndicator(
+                radius: 14,
               ),
             )
           : ListView(
               padding: EdgeInsets.all(20),
               children: [
-                NeuCard(
-                  decoration: NeumorphicDecoration(
-                    color: Theme.of(context).scaffoldBackgroundColor,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  bevel: 20,
-                  curveType: CurveType.flat,
-                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-                  child: TextField(
-                    controller: _usernameController,
-                    onChanged: (v) => changedData['username'] = v,
-                    enabled: false,
-                    decoration: InputDecoration(
-                      border: InputBorder.none,
-                      labelText: '名称',
+                Card(
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: TextField(
+                      controller: _usernameController,
+                      onChanged: (v) => changedData['username'] = v,
+                      enabled: false,
+                      decoration: InputDecoration(
+                        border: InputBorder.none,
+                        labelText: '名称',
+                      ),
                     ),
                   ),
                 ),
                 SizedBox(
                   height: 20,
                 ),
-                NeuCard(
-                  decoration: NeumorphicDecoration(
-                    color: Theme.of(context).scaffoldBackgroundColor,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  bevel: 20,
-                  curveType: CurveType.flat,
-                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-                  child: TextField(
-                    controller: _fullnameController,
-                    onChanged: (v) => changedData['fullname'] = v,
-                    decoration: InputDecoration(
-                      border: InputBorder.none,
-                      labelText: '描述',
+                Card(
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: TextField(
+                      controller: _fullnameController,
+                      onChanged: (v) => changedData['fullname'] = v,
+                      decoration: InputDecoration(
+                        border: InputBorder.none,
+                        labelText: '描述',
+                      ),
                     ),
                   ),
                 ),
@@ -116,57 +98,45 @@ class _UserSettingState extends State<UserSetting> {
                   SizedBox(
                     height: 20,
                   ),
-                  NeuCard(
-                    decoration: NeumorphicDecoration(
-                      color: Theme.of(context).scaffoldBackgroundColor,
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    bevel: 20,
-                    curveType: CurveType.flat,
-                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-                    child: TextField(
-                      onChanged: (v) => changedData['old_password'] = v,
-                      decoration: InputDecoration(
-                        border: InputBorder.none,
-                        labelText: '密码',
+                  Card(
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: TextField(
+                        onChanged: (v) => changedData['old_password'] = v,
+                        decoration: InputDecoration(
+                          border: InputBorder.none,
+                          labelText: '密码',
+                        ),
                       ),
                     ),
                   ),
                   SizedBox(
                     height: 20,
                   ),
-                  NeuCard(
-                    decoration: NeumorphicDecoration(
-                      color: Theme.of(context).scaffoldBackgroundColor,
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    bevel: 20,
-                    curveType: CurveType.flat,
-                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-                    child: TextField(
-                      onChanged: (v) => changedData['password'] = v,
-                      decoration: InputDecoration(
-                        border: InputBorder.none,
-                        labelText: '新密码',
+                  Card(
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: TextField(
+                        onChanged: (v) => changedData['password'] = v,
+                        decoration: InputDecoration(
+                          border: InputBorder.none,
+                          labelText: '新密码',
+                        ),
                       ),
                     ),
                   ),
                   SizedBox(
                     height: 20,
                   ),
-                  NeuCard(
-                    decoration: NeumorphicDecoration(
-                      color: Theme.of(context).scaffoldBackgroundColor,
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    bevel: 20,
-                    curveType: CurveType.flat,
-                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-                    child: TextField(
-                      onChanged: (v) => changedData['confirm_password'] = v,
-                      decoration: InputDecoration(
-                        border: InputBorder.none,
-                        labelText: '确认密码',
+                  Card(
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: TextField(
+                        onChanged: (v) => changedData['confirm_password'] = v,
+                        decoration: InputDecoration(
+                          border: InputBorder.none,
+                          labelText: '确认密码',
+                        ),
                       ),
                     ),
                   ),
@@ -174,20 +144,16 @@ class _UserSettingState extends State<UserSetting> {
                 SizedBox(
                   height: 20,
                 ),
-                NeuCard(
-                  decoration: NeumorphicDecoration(
-                    color: Theme.of(context).scaffoldBackgroundColor,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  bevel: 20,
-                  curveType: CurveType.flat,
-                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-                  child: TextField(
-                    controller: _emailController,
-                    onChanged: (v) => changedData['email'] = v,
-                    decoration: InputDecoration(
-                      border: InputBorder.none,
-                      labelText: '邮箱',
+                Card(
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: TextField(
+                      controller: _emailController,
+                      onChanged: (v) => changedData['email'] = v,
+                      decoration: InputDecoration(
+                        border: InputBorder.none,
+                        labelText: '邮箱',
+                      ),
                     ),
                   ),
                 ),
@@ -219,39 +185,27 @@ class _UserSettingState extends State<UserSetting> {
                       });
                     }
                   },
-                  child: NeuCard(
-                    decoration: NeumorphicDecoration(
-                      color: Theme.of(context).scaffoldBackgroundColor,
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    curveType: normalUser['OTP_enable']
-                        ? CurveType.emboss
-                        : CurveType.flat,
-                    bevel: 12,
-                    height: 68,
-                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                    child: Row(
-                      children: [
-                        Text("两步认证"),
-                        Spacer(),
-                        if (normalUser['OTP_enable'])
-                          Icon(
-                            CupertinoIcons.checkmark_alt,
-                            color: Color(0xffff9813),
-                          ),
-                      ],
+                  child: Card(
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Row(
+                        children: [
+                          Text("两步认证"),
+                          Spacer(),
+                          if (normalUser['OTP_enable'])
+                            Icon(
+                              CupertinoIcons.checkmark_alt,
+                              color: Color(0xffff9813),
+                            ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
                 SizedBox(
                   height: 20,
                 ),
-                NeuButton(
-                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-                  decoration: NeumorphicDecoration(
-                    color: Theme.of(context).scaffoldBackgroundColor,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
+                OutlinedButton(
                   onPressed: () async {
                     if (saving) {
                       return;

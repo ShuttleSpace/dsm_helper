@@ -7,7 +7,6 @@ import 'package:dsm_helper/widgets/label.dart';
 import 'package:dsm_helper/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:neumorphic/neumorphic.dart';
 
 class Smart extends StatefulWidget {
   final Map disk;
@@ -113,129 +112,121 @@ class _SmartState extends State<Smart> with SingleTickerProviderStateMixin {
   }
 
   Widget _buildSmartItem(smart) {
-    return NeuCard(
-      padding: EdgeInsets.all(20),
-      curveType: CurveType.flat,
-      decoration: NeumorphicDecoration(
-        color: Theme.of(context).scaffoldBackgroundColor,
-        borderRadius: BorderRadius.circular(20),
-      ),
-      bevel: 20,
-      child: Column(
-        children: [
-          Row(
-            children: [
-              Label(smart['id'], Colors.lightBlueAccent),
-              SizedBox(
-                width: 5,
-              ),
-              Label(
-                smart['status'],
-                smart['status'] == "OK" ? Colors.green : Colors.red,
-                fill: true,
-              ),
-              SizedBox(
-                width: 5,
-              ),
-              Text(smart['name']),
-            ],
-          ),
-          SizedBox(
-            height: 5,
-          ),
-          Row(
-            children: [
-              SizedBox(
-                width: 100,
-                child: Text.rich(
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          children: [
+            Row(
+              children: [
+                Label(smart['id'], Colors.lightBlueAccent),
+                SizedBox(
+                  width: 5,
+                ),
+                Label(
+                  smart['status'],
+                  smart['status'] == "OK" ? Colors.green : Colors.red,
+                  fill: true,
+                ),
+                SizedBox(
+                  width: 5,
+                ),
+                Text(smart['name']),
+              ],
+            ),
+            SizedBox(
+              height: 5,
+            ),
+            Row(
+              children: [
+                SizedBox(
+                  width: 100,
+                  child: Text.rich(
+                    TextSpan(
+                      children: [
+                        TextSpan(
+                            text: "现值：",
+                            style: TextStyle(fontWeight: FontWeight.w600)),
+                        TextSpan(text: "${smart['current']}"),
+                      ],
+                    ),
+                  ),
+                ),
+                Text.rich(
                   TextSpan(
                     children: [
                       TextSpan(
-                          text: "现值：",
+                          text: "最差值：",
                           style: TextStyle(fontWeight: FontWeight.w600)),
-                      TextSpan(text: "${smart['current']}"),
+                      TextSpan(text: "${smart['worst']}"),
                     ],
                   ),
                 ),
-              ),
-              Text.rich(
-                TextSpan(
-                  children: [
+              ],
+            ),
+            SizedBox(
+              height: 5,
+            ),
+            Row(
+              children: [
+                SizedBox(
+                  width: 100,
+                  child: Text.rich(
                     TextSpan(
-                        text: "最差值：",
-                        style: TextStyle(fontWeight: FontWeight.w600)),
-                    TextSpan(text: "${smart['worst']}"),
-                  ],
+                      children: [
+                        TextSpan(
+                            text: "临界值：",
+                            style: TextStyle(fontWeight: FontWeight.w600)),
+                        TextSpan(text: "${smart['threshold']}"),
+                      ],
+                    ),
+                  ),
                 ),
-              ),
-            ],
-          ),
-          SizedBox(
-            height: 5,
-          ),
-          Row(
-            children: [
-              SizedBox(
-                width: 100,
-                child: Text.rich(
+                Text.rich(
                   TextSpan(
                     children: [
                       TextSpan(
-                          text: "临界值：",
+                          text: "原始资料：",
                           style: TextStyle(fontWeight: FontWeight.w600)),
-                      TextSpan(text: "${smart['threshold']}"),
+                      TextSpan(text: "${smart['raw']}"),
                     ],
                   ),
                 ),
-              ),
-              Text.rich(
-                TextSpan(
-                  children: [
-                    TextSpan(
-                        text: "原始资料：",
-                        style: TextStyle(fontWeight: FontWeight.w600)),
-                    TextSpan(text: "${smart['raw']}"),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ],
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
 
   Widget _buildLogItem(log) {
-    return NeuCard(
-      padding: EdgeInsets.all(20),
-      curveType: CurveType.flat,
-      decoration: NeumorphicDecoration(
-        color: Theme.of(context).scaffoldBackgroundColor,
-        borderRadius: BorderRadius.circular(20),
-      ),
-      bevel: 20,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text("${log['time']}"),
-          SizedBox(
-            height: 10,
-          ),
-          Row(
-            children: [
-              Label(
-                log['result'] == "smart_complete" ? "正常" : log['result'],
-                log['result'] == "smart_complete" ? Colors.green : Colors.red,
-                fill: true,
-              ),
-              SizedBox(
-                width: 10,
-              ),
-              Text(
-                  "${log['test_type'] == "quick" ? "S.M.A.R.T. 快速测试" : log['test_type']}"),
-            ],
-          )
-        ],
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text("${log['time']}"),
+            SizedBox(
+              height: 10,
+            ),
+            Row(
+              children: [
+                Label(
+                  log['result'] == "smart_complete" ? "正常" : log['result'],
+                  log['result'] == "smart_complete" ? Colors.green : Colors.red,
+                  fill: true,
+                ),
+                SizedBox(
+                  width: 10,
+                ),
+                Text(
+                    "${log['test_type'] == "quick" ? "S.M.A.R.T. 快速测试" : log['test_type']}"),
+              ],
+            )
+          ],
+        ),
       ),
     );
   }
@@ -249,31 +240,16 @@ class _SmartState extends State<Smart> with SingleTickerProviderStateMixin {
       ),
       body: loading
           ? Center(
-              child: NeuCard(
-                padding: EdgeInsets.all(50),
-                curveType: CurveType.flat,
-                decoration: NeumorphicDecoration(
-                  color: Theme.of(context).scaffoldBackgroundColor,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                bevel: 20,
-                child: CupertinoActivityIndicator(
-                  radius: 14,
-                ),
+              child: CupertinoActivityIndicator(
+                radius: 14,
               ),
             )
           : Column(
               children: [
-                NeuCard(
-                  width: double.infinity,
-                  decoration: NeumorphicDecoration(
-                    color: Theme.of(context).scaffoldBackgroundColor,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
+                Card(
                   margin: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-                  curveType: CurveType.flat,
-                  bevel: 10,
                   child: TabBar(
+                    dividerHeight: 0,
                     isScrollable: true,
                     controller: _tabController,
                     indicatorSize: TabBarIndicatorSize.label,
@@ -316,15 +292,9 @@ class _SmartState extends State<Smart> with SingleTickerProviderStateMixin {
                     children: [
                       ListView(
                         children: [
-                          NeuCard(
+                          Card(
                             margin: EdgeInsets.symmetric(
                                 horizontal: 20, vertical: 15),
-                            curveType: CurveType.flat,
-                            bevel: 20,
-                            decoration: NeumorphicDecoration(
-                              color: Theme.of(context).scaffoldBackgroundColor,
-                              borderRadius: BorderRadius.circular(20),
-                            ),
                             child: Padding(
                               padding: const EdgeInsets.all(20),
                               child: Row(
@@ -374,15 +344,9 @@ class _SmartState extends State<Smart> with SingleTickerProviderStateMixin {
                               ),
                             ),
                           ),
-                          NeuCard(
+                          Card(
                             margin: EdgeInsets.symmetric(
                                 horizontal: 20, vertical: 15),
-                            curveType: CurveType.flat,
-                            bevel: 20,
-                            decoration: NeumorphicDecoration(
-                              color: Theme.of(context).scaffoldBackgroundColor,
-                              borderRadius: BorderRadius.circular(20),
-                            ),
                             child: Padding(
                               padding: EdgeInsets.all(20),
                               child: Column(
@@ -498,13 +462,7 @@ class _SmartState extends State<Smart> with SingleTickerProviderStateMixin {
                       ListView(
                         padding: EdgeInsets.all(20),
                         children: [
-                          NeuCard(
-                            curveType: CurveType.flat,
-                            bevel: 20,
-                            decoration: NeumorphicDecoration(
-                              color: Theme.of(context).scaffoldBackgroundColor,
-                              borderRadius: BorderRadius.circular(20),
-                            ),
+                          Card(
                             child: Padding(
                               padding: EdgeInsets.all(20),
                               child: Column(
@@ -589,13 +547,7 @@ class _SmartState extends State<Smart> with SingleTickerProviderStateMixin {
                           SizedBox(
                             height: 20,
                           ),
-                          NeuCard(
-                            curveType: CurveType.flat,
-                            bevel: 20,
-                            decoration: NeumorphicDecoration(
-                              color: Theme.of(context).scaffoldBackgroundColor,
-                              borderRadius: BorderRadius.circular(20),
-                            ),
+                          Card(
                             child: Padding(
                               padding: EdgeInsets.all(20),
                               child: Column(
@@ -617,14 +569,7 @@ class _SmartState extends State<Smart> with SingleTickerProviderStateMixin {
                                     height: 20,
                                   ),
                                   if (testing) ...[
-                                    NeuCard(
-                                      curveType: CurveType.flat,
-                                      bevel: 20,
-                                      decoration: NeumorphicDecoration(
-                                        color: Theme.of(context)
-                                            .scaffoldBackgroundColor,
-                                        borderRadius: BorderRadius.circular(20),
-                                      ),
+                                    Card(
                                       child: Padding(
                                         padding: EdgeInsets.symmetric(
                                             vertical: 15, horizontal: 20),
@@ -636,18 +581,10 @@ class _SmartState extends State<Smart> with SingleTickerProviderStateMixin {
                                             SizedBox(
                                               width: 10,
                                             ),
-                                            NeuButton(
+                                            OutlinedButton(
                                               onPressed: () async {
                                                 doSmartTest("stop");
                                               },
-                                              decoration: NeumorphicDecoration(
-                                                color: Theme.of(context)
-                                                    .scaffoldBackgroundColor,
-                                                borderRadius:
-                                                    BorderRadius.circular(10),
-                                              ),
-                                              padding: EdgeInsets.all(5),
-                                              bevel: 5,
                                               child: SizedBox(
                                                 width: 20,
                                                 height: 20,
@@ -663,14 +600,7 @@ class _SmartState extends State<Smart> with SingleTickerProviderStateMixin {
                                       ),
                                     ),
                                   ] else ...[
-                                    NeuCard(
-                                      curveType: CurveType.flat,
-                                      bevel: 20,
-                                      decoration: NeumorphicDecoration(
-                                        color: Theme.of(context)
-                                            .scaffoldBackgroundColor,
-                                        borderRadius: BorderRadius.circular(20),
-                                      ),
+                                    Card(
                                       child: Padding(
                                         padding: EdgeInsets.symmetric(
                                             vertical: 15, horizontal: 20),
@@ -694,18 +624,10 @@ class _SmartState extends State<Smart> with SingleTickerProviderStateMixin {
                                             SizedBox(
                                               width: 10,
                                             ),
-                                            NeuButton(
+                                            OutlinedButton(
                                               onPressed: () async {
                                                 doSmartTest("quick");
                                               },
-                                              decoration: NeumorphicDecoration(
-                                                color: Theme.of(context)
-                                                    .scaffoldBackgroundColor,
-                                                borderRadius:
-                                                    BorderRadius.circular(10),
-                                              ),
-                                              padding: EdgeInsets.all(5),
-                                              bevel: 5,
                                               child: SizedBox(
                                                 width: 20,
                                                 height: 20,
@@ -724,14 +646,7 @@ class _SmartState extends State<Smart> with SingleTickerProviderStateMixin {
                                     SizedBox(
                                       height: 20,
                                     ),
-                                    NeuCard(
-                                      curveType: CurveType.flat,
-                                      bevel: 20,
-                                      decoration: NeumorphicDecoration(
-                                        color: Theme.of(context)
-                                            .scaffoldBackgroundColor,
-                                        borderRadius: BorderRadius.circular(20),
-                                      ),
+                                    Card(
                                       child: Padding(
                                         padding: EdgeInsets.symmetric(
                                             vertical: 15, horizontal: 20),
@@ -755,18 +670,10 @@ class _SmartState extends State<Smart> with SingleTickerProviderStateMixin {
                                             SizedBox(
                                               width: 10,
                                             ),
-                                            NeuButton(
+                                            OutlinedButton(
                                               onPressed: () async {
                                                 doSmartTest("extend");
                                               },
-                                              decoration: NeumorphicDecoration(
-                                                color: Theme.of(context)
-                                                    .scaffoldBackgroundColor,
-                                                borderRadius:
-                                                    BorderRadius.circular(10),
-                                              ),
-                                              padding: EdgeInsets.all(5),
-                                              bevel: 5,
                                               child: SizedBox(
                                                 width: 20,
                                                 height: 20,
@@ -804,18 +711,8 @@ class _SmartState extends State<Smart> with SingleTickerProviderStateMixin {
                       logLoading
                           ? Center(
                               child: Center(
-                                child: NeuCard(
-                                  padding: EdgeInsets.all(50),
-                                  curveType: CurveType.flat,
-                                  decoration: NeumorphicDecoration(
-                                    color: Theme.of(context)
-                                        .scaffoldBackgroundColor,
-                                    borderRadius: BorderRadius.circular(20),
-                                  ),
-                                  bevel: 20,
-                                  child: CupertinoActivityIndicator(
-                                    radius: 14,
-                                  ),
+                                child: CupertinoActivityIndicator(
+                                  radius: 14,
                                 ),
                               ),
                             )

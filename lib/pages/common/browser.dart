@@ -1,6 +1,5 @@
 import 'package:dsm_helper/widgets/neu_back_button.dart';
 import 'package:flutter/material.dart';
-import 'package:neumorphic/neumorphic.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
@@ -61,13 +60,7 @@ Page resource error:
         actions: [
           Padding(
             padding: EdgeInsets.only(right: 10, top: 8, bottom: 8),
-            child: NeuButton(
-              decoration: NeumorphicDecoration(
-                color: Theme.of(context).scaffoldBackgroundColor,
-                borderRadius: BorderRadius.circular(10),
-              ),
-              padding: EdgeInsets.all(10),
-              bevel: 5,
+            child: OutlinedButton(
               onPressed: () {
                 launchUrlString(widget.url,
                     mode: LaunchMode.externalApplication);
@@ -97,17 +90,13 @@ Page resource error:
                     future: _webviewController.canGoBack(),
                     builder: (context, shot) {
                       bool canGoBack = shot.data ?? false;
-                      return NeuButton(
-                        decoration: NeumorphicDecoration(
-                          color: Theme.of(context).scaffoldBackgroundColor,
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        padding: EdgeInsets.all(10),
-                        enabled: canGoBack,
-                        onPressed: () async {
-                          await _webviewController.goBack();
-                          setState(() {});
-                        },
+                      return OutlinedButton(
+                        onPressed: canGoBack
+                            ? () async {
+                                await _webviewController.goBack();
+                                setState(() {});
+                              }
+                            : null,
                         child: Icon(
                           Icons.arrow_back_ios_outlined,
                           color: canGoBack ? Colors.black : Colors.grey,
@@ -123,17 +112,13 @@ Page resource error:
                     future: _webviewController.canGoForward(),
                     builder: (context, shot) {
                       bool canGoForward = shot.data ?? false;
-                      return NeuButton(
-                        decoration: NeumorphicDecoration(
-                          color: Theme.of(context).scaffoldBackgroundColor,
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        enabled: canGoForward,
-                        padding: EdgeInsets.all(10),
-                        onPressed: () async {
-                          await _webviewController.goForward();
-                          setState(() {});
-                        },
+                      return OutlinedButton(
+                        onPressed: canGoForward
+                            ? () async {
+                                await _webviewController.goForward();
+                                setState(() {});
+                              }
+                            : null,
                         child: Icon(
                           Icons.arrow_forward_ios,
                           size: 22,
@@ -143,12 +128,7 @@ Page resource error:
                     },
                   ),
                   Spacer(),
-                  NeuButton(
-                    decoration: NeumorphicDecoration(
-                      color: Theme.of(context).scaffoldBackgroundColor,
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    padding: EdgeInsets.all(10),
+                  OutlinedButton(
                     onPressed: () {
                       Navigator.of(context).pop();
                     },
@@ -160,12 +140,7 @@ Page resource error:
                   SizedBox(
                     width: 10,
                   ),
-                  NeuButton(
-                    decoration: NeumorphicDecoration(
-                      color: Theme.of(context).scaffoldBackgroundColor,
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    padding: EdgeInsets.all(10),
+                  OutlinedButton(
                     onPressed: () {
                       _webviewController.reload();
                     },

@@ -6,7 +6,6 @@ import 'package:dsm_helper/pages/photos/timeline.dart';
 import 'package:dsm_helper/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:neumorphic/neumorphic.dart';
 
 class Photos extends StatefulWidget {
   const Photos();
@@ -33,18 +32,16 @@ class _PhotosState extends State<Photos> {
     return Scaffold(
       appBar: AppBar(
         leading: AppBackButton(context),
-        title: NeuSwitch(
-          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-          thumbColor: Theme.of(context).scaffoldBackgroundColor,
-          children: {
-            0: Text("图片"),
-            1: Text("相册"),
-            2: Text("共享"),
-          },
-          groupValue: currentIndex,
-          onValueChanged: (v) {
+        title: DropdownMenu(
+          initialSelection: currentIndex,
+          dropdownMenuEntries: [
+            DropdownMenuEntry(value: 0, label: '图片'),
+            DropdownMenuEntry(value: 1, label: '相册'),
+            DropdownMenuEntry(value: 2, label: '共享'),
+          ],
+          onSelected: (value) {
             setState(() {
-              currentIndex = v;
+              currentIndex = value ?? 0;
             });
           },
         ),
@@ -52,22 +49,14 @@ class _PhotosState extends State<Photos> {
           if (currentIndex != 2)
             Padding(
               padding: EdgeInsets.only(right: 10, top: 8, bottom: 8),
-              child: NeuButton(
+              child: OutlinedButton(
                 onPressed: () {
                   showCupertinoModalPopup(
                     context: context,
                     builder: (context) {
                       return Material(
                         color: Colors.transparent,
-                        child: NeuCard(
-                          width: double.infinity,
-                          // padding: EdgeInsets.all(22),
-                          bevel: 5,
-                          curveType: CurveType.emboss,
-                          decoration: NeumorphicDecoration(
-                              color: Theme.of(context).scaffoldBackgroundColor,
-                              borderRadius: BorderRadius.vertical(
-                                  top: Radius.circular(22))),
+                        child: Card(
                           child: SafeArea(
                             top: false,
                             child: Padding(
@@ -75,7 +64,7 @@ class _PhotosState extends State<Photos> {
                               child: Column(
                                 mainAxisSize: MainAxisSize.min,
                                 children: <Widget>[
-                                  NeuButton(
+                                  OutlinedButton(
                                     onPressed: () async {
                                       setState(() {
                                         isTeam = !isTeam;
@@ -91,13 +80,6 @@ class _PhotosState extends State<Photos> {
                                           ?.getData(isTeam: isTeam);
                                       Navigator.of(context).pop();
                                     },
-                                    decoration: NeumorphicDecoration(
-                                      color: Theme.of(context)
-                                          .scaffoldBackgroundColor,
-                                      borderRadius: BorderRadius.circular(25),
-                                    ),
-                                    bevel: 5,
-                                    padding: EdgeInsets.symmetric(vertical: 10),
                                     child: Text(
                                       "切换到${isTeam ? '个人空间' : '共享空间'}",
                                       style: TextStyle(fontSize: 18),
@@ -107,7 +89,7 @@ class _PhotosState extends State<Photos> {
                                     height: 16,
                                   ),
                                   if (currentIndex == 0) ...[
-                                    NeuButton(
+                                    OutlinedButton(
                                       onPressed: () async {
                                         Navigator.of(context).pop();
                                         setState(() {
@@ -121,14 +103,6 @@ class _PhotosState extends State<Photos> {
                                               ?.getData(isTeam: isTeam);
                                         }
                                       },
-                                      decoration: NeumorphicDecoration(
-                                        color: Theme.of(context)
-                                            .scaffoldBackgroundColor,
-                                        borderRadius: BorderRadius.circular(25),
-                                      ),
-                                      bevel: 5,
-                                      padding:
-                                          EdgeInsets.symmetric(vertical: 10),
                                       child: Text(
                                         "切换到${isTimeline ? '文件夹' : '时间线'}视图",
                                         style: TextStyle(fontSize: 18),
@@ -138,17 +112,10 @@ class _PhotosState extends State<Photos> {
                                       height: 16,
                                     ),
                                   ],
-                                  NeuButton(
+                                  OutlinedButton(
                                     onPressed: () async {
                                       Navigator.of(context).pop();
                                     },
-                                    decoration: NeumorphicDecoration(
-                                      color: Theme.of(context)
-                                          .scaffoldBackgroundColor,
-                                      borderRadius: BorderRadius.circular(25),
-                                    ),
-                                    bevel: 5,
-                                    padding: EdgeInsets.symmetric(vertical: 10),
                                     child: Text(
                                       "取消",
                                       style: TextStyle(fontSize: 18),
@@ -166,12 +133,6 @@ class _PhotosState extends State<Photos> {
                     },
                   );
                 },
-                padding: EdgeInsets.all(10),
-                decoration: NeumorphicDecoration(
-                  color: Theme.of(context).scaffoldBackgroundColor,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                bevel: 5,
                 child: Image.asset(
                   "assets/icons/actions.png",
                   width: 20,

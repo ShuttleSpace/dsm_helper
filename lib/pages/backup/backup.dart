@@ -10,7 +10,6 @@ import 'package:dsm_helper/widgets/label.dart';
 import 'package:dsm_helper/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:neumorphic/neumorphic.dart';
 import 'package:flutter_vibrate/flutter_vibrate.dart';
 import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 
@@ -163,13 +162,7 @@ class _BackupState extends State<Backup> {
         actions: [
           Padding(
             padding: EdgeInsets.only(right: 10, top: 8, bottom: 8),
-            child: NeuButton(
-              decoration: NeumorphicDecoration(
-                color: Theme.of(context).scaffoldBackgroundColor,
-                borderRadius: BorderRadius.circular(10),
-              ),
-              padding: EdgeInsets.all(10),
-              bevel: 5,
+            child: OutlinedButton(
               onPressed: () async {
                 var hide = showWeuiLoadingToast(context: context);
                 await PhotoManager.clearFileCache();
@@ -189,77 +182,76 @@ class _BackupState extends State<Backup> {
         padding: EdgeInsets.all(20),
         children: [
           ...[
-            NeuCard(
-              decoration: NeumorphicDecoration(
-                color: Theme.of(context).scaffoldBackgroundColor,
-                borderRadius: BorderRadius.circular(20),
-              ),
-              curveType: CurveType.flat,
-              child: Stack(
-                children: [
-                  Container(
-                    width: (MediaQuery.of(context).size.width - 40) *
-                        (uploading?.uploadSize ??
-                            0 /
-                                (uploading?.fileSize == 0
-                                    ? 1
-                                    : (uploading?.fileSize ?? 0))),
-                    height: 70,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(20),
-                      color: Colors.blue,
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Stack(
+                  children: [
+                    Container(
+                      width: (MediaQuery.of(context).size.width - 40) *
+                          (uploading?.uploadSize ??
+                              0 /
+                                  (uploading?.fileSize == 0
+                                      ? 1
+                                      : (uploading?.fileSize ?? 0))),
+                      height: 70,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(20),
+                        color: Colors.blue,
+                      ),
                     ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 20, vertical: 15),
-                    child: Row(
-                      children: [
-                        uploading?.type == AssetType.image
-                            ? Image.file(
-                                uploading!.file!,
-                                height: 40,
-                                width: 40,
-                              )
-                            : FileIcon(FileTypeEnum.movie),
-                        SizedBox(
-                          width: 20,
-                        ),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                uploading?.file?.path.split("/").last ??
-                                    '[Wrong State]',
-                                overflow: TextOverflow.ellipsis,
-                                maxLines: 2,
-                                style: TextStyle(fontSize: 13),
-                              ),
-                              SizedBox(
-                                height: 5,
-                              ),
-                              Text(
-                                uploading?.file?.parent.path ?? '[Wrong State]',
-                                overflow: TextOverflow.ellipsis,
-                                maxLines: 1,
-                                style:
-                                    TextStyle(fontSize: 12, color: Colors.grey),
-                              ),
-                            ],
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 20, vertical: 15),
+                      child: Row(
+                        children: [
+                          uploading?.type == AssetType.image
+                              ? Image.file(
+                                  uploading!.file!,
+                                  height: 40,
+                                  width: 40,
+                                )
+                              : FileIcon(FileTypeEnum.movie),
+                          SizedBox(
+                            width: 20,
                           ),
-                        ),
-                      ],
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  uploading?.file?.path.split("/").last ??
+                                      '[Wrong State]',
+                                  overflow: TextOverflow.ellipsis,
+                                  maxLines: 2,
+                                  style: TextStyle(fontSize: 13),
+                                ),
+                                SizedBox(
+                                  height: 5,
+                                ),
+                                Text(
+                                  uploading?.file?.parent.path ??
+                                      '[Wrong State]',
+                                  overflow: TextOverflow.ellipsis,
+                                  maxLines: 1,
+                                  style: TextStyle(
+                                      fontSize: 12, color: Colors.grey),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
             SizedBox(
               height: 20,
             ),
           ],
-          NeuButton(
+          OutlinedButton(
             onPressed: () {
               showCupertinoModalPopup(
                 context: context,
@@ -277,10 +269,6 @@ class _BackupState extends State<Backup> {
                 }
               });
             },
-            decoration: NeumorphicDecoration(
-              color: Theme.of(context).scaffoldBackgroundColor,
-              borderRadius: BorderRadius.circular(20),
-            ),
             child: Row(
               children: [
                 Column(
@@ -302,7 +290,7 @@ class _BackupState extends State<Backup> {
           SizedBox(
             height: 20,
           ),
-          NeuButton(
+          OutlinedButton(
             onPressed: () {
               showCupertinoModalPopup(
                 context: context,
@@ -325,11 +313,6 @@ class _BackupState extends State<Backup> {
                 }
               });
             },
-            decoration: NeumorphicDecoration(
-              color: Theme.of(context).scaffoldBackgroundColor,
-              borderRadius: BorderRadius.circular(20),
-            ),
-            padding: EdgeInsets.all(12),
             child: Container(
               width: double.infinity,
               child: Column(
@@ -365,42 +348,39 @@ class _BackupState extends State<Backup> {
                 continueBackup = true;
               });
             },
-            child: NeuCard(
-              decoration: NeumorphicDecoration(
-                color: Theme.of(context).scaffoldBackgroundColor,
-                borderRadius: BorderRadius.circular(20),
-              ),
-              padding: EdgeInsets.all(12),
-              curveType: continueBackup ? CurveType.emboss : CurveType.flat,
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          "继续备份",
-                          style: TextStyle(fontSize: 18),
-                        ),
-                        Text(
-                          lastBackupTime != null
-                              ? lastBackupTime?.format("Y-m-d H:i:s") ?? ''
-                              : "从未备份过",
-                          style: TextStyle(fontSize: 16, color: Colors.grey),
-                        ),
-                        Text(
-                          "${uploads.where((AssetEntity upload) => (upload.modifiedDateTime.millisecondsSinceEpoch > (lastBackupTime?.millisecondsSinceEpoch ?? 0)) && upload.type == AssetType.image).length}张照片 ${uploads.where((upload) => (upload.modifiedDateTime.millisecondsSinceEpoch > (lastBackupTime?.millisecondsSinceEpoch ?? 0)) && upload.type == AssetType.video).length}个视频",
-                          style: TextStyle(fontSize: 16, color: Colors.grey),
-                        ),
-                      ],
+            child: Card(
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "继续备份",
+                            style: TextStyle(fontSize: 18),
+                          ),
+                          Text(
+                            lastBackupTime != null
+                                ? lastBackupTime?.format("Y-m-d H:i:s") ?? ''
+                                : "从未备份过",
+                            style: TextStyle(fontSize: 16, color: Colors.grey),
+                          ),
+                          Text(
+                            "${uploads.where((AssetEntity upload) => (upload.modifiedDateTime.millisecondsSinceEpoch > (lastBackupTime?.millisecondsSinceEpoch ?? 0)) && upload.type == AssetType.image).length}张照片 ${uploads.where((upload) => (upload.modifiedDateTime.millisecondsSinceEpoch > (lastBackupTime?.millisecondsSinceEpoch ?? 0)) && upload.type == AssetType.video).length}个视频",
+                            style: TextStyle(fontSize: 16, color: Colors.grey),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                  if (continueBackup)
-                    Icon(
-                      CupertinoIcons.checkmark_alt,
-                      color: Color(0xffff9813),
-                    ),
-                ],
+                    if (continueBackup)
+                      Icon(
+                        CupertinoIcons.checkmark_alt,
+                        color: Color(0xffff9813),
+                      ),
+                  ],
+                ),
               ),
             ),
           ),
@@ -413,36 +393,33 @@ class _BackupState extends State<Backup> {
                 continueBackup = false;
               });
             },
-            child: NeuCard(
-              decoration: NeumorphicDecoration(
-                color: Theme.of(context).scaffoldBackgroundColor,
-                borderRadius: BorderRadius.circular(20),
-              ),
-              padding: EdgeInsets.all(12),
-              curveType: continueBackup ? CurveType.flat : CurveType.emboss,
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          "全新备份",
-                          style: TextStyle(fontSize: 18),
-                        ),
-                        Text(
-                          "${uploads.where((upload) => upload.type == AssetType.image).length}张照片 ${uploads.where((upload) => upload.type == AssetType.video).length}个视频",
-                          style: TextStyle(fontSize: 16, color: Colors.grey),
-                        ),
-                      ],
+            child: Card(
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "全新备份",
+                            style: TextStyle(fontSize: 18),
+                          ),
+                          Text(
+                            "${uploads.where((upload) => upload.type == AssetType.image).length}张照片 ${uploads.where((upload) => upload.type == AssetType.video).length}个视频",
+                            style: TextStyle(fontSize: 16, color: Colors.grey),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                  if (!continueBackup)
-                    Icon(
-                      CupertinoIcons.checkmark_alt,
-                      color: Color(0xffff9813),
-                    ),
-                ],
+                    if (!continueBackup)
+                      Icon(
+                        CupertinoIcons.checkmark_alt,
+                        color: Color(0xffff9813),
+                      ),
+                  ],
+                ),
               ),
             ),
           ),
@@ -453,39 +430,35 @@ class _BackupState extends State<Backup> {
             onTap: () {
               Util.toast("暂不支持自动备份");
             },
-            child: NeuCard(
-              decoration: NeumorphicDecoration(
-                color: Theme.of(context).scaffoldBackgroundColor,
-                borderRadius: BorderRadius.circular(20),
-              ),
-              curveType: CurveType.flat,
-              bevel: 12,
-              padding: EdgeInsets.all(12),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          "自动备份",
-                          style: TextStyle(fontSize: 18),
-                        ),
-                        Text(
-                          "打开${Util.appName}后自动从上次备份位置继续备份",
-                          style: TextStyle(fontSize: 14, color: Colors.grey),
-                        ),
-                      ],
+            child: Card(
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "自动备份",
+                            style: TextStyle(fontSize: 18),
+                          ),
+                          Text(
+                            "打开${Util.appName}后自动从上次备份位置继续备份",
+                            style: TextStyle(fontSize: 14, color: Colors.grey),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                  SizedBox(
-                    width: 20,
-                    // child: Icon(
-                    //   CupertinoIcons.checkmark_alt,
-                    //   color: Color(0xffff9813),
-                    // ),
-                  ),
-                ],
+                    SizedBox(
+                      width: 20,
+                      // child: Icon(
+                      //   CupertinoIcons.checkmark_alt,
+                      //   color: Color(0xffff9813),
+                      // ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
@@ -493,12 +466,7 @@ class _BackupState extends State<Backup> {
             height: 20,
           ),
           uploading == null
-              ? NeuButton(
-                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-                  decoration: NeumorphicDecoration(
-                    color: Theme.of(context).scaffoldBackgroundColor,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
+              ? OutlinedButton(
                   onPressed: () async {
                     if (backupFolder.isBlank) {
                       Util.vibrate(FeedbackType.warning);
@@ -589,12 +557,7 @@ class _BackupState extends State<Backup> {
                   },
                   child: Text("开始备份"),
                 )
-              : NeuButton(
-                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-                  decoration: NeumorphicDecoration(
-                    color: Theme.of(context).scaffoldBackgroundColor,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
+              : OutlinedButton(
                   onPressed: () async {
                     cancel = true;
                     Util.toast("当前文件上传完成后将暂停任务");

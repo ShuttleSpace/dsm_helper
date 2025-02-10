@@ -10,7 +10,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_swiper_null_safety/flutter_swiper_null_safety.dart';
-import 'package:neumorphic/neumorphic.dart';
 
 class PackageDetail extends StatefulWidget {
   final Map package;
@@ -91,13 +90,7 @@ class _PackageDetailState extends State<PackageDetail> {
       builder: (context) {
         return Material(
           color: Colors.transparent,
-          child: NeuCard(
-            width: double.infinity,
-            bevel: 20,
-            curveType: CurveType.emboss,
-            decoration: NeumorphicDecoration(
-                color: Theme.of(context).scaffoldBackgroundColor,
-                borderRadius: BorderRadius.vertical(top: Radius.circular(22))),
+          child: Card(
             child: SafeArea(
               top: false,
               child: Padding(
@@ -116,17 +109,11 @@ class _PackageDetailState extends State<PackageDetail> {
                     ...volumes.map((volume) {
                       return Padding(
                         padding: EdgeInsets.only(bottom: 20),
-                        child: NeuButton(
+                        child: OutlinedButton(
                           onPressed: () async {
                             install(volume['volume_path']);
                             Navigator.of(context).pop();
                           },
-                          decoration: NeumorphicDecoration(
-                            color: Theme.of(context).scaffoldBackgroundColor,
-                            borderRadius: BorderRadius.circular(25),
-                          ),
-                          bevel: 20,
-                          padding: EdgeInsets.symmetric(vertical: 10),
                           child: Container(
                             padding: EdgeInsets.only(left: 20),
                             width: double.infinity,
@@ -148,16 +135,10 @@ class _PackageDetailState extends State<PackageDetail> {
                         ),
                       );
                     }).toList(),
-                    NeuButton(
+                    OutlinedButton(
                       onPressed: () async {
                         Navigator.of(context).pop();
                       },
-                      decoration: NeumorphicDecoration(
-                        color: Theme.of(context).scaffoldBackgroundColor,
-                        borderRadius: BorderRadius.circular(25),
-                      ),
-                      bevel: 20,
-                      padding: EdgeInsets.symmetric(vertical: 10),
                       child: Text(
                         "取消",
                         style: TextStyle(fontSize: 18),
@@ -195,14 +176,7 @@ class _PackageDetailState extends State<PackageDetail> {
           builder: (context) {
             return Material(
               color: Colors.transparent,
-              child: NeuCard(
-                width: double.infinity,
-                bevel: 5,
-                curveType: CurveType.emboss,
-                decoration: NeumorphicDecoration(
-                    color: Theme.of(context).scaffoldBackgroundColor,
-                    borderRadius:
-                        BorderRadius.vertical(top: Radius.circular(22))),
+              child: Card(
                 child: SafeArea(
                   top: false,
                   child: Padding(
@@ -229,18 +203,11 @@ class _PackageDetailState extends State<PackageDetail> {
                         Row(
                           children: [
                             Expanded(
-                              child: NeuButton(
+                              child: OutlinedButton(
                                 onPressed: () async {
                                   install(installPath);
                                   Navigator.of(context).pop();
                                 },
-                                decoration: NeumorphicDecoration(
-                                  color:
-                                      Theme.of(context).scaffoldBackgroundColor,
-                                  borderRadius: BorderRadius.circular(25),
-                                ),
-                                bevel: 5,
-                                padding: EdgeInsets.symmetric(vertical: 10),
                                 child: Text(
                                   "继续更新",
                                   style: TextStyle(
@@ -252,17 +219,10 @@ class _PackageDetailState extends State<PackageDetail> {
                               width: 16,
                             ),
                             Expanded(
-                              child: NeuButton(
+                              child: OutlinedButton(
                                 onPressed: () async {
                                   Navigator.of(context).pop();
                                 },
-                                decoration: NeumorphicDecoration(
-                                  color:
-                                      Theme.of(context).scaffoldBackgroundColor,
-                                  borderRadius: BorderRadius.circular(25),
-                                ),
-                                bevel: 5,
-                                padding: EdgeInsets.symmetric(vertical: 10),
                                 child: Text(
                                   "取消",
                                   style: TextStyle(fontSize: 18),
@@ -365,13 +325,7 @@ class _PackageDetailState extends State<PackageDetail> {
             child: ListView(
               padding: EdgeInsets.all(20),
               children: [
-                NeuCard(
-                  curveType: CurveType.flat,
-                  bevel: 20,
-                  decoration: NeumorphicDecoration(
-                    color: Theme.of(context).scaffoldBackgroundColor,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
+                Card(
                   child: Padding(
                     padding: EdgeInsets.all(20),
                     child: Row(
@@ -404,14 +358,8 @@ class _PackageDetailState extends State<PackageDetail> {
                 ),
                 if (widget.package['snapshot'] != null &&
                     widget.package['snapshot'].length > 0)
-                  NeuCard(
+                  Card(
                     margin: EdgeInsets.only(top: 20),
-                    curveType: CurveType.flat,
-                    bevel: 20,
-                    decoration: NeumorphicDecoration(
-                      color: Theme.of(context).scaffoldBackgroundColor,
-                      borderRadius: BorderRadius.circular(20),
-                    ),
                     child: Padding(
                       padding: EdgeInsets.all(10),
                       child: Column(
@@ -439,14 +387,8 @@ class _PackageDetailState extends State<PackageDetail> {
                       ),
                     ),
                   ),
-                NeuCard(
+                Card(
                   margin: EdgeInsets.only(top: 20),
-                  curveType: CurveType.flat,
-                  bevel: 20,
-                  decoration: NeumorphicDecoration(
-                    color: Theme.of(context).scaffoldBackgroundColor,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
                   child: Padding(
                     padding: EdgeInsets.all(20),
                     child: Column(
@@ -466,14 +408,8 @@ class _PackageDetailState extends State<PackageDetail> {
                   ),
                 ),
                 if (widget.package['changelog'] != "")
-                  NeuCard(
+                  Card(
                     margin: EdgeInsets.only(top: 20),
-                    curveType: CurveType.flat,
-                    bevel: 20,
-                    decoration: NeumorphicDecoration(
-                      color: Theme.of(context).scaffoldBackgroundColor,
-                      borderRadius: BorderRadius.circular(20),
-                    ),
                     child: Padding(
                       padding: EdgeInsets.all(20),
                       child: Column(
@@ -509,14 +445,8 @@ class _PackageDetailState extends State<PackageDetail> {
                       ),
                     ),
                   ),
-                NeuCard(
+                Card(
                   margin: EdgeInsets.only(top: 20),
-                  curveType: CurveType.flat,
-                  bevel: 20,
-                  decoration: NeumorphicDecoration(
-                    color: Theme.of(context).scaffoldBackgroundColor,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
                   child: Padding(
                     padding: EdgeInsets.all(20),
                     child: Column(
@@ -534,83 +464,29 @@ class _PackageDetailState extends State<PackageDetail> {
                           spacing: 20,
                           runSpacing: 20,
                           children: [
-                            NeuCard(
-                              width:
-                                  (MediaQuery.of(context).size.width - 100) / 2,
-                              curveType: CurveType.flat,
-                              decoration: NeumorphicDecoration(
-                                color:
-                                    Theme.of(context).scaffoldBackgroundColor,
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                              bevel: 20,
-                              padding: EdgeInsets.all(20),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text("开发者"),
-                                  SizedBox(
-                                    height: 5,
-                                  ),
-                                  if (widget.package['maintainer_url'] !=
-                                          null &&
-                                      widget.package['maintainer_url'] != "")
-                                    GestureDetector(
-                                      child: Text(
-                                        "${widget.package['maintainer']}",
-                                        style: TextStyle(color: Colors.blue),
-                                      ),
-                                      onTap: () {
-                                        AndroidIntent intent = AndroidIntent(
-                                          action: 'action_view',
-                                          data:
-                                              widget.package['maintainer_url'],
-                                          arguments: {},
-                                        );
-                                        intent.launch();
-                                      },
-                                    )
-                                  else
-                                    Text(
-                                      "${widget.package['maintainer']}",
-                                    ),
-                                ],
-                              ),
-                            ),
-                            if (widget.package['distributor'] != null &&
-                                widget.package['distributor'] != "")
-                              NeuCard(
-                                width:
-                                    (MediaQuery.of(context).size.width - 100) /
-                                        2,
-                                curveType: CurveType.flat,
-                                decoration: NeumorphicDecoration(
-                                  color:
-                                      Theme.of(context).scaffoldBackgroundColor,
-                                  borderRadius: BorderRadius.circular(20),
-                                ),
-                                bevel: 20,
-                                padding: EdgeInsets.all(20),
+                            Card(
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Text("发布人员"),
+                                    Text("开发者"),
                                     SizedBox(
                                       height: 5,
                                     ),
-                                    if (widget.package['distributor_url'] !=
+                                    if (widget.package['maintainer_url'] !=
                                             null &&
-                                        widget.package['distributor_url'] != "")
+                                        widget.package['maintainer_url'] != "")
                                       GestureDetector(
                                         child: Text(
-                                          "${widget.package['distributor']}",
+                                          "${widget.package['maintainer']}",
                                           style: TextStyle(color: Colors.blue),
                                         ),
                                         onTap: () {
                                           AndroidIntent intent = AndroidIntent(
                                             action: 'action_view',
                                             data: widget
-                                                .package['distributor_url'],
+                                                .package['maintainer_url'],
                                             arguments: {},
                                           );
                                           intent.launch();
@@ -618,103 +494,118 @@ class _PackageDetailState extends State<PackageDetail> {
                                       )
                                     else
                                       Text(
-                                        "${widget.package['distributor']}",
+                                        "${widget.package['maintainer']}",
                                       ),
                                   ],
                                 ),
                               ),
-                            NeuCard(
-                              width:
-                                  (MediaQuery.of(context).size.width - 100) / 2,
-                              curveType: CurveType.flat,
-                              decoration: NeumorphicDecoration(
-                                color:
-                                    Theme.of(context).scaffoldBackgroundColor,
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                              bevel: 20,
-                              padding: EdgeInsets.all(20),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text("下载次数"),
-                                  SizedBox(
-                                    height: 5,
+                            ),
+                            if (widget.package['distributor'] != null &&
+                                widget.package['distributor'] != "")
+                              Card(
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text("发布人员"),
+                                      SizedBox(
+                                        height: 5,
+                                      ),
+                                      if (widget.package['distributor_url'] !=
+                                              null &&
+                                          widget.package['distributor_url'] !=
+                                              "")
+                                        GestureDetector(
+                                          child: Text(
+                                            "${widget.package['distributor']}",
+                                            style:
+                                                TextStyle(color: Colors.blue),
+                                          ),
+                                          onTap: () {
+                                            AndroidIntent intent =
+                                                AndroidIntent(
+                                              action: 'action_view',
+                                              data: widget
+                                                  .package['distributor_url'],
+                                              arguments: {},
+                                            );
+                                            intent.launch();
+                                          },
+                                        )
+                                      else
+                                        Text(
+                                          "${widget.package['distributor']}",
+                                        ),
+                                    ],
                                   ),
-                                  Text("${widget.package['download_count']}"),
-                                ],
+                                ),
+                              ),
+                            Card(
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text("下载次数"),
+                                    SizedBox(
+                                      height: 5,
+                                    ),
+                                    Text("${widget.package['download_count']}"),
+                                  ],
+                                ),
                               ),
                             ),
                             if (widget.package['installed'])
-                              NeuCard(
-                                width:
-                                    (MediaQuery.of(context).size.width - 100) /
-                                        2,
-                                curveType: CurveType.flat,
-                                decoration: NeumorphicDecoration(
-                                  color:
-                                      Theme.of(context).scaffoldBackgroundColor,
-                                  borderRadius: BorderRadius.circular(20),
-                                ),
-                                bevel: 20,
-                                padding: EdgeInsets.all(20),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text("已安装版本"),
-                                    SizedBox(
-                                      height: 5,
-                                    ),
-                                    Text(
-                                        "${widget.package['installed_version']}"),
-                                  ],
+                              Card(
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text("已安装版本"),
+                                      SizedBox(
+                                        height: 5,
+                                      ),
+                                      Text(
+                                          "${widget.package['installed_version']}"),
+                                    ],
+                                  ),
                                 ),
                               ),
                             if (widget.package['installed'])
-                              NeuCard(
-                                width:
-                                    (MediaQuery.of(context).size.width - 100) /
-                                        2,
-                                curveType: CurveType.flat,
-                                decoration: NeumorphicDecoration(
-                                  color:
-                                      Theme.of(context).scaffoldBackgroundColor,
-                                  borderRadius: BorderRadius.circular(20),
+                              Card(
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text("安装位置"),
+                                      SizedBox(
+                                        height: 5,
+                                      ),
+                                      Text(
+                                          "${installVolume.replaceAll("volume", "存储空间 ")}"),
+                                    ],
+                                  ),
                                 ),
-                                bevel: 20,
-                                padding: EdgeInsets.all(20),
+                              ),
+                            Card(
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Text("安装位置"),
+                                    Text("最新版本"),
                                     SizedBox(
                                       height: 5,
                                     ),
-                                    Text(
-                                        "${installVolume.replaceAll("volume", "存储空间 ")}"),
+                                    Text("${widget.package['version']}"),
                                   ],
                                 ),
-                              ),
-                            NeuCard(
-                              width:
-                                  (MediaQuery.of(context).size.width - 100) / 2,
-                              curveType: CurveType.flat,
-                              decoration: NeumorphicDecoration(
-                                color:
-                                    Theme.of(context).scaffoldBackgroundColor,
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                              bevel: 20,
-                              padding: EdgeInsets.all(20),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text("最新版本"),
-                                  SizedBox(
-                                    height: 5,
-                                  ),
-                                  Text("${widget.package['version']}"),
-                                ],
                               ),
                             ),
                           ],
@@ -734,7 +625,7 @@ class _PackageDetailState extends State<PackageDetail> {
                   Expanded(
                     child: Padding(
                       padding: EdgeInsets.symmetric(horizontal: 10),
-                      child: NeuButton(
+                      child: OutlinedButton(
                         onPressed: () async {
                           if (widget.package['additional']
                               ['is_uninstall_pages']) {
@@ -750,99 +641,73 @@ class _PackageDetailState extends State<PackageDetail> {
                               builder: (context) {
                                 return Material(
                                   color: Colors.transparent,
-                                  child: NeuCard(
-                                    width: double.infinity,
-                                    padding: EdgeInsets.all(22),
-                                    bevel: 5,
-                                    curveType: CurveType.emboss,
-                                    decoration: NeumorphicDecoration(
-                                        color: Theme.of(context)
-                                            .scaffoldBackgroundColor,
-                                        borderRadius: BorderRadius.vertical(
-                                            top: Radius.circular(22))),
+                                  child: Card(
                                     child: SafeArea(
                                       top: false,
-                                      child: Column(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: <Widget>[
-                                          Text(
-                                            "卸载套件",
-                                            style: TextStyle(
-                                                fontSize: 20,
-                                                fontWeight: FontWeight.w500),
-                                          ),
-                                          SizedBox(
-                                            height: 12,
-                                          ),
-                                          Text(
-                                            "确认要卸载此套件？",
-                                            style: TextStyle(
-                                                fontSize: 20,
-                                                fontWeight: FontWeight.w400),
-                                          ),
-                                          SizedBox(
-                                            height: 22,
-                                          ),
-                                          Row(
-                                            children: [
-                                              Expanded(
-                                                child: NeuButton(
-                                                  onPressed: () async {
-                                                    Navigator.of(context).pop();
-                                                    uninstallPackage();
-                                                  },
-                                                  decoration:
-                                                      NeumorphicDecoration(
-                                                    color: Theme.of(context)
-                                                        .scaffoldBackgroundColor,
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            25),
-                                                  ),
-                                                  bevel: 5,
-                                                  padding: EdgeInsets.symmetric(
-                                                      vertical: 10),
-                                                  child: Text(
-                                                    "卸载",
-                                                    style: TextStyle(
-                                                        fontSize: 18,
-                                                        color:
-                                                            Colors.redAccent),
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Column(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: <Widget>[
+                                            Text(
+                                              "卸载套件",
+                                              style: TextStyle(
+                                                  fontSize: 20,
+                                                  fontWeight: FontWeight.w500),
+                                            ),
+                                            SizedBox(
+                                              height: 12,
+                                            ),
+                                            Text(
+                                              "确认要卸载此套件？",
+                                              style: TextStyle(
+                                                  fontSize: 20,
+                                                  fontWeight: FontWeight.w400),
+                                            ),
+                                            SizedBox(
+                                              height: 22,
+                                            ),
+                                            Row(
+                                              children: [
+                                                Expanded(
+                                                  child: OutlinedButton(
+                                                    onPressed: () async {
+                                                      Navigator.of(context)
+                                                          .pop();
+                                                      uninstallPackage();
+                                                    },
+                                                    child: Text(
+                                                      "卸载",
+                                                      style: TextStyle(
+                                                          fontSize: 18,
+                                                          color:
+                                                              Colors.redAccent),
+                                                    ),
                                                   ),
                                                 ),
-                                              ),
-                                              SizedBox(
-                                                width: 20,
-                                              ),
-                                              Expanded(
-                                                child: NeuButton(
-                                                  onPressed: () async {
-                                                    Navigator.of(context).pop();
-                                                  },
-                                                  decoration:
-                                                      NeumorphicDecoration(
-                                                    color: Theme.of(context)
-                                                        .scaffoldBackgroundColor,
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            25),
-                                                  ),
-                                                  bevel: 5,
-                                                  padding: EdgeInsets.symmetric(
-                                                      vertical: 10),
-                                                  child: Text(
-                                                    "取消",
-                                                    style:
-                                                        TextStyle(fontSize: 18),
+                                                SizedBox(
+                                                  width: 20,
+                                                ),
+                                                Expanded(
+                                                  child: OutlinedButton(
+                                                    onPressed: () async {
+                                                      Navigator.of(context)
+                                                          .pop();
+                                                    },
+                                                    child: Text(
+                                                      "取消",
+                                                      style: TextStyle(
+                                                          fontSize: 18),
+                                                    ),
                                                   ),
                                                 ),
-                                              ),
-                                            ],
-                                          ),
-                                          SizedBox(
-                                            height: 8,
-                                          ),
-                                        ],
+                                              ],
+                                            ),
+                                            SizedBox(
+                                              height: 8,
+                                            ),
+                                          ],
+                                        ),
                                       ),
                                     ),
                                   ),
@@ -851,11 +716,6 @@ class _PackageDetailState extends State<PackageDetail> {
                             );
                           }
                         },
-                        padding: EdgeInsets.symmetric(vertical: 15),
-                        decoration: NeumorphicDecoration(
-                          color: Theme.of(context).scaffoldBackgroundColor,
-                          borderRadius: BorderRadius.circular(50),
-                        ),
                         child: Text(
                           "卸载",
                           style: TextStyle(color: Colors.red),
@@ -870,130 +730,100 @@ class _PackageDetailState extends State<PackageDetail> {
                       child: Padding(
                         padding: EdgeInsets.symmetric(horizontal: 10),
                         child: widget.package['launched']
-                            ? NeuButton(
+                            ? OutlinedButton(
                                 onPressed: () {
                                   showCupertinoModalPopup(
                                     context: context,
                                     builder: (context) {
                                       return Material(
                                         color: Colors.transparent,
-                                        child: NeuCard(
-                                          width: double.infinity,
-                                          padding: EdgeInsets.all(22),
-                                          bevel: 5,
-                                          curveType: CurveType.emboss,
-                                          decoration: NeumorphicDecoration(
-                                              color: Theme.of(context)
-                                                  .scaffoldBackgroundColor,
-                                              borderRadius:
-                                                  BorderRadius.vertical(
-                                                      top:
-                                                          Radius.circular(22))),
+                                        child: Card(
                                           child: SafeArea(
                                             top: false,
-                                            child: Column(
-                                              mainAxisSize: MainAxisSize.min,
-                                              children: <Widget>[
-                                                Text(
-                                                  "停用套件",
-                                                  style: TextStyle(
-                                                      fontSize: 20,
-                                                      fontWeight:
-                                                          FontWeight.w500),
-                                                ),
-                                                SizedBox(
-                                                  height: 12,
-                                                ),
-                                                Text(
-                                                  "确认要停用此套件？",
-                                                  style: TextStyle(
-                                                      fontSize: 20,
-                                                      fontWeight:
-                                                          FontWeight.w400),
-                                                ),
-                                                SizedBox(
-                                                  height: 22,
-                                                ),
-                                                Row(
-                                                  children: [
-                                                    Expanded(
-                                                      child: NeuButton(
-                                                        onPressed: () async {
-                                                          Navigator.of(context)
-                                                              .pop();
-                                                          var res = await Api
-                                                              .launchPackage(
-                                                                  widget.package[
-                                                                      'id'],
-                                                                  widget.package[
-                                                                      'dsm_apps'],
-                                                                  "stop");
-                                                          if (res['success']) {
-                                                            Util.toast("已停用");
-                                                            setState(() {
-                                                              widget.package[
-                                                                      'launched'] =
-                                                                  false;
-                                                            });
-                                                          }
-                                                        },
-                                                        decoration:
-                                                            NeumorphicDecoration(
-                                                          color: Theme.of(
-                                                                  context)
-                                                              .scaffoldBackgroundColor,
-                                                          borderRadius:
-                                                              BorderRadius
-                                                                  .circular(25),
-                                                        ),
-                                                        bevel: 5,
-                                                        padding: EdgeInsets
-                                                            .symmetric(
-                                                                vertical: 10),
-                                                        child: Text(
-                                                          "停用",
-                                                          style: TextStyle(
-                                                              fontSize: 18,
-                                                              color: Colors
-                                                                  .redAccent),
+                                            child: Padding(
+                                              padding:
+                                                  const EdgeInsets.all(8.0),
+                                              child: Column(
+                                                mainAxisSize: MainAxisSize.min,
+                                                children: <Widget>[
+                                                  Text(
+                                                    "停用套件",
+                                                    style: TextStyle(
+                                                        fontSize: 20,
+                                                        fontWeight:
+                                                            FontWeight.w500),
+                                                  ),
+                                                  SizedBox(
+                                                    height: 12,
+                                                  ),
+                                                  Text(
+                                                    "确认要停用此套件？",
+                                                    style: TextStyle(
+                                                        fontSize: 20,
+                                                        fontWeight:
+                                                            FontWeight.w400),
+                                                  ),
+                                                  SizedBox(
+                                                    height: 22,
+                                                  ),
+                                                  Row(
+                                                    children: [
+                                                      Expanded(
+                                                        child: OutlinedButton(
+                                                          onPressed: () async {
+                                                            Navigator.of(
+                                                                    context)
+                                                                .pop();
+                                                            var res = await Api
+                                                                .launchPackage(
+                                                                    widget.package[
+                                                                        'id'],
+                                                                    widget.package[
+                                                                        'dsm_apps'],
+                                                                    "stop");
+                                                            if (res[
+                                                                'success']) {
+                                                              Util.toast("已停用");
+                                                              setState(() {
+                                                                widget.package[
+                                                                        'launched'] =
+                                                                    false;
+                                                              });
+                                                            }
+                                                          },
+                                                          child: Text(
+                                                            "停用",
+                                                            style: TextStyle(
+                                                                fontSize: 18,
+                                                                color: Colors
+                                                                    .redAccent),
+                                                          ),
                                                         ),
                                                       ),
-                                                    ),
-                                                    SizedBox(
-                                                      width: 20,
-                                                    ),
-                                                    Expanded(
-                                                      child: NeuButton(
-                                                        onPressed: () async {
-                                                          Navigator.of(context)
-                                                              .pop();
-                                                        },
-                                                        decoration:
-                                                            NeumorphicDecoration(
-                                                          color: Theme.of(
-                                                                  context)
-                                                              .scaffoldBackgroundColor,
-                                                          borderRadius:
-                                                              BorderRadius
-                                                                  .circular(25),
-                                                        ),
-                                                        bevel: 20,
-                                                        padding: EdgeInsets
-                                                            .symmetric(
-                                                                vertical: 10),
-                                                        child: Text(
-                                                          "取消",
-                                                          style: TextStyle(
-                                                              fontSize: 18),
+                                                      SizedBox(
+                                                        width: 20,
+                                                      ),
+                                                      Expanded(
+                                                        child: OutlinedButton(
+                                                          onPressed: () async {
+                                                            Navigator.of(
+                                                                    context)
+                                                                .pop();
+                                                          },
+                                                          child: Text(
+                                                            "取消",
+                                                            style: TextStyle(
+                                                                fontSize: 18),
+                                                          ),
                                                         ),
                                                       ),
-                                                    ),
-                                                  ],
-                                                ),
-                                                SizedBox(
-                                                  height: 8,
-                                                ),
-                                              ],
+                                                    ],
+                                                  ),
+                                                  SizedBox(
+                                                    height: 8,
+                                                  ),
+                                                ],
+                                              ),
                                             ),
                                           ),
                                         ),
@@ -1001,15 +831,9 @@ class _PackageDetailState extends State<PackageDetail> {
                                     },
                                   );
                                 },
-                                padding: EdgeInsets.symmetric(vertical: 15),
-                                decoration: NeumorphicDecoration(
-                                  color:
-                                      Theme.of(context).scaffoldBackgroundColor,
-                                  borderRadius: BorderRadius.circular(50),
-                                ),
                                 child: Text("停用"),
                               )
-                            : NeuButton(
+                            : OutlinedButton(
                                 onPressed: () async {
                                   var res = await Api.launchPackage(
                                       widget.package['id'],
@@ -1023,12 +847,6 @@ class _PackageDetailState extends State<PackageDetail> {
                                     });
                                   }
                                 },
-                                padding: EdgeInsets.symmetric(vertical: 15),
-                                decoration: NeumorphicDecoration(
-                                  color:
-                                      Theme.of(context).scaffoldBackgroundColor,
-                                  borderRadius: BorderRadius.circular(50),
-                                ),
                                 child: Text("启动"),
                               ),
                       ),
@@ -1037,15 +855,10 @@ class _PackageDetailState extends State<PackageDetail> {
                   Expanded(
                     child: Padding(
                       padding: EdgeInsets.symmetric(horizontal: 10),
-                      child: NeuButton(
+                      child: OutlinedButton(
                         onPressed: () {
                           selectVolume();
                         },
-                        padding: EdgeInsets.symmetric(vertical: 15),
-                        decoration: NeumorphicDecoration(
-                          color: Theme.of(context).scaffoldBackgroundColor,
-                          borderRadius: BorderRadius.circular(50),
-                        ),
                         child: Text("$installButtonText"),
                       ),
                     ),
@@ -1054,16 +867,11 @@ class _PackageDetailState extends State<PackageDetail> {
                   Expanded(
                     child: Padding(
                       padding: EdgeInsets.symmetric(horizontal: 10),
-                      child: NeuButton(
+                      child: OutlinedButton(
                         onPressed: () async {
                           update();
                           // install(volume['volume_path']);
                         },
-                        padding: EdgeInsets.symmetric(vertical: 15),
-                        decoration: NeumorphicDecoration(
-                          color: Theme.of(context).scaffoldBackgroundColor,
-                          borderRadius: BorderRadius.circular(50),
-                        ),
                         child: Text("$installButtonText"),
                       ),
                     ),

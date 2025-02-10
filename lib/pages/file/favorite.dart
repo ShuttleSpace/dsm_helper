@@ -4,7 +4,6 @@ import 'package:dsm_helper/widgets/file_icon.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_vibrate/flutter_vibrate.dart';
-import 'package:neumorphic/neumorphic.dart';
 
 class Favorite extends StatefulWidget {
   final Function callback;
@@ -40,7 +39,7 @@ class _FavoriteState extends State<Favorite> {
   Widget _buildFavoriteItem(favorite) {
     return Padding(
       padding: const EdgeInsets.only(top: 20.0),
-      child: NeuButton(
+      child: OutlinedButton(
         onPressed: () {
           if (favorite['status'] == "broken") {
             Util.toast("文件或目录不存在");
@@ -63,7 +62,7 @@ class _FavoriteState extends State<Favorite> {
               SizedBox(
                 width: 10,
               ),
-              NeuButton(
+              OutlinedButton(
                 onPressed: () {
                   Util.vibrate(FeedbackType.light);
                   showCupertinoModalPopup(
@@ -71,14 +70,7 @@ class _FavoriteState extends State<Favorite> {
                     builder: (context) {
                       return Material(
                         color: Colors.transparent,
-                        child: NeuCard(
-                          width: double.infinity,
-                          bevel: 5,
-                          curveType: CurveType.emboss,
-                          decoration: NeumorphicDecoration(
-                              color: Theme.of(context).scaffoldBackgroundColor,
-                              borderRadius: BorderRadius.vertical(
-                                  top: Radius.circular(22))),
+                        child: Card(
                           child: SafeArea(
                             top: false,
                             child: Padding(
@@ -104,7 +96,7 @@ class _FavoriteState extends State<Favorite> {
                                             (MediaQuery.of(context).size.width -
                                                     100) /
                                                 4,
-                                        child: NeuButton(
+                                        child: OutlinedButton(
                                           onPressed: () async {
                                             debugPrint(favorite['path']);
                                             TextEditingController
@@ -125,23 +117,10 @@ class _FavoriteState extends State<Favorite> {
                                                         MainAxisAlignment
                                                             .center,
                                                     children: [
-                                                      NeuCard(
-                                                        width: double.infinity,
+                                                      Card(
                                                         margin: EdgeInsets
                                                             .symmetric(
                                                                 horizontal: 50),
-                                                        curveType:
-                                                            CurveType.emboss,
-                                                        bevel: 5,
-                                                        decoration:
-                                                            NeumorphicDecoration(
-                                                          color: Theme.of(
-                                                                  context)
-                                                              .scaffoldBackgroundColor,
-                                                          borderRadius:
-                                                              BorderRadius
-                                                                  .circular(25),
-                                                        ),
                                                         child: Padding(
                                                           padding:
                                                               EdgeInsets.all(
@@ -160,44 +139,29 @@ class _FavoriteState extends State<Favorite> {
                                                               SizedBox(
                                                                 height: 16,
                                                               ),
-                                                              NeuCard(
-                                                                decoration:
-                                                                    NeumorphicDecoration(
-                                                                  color: Theme.of(
-                                                                          context)
-                                                                      .scaffoldBackgroundColor,
-                                                                  borderRadius:
-                                                                      BorderRadius
-                                                                          .circular(
-                                                                              20),
-                                                                ),
-                                                                bevel: 20,
-                                                                curveType:
-                                                                    CurveType
-                                                                        .flat,
-                                                                padding: EdgeInsets
-                                                                    .symmetric(
-                                                                        horizontal:
-                                                                            20,
-                                                                        vertical:
-                                                                            5),
-                                                                child:
-                                                                    TextField(
-                                                                  onChanged:
-                                                                      (v) =>
-                                                                          name =
-                                                                              v,
-                                                                  controller:
-                                                                      nameController,
-                                                                  decoration:
-                                                                      InputDecoration(
-                                                                    border:
-                                                                        InputBorder
-                                                                            .none,
-                                                                    hintText:
-                                                                        "请输入新的名称",
-                                                                    labelText:
-                                                                        "文件名",
+                                                              Card(
+                                                                child: Padding(
+                                                                  padding:
+                                                                      const EdgeInsets
+                                                                          .all(
+                                                                          8.0),
+                                                                  child:
+                                                                      TextField(
+                                                                    onChanged:
+                                                                        (v) =>
+                                                                            name =
+                                                                                v,
+                                                                    controller:
+                                                                        nameController,
+                                                                    decoration:
+                                                                        InputDecoration(
+                                                                      border: InputBorder
+                                                                          .none,
+                                                                      hintText:
+                                                                          "请输入新的名称",
+                                                                      labelText:
+                                                                          "文件名",
+                                                                    ),
                                                                   ),
                                                                 ),
                                                               ),
@@ -208,7 +172,7 @@ class _FavoriteState extends State<Favorite> {
                                                                 children: [
                                                                   Expanded(
                                                                     child:
-                                                                        NeuButton(
+                                                                        OutlinedButton(
                                                                       onPressed:
                                                                           () async {
                                                                         if (name.trim() ==
@@ -237,17 +201,6 @@ class _FavoriteState extends State<Favorite> {
                                                                           }
                                                                         }
                                                                       },
-                                                                      decoration:
-                                                                          NeumorphicDecoration(
-                                                                        color: Theme.of(context)
-                                                                            .scaffoldBackgroundColor,
-                                                                        borderRadius:
-                                                                            BorderRadius.circular(25),
-                                                                      ),
-                                                                      bevel: 20,
-                                                                      padding: EdgeInsets.symmetric(
-                                                                          vertical:
-                                                                              10),
                                                                       child:
                                                                           Text(
                                                                         "确定",
@@ -262,23 +215,12 @@ class _FavoriteState extends State<Favorite> {
                                                                   ),
                                                                   Expanded(
                                                                     child:
-                                                                        NeuButton(
+                                                                        OutlinedButton(
                                                                       onPressed:
                                                                           () async {
                                                                         Navigator.of(context)
                                                                             .pop();
                                                                       },
-                                                                      decoration:
-                                                                          NeumorphicDecoration(
-                                                                        color: Theme.of(context)
-                                                                            .scaffoldBackgroundColor,
-                                                                        borderRadius:
-                                                                            BorderRadius.circular(25),
-                                                                      ),
-                                                                      bevel: 20,
-                                                                      padding: EdgeInsets.symmetric(
-                                                                          vertical:
-                                                                              10),
                                                                       child:
                                                                           Text(
                                                                         "取消",
@@ -300,15 +242,6 @@ class _FavoriteState extends State<Favorite> {
                                               },
                                             );
                                           },
-                                          decoration: NeumorphicDecoration(
-                                            color: Theme.of(context)
-                                                .scaffoldBackgroundColor,
-                                            borderRadius:
-                                                BorderRadius.circular(25),
-                                          ),
-                                          bevel: 20,
-                                          padding: EdgeInsets.symmetric(
-                                              vertical: 10),
                                           child: Column(
                                             children: [
                                               Image.asset(
@@ -328,7 +261,7 @@ class _FavoriteState extends State<Favorite> {
                                             (MediaQuery.of(context).size.width -
                                                     100) /
                                                 4,
-                                        child: NeuButton(
+                                        child: OutlinedButton(
                                           onPressed: () async {
                                             Navigator.of(context).pop();
                                             Util.vibrate(FeedbackType.warning);
@@ -337,148 +270,103 @@ class _FavoriteState extends State<Favorite> {
                                               builder: (context) {
                                                 return Material(
                                                   color: Colors.transparent,
-                                                  child: NeuCard(
-                                                    width: double.infinity,
-                                                    padding: EdgeInsets.all(22),
-                                                    bevel: 5,
-                                                    curveType: CurveType.emboss,
-                                                    decoration: NeumorphicDecoration(
-                                                        color: Theme.of(context)
-                                                            .scaffoldBackgroundColor,
-                                                        borderRadius:
-                                                            BorderRadius.vertical(
-                                                                top: Radius
-                                                                    .circular(
-                                                                        22))),
-                                                    child: Column(
-                                                      mainAxisSize:
-                                                          MainAxisSize.min,
-                                                      children: <Widget>[
-                                                        Text(
-                                                          "取消收藏",
-                                                          style: TextStyle(
-                                                              fontSize: 20,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w500),
-                                                        ),
-                                                        SizedBox(
-                                                          height: 12,
-                                                        ),
-                                                        Text(
-                                                          "确定取消收藏？",
-                                                          style: TextStyle(
-                                                              fontSize: 20,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w400),
-                                                        ),
-                                                        SizedBox(
-                                                          height: 22,
-                                                        ),
-                                                        Row(
-                                                          children: [
-                                                            Expanded(
-                                                              child: NeuButton(
-                                                                onPressed:
-                                                                    () async {
-                                                                  Navigator.of(
-                                                                          context)
-                                                                      .pop();
-                                                                  var res = await Api
-                                                                      .favoriteDelete(
-                                                                          favorite[
-                                                                              'path']);
-                                                                  if (res[
-                                                                      'success']) {
-                                                                    Util.vibrate(
-                                                                        FeedbackType
-                                                                            .light);
-                                                                    Util.toast(
-                                                                        "取消收藏成功");
-                                                                    getData();
-                                                                  }
-                                                                },
-                                                                decoration:
-                                                                    NeumorphicDecoration(
-                                                                  color: Theme.of(
-                                                                          context)
-                                                                      .scaffoldBackgroundColor,
-                                                                  borderRadius:
-                                                                      BorderRadius
-                                                                          .circular(
-                                                                              25),
-                                                                ),
-                                                                bevel: 5,
-                                                                padding: EdgeInsets
-                                                                    .symmetric(
-                                                                        vertical:
-                                                                            10),
-                                                                child: Text(
-                                                                  "取消收藏",
-                                                                  style: TextStyle(
-                                                                      fontSize:
-                                                                          18,
-                                                                      color: Colors
-                                                                          .redAccent),
+                                                  child: Card(
+                                                    child: Padding(
+                                                      padding:
+                                                          const EdgeInsets.all(
+                                                              8.0),
+                                                      child: Column(
+                                                        mainAxisSize:
+                                                            MainAxisSize.min,
+                                                        children: <Widget>[
+                                                          Text(
+                                                            "取消收藏",
+                                                            style: TextStyle(
+                                                                fontSize: 20,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w500),
+                                                          ),
+                                                          SizedBox(
+                                                            height: 12,
+                                                          ),
+                                                          Text(
+                                                            "确定取消收藏？",
+                                                            style: TextStyle(
+                                                                fontSize: 20,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w400),
+                                                          ),
+                                                          SizedBox(
+                                                            height: 22,
+                                                          ),
+                                                          Row(
+                                                            children: [
+                                                              Expanded(
+                                                                child:
+                                                                    OutlinedButton(
+                                                                  onPressed:
+                                                                      () async {
+                                                                    Navigator.of(
+                                                                            context)
+                                                                        .pop();
+                                                                    var res = await Api
+                                                                        .favoriteDelete(
+                                                                            favorite['path']);
+                                                                    if (res[
+                                                                        'success']) {
+                                                                      Util.vibrate(
+                                                                          FeedbackType
+                                                                              .light);
+                                                                      Util.toast(
+                                                                          "取消收藏成功");
+                                                                      getData();
+                                                                    }
+                                                                  },
+                                                                  child: Text(
+                                                                    "取消收藏",
+                                                                    style: TextStyle(
+                                                                        fontSize:
+                                                                            18,
+                                                                        color: Colors
+                                                                            .redAccent),
+                                                                  ),
                                                                 ),
                                                               ),
-                                                            ),
-                                                            SizedBox(
-                                                              width: 20,
-                                                            ),
-                                                            Expanded(
-                                                              child: NeuButton(
-                                                                onPressed:
-                                                                    () async {
-                                                                  Navigator.of(
-                                                                          context)
-                                                                      .pop();
-                                                                },
-                                                                decoration:
-                                                                    NeumorphicDecoration(
-                                                                  color: Theme.of(
-                                                                          context)
-                                                                      .scaffoldBackgroundColor,
-                                                                  borderRadius:
-                                                                      BorderRadius
-                                                                          .circular(
-                                                                              25),
-                                                                ),
-                                                                bevel: 5,
-                                                                padding: EdgeInsets
-                                                                    .symmetric(
-                                                                        vertical:
-                                                                            10),
-                                                                child: Text(
-                                                                  "取消",
-                                                                  style: TextStyle(
-                                                                      fontSize:
-                                                                          18),
+                                                              SizedBox(
+                                                                width: 20,
+                                                              ),
+                                                              Expanded(
+                                                                child:
+                                                                    OutlinedButton(
+                                                                  onPressed:
+                                                                      () async {
+                                                                    Navigator.of(
+                                                                            context)
+                                                                        .pop();
+                                                                  },
+                                                                  child: Text(
+                                                                    "取消",
+                                                                    style: TextStyle(
+                                                                        fontSize:
+                                                                            18),
+                                                                  ),
                                                                 ),
                                                               ),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                        SizedBox(
-                                                          height: 8,
-                                                        ),
-                                                      ],
+                                                            ],
+                                                          ),
+                                                          SizedBox(
+                                                            height: 8,
+                                                          ),
+                                                        ],
+                                                      ),
                                                     ),
                                                   ),
                                                 );
                                               },
                                             );
                                           },
-                                          decoration: NeumorphicDecoration(
-                                            color: Theme.of(context)
-                                                .scaffoldBackgroundColor,
-                                            borderRadius:
-                                                BorderRadius.circular(10),
-                                          ),
-                                          bevel: 20,
-                                          padding: EdgeInsets.symmetric(
-                                              vertical: 10),
                                           child: Column(
                                             children: [
                                               Image.asset(
@@ -498,17 +386,10 @@ class _FavoriteState extends State<Favorite> {
                                   SizedBox(
                                     height: 16,
                                   ),
-                                  NeuButton(
+                                  OutlinedButton(
                                     onPressed: () async {
                                       Navigator.of(context).pop();
                                     },
-                                    decoration: NeumorphicDecoration(
-                                      color: Theme.of(context)
-                                          .scaffoldBackgroundColor,
-                                      borderRadius: BorderRadius.circular(25),
-                                    ),
-                                    bevel: 20,
-                                    padding: EdgeInsets.symmetric(vertical: 10),
                                     child: Text(
                                       "取消",
                                       style: TextStyle(fontSize: 18),
@@ -527,13 +408,6 @@ class _FavoriteState extends State<Favorite> {
                   );
                 },
                 // padding: EdgeInsets.zero,
-                padding: EdgeInsets.only(left: 6, right: 4, top: 5, bottom: 5),
-                decoration: NeumorphicDecoration(
-                  // color: Colors.red,
-                  color: Theme.of(context).scaffoldBackgroundColor,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                bevel: 10,
                 child: Icon(
                   CupertinoIcons.right_chevron,
                   size: 18,
@@ -542,12 +416,6 @@ class _FavoriteState extends State<Favorite> {
             ],
           ),
         ),
-        padding: EdgeInsets.zero,
-        decoration: NeumorphicDecoration(
-          color: Theme.of(context).scaffoldBackgroundColor,
-          borderRadius: BorderRadius.circular(20),
-        ),
-        bevel: 20,
       ),
     );
   }
@@ -560,17 +428,8 @@ class _FavoriteState extends State<Favorite> {
       color: Theme.of(context).scaffoldBackgroundColor,
       child: favoriteLoading
           ? Center(
-              child: NeuCard(
-                padding: EdgeInsets.all(50),
-                curveType: CurveType.flat,
-                decoration: NeumorphicDecoration(
-                  color: Theme.of(context).scaffoldBackgroundColor,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                bevel: 20,
-                child: CupertinoActivityIndicator(
-                  radius: 14,
-                ),
+              child: CupertinoActivityIndicator(
+                radius: 14,
               ),
             )
           : Container(

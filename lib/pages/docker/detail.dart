@@ -5,7 +5,6 @@ import 'package:dsm_helper/widgets/label.dart';
 import 'package:dsm_helper/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:neumorphic/neumorphic.dart';
 
 class ContainerDetail extends StatefulWidget {
   final String name;
@@ -219,15 +218,8 @@ class _ContainerDetailState extends State<ContainerDetail>
   }
 
   Widget _buildProcessItem(process) {
-    return NeuCard(
-      width: double.infinity,
-      decoration: NeumorphicDecoration(
-        color: Theme.of(context).scaffoldBackgroundColor,
-        borderRadius: BorderRadius.circular(20),
-      ),
+    return Card(
       margin: EdgeInsets.symmetric(horizontal: 20),
-      curveType: CurveType.flat,
-      bevel: 10,
       child: Padding(
         padding: EdgeInsets.all(20),
         child: Column(
@@ -266,14 +258,7 @@ class _ContainerDetailState extends State<ContainerDetail>
   }
 
   Widget _buildLogItem(log) {
-    return NeuCard(
-      width: double.infinity,
-      decoration: NeumorphicDecoration(
-        color: Theme.of(context).scaffoldBackgroundColor,
-        borderRadius: BorderRadius.circular(20),
-      ),
-      curveType: CurveType.flat,
-      bevel: 10,
+    return Card(
       child: Padding(
         padding: EdgeInsets.all(20),
         child: Column(
@@ -308,14 +293,7 @@ class _ContainerDetailState extends State<ContainerDetail>
         });
         getLog();
       },
-      child: NeuCard(
-        width: double.infinity,
-        decoration: NeumorphicDecoration(
-          color: Theme.of(context).scaffoldBackgroundColor,
-          borderRadius: BorderRadius.circular(20),
-        ),
-        curveType: date == selectedDate ? CurveType.emboss : CurveType.flat,
-        bevel: 10,
+      child: Card(
         child: Padding(
           padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
           child: Column(
@@ -343,31 +321,16 @@ class _ContainerDetailState extends State<ContainerDetail>
       ),
       body: loading
           ? Center(
-              child: NeuCard(
-                padding: EdgeInsets.all(50),
-                curveType: CurveType.flat,
-                decoration: NeumorphicDecoration(
-                  color: Theme.of(context).scaffoldBackgroundColor,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                bevel: 20,
-                child: CupertinoActivityIndicator(
-                  radius: 14,
-                ),
+              child: CupertinoActivityIndicator(
+                radius: 14,
               ),
             )
           : Column(
               children: [
-                NeuCard(
-                  width: double.infinity,
-                  decoration: NeumorphicDecoration(
-                    color: Theme.of(context).scaffoldBackgroundColor,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
+                Card(
                   margin: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-                  curveType: CurveType.flat,
-                  bevel: 10,
                   child: TabBar(
+                    dividerHeight: 0,
                     isScrollable: false,
                     controller: _tabController,
                     indicatorSize: TabBarIndicatorSize.label,
@@ -405,15 +368,9 @@ class _ContainerDetailState extends State<ContainerDetail>
                     children: [
                       ListView(
                         children: [
-                          NeuCard(
+                          Card(
                             margin: EdgeInsets.symmetric(
                                 horizontal: 20, vertical: 10),
-                            decoration: NeumorphicDecoration(
-                              color: Theme.of(context).scaffoldBackgroundColor,
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            curveType: CurveType.flat,
-                            bevel: 20,
                             child: Padding(
                               padding: EdgeInsets.symmetric(
                                   horizontal: 20, vertical: 15),
@@ -513,15 +470,9 @@ class _ContainerDetailState extends State<ContainerDetail>
                               ),
                             ),
                           ),
-                          NeuCard(
+                          Card(
                             margin: EdgeInsets.symmetric(
                                 horizontal: 20, vertical: 10),
-                            decoration: NeumorphicDecoration(
-                              color: Theme.of(context).scaffoldBackgroundColor,
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            curveType: CurveType.flat,
-                            bevel: 20,
                             child: Padding(
                               padding: EdgeInsets.symmetric(
                                   horizontal: 20, vertical: 15),
@@ -564,15 +515,9 @@ class _ContainerDetailState extends State<ContainerDetail>
                               ),
                             ),
                           ),
-                          NeuCard(
+                          Card(
                             margin: EdgeInsets.symmetric(
                                 horizontal: 20, vertical: 10),
-                            decoration: NeumorphicDecoration(
-                              color: Theme.of(context).scaffoldBackgroundColor,
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            curveType: CurveType.flat,
-                            bevel: 20,
                             child: Padding(
                               padding: EdgeInsets.symmetric(
                                   horizontal: 20, vertical: 15),
@@ -617,15 +562,9 @@ class _ContainerDetailState extends State<ContainerDetail>
                               ),
                             ),
                           ),
-                          NeuCard(
+                          Card(
                             margin: EdgeInsets.symmetric(
                                 horizontal: 20, vertical: 10),
-                            decoration: NeumorphicDecoration(
-                              color: Theme.of(context).scaffoldBackgroundColor,
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            curveType: CurveType.flat,
-                            bevel: 20,
                             child: Padding(
                               padding: EdgeInsets.symmetric(
                                   horizontal: 20, vertical: 15),
@@ -662,15 +601,9 @@ class _ContainerDetailState extends State<ContainerDetail>
                               ),
                             ),
                           ),
-                          NeuCard(
+                          Card(
                             margin: EdgeInsets.symmetric(
                                 horizontal: 20, vertical: 10),
-                            decoration: NeumorphicDecoration(
-                              color: Theme.of(context).scaffoldBackgroundColor,
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            curveType: CurveType.flat,
-                            bevel: 20,
                             child: Padding(
                               padding: EdgeInsets.symmetric(
                                   horizontal: 20, vertical: 15),
@@ -707,15 +640,9 @@ class _ContainerDetailState extends State<ContainerDetail>
                               ),
                             ),
                           ),
-                          NeuCard(
+                          Card(
                             margin: EdgeInsets.symmetric(
                                 horizontal: 20, vertical: 10),
-                            decoration: NeumorphicDecoration(
-                              color: Theme.of(context).scaffoldBackgroundColor,
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            curveType: CurveType.flat,
-                            bevel: 20,
                             child: Padding(
                               padding: EdgeInsets.symmetric(
                                   horizontal: 20, vertical: 15),

@@ -18,7 +18,6 @@ import 'package:local_auth/error_codes.dart' as auth_error;
 import 'package:local_auth/local_auth.dart';
 import 'package:local_auth_android/local_auth_android.dart';
 import 'package:local_auth_darwin/local_auth_darwin.dart';
-import 'package:neumorphic/neumorphic.dart';
 import 'package:provider/provider.dart';
 
 class HelperSetting extends StatefulWidget {
@@ -100,13 +99,7 @@ class _HelperSettingState extends State<HelperSetting> {
                 }
               });
             },
-            child: NeuCard(
-              decoration: NeumorphicDecoration(
-                color: Theme.of(context).scaffoldBackgroundColor,
-                borderRadius: BorderRadius.circular(20),
-              ),
-              curveType: Util.vibrateOn ? CurveType.emboss : CurveType.flat,
-              bevel: 20,
+            child: Card(
               child: Padding(
                 padding: EdgeInsets.all(20),
                 child: Column(
@@ -133,14 +126,8 @@ class _HelperSettingState extends State<HelperSetting> {
                       ],
                     ),
                     if (Util.vibrateOn)
-                      NeuCard(
+                      Card(
                         margin: EdgeInsets.only(top: 20),
-                        decoration: NeumorphicDecoration(
-                          color: Theme.of(context).scaffoldBackgroundColor,
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        curveType: CurveType.flat,
-                        bevel: 20,
                         child: Padding(
                           padding: EdgeInsets.all(20),
                           child: Column(
@@ -156,32 +143,25 @@ class _HelperSettingState extends State<HelperSetting> {
                                     }
                                   });
                                 },
-                                child: NeuCard(
+                                child: Card(
                                   // margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                                  padding: EdgeInsets.all(20),
-                                  decoration: NeumorphicDecoration(
-                                    color: Theme.of(context)
-                                        .scaffoldBackgroundColor,
-                                    borderRadius: BorderRadius.circular(20),
-                                  ),
-                                  curveType: Util.vibrateNormal
-                                      ? CurveType.emboss
-                                      : CurveType.flat,
-                                  bevel: 20,
-                                  child: Row(
-                                    children: [
-                                      Text(
-                                        "基础操作震动",
-                                        style: TextStyle(
-                                            fontSize: 16, height: 1.6),
-                                      ),
-                                      Spacer(),
-                                      if (Util.vibrateNormal)
-                                        Icon(
-                                          CupertinoIcons.checkmark_alt,
-                                          color: Color(0xffff9813),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Row(
+                                      children: [
+                                        Text(
+                                          "基础操作震动",
+                                          style: TextStyle(
+                                              fontSize: 16, height: 1.6),
                                         ),
-                                    ],
+                                        Spacer(),
+                                        if (Util.vibrateNormal)
+                                          Icon(
+                                            CupertinoIcons.checkmark_alt,
+                                            color: Color(0xffff9813),
+                                          ),
+                                      ],
+                                    ),
                                   ),
                                 ),
                               ),
@@ -199,32 +179,25 @@ class _HelperSettingState extends State<HelperSetting> {
                                     }
                                   });
                                 },
-                                child: NeuCard(
+                                child: Card(
                                   // margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                                  padding: EdgeInsets.all(20),
-                                  decoration: NeumorphicDecoration(
-                                    color: Theme.of(context)
-                                        .scaffoldBackgroundColor,
-                                    borderRadius: BorderRadius.circular(20),
-                                  ),
-                                  curveType: Util.vibrateWarning
-                                      ? CurveType.emboss
-                                      : CurveType.flat,
-                                  bevel: 20,
-                                  child: Row(
-                                    children: [
-                                      Text(
-                                        "敏感操作震动",
-                                        style: TextStyle(
-                                            fontSize: 16, height: 1.6),
-                                      ),
-                                      Spacer(),
-                                      if (Util.vibrateWarning)
-                                        Icon(
-                                          CupertinoIcons.checkmark_alt,
-                                          color: Color(0xffff9813),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Row(
+                                      children: [
+                                        Text(
+                                          "敏感操作震动",
+                                          style: TextStyle(
+                                              fontSize: 16, height: 1.6),
                                         ),
-                                    ],
+                                        Spacer(),
+                                        if (Util.vibrateWarning)
+                                          Icon(
+                                            CupertinoIcons.checkmark_alt,
+                                            color: Color(0xffff9813),
+                                          ),
+                                      ],
+                                    ),
                                   ),
                                 ),
                               ),
@@ -247,35 +220,31 @@ class _HelperSettingState extends State<HelperSetting> {
                 Util.setStorage("video_player", videoPlayer ? "1" : "0");
               });
             },
-            child: NeuCard(
+            child: Card(
               // margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-              padding: EdgeInsets.all(20),
-              decoration: NeumorphicDecoration(
-                color: Theme.of(context).scaffoldBackgroundColor,
-                borderRadius: BorderRadius.circular(20),
-              ),
-              curveType: videoPlayer ? CurveType.emboss : CurveType.flat,
-              bevel: 20,
-              child: Row(
-                children: [
-                  Image.asset(
-                    "assets/icons/player.png",
-                    width: 25,
-                  ),
-                  SizedBox(
-                    width: 8,
-                  ),
-                  Text(
-                    "始终使用第三方播放器",
-                    style: TextStyle(fontSize: 16, height: 1.6),
-                  ),
-                  Spacer(),
-                  if (videoPlayer)
-                    Icon(
-                      CupertinoIcons.checkmark_alt,
-                      color: Color(0xffff9813),
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  children: [
+                    Image.asset(
+                      "assets/icons/player.png",
+                      width: 25,
                     ),
-                ],
+                    SizedBox(
+                      width: 8,
+                    ),
+                    Text(
+                      "始终使用第三方播放器",
+                      style: TextStyle(fontSize: 16, height: 1.6),
+                    ),
+                    Spacer(),
+                    if (videoPlayer)
+                      Icon(
+                        CupertinoIcons.checkmark_alt,
+                        color: Color(0xffff9813),
+                      ),
+                  ],
+                ),
               ),
             ),
           ),
@@ -299,31 +268,27 @@ class _HelperSettingState extends State<HelperSetting> {
                   },
                 );
               },
-              child: NeuCard(
+              child: Card(
                 // margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                padding: EdgeInsets.all(20),
-                decoration: NeumorphicDecoration(
-                  color: Theme.of(context).scaffoldBackgroundColor,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                curveType: CurveType.flat,
-                bevel: 20,
-                child: Row(
-                  children: [
-                    Image.asset(
-                      "assets/icons/player.png",
-                      width: 25,
-                    ),
-                    SizedBox(
-                      width: 8,
-                    ),
-                    Text(
-                      "控制台/资源监控更新频率",
-                      style: TextStyle(fontSize: 16, height: 1.6),
-                    ),
-                    Spacer(),
-                    Text("${settingProvider.refreshDuration}秒")
-                  ],
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Row(
+                    children: [
+                      Image.asset(
+                        "assets/icons/player.png",
+                        width: 25,
+                      ),
+                      SizedBox(
+                        width: 8,
+                      ),
+                      Text(
+                        "控制台/资源监控更新频率",
+                        style: TextStyle(fontSize: 16, height: 1.6),
+                      ),
+                      Spacer(),
+                      Text("${settingProvider.refreshDuration}秒")
+                    ],
+                  ),
                 ),
               ),
             );
@@ -339,35 +304,31 @@ class _HelperSettingState extends State<HelperSetting> {
                     "launch_account_page", launchAccountPage ? "1" : "0");
               });
             },
-            child: NeuCard(
+            child: Card(
               // margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-              padding: EdgeInsets.all(20),
-              decoration: NeumorphicDecoration(
-                color: Theme.of(context).scaffoldBackgroundColor,
-                borderRadius: BorderRadius.circular(20),
-              ),
-              curveType: launchAccountPage ? CurveType.emboss : CurveType.flat,
-              bevel: 20,
-              child: Row(
-                children: [
-                  Image.asset(
-                    "assets/icons/change.png",
-                    width: 25,
-                  ),
-                  SizedBox(
-                    width: 8,
-                  ),
-                  Text(
-                    "启动时默认进入选择账号页面",
-                    style: TextStyle(fontSize: 16, height: 1.6),
-                  ),
-                  Spacer(),
-                  if (launchAccountPage)
-                    Icon(
-                      CupertinoIcons.checkmark_alt,
-                      color: Color(0xffff9813),
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  children: [
+                    Image.asset(
+                      "assets/icons/change.png",
+                      width: 25,
                     ),
-                ],
+                    SizedBox(
+                      width: 8,
+                    ),
+                    Text(
+                      "启动时默认进入选择账号页面",
+                      style: TextStyle(fontSize: 16, height: 1.6),
+                    ),
+                    Spacer(),
+                    if (launchAccountPage)
+                      Icon(
+                        CupertinoIcons.checkmark_alt,
+                        color: Color(0xffff9813),
+                      ),
+                  ],
+                ),
               ),
             ),
           ),
@@ -381,13 +342,7 @@ class _HelperSettingState extends State<HelperSetting> {
                 Util.setStorage("launch_auth", launchAuth ? "1" : "0");
               });
             },
-            child: NeuCard(
-              decoration: NeumorphicDecoration(
-                color: Theme.of(context).scaffoldBackgroundColor,
-                borderRadius: BorderRadius.circular(20),
-              ),
-              curveType: launchAuth ? CurveType.emboss : CurveType.flat,
-              bevel: 20,
+            child: Card(
               child: Padding(
                 padding: EdgeInsets.all(20),
                 child: Column(
@@ -414,14 +369,8 @@ class _HelperSettingState extends State<HelperSetting> {
                       ],
                     ),
                     if (launchAuth)
-                      NeuCard(
+                      Card(
                         margin: EdgeInsets.only(top: 20),
-                        decoration: NeumorphicDecoration(
-                          color: Theme.of(context).scaffoldBackgroundColor,
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        curveType: CurveType.flat,
-                        bevel: 20,
                         child: Padding(
                           padding: EdgeInsets.all(20),
                           child: Column(
@@ -458,36 +407,29 @@ class _HelperSettingState extends State<HelperSetting> {
                                     // Util.setStorage("launch_password", password ? "1" : "0");
                                   });
                                 },
-                                child: NeuCard(
+                                child: Card(
                                   // margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                                  padding: EdgeInsets.all(20),
-                                  decoration: NeumorphicDecoration(
-                                    color: Theme.of(context)
-                                        .scaffoldBackgroundColor,
-                                    borderRadius: BorderRadius.circular(20),
-                                  ),
-                                  curveType: password
-                                      ? CurveType.emboss
-                                      : CurveType.flat,
-                                  bevel: 20,
-                                  child: Column(
-                                    children: [
-                                      Row(
-                                        children: [
-                                          Text(
-                                            "图形密码",
-                                            style: TextStyle(
-                                                fontSize: 16, height: 1.6),
-                                          ),
-                                          Spacer(),
-                                          if (password)
-                                            Icon(
-                                              CupertinoIcons.checkmark_alt,
-                                              color: Color(0xffff9813),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Column(
+                                      children: [
+                                        Row(
+                                          children: [
+                                            Text(
+                                              "图形密码",
+                                              style: TextStyle(
+                                                  fontSize: 16, height: 1.6),
                                             ),
-                                        ],
-                                      ),
-                                    ],
+                                            Spacer(),
+                                            if (password)
+                                              Icon(
+                                                CupertinoIcons.checkmark_alt,
+                                                color: Color(0xffff9813),
+                                              ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ),
                               ),
@@ -568,36 +510,29 @@ class _HelperSettingState extends State<HelperSetting> {
                                     //   Util.setStorage("launch_biometrics", biometrics ? "1" : "0");
                                     // });
                                   },
-                                  child: NeuCard(
+                                  child: Card(
                                     // margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                                    padding: EdgeInsets.all(20),
-                                    decoration: NeumorphicDecoration(
-                                      color: Theme.of(context)
-                                          .scaffoldBackgroundColor,
-                                      borderRadius: BorderRadius.circular(20),
-                                    ),
-                                    curveType: biometrics
-                                        ? CurveType.emboss
-                                        : CurveType.flat,
-                                    bevel: 20,
-                                    child: Column(
-                                      children: [
-                                        Row(
-                                          children: [
-                                            Text(
-                                              "${biometricTypeName[biometricsType]}验证",
-                                              style: TextStyle(
-                                                  fontSize: 16, height: 1.6),
-                                            ),
-                                            Spacer(),
-                                            if (biometrics)
-                                              Icon(
-                                                CupertinoIcons.checkmark_alt,
-                                                color: Color(0xffff9813),
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Column(
+                                        children: [
+                                          Row(
+                                            children: [
+                                              Text(
+                                                "${biometricTypeName[biometricsType]}验证",
+                                                style: TextStyle(
+                                                    fontSize: 16, height: 1.6),
                                               ),
-                                          ],
-                                        ),
-                                      ],
+                                              Spacer(),
+                                              if (biometrics)
+                                                Icon(
+                                                  CupertinoIcons.checkmark_alt,
+                                                  color: Color(0xffff9813),
+                                                ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -615,7 +550,7 @@ class _HelperSettingState extends State<HelperSetting> {
             SizedBox(
               height: 20,
             ),
-            NeuButton(
+            OutlinedButton(
               onPressed: () {
                 Navigator.of(context).push(CupertinoPageRoute(
                     builder: (context) {
@@ -624,12 +559,6 @@ class _HelperSettingState extends State<HelperSetting> {
                     settings: RouteSettings(name: "logout")));
               },
               // margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-              padding: EdgeInsets.all(20),
-              decoration: NeumorphicDecoration(
-                color: Theme.of(context).scaffoldBackgroundColor,
-                borderRadius: BorderRadius.circular(20),
-              ),
-              bevel: 20,
               child: Row(
                 children: [
                   Image.asset(
@@ -650,7 +579,7 @@ class _HelperSettingState extends State<HelperSetting> {
           SizedBox(
             height: 20,
           ),
-          NeuButton(
+          OutlinedButton(
             onPressed: () {
               var hide = showWeuiLoadingToast(context: context);
               clearDiskCachedImages();
@@ -658,12 +587,6 @@ class _HelperSettingState extends State<HelperSetting> {
               Util.toast("图片缓存清理完成");
             },
             // margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-            padding: EdgeInsets.all(20),
-            decoration: NeumorphicDecoration(
-              color: Theme.of(context).scaffoldBackgroundColor,
-              borderRadius: BorderRadius.circular(20),
-            ),
-            bevel: 20,
             child: Row(
               children: [
                 Image.asset(
@@ -683,7 +606,7 @@ class _HelperSettingState extends State<HelperSetting> {
           SizedBox(
             height: 20,
           ),
-          NeuButton(
+          OutlinedButton(
             onPressed: () {
               Navigator.of(context).push(CupertinoPageRoute(
                   builder: (context) {
@@ -692,12 +615,6 @@ class _HelperSettingState extends State<HelperSetting> {
                   settings: RouteSettings(name: "about")));
             },
             // margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-            padding: EdgeInsets.all(20),
-            decoration: NeumorphicDecoration(
-              color: Theme.of(context).scaffoldBackgroundColor,
-              borderRadius: BorderRadius.circular(20),
-            ),
-            bevel: 20,
             child: Row(
               children: [
                 Image.asset(
@@ -718,7 +635,7 @@ class _HelperSettingState extends State<HelperSetting> {
             height: 20,
           ),
           if (Util.notReviewAccount)
-            NeuButton(
+            OutlinedButton(
               onPressed: () {
                 Navigator.of(context).push(CupertinoPageRoute(
                     builder: (context) {
@@ -727,12 +644,6 @@ class _HelperSettingState extends State<HelperSetting> {
                     settings: RouteSettings(name: "vip")));
               },
               // margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-              padding: EdgeInsets.all(20),
-              decoration: NeumorphicDecoration(
-                color: Theme.of(context).scaffoldBackgroundColor,
-                borderRadius: BorderRadius.circular(20),
-              ),
-              bevel: 20,
               child: Row(
                 children: [
                   Image.asset(

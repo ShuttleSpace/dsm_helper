@@ -1,6 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:neumorphic/neumorphic.dart';
 
 typedef CallBack = Function(int);
 
@@ -26,40 +25,21 @@ class _NeuPickerState extends State<NeuPicker> {
   @override
   Widget build(BuildContext context) {
     return Material(
-      child: NeuCard(
-        height: 300,
-        decoration: NeumorphicDecoration(
-          color: Theme.of(context).scaffoldBackgroundColor,
-          borderRadius: BorderRadius.circular(20),
-        ),
-        bevel: 2,
-        curveType: CurveType.concave,
+      child: Card(
         child: Column(
           children: [
             Padding(
               padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
               child: Row(
                 children: [
-                  NeuButton(
-                    padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                    decoration: NeumorphicDecoration(
-                      color: Theme.of(context).scaffoldBackgroundColor,
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    bevel: 10,
+                  OutlinedButton(
                     onPressed: () {
                       Navigator.of(context).pop();
                     },
                     child: Text("取消"),
                   ),
                   Spacer(),
-                  NeuButton(
-                    padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                    decoration: NeumorphicDecoration(
-                      color: Theme.of(context).scaffoldBackgroundColor,
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    bevel: 10,
+                  OutlinedButton(
                     onPressed: () {
                       widget.onConfirm?.call(value);
                       Navigator.of(context).pop();

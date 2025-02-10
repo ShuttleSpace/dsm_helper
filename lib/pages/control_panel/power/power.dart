@@ -8,7 +8,6 @@ import 'package:dsm_helper/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_vibrate/flutter_vibrate.dart';
-import 'package:neumorphic/neumorphic.dart';
 
 class Power extends StatefulWidget {
   @override
@@ -184,14 +183,8 @@ class _PowerState extends State<Power> with SingleTickerProviderStateMixin {
           task['enabled'] = !task['enabled'];
         });
       },
-      child: NeuCard(
-        decoration: NeumorphicDecoration(
-          color: Theme.of(context).scaffoldBackgroundColor,
-          borderRadius: BorderRadius.circular(20),
-        ),
+      child: Card(
         margin: EdgeInsets.only(top: 20, left: 20, right: 20),
-        bevel: 10,
-        curveType: task['enabled'] ? CurveType.emboss : CurveType.flat,
         child: Padding(
           padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
           child: Row(
@@ -239,18 +232,12 @@ class _PowerState extends State<Power> with SingleTickerProviderStateMixin {
               ),
               Column(
                 children: [
-                  NeuButton(
+                  OutlinedButton(
                     onPressed: () {
                       setState(() {
                         powerTasks.remove(task);
                       });
                     },
-                    decoration: NeumorphicDecoration(
-                      color: Theme.of(context).scaffoldBackgroundColor,
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    padding: EdgeInsets.all(5),
-                    bevel: 5,
                     child: Icon(
                       Icons.remove_circle_outline,
                       color: Colors.red,
@@ -259,7 +246,7 @@ class _PowerState extends State<Power> with SingleTickerProviderStateMixin {
                   SizedBox(
                     height: 10,
                   ),
-                  NeuButton(
+                  OutlinedButton(
                     onPressed: () {
                       Navigator.of(context)
                           .push(CupertinoPageRoute(
@@ -287,12 +274,6 @@ class _PowerState extends State<Power> with SingleTickerProviderStateMixin {
                         }
                       });
                     },
-                    decoration: NeumorphicDecoration(
-                      color: Theme.of(context).scaffoldBackgroundColor,
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    padding: EdgeInsets.all(5),
-                    bevel: 5,
                     child: Icon(
                       Icons.edit_outlined,
                       color: Colors.orangeAccent,
@@ -316,31 +297,16 @@ class _PowerState extends State<Power> with SingleTickerProviderStateMixin {
       ),
       body: loading
           ? Center(
-              child: NeuCard(
-                padding: EdgeInsets.all(50),
-                curveType: CurveType.flat,
-                decoration: NeumorphicDecoration(
-                  color: Theme.of(context).scaffoldBackgroundColor,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                bevel: 20,
-                child: CupertinoActivityIndicator(
-                  radius: 14,
-                ),
+              child: CupertinoActivityIndicator(
+                radius: 14,
               ),
             )
           : Column(
               children: [
-                NeuCard(
-                  width: double.infinity,
-                  decoration: NeumorphicDecoration(
-                    color: Theme.of(context).scaffoldBackgroundColor,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
+                Card(
                   margin: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-                  curveType: CurveType.flat,
-                  bevel: 10,
                   child: TabBar(
+                    dividerHeight: 0,
                     isScrollable: true,
                     controller: _tabController,
                     indicatorSize: TabBarIndicatorSize.label,
@@ -386,16 +352,9 @@ class _PowerState extends State<Power> with SingleTickerProviderStateMixin {
                           Expanded(
                             child: ListView(
                               children: [
-                                NeuCard(
-                                  decoration: NeumorphicDecoration(
-                                    color: Theme.of(context)
-                                        .scaffoldBackgroundColor,
-                                    borderRadius: BorderRadius.circular(20),
-                                  ),
+                                Card(
                                   margin: EdgeInsets.only(
                                       top: 20, left: 20, right: 20),
-                                  bevel: 10,
-                                  curveType: CurveType.flat,
                                   child: Padding(
                                     padding: const EdgeInsets.all(20.0),
                                     child: Column(
@@ -421,32 +380,24 @@ class _PowerState extends State<Power> with SingleTickerProviderStateMixin {
                                                   enableZram = !enableZram;
                                                 });
                                               },
-                                              child: NeuCard(
-                                                decoration:
-                                                    NeumorphicDecoration(
-                                                  color: Theme.of(context)
-                                                      .scaffoldBackgroundColor,
-                                                  borderRadius:
-                                                      BorderRadius.circular(10),
-                                                ),
-                                                padding: EdgeInsets.all(10),
-                                                bevel: 10,
-                                                curveType: enableZram
-                                                    ? CurveType.emboss
-                                                    : CurveType.flat,
-                                                child: Row(
-                                                  children: [
-                                                    Text("启用内存压缩可提高系统响应性能"),
-                                                    Spacer(),
-                                                    if (enableZram)
-                                                      Icon(
-                                                        CupertinoIcons
-                                                            .checkmark_alt,
-                                                        color:
-                                                            Color(0xffff9813),
-                                                        size: 22,
-                                                      ),
-                                                  ],
+                                              child: Card(
+                                                child: Padding(
+                                                  padding:
+                                                      const EdgeInsets.all(8.0),
+                                                  child: Row(
+                                                    children: [
+                                                      Text("启用内存压缩可提高系统响应性能"),
+                                                      Spacer(),
+                                                      if (enableZram)
+                                                        Icon(
+                                                          CupertinoIcons
+                                                              .checkmark_alt,
+                                                          color:
+                                                              Color(0xffff9813),
+                                                          size: 22,
+                                                        ),
+                                                    ],
+                                                  ),
                                                 ),
                                               ),
                                             ),
@@ -456,16 +407,9 @@ class _PowerState extends State<Power> with SingleTickerProviderStateMixin {
                                     ),
                                   ),
                                 ),
-                                NeuCard(
-                                  decoration: NeumorphicDecoration(
-                                    color: Theme.of(context)
-                                        .scaffoldBackgroundColor,
-                                    borderRadius: BorderRadius.circular(20),
-                                  ),
+                                Card(
                                   margin: EdgeInsets.only(
                                       top: 20, left: 20, right: 20),
-                                  bevel: 10,
-                                  curveType: CurveType.flat,
                                   child: Padding(
                                     padding: const EdgeInsets.all(20.0),
                                     child: Column(
@@ -494,34 +438,25 @@ class _PowerState extends State<Power> with SingleTickerProviderStateMixin {
                                                           'rc_power_config'];
                                                 });
                                               },
-                                              child: NeuCard(
-                                                decoration:
-                                                    NeumorphicDecoration(
-                                                  color: Theme.of(context)
-                                                      .scaffoldBackgroundColor,
-                                                  borderRadius:
-                                                      BorderRadius.circular(10),
-                                                ),
-                                                padding: EdgeInsets.all(10),
-                                                bevel: 10,
-                                                curveType: powerRecovery[
-                                                        'rc_power_config']
-                                                    ? CurveType.emboss
-                                                    : CurveType.flat,
-                                                child: Row(
-                                                  children: [
-                                                    Text("修复电源问题后自动重新启动"),
-                                                    Spacer(),
-                                                    if (powerRecovery[
-                                                        'rc_power_config'])
-                                                      Icon(
-                                                        CupertinoIcons
-                                                            .checkmark_alt,
-                                                        color:
-                                                            Color(0xffff9813),
-                                                        size: 22,
-                                                      ),
-                                                  ],
+                                              child: Card(
+                                                child: Padding(
+                                                  padding:
+                                                      const EdgeInsets.all(8.0),
+                                                  child: Row(
+                                                    children: [
+                                                      Text("修复电源问题后自动重新启动"),
+                                                      Spacer(),
+                                                      if (powerRecovery[
+                                                          'rc_power_config'])
+                                                        Icon(
+                                                          CupertinoIcons
+                                                              .checkmark_alt,
+                                                          color:
+                                                              Color(0xffff9813),
+                                                          size: 22,
+                                                        ),
+                                                    ],
+                                                  ),
                                                 ),
                                               ),
                                             ),
@@ -546,37 +481,27 @@ class _PowerState extends State<Power> with SingleTickerProviderStateMixin {
                                                                 'wol$i'];
                                                       });
                                                     },
-                                                    child: NeuCard(
-                                                      decoration:
-                                                          NeumorphicDecoration(
-                                                        color: Theme.of(context)
-                                                            .scaffoldBackgroundColor,
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(10),
-                                                      ),
-                                                      padding:
-                                                          EdgeInsets.all(10),
-                                                      bevel: 10,
-                                                      curveType:
-                                                          powerRecovery['wol$i']
-                                                              ? CurveType.emboss
-                                                              : CurveType.flat,
-                                                      child: Row(
-                                                        children: [
-                                                          Text(
-                                                              "启用局域网 $i 的局域网唤醒"),
-                                                          Spacer(),
-                                                          if (powerRecovery[
-                                                              'wol$i'])
-                                                            Icon(
-                                                              CupertinoIcons
-                                                                  .checkmark_alt,
-                                                              color: Color(
-                                                                  0xffff9813),
-                                                              size: 22,
-                                                            ),
-                                                        ],
+                                                    child: Card(
+                                                      child: Padding(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .all(8.0),
+                                                        child: Row(
+                                                          children: [
+                                                            Text(
+                                                                "启用局域网 $i 的局域网唤醒"),
+                                                            Spacer(),
+                                                            if (powerRecovery[
+                                                                'wol$i'])
+                                                              Icon(
+                                                                CupertinoIcons
+                                                                    .checkmark_alt,
+                                                                color: Color(
+                                                                    0xffff9813),
+                                                                size: 22,
+                                                              ),
+                                                          ],
+                                                        ),
                                                       ),
                                                     ),
                                                   ),
@@ -587,16 +512,9 @@ class _PowerState extends State<Power> with SingleTickerProviderStateMixin {
                                     ),
                                   ),
                                 ),
-                                NeuCard(
-                                  decoration: NeumorphicDecoration(
-                                    color: Theme.of(context)
-                                        .scaffoldBackgroundColor,
-                                    borderRadius: BorderRadius.circular(20),
-                                  ),
+                                Card(
                                   margin: EdgeInsets.only(
                                       top: 20, left: 20, right: 20),
-                                  bevel: 10,
-                                  curveType: CurveType.flat,
                                   child: Padding(
                                     padding: const EdgeInsets.all(20.0),
                                     child: Column(
@@ -629,35 +547,26 @@ class _PowerState extends State<Power> with SingleTickerProviderStateMixin {
                                                             'fan_fail'];
                                                   });
                                                 },
-                                                child: NeuCard(
-                                                  decoration:
-                                                      NeumorphicDecoration(
-                                                    color: Theme.of(context)
-                                                        .scaffoldBackgroundColor,
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            10),
-                                                  ),
-                                                  padding: EdgeInsets.all(10),
-                                                  bevel: 10,
-                                                  curveType:
-                                                      beepControl['fan_fail']
-                                                          ? CurveType.emboss
-                                                          : CurveType.flat,
-                                                  child: Row(
-                                                    children: [
-                                                      Text("冷却风扇故障"),
-                                                      Spacer(),
-                                                      if (beepControl[
-                                                          'fan_fail'])
-                                                        Icon(
-                                                          CupertinoIcons
-                                                              .checkmark_alt,
-                                                          color:
-                                                              Color(0xffff9813),
-                                                          size: 22,
-                                                        ),
-                                                    ],
+                                                child: Card(
+                                                  child: Padding(
+                                                    padding:
+                                                        const EdgeInsets.all(
+                                                            8.0),
+                                                    child: Row(
+                                                      children: [
+                                                        Text("冷却风扇故障"),
+                                                        Spacer(),
+                                                        if (beepControl[
+                                                            'fan_fail'])
+                                                          Icon(
+                                                            CupertinoIcons
+                                                                .checkmark_alt,
+                                                            color: Color(
+                                                                0xffff9813),
+                                                            size: 22,
+                                                          ),
+                                                      ],
+                                                    ),
                                                   ),
                                                 ),
                                               ),
@@ -679,35 +588,26 @@ class _PowerState extends State<Power> with SingleTickerProviderStateMixin {
                                                             'volume_crash'];
                                                   });
                                                 },
-                                                child: NeuCard(
-                                                  decoration:
-                                                      NeumorphicDecoration(
-                                                    color: Theme.of(context)
-                                                        .scaffoldBackgroundColor,
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            10),
-                                                  ),
-                                                  padding: EdgeInsets.all(10),
-                                                  bevel: 10,
-                                                  curveType: beepControl[
-                                                          'volume_crash']
-                                                      ? CurveType.emboss
-                                                      : CurveType.flat,
-                                                  child: Row(
-                                                    children: [
-                                                      Text("存储空间降级或毁损"),
-                                                      Spacer(),
-                                                      if (beepControl[
-                                                          'volume_crash'])
-                                                        Icon(
-                                                          CupertinoIcons
-                                                              .checkmark_alt,
-                                                          color:
-                                                              Color(0xffff9813),
-                                                          size: 22,
-                                                        ),
-                                                    ],
+                                                child: Card(
+                                                  child: Padding(
+                                                    padding:
+                                                        const EdgeInsets.all(
+                                                            8.0),
+                                                    child: Row(
+                                                      children: [
+                                                        Text("存储空间降级或毁损"),
+                                                        Spacer(),
+                                                        if (beepControl[
+                                                            'volume_crash'])
+                                                          Icon(
+                                                            CupertinoIcons
+                                                                .checkmark_alt,
+                                                            color: Color(
+                                                                0xffff9813),
+                                                            size: 22,
+                                                          ),
+                                                      ],
+                                                    ),
                                                   ),
                                                 ),
                                               ),
@@ -729,35 +629,26 @@ class _PowerState extends State<Power> with SingleTickerProviderStateMixin {
                                                             'support_volume_or_cache_crash'];
                                                   });
                                                 },
-                                                child: NeuCard(
-                                                  decoration:
-                                                      NeumorphicDecoration(
-                                                    color: Theme.of(context)
-                                                        .scaffoldBackgroundColor,
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            10),
-                                                  ),
-                                                  padding: EdgeInsets.all(10),
-                                                  bevel: 10,
-                                                  curveType: beepControl[
-                                                          'support_volume_or_cache_crash']
-                                                      ? CurveType.emboss
-                                                      : CurveType.flat,
-                                                  child: Row(
-                                                    children: [
-                                                      Text("存储空间或 SSD 缓存异常"),
-                                                      Spacer(),
-                                                      if (beepControl[
-                                                          'support_volume_or_cache_crash'])
-                                                        Icon(
-                                                          CupertinoIcons
-                                                              .checkmark_alt,
-                                                          color:
-                                                              Color(0xffff9813),
-                                                          size: 22,
-                                                        ),
-                                                    ],
+                                                child: Card(
+                                                  child: Padding(
+                                                    padding:
+                                                        const EdgeInsets.all(
+                                                            8.0),
+                                                    child: Row(
+                                                      children: [
+                                                        Text("存储空间或 SSD 缓存异常"),
+                                                        Spacer(),
+                                                        if (beepControl[
+                                                            'support_volume_or_cache_crash'])
+                                                          Icon(
+                                                            CupertinoIcons
+                                                                .checkmark_alt,
+                                                            color: Color(
+                                                                0xffff9813),
+                                                            size: 22,
+                                                          ),
+                                                      ],
+                                                    ),
                                                   ),
                                                 ),
                                               ),
@@ -779,35 +670,26 @@ class _PowerState extends State<Power> with SingleTickerProviderStateMixin {
                                                             'ssd_cache_crash'];
                                                   });
                                                 },
-                                                child: NeuCard(
-                                                  decoration:
-                                                      NeumorphicDecoration(
-                                                    color: Theme.of(context)
-                                                        .scaffoldBackgroundColor,
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            10),
-                                                  ),
-                                                  padding: EdgeInsets.all(10),
-                                                  bevel: 10,
-                                                  curveType: beepControl[
-                                                          'ssd_cache_crash']
-                                                      ? CurveType.emboss
-                                                      : CurveType.flat,
-                                                  child: Row(
-                                                    children: [
-                                                      Text("SSD 缓存异常"),
-                                                      Spacer(),
-                                                      if (beepControl[
-                                                          'ssd_cache_crash'])
-                                                        Icon(
-                                                          CupertinoIcons
-                                                              .checkmark_alt,
-                                                          color:
-                                                              Color(0xffff9813),
-                                                          size: 22,
-                                                        ),
-                                                    ],
+                                                child: Card(
+                                                  child: Padding(
+                                                    padding:
+                                                        const EdgeInsets.all(
+                                                            8.0),
+                                                    child: Row(
+                                                      children: [
+                                                        Text("SSD 缓存异常"),
+                                                        Spacer(),
+                                                        if (beepControl[
+                                                            'ssd_cache_crash'])
+                                                          Icon(
+                                                            CupertinoIcons
+                                                                .checkmark_alt,
+                                                            color: Color(
+                                                                0xffff9813),
+                                                            size: 22,
+                                                          ),
+                                                      ],
+                                                    ),
                                                   ),
                                                 ),
                                               ),
@@ -829,35 +711,26 @@ class _PowerState extends State<Power> with SingleTickerProviderStateMixin {
                                                             'poweron_beep'];
                                                   });
                                                 },
-                                                child: NeuCard(
-                                                  decoration:
-                                                      NeumorphicDecoration(
-                                                    color: Theme.of(context)
-                                                        .scaffoldBackgroundColor,
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            10),
-                                                  ),
-                                                  padding: EdgeInsets.all(10),
-                                                  bevel: 10,
-                                                  curveType: beepControl[
-                                                          'poweron_beep']
-                                                      ? CurveType.emboss
-                                                      : CurveType.flat,
-                                                  child: Row(
-                                                    children: [
-                                                      Text("系统开机"),
-                                                      Spacer(),
-                                                      if (beepControl[
-                                                          'poweron_beep'])
-                                                        Icon(
-                                                          CupertinoIcons
-                                                              .checkmark_alt,
-                                                          color:
-                                                              Color(0xffff9813),
-                                                          size: 22,
-                                                        ),
-                                                    ],
+                                                child: Card(
+                                                  child: Padding(
+                                                    padding:
+                                                        const EdgeInsets.all(
+                                                            8.0),
+                                                    child: Row(
+                                                      children: [
+                                                        Text("系统开机"),
+                                                        Spacer(),
+                                                        if (beepControl[
+                                                            'poweron_beep'])
+                                                          Icon(
+                                                            CupertinoIcons
+                                                                .checkmark_alt,
+                                                            color: Color(
+                                                                0xffff9813),
+                                                            size: 22,
+                                                          ),
+                                                      ],
+                                                    ),
                                                   ),
                                                 ),
                                               ),
@@ -879,35 +752,26 @@ class _PowerState extends State<Power> with SingleTickerProviderStateMixin {
                                                             'poweroff_beep'];
                                                   });
                                                 },
-                                                child: NeuCard(
-                                                  decoration:
-                                                      NeumorphicDecoration(
-                                                    color: Theme.of(context)
-                                                        .scaffoldBackgroundColor,
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            10),
-                                                  ),
-                                                  padding: EdgeInsets.all(10),
-                                                  bevel: 10,
-                                                  curveType: beepControl[
-                                                          'poweroff_beep']
-                                                      ? CurveType.emboss
-                                                      : CurveType.flat,
-                                                  child: Row(
-                                                    children: [
-                                                      Text("按下电源按钮后系统关机"),
-                                                      Spacer(),
-                                                      if (beepControl[
-                                                          'poweroff_beep'])
-                                                        Icon(
-                                                          CupertinoIcons
-                                                              .checkmark_alt,
-                                                          color:
-                                                              Color(0xffff9813),
-                                                          size: 22,
-                                                        ),
-                                                    ],
+                                                child: Card(
+                                                  child: Padding(
+                                                    padding:
+                                                        const EdgeInsets.all(
+                                                            8.0),
+                                                    child: Row(
+                                                      children: [
+                                                        Text("按下电源按钮后系统关机"),
+                                                        Spacer(),
+                                                        if (beepControl[
+                                                            'poweroff_beep'])
+                                                          Icon(
+                                                            CupertinoIcons
+                                                                .checkmark_alt,
+                                                            color: Color(
+                                                                0xffff9813),
+                                                            size: 22,
+                                                          ),
+                                                      ],
+                                                    ),
                                                   ),
                                                 ),
                                               ),
@@ -929,35 +793,26 @@ class _PowerState extends State<Power> with SingleTickerProviderStateMixin {
                                                             'redundant_power_fail'];
                                                   });
                                                 },
-                                                child: NeuCard(
-                                                  decoration:
-                                                      NeumorphicDecoration(
-                                                    color: Theme.of(context)
-                                                        .scaffoldBackgroundColor,
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            10),
-                                                  ),
-                                                  padding: EdgeInsets.all(10),
-                                                  bevel: 10,
-                                                  curveType: beepControl[
-                                                          'redundant_power_fail']
-                                                      ? CurveType.emboss
-                                                      : CurveType.flat,
-                                                  child: Row(
-                                                    children: [
-                                                      Text("冗余电源离线"),
-                                                      Spacer(),
-                                                      if (beepControl[
-                                                          'redundant_power_fail'])
-                                                        Icon(
-                                                          CupertinoIcons
-                                                              .checkmark_alt,
-                                                          color:
-                                                              Color(0xffff9813),
-                                                          size: 22,
-                                                        ),
-                                                    ],
+                                                child: Card(
+                                                  child: Padding(
+                                                    padding:
+                                                        const EdgeInsets.all(
+                                                            8.0),
+                                                    child: Row(
+                                                      children: [
+                                                        Text("冗余电源离线"),
+                                                        Spacer(),
+                                                        if (beepControl[
+                                                            'redundant_power_fail'])
+                                                          Icon(
+                                                            CupertinoIcons
+                                                                .checkmark_alt,
+                                                            color: Color(
+                                                                0xffff9813),
+                                                            size: 22,
+                                                          ),
+                                                      ],
+                                                    ),
                                                   ),
                                                 ),
                                               ),
@@ -978,35 +833,26 @@ class _PowerState extends State<Power> with SingleTickerProviderStateMixin {
                                                             'reset_beep'];
                                                   });
                                                 },
-                                                child: NeuCard(
-                                                  decoration:
-                                                      NeumorphicDecoration(
-                                                    color: Theme.of(context)
-                                                        .scaffoldBackgroundColor,
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            10),
-                                                  ),
-                                                  padding: EdgeInsets.all(10),
-                                                  bevel: 10,
-                                                  curveType:
-                                                      beepControl['reset_beep']
-                                                          ? CurveType.emboss
-                                                          : CurveType.flat,
-                                                  child: Row(
-                                                    children: [
-                                                      Text("系统重置"),
-                                                      Spacer(),
-                                                      if (beepControl[
-                                                          'reset_beep'])
-                                                        Icon(
-                                                          CupertinoIcons
-                                                              .checkmark_alt,
-                                                          color:
-                                                              Color(0xffff9813),
-                                                          size: 22,
-                                                        ),
-                                                    ],
+                                                child: Card(
+                                                  child: Padding(
+                                                    padding:
+                                                        const EdgeInsets.all(
+                                                            8.0),
+                                                    child: Row(
+                                                      children: [
+                                                        Text("系统重置"),
+                                                        Spacer(),
+                                                        if (beepControl[
+                                                            'reset_beep'])
+                                                          Icon(
+                                                            CupertinoIcons
+                                                                .checkmark_alt,
+                                                            color: Color(
+                                                                0xffff9813),
+                                                            size: 22,
+                                                          ),
+                                                      ],
+                                                    ),
                                                   ),
                                                 ),
                                               ),
@@ -1020,16 +866,9 @@ class _PowerState extends State<Power> with SingleTickerProviderStateMixin {
                                     ),
                                   ),
                                 ),
-                                NeuCard(
-                                  decoration: NeumorphicDecoration(
-                                    color: Theme.of(context)
-                                        .scaffoldBackgroundColor,
-                                    borderRadius: BorderRadius.circular(20),
-                                  ),
+                                Card(
                                   margin: EdgeInsets.only(
                                       top: 20, left: 20, right: 20),
-                                  bevel: 10,
-                                  curveType: CurveType.flat,
                                   child: Padding(
                                     padding: const EdgeInsets.all(20.0),
                                     child: Column(
@@ -1056,58 +895,48 @@ class _PowerState extends State<Power> with SingleTickerProviderStateMixin {
                                                       "fullfan";
                                                 });
                                               },
-                                              child: NeuCard(
-                                                decoration:
-                                                    NeumorphicDecoration(
-                                                  color: Theme.of(context)
-                                                      .scaffoldBackgroundColor,
-                                                  borderRadius:
-                                                      BorderRadius.circular(10),
-                                                ),
-                                                padding: EdgeInsets.all(10),
-                                                bevel: 10,
-                                                curveType: fanSpeed[
-                                                            'dual_fan_speed'] ==
-                                                        "fullfan"
-                                                    ? CurveType.emboss
-                                                    : CurveType.flat,
-                                                child: Row(
-                                                  children: [
-                                                    Expanded(
-                                                      child: Column(
-                                                        crossAxisAlignment:
-                                                            CrossAxisAlignment
-                                                                .start,
-                                                        children: [
-                                                          Text("全速模式"),
-                                                          Text(
-                                                            "风扇以全速工作可保持系统冷却，但会产生较大的噪音。",
-                                                            style: TextStyle(
-                                                                fontSize: 12,
-                                                                color: Colors
-                                                                    .grey),
-                                                          ),
-                                                        ],
+                                              child: Card(
+                                                child: Padding(
+                                                  padding:
+                                                      const EdgeInsets.all(8.0),
+                                                  child: Row(
+                                                    children: [
+                                                      Expanded(
+                                                        child: Column(
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .start,
+                                                          children: [
+                                                            Text("全速模式"),
+                                                            Text(
+                                                              "风扇以全速工作可保持系统冷却，但会产生较大的噪音。",
+                                                              style: TextStyle(
+                                                                  fontSize: 12,
+                                                                  color: Colors
+                                                                      .grey),
+                                                            ),
+                                                          ],
+                                                        ),
                                                       ),
-                                                    ),
-                                                    SizedBox(
-                                                      width: 10,
-                                                    ),
-                                                    SizedBox(
-                                                      width: 22,
-                                                      child: fanSpeed[
-                                                                  'dual_fan_speed'] ==
-                                                              "fullfan"
-                                                          ? Icon(
-                                                              CupertinoIcons
-                                                                  .checkmark_alt,
-                                                              color: Color(
-                                                                  0xffff9813),
-                                                              size: 22,
-                                                            )
-                                                          : null,
-                                                    ),
-                                                  ],
+                                                      SizedBox(
+                                                        width: 10,
+                                                      ),
+                                                      SizedBox(
+                                                        width: 22,
+                                                        child: fanSpeed[
+                                                                    'dual_fan_speed'] ==
+                                                                "fullfan"
+                                                            ? Icon(
+                                                                CupertinoIcons
+                                                                    .checkmark_alt,
+                                                                color: Color(
+                                                                    0xffff9813),
+                                                                size: 22,
+                                                              )
+                                                            : null,
+                                                      ),
+                                                    ],
+                                                  ),
                                                 ),
                                               ),
                                             ),
@@ -1121,58 +950,48 @@ class _PowerState extends State<Power> with SingleTickerProviderStateMixin {
                                                       "coolfan";
                                                 });
                                               },
-                                              child: NeuCard(
-                                                decoration:
-                                                    NeumorphicDecoration(
-                                                  color: Theme.of(context)
-                                                      .scaffoldBackgroundColor,
-                                                  borderRadius:
-                                                      BorderRadius.circular(10),
-                                                ),
-                                                padding: EdgeInsets.all(10),
-                                                bevel: 10,
-                                                curveType: fanSpeed[
-                                                            'dual_fan_speed'] ==
-                                                        "coolfan"
-                                                    ? CurveType.emboss
-                                                    : CurveType.flat,
-                                                child: Row(
-                                                  children: [
-                                                    Expanded(
-                                                      child: Column(
-                                                        crossAxisAlignment:
-                                                            CrossAxisAlignment
-                                                                .start,
-                                                        children: [
-                                                          Text("低温模式"),
-                                                          Text(
-                                                            "风扇以较高的速度工作可保持系统冷却，但会产生较大的噪音。",
-                                                            style: TextStyle(
-                                                                fontSize: 12,
-                                                                color: Colors
-                                                                    .grey),
-                                                          ),
-                                                        ],
+                                              child: Card(
+                                                child: Padding(
+                                                  padding:
+                                                      const EdgeInsets.all(8.0),
+                                                  child: Row(
+                                                    children: [
+                                                      Expanded(
+                                                        child: Column(
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .start,
+                                                          children: [
+                                                            Text("低温模式"),
+                                                            Text(
+                                                              "风扇以较高的速度工作可保持系统冷却，但会产生较大的噪音。",
+                                                              style: TextStyle(
+                                                                  fontSize: 12,
+                                                                  color: Colors
+                                                                      .grey),
+                                                            ),
+                                                          ],
+                                                        ),
                                                       ),
-                                                    ),
-                                                    SizedBox(
-                                                      width: 10,
-                                                    ),
-                                                    SizedBox(
-                                                      width: 22,
-                                                      child: fanSpeed[
-                                                                  'dual_fan_speed'] ==
-                                                              "coolfan"
-                                                          ? Icon(
-                                                              CupertinoIcons
-                                                                  .checkmark_alt,
-                                                              color: Color(
-                                                                  0xffff9813),
-                                                              size: 22,
-                                                            )
-                                                          : null,
-                                                    ),
-                                                  ],
+                                                      SizedBox(
+                                                        width: 10,
+                                                      ),
+                                                      SizedBox(
+                                                        width: 22,
+                                                        child: fanSpeed[
+                                                                    'dual_fan_speed'] ==
+                                                                "coolfan"
+                                                            ? Icon(
+                                                                CupertinoIcons
+                                                                    .checkmark_alt,
+                                                                color: Color(
+                                                                    0xffff9813),
+                                                                size: 22,
+                                                              )
+                                                            : null,
+                                                      ),
+                                                    ],
+                                                  ),
                                                 ),
                                               ),
                                             ),
@@ -1186,58 +1005,48 @@ class _PowerState extends State<Power> with SingleTickerProviderStateMixin {
                                                       'quietfan';
                                                 });
                                               },
-                                              child: NeuCard(
-                                                decoration:
-                                                    NeumorphicDecoration(
-                                                  color: Theme.of(context)
-                                                      .scaffoldBackgroundColor,
-                                                  borderRadius:
-                                                      BorderRadius.circular(10),
-                                                ),
-                                                padding: EdgeInsets.all(10),
-                                                bevel: 10,
-                                                curveType: fanSpeed[
-                                                            'dual_fan_speed'] ==
-                                                        'quietfan'
-                                                    ? CurveType.emboss
-                                                    : CurveType.flat,
-                                                child: Row(
-                                                  children: [
-                                                    Expanded(
-                                                      child: Column(
-                                                        crossAxisAlignment:
-                                                            CrossAxisAlignment
-                                                                .start,
-                                                        children: [
-                                                          Text("静音模式"),
-                                                          Text(
-                                                            "风扇以较低的速度工作所产生的噪音较低，但过程中系统可能会变热。",
-                                                            style: TextStyle(
-                                                                fontSize: 12,
-                                                                color: Colors
-                                                                    .grey),
-                                                          ),
-                                                        ],
+                                              child: Card(
+                                                child: Padding(
+                                                  padding:
+                                                      const EdgeInsets.all(8.0),
+                                                  child: Row(
+                                                    children: [
+                                                      Expanded(
+                                                        child: Column(
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .start,
+                                                          children: [
+                                                            Text("静音模式"),
+                                                            Text(
+                                                              "风扇以较低的速度工作所产生的噪音较低，但过程中系统可能会变热。",
+                                                              style: TextStyle(
+                                                                  fontSize: 12,
+                                                                  color: Colors
+                                                                      .grey),
+                                                            ),
+                                                          ],
+                                                        ),
                                                       ),
-                                                    ),
-                                                    SizedBox(
-                                                      width: 10,
-                                                    ),
-                                                    SizedBox(
-                                                      width: 22,
-                                                      child: fanSpeed[
-                                                                  'dual_fan_speed'] ==
-                                                              'quietfan'
-                                                          ? Icon(
-                                                              CupertinoIcons
-                                                                  .checkmark_alt,
-                                                              color: Color(
-                                                                  0xffff9813),
-                                                              size: 22,
-                                                            )
-                                                          : null,
-                                                    ),
-                                                  ],
+                                                      SizedBox(
+                                                        width: 10,
+                                                      ),
+                                                      SizedBox(
+                                                        width: 22,
+                                                        child: fanSpeed[
+                                                                    'dual_fan_speed'] ==
+                                                                'quietfan'
+                                                            ? Icon(
+                                                                CupertinoIcons
+                                                                    .checkmark_alt,
+                                                                color: Color(
+                                                                    0xffff9813),
+                                                                size: 22,
+                                                              )
+                                                            : null,
+                                                      ),
+                                                    ],
+                                                  ),
                                                 ),
                                               ),
                                             ),
@@ -1250,16 +1059,7 @@ class _PowerState extends State<Power> with SingleTickerProviderStateMixin {
                                 SizedBox(
                                   height: 20,
                                 ),
-                                NeuCard(
-                                  decoration: NeumorphicDecoration(
-                                    color: Theme.of(context)
-                                        .scaffoldBackgroundColor,
-                                    borderRadius: BorderRadius.circular(20),
-                                  ),
-                                  margin: EdgeInsets.only(
-                                      top: 20, left: 20, right: 20),
-                                  bevel: 10,
-                                  curveType: CurveType.flat,
+                                Card(
                                   child: Padding(
                                     padding: const EdgeInsets.all(20.0),
                                     child: Column(
@@ -1298,14 +1098,7 @@ class _PowerState extends State<Power> with SingleTickerProviderStateMixin {
                           ),
                           Padding(
                             padding: EdgeInsets.all(20),
-                            child: NeuButton(
-                              padding: EdgeInsets.symmetric(
-                                  horizontal: 20, vertical: 20),
-                              decoration: NeumorphicDecoration(
-                                color:
-                                    Theme.of(context).scaffoldBackgroundColor,
-                                borderRadius: BorderRadius.circular(20),
-                              ),
+                            child: OutlinedButton(
                               onPressed: () async {
                                 var res = await Api.powerSet(enableZram,
                                     powerRecovery, beepControl, fanSpeed, led);
@@ -1354,14 +1147,7 @@ class _PowerState extends State<Power> with SingleTickerProviderStateMixin {
                             child: Row(
                               children: [
                                 Expanded(
-                                  child: NeuButton(
-                                    padding: EdgeInsets.symmetric(
-                                        horizontal: 20, vertical: 20),
-                                    decoration: NeumorphicDecoration(
-                                      color: Theme.of(context)
-                                          .scaffoldBackgroundColor,
-                                      borderRadius: BorderRadius.circular(20),
-                                    ),
+                                  child: OutlinedButton(
                                     onPressed: () async {
                                       Navigator.of(context)
                                           .push(CupertinoPageRoute(
@@ -1399,14 +1185,7 @@ class _PowerState extends State<Power> with SingleTickerProviderStateMixin {
                                   width: 20,
                                 ),
                                 Expanded(
-                                  child: NeuButton(
-                                    padding: EdgeInsets.symmetric(
-                                        horizontal: 20, vertical: 20),
-                                    decoration: NeumorphicDecoration(
-                                      color: Theme.of(context)
-                                          .scaffoldBackgroundColor,
-                                      borderRadius: BorderRadius.circular(20),
-                                    ),
+                                  child: OutlinedButton(
                                     onPressed: () async {
                                       List powerOns = powerTasks
                                           .where((task) =>
@@ -1448,16 +1227,9 @@ class _PowerState extends State<Power> with SingleTickerProviderStateMixin {
                           Expanded(
                             child: ListView(
                               children: [
-                                NeuCard(
-                                  decoration: NeumorphicDecoration(
-                                    color: Theme.of(context)
-                                        .scaffoldBackgroundColor,
-                                    borderRadius: BorderRadius.circular(20),
-                                  ),
+                                Card(
                                   margin: EdgeInsets.only(
                                       top: 20, left: 20, right: 20),
-                                  bevel: 10,
-                                  curveType: CurveType.flat,
                                   child: Padding(
                                     padding: const EdgeInsets.all(20.0),
                                     child: Column(
@@ -1498,23 +1270,18 @@ class _PowerState extends State<Power> with SingleTickerProviderStateMixin {
                                                   );
                                                 });
                                           },
-                                          child: NeuCard(
-                                            decoration: NeumorphicDecoration(
-                                              color: Theme.of(context)
-                                                  .scaffoldBackgroundColor,
-                                              borderRadius:
-                                                  BorderRadius.circular(10),
-                                            ),
-                                            padding: EdgeInsets.all(10),
-                                            bevel: 10,
-                                            curveType: CurveType.flat,
-                                            child: Row(
-                                              children: [
-                                                Text("时间"),
-                                                Spacer(),
-                                                Text(
-                                                    "${dataList.where((element) => element['value'] == hibernation['internal_hd_idletime']).first['title']}"),
-                                              ],
+                                          child: Card(
+                                            child: Padding(
+                                              padding:
+                                                  const EdgeInsets.all(8.0),
+                                              child: Row(
+                                                children: [
+                                                  Text("时间"),
+                                                  Spacer(),
+                                                  Text(
+                                                      "${dataList.where((element) => element['value'] == hibernation['internal_hd_idletime']).first['title']}"),
+                                                ],
+                                              ),
                                             ),
                                           ),
                                         ),
@@ -1534,48 +1301,35 @@ class _PowerState extends State<Power> with SingleTickerProviderStateMixin {
                                                         : 1;
                                               });
                                           },
-                                          child: NeuCard(
-                                            decoration: NeumorphicDecoration(
-                                              color: Theme.of(context)
-                                                  .scaffoldBackgroundColor,
-                                              borderRadius:
-                                                  BorderRadius.circular(10),
-                                            ),
-                                            padding: EdgeInsets.all(10),
-                                            bevel: 10,
-                                            curveType: hibernation[
-                                                        'internal_hd_idletime'] >
-                                                    0
-                                                ? (hibernation[
-                                                            'sata_deep_sleep'] ==
-                                                        1
-                                                    ? CurveType.emboss
-                                                    : CurveType.flat)
-                                                : CurveType.concave,
-                                            child: Row(
-                                              children: [
-                                                Expanded(
-                                                  child: Text(
-                                                      "启动进阶硬盘休眠以将设备的耗电量降至最低"),
-                                                ),
-                                                SizedBox(
-                                                  width: 10,
-                                                ),
-                                                SizedBox(
-                                                  width: 22,
-                                                  child: hibernation[
-                                                              'sata_deep_sleep'] ==
-                                                          1
-                                                      ? Icon(
-                                                          CupertinoIcons
-                                                              .checkmark_alt,
-                                                          color:
-                                                              Color(0xffff9813),
-                                                          size: 22,
-                                                        )
-                                                      : null,
-                                                ),
-                                              ],
+                                          child: Card(
+                                            child: Padding(
+                                              padding:
+                                                  const EdgeInsets.all(8.0),
+                                              child: Row(
+                                                children: [
+                                                  Expanded(
+                                                    child: Text(
+                                                        "启动进阶硬盘休眠以将设备的耗电量降至最低"),
+                                                  ),
+                                                  SizedBox(
+                                                    width: 10,
+                                                  ),
+                                                  SizedBox(
+                                                    width: 22,
+                                                    child: hibernation[
+                                                                'sata_deep_sleep'] ==
+                                                            1
+                                                        ? Icon(
+                                                            CupertinoIcons
+                                                                .checkmark_alt,
+                                                            color: Color(
+                                                                0xffff9813),
+                                                            size: 22,
+                                                          )
+                                                        : null,
+                                                  ),
+                                                ],
+                                              ),
                                             ),
                                           ),
                                         ),
@@ -1583,16 +1337,9 @@ class _PowerState extends State<Power> with SingleTickerProviderStateMixin {
                                     ),
                                   ),
                                 ),
-                                NeuCard(
-                                  decoration: NeumorphicDecoration(
-                                    color: Theme.of(context)
-                                        .scaffoldBackgroundColor,
-                                    borderRadius: BorderRadius.circular(20),
-                                  ),
+                                Card(
                                   margin: EdgeInsets.only(
                                       top: 20, left: 20, right: 20),
-                                  bevel: 10,
-                                  curveType: CurveType.flat,
                                   child: Padding(
                                     padding: const EdgeInsets.all(20.0),
                                     child: Column(
@@ -1633,23 +1380,18 @@ class _PowerState extends State<Power> with SingleTickerProviderStateMixin {
                                                   );
                                                 });
                                           },
-                                          child: NeuCard(
-                                            decoration: NeumorphicDecoration(
-                                              color: Theme.of(context)
-                                                  .scaffoldBackgroundColor,
-                                              borderRadius:
-                                                  BorderRadius.circular(10),
-                                            ),
-                                            padding: EdgeInsets.all(10),
-                                            bevel: 10,
-                                            curveType: CurveType.flat,
-                                            child: Row(
-                                              children: [
-                                                Text("时间"),
-                                                Spacer(),
-                                                Text(
-                                                    "${dataList.where((element) => element['value'] == hibernation['usb_idletime']).first['title']}"),
-                                              ],
+                                          child: Card(
+                                            child: Padding(
+                                              padding:
+                                                  const EdgeInsets.all(8.0),
+                                              child: Row(
+                                                children: [
+                                                  Text("时间"),
+                                                  Spacer(),
+                                                  Text(
+                                                      "${dataList.where((element) => element['value'] == hibernation['usb_idletime']).first['title']}"),
+                                                ],
+                                              ),
                                             ),
                                           ),
                                         ),
@@ -1667,47 +1409,33 @@ class _PowerState extends State<Power> with SingleTickerProviderStateMixin {
                                                     !hibernation['enable_log'];
                                               });
                                           },
-                                          child: NeuCard(
-                                            decoration: NeumorphicDecoration(
-                                              color: Theme.of(context)
-                                                  .scaffoldBackgroundColor,
-                                              borderRadius:
-                                                  BorderRadius.circular(10),
-                                            ),
-                                            padding: EdgeInsets.all(10),
-                                            bevel: 10,
-                                            curveType: hibernation[
-                                                            'internal_hd_idletime'] >
-                                                        0 ||
-                                                    hibernation[
-                                                            'usb_idletime'] >
-                                                        0
-                                                ? (hibernation['enable_log']
-                                                    ? CurveType.emboss
-                                                    : CurveType.flat)
-                                                : CurveType.convex,
-                                            child: Row(
-                                              children: [
-                                                Expanded(
-                                                  child: Text("启用硬盘休眠日志"),
-                                                ),
-                                                SizedBox(
-                                                  width: 10,
-                                                ),
-                                                SizedBox(
-                                                  width: 22,
-                                                  child:
-                                                      hibernation['enable_log']
-                                                          ? Icon(
-                                                              CupertinoIcons
-                                                                  .checkmark_alt,
-                                                              color: Color(
-                                                                  0xffff9813),
-                                                              size: 22,
-                                                            )
-                                                          : null,
-                                                ),
-                                              ],
+                                          child: Card(
+                                            child: Padding(
+                                              padding:
+                                                  const EdgeInsets.all(8.0),
+                                              child: Row(
+                                                children: [
+                                                  Expanded(
+                                                    child: Text("启用硬盘休眠日志"),
+                                                  ),
+                                                  SizedBox(
+                                                    width: 10,
+                                                  ),
+                                                  SizedBox(
+                                                    width: 22,
+                                                    child: hibernation[
+                                                            'enable_log']
+                                                        ? Icon(
+                                                            CupertinoIcons
+                                                                .checkmark_alt,
+                                                            color: Color(
+                                                                0xffff9813),
+                                                            size: 22,
+                                                          )
+                                                        : null,
+                                                  ),
+                                                ],
+                                              ),
                                             ),
                                           ),
                                         ),
@@ -1716,16 +1444,9 @@ class _PowerState extends State<Power> with SingleTickerProviderStateMixin {
                                   ),
                                 ),
                                 if (powerRecovery['wol1'] != null)
-                                  NeuCard(
-                                    decoration: NeumorphicDecoration(
-                                      color: Theme.of(context)
-                                          .scaffoldBackgroundColor,
-                                      borderRadius: BorderRadius.circular(20),
-                                    ),
+                                  Card(
                                     margin: EdgeInsets.only(
                                         top: 20, left: 20, right: 20),
-                                    bevel: 10,
-                                    curveType: CurveType.flat,
                                     child: Padding(
                                       padding: const EdgeInsets.all(20.0),
                                       child: Column(
@@ -1756,47 +1477,33 @@ class _PowerState extends State<Power> with SingleTickerProviderStateMixin {
                                                       'auto_poweroff_time'] = 10;
                                                 });
                                             },
-                                            child: NeuCard(
-                                              decoration: NeumorphicDecoration(
-                                                color: Theme.of(context)
-                                                    .scaffoldBackgroundColor,
-                                                borderRadius:
-                                                    BorderRadius.circular(10),
-                                              ),
-                                              padding: EdgeInsets.all(10),
-                                              bevel: 10,
-                                              curveType: powerRecovery[
-                                                          'wol1'] &&
-                                                      hibernation[
-                                                              'internal_hd_idletime'] >
-                                                          0
-                                                  ? (hibernation[
-                                                          'auto_poweroff_enable']
-                                                      ? CurveType.emboss
-                                                      : CurveType.flat)
-                                                  : CurveType.convex,
-                                              child: Row(
-                                                children: [
-                                                  Expanded(
-                                                    child: Text("启用自动关机"),
-                                                  ),
-                                                  SizedBox(
-                                                    width: 10,
-                                                  ),
-                                                  SizedBox(
-                                                    width: 22,
-                                                    child: hibernation[
-                                                            'auto_poweroff_enable']
-                                                        ? Icon(
-                                                            CupertinoIcons
-                                                                .checkmark_alt,
-                                                            color: Color(
-                                                                0xffff9813),
-                                                            size: 22,
-                                                          )
-                                                        : null,
-                                                  ),
-                                                ],
+                                            child: Card(
+                                              child: Padding(
+                                                padding:
+                                                    const EdgeInsets.all(8.0),
+                                                child: Row(
+                                                  children: [
+                                                    Expanded(
+                                                      child: Text("启用自动关机"),
+                                                    ),
+                                                    SizedBox(
+                                                      width: 10,
+                                                    ),
+                                                    SizedBox(
+                                                      width: 22,
+                                                      child: hibernation[
+                                                              'auto_poweroff_enable']
+                                                          ? Icon(
+                                                              CupertinoIcons
+                                                                  .checkmark_alt,
+                                                              color: Color(
+                                                                  0xffff9813),
+                                                              size: 22,
+                                                            )
+                                                          : null,
+                                                    ),
+                                                  ],
+                                                ),
                                               ),
                                             ),
                                           ),
@@ -1836,26 +1543,18 @@ class _PowerState extends State<Power> with SingleTickerProviderStateMixin {
                                                       );
                                                     });
                                             },
-                                            child: NeuCard(
-                                              decoration: NeumorphicDecoration(
-                                                color: Theme.of(context)
-                                                    .scaffoldBackgroundColor,
-                                                borderRadius:
-                                                    BorderRadius.circular(10),
-                                              ),
-                                              padding: EdgeInsets.all(10),
-                                              bevel: 10,
-                                              curveType: hibernation[
-                                                      'auto_poweroff_enable']
-                                                  ? CurveType.flat
-                                                  : CurveType.convex,
-                                              child: Row(
-                                                children: [
-                                                  Text("时间"),
-                                                  Spacer(),
-                                                  Text(
-                                                      "${hibernation['auto_poweroff_enable'] ? dataList.where((element) => element['value'] == hibernation['auto_poweroff_time']).first['title'] : ""}"),
-                                                ],
+                                            child: Card(
+                                              child: Padding(
+                                                padding:
+                                                    const EdgeInsets.all(8.0),
+                                                child: Row(
+                                                  children: [
+                                                    Text("时间"),
+                                                    Spacer(),
+                                                    Text(
+                                                        "${hibernation['auto_poweroff_enable'] ? dataList.where((element) => element['value'] == hibernation['auto_poweroff_time']).first['title'] : ""}"),
+                                                  ],
+                                                ),
                                               ),
                                             ),
                                           ),
@@ -1868,14 +1567,7 @@ class _PowerState extends State<Power> with SingleTickerProviderStateMixin {
                           ),
                           Padding(
                             padding: EdgeInsets.all(20),
-                            child: NeuButton(
-                              padding: EdgeInsets.symmetric(
-                                  horizontal: 20, vertical: 20),
-                              decoration: NeumorphicDecoration(
-                                color:
-                                    Theme.of(context).scaffoldBackgroundColor,
-                                borderRadius: BorderRadius.circular(20),
-                              ),
+                            child: OutlinedButton(
                               onPressed: () async {
                                 var res = await Api.powerHibernationSave(
                                   internalHdIdletime:

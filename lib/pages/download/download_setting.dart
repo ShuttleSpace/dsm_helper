@@ -6,7 +6,6 @@ import 'package:dsm_helper/util/function.dart';
 import 'package:dsm_helper/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:neumorphic/neumorphic.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 class DownloadSetting extends StatefulWidget {
@@ -37,13 +36,15 @@ class _DownloadSettingState extends State<DownloadSetting> {
         padding: EdgeInsets.all(20.0),
         children: [
           if (Platform.isAndroid) ...[
-            NeuButton(
+            OutlinedButton(
               onPressed: () async {
                 DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
                 AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
                 if (Platform.isAndroid && androidInfo.version.sdkInt >= 30) {
                   bool permission = false;
-                  permission = await Permission.manageExternalStorage.request().isGranted;
+                  permission = await Permission.manageExternalStorage
+                      .request()
+                      .isGranted;
                   if (!permission) {
                     Util.toast("安卓11以上需授权文件管理权限");
                     return;
@@ -75,10 +76,6 @@ class _DownloadSettingState extends State<DownloadSetting> {
                   }
                 });
               },
-              decoration: NeumorphicDecoration(
-                color: Theme.of(context).scaffoldBackgroundColor,
-                borderRadius: BorderRadius.circular(20),
-              ),
               child: Row(
                 children: [
                   Expanded(

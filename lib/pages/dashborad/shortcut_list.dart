@@ -13,7 +13,6 @@ import 'package:dsm_helper/pages/virtual_machine/virtual_machine.dart';
 import 'package:dsm_helper/util/function.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:neumorphic/neumorphic.dart';
 
 import '../photos/photos.dart';
 
@@ -44,14 +43,8 @@ class ShortcutList extends StatelessWidget {
 
   @override
   Widget build(BuildContext ctx) {
-    return NeuCard(
-      margin: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
-      bevel: 20,
-      curveType: CurveType.flat,
-      decoration: NeumorphicDecoration(
-        color: Theme.of(context).scaffoldBackgroundColor,
-        borderRadius: BorderRadius.circular(20),
-      ),
+    return Card(
+      margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
       child: Container(
         height: 140,
         child: ListView.builder(
@@ -198,7 +191,7 @@ class ShortcutList extends StatelessWidget {
     }
     if (icon != "") {
       return Padding(
-        padding: EdgeInsets.only(left: 10, top: 20, bottom: 20, right: 10),
+        padding: EdgeInsets.symmetric(horizontal: 10, vertical: 15),
         child: GestureDetector(
           onTap: () {
             Navigator.of(context).push(CupertinoPageRoute(
@@ -207,60 +200,56 @@ class ShortcutList extends StatelessWidget {
                 },
                 settings: RouteSettings(name: routerName)));
           },
-          child: NeuCard(
-            bevel: 20,
-            width: 100,
-            curveType: CurveType.flat,
-            decoration: NeumorphicDecoration(
-              color: Theme.of(context).scaffoldBackgroundColor,
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: Stack(
-              children: [
-                Align(
-                  alignment: Alignment.center,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 10),
-                    child: Column(
-                      children: [
-                        Image.asset(
-                          icon,
-                          width: 50,
-                        ),
-                        SizedBox(
-                          height: 5,
-                        ),
-                        Text(
-                          "$name",
-                          textAlign: TextAlign.center,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(fontSize: 14),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                if (unread > 0)
-                  Positioned(
-                    right: 20,
-                    top: 10,
-                    child: Container(
-                      alignment: Alignment.center,
-                      height: 15,
-                      width: 15,
-                      decoration: BoxDecoration(
-                        color: Colors.red,
-                        shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(
-                              color: Colors.black.withOpacity(0.5),
-                              offset: Offset(1, 1)),
+          child: Card(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+              child: Stack(
+                children: [
+                  Align(
+                    alignment: Alignment.center,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 10),
+                      child: Column(
+                        children: [
+                          Image.asset(
+                            icon,
+                            width: 50,
+                          ),
+                          SizedBox(
+                            height: 5,
+                          ),
+                          Text(
+                            "$name",
+                            textAlign: TextAlign.center,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(fontSize: 14),
+                          ),
                         ],
                       ),
                     ),
                   ),
-              ],
+                  if (unread > 0)
+                    Positioned(
+                      right: 20,
+                      top: 10,
+                      child: Container(
+                        alignment: Alignment.center,
+                        height: 15,
+                        width: 15,
+                        decoration: BoxDecoration(
+                          color: Colors.red,
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                                color: Colors.black.withOpacity(0.5),
+                                offset: Offset(1, 1)),
+                          ],
+                        ),
+                      ),
+                    ),
+                ],
+              ),
             ),
           ),
         ),

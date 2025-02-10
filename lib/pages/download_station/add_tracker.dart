@@ -1,6 +1,5 @@
 import 'package:dsm_helper/util/function.dart';
 import 'package:flutter/material.dart';
-import 'package:neumorphic/neumorphic.dart';
 
 class AddTracker extends StatefulWidget {
   final String id;
@@ -18,32 +17,23 @@ class _AddTrackerState extends State<AddTracker> {
       body: ListView(
         padding: EdgeInsets.all(20),
         children: [
-          NeuCard(
-            decoration: NeumorphicDecoration(
-              color: Theme.of(context).scaffoldBackgroundColor,
-              borderRadius: BorderRadius.circular(20),
-            ),
-            bevel: 20,
-            curveType: CurveType.flat,
-            padding: EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-            child: TextField(
-              onChanged: (v) => tracker = v,
-              maxLines: 5,
-              decoration: InputDecoration(
-                border: InputBorder.none,
-                labelText: 'Tracker链接，每行一个',
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: TextField(
+                onChanged: (v) => tracker = v,
+                maxLines: 5,
+                decoration: InputDecoration(
+                  border: InputBorder.none,
+                  labelText: 'Tracker链接，每行一个',
+                ),
               ),
             ),
           ),
           SizedBox(
             height: 20,
           ),
-          NeuButton(
-            padding: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-            decoration: NeumorphicDecoration(
-              color: Theme.of(context).scaffoldBackgroundColor,
-              borderRadius: BorderRadius.circular(20),
-            ),
+          OutlinedButton(
             onPressed: () async {
               List<String> temp = tracker.split("\n");
               List<String> trackers = [];

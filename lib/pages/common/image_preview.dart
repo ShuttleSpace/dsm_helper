@@ -9,7 +9,6 @@ import 'package:extended_image/extended_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluwx/fluwx.dart';
-import 'package:neumorphic/neumorphic.dart';
 import 'package:flutter_vibrate/flutter_vibrate.dart';
 import 'package:provider/provider.dart';
 
@@ -80,99 +79,85 @@ class _ImagePreviewState extends State<ImagePreview>
       builder: (context) {
         return Material(
           color: Colors.transparent,
-          child: NeuCard(
-            width: double.infinity,
-            padding: EdgeInsets.all(22),
-            bevel: 5,
-            curveType: CurveType.emboss,
-            decoration: NeumorphicDecoration(
-                color: Theme.of(context).scaffoldBackgroundColor,
-                borderRadius: BorderRadius.vertical(top: Radius.circular(22))),
-            child: SafeArea(
-              top: false,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  Text(
-                    "确认删除",
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
-                  ),
-                  SizedBox(
-                    height: 12,
-                  ),
-                  Text(
-                    "确认要删除文件？",
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.w400),
-                  ),
-                  SizedBox(
-                    height: 22,
-                  ),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: NeuButton(
-                          onPressed: () async {
-                            Navigator.of(context).pop();
-                            var res =
-                                await Api.deleteTask([widget.paths[index]]);
-                            if (res['success']) {
-                              Util.toast("文件删除成功");
-                              if (widget.thumbs.length > index) {
-                                widget.thumbs.removeAt(index);
-                              }
+          child: Card(
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: SafeArea(
+                top: false,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    Text(
+                      "确认删除",
+                      style:
+                          TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
+                    ),
+                    SizedBox(
+                      height: 12,
+                    ),
+                    Text(
+                      "确认要删除文件？",
+                      style:
+                          TextStyle(fontSize: 20, fontWeight: FontWeight.w400),
+                    ),
+                    SizedBox(
+                      height: 22,
+                    ),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: OutlinedButton(
+                            onPressed: () async {
+                              Navigator.of(context).pop();
+                              var res =
+                                  await Api.deleteTask([widget.paths[index]]);
+                              if (res['success']) {
+                                Util.toast("文件删除成功");
+                                if (widget.thumbs.length > index) {
+                                  widget.thumbs.removeAt(index);
+                                }
 
-                              if (widget.images.length > index) {
-                                widget.images.removeAt(index);
+                                if (widget.images.length > index) {
+                                  widget.images.removeAt(index);
+                                }
+                                if (widget.paths.length > index) {
+                                  widget.paths.removeAt(index);
+                                }
+                                if (widget.names.length > index) {
+                                  widget.names.removeAt(index);
+                                }
+                                setState(() {});
+                                widget.onDelete?.call();
                               }
-                              if (widget.paths.length > index) {
-                                widget.paths.removeAt(index);
-                              }
-                              if (widget.names.length > index) {
-                                widget.names.removeAt(index);
-                              }
-                              setState(() {});
-                              widget.onDelete?.call();
-                            }
-                          },
-                          decoration: NeumorphicDecoration(
-                            color: Theme.of(context).scaffoldBackgroundColor,
-                            borderRadius: BorderRadius.circular(25),
-                          ),
-                          bevel: 5,
-                          padding: EdgeInsets.symmetric(vertical: 10),
-                          child: Text(
-                            "确认删除",
-                            style: TextStyle(
-                                fontSize: 18, color: Colors.redAccent),
+                            },
+                            child: Text(
+                              "确认删除",
+                              style: TextStyle(
+                                  fontSize: 18, color: Colors.redAccent),
+                            ),
                           ),
                         ),
-                      ),
-                      SizedBox(
-                        width: 20,
-                      ),
-                      Expanded(
-                        child: NeuButton(
-                          onPressed: () async {
-                            Navigator.of(context).pop();
-                          },
-                          decoration: NeumorphicDecoration(
-                            color: Theme.of(context).scaffoldBackgroundColor,
-                            borderRadius: BorderRadius.circular(25),
-                          ),
-                          bevel: 5,
-                          padding: EdgeInsets.symmetric(vertical: 10),
-                          child: Text(
-                            "取消",
-                            style: TextStyle(fontSize: 18),
+                        SizedBox(
+                          width: 20,
+                        ),
+                        Expanded(
+                          child: OutlinedButton(
+                            onPressed: () async {
+                              Navigator.of(context).pop();
+                            },
+                            child: Text(
+                              "取消",
+                              style: TextStyle(fontSize: 18),
+                            ),
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(
-                    height: 8,
-                  ),
-                ],
+                      ],
+                    ),
+                    SizedBox(
+                      height: 8,
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
@@ -565,13 +550,7 @@ class MySwiperPlugin extends StatelessWidget {
             padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
             child: Row(
               children: <Widget>[
-                NeuButton(
-                  decoration: NeumorphicDecoration(
-                    color: Theme.of(context).scaffoldBackgroundColor,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  bevel: 0,
-                  padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                OutlinedButton(
                   onPressed: () {
                     if (data.data == null) {
                       Util.toast('图片下载失败');
@@ -600,13 +579,7 @@ class MySwiperPlugin extends StatelessWidget {
                   ),
                 ),
                 Spacer(),
-                NeuButton(
-                  decoration: NeumorphicDecoration(
-                    color: Theme.of(context).scaffoldBackgroundColor,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  bevel: 0,
-                  padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                OutlinedButton(
                   onPressed: () {
                     if (data.data == null) {
                       Util.toast('图片下载失败,请重试!');
@@ -622,17 +595,13 @@ class MySwiperPlugin extends StatelessWidget {
                 SizedBox(
                   width: 10,
                 ),
-                NeuCard(
-                  decoration: NeumorphicDecoration(
-                    color: Theme.of(context).scaffoldBackgroundColor,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  curveType: CurveType.flat,
-                  bevel: 0,
-                  padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  child: Text(
-                    "${data.data ?? 0 + 1} / ${pics.length}",
-                    style: TextStyle(fontSize: 12),
+                Card(
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(
+                      "${data.data ?? 0 + 1} / ${pics.length}",
+                      style: TextStyle(fontSize: 12),
+                    ),
                   ),
                 ),
               ],

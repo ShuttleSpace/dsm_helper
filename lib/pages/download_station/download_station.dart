@@ -9,7 +9,6 @@ import 'package:dsm_helper/widgets/animation_progress_bar.dart';
 import 'package:dsm_helper/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:neumorphic/neumorphic.dart';
 
 class DownloadStation extends StatefulWidget {
   @override
@@ -88,13 +87,7 @@ class _DownloadStationState extends State<DownloadStation> {
           }
         });
       },
-      child: NeuCard(
-        curveType: CurveType.flat,
-        decoration: NeumorphicDecoration(
-          color: Theme.of(context).scaffoldBackgroundColor,
-          borderRadius: BorderRadius.circular(20),
-        ),
-        bevel: 20,
+      child: Card(
         child: Padding(
           padding: EdgeInsets.all(20),
           child: Column(
@@ -135,30 +128,16 @@ class _DownloadStationState extends State<DownloadStation> {
                                 getData();
                               }
                             },
-                            child: NeuCard(
-                              padding: EdgeInsets.all(5),
-                              // margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                              // padding: EdgeInsets.symmetric(vertical: 20),
-                              decoration: NeumorphicDecoration(
-                                color:
-                                    Theme.of(context).scaffoldBackgroundColor,
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                              curveType: download['status'] == 2
-                                  ? CurveType.emboss
-                                  : CurveType.flat,
-                              bevel: 20,
-                              child: pauseLoading[download['id']] == true
-                                  ? CupertinoActivityIndicator()
-                                  : Icon(
-                                      download['status'] == 2
-                                          ? Icons.pause_circle_outline_sharp
-                                          : Icons.play_circle_outline_sharp,
-                                      color: download['status'] == 2
-                                          ? Colors.red
-                                          : Colors.green,
-                                    ),
-                            ),
+                            child: pauseLoading[download['id']] == true
+                                ? CupertinoActivityIndicator()
+                                : Icon(
+                                    download['status'] == 2
+                                        ? Icons.pause_circle_outline_sharp
+                                        : Icons.play_circle_outline_sharp,
+                                    color: download['status'] == 2
+                                        ? Colors.red
+                                        : Colors.green,
+                                  ),
                           )
                         : Container(
                             // child: Text("${download['status']}"),
@@ -380,13 +359,7 @@ class _DownloadStationState extends State<DownloadStation> {
         actions: [
           Padding(
             padding: EdgeInsets.only(right: 10, top: 8, bottom: 8),
-            child: NeuButton(
-              decoration: NeumorphicDecoration(
-                color: Theme.of(context).scaffoldBackgroundColor,
-                borderRadius: BorderRadius.circular(10),
-              ),
-              padding: EdgeInsets.all(10),
-              bevel: 5,
+            child: OutlinedButton(
               onPressed: () {
                 Navigator.of(context)
                     .push(
@@ -408,17 +381,8 @@ class _DownloadStationState extends State<DownloadStation> {
       ),
       body: loading
           ? Center(
-              child: NeuCard(
-                padding: EdgeInsets.all(50),
-                curveType: CurveType.flat,
-                decoration: NeumorphicDecoration(
-                  color: Theme.of(context).scaffoldBackgroundColor,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                bevel: 20,
-                child: CupertinoActivityIndicator(
-                  radius: 14,
-                ),
+              child: CupertinoActivityIndicator(
+                radius: 14,
               ),
             )
           : tasks.length > 0

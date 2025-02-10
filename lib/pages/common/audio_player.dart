@@ -6,7 +6,6 @@ import 'package:dsm_helper/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart' as ja;
-import 'package:neumorphic/neumorphic.dart';
 import 'package:provider/provider.dart';
 
 class AudioPlayer extends StatefulWidget {
@@ -154,13 +153,8 @@ class ControlButtons extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        NeuButton(
+        OutlinedButton(
           child: const Icon(Icons.volume_up),
-          decoration: NeumorphicDecoration(
-            shape: BoxShape.circle,
-            color: Theme.of(context).scaffoldBackgroundColor,
-          ),
-          bevel: 10,
           onPressed: () {
             showSliderDialog(
               context: context,
@@ -192,54 +186,34 @@ class ControlButtons extends StatelessWidget {
             final playing = playerState?.playing;
             if (processingState == ja.ProcessingState.loading ||
                 processingState == ja.ProcessingState.buffering) {
-              return NeuButton(
+              return OutlinedButton(
                 child: const CupertinoActivityIndicator(
                   radius: 32,
                 ),
-                decoration: NeumorphicDecoration(
-                  shape: BoxShape.circle,
-                  color: Theme.of(context).scaffoldBackgroundColor,
-                ),
-                bevel: 10,
                 onPressed: player.play,
               );
             } else if (playing != true) {
-              return NeuButton(
+              return OutlinedButton(
                 child: const Icon(
                   Icons.play_arrow,
                   size: 64,
                 ),
-                decoration: NeumorphicDecoration(
-                  shape: BoxShape.circle,
-                  color: Theme.of(context).scaffoldBackgroundColor,
-                ),
-                bevel: 10,
                 onPressed: player.play,
               );
             } else if (processingState != ja.ProcessingState.completed) {
-              return NeuButton(
+              return OutlinedButton(
                 child: const Icon(
                   Icons.pause,
                   size: 64,
                 ),
-                decoration: NeumorphicDecoration(
-                  shape: BoxShape.circle,
-                  color: Theme.of(context).scaffoldBackgroundColor,
-                ),
-                bevel: 10,
                 onPressed: player.pause,
               );
             } else {
-              return NeuButton(
+              return OutlinedButton(
                 child: const Icon(
                   Icons.play_arrow,
                   size: 64,
                 ),
-                decoration: NeumorphicDecoration(
-                  shape: BoxShape.circle,
-                  color: Theme.of(context).scaffoldBackgroundColor,
-                ),
-                bevel: 10,
                 onPressed: () => player.seek(Duration.zero,
                     index: player.effectiveIndices?.first),
               );
@@ -258,14 +232,9 @@ class ControlButtons extends StatelessWidget {
         ),
         StreamBuilder<double>(
           stream: player.speedStream,
-          builder: (context, snapshot) => NeuButton(
+          builder: (context, snapshot) => OutlinedButton(
             child: Text("${snapshot.data?.toStringAsFixed(1)}x",
                 style: const TextStyle(fontWeight: FontWeight.bold)),
-            decoration: NeumorphicDecoration(
-              shape: BoxShape.circle,
-              color: Theme.of(context).scaffoldBackgroundColor,
-            ),
-            bevel: 10,
             onPressed: () {
               showSliderDialog(
                 context: context,

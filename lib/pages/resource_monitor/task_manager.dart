@@ -7,7 +7,6 @@ import 'package:dsm_helper/widgets/label.dart';
 import 'package:dsm_helper/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:neumorphic/neumorphic.dart';
 
 class TaskManager extends StatefulWidget {
   @override
@@ -79,26 +78,23 @@ class _TaskManagerState extends State<TaskManager>
       title = service['display_name'];
     }
 
-    return NeuCard(
-      decoration: NeumorphicDecoration(
-        color: Theme.of(context).scaffoldBackgroundColor,
-        borderRadius: BorderRadius.circular(20),
-      ),
+    return Card(
       margin: EdgeInsets.all(10),
-      padding: EdgeInsets.all(20),
-      curveType: CurveType.flat,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            "$title",
-            overflow: TextOverflow.ellipsis,
-            style: TextStyle(fontSize: 16),
-          ),
-          // SizedBox(
-          //   height: 10,
-          // ),
-        ],
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              "$title",
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(fontSize: 16),
+            ),
+            // SizedBox(
+            //   height: 10,
+            // ),
+          ],
+        ),
       ),
     );
   }
@@ -108,109 +104,103 @@ class _TaskManagerState extends State<TaskManager>
     if (slice['cpu_time'] is num) {
       cpuTime = Util.timeLong(slice['cpu_time'].toInt());
     }
-    return NeuCard(
-      decoration: NeumorphicDecoration(
-        color: Theme.of(context).scaffoldBackgroundColor,
-        borderRadius: BorderRadius.circular(20),
-      ),
+    return Card(
       margin: EdgeInsets.all(10),
-      padding: EdgeInsets.all(20),
-      curveType: CurveType.flat,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Expanded(
-                child: Text(
-                  "${slice['name'] != '' ? slice['name'] : slice['name_i18n'] != '' ? slice['name_i18n'] : slice['unit_name']}",
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(fontSize: 16),
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    "${slice['name'] != '' ? slice['name'] : slice['name_i18n'] != '' ? slice['name_i18n'] : slice['unit_name']}",
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(fontSize: 16),
+                  ),
                 ),
-              ),
-              Text(
-                  "内存：${slice['memory'] is num ? Util.formatSize(slice['memory'], fixed: 1) : slice['memory']}")
-            ],
-          ),
-          SizedBox(
-            height: 10,
-          ),
-          Row(
-            children: [
-              Expanded(
-                  child: Text(
-                      "CPU(%)：${slice['cpu_utilization'] is num ? slice['cpu_utilization'].toStringAsFixed(2) : slice['cpu_utilization']}")),
-              Expanded(
-                  child: Text(
-                      "CPU Time：${slice['cpu_time'] is String ? slice['cpu_time'] : '${cpuTime['hours']}:${cpuTime['minutes']}:${cpuTime['seconds']}'}")),
-            ],
-          ),
-          Row(
-            children: [
-              Expanded(
-                  child: Text(
-                      "读取(秒)：${slice['byte_read_per_sec'] is num ? Util.formatSize(slice['byte_read_per_sec'], fixed: 1, showByte: true) : slice['byte_read_per_sec']}")),
-              Expanded(
-                  child: Text(
-                      "写入(秒)：${slice['byte_write_per_sec'] is num ? Util.formatSize(slice['byte_write_per_sec'], fixed: 1, showByte: true) : slice['byte_write_per_sec']}")),
-            ],
-          ),
-        ],
+                Text(
+                    "内存：${slice['memory'] is num ? Util.formatSize(slice['memory'], fixed: 1) : slice['memory']}")
+              ],
+            ),
+            SizedBox(
+              height: 10,
+            ),
+            Row(
+              children: [
+                Expanded(
+                    child: Text(
+                        "CPU(%)：${slice['cpu_utilization'] is num ? slice['cpu_utilization'].toStringAsFixed(2) : slice['cpu_utilization']}")),
+                Expanded(
+                    child: Text(
+                        "CPU Time：${slice['cpu_time'] is String ? slice['cpu_time'] : '${cpuTime['hours']}:${cpuTime['minutes']}:${cpuTime['seconds']}'}")),
+              ],
+            ),
+            Row(
+              children: [
+                Expanded(
+                    child: Text(
+                        "读取(秒)：${slice['byte_read_per_sec'] is num ? Util.formatSize(slice['byte_read_per_sec'], fixed: 1, showByte: true) : slice['byte_read_per_sec']}")),
+                Expanded(
+                    child: Text(
+                        "写入(秒)：${slice['byte_write_per_sec'] is num ? Util.formatSize(slice['byte_write_per_sec'], fixed: 1, showByte: true) : slice['byte_write_per_sec']}")),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
 
   Widget _buildProcessItem(process) {
-    return NeuCard(
-      decoration: NeumorphicDecoration(
-        color: Theme.of(context).scaffoldBackgroundColor,
-        borderRadius: BorderRadius.circular(20),
-      ),
+    return Card(
       margin: EdgeInsets.all(10),
-      padding: EdgeInsets.all(20),
-      curveType: CurveType.flat,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            "${process['command']}",
-            overflow: TextOverflow.ellipsis,
-            style: TextStyle(fontSize: 16),
-          ),
-          SizedBox(
-            height: 10,
-          ),
-          Row(
-            children: [
-              process['status'] == "R"
-                  ? Label("运行中", Colors.green)
-                  : process['status'] == "S"
-                      ? Label("睡眠中", Colors.grey)
-                      : Label(process['status'], Colors.red),
-              SizedBox(
-                width: 10,
-              ),
-              Text("CPU:${(process['cpu'] / 10).toStringAsFixed(1)}%"),
-              SizedBox(
-                width: 10,
-              ),
-              Text("PID:${process['pid']}"),
-            ],
-          ),
-          SizedBox(
-            height: 10,
-          ),
-          Row(
-            children: [
-              Expanded(
-                  child: Text(
-                      "私有内存：${Util.formatSize(process['mem'] * 97, fixed: 1)}")),
-              Expanded(
-                  child: Text(
-                      "共享内存：${Util.formatSize(process['mem_shared'] * 1024, fixed: 2)}")),
-            ],
-          ),
-        ],
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              "${process['command']}",
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(fontSize: 16),
+            ),
+            SizedBox(
+              height: 10,
+            ),
+            Row(
+              children: [
+                process['status'] == "R"
+                    ? Label("运行中", Colors.green)
+                    : process['status'] == "S"
+                        ? Label("睡眠中", Colors.grey)
+                        : Label(process['status'], Colors.red),
+                SizedBox(
+                  width: 10,
+                ),
+                Text("CPU:${(process['cpu'] / 10).toStringAsFixed(1)}%"),
+                SizedBox(
+                  width: 10,
+                ),
+                Text("PID:${process['pid']}"),
+              ],
+            ),
+            SizedBox(
+              height: 10,
+            ),
+            Row(
+              children: [
+                Expanded(
+                    child: Text(
+                        "私有内存：${Util.formatSize(process['mem'] * 97, fixed: 1)}")),
+                Expanded(
+                    child: Text(
+                        "共享内存：${Util.formatSize(process['mem_shared'] * 1024, fixed: 2)}")),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -224,17 +214,8 @@ class _TaskManagerState extends State<TaskManager>
       ),
       body: loading
           ? Center(
-              child: NeuCard(
-                padding: EdgeInsets.all(50),
-                curveType: CurveType.flat,
-                decoration: NeumorphicDecoration(
-                  color: Theme.of(context).scaffoldBackgroundColor,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                bevel: 20,
-                child: CupertinoActivityIndicator(
-                  radius: 14,
-                ),
+              child: CupertinoActivityIndicator(
+                radius: 14,
               ),
             )
           : Column(
@@ -242,6 +223,7 @@ class _TaskManagerState extends State<TaskManager>
                 Container(
                   color: Theme.of(context).colorScheme.surface,
                   child: TabBar(
+                    dividerHeight: 0,
                     isScrollable: true,
                     controller: _tabController,
                     indicatorSize: TabBarIndicatorSize.label,

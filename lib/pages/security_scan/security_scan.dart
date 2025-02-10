@@ -5,7 +5,6 @@ import 'package:dsm_helper/widgets/bubble_tab_indicator.dart';
 import 'package:dsm_helper/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:neumorphic/neumorphic.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 
 class SecurityScan extends StatefulWidget {
@@ -137,14 +136,8 @@ class _SecurityScanState extends State<SecurityScan>
 
     rules.forEach((value) {
       value['strId'] = value['strId'].replaceAll("_v2", "");
-      list.add(NeuCard(
+      list.add(Card(
         margin: EdgeInsets.only(bottom: 20),
-        decoration: NeumorphicDecoration(
-          color: Theme.of(context).scaffoldBackgroundColor,
-          borderRadius: BorderRadius.circular(20),
-        ),
-        curveType: CurveType.flat,
-        bevel: 20,
         child: Padding(
           padding: const EdgeInsets.all(20.0),
           child: Row(
@@ -180,31 +173,16 @@ class _SecurityScanState extends State<SecurityScan>
       ),
       body: loading
           ? Center(
-              child: NeuCard(
-                padding: EdgeInsets.all(50),
-                curveType: CurveType.flat,
-                decoration: NeumorphicDecoration(
-                  color: Theme.of(context).scaffoldBackgroundColor,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                bevel: 20,
-                child: CupertinoActivityIndicator(
-                  radius: 14,
-                ),
+              child: CupertinoActivityIndicator(
+                radius: 14,
               ),
             )
           : Column(
               children: [
-                NeuCard(
-                  width: double.infinity,
-                  decoration: NeumorphicDecoration(
-                    color: Theme.of(context).scaffoldBackgroundColor,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
+                Card(
                   margin: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-                  curveType: CurveType.flat,
-                  bevel: 10,
                   child: TabBar(
+                    dividerHeight: 0,
                     isScrollable: true,
                     controller: _tabController,
                     indicatorSize: TabBarIndicatorSize.label,
@@ -248,13 +226,7 @@ class _SecurityScanState extends State<SecurityScan>
                       ListView(
                         padding: EdgeInsets.all(20),
                         children: [
-                          NeuCard(
-                            decoration: NeumorphicDecoration(
-                              color: Theme.of(context).scaffoldBackgroundColor,
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            curveType: CurveType.flat,
-                            bevel: 20,
+                          Card(
                             child: Padding(
                               padding: EdgeInsets.all(20),
                               child: Row(

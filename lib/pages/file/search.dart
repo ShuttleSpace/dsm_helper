@@ -1,7 +1,6 @@
 import 'package:dsm_helper/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:neumorphic/neumorphic.dart';
 
 class Search extends StatefulWidget {
   final String folder;
@@ -40,19 +39,15 @@ class _SearchState extends State<Search> {
         child: ListView(
           padding: EdgeInsets.all(20),
           children: [
-            NeuCard(
-              decoration: NeumorphicDecoration(
-                color: Theme.of(context).scaffoldBackgroundColor,
-                borderRadius: BorderRadius.circular(20),
-              ),
-              bevel: 20,
-              curveType: CurveType.flat,
-              padding: EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-              child: TextField(
-                onChanged: (v) => pattern = v,
-                decoration: InputDecoration(
-                  border: InputBorder.none,
-                  labelText: '关键字',
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: TextField(
+                  onChanged: (v) => pattern = v,
+                  decoration: InputDecoration(
+                    border: InputBorder.none,
+                    labelText: '关键字',
+                  ),
                 ),
               ),
             ),
@@ -67,57 +62,47 @@ class _SearchState extends State<Search> {
                     searchContent = !searchContent;
                   });
                 },
-                child: NeuCard(
-                  decoration: NeumorphicDecoration(
-                    color: Theme.of(context).scaffoldBackgroundColor,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  curveType: searchContent ? CurveType.emboss : CurveType.flat,
-                  bevel: 12,
-                  height: 60,
-                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-                  child: Row(
-                    children: [
-                      Text("启用文件内容搜索"),
-                      Spacer(),
-                      if (searchContent)
-                        Icon(
-                          CupertinoIcons.checkmark_alt,
-                          color: Color(0xffff9813),
-                        ),
-                    ],
+                child: Card(
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Row(
+                      children: [
+                        Text("启用文件内容搜索"),
+                        Spacer(),
+                        if (searchContent)
+                          Icon(
+                            CupertinoIcons.checkmark_alt,
+                            color: Color(0xffff9813),
+                          ),
+                      ],
+                    ),
                   ),
                 ),
               ),
             ),
-            NeuCard(
-              decoration: NeumorphicDecoration(
-                color: Theme.of(context).scaffoldBackgroundColor,
-                borderRadius: BorderRadius.circular(20),
-              ),
-              bevel: 20,
-              curveType: CurveType.flat,
-              padding: EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-              child: TextField(
-                controller: folderController,
-                enabled: false,
-                decoration: InputDecoration(
-                  border: InputBorder.none,
-                  labelText: '所在位置',
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: TextField(
+                  controller: folderController,
+                  enabled: false,
+                  decoration: InputDecoration(
+                    border: InputBorder.none,
+                    labelText: '所在位置',
+                  ),
                 ),
               ),
             ),
             SizedBox(
               height: 20,
             ),
-            NeuButton(
-              padding: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-              decoration: NeumorphicDecoration(
-                color: Theme.of(context).scaffoldBackgroundColor,
-                borderRadius: BorderRadius.circular(20),
-              ),
+            OutlinedButton(
               onPressed: () {
-                Navigator.of(context).pop({"folders": folders, "pattern": pattern, "search_content": searchContent});
+                Navigator.of(context).pop({
+                  "folders": folders,
+                  "pattern": pattern,
+                  "search_content": searchContent
+                });
                 // Navigator.of(context).push(CupertinoPageRoute(
                 //     builder: (context) {
                 //       return SearchResult(

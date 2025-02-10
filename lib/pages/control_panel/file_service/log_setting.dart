@@ -2,7 +2,6 @@ import 'package:dsm_helper/util/function.dart';
 import 'package:dsm_helper/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:neumorphic/neumorphic.dart';
 import 'package:flutter_vibrate/flutter_vibrate.dart';
 
 class LogSetting extends StatefulWidget {
@@ -43,17 +42,8 @@ class _LogSettingState extends State<LogSetting> {
       ),
       body: loading
           ? Center(
-              child: NeuCard(
-                padding: EdgeInsets.all(50),
-                curveType: CurveType.flat,
-                decoration: NeumorphicDecoration(
-                  color: Theme.of(context).scaffoldBackgroundColor,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                bevel: 20,
-                child: CupertinoActivityIndicator(
-                  radius: 14,
-                ),
+              child: CupertinoActivityIndicator(
+                radius: 14,
               ),
             )
           : Column(
@@ -69,29 +59,23 @@ class _LogSettingState extends State<LogSetting> {
                                 setting['create'] == "1" ? "0" : "1";
                           });
                         },
-                        child: NeuCard(
-                          padding: EdgeInsets.symmetric(
-                              horizontal: 20, vertical: 20),
-                          decoration: NeumorphicDecoration(
-                            color: Theme.of(context).scaffoldBackgroundColor,
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          curveType: setting['create'] == "1"
-                              ? CurveType.emboss
-                              : CurveType.flat,
-                          child: Row(
-                            children: [
-                              Text(
-                                '创建',
-                                style: TextStyle(fontSize: 18),
-                              ),
-                              Spacer(),
-                              if (setting['create'] == "1")
-                                Icon(
-                                  CupertinoIcons.checkmark_alt,
-                                  color: Color(0xffff9813),
+                        child: Card(
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Row(
+                              children: [
+                                Text(
+                                  '创建',
+                                  style: TextStyle(fontSize: 18),
                                 ),
-                            ],
+                                Spacer(),
+                                if (setting['create'] == "1")
+                                  Icon(
+                                    CupertinoIcons.checkmark_alt,
+                                    color: Color(0xffff9813),
+                                  ),
+                              ],
+                            ),
                           ),
                         ),
                       ),
@@ -105,29 +89,23 @@ class _LogSettingState extends State<LogSetting> {
                                 setting['write'] == "1" ? "0" : "1";
                           });
                         },
-                        child: NeuCard(
-                          padding: EdgeInsets.symmetric(
-                              horizontal: 20, vertical: 20),
-                          decoration: NeumorphicDecoration(
-                            color: Theme.of(context).scaffoldBackgroundColor,
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          curveType: setting['write'] == "1"
-                              ? CurveType.emboss
-                              : CurveType.flat,
-                          child: Row(
-                            children: [
-                              Text(
-                                '写入',
-                                style: TextStyle(fontSize: 18),
-                              ),
-                              Spacer(),
-                              if (setting['write'] == "1")
-                                Icon(
-                                  CupertinoIcons.checkmark_alt,
-                                  color: Color(0xffff9813),
+                        child: Card(
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Row(
+                              children: [
+                                Text(
+                                  '写入',
+                                  style: TextStyle(fontSize: 18),
                                 ),
-                            ],
+                                Spacer(),
+                                if (setting['write'] == "1")
+                                  Icon(
+                                    CupertinoIcons.checkmark_alt,
+                                    color: Color(0xffff9813),
+                                  ),
+                              ],
+                            ),
                           ),
                         ),
                       ),
@@ -141,29 +119,23 @@ class _LogSettingState extends State<LogSetting> {
                                 setting['move'] == "1" ? "0" : "1";
                           });
                         },
-                        child: NeuCard(
-                          padding: EdgeInsets.symmetric(
-                              horizontal: 20, vertical: 20),
-                          decoration: NeumorphicDecoration(
-                            color: Theme.of(context).scaffoldBackgroundColor,
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          curveType: setting['move'] == "1"
-                              ? CurveType.emboss
-                              : CurveType.flat,
-                          child: Row(
-                            children: [
-                              Text(
-                                '移动',
-                                style: TextStyle(fontSize: 18),
-                              ),
-                              Spacer(),
-                              if (setting['move'] == "1")
-                                Icon(
-                                  CupertinoIcons.checkmark_alt,
-                                  color: Color(0xffff9813),
+                        child: Card(
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Row(
+                              children: [
+                                Text(
+                                  '移动',
+                                  style: TextStyle(fontSize: 18),
                                 ),
-                            ],
+                                Spacer(),
+                                if (setting['move'] == "1")
+                                  Icon(
+                                    CupertinoIcons.checkmark_alt,
+                                    color: Color(0xffff9813),
+                                  ),
+                              ],
+                            ),
                           ),
                         ),
                       ),
@@ -177,29 +149,23 @@ class _LogSettingState extends State<LogSetting> {
                                 setting['delete'] == "1" ? "0" : "1";
                           });
                         },
-                        child: NeuCard(
-                          padding: EdgeInsets.symmetric(
-                              horizontal: 20, vertical: 20),
-                          decoration: NeumorphicDecoration(
-                            color: Theme.of(context).scaffoldBackgroundColor,
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          curveType: setting['delete'] == "1"
-                              ? CurveType.emboss
-                              : CurveType.flat,
-                          child: Row(
-                            children: [
-                              Text(
-                                '删除',
-                                style: TextStyle(fontSize: 18),
-                              ),
-                              Spacer(),
-                              if (setting['delete'] == "1")
-                                Icon(
-                                  CupertinoIcons.checkmark_alt,
-                                  color: Color(0xffff9813),
+                        child: Card(
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Row(
+                              children: [
+                                Text(
+                                  '删除',
+                                  style: TextStyle(fontSize: 18),
                                 ),
-                            ],
+                                Spacer(),
+                                if (setting['delete'] == "1")
+                                  Icon(
+                                    CupertinoIcons.checkmark_alt,
+                                    color: Color(0xffff9813),
+                                  ),
+                              ],
+                            ),
                           ),
                         ),
                       ),
@@ -213,29 +179,23 @@ class _LogSettingState extends State<LogSetting> {
                                 setting['read'] == "1" ? "0" : "1";
                           });
                         },
-                        child: NeuCard(
-                          padding: EdgeInsets.symmetric(
-                              horizontal: 20, vertical: 20),
-                          decoration: NeumorphicDecoration(
-                            color: Theme.of(context).scaffoldBackgroundColor,
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          curveType: setting['read'] == "1"
-                              ? CurveType.emboss
-                              : CurveType.flat,
-                          child: Row(
-                            children: [
-                              Text(
-                                '读取',
-                                style: TextStyle(fontSize: 18),
-                              ),
-                              Spacer(),
-                              if (setting['read'] == "1")
-                                Icon(
-                                  CupertinoIcons.checkmark_alt,
-                                  color: Color(0xffff9813),
+                        child: Card(
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Row(
+                              children: [
+                                Text(
+                                  '读取',
+                                  style: TextStyle(fontSize: 18),
                                 ),
-                            ],
+                                Spacer(),
+                                if (setting['read'] == "1")
+                                  Icon(
+                                    CupertinoIcons.checkmark_alt,
+                                    color: Color(0xffff9813),
+                                  ),
+                              ],
+                            ),
                           ),
                         ),
                       ),
@@ -249,29 +209,23 @@ class _LogSettingState extends State<LogSetting> {
                                 setting['rename'] == "1" ? "0" : "1";
                           });
                         },
-                        child: NeuCard(
-                          padding: EdgeInsets.symmetric(
-                              horizontal: 20, vertical: 20),
-                          decoration: NeumorphicDecoration(
-                            color: Theme.of(context).scaffoldBackgroundColor,
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          curveType: setting['rename'] == "1"
-                              ? CurveType.emboss
-                              : CurveType.flat,
-                          child: Row(
-                            children: [
-                              Text(
-                                '重命名',
-                                style: TextStyle(fontSize: 18),
-                              ),
-                              Spacer(),
-                              if (setting['rename'] == "1")
-                                Icon(
-                                  CupertinoIcons.checkmark_alt,
-                                  color: Color(0xffff9813),
+                        child: Card(
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Row(
+                              children: [
+                                Text(
+                                  '重命名',
+                                  style: TextStyle(fontSize: 18),
                                 ),
-                            ],
+                                Spacer(),
+                                if (setting['rename'] == "1")
+                                  Icon(
+                                    CupertinoIcons.checkmark_alt,
+                                    color: Color(0xffff9813),
+                                  ),
+                              ],
+                            ),
                           ),
                         ),
                       ),
@@ -283,12 +237,7 @@ class _LogSettingState extends State<LogSetting> {
                 ),
                 Padding(
                   padding: EdgeInsets.all(20),
-                  child: NeuButton(
-                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-                    decoration: NeumorphicDecoration(
-                      color: Theme.of(context).scaffoldBackgroundColor,
-                      borderRadius: BorderRadius.circular(20),
-                    ),
+                  child: OutlinedButton(
                     onPressed: () async {
                       var res = await Api.fileServiceLogSave(
                           widget.protocol, setting);

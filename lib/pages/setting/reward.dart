@@ -2,7 +2,6 @@ import 'package:dsm_helper/util/function.dart';
 import 'package:dsm_helper/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:neumorphic/neumorphic.dart';
 
 class Reward extends StatefulWidget {
   @override
@@ -32,14 +31,7 @@ class _RewardState extends State<Reward> {
   }
 
   Widget _buildRewardItem(reward) {
-    return NeuCard(
-      padding: EdgeInsets.all(20),
-      curveType: CurveType.flat,
-      decoration: NeumorphicDecoration(
-        color: Theme.of(context).scaffoldBackgroundColor,
-        borderRadius: BorderRadius.circular(20),
-      ),
-      bevel: 20,
+    return Card(
       child: Row(
         children: [
           Expanded(child: Text(reward['name'])),
@@ -58,17 +50,8 @@ class _RewardState extends State<Reward> {
       ),
       body: loading
           ? Center(
-              child: NeuCard(
-                padding: EdgeInsets.all(50),
-                curveType: CurveType.flat,
-                decoration: NeumorphicDecoration(
-                  color: Theme.of(context).scaffoldBackgroundColor,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                bevel: 20,
-                child: CupertinoActivityIndicator(
-                  radius: 14,
-                ),
+              child: CupertinoActivityIndicator(
+                radius: 14,
               ),
             )
           : ListView.separated(

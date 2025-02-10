@@ -6,7 +6,6 @@ import 'package:dsm_helper/widgets/label.dart';
 import 'package:dsm_helper/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:neumorphic/neumorphic.dart';
 
 class VirtualMachine extends StatefulWidget {
   @override
@@ -53,93 +52,79 @@ class _VirtualMachineState extends State<VirtualMachine> {
       builder: (context) {
         return Material(
           color: Colors.transparent,
-          child: NeuCard(
-            width: double.infinity,
-            padding: EdgeInsets.all(22),
-            bevel: 5,
-            curveType: CurveType.emboss,
-            decoration: NeumorphicDecoration(
-                color: Theme.of(context).scaffoldBackgroundColor,
-                borderRadius: BorderRadius.vertical(top: Radius.circular(22))),
+          child: Card(
             child: SafeArea(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  Text(
-                    "确认操作",
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
-                  ),
-                  SizedBox(
-                    height: 12,
-                  ),
-                  Text(
-                    action == "poweroff"
-                        ? "如果您强制关闭虚拟机，可能出现数据丟失或文件系统错误。是否确定继续？"
-                        : "如果您虚拟机上未安装Guest Agent，可能无法成功关闭，是否确定继续？",
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.w400),
-                  ),
-                  SizedBox(
-                    height: 22,
-                  ),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: NeuButton(
-                          onPressed: () async {
-                            Navigator.of(context).pop();
-                            setState(() {
-                              powerLoading[guest['id']] = true;
-                            });
-                            var res = await Api.vmmPower(guest['id'], action);
-                            if (res['success']) {
-                              Util.toast("请求发送成功");
-                              getGuests();
-                            } else {
-                              Util.toast("请求发送失败，代码：${res['error']['code']}");
-                            }
-                            setState(() {
-                              powerLoading[guest['id']] = false;
-                            });
-                          },
-                          decoration: NeumorphicDecoration(
-                            color: Theme.of(context).scaffoldBackgroundColor,
-                            borderRadius: BorderRadius.circular(25),
-                          ),
-                          bevel: 5,
-                          padding: EdgeInsets.symmetric(vertical: 10),
-                          child: Text(
-                            "确认",
-                            style: TextStyle(
-                                fontSize: 18, color: Colors.redAccent),
-                          ),
-                        ),
-                      ),
-                      SizedBox(
-                        width: 16,
-                      ),
-                      Expanded(
-                        child: NeuButton(
-                          onPressed: () async {
-                            Navigator.of(context).pop();
-                          },
-                          decoration: NeumorphicDecoration(
-                            color: Theme.of(context).scaffoldBackgroundColor,
-                            borderRadius: BorderRadius.circular(25),
-                          ),
-                          bevel: 5,
-                          padding: EdgeInsets.symmetric(vertical: 10),
-                          child: Text(
-                            "取消",
-                            style: TextStyle(fontSize: 18),
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    Text(
+                      "确认操作",
+                      style:
+                          TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
+                    ),
+                    SizedBox(
+                      height: 12,
+                    ),
+                    Text(
+                      action == "poweroff"
+                          ? "如果您强制关闭虚拟机，可能出现数据丟失或文件系统错误。是否确定继续？"
+                          : "如果您虚拟机上未安装Guest Agent，可能无法成功关闭，是否确定继续？",
+                      style:
+                          TextStyle(fontSize: 20, fontWeight: FontWeight.w400),
+                    ),
+                    SizedBox(
+                      height: 22,
+                    ),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: OutlinedButton(
+                            onPressed: () async {
+                              Navigator.of(context).pop();
+                              setState(() {
+                                powerLoading[guest['id']] = true;
+                              });
+                              var res = await Api.vmmPower(guest['id'], action);
+                              if (res['success']) {
+                                Util.toast("请求发送成功");
+                                getGuests();
+                              } else {
+                                Util.toast("请求发送失败，代码：${res['error']['code']}");
+                              }
+                              setState(() {
+                                powerLoading[guest['id']] = false;
+                              });
+                            },
+                            child: Text(
+                              "确认",
+                              style: TextStyle(
+                                  fontSize: 18, color: Colors.redAccent),
+                            ),
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(
-                    height: 8,
-                  ),
-                ],
+                        SizedBox(
+                          width: 16,
+                        ),
+                        Expanded(
+                          child: OutlinedButton(
+                            onPressed: () async {
+                              Navigator.of(context).pop();
+                            },
+                            child: Text(
+                              "取消",
+                              style: TextStyle(fontSize: 18),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(
+                      height: 8,
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
@@ -238,13 +223,7 @@ class _VirtualMachineState extends State<VirtualMachine> {
 
   Widget _buildHostItem(host) {
     List networks = host['nics'];
-    return NeuCard(
-      decoration: NeumorphicDecoration(
-        color: Theme.of(context).scaffoldBackgroundColor,
-        borderRadius: BorderRadius.circular(20),
-      ),
-      curveType: CurveType.flat,
-      bevel: 20,
+    return Card(
       child: Padding(
         padding: const EdgeInsets.all(20.0),
         child: Column(
@@ -274,20 +253,17 @@ class _VirtualMachineState extends State<VirtualMachine> {
                   child: Text("CPU："),
                 ),
                 Expanded(
-                  child: NeuCard(
-                    curveType: CurveType.flat,
-                    bevel: 10,
-                    decoration: NeumorphicDecoration(
-                      color: Theme.of(context).scaffoldBackgroundColor,
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: FAProgressBar(
-                      backgroundColor: Colors.transparent,
-                      changeColorValue: 90,
-                      changeProgressColor: Colors.red,
-                      progressColor: Colors.blue,
-                      currentValue: host['cpu_usage'],
-                      displayText: '%',
+                  child: Card(
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: FAProgressBar(
+                        backgroundColor: Colors.transparent,
+                        changeColorValue: 90,
+                        changeProgressColor: Colors.red,
+                        progressColor: Colors.blue,
+                        currentValue: host['cpu_usage'],
+                        displayText: '%',
+                      ),
                     ),
                   ),
                 ),
@@ -303,20 +279,17 @@ class _VirtualMachineState extends State<VirtualMachine> {
                   child: Text("RAM："),
                 ),
                 Expanded(
-                  child: NeuCard(
-                    curveType: CurveType.flat,
-                    bevel: 10,
-                    decoration: NeumorphicDecoration(
-                      color: Theme.of(context).scaffoldBackgroundColor,
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: FAProgressBar(
-                      backgroundColor: Colors.transparent,
-                      changeColorValue: 90,
-                      changeProgressColor: Colors.red,
-                      progressColor: Colors.blue,
-                      currentValue: host['ram_usage'],
-                      displayText: '%',
+                  child: Card(
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: FAProgressBar(
+                        backgroundColor: Colors.transparent,
+                        changeColorValue: 90,
+                        changeProgressColor: Colors.red,
+                        progressColor: Colors.blue,
+                        currentValue: host['ram_usage'],
+                        displayText: '%',
+                      ),
                     ),
                   ),
                 ),
@@ -336,14 +309,8 @@ class _VirtualMachineState extends State<VirtualMachine> {
       powerLoading[guest['id']] = false;
     }
     List networks = guest['nics'];
-    return NeuCard(
-      decoration: NeumorphicDecoration(
-        color: Theme.of(context).scaffoldBackgroundColor,
-        borderRadius: BorderRadius.circular(20),
-      ),
+    return Card(
       margin: EdgeInsets.only(bottom: 20),
-      curveType: CurveType.flat,
-      bevel: 20,
       child: Padding(
         padding: const EdgeInsets.all(20.0),
         child: Column(
@@ -384,103 +351,70 @@ class _VirtualMachineState extends State<VirtualMachine> {
                           builder: (context) {
                             return Material(
                               color: Colors.transparent,
-                              child: NeuCard(
-                                width: double.infinity,
-                                padding: EdgeInsets.all(22),
-                                bevel: 5,
-                                curveType: CurveType.emboss,
-                                decoration: NeumorphicDecoration(
-                                    color: Theme.of(context)
-                                        .scaffoldBackgroundColor,
-                                    borderRadius: BorderRadius.vertical(
-                                        top: Radius.circular(22))),
+                              child: Card(
                                 child: SafeArea(
                                   top: false,
-                                  child: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: <Widget>[
-                                      Text(
-                                        "选择操作",
-                                        style: TextStyle(
-                                            fontSize: 20,
-                                            fontWeight: FontWeight.w500),
-                                      ),
-                                      SizedBox(
-                                        height: 12,
-                                      ),
-                                      NeuButton(
-                                        onPressed: () async {
-                                          Navigator.of(context).pop();
-                                          power(guest, "shutdown");
-                                        },
-                                        decoration: NeumorphicDecoration(
-                                          color: Theme.of(context)
-                                              .scaffoldBackgroundColor,
-                                          borderRadius:
-                                              BorderRadius.circular(25),
-                                        ),
-                                        bevel: 5,
-                                        padding:
-                                            EdgeInsets.symmetric(vertical: 10),
-                                        child: Text(
-                                          "关机",
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: <Widget>[
+                                        Text(
+                                          "选择操作",
                                           style: TextStyle(
-                                              fontSize: 18,
-                                              color: Colors.redAccent),
+                                              fontSize: 20,
+                                              fontWeight: FontWeight.w500),
                                         ),
-                                      ),
-                                      SizedBox(
-                                        height: 22,
-                                      ),
-                                      NeuButton(
-                                        onPressed: () async {
-                                          Navigator.of(context).pop();
-                                          power(guest, "poweroff");
-                                        },
-                                        decoration: NeumorphicDecoration(
-                                          color: Theme.of(context)
-                                              .scaffoldBackgroundColor,
-                                          borderRadius:
-                                              BorderRadius.circular(25),
+                                        SizedBox(
+                                          height: 12,
                                         ),
-                                        bevel: 5,
-                                        padding:
-                                            EdgeInsets.symmetric(vertical: 10),
-                                        child: Text(
-                                          "强制关机",
-                                          style: TextStyle(
-                                              fontSize: 18,
-                                              color: Colors.redAccent),
+                                        OutlinedButton(
+                                          onPressed: () async {
+                                            Navigator.of(context).pop();
+                                            power(guest, "shutdown");
+                                          },
+                                          child: Text(
+                                            "关机",
+                                            style: TextStyle(
+                                                fontSize: 18,
+                                                color: Colors.redAccent),
+                                          ),
                                         ),
-                                      ),
-                                      SizedBox(
-                                        height: 22,
-                                      ),
-                                      NeuButton(
-                                        onPressed: () async {
-                                          Navigator.of(context).pop();
-                                          power(guest, "reboot");
-                                        },
-                                        decoration: NeumorphicDecoration(
-                                          color: Theme.of(context)
-                                              .scaffoldBackgroundColor,
-                                          borderRadius:
-                                              BorderRadius.circular(25),
+                                        SizedBox(
+                                          height: 22,
                                         ),
-                                        bevel: 5,
-                                        padding:
-                                            EdgeInsets.symmetric(vertical: 10),
-                                        child: Text(
-                                          "重新启动",
-                                          style: TextStyle(
-                                              fontSize: 18,
-                                              color: Colors.redAccent),
+                                        OutlinedButton(
+                                          onPressed: () async {
+                                            Navigator.of(context).pop();
+                                            power(guest, "poweroff");
+                                          },
+                                          child: Text(
+                                            "强制关机",
+                                            style: TextStyle(
+                                                fontSize: 18,
+                                                color: Colors.redAccent),
+                                          ),
                                         ),
-                                      ),
-                                      SizedBox(
-                                        height: 8,
-                                      ),
-                                    ],
+                                        SizedBox(
+                                          height: 22,
+                                        ),
+                                        OutlinedButton(
+                                          onPressed: () async {
+                                            Navigator.of(context).pop();
+                                            power(guest, "reboot");
+                                          },
+                                          child: Text(
+                                            "重新启动",
+                                            style: TextStyle(
+                                                fontSize: 18,
+                                                color: Colors.redAccent),
+                                          ),
+                                        ),
+                                        SizedBox(
+                                          height: 8,
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ),
                               ),
@@ -510,27 +444,12 @@ class _VirtualMachineState extends State<VirtualMachine> {
                       Util.toast("虚拟机状态未知，无法操作");
                     }
                   },
-                  child: NeuCard(
-                    padding: EdgeInsets.all(10),
-                    // margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                    // padding: EdgeInsets.symmetric(vertical: 20),
-                    decoration: NeumorphicDecoration(
-                      color: Theme.of(context).scaffoldBackgroundColor,
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    curveType: guest['type'] == "healthy"
-                        ? (guest['status'] == "none"
-                            ? CurveType.emboss
-                            : CurveType.flat)
-                        : CurveType.convex,
-                    bevel: 20,
-                    child: powerLoading[guest['id']] == true
-                        ? CupertinoActivityIndicator()
-                        : Image.asset(
-                            "assets/icons/shutdown.png",
-                            width: 20,
-                          ),
-                  ),
+                  child: powerLoading[guest['id']] == true
+                      ? CupertinoActivityIndicator()
+                      : Image.asset(
+                          "assets/icons/shutdown.png",
+                          width: 20,
+                        ),
                 ),
               ],
             ),
@@ -545,20 +464,17 @@ class _VirtualMachineState extends State<VirtualMachine> {
                     child: Text("CPU："),
                   ),
                   Expanded(
-                    child: NeuCard(
-                      curveType: CurveType.flat,
-                      bevel: 10,
-                      decoration: NeumorphicDecoration(
-                        color: Theme.of(context).scaffoldBackgroundColor,
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: FAProgressBar(
-                        backgroundColor: Colors.transparent,
-                        changeColorValue: 90,
-                        changeProgressColor: Colors.red,
-                        progressColor: Colors.blue,
-                        currentValue: guest['cpu_usage'] ~/ 10,
-                        displayText: '.${guest['cpu_usage'] % 10}%',
+                    child: Card(
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: FAProgressBar(
+                          backgroundColor: Colors.transparent,
+                          changeColorValue: 90,
+                          changeProgressColor: Colors.red,
+                          progressColor: Colors.blue,
+                          currentValue: guest['cpu_usage'] ~/ 10,
+                          displayText: '.${guest['cpu_usage'] % 10}%',
+                        ),
                       ),
                     ),
                   ),
@@ -574,21 +490,18 @@ class _VirtualMachineState extends State<VirtualMachine> {
                     child: Text("RAM："),
                   ),
                   Expanded(
-                    child: NeuCard(
-                      curveType: CurveType.flat,
-                      bevel: 10,
-                      decoration: NeumorphicDecoration(
-                        color: Theme.of(context).scaffoldBackgroundColor,
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: FAProgressBar(
-                        backgroundColor: Colors.transparent,
-                        changeColorValue: 90,
-                        changeProgressColor: Colors.red,
-                        progressColor: Colors.blue,
-                        currentValue: guest['ram_usage'] ~/ 100,
-                        displayText:
-                            '.${(guest['ram_usage'] % 100).toString().padLeft(2, "0")}%',
+                    child: Card(
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: FAProgressBar(
+                          backgroundColor: Colors.transparent,
+                          changeColorValue: 90,
+                          changeProgressColor: Colors.red,
+                          progressColor: Colors.blue,
+                          currentValue: guest['ram_usage'] ~/ 100,
+                          displayText:
+                              '.${(guest['ram_usage'] % 100).toString().padLeft(2, "0")}%',
+                        ),
                       ),
                     ),
                   ),
@@ -605,14 +518,8 @@ class _VirtualMachineState extends State<VirtualMachine> {
   }
 
   Widget _buildRepoItem(repo) {
-    return NeuCard(
-      decoration: NeumorphicDecoration(
-        color: Theme.of(context).scaffoldBackgroundColor,
-        borderRadius: BorderRadius.circular(20),
-      ),
-      curveType: CurveType.flat,
+    return Card(
       margin: EdgeInsets.only(bottom: 20),
-      bevel: 20,
       child: Padding(
         padding: const EdgeInsets.all(20.0),
         child: Column(
@@ -661,23 +568,20 @@ class _VirtualMachineState extends State<VirtualMachine> {
             Row(
               children: [
                 Expanded(
-                  child: NeuCard(
-                    curveType: CurveType.flat,
-                    bevel: 10,
-                    decoration: NeumorphicDecoration(
-                      color: Theme.of(context).scaffoldBackgroundColor,
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: FAProgressBar(
-                      backgroundColor: Colors.transparent,
-                      changeColorValue: 90,
-                      changeProgressColor: Colors.red,
-                      progressColor: Colors.blue,
-                      currentValue:
-                          ((int.parse(repo['used']) / int.parse(repo['size'])) *
-                                  100)
-                              .floor(),
-                      displayText: '%',
+                  child: Card(
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: FAProgressBar(
+                        backgroundColor: Colors.transparent,
+                        changeColorValue: 90,
+                        changeProgressColor: Colors.red,
+                        progressColor: Colors.blue,
+                        currentValue: ((int.parse(repo['used']) /
+                                    int.parse(repo['size'])) *
+                                100)
+                            .floor(),
+                        displayText: '%',
+                      ),
                     ),
                   ),
                 ),
@@ -698,17 +602,8 @@ class _VirtualMachineState extends State<VirtualMachine> {
       ),
       body: loading
           ? Center(
-              child: NeuCard(
-                padding: EdgeInsets.all(50),
-                curveType: CurveType.flat,
-                decoration: NeumorphicDecoration(
-                  color: Theme.of(context).scaffoldBackgroundColor,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                bevel: 20,
-                child: CupertinoActivityIndicator(
-                  radius: 14,
-                ),
+              child: CupertinoActivityIndicator(
+                radius: 14,
               ),
             )
           : Column(
@@ -720,62 +615,50 @@ class _VirtualMachineState extends State<VirtualMachine> {
                     });
                     getHosts();
                   },
-                  child: NeuCard(
-                    decoration: NeumorphicDecoration(
-                      color: Theme.of(context).scaffoldBackgroundColor,
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    curveType: CurveType.flat,
+                  child: Card(
                     margin: EdgeInsets.all(20),
-                    bevel: 20,
                     child: Padding(
                       padding: const EdgeInsets.all(20.0),
                       child: Row(
                         children: [
                           Expanded(
-                            child: NeuCard(
-                              decoration: NeumorphicDecoration(
-                                color:
-                                    Theme.of(context).scaffoldBackgroundColor,
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                              curveType: _currentIndex == 0
-                                  ? CurveType.emboss
-                                  : CurveType.flat,
-                              padding: EdgeInsets.all(10),
-                              bevel: 20,
-                              child: Column(
-                                children: [
-                                  Row(
-                                    children: [
-                                      Text("主机"),
-                                      Spacer(),
-                                      Text(
-                                          "${cluster['host_summ']['error'] + cluster['host_summ']['healthy'] + cluster['host_summ']['warning']}"),
-                                    ],
-                                  ),
-                                  SizedBox(
-                                    height: 10,
-                                  ),
-                                  if (cluster['host_summ']['error'] > 0)
-                                    Text(
-                                      "${cluster['host_summ']['error']}",
-                                      style: TextStyle(
-                                          fontSize: 40, color: Colors.red),
-                                    )
-                                  else if (cluster['host_summ']['warning'] > 0)
-                                    Text(
-                                      "${cluster['host_summ']['warning']}",
-                                      style: TextStyle(
-                                          fontSize: 40, color: Colors.orange),
-                                    )
-                                  else
-                                    Text(
-                                      "${cluster['host_summ']['healthy']}",
-                                      style: TextStyle(
-                                          fontSize: 40, color: Colors.green),
+                            child: Card(
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Column(
+                                  children: [
+                                    Row(
+                                      children: [
+                                        Text("主机"),
+                                        Spacer(),
+                                        Text(
+                                            "${cluster['host_summ']['error'] + cluster['host_summ']['healthy'] + cluster['host_summ']['warning']}"),
+                                      ],
                                     ),
-                                ],
+                                    SizedBox(
+                                      height: 10,
+                                    ),
+                                    if (cluster['host_summ']['error'] > 0)
+                                      Text(
+                                        "${cluster['host_summ']['error']}",
+                                        style: TextStyle(
+                                            fontSize: 40, color: Colors.red),
+                                      )
+                                    else if (cluster['host_summ']['warning'] >
+                                        0)
+                                      Text(
+                                        "${cluster['host_summ']['warning']}",
+                                        style: TextStyle(
+                                            fontSize: 40, color: Colors.orange),
+                                      )
+                                    else
+                                      Text(
+                                        "${cluster['host_summ']['healthy']}",
+                                        style: TextStyle(
+                                            fontSize: 40, color: Colors.green),
+                                      ),
+                                  ],
+                                ),
                               ),
                             ),
                           ),
@@ -790,50 +673,46 @@ class _VirtualMachineState extends State<VirtualMachine> {
                                 });
                                 getGuests();
                               },
-                              child: NeuCard(
-                                decoration: NeumorphicDecoration(
-                                  color:
-                                      Theme.of(context).scaffoldBackgroundColor,
-                                  borderRadius: BorderRadius.circular(20),
-                                ),
-                                curveType: _currentIndex == 1
-                                    ? CurveType.emboss
-                                    : CurveType.flat,
-                                padding: EdgeInsets.all(10),
-                                bevel: 20,
-                                child: Column(
-                                  children: [
-                                    Row(
-                                      children: [
-                                        Text("虚拟机"),
-                                        Spacer(),
-                                        Text(
-                                            "${cluster['guest_summ']['error'] + cluster['guest_summ']['healthy'] + cluster['guest_summ']['warning']}"),
-                                      ],
-                                    ),
-                                    SizedBox(
-                                      height: 10,
-                                    ),
-                                    if (cluster['guest_summ']['error'] > 0)
-                                      Text(
-                                        "${cluster['guest_summ']['error']}",
-                                        style: TextStyle(
-                                            fontSize: 40, color: Colors.red),
-                                      )
-                                    else if (cluster['guest_summ']['warning'] >
-                                        0)
-                                      Text(
-                                        "${cluster['guest_summ']['warning']}",
-                                        style: TextStyle(
-                                            fontSize: 40, color: Colors.orange),
-                                      )
-                                    else
-                                      Text(
-                                        "${cluster['guest_summ']['healthy']}",
-                                        style: TextStyle(
-                                            fontSize: 40, color: Colors.green),
+                              child: Card(
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Column(
+                                    children: [
+                                      Row(
+                                        children: [
+                                          Text("虚拟机"),
+                                          Spacer(),
+                                          Text(
+                                              "${cluster['guest_summ']['error'] + cluster['guest_summ']['healthy'] + cluster['guest_summ']['warning']}"),
+                                        ],
                                       ),
-                                  ],
+                                      SizedBox(
+                                        height: 10,
+                                      ),
+                                      if (cluster['guest_summ']['error'] > 0)
+                                        Text(
+                                          "${cluster['guest_summ']['error']}",
+                                          style: TextStyle(
+                                              fontSize: 40, color: Colors.red),
+                                        )
+                                      else if (cluster['guest_summ']
+                                              ['warning'] >
+                                          0)
+                                        Text(
+                                          "${cluster['guest_summ']['warning']}",
+                                          style: TextStyle(
+                                              fontSize: 40,
+                                              color: Colors.orange),
+                                        )
+                                      else
+                                        Text(
+                                          "${cluster['guest_summ']['healthy']}",
+                                          style: TextStyle(
+                                              fontSize: 40,
+                                              color: Colors.green),
+                                        ),
+                                    ],
+                                  ),
                                 ),
                               ),
                             ),
@@ -849,50 +728,45 @@ class _VirtualMachineState extends State<VirtualMachine> {
                                 });
                                 getRepos();
                               },
-                              child: NeuCard(
-                                decoration: NeumorphicDecoration(
-                                  color:
-                                      Theme.of(context).scaffoldBackgroundColor,
-                                  borderRadius: BorderRadius.circular(20),
-                                ),
-                                curveType: _currentIndex == 2
-                                    ? CurveType.emboss
-                                    : CurveType.flat,
-                                padding: EdgeInsets.all(10),
-                                bevel: 20,
-                                child: Column(
-                                  children: [
-                                    Row(
-                                      children: [
-                                        Text("存储"),
-                                        Spacer(),
-                                        Text(
-                                            "${cluster['repo_summ']['error'] + cluster['repo_summ']['healthy'] + cluster['repo_summ']['warning']}"),
-                                      ],
-                                    ),
-                                    SizedBox(
-                                      height: 10,
-                                    ),
-                                    if (cluster['repo_summ']['error'] > 0)
-                                      Text(
-                                        "${cluster['repo_summ']['error']}",
-                                        style: TextStyle(
-                                            fontSize: 40, color: Colors.red),
-                                      )
-                                    else if (cluster['repo_summ']['warning'] >
-                                        0)
-                                      Text(
-                                        "${cluster['repo_summ']['warning']}",
-                                        style: TextStyle(
-                                            fontSize: 40, color: Colors.orange),
-                                      )
-                                    else
-                                      Text(
-                                        "${cluster['repo_summ']['healthy']}",
-                                        style: TextStyle(
-                                            fontSize: 40, color: Colors.green),
+                              child: Card(
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Column(
+                                    children: [
+                                      Row(
+                                        children: [
+                                          Text("存储"),
+                                          Spacer(),
+                                          Text(
+                                              "${cluster['repo_summ']['error'] + cluster['repo_summ']['healthy'] + cluster['repo_summ']['warning']}"),
+                                        ],
                                       ),
-                                  ],
+                                      SizedBox(
+                                        height: 10,
+                                      ),
+                                      if (cluster['repo_summ']['error'] > 0)
+                                        Text(
+                                          "${cluster['repo_summ']['error']}",
+                                          style: TextStyle(
+                                              fontSize: 40, color: Colors.red),
+                                        )
+                                      else if (cluster['repo_summ']['warning'] >
+                                          0)
+                                        Text(
+                                          "${cluster['repo_summ']['warning']}",
+                                          style: TextStyle(
+                                              fontSize: 40,
+                                              color: Colors.orange),
+                                        )
+                                      else
+                                        Text(
+                                          "${cluster['repo_summ']['healthy']}",
+                                          style: TextStyle(
+                                              fontSize: 40,
+                                              color: Colors.green),
+                                        ),
+                                    ],
+                                  ),
                                 ),
                               ),
                             ),
@@ -908,18 +782,8 @@ class _VirtualMachineState extends State<VirtualMachine> {
                     children: [
                       hostLoading
                           ? Center(
-                              child: NeuCard(
-                                padding: EdgeInsets.all(50),
-                                curveType: CurveType.flat,
-                                decoration: NeumorphicDecoration(
-                                  color:
-                                      Theme.of(context).scaffoldBackgroundColor,
-                                  borderRadius: BorderRadius.circular(20),
-                                ),
-                                bevel: 20,
-                                child: CupertinoActivityIndicator(
-                                  radius: 14,
-                                ),
+                              child: CupertinoActivityIndicator(
+                                radius: 14,
                               ),
                             )
                           : ListView.builder(
@@ -931,18 +795,8 @@ class _VirtualMachineState extends State<VirtualMachine> {
                             ),
                       guestLoading
                           ? Center(
-                              child: NeuCard(
-                                padding: EdgeInsets.all(50),
-                                curveType: CurveType.flat,
-                                decoration: NeumorphicDecoration(
-                                  color:
-                                      Theme.of(context).scaffoldBackgroundColor,
-                                  borderRadius: BorderRadius.circular(20),
-                                ),
-                                bevel: 20,
-                                child: CupertinoActivityIndicator(
-                                  radius: 14,
-                                ),
+                              child: CupertinoActivityIndicator(
+                                radius: 14,
                               ),
                             )
                           : ListView.builder(
@@ -954,18 +808,8 @@ class _VirtualMachineState extends State<VirtualMachine> {
                             ),
                       repoLoading
                           ? Center(
-                              child: NeuCard(
-                                padding: EdgeInsets.all(50),
-                                curveType: CurveType.flat,
-                                decoration: NeumorphicDecoration(
-                                  color:
-                                      Theme.of(context).scaffoldBackgroundColor,
-                                  borderRadius: BorderRadius.circular(20),
-                                ),
-                                bevel: 20,
-                                child: CupertinoActivityIndicator(
-                                  radius: 14,
-                                ),
+                              child: CupertinoActivityIndicator(
+                                radius: 14,
                               ),
                             )
                           : ListView.builder(

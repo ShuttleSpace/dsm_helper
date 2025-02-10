@@ -12,7 +12,6 @@ import 'package:extended_image/extended_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluwx/fluwx.dart';
-import 'package:neumorphic/neumorphic.dart';
 import 'package:provider/provider.dart';
 
 class Vip extends StatefulWidget {
@@ -178,15 +177,8 @@ class _VipState extends State<Vip> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              NeuCard(
-                width: double.infinity,
+              Card(
                 margin: EdgeInsets.symmetric(horizontal: 50),
-                curveType: CurveType.emboss,
-                bevel: 5,
-                decoration: NeumorphicDecoration(
-                  color: Theme.of(context).scaffoldBackgroundColor,
-                  borderRadius: BorderRadius.circular(25),
-                ),
                 child: Padding(
                   padding: EdgeInsets.all(20),
                   child: Column(
@@ -199,15 +191,7 @@ class _VipState extends State<Vip> {
                       SizedBox(
                         height: 16,
                       ),
-                      NeuCard(
-                        decoration: NeumorphicDecoration(
-                          color: Theme.of(context).scaffoldBackgroundColor,
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        bevel: 20,
-                        curveType: CurveType.flat,
-                        padding:
-                            EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                      Card(
                         child: Text("通过观看视频广告，可关闭3天开屏广告"),
                       ),
                       SizedBox(
@@ -216,15 +200,8 @@ class _VipState extends State<Vip> {
                       Row(
                         children: [
                           Expanded(
-                            child: NeuButton(
+                            child: OutlinedButton(
                               onPressed: playVideo,
-                              decoration: NeumorphicDecoration(
-                                color:
-                                    Theme.of(context).scaffoldBackgroundColor,
-                                borderRadius: BorderRadius.circular(25),
-                              ),
-                              bevel: 20,
-                              padding: EdgeInsets.symmetric(vertical: 10),
                               child: Text(
                                 "观看广告",
                                 style: TextStyle(fontSize: 18),
@@ -235,17 +212,10 @@ class _VipState extends State<Vip> {
                             width: 16,
                           ),
                           Expanded(
-                            child: NeuButton(
+                            child: OutlinedButton(
                               onPressed: () async {
                                 Navigator.of(context).pop();
                               },
-                              decoration: NeumorphicDecoration(
-                                color:
-                                    Theme.of(context).scaffoldBackgroundColor,
-                                borderRadius: BorderRadius.circular(25),
-                              ),
-                              bevel: 20,
-                              padding: EdgeInsets.symmetric(vertical: 10),
                               child: Text(
                                 "取消",
                                 style: TextStyle(fontSize: 18),
@@ -278,15 +248,8 @@ class _VipState extends State<Vip> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                NeuCard(
-                  width: double.infinity,
+                Card(
                   margin: EdgeInsets.symmetric(horizontal: 50),
-                  curveType: CurveType.emboss,
-                  bevel: 5,
-                  decoration: NeumorphicDecoration(
-                    color: Theme.of(context).scaffoldBackgroundColor,
-                    borderRadius: BorderRadius.circular(25),
-                  ),
                   child: Padding(
                     padding: EdgeInsets.all(20),
                     child: Column(
@@ -307,21 +270,16 @@ class _VipState extends State<Vip> {
                         SizedBox(
                           height: 16,
                         ),
-                        NeuCard(
-                          decoration: NeumorphicDecoration(
-                            color: Theme.of(context).scaffoldBackgroundColor,
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          bevel: 20,
-                          curveType: CurveType.flat,
-                          padding:
-                              EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-                          child: TextField(
-                            onChanged: (v) => code = v,
-                            decoration: InputDecoration(
-                              border: InputBorder.none,
-                              hintText: "请输入兑换码",
-                              labelText: "兑换码",
+                        Card(
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: TextField(
+                              onChanged: (v) => code = v,
+                              decoration: InputDecoration(
+                                border: InputBorder.none,
+                                hintText: "请输入兑换码",
+                                labelText: "兑换码",
+                              ),
                             ),
                           ),
                         ),
@@ -331,7 +289,7 @@ class _VipState extends State<Vip> {
                         Row(
                           children: [
                             Expanded(
-                              child: NeuButton(
+                              child: OutlinedButton(
                                 onPressed: () async {
                                   if (code.trim() == "") {
                                     Util.toast("请输入兑换码");
@@ -351,13 +309,6 @@ class _VipState extends State<Vip> {
                                     Navigator.of(context).pop();
                                   }
                                 },
-                                decoration: NeumorphicDecoration(
-                                  color:
-                                      Theme.of(context).scaffoldBackgroundColor,
-                                  borderRadius: BorderRadius.circular(25),
-                                ),
-                                bevel: 20,
-                                padding: EdgeInsets.symmetric(vertical: 10),
                                 child: Text(
                                   "兑换",
                                   style: TextStyle(fontSize: 18),
@@ -368,17 +319,10 @@ class _VipState extends State<Vip> {
                               width: 16,
                             ),
                             Expanded(
-                              child: NeuButton(
+                              child: OutlinedButton(
                                 onPressed: () async {
                                   Navigator.of(context).pop();
                                 },
-                                decoration: NeumorphicDecoration(
-                                  color:
-                                      Theme.of(context).scaffoldBackgroundColor,
-                                  borderRadius: BorderRadius.circular(25),
-                                ),
-                                bevel: 20,
-                                padding: EdgeInsets.symmetric(vertical: 10),
                                 child: Text(
                                   "取消",
                                   style: TextStyle(fontSize: 18),
@@ -415,15 +359,8 @@ class _VipState extends State<Vip> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              NeuCard(
-                width: double.infinity,
+              Card(
                 margin: EdgeInsets.symmetric(horizontal: 50),
-                curveType: CurveType.emboss,
-                bevel: 5,
-                decoration: NeumorphicDecoration(
-                  color: Theme.of(context).scaffoldBackgroundColor,
-                  borderRadius: BorderRadius.circular(25),
-                ),
                 child: Padding(
                   padding: EdgeInsets.all(20),
                   child: Column(
@@ -447,18 +384,11 @@ class _VipState extends State<Vip> {
                       Row(
                         children: [
                           Expanded(
-                            child: NeuButton(
+                            child: OutlinedButton(
                               onPressed: () async {
                                 wxLogin();
                                 Navigator.of(context).pop();
                               },
-                              decoration: NeumorphicDecoration(
-                                color:
-                                    Theme.of(context).scaffoldBackgroundColor,
-                                borderRadius: BorderRadius.circular(25),
-                              ),
-                              bevel: 20,
-                              padding: EdgeInsets.symmetric(vertical: 10),
                               child: Image.asset(
                                 "assets/icons/wechat.png",
                                 width: 25,
@@ -469,7 +399,7 @@ class _VipState extends State<Vip> {
                             width: 16,
                           ),
                           Expanded(
-                            child: NeuButton(
+                            child: OutlinedButton(
                               onPressed: () async {
                                 Navigator.of(context).pop();
                                 Navigator.of(context).push(
@@ -481,13 +411,6 @@ class _VipState extends State<Vip> {
                                   }
                                 });
                               },
-                              decoration: NeumorphicDecoration(
-                                color:
-                                    Theme.of(context).scaffoldBackgroundColor,
-                                borderRadius: BorderRadius.circular(25),
-                              ),
-                              bevel: 20,
-                              padding: EdgeInsets.symmetric(vertical: 10),
                               child: Text(
                                 "账号登录",
                                 style: TextStyle(fontSize: 18),
@@ -498,17 +421,10 @@ class _VipState extends State<Vip> {
                             width: 16,
                           ),
                           Expanded(
-                            child: NeuButton(
+                            child: OutlinedButton(
                               onPressed: () async {
                                 Navigator.of(context).pop();
                               },
-                              decoration: NeumorphicDecoration(
-                                color:
-                                    Theme.of(context).scaffoldBackgroundColor,
-                                borderRadius: BorderRadius.circular(25),
-                              ),
-                              bevel: 20,
-                              padding: EdgeInsets.symmetric(vertical: 10),
                               child: Text(
                                 "取消",
                                 style: TextStyle(fontSize: 18),
@@ -584,13 +500,7 @@ class _VipState extends State<Vip> {
         actions: [
           Padding(
             padding: EdgeInsets.only(right: 10, top: 8, bottom: 8),
-            child: NeuButton(
-              decoration: NeumorphicDecoration(
-                color: Theme.of(context).scaffoldBackgroundColor,
-                borderRadius: BorderRadius.circular(10),
-              ),
-              padding: EdgeInsets.all(10),
-              bevel: 5,
+            child: OutlinedButton(
               onPressed: () {
                 if (!isLogin) {
                   loginDialog(alert: false);
@@ -632,13 +542,7 @@ class _VipState extends State<Vip> {
                 ),
               ),
             ),
-          NeuCard(
-            decoration: NeumorphicDecoration(
-              color: Theme.of(context).scaffoldBackgroundColor,
-              borderRadius: BorderRadius.circular(20),
-            ),
-            bevel: 20,
-            curveType: CurveType.flat,
+          Card(
             child: Padding(
               padding: EdgeInsets.all(20.0),
               child: Row(
@@ -729,14 +633,8 @@ class NoAdButton extends StatelessWidget {
   final Function()? onPressed;
   @override
   Widget build(BuildContext context) {
-    return NeuCard(
-      decoration: NeumorphicDecoration(
-        color: Theme.of(context).scaffoldBackgroundColor,
-        borderRadius: BorderRadius.circular(20),
-      ),
+    return Card(
       margin: EdgeInsets.only(top: 20),
-      bevel: 20,
-      curveType: CurveType.flat,
       child: Padding(
         padding: EdgeInsets.all(20.0),
         child: Row(
@@ -744,14 +642,8 @@ class NoAdButton extends StatelessWidget {
           children: [
             Text(title ?? ''),
             Spacer(),
-            NeuButton(
+            OutlinedButton(
               onPressed: onPressed,
-              decoration: NeumorphicDecoration(
-                color: Theme.of(context).scaffoldBackgroundColor,
-                borderRadius: BorderRadius.circular(20),
-              ),
-              bevel: 5,
-              padding: EdgeInsets.symmetric(horizontal: 15, vertical: 7),
               child: Text(
                 price ?? '',
                 style: TextStyle(fontSize: 12),

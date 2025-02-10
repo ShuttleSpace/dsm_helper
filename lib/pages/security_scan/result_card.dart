@@ -1,7 +1,6 @@
 import 'package:dsm_helper/util/function.dart';
 import 'package:dsm_helper/util/strings.dart';
 import 'package:flutter/material.dart';
-import 'package:neumorphic/neumorphic.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 
 class ResultCard extends StatelessWidget {
@@ -36,14 +35,8 @@ class ResultCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return NeuCard(
-      decoration: NeumorphicDecoration(
-        color: Theme.of(context).scaffoldBackgroundColor,
-        borderRadius: BorderRadius.circular(20),
-      ),
+    return Card(
       margin: EdgeInsets.only(bottom: 20),
-      curveType: CurveType.flat,
-      bevel: 20,
       child: Padding(
         padding: EdgeInsets.all(20),
         child: Column(
@@ -85,7 +78,10 @@ class ResultCard extends StatelessWidget {
                     percent: data['progress'] / 100,
                     center: Text(
                       "${data['progress']}%",
-                      style: TextStyle(color: data['progress'] < 90 ? Colors.blue : Colors.red, fontSize: 8),
+                      style: TextStyle(
+                          color:
+                              data['progress'] < 90 ? Colors.blue : Colors.red,
+                          fontSize: 8),
                     ),
                   )
               ],

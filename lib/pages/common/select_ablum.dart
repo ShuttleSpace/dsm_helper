@@ -1,6 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:neumorphic/neumorphic.dart';
 import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 
 class SelectAlbum extends StatefulWidget {
@@ -39,7 +38,7 @@ class _SelectAlbumState extends State<SelectAlbum> {
       padding: const EdgeInsets.only(top: 20.0, left: 20, right: 20),
       child: Opacity(
         opacity: 1,
-        child: NeuButton(
+        child: OutlinedButton(
           onPressed: () async {
             setState(() {
               if (widget.multi) {
@@ -61,12 +60,6 @@ class _SelectAlbumState extends State<SelectAlbum> {
             });
           },
           // margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-          padding: EdgeInsets.symmetric(vertical: 20),
-          decoration: NeumorphicDecoration(
-            color: Theme.of(context).scaffoldBackgroundColor,
-            borderRadius: BorderRadius.circular(20),
-          ),
-          bevel: 8,
           child: Row(
             children: [
               SizedBox(
@@ -91,23 +84,19 @@ class _SelectAlbumState extends State<SelectAlbum> {
               SizedBox(
                 width: 10,
               ),
-              NeuCard(
-                decoration: NeumorphicDecoration(
-                  color: Theme.of(context).scaffoldBackgroundColor,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                // onPressed: () {},
-                padding: EdgeInsets.all(5),
-                bevel: 5,
-                child: SizedBox(
-                  width: 20,
-                  height: 20,
-                  child: selectedAlbums.contains(album)
-                      ? Icon(
-                          CupertinoIcons.checkmark_alt,
-                          color: Color(0xffff9813),
-                        )
-                      : null,
+              Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: selectedAlbums.contains(album)
+                        ? Icon(
+                            CupertinoIcons.checkmark_alt,
+                            color: Color(0xffff9813),
+                          )
+                        : null,
+                  ),
                 ),
               ),
               SizedBox(
@@ -139,17 +128,10 @@ class _SelectAlbumState extends State<SelectAlbum> {
                     Spacer(),
                     Container(
                       padding: const EdgeInsets.symmetric(vertical: 10),
-                      child: NeuButton(
+                      child: OutlinedButton(
                         onPressed: () {
                           Navigator.of(context).pop(selectedAlbums);
                         },
-                        decoration: NeumorphicDecoration(
-                          color: Theme.of(context).scaffoldBackgroundColor,
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        bevel: 5,
-                        padding:
-                            EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                         child: Text(
                           "完成",
                           style: TextStyle(fontSize: 12, color: Colors.blue),

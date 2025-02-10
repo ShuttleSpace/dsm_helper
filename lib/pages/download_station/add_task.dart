@@ -6,7 +6,6 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_vibrate/flutter_vibrate.dart';
-import 'package:neumorphic/neumorphic.dart';
 
 class AddDownloadTask extends StatefulWidget {
   final String? torrentPath;
@@ -50,7 +49,7 @@ class _AddDownloadTaskState extends State<AddDownloadTask> {
       body: ListView(
         padding: EdgeInsets.all(20),
         children: [
-          NeuButton(
+          OutlinedButton(
             onPressed: () {
               FocusScope.of(context).unfocus();
               showCupertinoModalPopup(
@@ -68,10 +67,6 @@ class _AddDownloadTaskState extends State<AddDownloadTask> {
                 }
               });
             },
-            decoration: NeumorphicDecoration(
-              color: Theme.of(context).scaffoldBackgroundColor,
-              borderRadius: BorderRadius.circular(20),
-            ),
             child: Row(
               children: [
                 Expanded(
@@ -98,26 +93,22 @@ class _AddDownloadTaskState extends State<AddDownloadTask> {
           SizedBox(
             height: 20,
           ),
-          NeuCard(
-            decoration: NeumorphicDecoration(
-              color: Theme.of(context).scaffoldBackgroundColor,
-              borderRadius: BorderRadius.circular(20),
-            ),
-            bevel: 20,
-            curveType: CurveType.flat,
-            padding: EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-            child: TextField(
-              onChanged: (v) => url = v,
-              decoration: InputDecoration(
-                border: InputBorder.none,
-                labelText: '下载链接',
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: TextField(
+                onChanged: (v) => url = v,
+                decoration: InputDecoration(
+                  border: InputBorder.none,
+                  labelText: '下载链接',
+                ),
               ),
             ),
           ),
           SizedBox(
             height: 20,
           ),
-          NeuButton(
+          OutlinedButton(
             onPressed: () async {
               FocusScope.of(context).unfocus();
               FilePickerResult? _pickedFile =
@@ -138,10 +129,6 @@ class _AddDownloadTaskState extends State<AddDownloadTask> {
                 }
               }
             },
-            decoration: NeumorphicDecoration(
-              color: Theme.of(context).scaffoldBackgroundColor,
-              borderRadius: BorderRadius.circular(20),
-            ),
             child: Row(
               children: [
                 Expanded(
@@ -166,12 +153,7 @@ class _AddDownloadTaskState extends State<AddDownloadTask> {
           SizedBox(
             height: 20,
           ),
-          NeuButton(
-            padding: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-            decoration: NeumorphicDecoration(
-              color: Theme.of(context).scaffoldBackgroundColor,
-              borderRadius: BorderRadius.circular(20),
-            ),
+          OutlinedButton(
             onPressed: () async {
               if (saveFolder == "") {
                 Util.toast("请选择保存位置");

@@ -5,7 +5,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_vibrate/flutter_vibrate.dart';
-import 'package:neumorphic/neumorphic.dart';
 
 class SshSetting extends StatefulWidget {
   @override
@@ -53,31 +52,16 @@ class _SshSettingState extends State<SshSetting>
       ),
       body: loading
           ? Center(
-              child: NeuCard(
-                padding: EdgeInsets.all(50),
-                curveType: CurveType.flat,
-                decoration: NeumorphicDecoration(
-                  color: Theme.of(context).scaffoldBackgroundColor,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                bevel: 20,
-                child: CupertinoActivityIndicator(
-                  radius: 14,
-                ),
+              child: CupertinoActivityIndicator(
+                radius: 14,
               ),
             )
           : Column(
               children: [
-                NeuCard(
-                  width: double.infinity,
-                  decoration: NeumorphicDecoration(
-                    color: Theme.of(context).scaffoldBackgroundColor,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
+                Card(
                   margin: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-                  curveType: CurveType.flat,
-                  bevel: 10,
                   child: TabBar(
+                    dividerHeight: 0,
                     isScrollable: false,
                     controller: _tabController,
                     indicatorSize: TabBarIndicatorSize.label,
@@ -117,15 +101,7 @@ class _SshSettingState extends State<SshSetting>
                                 telnet = !telnet;
                               });
                             },
-                            child: NeuCard(
-                              decoration: NeumorphicDecoration(
-                                color:
-                                    Theme.of(context).scaffoldBackgroundColor,
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                              curveType:
-                                  telnet ? CurveType.emboss : CurveType.flat,
-                              bevel: 20,
+                            child: Card(
                               child: Padding(
                                 padding: EdgeInsets.all(20),
                                 child: Row(
@@ -154,15 +130,7 @@ class _SshSettingState extends State<SshSetting>
                                 ssh = !ssh;
                               });
                             },
-                            child: NeuCard(
-                              decoration: NeumorphicDecoration(
-                                color:
-                                    Theme.of(context).scaffoldBackgroundColor,
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                              curveType:
-                                  ssh ? CurveType.emboss : CurveType.flat,
-                              bevel: 20,
+                            child: Card(
                               child: Padding(
                                 padding: EdgeInsets.all(20),
                                 child: Row(
@@ -185,38 +153,27 @@ class _SshSettingState extends State<SshSetting>
                           SizedBox(
                             height: 20,
                           ),
-                          NeuCard(
-                            decoration: NeumorphicDecoration(
-                              color: Theme.of(context).scaffoldBackgroundColor,
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            bevel: 20,
-                            curveType: CurveType.flat,
-                            padding: EdgeInsets.symmetric(
-                                horizontal: 20, vertical: 5),
-                            child: TextField(
-                              controller: _portController,
-                              keyboardType: TextInputType.number,
-                              onChanged: (v) => sshPort = v,
-                              inputFormatters: [
-                                FilteringTextInputFormatter.digitsOnly,
-                              ],
-                              decoration: InputDecoration(
-                                border: InputBorder.none,
-                                labelText: 'SSH端口',
+                          Card(
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: TextField(
+                                controller: _portController,
+                                keyboardType: TextInputType.number,
+                                onChanged: (v) => sshPort = v,
+                                inputFormatters: [
+                                  FilteringTextInputFormatter.digitsOnly,
+                                ],
+                                decoration: InputDecoration(
+                                  border: InputBorder.none,
+                                  labelText: 'SSH端口',
+                                ),
                               ),
                             ),
                           ),
                           SizedBox(
                             height: 20,
                           ),
-                          NeuButton(
-                            padding: EdgeInsets.symmetric(
-                                horizontal: 20, vertical: 20),
-                            decoration: NeumorphicDecoration(
-                              color: Theme.of(context).scaffoldBackgroundColor,
-                              borderRadius: BorderRadius.circular(20),
-                            ),
+                          OutlinedButton(
                             onPressed: () async {
                               var res =
                                   await Api.setTerminal(ssh, telnet, sshPort);

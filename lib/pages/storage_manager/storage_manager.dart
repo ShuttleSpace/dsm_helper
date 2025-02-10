@@ -6,7 +6,6 @@ import 'package:dsm_helper/widgets/label.dart';
 import 'package:dsm_helper/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:neumorphic/neumorphic.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 
 class StorageManager extends StatefulWidget {
@@ -61,52 +60,40 @@ class _StorageManagerState extends State<StorageManager>
     double percent =
         int.parse(volume['size']['used'] ?? volume['size']['reusable']) /
             int.parse(volume['size']['total']);
-    return NeuCard(
-      decoration: NeumorphicDecoration(
-        color: Theme.of(context).scaffoldBackgroundColor,
-        borderRadius: BorderRadius.circular(20),
-      ),
-      curveType: CurveType.flat,
-      padding: EdgeInsets.all(10),
+    return Card(
       margin: EdgeInsets.only(top: 20, left: 20, right: 20),
-      bevel: 10,
       child: Row(
         children: [
-          NeuCard(
-            curveType: CurveType.flat,
+          Card(
             margin: EdgeInsets.all(10),
-            decoration: NeumorphicDecoration(
-              color: Theme.of(context).scaffoldBackgroundColor,
-              borderRadius: BorderRadius.circular(80),
-              // color: Colors.red,
-            ),
-            padding: EdgeInsets.all(5),
-            bevel: 8,
-            child: CircularPercentIndicator(
-              radius: 40,
-              // progressColor: Colors.lightBlueAccent,
-              animation: true,
-              linearGradient: LinearGradient(
-                colors: percent <= 0.9
-                    ? [
-                        Colors.blue,
-                        Colors.blueAccent,
-                      ]
-                    : [
-                        Colors.red,
-                        Colors.orangeAccent,
-                      ],
-              ),
-              animateFromLastPercent: true,
-              circularStrokeCap: CircularStrokeCap.round,
-              lineWidth: 12,
-              backgroundColor: Colors.black12,
-              percent: percent,
-              center: Text(
-                "${(percent * 100).toStringAsFixed(0)}%",
-                style: TextStyle(
-                    color: percent <= 0.9 ? Colors.blue : Colors.red,
-                    fontSize: 22),
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: CircularPercentIndicator(
+                radius: 40,
+                // progressColor: Colors.lightBlueAccent,
+                animation: true,
+                linearGradient: LinearGradient(
+                  colors: percent <= 0.9
+                      ? [
+                          Colors.blue,
+                          Colors.blueAccent,
+                        ]
+                      : [
+                          Colors.red,
+                          Colors.orangeAccent,
+                        ],
+                ),
+                animateFromLastPercent: true,
+                circularStrokeCap: CircularStrokeCap.round,
+                lineWidth: 12,
+                backgroundColor: Colors.black12,
+                percent: percent,
+                center: Text(
+                  "${(percent * 100).toStringAsFixed(0)}%",
+                  style: TextStyle(
+                      color: percent <= 0.9 ? Colors.blue : Colors.red,
+                      fontSize: 22),
+                ),
               ),
             ),
           ),
@@ -157,130 +144,121 @@ class _StorageManagerState extends State<StorageManager>
   }
 
   Widget _buildVolumeItem(volume) {
-    return NeuCard(
-      decoration: NeumorphicDecoration(
-        color: Theme.of(context).scaffoldBackgroundColor,
-        borderRadius: BorderRadius.circular(20),
-      ),
-      curveType: CurveType.flat,
-      padding: EdgeInsets.all(10),
+    return Card(
       margin: EdgeInsets.only(top: 20, left: 20, right: 20),
-      bevel: 10,
-      child: Row(
-        children: [
-          NeuCard(
-            curveType: CurveType.flat,
-            margin: EdgeInsets.all(10),
-            decoration: NeumorphicDecoration(
-              color: Theme.of(context).scaffoldBackgroundColor,
-              borderRadius: BorderRadius.circular(80),
-              // color: Colors.red,
-            ),
-            padding: EdgeInsets.all(5),
-            bevel: 8,
-            child: CircularPercentIndicator(
-              radius: 40,
-              // progressColor: Colors.lightBlueAccent,
-              animation: true,
-              linearGradient: LinearGradient(
-                colors: int.parse(volume['size']['used']) /
-                            int.parse(volume['size']['total']) <=
-                        0.9
-                    ? [
-                        Colors.blue,
-                        Colors.blueAccent,
-                      ]
-                    : [
-                        Colors.red,
-                        Colors.orangeAccent,
-                      ],
-              ),
-              animateFromLastPercent: true,
-              circularStrokeCap: CircularStrokeCap.round,
-              lineWidth: 12,
-              backgroundColor: Colors.black12,
-              percent: int.parse(volume['size']['used']) /
-                  int.parse(volume['size']['total']),
-              center: Text(
-                "${(int.parse(volume['size']['used']) / int.parse(volume['size']['total']) * 100).toStringAsFixed(0)}%",
-                style: TextStyle(
-                    color: int.parse(volume['size']['used']) /
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Row(
+          children: [
+            Card(
+              margin: EdgeInsets.all(10),
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: CircularPercentIndicator(
+                  radius: 40,
+                  // progressColor: Colors.lightBlueAccent,
+                  animation: true,
+                  linearGradient: LinearGradient(
+                    colors: int.parse(volume['size']['used']) /
                                 int.parse(volume['size']['total']) <=
                             0.9
-                        ? Colors.blue
-                        : Colors.red,
-                    fontSize: 22),
+                        ? [
+                            Colors.blue,
+                            Colors.blueAccent,
+                          ]
+                        : [
+                            Colors.red,
+                            Colors.orangeAccent,
+                          ],
+                  ),
+                  animateFromLastPercent: true,
+                  circularStrokeCap: CircularStrokeCap.round,
+                  lineWidth: 12,
+                  backgroundColor: Colors.black12,
+                  percent: int.parse(volume['size']['used']) /
+                      int.parse(volume['size']['total']),
+                  center: Text(
+                    "${(int.parse(volume['size']['used']) / int.parse(volume['size']['total']) * 100).toStringAsFixed(0)}%",
+                    style: TextStyle(
+                        color: int.parse(volume['size']['used']) /
+                                    int.parse(volume['size']['total']) <=
+                                0.9
+                            ? Colors.blue
+                            : Colors.red,
+                        fontSize: 22),
+                  ),
+                ),
               ),
             ),
-          ),
-          SizedBox(
-            width: 10,
-          ),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  "存储空间 ${volume['num_id']}",
-                  style: TextStyle(fontWeight: FontWeight.w600),
-                ),
-                SizedBox(
-                  height: 5,
-                ),
-                Row(
-                  children: [
-                    Label(
-                      "${volume['fs_type']}",
-                      Colors.lightBlueAccent,
-                      height: 23,
-                    ),
-                    SizedBox(
-                      width: 5,
-                    ),
-                    volume['status'] == "normal"
-                        ? Label(
-                            "正常",
-                            Colors.green,
-                            fill: true,
-                          )
-                        : volume['status'] == "background"
-                            ? Label(
-                                "正在检查硬盘",
-                                Colors.lightBlueAccent,
-                                fill: true,
-                              )
-                            : volume['status'] == "attention"
-                                ? Label(
-                                    "注意",
-                                    Colors.orangeAccent,
-                                    fill: true,
-                                  )
-                                : Label(
-                                    volume['status'],
-                                    Colors.red,
-                                    fill: true,
-                                  ),
-                  ],
-                ),
-                SizedBox(
-                  height: 5,
-                ),
-                Text(
-                    "已用：${Util.formatSize(int.parse(volume['size']['used']))}"),
-                SizedBox(
-                  height: 5,
-                ),
-                Text(
-                    "可用：${Util.formatSize(int.parse(volume['size']['total']) - int.parse(volume['size']['used']))}"),
-                SizedBox(
-                  height: 5,
-                ),
-                Text(
-                    "全部：${Util.formatSize(int.parse(volume['size']['total']))}"),
-              ],
+            SizedBox(
+              width: 10,
             ),
-          )
-        ],
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "存储空间 ${volume['num_id']}",
+                    style: TextStyle(fontWeight: FontWeight.w600),
+                  ),
+                  SizedBox(
+                    height: 5,
+                  ),
+                  Row(
+                    children: [
+                      Label(
+                        "${volume['fs_type']}",
+                        Colors.lightBlueAccent,
+                        height: 23,
+                      ),
+                      SizedBox(
+                        width: 5,
+                      ),
+                      volume['status'] == "normal"
+                          ? Label(
+                              "正常",
+                              Colors.green,
+                              fill: true,
+                            )
+                          : volume['status'] == "background"
+                              ? Label(
+                                  "正在检查硬盘",
+                                  Colors.lightBlueAccent,
+                                  fill: true,
+                                )
+                              : volume['status'] == "attention"
+                                  ? Label(
+                                      "注意",
+                                      Colors.orangeAccent,
+                                      fill: true,
+                                    )
+                                  : Label(
+                                      volume['status'],
+                                      Colors.red,
+                                      fill: true,
+                                    ),
+                    ],
+                  ),
+                  SizedBox(
+                    height: 5,
+                  ),
+                  Text(
+                      "已用：${Util.formatSize(int.parse(volume['size']['used']))}"),
+                  SizedBox(
+                    height: 5,
+                  ),
+                  Text(
+                      "可用：${Util.formatSize(int.parse(volume['size']['total']) - int.parse(volume['size']['used']))}"),
+                  SizedBox(
+                    height: 5,
+                  ),
+                  Text(
+                      "全部：${Util.formatSize(int.parse(volume['size']['total']))}"),
+                ],
+              ),
+            )
+          ],
+        ),
       ),
     );
   }
@@ -294,308 +272,295 @@ class _StorageManagerState extends State<StorageManager>
             },
             settings: RouteSettings(name: "disk_smart")));
       },
-      child: NeuCard(
-        decoration: NeumorphicDecoration(
-          color: Theme.of(context).scaffoldBackgroundColor,
-          borderRadius: BorderRadius.circular(20),
-        ),
-        curveType: CurveType.flat,
-        padding: EdgeInsets.all(10),
+      child: Card(
         margin: EdgeInsets.only(top: 10),
-        bevel: 10,
-        child: Column(
-          children: [
-            Row(
-              children: [
-                NeuCard(
-                  curveType: CurveType.flat,
-                  margin: EdgeInsets.all(10),
-                  decoration: NeumorphicDecoration(
-                    color: Theme.of(context).scaffoldBackgroundColor,
-                    // color: Colors.red,
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            children: [
+              Row(
+                children: [
+                  Card(
+                    margin: EdgeInsets.all(10),
+                    child: Image.asset(
+                      disk['isSsd']
+                          ? "assets/icons/ssd.png"
+                          : "assets/icons/hdd.png",
+                      width: 40,
+                    ),
                   ),
-                  bevel: 8,
-                  child: Image.asset(
-                    disk['isSsd']
-                        ? "assets/icons/ssd.png"
-                        : "assets/icons/hdd.png",
-                    width: 40,
+                  SizedBox(
+                    width: 10,
                   ),
-                ),
-                SizedBox(
-                  width: 10,
-                ),
-                Expanded(
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Text(
+                              "${disk['longName'].replaceAll("Cache device", "缓存设备")}",
+                              style: TextStyle(fontWeight: FontWeight.w600),
+                            ),
+                            SizedBox(
+                              width: 5,
+                            ),
+                            Label(
+                              disk['overview_status'] == "normal"
+                                  ? "正常"
+                                  : disk['overview_status'],
+                              disk['overview_status'] == "normal"
+                                  ? Colors.green
+                                  : Colors.red,
+                              fill: true,
+                            ),
+                            SizedBox(
+                              width: 5,
+                            ),
+                            if (disk['temp'] != null && disk['temp'] > -1)
+                              Label(
+                                "${disk['temp']}℃",
+                                Colors.lightBlueAccent,
+                                height: 23,
+                              ),
+                          ],
+                        ),
+                        SizedBox(
+                          height: 5,
+                        ),
+                        Text(
+                            "${disk['vendor'].trim()} ${disk['model'].trim()}"),
+                        SizedBox(
+                          height: 5,
+                        ),
+                        Text(
+                            "${Util.formatSize(int.parse(disk['size_total']))}"),
+                      ],
+                    ),
+                  )
+                ],
+              ),
+              if (full) ...[
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 10),
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Row(
                         children: [
-                          Text(
-                            "${disk['longName'].replaceAll("Cache device", "缓存设备")}",
-                            style: TextStyle(fontWeight: FontWeight.w600),
-                          ),
                           SizedBox(
-                            width: 5,
-                          ),
-                          Label(
-                            disk['overview_status'] == "normal"
-                                ? "正常"
-                                : disk['overview_status'],
-                            disk['overview_status'] == "normal"
-                                ? Colors.green
-                                : Colors.red,
-                            fill: true,
-                          ),
-                          SizedBox(
-                            width: 5,
-                          ),
-                          if (disk['temp'] != null && disk['temp'] > -1)
-                            Label(
-                              "${disk['temp']}℃",
-                              Colors.lightBlueAccent,
-                              height: 23,
+                            width: 150,
+                            child: Text(
+                              "位置",
+                              style: TextStyle(fontWeight: FontWeight.w600),
                             ),
+                          ),
+                          Text("${disk['container']['str']}"),
                         ],
                       ),
                       SizedBox(
                         height: 5,
                       ),
-                      Text("${disk['vendor'].trim()} ${disk['model'].trim()}"),
+                      Row(
+                        children: [
+                          SizedBox(
+                            width: 150,
+                            child: Text(
+                              "硬盘类型",
+                              style: TextStyle(fontWeight: FontWeight.w600),
+                            ),
+                          ),
+                          Text("${disk['diskType']}"),
+                        ],
+                      ),
                       SizedBox(
                         height: 5,
                       ),
-                      Text("${Util.formatSize(int.parse(disk['size_total']))}"),
+                      Row(
+                        children: [
+                          SizedBox(
+                            width: 150,
+                            child: Text(
+                              "存储池",
+                              style: TextStyle(fontWeight: FontWeight.w600),
+                            ),
+                          ),
+                          if (storagePools
+                                  .where(
+                                      (pool) => pool['id'] == disk['used_by'])
+                                  .toList()
+                                  .length >
+                              0)
+                            Text(
+                                "存储池 ${storagePools.where((pool) => pool['id'] == disk['used_by']).toList()[0]['num_id']}")
+                          else if (ssdCaches
+                                  .where((ssd) => ssd['id'] == disk['used_by'])
+                                  .toList()
+                                  .length >
+                              0)
+                            Text(
+                                "${ssdCaches.where((ssd) => ssd['id'] == disk['used_by']).toList()[0]['id'].toString().replaceFirst("ssd_", "SSD 缓存 ")}")
+                          else
+                            Text("-"),
+                        ],
+                      ),
+                      SizedBox(
+                        height: 5,
+                      ),
+                      Row(
+                        children: [
+                          SizedBox(
+                            width: 150,
+                            child: Text(
+                              "硬盘分配状态",
+                              style: TextStyle(fontWeight: FontWeight.w600),
+                            ),
+                          ),
+                          Text(
+                            "${disk['status'] == "normal" ? "正常" : disk['status'] == "not_use" ? "未初始化" : disk['status'] == "sys_partition_normal" ? "已初始化" : "${disk['status']}"}",
+                            style: TextStyle(
+                                color: disk['status'] == "normal"
+                                    ? Colors.green
+                                    : Colors.red),
+                          ),
+                        ],
+                      ),
+                      SizedBox(
+                        height: 5,
+                      ),
+                      Row(
+                        children: [
+                          SizedBox(
+                            width: 150,
+                            child: Text(
+                              "健康状态",
+                              style: TextStyle(fontWeight: FontWeight.w600),
+                            ),
+                          ),
+                          Text(
+                            "${disk['smart_status'] == "normal" ? "正常" : disk['smart_status']}",
+                            style: TextStyle(
+                                color: disk['smart_status'] == "normal"
+                                    ? Colors.green
+                                    : Colors.red),
+                          ),
+                        ],
+                      ),
+                      SizedBox(
+                        height: 5,
+                      ),
+                      if (disk['remain_life'] != null) ...[
+                        Row(
+                          children: [
+                            SizedBox(
+                              width: 150,
+                              child: Text(
+                                "预计寿命",
+                                style: TextStyle(fontWeight: FontWeight.w600),
+                              ),
+                            ),
+                            Text(
+                                "${disk['remain_life'] == -1 ? "-" : disk['remain_life']}"),
+                          ],
+                        ),
+                        SizedBox(
+                          height: 5,
+                        ),
+                      ],
+                      if (disk['unc'] != null && disk['unc'] > -1) ...[
+                        Row(
+                          children: [
+                            SizedBox(
+                              width: 150,
+                              child: Text(
+                                "坏扇区数量",
+                                style: TextStyle(fontWeight: FontWeight.w600),
+                              ),
+                            ),
+                            Text("${disk['unc']}"),
+                          ],
+                        ),
+                        SizedBox(
+                          height: 5,
+                        ),
+                      ],
+                      if (disk['temp'] != null) ...[
+                        Row(
+                          children: [
+                            SizedBox(
+                              width: 150,
+                              child: Text(
+                                "温度",
+                                style: TextStyle(fontWeight: FontWeight.w600),
+                              ),
+                            ),
+                            Text(
+                                "${disk['temp'] > -1 ? "${disk['temp']} ℃" : "-"}"),
+                          ],
+                        ),
+                        SizedBox(
+                          height: 5,
+                        ),
+                      ],
+                      if (disk['serial'] != null) ...[
+                        Row(
+                          children: [
+                            SizedBox(
+                              width: 150,
+                              child: Text(
+                                "序列号",
+                                style: TextStyle(fontWeight: FontWeight.w600),
+                              ),
+                            ),
+                            Text("${disk['serial']}"),
+                          ],
+                        ),
+                        SizedBox(
+                          height: 5,
+                        ),
+                      ],
+                      if (disk['firm'] != null) ...[
+                        Row(
+                          children: [
+                            SizedBox(
+                              width: 150,
+                              child: Text(
+                                "固件版本",
+                                style: TextStyle(fontWeight: FontWeight.w600),
+                              ),
+                            ),
+                            Text("${disk['firm']}"),
+                          ],
+                        ),
+                        SizedBox(
+                          height: 5,
+                        ),
+                      ],
+                      if (disk['is4Kn'] != null)
+                        Row(
+                          children: [
+                            SizedBox(
+                              width: 150,
+                              child: Text(
+                                "4K原生硬盘",
+                                style: TextStyle(fontWeight: FontWeight.w600),
+                              ),
+                            ),
+                            Text("${disk['is4Kn'] ? "是" : "否"}"),
+                          ],
+                        ),
                     ],
                   ),
-                )
-              ],
-            ),
-            if (full) ...[
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 10),
-                child: Column(
-                  children: [
-                    Row(
-                      children: [
-                        SizedBox(
-                          width: 150,
-                          child: Text(
-                            "位置",
-                            style: TextStyle(fontWeight: FontWeight.w600),
-                          ),
-                        ),
-                        Text("${disk['container']['str']}"),
-                      ],
-                    ),
-                    SizedBox(
-                      height: 5,
-                    ),
-                    Row(
-                      children: [
-                        SizedBox(
-                          width: 150,
-                          child: Text(
-                            "硬盘类型",
-                            style: TextStyle(fontWeight: FontWeight.w600),
-                          ),
-                        ),
-                        Text("${disk['diskType']}"),
-                      ],
-                    ),
-                    SizedBox(
-                      height: 5,
-                    ),
-                    Row(
-                      children: [
-                        SizedBox(
-                          width: 150,
-                          child: Text(
-                            "存储池",
-                            style: TextStyle(fontWeight: FontWeight.w600),
-                          ),
-                        ),
-                        if (storagePools
-                                .where((pool) => pool['id'] == disk['used_by'])
-                                .toList()
-                                .length >
-                            0)
-                          Text(
-                              "存储池 ${storagePools.where((pool) => pool['id'] == disk['used_by']).toList()[0]['num_id']}")
-                        else if (ssdCaches
-                                .where((ssd) => ssd['id'] == disk['used_by'])
-                                .toList()
-                                .length >
-                            0)
-                          Text(
-                              "${ssdCaches.where((ssd) => ssd['id'] == disk['used_by']).toList()[0]['id'].toString().replaceFirst("ssd_", "SSD 缓存 ")}")
-                        else
-                          Text("-"),
-                      ],
-                    ),
-                    SizedBox(
-                      height: 5,
-                    ),
-                    Row(
-                      children: [
-                        SizedBox(
-                          width: 150,
-                          child: Text(
-                            "硬盘分配状态",
-                            style: TextStyle(fontWeight: FontWeight.w600),
-                          ),
-                        ),
-                        Text(
-                          "${disk['status'] == "normal" ? "正常" : disk['status'] == "not_use" ? "未初始化" : disk['status'] == "sys_partition_normal" ? "已初始化" : "${disk['status']}"}",
-                          style: TextStyle(
-                              color: disk['status'] == "normal"
-                                  ? Colors.green
-                                  : Colors.red),
-                        ),
-                      ],
-                    ),
-                    SizedBox(
-                      height: 5,
-                    ),
-                    Row(
-                      children: [
-                        SizedBox(
-                          width: 150,
-                          child: Text(
-                            "健康状态",
-                            style: TextStyle(fontWeight: FontWeight.w600),
-                          ),
-                        ),
-                        Text(
-                          "${disk['smart_status'] == "normal" ? "正常" : disk['smart_status']}",
-                          style: TextStyle(
-                              color: disk['smart_status'] == "normal"
-                                  ? Colors.green
-                                  : Colors.red),
-                        ),
-                      ],
-                    ),
-                    SizedBox(
-                      height: 5,
-                    ),
-                    if (disk['remain_life'] != null) ...[
-                      Row(
-                        children: [
-                          SizedBox(
-                            width: 150,
-                            child: Text(
-                              "预计寿命",
-                              style: TextStyle(fontWeight: FontWeight.w600),
-                            ),
-                          ),
-                          Text(
-                              "${disk['remain_life'] == -1 ? "-" : disk['remain_life']}"),
-                        ],
-                      ),
-                      SizedBox(
-                        height: 5,
-                      ),
-                    ],
-                    if (disk['unc'] != null && disk['unc'] > -1) ...[
-                      Row(
-                        children: [
-                          SizedBox(
-                            width: 150,
-                            child: Text(
-                              "坏扇区数量",
-                              style: TextStyle(fontWeight: FontWeight.w600),
-                            ),
-                          ),
-                          Text("${disk['unc']}"),
-                        ],
-                      ),
-                      SizedBox(
-                        height: 5,
-                      ),
-                    ],
-                    if (disk['temp'] != null) ...[
-                      Row(
-                        children: [
-                          SizedBox(
-                            width: 150,
-                            child: Text(
-                              "温度",
-                              style: TextStyle(fontWeight: FontWeight.w600),
-                            ),
-                          ),
-                          Text(
-                              "${disk['temp'] > -1 ? "${disk['temp']} ℃" : "-"}"),
-                        ],
-                      ),
-                      SizedBox(
-                        height: 5,
-                      ),
-                    ],
-                    if (disk['serial'] != null) ...[
-                      Row(
-                        children: [
-                          SizedBox(
-                            width: 150,
-                            child: Text(
-                              "序列号",
-                              style: TextStyle(fontWeight: FontWeight.w600),
-                            ),
-                          ),
-                          Text("${disk['serial']}"),
-                        ],
-                      ),
-                      SizedBox(
-                        height: 5,
-                      ),
-                    ],
-                    if (disk['firm'] != null) ...[
-                      Row(
-                        children: [
-                          SizedBox(
-                            width: 150,
-                            child: Text(
-                              "固件版本",
-                              style: TextStyle(fontWeight: FontWeight.w600),
-                            ),
-                          ),
-                          Text("${disk['firm']}"),
-                        ],
-                      ),
-                      SizedBox(
-                        height: 5,
-                      ),
-                    ],
-                    if (disk['is4Kn'] != null)
-                      Row(
-                        children: [
-                          SizedBox(
-                            width: 150,
-                            child: Text(
-                              "4K原生硬盘",
-                              style: TextStyle(fontWeight: FontWeight.w600),
-                            ),
-                          ),
-                          Text("${disk['is4Kn'] ? "是" : "否"}"),
-                        ],
-                      ),
-                  ],
                 ),
-              ),
+              ],
             ],
-          ],
+          ),
         ),
       ),
     );
   }
 
   Widget _buildPoolDetail(pool) {
-    return NeuCard(
-      curveType: CurveType.flat,
-      bevel: 20,
-      decoration: NeumorphicDecoration(
-        color: Theme.of(context).scaffoldBackgroundColor,
-        borderRadius: BorderRadius.circular(20),
-      ),
+    return Card(
       child: Padding(
         padding: EdgeInsets.all(20),
         child: Column(
@@ -690,13 +655,7 @@ class _StorageManagerState extends State<StorageManager>
             SizedBox(
               height: 20,
             ),
-            NeuCard(
-              curveType: CurveType.flat,
-              bevel: 20,
-              decoration: NeumorphicDecoration(
-                color: Theme.of(context).scaffoldBackgroundColor,
-                borderRadius: BorderRadius.circular(20),
-              ),
+            Card(
               child: Padding(
                 padding: EdgeInsets.all(20),
                 child: Column(
@@ -717,13 +676,7 @@ class _StorageManagerState extends State<StorageManager>
             SizedBox(
               height: 20,
             ),
-            NeuCard(
-              curveType: CurveType.flat,
-              bevel: 20,
-              decoration: NeumorphicDecoration(
-                color: Theme.of(context).scaffoldBackgroundColor,
-                borderRadius: BorderRadius.circular(20),
-              ),
+            Card(
               child: Padding(
                 padding: EdgeInsets.all(20),
                 child: Column(
@@ -749,31 +702,28 @@ class _StorageManagerState extends State<StorageManager>
             SizedBox(
               height: 20,
             ),
-            NeuCard(
-              curveType: CurveType.flat,
-              bevel: 20,
-              decoration: NeumorphicDecoration(
-                color: Theme.of(context).scaffoldBackgroundColor,
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Padding(
-                    padding: EdgeInsets.only(left: 20, top: 20),
-                    child: Text(
-                      "存储分配",
-                      style: TextStyle(fontWeight: FontWeight.w600),
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: EdgeInsets.only(left: 20, top: 20),
+                      child: Text(
+                        "存储分配",
+                        style: TextStyle(fontWeight: FontWeight.w600),
+                      ),
                     ),
-                  ),
-                  ...volumes
-                      .where((e) => e['pool_path'] == pool['id'])
-                      .map(_buildVolumeItem)
-                      .toList(),
-                  SizedBox(
-                    height: 20,
-                  ),
-                ],
+                    ...volumes
+                        .where((e) => e['pool_path'] == pool['id'])
+                        .map(_buildVolumeItem)
+                        .toList(),
+                    SizedBox(
+                      height: 20,
+                    ),
+                  ],
+                ),
               ),
             ),
           ],
@@ -783,16 +733,8 @@ class _StorageManagerState extends State<StorageManager>
   }
 
   Widget _buildPoolItem(pool) {
-    return NeuCard(
-      curveType: CurveType.flat,
+    return Card(
       margin: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-      decoration: NeumorphicDecoration(
-        color: Theme.of(context).scaffoldBackgroundColor,
-        borderRadius: BorderRadius.circular(20),
-        // color: Colors.red,
-      ),
-      padding: EdgeInsets.symmetric(horizontal: 5),
-      bevel: 8,
       child: Padding(
         padding: EdgeInsets.all(10),
         child: Column(
@@ -868,31 +810,16 @@ class _StorageManagerState extends State<StorageManager>
       ),
       body: loading
           ? Center(
-              child: NeuCard(
-                padding: EdgeInsets.all(50),
-                curveType: CurveType.flat,
-                decoration: NeumorphicDecoration(
-                  color: Theme.of(context).scaffoldBackgroundColor,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                bevel: 20,
-                child: CupertinoActivityIndicator(
-                  radius: 14,
-                ),
+              child: CupertinoActivityIndicator(
+                radius: 14,
               ),
             )
           : Column(
               children: [
-                NeuCard(
-                  width: double.infinity,
-                  decoration: NeumorphicDecoration(
-                    color: Theme.of(context).scaffoldBackgroundColor,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
+                Card(
                   margin: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-                  curveType: CurveType.flat,
-                  bevel: 10,
                   child: TabBar(
+                    dividerHeight: 0,
                     isScrollable: true,
                     controller: _tabController,
                     indicatorSize: TabBarIndicatorSize.label,
@@ -945,79 +872,69 @@ class _StorageManagerState extends State<StorageManager>
                     children: [
                       ListView(
                         children: [
-                          NeuCard(
+                          Card(
                             margin: EdgeInsets.symmetric(
                                 horizontal: 20, vertical: 15),
-                            curveType: CurveType.flat,
-                            bevel: 20,
-                            decoration: NeumorphicDecoration(
-                              color: Theme.of(context).scaffoldBackgroundColor,
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                SizedBox(
-                                  height: 20,
-                                ),
-                                Padding(
-                                  padding: EdgeInsets.symmetric(horizontal: 20),
-                                  child: Text(
-                                    "存储空间状态",
-                                    style: TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.w600),
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  SizedBox(
+                                    height: 20,
                                   ),
-                                ),
-                                ...volumes.map(_buildVolumeItem).toList(),
-                                SizedBox(
-                                  height: 20,
-                                ),
-                              ],
+                                  Padding(
+                                    padding:
+                                        EdgeInsets.symmetric(horizontal: 20),
+                                    child: Text(
+                                      "存储空间状态",
+                                      style: TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.w600),
+                                    ),
+                                  ),
+                                  ...volumes.map(_buildVolumeItem).toList(),
+                                  SizedBox(
+                                    height: 20,
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
-                          NeuCard(
+                          Card(
                             margin: EdgeInsets.symmetric(
                                 horizontal: 20, vertical: 15),
-                            curveType: CurveType.flat,
-                            bevel: 20,
-                            decoration: NeumorphicDecoration(
-                              color: Theme.of(context).scaffoldBackgroundColor,
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                SizedBox(
-                                  height: 20,
-                                ),
-                                Padding(
-                                  padding: EdgeInsets.symmetric(horizontal: 20),
-                                  child: Text(
-                                    "存储池",
-                                    style: TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.w600),
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  SizedBox(
+                                    height: 20,
                                   ),
-                                ),
-                                ...storagePools.reversed
-                                    .map(_buildPoolItem)
-                                    .toList(),
-                                SizedBox(
-                                  height: 20,
-                                ),
-                              ],
+                                  Padding(
+                                    padding:
+                                        EdgeInsets.symmetric(horizontal: 20),
+                                    child: Text(
+                                      "存储池",
+                                      style: TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.w600),
+                                    ),
+                                  ),
+                                  ...storagePools.reversed
+                                      .map(_buildPoolItem)
+                                      .toList(),
+                                  SizedBox(
+                                    height: 20,
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
-                          NeuCard(
+                          Card(
                             margin: EdgeInsets.symmetric(
                                 horizontal: 20, vertical: 15),
-                            curveType: CurveType.flat,
-                            bevel: 20,
-                            decoration: NeumorphicDecoration(
-                              color: Theme.of(context).scaffoldBackgroundColor,
-                              borderRadius: BorderRadius.circular(20),
-                            ),
                             child: Padding(
                               padding: EdgeInsets.all(20),
                               child: Column(

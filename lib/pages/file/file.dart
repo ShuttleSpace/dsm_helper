@@ -35,7 +35,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_floating/floating/assist/floating_slide_type.dart';
 import 'package:flutter_floating/floating/floating.dart';
 import 'package:flutter_floating/floating/manager/floating_manager.dart';
-import 'package:neumorphic/neumorphic.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
@@ -207,15 +206,8 @@ class FilesState extends State<Files> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        NeuCard(
-                          width: double.infinity,
+                        Card(
                           margin: EdgeInsets.symmetric(horizontal: 50),
-                          curveType: CurveType.emboss,
-                          bevel: 5,
-                          decoration: NeumorphicDecoration(
-                            color: Theme.of(context).scaffoldBackgroundColor,
-                            borderRadius: BorderRadius.circular(25),
-                          ),
                           child: Padding(
                             padding: EdgeInsets.all(20),
                             child: Column(
@@ -229,22 +221,16 @@ class FilesState extends State<Files> {
                                 SizedBox(
                                   height: 16,
                                 ),
-                                NeuCard(
-                                  decoration: NeumorphicDecoration(
-                                    color: Theme.of(context)
-                                        .scaffoldBackgroundColor,
-                                    borderRadius: BorderRadius.circular(20),
-                                  ),
-                                  bevel: 20,
-                                  curveType: CurveType.flat,
-                                  padding: EdgeInsets.symmetric(
-                                      horizontal: 20, vertical: 5),
-                                  child: TextField(
-                                    onChanged: (v) => password = v,
-                                    decoration: InputDecoration(
-                                      border: InputBorder.none,
-                                      hintText: "请输入解压密码",
-                                      labelText: "解压密码",
+                                Card(
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: TextField(
+                                      onChanged: (v) => password = v,
+                                      decoration: InputDecoration(
+                                        border: InputBorder.none,
+                                        hintText: "请输入解压密码",
+                                        labelText: "解压密码",
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -254,7 +240,7 @@ class FilesState extends State<Files> {
                                 Row(
                                   children: [
                                     Expanded(
-                                      child: NeuButton(
+                                      child: OutlinedButton(
                                         onPressed: () async {
                                           if (password == "") {
                                             Util.toast("请输入解压密码");
@@ -264,15 +250,6 @@ class FilesState extends State<Files> {
                                           extractFile(result['data']['path'],
                                               password: password);
                                         },
-                                        decoration: NeumorphicDecoration(
-                                          color: Theme.of(context)
-                                              .scaffoldBackgroundColor,
-                                          borderRadius:
-                                              BorderRadius.circular(25),
-                                        ),
-                                        bevel: 20,
-                                        padding:
-                                            EdgeInsets.symmetric(vertical: 10),
                                         child: Text(
                                           "确定",
                                           style: TextStyle(fontSize: 18),
@@ -283,19 +260,10 @@ class FilesState extends State<Files> {
                                       width: 16,
                                     ),
                                     Expanded(
-                                      child: NeuButton(
+                                      child: OutlinedButton(
                                         onPressed: () async {
                                           Navigator.of(context).pop();
                                         },
-                                        decoration: NeumorphicDecoration(
-                                          color: Theme.of(context)
-                                              .scaffoldBackgroundColor,
-                                          borderRadius:
-                                              BorderRadius.circular(25),
-                                        ),
-                                        bevel: 20,
-                                        padding:
-                                            EdgeInsets.symmetric(vertical: 10),
                                         child: Text(
                                           "取消",
                                           style: TextStyle(fontSize: 18),
@@ -475,85 +443,66 @@ class FilesState extends State<Files> {
           builder: (context) {
             return Material(
               color: Colors.transparent,
-              child: NeuCard(
-                width: double.infinity,
-                padding: EdgeInsets.all(22),
-                bevel: 5,
-                curveType: CurveType.emboss,
-                decoration: NeumorphicDecoration(
-                    color: Theme.of(context).scaffoldBackgroundColor,
-                    borderRadius:
-                        BorderRadius.vertical(top: Radius.circular(22))),
+              child: Card(
                 child: SafeArea(
                   top: false,
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: <Widget>[
-                      Text(
-                        "下载确认",
-                        style: TextStyle(
-                            fontSize: 20, fontWeight: FontWeight.w500),
-                      ),
-                      SizedBox(
-                        height: 12,
-                      ),
-                      Text(
-                        "您当前正在使用数据网络，下载文件可能会产生流量费用，是否继续下载？",
-                        style: TextStyle(
-                            fontSize: 20, fontWeight: FontWeight.w400),
-                      ),
-                      SizedBox(
-                        height: 22,
-                      ),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: NeuButton(
-                              onPressed: () async {
-                                Navigator.of(context).pop(true);
-                                download(files);
-                              },
-                              decoration: NeumorphicDecoration(
-                                color:
-                                    Theme.of(context).scaffoldBackgroundColor,
-                                borderRadius: BorderRadius.circular(25),
-                              ),
-                              bevel: 5,
-                              padding: EdgeInsets.symmetric(vertical: 10),
-                              child: Text(
-                                "下载",
-                                style: TextStyle(
-                                    fontSize: 18, color: Colors.redAccent),
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: <Widget>[
+                        Text(
+                          "下载确认",
+                          style: TextStyle(
+                              fontSize: 20, fontWeight: FontWeight.w500),
+                        ),
+                        SizedBox(
+                          height: 12,
+                        ),
+                        Text(
+                          "您当前正在使用数据网络，下载文件可能会产生流量费用，是否继续下载？",
+                          style: TextStyle(
+                              fontSize: 20, fontWeight: FontWeight.w400),
+                        ),
+                        SizedBox(
+                          height: 22,
+                        ),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: OutlinedButton(
+                                onPressed: () async {
+                                  Navigator.of(context).pop(true);
+                                  download(files);
+                                },
+                                child: Text(
+                                  "下载",
+                                  style: TextStyle(
+                                      fontSize: 18, color: Colors.redAccent),
+                                ),
                               ),
                             ),
-                          ),
-                          SizedBox(
-                            width: 20,
-                          ),
-                          Expanded(
-                            child: NeuButton(
-                              onPressed: () async {
-                                Navigator.of(context).pop(false);
-                              },
-                              decoration: NeumorphicDecoration(
-                                color:
-                                    Theme.of(context).scaffoldBackgroundColor,
-                                borderRadius: BorderRadius.circular(25),
-                              ),
-                              bevel: 5,
-                              padding: EdgeInsets.symmetric(vertical: 10),
-                              child: Text(
-                                "取消",
-                                style: TextStyle(fontSize: 18),
+                            SizedBox(
+                              width: 20,
+                            ),
+                            Expanded(
+                              child: OutlinedButton(
+                                onPressed: () async {
+                                  Navigator.of(context).pop(false);
+                                },
+                                child: Text(
+                                  "取消",
+                                  style: TextStyle(fontSize: 18),
+                                ),
                               ),
                             ),
-                          ),
-                        ],
-                      ),
-                      SizedBox(
-                        height: 8,
-                      ),
-                    ],
+                          ],
+                        ),
+                        SizedBox(
+                          height: 8,
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -763,25 +712,13 @@ class FilesState extends State<Files> {
   Widget _buildSortMenu(BuildContext context, StateSetter setState) {
     return Material(
       color: Colors.transparent,
-      child: NeuCard(
-        width: double.infinity,
-        bevel: 5,
-        curveType: CurveType.emboss,
-        decoration: NeumorphicDecoration(
-            color: Theme.of(context).scaffoldBackgroundColor,
-            borderRadius: BorderRadius.vertical(top: Radius.circular(22))),
+      child: Card(
         child: Padding(
           padding: EdgeInsets.all(20),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
-              NeuCard(
-                curveType: CurveType.flat,
-                decoration: NeumorphicDecoration(
-                  color: Theme.of(context).scaffoldBackgroundColor,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                bevel: 20,
+              Card(
                 child: SafeArea(
                   top: false,
                   child: Padding(
@@ -799,26 +736,19 @@ class FilesState extends State<Files> {
                               Expanded(
                                 child: Text("名称"),
                               ),
-                              NeuCard(
-                                decoration: NeumorphicDecoration(
-                                  color:
-                                      Theme.of(context).scaffoldBackgroundColor,
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                curveType: sortBy == "name"
-                                    ? CurveType.emboss
-                                    : CurveType.flat,
-                                padding: EdgeInsets.all(5),
-                                bevel: 5,
-                                child: SizedBox(
-                                  width: 20,
-                                  height: 20,
-                                  child: sortBy == "name"
-                                      ? Icon(
-                                          CupertinoIcons.checkmark_alt,
-                                          color: Color(0xffff9813),
-                                        )
-                                      : null,
+                              Card(
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: SizedBox(
+                                    width: 20,
+                                    height: 20,
+                                    child: sortBy == "name"
+                                        ? Icon(
+                                            CupertinoIcons.checkmark_alt,
+                                            color: Color(0xffff9813),
+                                          )
+                                        : null,
+                                  ),
                                 ),
                               ),
                             ],
@@ -836,26 +766,19 @@ class FilesState extends State<Files> {
                               Expanded(
                                 child: Text("大小"),
                               ),
-                              NeuCard(
-                                decoration: NeumorphicDecoration(
-                                  color:
-                                      Theme.of(context).scaffoldBackgroundColor,
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                curveType: sortBy == "size"
-                                    ? CurveType.emboss
-                                    : CurveType.flat,
-                                padding: EdgeInsets.all(5),
-                                bevel: 5,
-                                child: SizedBox(
-                                  width: 20,
-                                  height: 20,
-                                  child: sortBy == "size"
-                                      ? Icon(
-                                          CupertinoIcons.checkmark_alt,
-                                          color: Color(0xffff9813),
-                                        )
-                                      : null,
+                              Card(
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: SizedBox(
+                                    width: 20,
+                                    height: 20,
+                                    child: sortBy == "size"
+                                        ? Icon(
+                                            CupertinoIcons.checkmark_alt,
+                                            color: Color(0xffff9813),
+                                          )
+                                        : null,
+                                  ),
                                 ),
                               ),
                             ],
@@ -873,26 +796,19 @@ class FilesState extends State<Files> {
                               Expanded(
                                 child: Text("文件类型"),
                               ),
-                              NeuCard(
-                                decoration: NeumorphicDecoration(
-                                  color:
-                                      Theme.of(context).scaffoldBackgroundColor,
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                curveType: sortBy == "type"
-                                    ? CurveType.emboss
-                                    : CurveType.flat,
-                                padding: EdgeInsets.all(5),
-                                bevel: 5,
-                                child: SizedBox(
-                                  width: 20,
-                                  height: 20,
-                                  child: sortBy == "type"
-                                      ? Icon(
-                                          CupertinoIcons.checkmark_alt,
-                                          color: Color(0xffff9813),
-                                        )
-                                      : null,
+                              Card(
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: SizedBox(
+                                    width: 20,
+                                    height: 20,
+                                    child: sortBy == "type"
+                                        ? Icon(
+                                            CupertinoIcons.checkmark_alt,
+                                            color: Color(0xffff9813),
+                                          )
+                                        : null,
+                                  ),
                                 ),
                               ),
                             ],
@@ -910,26 +826,19 @@ class FilesState extends State<Files> {
                               Expanded(
                                 child: Text("修改日期"),
                               ),
-                              NeuCard(
-                                decoration: NeumorphicDecoration(
-                                  color:
-                                      Theme.of(context).scaffoldBackgroundColor,
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                curveType: sortBy == "mtime"
-                                    ? CurveType.emboss
-                                    : CurveType.flat,
-                                padding: EdgeInsets.all(5),
-                                bevel: 5,
-                                child: SizedBox(
-                                  width: 20,
-                                  height: 20,
-                                  child: sortBy == "mtime"
-                                      ? Icon(
-                                          CupertinoIcons.checkmark_alt,
-                                          color: Color(0xffff9813),
-                                        )
-                                      : null,
+                              Card(
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: SizedBox(
+                                    width: 20,
+                                    height: 20,
+                                    child: sortBy == "mtime"
+                                        ? Icon(
+                                            CupertinoIcons.checkmark_alt,
+                                            color: Color(0xffff9813),
+                                          )
+                                        : null,
+                                  ),
                                 ),
                               ),
                             ],
@@ -947,26 +856,19 @@ class FilesState extends State<Files> {
                               Expanded(
                                 child: Text("创建日期"),
                               ),
-                              NeuCard(
-                                decoration: NeumorphicDecoration(
-                                  color:
-                                      Theme.of(context).scaffoldBackgroundColor,
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                curveType: sortBy == "crtime"
-                                    ? CurveType.emboss
-                                    : CurveType.flat,
-                                padding: EdgeInsets.all(5),
-                                bevel: 5,
-                                child: SizedBox(
-                                  width: 20,
-                                  height: 20,
-                                  child: sortBy == "crtime"
-                                      ? Icon(
-                                          CupertinoIcons.checkmark_alt,
-                                          color: Color(0xffff9813),
-                                        )
-                                      : null,
+                              Card(
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: SizedBox(
+                                    width: 20,
+                                    height: 20,
+                                    child: sortBy == "crtime"
+                                        ? Icon(
+                                            CupertinoIcons.checkmark_alt,
+                                            color: Color(0xffff9813),
+                                          )
+                                        : null,
+                                  ),
                                 ),
                               ),
                             ],
@@ -984,26 +886,19 @@ class FilesState extends State<Files> {
                               Expanded(
                                 child: Text("最近访问时间"),
                               ),
-                              NeuCard(
-                                decoration: NeumorphicDecoration(
-                                  color:
-                                      Theme.of(context).scaffoldBackgroundColor,
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                curveType: sortBy == "atime"
-                                    ? CurveType.emboss
-                                    : CurveType.flat,
-                                padding: EdgeInsets.all(5),
-                                bevel: 5,
-                                child: SizedBox(
-                                  width: 20,
-                                  height: 20,
-                                  child: sortBy == "atime"
-                                      ? Icon(
-                                          CupertinoIcons.checkmark_alt,
-                                          color: Color(0xffff9813),
-                                        )
-                                      : null,
+                              Card(
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: SizedBox(
+                                    width: 20,
+                                    height: 20,
+                                    child: sortBy == "atime"
+                                        ? Icon(
+                                            CupertinoIcons.checkmark_alt,
+                                            color: Color(0xffff9813),
+                                          )
+                                        : null,
+                                  ),
                                 ),
                               ),
                             ],
@@ -1021,26 +916,19 @@ class FilesState extends State<Files> {
                               Expanded(
                                 child: Text("权限"),
                               ),
-                              NeuCard(
-                                decoration: NeumorphicDecoration(
-                                  color:
-                                      Theme.of(context).scaffoldBackgroundColor,
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                curveType: sortBy == "posix"
-                                    ? CurveType.emboss
-                                    : CurveType.flat,
-                                padding: EdgeInsets.all(5),
-                                bevel: 5,
-                                child: SizedBox(
-                                  width: 20,
-                                  height: 20,
-                                  child: sortBy == "posix"
-                                      ? Icon(
-                                          CupertinoIcons.checkmark_alt,
-                                          color: Color(0xffff9813),
-                                        )
-                                      : null,
+                              Card(
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: SizedBox(
+                                    width: 20,
+                                    height: 20,
+                                    child: sortBy == "posix"
+                                        ? Icon(
+                                            CupertinoIcons.checkmark_alt,
+                                            color: Color(0xffff9813),
+                                          )
+                                        : null,
+                                  ),
                                 ),
                               ),
                             ],
@@ -1058,26 +946,19 @@ class FilesState extends State<Files> {
                               Expanded(
                                 child: Text("拥有者"),
                               ),
-                              NeuCard(
-                                decoration: NeumorphicDecoration(
-                                  color:
-                                      Theme.of(context).scaffoldBackgroundColor,
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                curveType: sortBy == "user"
-                                    ? CurveType.emboss
-                                    : CurveType.flat,
-                                padding: EdgeInsets.all(5),
-                                bevel: 5,
-                                child: SizedBox(
-                                  width: 20,
-                                  height: 20,
-                                  child: sortBy == "user"
-                                      ? Icon(
-                                          CupertinoIcons.checkmark_alt,
-                                          color: Color(0xffff9813),
-                                        )
-                                      : null,
+                              Card(
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: SizedBox(
+                                    width: 20,
+                                    height: 20,
+                                    child: sortBy == "user"
+                                        ? Icon(
+                                            CupertinoIcons.checkmark_alt,
+                                            color: Color(0xffff9813),
+                                          )
+                                        : null,
+                                  ),
                                 ),
                               ),
                             ],
@@ -1095,26 +976,19 @@ class FilesState extends State<Files> {
                               Expanded(
                                 child: Text("群组"),
                               ),
-                              NeuCard(
-                                decoration: NeumorphicDecoration(
-                                  color:
-                                      Theme.of(context).scaffoldBackgroundColor,
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                curveType: sortBy == "group"
-                                    ? CurveType.emboss
-                                    : CurveType.flat,
-                                padding: EdgeInsets.all(5),
-                                bevel: 5,
-                                child: SizedBox(
-                                  width: 20,
-                                  height: 20,
-                                  child: sortBy == "group"
-                                      ? Icon(
-                                          CupertinoIcons.checkmark_alt,
-                                          color: Color(0xffff9813),
-                                        )
-                                      : null,
+                              Card(
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: SizedBox(
+                                    width: 20,
+                                    height: 20,
+                                    child: sortBy == "group"
+                                        ? Icon(
+                                            CupertinoIcons.checkmark_alt,
+                                            color: Color(0xffff9813),
+                                          )
+                                        : null,
+                                  ),
                                 ),
                               ),
                             ],
@@ -1128,13 +1002,7 @@ class FilesState extends State<Files> {
               SizedBox(
                 height: 20,
               ),
-              NeuCard(
-                curveType: CurveType.flat,
-                decoration: NeumorphicDecoration(
-                  color: Theme.of(context).scaffoldBackgroundColor,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                bevel: 20,
+              Card(
                 child: Padding(
                   padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                   child: Column(
@@ -1150,26 +1018,19 @@ class FilesState extends State<Files> {
                             Expanded(
                               child: Text("由小至大"),
                             ),
-                            NeuCard(
-                              decoration: NeumorphicDecoration(
-                                color:
-                                    Theme.of(context).scaffoldBackgroundColor,
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              curveType: sortDirection == "ASC"
-                                  ? CurveType.emboss
-                                  : CurveType.flat,
-                              padding: EdgeInsets.all(5),
-                              bevel: 5,
-                              child: SizedBox(
-                                width: 20,
-                                height: 20,
-                                child: sortDirection == "ASC"
-                                    ? Icon(
-                                        CupertinoIcons.checkmark_alt,
-                                        color: Color(0xffff9813),
-                                      )
-                                    : null,
+                            Card(
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: SizedBox(
+                                  width: 20,
+                                  height: 20,
+                                  child: sortDirection == "ASC"
+                                      ? Icon(
+                                          CupertinoIcons.checkmark_alt,
+                                          color: Color(0xffff9813),
+                                        )
+                                      : null,
+                                ),
                               ),
                             ),
                           ],
@@ -1187,26 +1048,19 @@ class FilesState extends State<Files> {
                             Expanded(
                               child: Text("由大至小"),
                             ),
-                            NeuCard(
-                              decoration: NeumorphicDecoration(
-                                color:
-                                    Theme.of(context).scaffoldBackgroundColor,
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              curveType: sortDirection == "DESC"
-                                  ? CurveType.emboss
-                                  : CurveType.flat,
-                              padding: EdgeInsets.all(5),
-                              bevel: 5,
-                              child: SizedBox(
-                                width: 20,
-                                height: 20,
-                                child: sortDirection == "DESC"
-                                    ? Icon(
-                                        CupertinoIcons.checkmark_alt,
-                                        color: Color(0xffff9813),
-                                      )
-                                    : null,
+                            Card(
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: SizedBox(
+                                  width: 20,
+                                  height: 20,
+                                  child: sortDirection == "DESC"
+                                      ? Icon(
+                                          CupertinoIcons.checkmark_alt,
+                                          color: Color(0xffff9813),
+                                        )
+                                      : null,
+                                ),
                               ),
                             ),
                           ],
@@ -1219,16 +1073,10 @@ class FilesState extends State<Files> {
               SizedBox(
                 height: 22,
               ),
-              NeuButton(
+              OutlinedButton(
                 onPressed: () async {
                   Navigator.of(context).pop();
                 },
-                decoration: NeumorphicDecoration(
-                  color: Theme.of(context).scaffoldBackgroundColor,
-                  borderRadius: BorderRadius.circular(25),
-                ),
-                bevel: 5,
-                padding: EdgeInsets.symmetric(vertical: 10),
                 child: Text(
                   "确定",
                   style: TextStyle(fontSize: 18),
@@ -1251,95 +1099,81 @@ class FilesState extends State<Files> {
       builder: (context) {
         return Material(
           color: Colors.transparent,
-          child: NeuCard(
-            width: double.infinity,
-            padding: EdgeInsets.all(22),
-            bevel: 5,
-            curveType: CurveType.emboss,
-            decoration: NeumorphicDecoration(
-                color: Theme.of(context).scaffoldBackgroundColor,
-                borderRadius: BorderRadius.vertical(top: Radius.circular(22))),
+          child: Card(
             child: SafeArea(
               top: false,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  Text(
-                    "确认删除",
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
-                  ),
-                  SizedBox(
-                    height: 12,
-                  ),
-                  Text(
-                    "确认要删除文件？",
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.w400),
-                  ),
-                  SizedBox(
-                    height: 22,
-                  ),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: NeuButton(
-                          onPressed: () async {
-                            Navigator.of(context).pop();
-                            var res = await Api.deleteTask(files);
-                            backgroundProcess[res['data']['taskid']] = {
-                              "timer": null,
-                              "data": {
-                                "progress": 0,
-                              },
-                              "type": 'delete',
-                              "path": files,
-                            };
-                            if (res['success']) {
-                              setState(() {
-                                selectedFiles = [];
-                                multiSelect = false;
-                              });
-                              getProcessingTaskResult(res['data']['taskid']);
-                            }
-                          },
-                          decoration: NeumorphicDecoration(
-                            color: Theme.of(context).scaffoldBackgroundColor,
-                            borderRadius: BorderRadius.circular(25),
-                          ),
-                          bevel: 5,
-                          padding: EdgeInsets.symmetric(vertical: 10),
-                          child: Text(
-                            "确认删除",
-                            style: TextStyle(
-                                fontSize: 18, color: Colors.redAccent),
-                          ),
-                        ),
-                      ),
-                      SizedBox(
-                        width: 20,
-                      ),
-                      Expanded(
-                        child: NeuButton(
-                          onPressed: () async {
-                            Navigator.of(context).pop();
-                          },
-                          decoration: NeumorphicDecoration(
-                            color: Theme.of(context).scaffoldBackgroundColor,
-                            borderRadius: BorderRadius.circular(25),
-                          ),
-                          bevel: 5,
-                          padding: EdgeInsets.symmetric(vertical: 10),
-                          child: Text(
-                            "取消",
-                            style: TextStyle(fontSize: 18),
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    Text(
+                      "确认删除",
+                      style:
+                          TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
+                    ),
+                    SizedBox(
+                      height: 12,
+                    ),
+                    Text(
+                      "确认要删除文件？",
+                      style:
+                          TextStyle(fontSize: 20, fontWeight: FontWeight.w400),
+                    ),
+                    SizedBox(
+                      height: 22,
+                    ),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: OutlinedButton(
+                            onPressed: () async {
+                              Navigator.of(context).pop();
+                              var res = await Api.deleteTask(files);
+                              backgroundProcess[res['data']['taskid']] = {
+                                "timer": null,
+                                "data": {
+                                  "progress": 0,
+                                },
+                                "type": 'delete',
+                                "path": files,
+                              };
+                              if (res['success']) {
+                                setState(() {
+                                  selectedFiles = [];
+                                  multiSelect = false;
+                                });
+                                getProcessingTaskResult(res['data']['taskid']);
+                              }
+                            },
+                            child: Text(
+                              "确认删除",
+                              style: TextStyle(
+                                  fontSize: 18, color: Colors.redAccent),
+                            ),
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(
-                    height: 8,
-                  ),
-                ],
+                        SizedBox(
+                          width: 20,
+                        ),
+                        Expanded(
+                          child: OutlinedButton(
+                            onPressed: () async {
+                              Navigator.of(context).pop();
+                            },
+                            child: Text(
+                              "取消",
+                              style: TextStyle(fontSize: 18),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(
+                      height: 8,
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
@@ -1376,106 +1210,86 @@ class FilesState extends State<Files> {
       builder: (context) {
         return Material(
           color: Colors.transparent,
-          child: NeuCard(
-            width: double.infinity,
-            padding: EdgeInsets.all(22),
-            bevel: 5,
-            curveType: CurveType.emboss,
-            decoration: NeumorphicDecoration(
-                color: Theme.of(context).scaffoldBackgroundColor,
-                borderRadius: BorderRadius.vertical(top: Radius.circular(22))),
+          child: Card(
             child: SafeArea(
               top: false,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  Text(
-                    "压缩文件",
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
-                  ),
-                  SizedBox(
-                    height: 12,
-                  ),
-                  Text(
-                    "确认要压缩到$zipName？",
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.w400),
-                  ),
-                  SizedBox(
-                    height: 22,
-                  ),
-                  NeuButton(
-                    onPressed: () async {
-                      Navigator.of(context).pop();
-                      var res = await Api.compressTask(file, destPath);
-                      if (res['success']) {
-                        backgroundProcess[res['data']['taskid']] = {
-                          "timer": null,
-                          "data": {
-                            "dest_folder_path": destPath,
-                            "progress": 0,
-                          },
-                          "path": [file],
-                          "type": 'compress',
-                        };
-                        setState(() {
-                          multiSelect = false;
-                          selectedFiles = [];
-                        });
-                        getProcessingTaskResult(res['data']['taskid']);
-                      }
-                    },
-                    decoration: NeumorphicDecoration(
-                      color: Theme.of(context).scaffoldBackgroundColor,
-                      borderRadius: BorderRadius.circular(25),
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    Text(
+                      "压缩文件",
+                      style:
+                          TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
                     ),
-                    bevel: 5,
-                    padding: EdgeInsets.symmetric(vertical: 10),
-                    child: Text(
-                      "开始压缩",
-                      style: TextStyle(fontSize: 18),
+                    SizedBox(
+                      height: 12,
                     ),
-                  ),
-                  SizedBox(
-                    height: 16,
-                  ),
-                  NeuButton(
-                    onPressed: () async {
-                      // Navigator.of(context).pop();
-                      Util.toast("敬请期待");
-                    },
-                    decoration: NeumorphicDecoration(
-                      color: Theme.of(context).scaffoldBackgroundColor,
-                      borderRadius: BorderRadius.circular(25),
+                    Text(
+                      "确认要压缩到$zipName？",
+                      style:
+                          TextStyle(fontSize: 20, fontWeight: FontWeight.w400),
                     ),
-                    bevel: 5,
-                    padding: EdgeInsets.symmetric(vertical: 10),
-                    child: Text(
-                      "更多选项",
-                      style: TextStyle(fontSize: 18),
+                    SizedBox(
+                      height: 22,
                     ),
-                  ),
-                  SizedBox(
-                    height: 16,
-                  ),
-                  NeuButton(
-                    onPressed: () async {
-                      Navigator.of(context).pop();
-                    },
-                    decoration: NeumorphicDecoration(
-                      color: Theme.of(context).scaffoldBackgroundColor,
-                      borderRadius: BorderRadius.circular(25),
+                    OutlinedButton(
+                      onPressed: () async {
+                        Navigator.of(context).pop();
+                        var res = await Api.compressTask(file, destPath);
+                        if (res['success']) {
+                          backgroundProcess[res['data']['taskid']] = {
+                            "timer": null,
+                            "data": {
+                              "dest_folder_path": destPath,
+                              "progress": 0,
+                            },
+                            "path": [file],
+                            "type": 'compress',
+                          };
+                          setState(() {
+                            multiSelect = false;
+                            selectedFiles = [];
+                          });
+                          getProcessingTaskResult(res['data']['taskid']);
+                        }
+                      },
+                      child: Text(
+                        "开始压缩",
+                        style: TextStyle(fontSize: 18),
+                      ),
                     ),
-                    bevel: 5,
-                    padding: EdgeInsets.symmetric(vertical: 10),
-                    child: Text(
-                      "取消",
-                      style: TextStyle(fontSize: 18),
+                    SizedBox(
+                      height: 16,
                     ),
-                  ),
-                  SizedBox(
-                    height: 8,
-                  ),
-                ],
+                    OutlinedButton(
+                      onPressed: () async {
+                        // Navigator.of(context).pop();
+                        Util.toast("敬请期待");
+                      },
+                      child: Text(
+                        "更多选项",
+                        style: TextStyle(fontSize: 18),
+                      ),
+                    ),
+                    SizedBox(
+                      height: 16,
+                    ),
+                    OutlinedButton(
+                      onPressed: () async {
+                        Navigator.of(context).pop();
+                      },
+                      child: Text(
+                        "取消",
+                        style: TextStyle(fontSize: 18),
+                      ),
+                    ),
+                    SizedBox(
+                      height: 8,
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
@@ -1698,13 +1512,7 @@ class FilesState extends State<Files> {
       builder: (context) {
         return Material(
           color: Colors.transparent,
-          child: NeuCard(
-            width: double.infinity,
-            bevel: 5,
-            curveType: CurveType.emboss,
-            decoration: NeumorphicDecoration(
-                color: Theme.of(context).scaffoldBackgroundColor,
-                borderRadius: BorderRadius.vertical(top: Radius.circular(22))),
+          child: Card(
             child: SafeArea(
               top: false,
               child: Padding(
@@ -1727,14 +1535,7 @@ class FilesState extends State<Files> {
                         if (!remote)
                           Row(
                             children: [
-                              NeuButton(
-                                decoration: NeumorphicDecoration(
-                                  color:
-                                      Theme.of(context).scaffoldBackgroundColor,
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                padding: EdgeInsets.all(5),
-                                bevel: 5,
+                              OutlinedButton(
                                 onPressed: () async {
                                   Navigator.of(context).pop();
                                   setState(() {
@@ -1773,7 +1574,7 @@ class FilesState extends State<Files> {
                             constraints: BoxConstraints(maxWidth: 112),
                             width:
                                 (MediaQuery.of(context).size.width - 100) / 4,
-                            child: NeuButton(
+                            child: OutlinedButton(
                               onPressed: () async {
                                 Navigator.of(context).pop();
                                 Navigator.of(context).push(CupertinoPageRoute(
@@ -1783,13 +1584,6 @@ class FilesState extends State<Files> {
                                     settings:
                                         RouteSettings(name: "file_detail")));
                               },
-                              decoration: NeumorphicDecoration(
-                                color:
-                                    Theme.of(context).scaffoldBackgroundColor,
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              bevel: 20,
-                              padding: EdgeInsets.symmetric(vertical: 10),
                               child: Column(
                                 children: [
                                   Image.asset(
@@ -1808,18 +1602,11 @@ class FilesState extends State<Files> {
                             constraints: BoxConstraints(maxWidth: 112),
                             width:
                                 (MediaQuery.of(context).size.width - 100) / 4,
-                            child: NeuButton(
+                            child: OutlinedButton(
                               onPressed: () async {
                                 Navigator.of(context).pop();
                                 downloadFiles([file]);
                               },
-                              decoration: NeumorphicDecoration(
-                                color:
-                                    Theme.of(context).scaffoldBackgroundColor,
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              bevel: 20,
-                              padding: EdgeInsets.symmetric(vertical: 10),
                               child: Column(
                                 children: [
                                   Image.asset(
@@ -1841,18 +1628,11 @@ class FilesState extends State<Files> {
                               constraints: BoxConstraints(maxWidth: 112),
                               width:
                                   (MediaQuery.of(context).size.width - 100) / 4,
-                              child: NeuButton(
+                              child: OutlinedButton(
                                 onPressed: () async {
                                   Navigator.of(context).pop();
                                   extractFile(file);
                                 },
-                                decoration: NeumorphicDecoration(
-                                  color:
-                                      Theme.of(context).scaffoldBackgroundColor,
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                bevel: 20,
-                                padding: EdgeInsets.symmetric(vertical: 10),
                                 child: Column(
                                   children: [
                                     Image.asset(
@@ -1875,18 +1655,11 @@ class FilesState extends State<Files> {
                               constraints: BoxConstraints(maxWidth: 112),
                               width:
                                   (MediaQuery.of(context).size.width - 100) / 4,
-                              child: NeuButton(
+                              child: OutlinedButton(
                                 onPressed: () async {
                                   Navigator.of(context).pop();
                                   compressFile([file['path']]);
                                 },
-                                decoration: NeumorphicDecoration(
-                                  color:
-                                      Theme.of(context).scaffoldBackgroundColor,
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                bevel: 20,
-                                padding: EdgeInsets.symmetric(vertical: 10),
                                 child: Column(
                                   children: [
                                     Image.asset(
@@ -1908,7 +1681,7 @@ class FilesState extends State<Files> {
                               constraints: BoxConstraints(maxWidth: 112),
                               width:
                                   (MediaQuery.of(context).size.width - 100) / 4,
-                              child: NeuButton(
+                              child: OutlinedButton(
                                 onPressed: () async {
                                   Navigator.of(context).pop();
                                   Navigator.of(context).push(CupertinoPageRoute(
@@ -1917,13 +1690,6 @@ class FilesState extends State<Files> {
                                       },
                                       settings: RouteSettings(name: "share")));
                                 },
-                                decoration: NeumorphicDecoration(
-                                  color:
-                                      Theme.of(context).scaffoldBackgroundColor,
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                bevel: 20,
-                                padding: EdgeInsets.symmetric(vertical: 10),
                                 child: Column(
                                   children: [
                                     Image.asset(
@@ -1946,7 +1712,7 @@ class FilesState extends State<Files> {
                               constraints: BoxConstraints(maxWidth: 112),
                               width:
                                   (MediaQuery.of(context).size.width - 100) / 4,
-                              child: NeuButton(
+                              child: OutlinedButton(
                                 onPressed: () async {
                                   Navigator.of(context).pop();
                                   Navigator.of(context).push(CupertinoPageRoute(
@@ -1958,13 +1724,6 @@ class FilesState extends State<Files> {
                                       },
                                       settings: RouteSettings(name: "share")));
                                 },
-                                decoration: NeumorphicDecoration(
-                                  color:
-                                      Theme.of(context).scaffoldBackgroundColor,
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                bevel: 20,
-                                padding: EdgeInsets.symmetric(vertical: 10),
                                 child: Column(
                                   children: [
                                     Image.asset(
@@ -1985,7 +1744,7 @@ class FilesState extends State<Files> {
                               constraints: BoxConstraints(maxWidth: 112),
                               width:
                                   (MediaQuery.of(context).size.width - 100) / 4,
-                              child: NeuButton(
+                              child: OutlinedButton(
                                 onPressed: () async {
                                   TextEditingController nameController =
                                       TextEditingController.fromValue(
@@ -2001,18 +1760,9 @@ class FilesState extends State<Files> {
                                           mainAxisAlignment:
                                               MainAxisAlignment.center,
                                           children: [
-                                            NeuCard(
-                                              width: double.infinity,
+                                            Card(
                                               margin: EdgeInsets.symmetric(
                                                   horizontal: 50),
-                                              curveType: CurveType.emboss,
-                                              bevel: 5,
-                                              decoration: NeumorphicDecoration(
-                                                color: Theme.of(context)
-                                                    .scaffoldBackgroundColor,
-                                                borderRadius:
-                                                    BorderRadius.circular(25),
-                                              ),
                                               child: Padding(
                                                 padding: EdgeInsets.all(20),
                                                 child: Column(
@@ -2027,32 +1777,23 @@ class FilesState extends State<Files> {
                                                     SizedBox(
                                                       height: 16,
                                                     ),
-                                                    NeuCard(
-                                                      decoration:
-                                                          NeumorphicDecoration(
-                                                        color: Theme.of(context)
-                                                            .scaffoldBackgroundColor,
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(20),
-                                                      ),
-                                                      bevel: 20,
-                                                      curveType: CurveType.flat,
-                                                      padding:
-                                                          EdgeInsets.symmetric(
-                                                              horizontal: 20,
-                                                              vertical: 5),
-                                                      child: TextField(
-                                                        onChanged: (v) =>
-                                                            name = v,
-                                                        controller:
-                                                            nameController,
-                                                        decoration:
-                                                            InputDecoration(
-                                                          border:
-                                                              InputBorder.none,
-                                                          hintText: "请输入新的名称",
-                                                          labelText: "文件名",
+                                                    Card(
+                                                      child: Padding(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .all(8.0),
+                                                        child: TextField(
+                                                          onChanged: (v) =>
+                                                              name = v,
+                                                          controller:
+                                                              nameController,
+                                                          decoration:
+                                                              InputDecoration(
+                                                            border: InputBorder
+                                                                .none,
+                                                            hintText: "请输入新的名称",
+                                                            labelText: "文件名",
+                                                          ),
                                                         ),
                                                       ),
                                                     ),
@@ -2062,7 +1803,7 @@ class FilesState extends State<Files> {
                                                     Row(
                                                       children: [
                                                         Expanded(
-                                                          child: NeuButton(
+                                                          child: OutlinedButton(
                                                             onPressed:
                                                                 () async {
                                                               if (name.trim() ==
@@ -2104,21 +1845,6 @@ class FilesState extends State<Files> {
                                                                 }
                                                               }
                                                             },
-                                                            decoration:
-                                                                NeumorphicDecoration(
-                                                              color: Theme.of(
-                                                                      context)
-                                                                  .scaffoldBackgroundColor,
-                                                              borderRadius:
-                                                                  BorderRadius
-                                                                      .circular(
-                                                                          25),
-                                                            ),
-                                                            bevel: 20,
-                                                            padding: EdgeInsets
-                                                                .symmetric(
-                                                                    vertical:
-                                                                        10),
                                                             child: Text(
                                                               "确定",
                                                               style: TextStyle(
@@ -2130,28 +1856,13 @@ class FilesState extends State<Files> {
                                                           width: 16,
                                                         ),
                                                         Expanded(
-                                                          child: NeuButton(
+                                                          child: OutlinedButton(
                                                             onPressed:
                                                                 () async {
                                                               Navigator.of(
                                                                       context)
                                                                   .pop();
                                                             },
-                                                            decoration:
-                                                                NeumorphicDecoration(
-                                                              color: Theme.of(
-                                                                      context)
-                                                                  .scaffoldBackgroundColor,
-                                                              borderRadius:
-                                                                  BorderRadius
-                                                                      .circular(
-                                                                          25),
-                                                            ),
-                                                            bevel: 20,
-                                                            padding: EdgeInsets
-                                                                .symmetric(
-                                                                    vertical:
-                                                                        10),
                                                             child: Text(
                                                               "取消",
                                                               style: TextStyle(
@@ -2171,13 +1882,6 @@ class FilesState extends State<Files> {
                                     },
                                   );
                                 },
-                                decoration: NeumorphicDecoration(
-                                  color:
-                                      Theme.of(context).scaffoldBackgroundColor,
-                                  borderRadius: BorderRadius.circular(25),
-                                ),
-                                bevel: 20,
-                                padding: EdgeInsets.symmetric(vertical: 10),
                                 child: Column(
                                   children: [
                                     Image.asset(
@@ -2200,7 +1904,7 @@ class FilesState extends State<Files> {
                               constraints: BoxConstraints(maxWidth: 112),
                               width:
                                   (MediaQuery.of(context).size.width - 100) / 4,
-                              child: NeuButton(
+                              child: OutlinedButton(
                                 onPressed: () async {
                                   Navigator.of(context).pop();
                                   var res = await Api.favoriteAdd(
@@ -2213,13 +1917,6 @@ class FilesState extends State<Files> {
                                         "收藏失败，代码${res['error']['code']}");
                                   }
                                 },
-                                decoration: NeumorphicDecoration(
-                                  color:
-                                      Theme.of(context).scaffoldBackgroundColor,
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                bevel: 20,
-                                padding: EdgeInsets.symmetric(vertical: 10),
                                 child: Column(
                                   children: [
                                     Image.asset(
@@ -2241,7 +1938,7 @@ class FilesState extends State<Files> {
                               constraints: BoxConstraints(maxWidth: 112),
                               width:
                                   (MediaQuery.of(context).size.width - 100) / 4,
-                              child: NeuButton(
+                              child: OutlinedButton(
                                 onPressed: () async {
                                   Navigator.of(context).pop();
                                   var res =
@@ -2255,13 +1952,6 @@ class FilesState extends State<Files> {
                                         "卸载失败，代码${res['error']['code']}");
                                   }
                                 },
-                                decoration: NeumorphicDecoration(
-                                  color:
-                                      Theme.of(context).scaffoldBackgroundColor,
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                bevel: 20,
-                                padding: EdgeInsets.symmetric(vertical: 10),
                                 child: Column(
                                   children: [
                                     Image.asset(
@@ -2281,7 +1971,7 @@ class FilesState extends State<Files> {
                               constraints: BoxConstraints(maxWidth: 112),
                               width:
                                   (MediaQuery.of(context).size.width - 100) / 4,
-                              child: NeuButton(
+                              child: OutlinedButton(
                                 onPressed: () async {
                                   Navigator.of(context).pop();
                                   var res =
@@ -2295,13 +1985,6 @@ class FilesState extends State<Files> {
                                         "断开连接失败，代码${res['error']['code']}");
                                   }
                                 },
-                                decoration: NeumorphicDecoration(
-                                  color:
-                                      Theme.of(context).scaffoldBackgroundColor,
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                bevel: 20,
-                                padding: EdgeInsets.symmetric(vertical: 10),
                                 child: Column(
                                   children: [
                                     Image.asset(
@@ -2321,18 +2004,11 @@ class FilesState extends State<Files> {
                               constraints: BoxConstraints(maxWidth: 112),
                               width:
                                   (MediaQuery.of(context).size.width - 100) / 4,
-                              child: NeuButton(
+                              child: OutlinedButton(
                                 onPressed: () async {
                                   Navigator.of(context).pop();
                                   deleteFile([file['path']]);
                                 },
-                                decoration: NeumorphicDecoration(
-                                  color:
-                                      Theme.of(context).scaffoldBackgroundColor,
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                bevel: 20,
-                                padding: EdgeInsets.symmetric(vertical: 10),
                                 child: Column(
                                   children: [
                                     Image.asset(
@@ -2355,16 +2031,10 @@ class FilesState extends State<Files> {
                     SizedBox(
                       height: 16,
                     ),
-                    NeuButton(
+                    OutlinedButton(
                       onPressed: () async {
                         Navigator.of(context).pop();
                       },
-                      decoration: NeumorphicDecoration(
-                        color: Theme.of(context).scaffoldBackgroundColor,
-                        borderRadius: BorderRadius.circular(25),
-                      ),
-                      bevel: 20,
-                      padding: EdgeInsets.symmetric(vertical: 10),
                       child: Text(
                         "取消",
                         style: TextStyle(fontSize: 18),
@@ -2387,16 +2057,7 @@ class FilesState extends State<Files> {
     FileTypeEnum fileType = Util.fileType(file['name']);
     String path = file['path'];
     Widget actionButton = multiSelect
-        ? NeuCard(
-            decoration: NeumorphicDecoration(
-              color: Theme.of(context).scaffoldBackgroundColor,
-              borderRadius: BorderRadius.circular(10),
-            ),
-            curveType: selectedFiles.contains(file)
-                ? CurveType.emboss
-                : CurveType.flat,
-            padding: EdgeInsets.all(5),
-            bevel: 5,
+        ? Card(
             child: SizedBox(
               width: 20,
               height: 20,
@@ -2412,16 +2073,8 @@ class FilesState extends State<Files> {
             onTap: () {
               fileAction(file, remote: remote);
             },
-            child: NeuCard(
+            child: Card(
               // padding: EdgeInsets.zero,
-              curveType: CurveType.flat,
-              padding: EdgeInsets.only(left: 6, right: 4, top: 5, bottom: 5),
-              decoration: NeumorphicDecoration(
-                // color: Colors.red,
-                color: Theme.of(context).scaffoldBackgroundColor,
-                borderRadius: BorderRadius.circular(10),
-              ),
-              bevel: 10,
               child: Icon(
                 CupertinoIcons.right_chevron,
                 size: 18,
@@ -2438,7 +2091,7 @@ class FilesState extends State<Files> {
       padding: listType == ListType.icon && !remote
           ? EdgeInsets.zero
           : EdgeInsets.only(bottom: 20.0),
-      child: NeuButton(
+      child: OutlinedButton(
         onLongPress: () {
           Util.vibrate(FeedbackType.light);
           fileAction(file, remote: remote);
@@ -2455,12 +2108,6 @@ class FilesState extends State<Files> {
         onPressed: () {
           openFile(file, fileType: fileType, remote: remote);
         },
-        padding: EdgeInsets.zero,
-        decoration: NeumorphicDecoration(
-          color: Theme.of(context).scaffoldBackgroundColor,
-          borderRadius: BorderRadius.circular(20),
-        ),
-        bevel: 20,
         child: listType == ListType.list || remote
             ? Padding(
                 padding: EdgeInsets.symmetric(vertical: 5),
@@ -2605,7 +2252,7 @@ class FilesState extends State<Files> {
   Widget _buildPathItem(BuildContext context, int index) {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 10),
-      child: NeuButton(
+      child: OutlinedButton(
         onPressed: () {
           String path = "";
           List<String> items = [];
@@ -2621,15 +2268,11 @@ class FilesState extends State<Files> {
           }
           goPath(path);
         },
-        decoration: NeumorphicDecoration(
-          color: Theme.of(context).scaffoldBackgroundColor,
-          borderRadius: BorderRadius.circular(20),
-        ),
-        bevel: 5,
-        padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
         child: Text(
           paths[index],
-          style: TextStyle(fontSize: 12),
+          style: TextStyle(
+              fontSize: 12,
+              color: Theme.of(context).textTheme.headlineMedium?.color),
         ),
       ),
     );
@@ -2678,15 +2321,8 @@ class FilesState extends State<Files> {
     backgroundProcess.forEach((key, task) {
       var value = task['data'];
       children.add(
-        NeuCard(
-          curveType: CurveType.flat,
+        Card(
           margin: EdgeInsets.only(left: 20, right: 20, bottom: 20),
-          bevel: 10,
-          width: double.infinity,
-          decoration: NeumorphicDecoration(
-            color: Theme.of(context).scaffoldBackgroundColor,
-            borderRadius: BorderRadius.circular(20),
-          ),
           child: Padding(
             padding: EdgeInsets.all(20),
             child: Column(
@@ -2725,23 +2361,15 @@ class FilesState extends State<Files> {
                   height: 10,
                 ),
                 if (value != null)
-                  NeuCard(
-                    curveType: CurveType.flat,
-                    bevel: 10,
-                    decoration: NeumorphicDecoration(
-                      color: Theme.of(context).scaffoldBackgroundColor,
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: FAProgressBar(
-                      backgroundColor: Colors.transparent,
-                      changeColorValue: 100,
-                      changeProgressColor: Colors.green,
-                      progressColor: Colors.blue,
-                      size: 20,
-                      currentValue:
-                          (num.parse("${value['progress']}") * 100).toInt(),
-                      displayText: '%',
-                    ),
+                  FAProgressBar(
+                    backgroundColor: Colors.transparent,
+                    changeColorValue: 100,
+                    changeProgressColor: Colors.green,
+                    progressColor: Colors.blue,
+                    size: 20,
+                    currentValue:
+                        (num.parse("${value['progress']}") * 100).toInt(),
+                    displayText: '%',
                   ),
               ],
             ),
@@ -2766,13 +2394,7 @@ class FilesState extends State<Files> {
           children: [
             Padding(
               padding: EdgeInsets.only(left: 10, top: 8, bottom: 8),
-              child: NeuButton(
-                decoration: NeumorphicDecoration(
-                  color: Theme.of(context).scaffoldBackgroundColor,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                padding: EdgeInsets.all(10),
-                bevel: 5,
+              child: OutlinedButton(
                 onPressed: () async {
                   if (multiSelect) {
                     setState(() {
@@ -2805,27 +2427,14 @@ class FilesState extends State<Files> {
             ),
             Padding(
               padding: EdgeInsets.only(left: 10, top: 8, bottom: 8),
-              child: NeuButton(
-                decoration: NeumorphicDecoration(
-                  color: Theme.of(context).scaffoldBackgroundColor,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                padding: EdgeInsets.all(10),
-                bevel: 5,
+              child: OutlinedButton(
                 onPressed: () async {
                   showCupertinoModalPopup(
                     context: context,
                     builder: (context) {
                       return Material(
                         color: Colors.transparent,
-                        child: NeuCard(
-                          width: double.infinity,
-                          bevel: 5,
-                          curveType: CurveType.emboss,
-                          decoration: NeumorphicDecoration(
-                              color: Theme.of(context).scaffoldBackgroundColor,
-                              borderRadius: BorderRadius.vertical(
-                                  top: Radius.circular(22))),
+                        child: Card(
                           child: SafeArea(
                             top: false,
                             child: Padding(
@@ -2849,15 +2458,7 @@ class FilesState extends State<Files> {
                                         child: Container(
                                           width: 30,
                                           height: 30,
-                                          child: NeuButton(
-                                            decoration: NeumorphicDecoration(
-                                              color: Theme.of(context)
-                                                  .scaffoldBackgroundColor,
-                                              borderRadius:
-                                                  BorderRadius.circular(10),
-                                            ),
-                                            padding: EdgeInsets.all(5),
-                                            bevel: 5,
+                                          child: OutlinedButton(
                                             onPressed: () async {
                                               Util.toast("重新加载远程连接中");
                                               Navigator.of(context).pop();
@@ -2918,17 +2519,10 @@ class FilesState extends State<Files> {
                                   SizedBox(
                                     height: 16,
                                   ),
-                                  NeuButton(
+                                  OutlinedButton(
                                     onPressed: () async {
                                       Navigator.of(context).pop();
                                     },
-                                    decoration: NeumorphicDecoration(
-                                      color: Theme.of(context)
-                                          .scaffoldBackgroundColor,
-                                      borderRadius: BorderRadius.circular(25),
-                                    ),
-                                    bevel: 20,
-                                    padding: EdgeInsets.symmetric(vertical: 10),
                                     child: Text(
                                       "取消",
                                       style: TextStyle(fontSize: 18),
@@ -2955,13 +2549,7 @@ class FilesState extends State<Files> {
             if (Util.notReviewAccount && paths.length > 0 && !multiSelect)
               Padding(
                 padding: EdgeInsets.only(left: 10, top: 8, bottom: 8),
-                child: NeuButton(
-                  decoration: NeumorphicDecoration(
-                    color: Theme.of(context).scaffoldBackgroundColor,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  padding: EdgeInsets.all(10),
-                  bevel: 5,
+                child: OutlinedButton(
                   onPressed: () async {
                     Navigator.of(context)
                         .push(CupertinoPageRoute(
@@ -2982,13 +2570,7 @@ class FilesState extends State<Files> {
             if (backgroundProcess.isNotEmpty)
               Padding(
                 padding: EdgeInsets.only(left: 10, top: 8, bottom: 8),
-                child: NeuButton(
-                  decoration: NeumorphicDecoration(
-                    color: Theme.of(context).scaffoldBackgroundColor,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  padding: EdgeInsets.all(10),
-                  bevel: 5,
+                child: OutlinedButton(
                   onPressed: () async {
                     setState(() {
                       showProcessList = !showProcessList;
@@ -3004,7 +2586,7 @@ class FilesState extends State<Files> {
             if (paths.length > 0)
               Padding(
                 padding: EdgeInsets.only(right: 10, top: 8, bottom: 8),
-                child: NeuButton(
+                child: OutlinedButton(
                   onPressed: () async {
                     Navigator.of(context)
                         .push(CupertinoPageRoute(
@@ -3019,12 +2601,6 @@ class FilesState extends State<Files> {
                       }
                     });
                   },
-                  decoration: NeumorphicDecoration(
-                    color: Theme.of(context).scaffoldBackgroundColor,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  bevel: 5,
-                  padding: EdgeInsets.all(10),
                   child: Image.asset(
                     "assets/icons/search.png",
                     width: 20,
@@ -3033,13 +2609,7 @@ class FilesState extends State<Files> {
               ),
             Padding(
               padding: EdgeInsets.only(right: 10, top: 8, bottom: 8),
-              child: NeuButton(
-                decoration: NeumorphicDecoration(
-                  color: Theme.of(context).scaffoldBackgroundColor,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                padding: EdgeInsets.all(10),
-                bevel: 5,
+              child: OutlinedButton(
                 onPressed: () {
                   setState(() {
                     listType = listType == ListType.list
@@ -3061,13 +2631,7 @@ class FilesState extends State<Files> {
             if (multiSelect)
               Padding(
                 padding: EdgeInsets.only(right: 10, top: 8, bottom: 8),
-                child: NeuButton(
-                  decoration: NeumorphicDecoration(
-                    color: Theme.of(context).scaffoldBackgroundColor,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  padding: EdgeInsets.all(10),
-                  bevel: 5,
+                child: OutlinedButton(
                   onPressed: () {
                     if (selectedFiles.length == files.length) {
                       selectedFiles = [];
@@ -3090,13 +2654,7 @@ class FilesState extends State<Files> {
             else if (paths.length > 1)
               Padding(
                 padding: EdgeInsets.only(right: 10, top: 8, bottom: 8),
-                child: NeuButton(
-                  decoration: NeumorphicDecoration(
-                    color: Theme.of(context).scaffoldBackgroundColor,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  padding: EdgeInsets.all(10),
-                  bevel: 5,
+                child: OutlinedButton(
                   onPressed: () {
                     showCupertinoModalPopup(
                       context: context,
@@ -3118,27 +2676,14 @@ class FilesState extends State<Files> {
               ),
             Padding(
               padding: EdgeInsets.only(right: 10, top: 8, bottom: 8),
-              child: NeuButton(
-                decoration: NeumorphicDecoration(
-                  color: Theme.of(context).scaffoldBackgroundColor,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                padding: EdgeInsets.all(10),
-                bevel: 5,
+              child: OutlinedButton(
                 onPressed: () {
                   showCupertinoModalPopup(
                     context: context,
                     builder: (context) {
                       return Material(
                         color: Colors.transparent,
-                        child: NeuCard(
-                          width: double.infinity,
-                          bevel: 20,
-                          curveType: CurveType.emboss,
-                          decoration: NeumorphicDecoration(
-                              color: Theme.of(context).scaffoldBackgroundColor,
-                              borderRadius: BorderRadius.vertical(
-                                  top: Radius.circular(22))),
+                        child: Card(
                           child: SafeArea(
                             top: false,
                             child: Padding(
@@ -3170,7 +2715,7 @@ class FilesState extends State<Files> {
                                                         .width -
                                                     100) /
                                                 4,
-                                            child: NeuButton(
+                                            child: OutlinedButton(
                                               onPressed: () async {
                                                 Navigator.of(context).pop();
                                                 List volumes =
@@ -3194,15 +2739,6 @@ class FilesState extends State<Files> {
                                                   Util.toast("未获取到存储空间");
                                                 }
                                               },
-                                              decoration: NeumorphicDecoration(
-                                                color: Theme.of(context)
-                                                    .scaffoldBackgroundColor,
-                                                borderRadius:
-                                                    BorderRadius.circular(10),
-                                              ),
-                                              bevel: 20,
-                                              padding: EdgeInsets.symmetric(
-                                                  vertical: 10),
                                               child: Column(
                                                 children: [
                                                   Image.asset(
@@ -3228,7 +2764,7 @@ class FilesState extends State<Files> {
                                                         .width -
                                                     100) /
                                                 4,
-                                            child: NeuButton(
+                                            child: OutlinedButton(
                                               onPressed: () async {
                                                 Navigator.of(context).pop();
                                                 String name = "";
@@ -3243,27 +2779,7 @@ class FilesState extends State<Files> {
                                                               MainAxisAlignment
                                                                   .center,
                                                           children: [
-                                                            NeuCard(
-                                                              width: double
-                                                                  .infinity,
-                                                              margin: EdgeInsets
-                                                                  .symmetric(
-                                                                      horizontal:
-                                                                          50),
-                                                              curveType:
-                                                                  CurveType
-                                                                      .emboss,
-                                                              bevel: 5,
-                                                              decoration:
-                                                                  NeumorphicDecoration(
-                                                                color: Theme.of(
-                                                                        context)
-                                                                    .scaffoldBackgroundColor,
-                                                                borderRadius:
-                                                                    BorderRadius
-                                                                        .circular(
-                                                                            25),
-                                                              ),
+                                                            Card(
                                                               child: Padding(
                                                                 padding:
                                                                     EdgeInsets
@@ -3283,36 +2799,25 @@ class FilesState extends State<Files> {
                                                                       height:
                                                                           16,
                                                                     ),
-                                                                    NeuCard(
-                                                                      decoration:
-                                                                          NeumorphicDecoration(
-                                                                        color: Theme.of(context)
-                                                                            .scaffoldBackgroundColor,
-                                                                        borderRadius:
-                                                                            BorderRadius.circular(20),
-                                                                      ),
-                                                                      bevel: 20,
-                                                                      curveType:
-                                                                          CurveType
-                                                                              .flat,
-                                                                      padding: EdgeInsets.symmetric(
-                                                                          horizontal:
-                                                                              20,
-                                                                          vertical:
-                                                                              5),
+                                                                    Card(
                                                                       child:
-                                                                          TextField(
-                                                                        onChanged:
-                                                                            (v) =>
-                                                                                name = v,
-                                                                        decoration:
-                                                                            InputDecoration(
-                                                                          border:
-                                                                              InputBorder.none,
-                                                                          hintText:
-                                                                              "请输入文件夹名",
-                                                                          labelText:
-                                                                              "文件夹名",
+                                                                          Padding(
+                                                                        padding: const EdgeInsets
+                                                                            .all(
+                                                                            8.0),
+                                                                        child:
+                                                                            TextField(
+                                                                          onChanged: (v) =>
+                                                                              name = v,
+                                                                          decoration:
+                                                                              InputDecoration(
+                                                                            border:
+                                                                                InputBorder.none,
+                                                                            hintText:
+                                                                                "请输入文件夹名",
+                                                                            labelText:
+                                                                                "文件夹名",
+                                                                          ),
                                                                         ),
                                                                       ),
                                                                     ),
@@ -3324,7 +2829,7 @@ class FilesState extends State<Files> {
                                                                       children: [
                                                                         Expanded(
                                                                           child:
-                                                                              NeuButton(
+                                                                              OutlinedButton(
                                                                             onPressed:
                                                                                 () async {
                                                                               if (name.trim() == "") {
@@ -3345,15 +2850,6 @@ class FilesState extends State<Files> {
                                                                                 }
                                                                               }
                                                                             },
-                                                                            decoration:
-                                                                                NeumorphicDecoration(
-                                                                              color: Theme.of(context).scaffoldBackgroundColor,
-                                                                              borderRadius: BorderRadius.circular(25),
-                                                                            ),
-                                                                            bevel:
-                                                                                20,
-                                                                            padding:
-                                                                                EdgeInsets.symmetric(vertical: 10),
                                                                             child:
                                                                                 Text(
                                                                               "确定",
@@ -3367,20 +2863,11 @@ class FilesState extends State<Files> {
                                                                         ),
                                                                         Expanded(
                                                                           child:
-                                                                              NeuButton(
+                                                                              OutlinedButton(
                                                                             onPressed:
                                                                                 () async {
                                                                               Navigator.of(context).pop();
                                                                             },
-                                                                            decoration:
-                                                                                NeumorphicDecoration(
-                                                                              color: Theme.of(context).scaffoldBackgroundColor,
-                                                                              borderRadius: BorderRadius.circular(25),
-                                                                            ),
-                                                                            bevel:
-                                                                                20,
-                                                                            padding:
-                                                                                EdgeInsets.symmetric(vertical: 10),
                                                                             child:
                                                                                 Text(
                                                                               "取消",
@@ -3399,15 +2886,6 @@ class FilesState extends State<Files> {
                                                       );
                                                     });
                                               },
-                                              decoration: NeumorphicDecoration(
-                                                color: Theme.of(context)
-                                                    .scaffoldBackgroundColor,
-                                                borderRadius:
-                                                    BorderRadius.circular(10),
-                                              ),
-                                              bevel: 20,
-                                              padding: EdgeInsets.symmetric(
-                                                  vertical: 10),
                                               child: Column(
                                                 children: [
                                                   Image.asset(
@@ -3429,7 +2907,7 @@ class FilesState extends State<Files> {
                                                         .width -
                                                     100) /
                                                 4,
-                                            child: NeuButton(
+                                            child: OutlinedButton(
                                               onPressed: () async {
                                                 Navigator.of(context).pop();
                                                 Navigator.of(context).push(
@@ -3447,15 +2925,6 @@ class FilesState extends State<Files> {
                                                         settings: RouteSettings(
                                                             name: "share")));
                                               },
-                                              decoration: NeumorphicDecoration(
-                                                color: Theme.of(context)
-                                                    .scaffoldBackgroundColor,
-                                                borderRadius:
-                                                    BorderRadius.circular(10),
-                                              ),
-                                              bevel: 20,
-                                              padding: EdgeInsets.symmetric(
-                                                  vertical: 10),
                                               child: Column(
                                                 children: [
                                                   Image.asset(
@@ -3480,7 +2949,7 @@ class FilesState extends State<Files> {
                                                       .width -
                                                   100) /
                                               4,
-                                          child: NeuButton(
+                                          child: OutlinedButton(
                                             onPressed: () async {
                                               Navigator.of(context).pop();
                                               Navigator.of(context).push(
@@ -3492,15 +2961,6 @@ class FilesState extends State<Files> {
                                                           name:
                                                               "share_manager")));
                                             },
-                                            decoration: NeumorphicDecoration(
-                                              color: Theme.of(context)
-                                                  .scaffoldBackgroundColor,
-                                              borderRadius:
-                                                  BorderRadius.circular(10),
-                                            ),
-                                            bevel: 20,
-                                            padding: EdgeInsets.symmetric(
-                                                vertical: 10),
                                             child: Column(
                                               children: [
                                                 Image.asset(
@@ -3524,7 +2984,7 @@ class FilesState extends State<Files> {
                                                       .width -
                                                   100) /
                                               4,
-                                          child: NeuButton(
+                                          child: OutlinedButton(
                                             onPressed: () async {
                                               Navigator.of(context).pop();
                                               Navigator.of(context)
@@ -3540,15 +3000,6 @@ class FilesState extends State<Files> {
                                                 getSmbFolder();
                                               });
                                             },
-                                            decoration: NeumorphicDecoration(
-                                              color: Theme.of(context)
-                                                  .scaffoldBackgroundColor,
-                                              borderRadius:
-                                                  BorderRadius.circular(10),
-                                            ),
-                                            bevel: 20,
-                                            padding: EdgeInsets.symmetric(
-                                                vertical: 10),
                                             child: Column(
                                               children: [
                                                 Image.asset(
@@ -3609,17 +3060,10 @@ class FilesState extends State<Files> {
                                   SizedBox(
                                     height: 20,
                                   ),
-                                  NeuButton(
+                                  OutlinedButton(
                                     onPressed: () async {
                                       Navigator.of(context).pop();
                                     },
-                                    decoration: NeumorphicDecoration(
-                                      color: Theme.of(context)
-                                          .scaffoldBackgroundColor,
-                                      borderRadius: BorderRadius.circular(25),
-                                    ),
-                                    bevel: 20,
-                                    padding: EdgeInsets.symmetric(vertical: 10),
                                     child: Text(
                                       "取消",
                                       style: TextStyle(fontSize: 18),
@@ -3659,16 +3103,13 @@ class FilesState extends State<Files> {
                   Container(
                     margin: EdgeInsets.only(left: 20),
                     padding: const EdgeInsets.symmetric(vertical: 10),
-                    child: NeuCard(
-                      decoration: NeumorphicDecoration(
-                        color: Theme.of(context).scaffoldBackgroundColor,
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      bevel: 5,
-                      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                      child: Text(
-                        "搜索结果",
-                        style: TextStyle(fontSize: 12),
+                    child: Card(
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(
+                          "搜索结果",
+                          style: TextStyle(fontSize: 12),
+                        ),
                       ),
                     ),
                   ),
@@ -3685,34 +3126,29 @@ class FilesState extends State<Files> {
                     child: Container(
                       margin: EdgeInsets.only(right: 20),
                       padding: const EdgeInsets.symmetric(vertical: 10),
-                      child: NeuCard(
-                        decoration: NeumorphicDecoration(
-                          color: Theme.of(context).scaffoldBackgroundColor,
-                          borderRadius: BorderRadius.circular(20),
+                      child: Card(
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: searching
+                              ? Row(
+                                  children: [
+                                    Text(
+                                      "搜索中",
+                                      style: TextStyle(fontSize: 12),
+                                    ),
+                                    SizedBox(
+                                      width: 5,
+                                    ),
+                                    CupertinoActivityIndicator(
+                                      radius: 6,
+                                    ),
+                                  ],
+                                )
+                              : Text(
+                                  "退出搜索",
+                                  style: TextStyle(fontSize: 12),
+                                ),
                         ),
-                        bevel: 5,
-                        curveType: CurveType.flat,
-                        padding:
-                            EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                        child: searching
-                            ? Row(
-                                children: [
-                                  Text(
-                                    "搜索中",
-                                    style: TextStyle(fontSize: 12),
-                                  ),
-                                  SizedBox(
-                                    width: 5,
-                                  ),
-                                  CupertinoActivityIndicator(
-                                    radius: 6,
-                                  ),
-                                ],
-                              )
-                            : Text(
-                                "退出搜索",
-                                style: TextStyle(fontSize: 12),
-                              ),
                       ),
                     ),
                   ),
@@ -3728,16 +3164,10 @@ class FilesState extends State<Files> {
                 children: [
                   Container(
                     padding: EdgeInsets.only(left: 20, top: 10, bottom: 10),
-                    child: NeuButton(
+                    child: OutlinedButton(
                       onPressed: () {
                         goPath("");
                       },
-                      decoration: NeumorphicDecoration(
-                        color: Theme.of(context).scaffoldBackgroundColor,
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      bevel: 5,
-                      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                       child: Icon(
                         CupertinoIcons.home,
                         size: 16,
@@ -3823,177 +3253,173 @@ class FilesState extends State<Files> {
                       AnimatedPositioned(
                         bottom: selectedFiles.length > 0 ? 0 : -100,
                         duration: Duration(milliseconds: 200),
-                        child: NeuCard(
-                          width: MediaQuery.of(context).size.width - 40,
+                        child: Card(
                           margin: EdgeInsets.all(20),
-                          padding: EdgeInsets.all(10),
-                          height: 62,
-                          bevel: 20,
-                          curveType: CurveType.flat,
-                          decoration: NeumorphicDecoration(
-                            color: Theme.of(context).scaffoldBackgroundColor,
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceAround,
-                            children: [
-                              GestureDetector(
-                                onTap: () {
-                                  showCupertinoModalPopup(
-                                    context: context,
-                                    builder: (context) {
-                                      return SelectFolder(
-                                        multi: false,
-                                      );
-                                    },
-                                  ).then((folder) async {
-                                    if (folder != null && folder.length == 1) {
-                                      List<String> files = selectedFiles
-                                          .map((e) => e['path'] as String)
-                                          .toList();
-                                      var res = await Api.copyMoveTask(
-                                          files, folder[0], true);
-                                      if (res['success']) {
-                                        setState(() {
-                                          selectedFiles = [];
-                                          multiSelect = false;
-                                          backgroundProcess[res['data']
-                                              ['taskid']] = {
-                                            "timer": null,
-                                            "data": {
-                                              "dest_folder_path": folder[0],
-                                              "progress": 0,
-                                            },
-                                            "type": 'move',
-                                            "path": files,
-                                          };
-                                        });
-                                        //获取移动进度
-                                        getProcessingTaskResult(
-                                            res['data']['taskid']);
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              children: [
+                                GestureDetector(
+                                  onTap: () {
+                                    showCupertinoModalPopup(
+                                      context: context,
+                                      builder: (context) {
+                                        return SelectFolder(
+                                          multi: false,
+                                        );
+                                      },
+                                    ).then((folder) async {
+                                      if (folder != null &&
+                                          folder.length == 1) {
+                                        List<String> files = selectedFiles
+                                            .map((e) => e['path'] as String)
+                                            .toList();
+                                        var res = await Api.copyMoveTask(
+                                            files, folder[0], true);
+                                        if (res['success']) {
+                                          setState(() {
+                                            selectedFiles = [];
+                                            multiSelect = false;
+                                            backgroundProcess[res['data']
+                                                ['taskid']] = {
+                                              "timer": null,
+                                              "data": {
+                                                "dest_folder_path": folder[0],
+                                                "progress": 0,
+                                              },
+                                              "type": 'move',
+                                              "path": files,
+                                            };
+                                          });
+                                          //获取移动进度
+                                          getProcessingTaskResult(
+                                              res['data']['taskid']);
+                                        }
                                       }
-                                    }
-                                  });
-                                },
-                                child: Column(
-                                  children: [
-                                    Image.asset(
-                                      "assets/icons/move.png",
-                                      width: 25,
-                                    ),
-                                    Text(
-                                      "移动到",
-                                      style: TextStyle(fontSize: 12),
-                                    ),
-                                  ],
+                                    });
+                                  },
+                                  child: Column(
+                                    children: [
+                                      Image.asset(
+                                        "assets/icons/move.png",
+                                        width: 25,
+                                      ),
+                                      Text(
+                                        "移动到",
+                                        style: TextStyle(fontSize: 12),
+                                      ),
+                                    ],
+                                  ),
                                 ),
-                              ),
-                              GestureDetector(
-                                onTap: () {
-                                  showCupertinoModalPopup(
-                                    context: context,
-                                    builder: (context) {
-                                      return SelectFolder(
-                                        multi: false,
-                                      );
-                                    },
-                                  ).then((folder) async {
-                                    if (folder != null && folder.length == 1) {
-                                      List<String> files = selectedFiles
-                                          .map((e) => e['path'] as String)
-                                          .toList();
-                                      var res = await Api.copyMoveTask(
-                                          files, folder[0], false);
-                                      if (res['success']) {
-                                        setState(() {
-                                          selectedFiles = [];
-                                          multiSelect = false;
-                                          backgroundProcess[res['data']
-                                              ['taskid']] = {
-                                            "timer": null,
-                                            "data": {
-                                              "dest_folder_path": folder[0],
-                                              "progress": 0,
-                                            },
-                                            "type": "copy",
-                                            "path": files,
-                                          };
-                                        });
-                                        getProcessingTaskResult(
-                                            res['data']['taskid']);
+                                GestureDetector(
+                                  onTap: () {
+                                    showCupertinoModalPopup(
+                                      context: context,
+                                      builder: (context) {
+                                        return SelectFolder(
+                                          multi: false,
+                                        );
+                                      },
+                                    ).then((folder) async {
+                                      if (folder != null &&
+                                          folder.length == 1) {
+                                        List<String> files = selectedFiles
+                                            .map((e) => e['path'] as String)
+                                            .toList();
+                                        var res = await Api.copyMoveTask(
+                                            files, folder[0], false);
+                                        if (res['success']) {
+                                          setState(() {
+                                            selectedFiles = [];
+                                            multiSelect = false;
+                                            backgroundProcess[res['data']
+                                                ['taskid']] = {
+                                              "timer": null,
+                                              "data": {
+                                                "dest_folder_path": folder[0],
+                                                "progress": 0,
+                                              },
+                                              "type": "copy",
+                                              "path": files,
+                                            };
+                                          });
+                                          getProcessingTaskResult(
+                                              res['data']['taskid']);
+                                        }
                                       }
-                                    }
-                                  });
-                                },
-                                child: Column(
-                                  children: [
-                                    Image.asset(
-                                      "assets/icons/copy.png",
-                                      width: 25,
-                                    ),
-                                    Text(
-                                      "复制到",
-                                      style: TextStyle(fontSize: 12),
-                                    ),
-                                  ],
+                                    });
+                                  },
+                                  child: Column(
+                                    children: [
+                                      Image.asset(
+                                        "assets/icons/copy.png",
+                                        width: 25,
+                                      ),
+                                      Text(
+                                        "复制到",
+                                        style: TextStyle(fontSize: 12),
+                                      ),
+                                    ],
+                                  ),
                                 ),
-                              ),
-                              GestureDetector(
-                                onTap: () {
-                                  compressFile(selectedFiles
-                                      .map((e) => e['path'] as String)
-                                      .toList());
-                                },
-                                child: Column(
-                                  children: [
-                                    Image.asset(
-                                      "assets/icons/archive.png",
-                                      width: 25,
-                                    ),
-                                    Text(
-                                      "压缩",
-                                      style: TextStyle(fontSize: 12),
-                                    ),
-                                  ],
+                                GestureDetector(
+                                  onTap: () {
+                                    compressFile(selectedFiles
+                                        .map((e) => e['path'] as String)
+                                        .toList());
+                                  },
+                                  child: Column(
+                                    children: [
+                                      Image.asset(
+                                        "assets/icons/archive.png",
+                                        width: 25,
+                                      ),
+                                      Text(
+                                        "压缩",
+                                        style: TextStyle(fontSize: 12),
+                                      ),
+                                    ],
+                                  ),
                                 ),
-                              ),
-                              GestureDetector(
-                                onTap: () {
-                                  downloadFiles(selectedFiles);
-                                },
-                                child: Column(
-                                  children: [
-                                    Image.asset(
-                                      "assets/icons/download.png",
-                                      width: 25,
-                                    ),
-                                    Text(
-                                      "下载",
-                                      style: TextStyle(fontSize: 12),
-                                    ),
-                                  ],
+                                GestureDetector(
+                                  onTap: () {
+                                    downloadFiles(selectedFiles);
+                                  },
+                                  child: Column(
+                                    children: [
+                                      Image.asset(
+                                        "assets/icons/download.png",
+                                        width: 25,
+                                      ),
+                                      Text(
+                                        "下载",
+                                        style: TextStyle(fontSize: 12),
+                                      ),
+                                    ],
+                                  ),
                                 ),
-                              ),
-                              GestureDetector(
-                                onTap: () {
-                                  deleteFile(selectedFiles
-                                      .map((e) => e['path'] as String)
-                                      .toList());
-                                },
-                                child: Column(
-                                  children: [
-                                    Image.asset(
-                                      "assets/icons/delete.png",
-                                      width: 25,
-                                    ),
-                                    Text(
-                                      "删除",
-                                      style: TextStyle(fontSize: 12),
-                                    ),
-                                  ],
+                                GestureDetector(
+                                  onTap: () {
+                                    deleteFile(selectedFiles
+                                        .map((e) => e['path'] as String)
+                                        .toList());
+                                  },
+                                  child: Column(
+                                    children: [
+                                      Image.asset(
+                                        "assets/icons/delete.png",
+                                        width: 25,
+                                      ),
+                                      Text(
+                                        "删除",
+                                        style: TextStyle(fontSize: 12),
+                                      ),
+                                    ],
+                                  ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                         ),
                       ),
@@ -4005,18 +3431,8 @@ class FilesState extends State<Files> {
                               .scaffoldBackgroundColor
                               .withOpacity(0.7),
                           child: Center(
-                            child: NeuCard(
-                              padding: EdgeInsets.all(50),
-                              curveType: CurveType.flat,
-                              decoration: NeumorphicDecoration(
-                                color:
-                                    Theme.of(context).scaffoldBackgroundColor,
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                              bevel: 20,
-                              child: CupertinoActivityIndicator(
-                                radius: 14,
-                              ),
+                            child: CupertinoActivityIndicator(
+                              radius: 14,
                             ),
                           ),
                         ),
@@ -4036,14 +3452,7 @@ class FilesState extends State<Files> {
                         ),
                         SizedBox(
                           width: 200,
-                          child: NeuButton(
-                            padding: EdgeInsets.symmetric(
-                                horizontal: 10, vertical: 10),
-                            decoration: NeumorphicDecoration(
-                              color: Theme.of(context).scaffoldBackgroundColor,
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            bevel: 5,
+                          child: OutlinedButton(
                             onPressed: () {
                               refresh();
                             },

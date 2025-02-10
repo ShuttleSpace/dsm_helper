@@ -9,7 +9,6 @@ import 'package:dsm_helper/widgets/neu_back_button.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:neumorphic/neumorphic.dart';
 import 'package:provider/provider.dart';
 
 class Performance extends StatefulWidget {
@@ -128,31 +127,16 @@ class _PerformanceState extends State<Performance>
       ),
       body: loading
           ? Center(
-              child: NeuCard(
-                padding: EdgeInsets.all(50),
-                curveType: CurveType.flat,
-                decoration: NeumorphicDecoration(
-                  color: Theme.of(context).scaffoldBackgroundColor,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                bevel: 20,
-                child: CupertinoActivityIndicator(
-                  radius: 14,
-                ),
+              child: CupertinoActivityIndicator(
+                radius: 14,
               ),
             )
           : Column(
               children: [
-                NeuCard(
-                  width: double.infinity,
-                  decoration: NeumorphicDecoration(
-                    color: Theme.of(context).scaffoldBackgroundColor,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
+                Card(
                   margin: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-                  curveType: CurveType.flat,
-                  bevel: 10,
                   child: TabBar(
+                    dividerHeight: 0,
                     isScrollable: true,
                     controller: _tabController,
                     indicatorSize: TabBarIndicatorSize.label,
@@ -208,884 +192,868 @@ class _PerformanceState extends State<Performance>
                           SizedBox(
                             height: 20,
                           ),
-                          NeuCard(
-                            curveType: CurveType.flat,
+                          Card(
                             margin: EdgeInsets.symmetric(horizontal: 20),
-                            bevel: 20,
-                            decoration: NeumorphicDecoration(
-                              color: Theme.of(context).scaffoldBackgroundColor,
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                SizedBox(
-                                  height: 20,
-                                ),
-                                Padding(
-                                  padding: EdgeInsets.symmetric(horizontal: 20),
-                                  child: Text(
-                                    "CPU",
-                                    style: TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.w600),
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  SizedBox(
+                                    height: 20,
                                   ),
-                                ),
-                                AspectRatio(
-                                  aspectRatio: 1.70,
-                                  child: Padding(
-                                    padding: const EdgeInsets.only(
-                                        left: 20,
-                                        right: 20,
-                                        top: 20,
-                                        bottom: 5),
-                                    child: NeuCard(
-                                      curveType: CurveType.flat,
-                                      bevel: 20,
-                                      decoration: NeumorphicDecoration(
-                                        color: Theme.of(context)
-                                            .scaffoldBackgroundColor,
-                                        borderRadius: BorderRadius.circular(20),
-                                      ),
-                                      // padding: EdgeInsets.symmetric(horizontal: 10),
-                                      child: Padding(
-                                        padding: EdgeInsets.all(10),
-                                        child: LineChart(
-                                          LineChartData(
-                                            lineTouchData: LineTouchData(
-                                              touchTooltipData:
-                                                  LineTouchTooltipData(
-                                                      // tooltipBgColor: Colors
-                                                      //     .white
-                                                      //     .withOpacity(0.6),
-                                                      tooltipRoundedRadius: 20,
-                                                      fitInsideHorizontally:
-                                                          true,
-                                                      fitInsideVertically: true,
-                                                      getTooltipItems: (items) {
-                                                        return [
-                                                          LineTooltipItem(
-                                                              "利用率：${items[0].y.floor()}%",
-                                                              TextStyle(
-                                                                  color: Colors
-                                                                      .cyan)),
-                                                        ];
-                                                      }),
-                                            ),
-                                            gridData: FlGridData(
-                                              show: false,
-                                            ),
-                                            titlesData: FlTitlesData(
-                                              show: true,
-                                              bottomTitles: AxisTitles(
-                                                sideTitles: SideTitles(
-                                                  showTitles: false,
-                                                  reservedSize: 22,
-                                                ),
-                                              ),
-                                              topTitles: AxisTitles(
-                                                  sideTitles: SideTitles(
-                                                      showTitles: false)),
-                                              rightTitles: AxisTitles(
-                                                  sideTitles: SideTitles(
-                                                      showTitles: false)),
-                                              leftTitles: AxisTitles(
-                                                  sideTitles: SideTitles(
-                                                showTitles: true,
-                                                getTitlesWidget: (value, _) {
-                                                  return Text(
-                                                    "${value.toInt()}%",
-                                                    style: TextStyle(
-                                                      color: Color(0xff67727d),
-                                                      fontSize: 12,
-                                                    ),
-                                                  );
-                                                },
-                                                // getTextStyles: (value, _) => const ,
-                                                // getTitles: Util.formatSize,
-                                                // getTitles: (value) {
-                                                //   value = value / 1000 / 1000;
-                                                //   return (value.floor() * 1000).toString();
-                                                // },
-                                                reservedSize: 35,
-                                                interval: 10,
-                                              )),
-                                            ),
-                                            minY: 0,
-                                            maxY: 100,
-                                            // maxY: 20,
-                                            borderData: FlBorderData(
-                                                show: true,
-                                                border: Border.all(
-                                                    color: Colors.black12,
-                                                    width: 1)),
-                                            lineBarsData: [
-                                              LineChartBarData(
-                                                spots: cpus.map((cpu) {
-                                                  return FlSpot(
-                                                      cpus
-                                                          .indexOf(cpu)
-                                                          .toDouble(),
-                                                      (cpu['user_load'] +
-                                                              cpu['system_load'])
-                                                          .toDouble());
-                                                }).toList(),
-                                                isCurved: true,
-                                                color: Colors.cyan,
-                                                barWidth: 2,
-                                                isStrokeCapRound: true,
-                                                dotData: FlDotData(
-                                                  show: false,
-                                                ),
-                                                belowBarData: BarAreaData(
-                                                  show: true,
-                                                  color: Colors.cyan
-                                                      .withOpacity(0.2),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
+                                  Padding(
+                                    padding:
+                                        EdgeInsets.symmetric(horizontal: 20),
+                                    child: Text(
+                                      "CPU",
+                                      style: TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.w600),
                                     ),
                                   ),
-                                ),
-                                Padding(
-                                  padding: EdgeInsets.symmetric(horizontal: 20),
-                                  child: Row(
-                                    children: [
-                                      Text(
-                                        "利用率（%）",
-                                      ),
-                                      Spacer(),
-                                      Text(
-                                        "${cpus.last['user_load'] + cpus.last['system_load']} %",
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                SizedBox(
-                                  height: 20,
-                                ),
-                              ],
-                            ),
-                          ),
-                          SizedBox(
-                            height: 20,
-                          ),
-                          NeuCard(
-                            curveType: CurveType.flat,
-                            margin: EdgeInsets.symmetric(horizontal: 20),
-                            bevel: 20,
-                            decoration: NeumorphicDecoration(
-                              color: Theme.of(context).scaffoldBackgroundColor,
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                SizedBox(
-                                  height: 20,
-                                ),
-                                Padding(
-                                  padding: EdgeInsets.symmetric(horizontal: 20),
-                                  child: Text(
-                                    "内存",
-                                    style: TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.w600),
-                                  ),
-                                ),
-                                AspectRatio(
-                                  aspectRatio: 1.70,
-                                  child: Padding(
-                                    padding: const EdgeInsets.only(
-                                        left: 20,
-                                        right: 20,
-                                        top: 20,
-                                        bottom: 5),
-                                    child: NeuCard(
-                                      curveType: CurveType.flat,
-                                      bevel: 20,
-                                      decoration: NeumorphicDecoration(
-                                        color: Theme.of(context)
-                                            .scaffoldBackgroundColor,
-                                        borderRadius: BorderRadius.circular(20),
-                                      ),
-                                      // padding: EdgeInsets.symmetric(horizontal: 10),
-                                      child: Padding(
-                                        padding: EdgeInsets.all(10),
-                                        child: LineChart(
-                                          LineChartData(
-                                            lineTouchData: LineTouchData(
-                                              touchTooltipData:
-                                                  LineTouchTooltipData(
-                                                      // tooltipBgColor: Colors
-                                                      //     .white
-                                                      //     .withOpacity(0.6),
-                                                      tooltipRoundedRadius: 20,
-                                                      fitInsideHorizontally:
-                                                          true,
-                                                      fitInsideVertically: true,
-                                                      getTooltipItems: (items) {
-                                                        return [
-                                                          LineTooltipItem(
-                                                              "利用率：${items[0].y.floor()}%",
-                                                              TextStyle(
-                                                                  color: Colors
-                                                                      .orangeAccent)),
-                                                        ];
-                                                      }),
-                                            ),
-                                            gridData: FlGridData(
-                                              show: false,
-                                            ),
-                                            titlesData: FlTitlesData(
-                                              show: true,
-                                              bottomTitles: AxisTitles(
-                                                sideTitles: SideTitles(
-                                                  showTitles: false,
-                                                  reservedSize: 22,
-                                                ),
+                                  AspectRatio(
+                                    aspectRatio: 1.70,
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(
+                                          left: 20,
+                                          right: 20,
+                                          top: 20,
+                                          bottom: 5),
+                                      child: Card(
+                                        // padding: EdgeInsets.symmetric(horizontal: 10),
+                                        child: Padding(
+                                          padding: EdgeInsets.all(10),
+                                          child: LineChart(
+                                            LineChartData(
+                                              lineTouchData: LineTouchData(
+                                                touchTooltipData:
+                                                    LineTouchTooltipData(
+                                                        // tooltipBgColor: Colors
+                                                        //     .white
+                                                        //     .withOpacity(0.6),
+                                                        tooltipRoundedRadius:
+                                                            20,
+                                                        fitInsideHorizontally:
+                                                            true,
+                                                        fitInsideVertically:
+                                                            true,
+                                                        getTooltipItems:
+                                                            (items) {
+                                                          return [
+                                                            LineTooltipItem(
+                                                                "利用率：${items[0].y.floor()}%",
+                                                                TextStyle(
+                                                                    color: Colors
+                                                                        .cyan)),
+                                                          ];
+                                                        }),
                                               ),
-                                              topTitles: AxisTitles(
-                                                  sideTitles: SideTitles(
-                                                      showTitles: false)),
-                                              rightTitles: AxisTitles(
-                                                  sideTitles: SideTitles(
-                                                      showTitles: false)),
-                                              leftTitles: AxisTitles(
-                                                  sideTitles: SideTitles(
-                                                showTitles: true,
-                                                getTitlesWidget: (value, _) {
-                                                  return Text(
-                                                    "${value.toInt()}%",
-                                                    style: TextStyle(
-                                                      color: Color(0xff67727d),
-                                                      fontSize: 12,
-                                                    ),
-                                                  );
-                                                },
-                                                // getTextStyles: (value, _) => const ,
-                                                // getTitles: Util.formatSize,
-                                                // getTitles: (value) {
-                                                //   value = value / 1000 / 1000;
-                                                //   return (value.floor() * 1000).toString();
-                                                // },
-                                                reservedSize: 35,
-                                                interval: 10,
-                                              )),
-                                            ),
-                                            minY: 0,
-                                            maxY: 100,
-                                            // maxY: 20,
-                                            borderData: FlBorderData(
+                                              gridData: FlGridData(
+                                                show: false,
+                                              ),
+                                              titlesData: FlTitlesData(
                                                 show: true,
-                                                border: Border.all(
-                                                    color: Colors.black12,
-                                                    width: 1)),
-                                            lineBarsData: [
-                                              LineChartBarData(
-                                                spots: memories.map((memory) {
-                                                  return FlSpot(
-                                                      memories
-                                                          .indexOf(memory)
-                                                          .toDouble(),
-                                                      memory['real_usage']
-                                                          .toDouble());
-                                                }).toList(),
-                                                isCurved: true,
-                                                color: Colors.orangeAccent,
-                                                barWidth: 2,
-                                                isStrokeCapRound: true,
-                                                dotData: FlDotData(
-                                                  show: false,
+                                                bottomTitles: AxisTitles(
+                                                  sideTitles: SideTitles(
+                                                    showTitles: false,
+                                                    reservedSize: 22,
+                                                  ),
                                                 ),
-                                                belowBarData: BarAreaData(
-                                                  show: true,
-                                                  color: Colors.orangeAccent
-                                                      .withOpacity(0.2),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                Padding(
-                                  padding: EdgeInsets.symmetric(horizontal: 20),
-                                  child: Row(
-                                    children: [
-                                      Text(
-                                        "利用率（%）",
-                                      ),
-                                      Spacer(),
-                                      Text(
-                                        "${memories.last['real_usage']} %",
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                SizedBox(
-                                  height: 20,
-                                ),
-                              ],
-                            ),
-                          ),
-                          SizedBox(
-                            height: 20,
-                          ),
-                          NeuCard(
-                            curveType: CurveType.flat,
-                            margin: EdgeInsets.symmetric(horizontal: 20),
-                            bevel: 20,
-                            decoration: NeumorphicDecoration(
-                              color: Theme.of(context).scaffoldBackgroundColor,
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                SizedBox(
-                                  height: 20,
-                                ),
-                                Padding(
-                                  padding: EdgeInsets.symmetric(horizontal: 20),
-                                  child: Text(
-                                    "网络",
-                                    style: TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.w600),
-                                  ),
-                                ),
-                                AspectRatio(
-                                  aspectRatio: 1.70,
-                                  child: Padding(
-                                    padding: const EdgeInsets.only(
-                                        left: 20,
-                                        right: 20,
-                                        top: 20,
-                                        bottom: 5),
-                                    child: NeuCard(
-                                      curveType: CurveType.flat,
-                                      bevel: 20,
-                                      decoration: NeumorphicDecoration(
-                                        color: Theme.of(context)
-                                            .scaffoldBackgroundColor,
-                                        borderRadius: BorderRadius.circular(20),
-                                      ),
-                                      // padding: EdgeInsets.symmetric(horizontal: 10),
-                                      child: Padding(
-                                        padding: EdgeInsets.all(10),
-                                        child: LineChart(
-                                          LineChartData(
-                                            lineTouchData: LineTouchData(
-                                              touchTooltipData:
-                                                  LineTouchTooltipData(
-                                                // tooltipBgColor: Colors.white
-                                                //     .withOpacity(0.6),
-                                                tooltipRoundedRadius: 20,
-                                                fitInsideHorizontally: true,
-                                                fitInsideVertically: true,
-                                                getTooltipItems:
-                                                    (List<LineBarSpot> items) {
-                                                  return items.map((LineBarSpot
-                                                      touchedSpot) {
-                                                    final textStyle = TextStyle(
-                                                      color:
-                                                          touchedSpot.bar.color,
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      fontSize: 14,
+                                                topTitles: AxisTitles(
+                                                    sideTitles: SideTitles(
+                                                        showTitles: false)),
+                                                rightTitles: AxisTitles(
+                                                    sideTitles: SideTitles(
+                                                        showTitles: false)),
+                                                leftTitles: AxisTitles(
+                                                    sideTitles: SideTitles(
+                                                  showTitles: true,
+                                                  getTitlesWidget: (value, _) {
+                                                    return Text(
+                                                      "${value.toInt()}%",
+                                                      style: TextStyle(
+                                                        color:
+                                                            Color(0xff67727d),
+                                                        fontSize: 12,
+                                                      ),
                                                     );
-                                                    return LineTooltipItem(
-                                                        '${touchedSpot.bar.color == Colors.blue ? "上传" : "下载"}:${Util.formatSize(touchedSpot.y.floor())}',
-                                                        textStyle);
-                                                  }).toList();
-                                                },
+                                                  },
+                                                  // getTextStyles: (value, _) => const ,
+                                                  // getTitles: Util.formatSize,
+                                                  // getTitles: (value) {
+                                                  //   value = value / 1000 / 1000;
+                                                  //   return (value.floor() * 1000).toString();
+                                                  // },
+                                                  reservedSize: 35,
+                                                  interval: 10,
+                                                )),
                                               ),
-                                            ),
-                                            gridData: FlGridData(
-                                              show: false,
-                                            ),
-                                            titlesData: FlTitlesData(
-                                              show: true,
-                                              bottomTitles: AxisTitles(
-                                                sideTitles: SideTitles(
-                                                  showTitles: false,
-                                                  reservedSize: 22,
-                                                ),
-                                              ),
-                                              topTitles: AxisTitles(
-                                                  sideTitles: SideTitles(
-                                                      showTitles: false)),
-                                              rightTitles: AxisTitles(
-                                                  sideTitles: SideTitles(
-                                                      showTitles: false)),
-                                              leftTitles: AxisTitles(
-                                                  sideTitles: SideTitles(
-                                                showTitles: true,
-                                                getTitlesWidget: (value, _) {
-                                                  return Text(
-                                                    Util.formatSize(value,
-                                                        fixed: 0),
-                                                    style: TextStyle(
-                                                      color: Color(0xff67727d),
-                                                      fontSize: 12,
-                                                    ),
-                                                  );
-                                                },
-                                                // getTextStyles: (value, _) => const ,
-                                                // getTitles: Util.formatSize,
-                                                // getTitles: (value) {
-                                                //   value = value / 1000 / 1000;
-                                                //   return (value.floor() * 1000).toString();
-                                                // },
-                                                reservedSize: 28,
-                                                interval: Util.chartInterval(
-                                                    maxNetworkSpeed),
-                                              )),
-                                            ),
-                                            // titlesData: FlTitlesData(
-                                            //   show: true,
-                                            //   bottomTitles: SideTitles(
-                                            //     showTitles: false,
-                                            //     reservedSize: 22,
-                                            //   ),
-                                            //   topTitles: SideTitles(showTitles: false),
-                                            //   rightTitles: SideTitles(showTitles: false),
-                                            //   leftTitles: SideTitles(
-                                            //     showTitles: true,
-                                            //     getTextStyles: (value, _) => const TextStyle(
-                                            //       color: Color(0xff67727d),
-                                            //       fontSize: 12,
-                                            //     ),
-                                            //     getTitles: (v) {
-                                            //       return Util.formatSize(v, maxNetworkSpeed);
-                                            //     },
-                                            //     reservedSize: 28,
-                                            //     interval: Util.chartInterval(maxNetworkSpeed),
-                                            //   ),
-                                            // ),
-                                            minY: 0,
-                                            // maxY: 20,
-                                            borderData: FlBorderData(
-                                                show: true,
-                                                border: Border.all(
-                                                    color: Colors.black12,
-                                                    width: 1)),
-                                            lineBarsData: [
-                                              LineChartBarData(
-                                                spots: networks.map((network) {
-                                                  return FlSpot(
-                                                      networks
-                                                          .indexOf(network)
-                                                          .toDouble(),
-                                                      network[0]['tx']
-                                                          .toDouble());
-                                                }).toList(),
-                                                isCurved: true,
-                                                color: Colors.blue,
-                                                barWidth: 2,
-                                                isStrokeCapRound: true,
-                                                dotData: FlDotData(
-                                                  show: false,
-                                                ),
-                                                belowBarData: BarAreaData(
+                                              minY: 0,
+                                              maxY: 100,
+                                              // maxY: 20,
+                                              borderData: FlBorderData(
                                                   show: true,
-                                                  color: Colors.blue
-                                                      .withOpacity(0.2),
+                                                  border: Border.all(
+                                                      color: Colors.black12,
+                                                      width: 1)),
+                                              lineBarsData: [
+                                                LineChartBarData(
+                                                  spots: cpus.map((cpu) {
+                                                    return FlSpot(
+                                                        cpus
+                                                            .indexOf(cpu)
+                                                            .toDouble(),
+                                                        (cpu['user_load'] +
+                                                                cpu['system_load'])
+                                                            .toDouble());
+                                                  }).toList(),
+                                                  isCurved: true,
+                                                  color: Colors.cyan,
+                                                  barWidth: 2,
+                                                  isStrokeCapRound: true,
+                                                  dotData: FlDotData(
+                                                    show: false,
+                                                  ),
+                                                  belowBarData: BarAreaData(
+                                                    show: true,
+                                                    color: Colors.cyan
+                                                        .withOpacity(0.2),
+                                                  ),
                                                 ),
-                                              ),
-                                              LineChartBarData(
-                                                spots: networks.map((network) {
-                                                  return FlSpot(
-                                                      networks
-                                                          .indexOf(network)
-                                                          .toDouble(),
-                                                      network[0]['rx']
-                                                          .toDouble());
-                                                }).toList(),
-                                                isCurved: true,
-                                                color: Colors.green,
-                                                barWidth: 2,
-                                                isStrokeCapRound: true,
-                                                dotData: FlDotData(
-                                                  show: false,
-                                                ),
-                                                belowBarData: BarAreaData(
-                                                  show: true,
-                                                  color: Colors.green
-                                                      .withOpacity(0.2),
-                                                ),
-                                              ),
-                                            ],
+                                              ],
+                                            ),
                                           ),
                                         ),
                                       ),
                                     ),
                                   ),
-                                ),
-                                Padding(
-                                  padding: EdgeInsets.symmetric(horizontal: 20),
-                                  child: Row(
-                                    children: [
-                                      Icon(
-                                        Icons.upload_sharp,
-                                        color: Colors.blue,
-                                      ),
-                                      Text(
-                                        Util.formatSize(networks.last[0]['tx'],
-                                                fixed: 0) +
-                                            "/S",
-                                        style: TextStyle(color: Colors.blue),
-                                      ),
-                                      Spacer(),
-                                      Icon(
-                                        Icons.download_sharp,
-                                        color: Colors.green,
-                                      ),
-                                      Text(
-                                        Util.formatSize(networks.last[0]['rx'],
-                                                fixed: 0) +
-                                            "/S",
-                                        style: TextStyle(color: Colors.green),
-                                      ),
-                                    ],
+                                  Padding(
+                                    padding:
+                                        EdgeInsets.symmetric(horizontal: 20),
+                                    child: Row(
+                                      children: [
+                                        Text(
+                                          "利用率（%）",
+                                        ),
+                                        Spacer(),
+                                        Text(
+                                          "${cpus.last['user_load'] + cpus.last['system_load']} %",
+                                        ),
+                                      ],
+                                    ),
                                   ),
-                                ),
-                                SizedBox(
-                                  height: 20,
-                                ),
-                              ],
+                                  SizedBox(
+                                    height: 20,
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                           SizedBox(
                             height: 20,
                           ),
-                          NeuCard(
-                            curveType: CurveType.flat,
+                          Card(
                             margin: EdgeInsets.symmetric(horizontal: 20),
-                            bevel: 20,
-                            decoration: NeumorphicDecoration(
-                              color: Theme.of(context).scaffoldBackgroundColor,
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                SizedBox(
-                                  height: 20,
-                                ),
-                                Padding(
-                                  padding: EdgeInsets.symmetric(horizontal: 20),
-                                  child: Text(
-                                    "磁盘",
-                                    style: TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.w600),
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  SizedBox(
+                                    height: 20,
                                   ),
-                                ),
-                                AspectRatio(
-                                  aspectRatio: 1.70,
-                                  child: Padding(
-                                    padding: const EdgeInsets.only(
-                                        left: 20,
-                                        right: 20,
-                                        top: 20,
-                                        bottom: 5),
-                                    child: NeuCard(
-                                      curveType: CurveType.flat,
-                                      bevel: 20,
-                                      decoration: NeumorphicDecoration(
-                                        color: Theme.of(context)
-                                            .scaffoldBackgroundColor,
-                                        borderRadius: BorderRadius.circular(20),
-                                      ),
-                                      // padding: EdgeInsets.symmetric(horizontal: 10),
-                                      child: Padding(
-                                        padding: EdgeInsets.all(10),
-                                        child: LineChart(
-                                          LineChartData(
-                                            lineTouchData: LineTouchData(
-                                              touchTooltipData:
-                                                  LineTouchTooltipData(
-                                                      // tooltipBgColor: Colors
-                                                      //     .white
-                                                      //     .withOpacity(0.6),
-                                                      tooltipRoundedRadius: 20,
-                                                      fitInsideHorizontally:
-                                                          true,
-                                                      fitInsideVertically: true,
-                                                      getTooltipItems: (items) {
-                                                        return [
-                                                          LineTooltipItem(
-                                                              "利用率：${items[0].y.floor()}%",
-                                                              TextStyle(
-                                                                  color: Colors
-                                                                      .pink)),
-                                                        ];
-                                                      }),
-                                            ),
-                                            gridData: FlGridData(
-                                              show: false,
-                                            ),
-                                            titlesData: FlTitlesData(
-                                              show: true,
-                                              bottomTitles: AxisTitles(
-                                                sideTitles: SideTitles(
-                                                  showTitles: false,
-                                                  reservedSize: 22,
-                                                ),
+                                  Padding(
+                                    padding:
+                                        EdgeInsets.symmetric(horizontal: 20),
+                                    child: Text(
+                                      "内存",
+                                      style: TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.w600),
+                                    ),
+                                  ),
+                                  AspectRatio(
+                                    aspectRatio: 1.70,
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(
+                                          left: 20,
+                                          right: 20,
+                                          top: 20,
+                                          bottom: 5),
+                                      child: Card(
+                                        // padding: EdgeInsets.symmetric(horizontal: 10),
+                                        child: Padding(
+                                          padding: EdgeInsets.all(10),
+                                          child: LineChart(
+                                            LineChartData(
+                                              lineTouchData: LineTouchData(
+                                                touchTooltipData:
+                                                    LineTouchTooltipData(
+                                                        // tooltipBgColor: Colors
+                                                        //     .white
+                                                        //     .withOpacity(0.6),
+                                                        tooltipRoundedRadius:
+                                                            20,
+                                                        fitInsideHorizontally:
+                                                            true,
+                                                        fitInsideVertically:
+                                                            true,
+                                                        getTooltipItems:
+                                                            (items) {
+                                                          return [
+                                                            LineTooltipItem(
+                                                                "利用率：${items[0].y.floor()}%",
+                                                                TextStyle(
+                                                                    color: Colors
+                                                                        .orangeAccent)),
+                                                          ];
+                                                        }),
                                               ),
-                                              topTitles: AxisTitles(
-                                                  sideTitles: SideTitles(
-                                                      showTitles: false)),
-                                              rightTitles: AxisTitles(
-                                                  sideTitles: SideTitles(
-                                                      showTitles: false)),
-                                              leftTitles: AxisTitles(
-                                                  sideTitles: SideTitles(
-                                                showTitles: true,
-                                                getTitlesWidget: (value, _) {
-                                                  return Text(
-                                                    "${value.toInt()}%",
-                                                    style: TextStyle(
-                                                      color: Color(0xff67727d),
-                                                      fontSize: 12,
-                                                    ),
-                                                  );
-                                                },
-                                                // getTextStyles: (value, _) => const ,
-                                                // getTitles: Util.formatSize,
-                                                // getTitles: (value) {
-                                                //   value = value / 1000 / 1000;
-                                                //   return (value.floor() * 1000).toString();
-                                                // },
-                                                reservedSize: 35,
-                                                interval: 10,
-                                              )),
-                                            ),
-                                            minY: 0,
-                                            maxY: 100,
-                                            // maxY: 20,
-                                            borderData: FlBorderData(
+                                              gridData: FlGridData(
+                                                show: false,
+                                              ),
+                                              titlesData: FlTitlesData(
                                                 show: true,
-                                                border: Border.all(
-                                                    color: Colors.black12,
-                                                    width: 1)),
-                                            lineBarsData: [
-                                              LineChartBarData(
-                                                spots: disks.map((disk) {
-                                                  return FlSpot(
-                                                      disks
-                                                          .indexOf(disk)
-                                                          .toDouble(),
-                                                      disk['total']
-                                                              ['utilization']
-                                                          .toDouble());
-                                                }).toList(),
-                                                isCurved: true,
-                                                color: Colors.pink,
-                                                barWidth: 2,
-                                                isStrokeCapRound: true,
-                                                dotData: FlDotData(
-                                                  show: false,
+                                                bottomTitles: AxisTitles(
+                                                  sideTitles: SideTitles(
+                                                    showTitles: false,
+                                                    reservedSize: 22,
+                                                  ),
                                                 ),
-                                                belowBarData: BarAreaData(
-                                                  show: true,
-                                                  color: Colors.pink
-                                                      .withOpacity(0.2),
-                                                ),
+                                                topTitles: AxisTitles(
+                                                    sideTitles: SideTitles(
+                                                        showTitles: false)),
+                                                rightTitles: AxisTitles(
+                                                    sideTitles: SideTitles(
+                                                        showTitles: false)),
+                                                leftTitles: AxisTitles(
+                                                    sideTitles: SideTitles(
+                                                  showTitles: true,
+                                                  getTitlesWidget: (value, _) {
+                                                    return Text(
+                                                      "${value.toInt()}%",
+                                                      style: TextStyle(
+                                                        color:
+                                                            Color(0xff67727d),
+                                                        fontSize: 12,
+                                                      ),
+                                                    );
+                                                  },
+                                                  // getTextStyles: (value, _) => const ,
+                                                  // getTitles: Util.formatSize,
+                                                  // getTitles: (value) {
+                                                  //   value = value / 1000 / 1000;
+                                                  //   return (value.floor() * 1000).toString();
+                                                  // },
+                                                  reservedSize: 35,
+                                                  interval: 10,
+                                                )),
                                               ),
-                                            ],
+                                              minY: 0,
+                                              maxY: 100,
+                                              // maxY: 20,
+                                              borderData: FlBorderData(
+                                                  show: true,
+                                                  border: Border.all(
+                                                      color: Colors.black12,
+                                                      width: 1)),
+                                              lineBarsData: [
+                                                LineChartBarData(
+                                                  spots: memories.map((memory) {
+                                                    return FlSpot(
+                                                        memories
+                                                            .indexOf(memory)
+                                                            .toDouble(),
+                                                        memory['real_usage']
+                                                            .toDouble());
+                                                  }).toList(),
+                                                  isCurved: true,
+                                                  color: Colors.orangeAccent,
+                                                  barWidth: 2,
+                                                  isStrokeCapRound: true,
+                                                  dotData: FlDotData(
+                                                    show: false,
+                                                  ),
+                                                  belowBarData: BarAreaData(
+                                                    show: true,
+                                                    color: Colors.orangeAccent
+                                                        .withOpacity(0.2),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
                                           ),
                                         ),
                                       ),
                                     ),
                                   ),
-                                ),
-                                Padding(
-                                  padding: EdgeInsets.symmetric(horizontal: 20),
-                                  child: Row(
-                                    children: [
-                                      Text(
-                                        "利用率（%）",
-                                      ),
-                                      Spacer(),
-                                      Text(
-                                        "${disks.last['total']['utilization']} %",
-                                      ),
-                                    ],
+                                  Padding(
+                                    padding:
+                                        EdgeInsets.symmetric(horizontal: 20),
+                                    child: Row(
+                                      children: [
+                                        Text(
+                                          "利用率（%）",
+                                        ),
+                                        Spacer(),
+                                        Text(
+                                          "${memories.last['real_usage']} %",
+                                        ),
+                                      ],
+                                    ),
                                   ),
-                                ),
-                                SizedBox(
-                                  height: 20,
-                                ),
-                              ],
+                                  SizedBox(
+                                    height: 20,
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
-                          NeuCard(
-                            curveType: CurveType.flat,
+                          SizedBox(
+                            height: 20,
+                          ),
+                          Card(
                             margin: EdgeInsets.symmetric(horizontal: 20),
-                            bevel: 20,
-                            decoration: NeumorphicDecoration(
-                              color: Theme.of(context).scaffoldBackgroundColor,
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                SizedBox(
-                                  height: 20,
-                                ),
-                                Padding(
-                                  padding: EdgeInsets.symmetric(horizontal: 20),
-                                  child: Text(
-                                    "存储空间",
-                                    style: TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.w600),
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  SizedBox(
+                                    height: 20,
                                   ),
-                                ),
-                                AspectRatio(
-                                  aspectRatio: 1.70,
-                                  child: Padding(
-                                    padding: const EdgeInsets.only(
-                                        left: 20,
-                                        right: 20,
-                                        top: 20,
-                                        bottom: 5),
-                                    child: NeuCard(
-                                      curveType: CurveType.flat,
-                                      bevel: 20,
-                                      decoration: NeumorphicDecoration(
-                                        color: Theme.of(context)
-                                            .scaffoldBackgroundColor,
-                                        borderRadius: BorderRadius.circular(20),
-                                      ),
-                                      // padding: EdgeInsets.symmetric(horizontal: 10),
-                                      child: Padding(
-                                        padding: EdgeInsets.all(10),
-                                        child: LineChart(
-                                          LineChartData(
-                                            lineTouchData: LineTouchData(
-                                              touchTooltipData:
-                                                  LineTouchTooltipData(
-                                                      // tooltipBgColor: Colors
-                                                      //     .white
-                                                      //     .withOpacity(0.6),
-                                                      tooltipRoundedRadius: 20,
-                                                      fitInsideHorizontally:
-                                                          true,
-                                                      fitInsideVertically: true,
-                                                      getTooltipItems: (items) {
-                                                        return [
-                                                          LineTooltipItem(
-                                                              "利用率：${items[0].y.floor()}%",
-                                                              TextStyle(
-                                                                  color: Colors
-                                                                      .purpleAccent)),
-                                                        ];
-                                                      }),
-                                            ),
-                                            gridData: FlGridData(
-                                              show: false,
-                                            ),
-                                            titlesData: FlTitlesData(
-                                              show: true,
-                                              bottomTitles: AxisTitles(
-                                                sideTitles: SideTitles(
-                                                  showTitles: false,
-                                                  reservedSize: 22,
+                                  Padding(
+                                    padding:
+                                        EdgeInsets.symmetric(horizontal: 20),
+                                    child: Text(
+                                      "网络",
+                                      style: TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.w600),
+                                    ),
+                                  ),
+                                  AspectRatio(
+                                    aspectRatio: 1.70,
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(
+                                          left: 20,
+                                          right: 20,
+                                          top: 20,
+                                          bottom: 5),
+                                      child: Card(
+                                        // padding: EdgeInsets.symmetric(horizontal: 10),
+                                        child: Padding(
+                                          padding: EdgeInsets.all(10),
+                                          child: LineChart(
+                                            LineChartData(
+                                              lineTouchData: LineTouchData(
+                                                touchTooltipData:
+                                                    LineTouchTooltipData(
+                                                  // tooltipBgColor: Colors.white
+                                                  //     .withOpacity(0.6),
+                                                  tooltipRoundedRadius: 20,
+                                                  fitInsideHorizontally: true,
+                                                  fitInsideVertically: true,
+                                                  getTooltipItems:
+                                                      (List<LineBarSpot>
+                                                          items) {
+                                                    return items.map(
+                                                        (LineBarSpot
+                                                            touchedSpot) {
+                                                      final textStyle =
+                                                          TextStyle(
+                                                        color: touchedSpot
+                                                            .bar.color,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        fontSize: 14,
+                                                      );
+                                                      return LineTooltipItem(
+                                                          '${touchedSpot.bar.color == Colors.blue ? "上传" : "下载"}:${Util.formatSize(touchedSpot.y.floor())}',
+                                                          textStyle);
+                                                    }).toList();
+                                                  },
                                                 ),
                                               ),
-                                              topTitles: AxisTitles(
-                                                  sideTitles: SideTitles(
-                                                      showTitles: false)),
-                                              rightTitles: AxisTitles(
-                                                  sideTitles: SideTitles(
-                                                      showTitles: false)),
-                                              leftTitles: AxisTitles(
-                                                  sideTitles: SideTitles(
-                                                showTitles: true,
-                                                getTitlesWidget: (value, _) {
-                                                  return Text(
-                                                    "${value.toInt()}%",
-                                                    style: TextStyle(
-                                                      color: Color(0xff67727d),
-                                                      fontSize: 12,
-                                                    ),
-                                                  );
-                                                },
-                                                // getTextStyles: (value, _) => const ,
-                                                // getTitles: Util.formatSize,
-                                                // getTitles: (value) {
-                                                //   value = value / 1000 / 1000;
-                                                //   return (value.floor() * 1000).toString();
-                                                // },
-                                                reservedSize: 35,
-                                                interval: 10,
-                                              )),
-                                            ),
-                                            minY: 0,
-                                            maxY: 100,
-                                            // maxY: 20,
-                                            borderData: FlBorderData(
+                                              gridData: FlGridData(
+                                                show: false,
+                                              ),
+                                              titlesData: FlTitlesData(
                                                 show: true,
-                                                border: Border.all(
-                                                    color: Colors.black12,
-                                                    width: 1)),
-                                            lineBarsData: [
-                                              LineChartBarData(
-                                                spots: spaces.map((space) {
-                                                  return FlSpot(
-                                                      spaces
-                                                          .indexOf(space)
-                                                          .toDouble(),
-                                                      space['total']
-                                                              ['utilization']
-                                                          .toDouble());
-                                                }).toList(),
-                                                isCurved: true,
-                                                color: Colors.purpleAccent,
-                                                barWidth: 2,
-                                                isStrokeCapRound: true,
-                                                dotData: FlDotData(
-                                                  show: false,
+                                                bottomTitles: AxisTitles(
+                                                  sideTitles: SideTitles(
+                                                    showTitles: false,
+                                                    reservedSize: 22,
+                                                  ),
                                                 ),
-                                                belowBarData: BarAreaData(
-                                                    show: true,
-                                                    color: Colors.purpleAccent
-                                                        .withOpacity(0.2)),
+                                                topTitles: AxisTitles(
+                                                    sideTitles: SideTitles(
+                                                        showTitles: false)),
+                                                rightTitles: AxisTitles(
+                                                    sideTitles: SideTitles(
+                                                        showTitles: false)),
+                                                leftTitles: AxisTitles(
+                                                    sideTitles: SideTitles(
+                                                  showTitles: true,
+                                                  getTitlesWidget: (value, _) {
+                                                    return Text(
+                                                      Util.formatSize(value,
+                                                          fixed: 0),
+                                                      style: TextStyle(
+                                                        color:
+                                                            Color(0xff67727d),
+                                                        fontSize: 12,
+                                                      ),
+                                                    );
+                                                  },
+                                                  // getTextStyles: (value, _) => const ,
+                                                  // getTitles: Util.formatSize,
+                                                  // getTitles: (value) {
+                                                  //   value = value / 1000 / 1000;
+                                                  //   return (value.floor() * 1000).toString();
+                                                  // },
+                                                  reservedSize: 28,
+                                                  interval: Util.chartInterval(
+                                                      maxNetworkSpeed),
+                                                )),
                                               ),
-                                            ],
+                                              // titlesData: FlTitlesData(
+                                              //   show: true,
+                                              //   bottomTitles: SideTitles(
+                                              //     showTitles: false,
+                                              //     reservedSize: 22,
+                                              //   ),
+                                              //   topTitles: SideTitles(showTitles: false),
+                                              //   rightTitles: SideTitles(showTitles: false),
+                                              //   leftTitles: SideTitles(
+                                              //     showTitles: true,
+                                              //     getTextStyles: (value, _) => const TextStyle(
+                                              //       color: Color(0xff67727d),
+                                              //       fontSize: 12,
+                                              //     ),
+                                              //     getTitles: (v) {
+                                              //       return Util.formatSize(v, maxNetworkSpeed);
+                                              //     },
+                                              //     reservedSize: 28,
+                                              //     interval: Util.chartInterval(maxNetworkSpeed),
+                                              //   ),
+                                              // ),
+                                              minY: 0,
+                                              // maxY: 20,
+                                              borderData: FlBorderData(
+                                                  show: true,
+                                                  border: Border.all(
+                                                      color: Colors.black12,
+                                                      width: 1)),
+                                              lineBarsData: [
+                                                LineChartBarData(
+                                                  spots:
+                                                      networks.map((network) {
+                                                    return FlSpot(
+                                                        networks
+                                                            .indexOf(network)
+                                                            .toDouble(),
+                                                        network[0]['tx']
+                                                            .toDouble());
+                                                  }).toList(),
+                                                  isCurved: true,
+                                                  color: Colors.blue,
+                                                  barWidth: 2,
+                                                  isStrokeCapRound: true,
+                                                  dotData: FlDotData(
+                                                    show: false,
+                                                  ),
+                                                  belowBarData: BarAreaData(
+                                                    show: true,
+                                                    color: Colors.blue
+                                                        .withOpacity(0.2),
+                                                  ),
+                                                ),
+                                                LineChartBarData(
+                                                  spots:
+                                                      networks.map((network) {
+                                                    return FlSpot(
+                                                        networks
+                                                            .indexOf(network)
+                                                            .toDouble(),
+                                                        network[0]['rx']
+                                                            .toDouble());
+                                                  }).toList(),
+                                                  isCurved: true,
+                                                  color: Colors.green,
+                                                  barWidth: 2,
+                                                  isStrokeCapRound: true,
+                                                  dotData: FlDotData(
+                                                    show: false,
+                                                  ),
+                                                  belowBarData: BarAreaData(
+                                                    show: true,
+                                                    color: Colors.green
+                                                        .withOpacity(0.2),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
                                           ),
                                         ),
                                       ),
                                     ),
                                   ),
-                                ),
-                                Padding(
-                                  padding: EdgeInsets.symmetric(horizontal: 20),
-                                  child: Row(
-                                    children: [
-                                      Text(
-                                        "利用率（%）",
-                                      ),
-                                      Spacer(),
-                                      Text(
-                                        "${spaces.last['total']['utilization']} %",
-                                      ),
-                                    ],
+                                  Padding(
+                                    padding:
+                                        EdgeInsets.symmetric(horizontal: 20),
+                                    child: Row(
+                                      children: [
+                                        Icon(
+                                          Icons.upload_sharp,
+                                          color: Colors.blue,
+                                        ),
+                                        Text(
+                                          Util.formatSize(
+                                                  networks.last[0]['tx'],
+                                                  fixed: 0) +
+                                              "/S",
+                                          style: TextStyle(color: Colors.blue),
+                                        ),
+                                        Spacer(),
+                                        Icon(
+                                          Icons.download_sharp,
+                                          color: Colors.green,
+                                        ),
+                                        Text(
+                                          Util.formatSize(
+                                                  networks.last[0]['rx'],
+                                                  fixed: 0) +
+                                              "/S",
+                                          style: TextStyle(color: Colors.green),
+                                        ),
+                                      ],
+                                    ),
                                   ),
-                                ),
-                                SizedBox(
-                                  height: 20,
-                                ),
-                              ],
+                                  SizedBox(
+                                    height: 20,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          SizedBox(
+                            height: 20,
+                          ),
+                          Card(
+                            margin: EdgeInsets.symmetric(horizontal: 20),
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  SizedBox(
+                                    height: 20,
+                                  ),
+                                  Padding(
+                                    padding:
+                                        EdgeInsets.symmetric(horizontal: 20),
+                                    child: Text(
+                                      "磁盘",
+                                      style: TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.w600),
+                                    ),
+                                  ),
+                                  AspectRatio(
+                                    aspectRatio: 1.70,
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(
+                                          left: 20,
+                                          right: 20,
+                                          top: 20,
+                                          bottom: 5),
+                                      child: Card(
+                                        // padding: EdgeInsets.symmetric(horizontal: 10),
+                                        child: Padding(
+                                          padding: EdgeInsets.all(10),
+                                          child: LineChart(
+                                            LineChartData(
+                                              lineTouchData: LineTouchData(
+                                                touchTooltipData:
+                                                    LineTouchTooltipData(
+                                                        // tooltipBgColor: Colors
+                                                        //     .white
+                                                        //     .withOpacity(0.6),
+                                                        tooltipRoundedRadius:
+                                                            20,
+                                                        fitInsideHorizontally:
+                                                            true,
+                                                        fitInsideVertically:
+                                                            true,
+                                                        getTooltipItems:
+                                                            (items) {
+                                                          return [
+                                                            LineTooltipItem(
+                                                                "利用率：${items[0].y.floor()}%",
+                                                                TextStyle(
+                                                                    color: Colors
+                                                                        .pink)),
+                                                          ];
+                                                        }),
+                                              ),
+                                              gridData: FlGridData(
+                                                show: false,
+                                              ),
+                                              titlesData: FlTitlesData(
+                                                show: true,
+                                                bottomTitles: AxisTitles(
+                                                  sideTitles: SideTitles(
+                                                    showTitles: false,
+                                                    reservedSize: 22,
+                                                  ),
+                                                ),
+                                                topTitles: AxisTitles(
+                                                    sideTitles: SideTitles(
+                                                        showTitles: false)),
+                                                rightTitles: AxisTitles(
+                                                    sideTitles: SideTitles(
+                                                        showTitles: false)),
+                                                leftTitles: AxisTitles(
+                                                    sideTitles: SideTitles(
+                                                  showTitles: true,
+                                                  getTitlesWidget: (value, _) {
+                                                    return Text(
+                                                      "${value.toInt()}%",
+                                                      style: TextStyle(
+                                                        color:
+                                                            Color(0xff67727d),
+                                                        fontSize: 12,
+                                                      ),
+                                                    );
+                                                  },
+                                                  // getTextStyles: (value, _) => const ,
+                                                  // getTitles: Util.formatSize,
+                                                  // getTitles: (value) {
+                                                  //   value = value / 1000 / 1000;
+                                                  //   return (value.floor() * 1000).toString();
+                                                  // },
+                                                  reservedSize: 35,
+                                                  interval: 10,
+                                                )),
+                                              ),
+                                              minY: 0,
+                                              maxY: 100,
+                                              // maxY: 20,
+                                              borderData: FlBorderData(
+                                                  show: true,
+                                                  border: Border.all(
+                                                      color: Colors.black12,
+                                                      width: 1)),
+                                              lineBarsData: [
+                                                LineChartBarData(
+                                                  spots: disks.map((disk) {
+                                                    return FlSpot(
+                                                        disks
+                                                            .indexOf(disk)
+                                                            .toDouble(),
+                                                        disk['total']
+                                                                ['utilization']
+                                                            .toDouble());
+                                                  }).toList(),
+                                                  isCurved: true,
+                                                  color: Colors.pink,
+                                                  barWidth: 2,
+                                                  isStrokeCapRound: true,
+                                                  dotData: FlDotData(
+                                                    show: false,
+                                                  ),
+                                                  belowBarData: BarAreaData(
+                                                    show: true,
+                                                    color: Colors.pink
+                                                        .withOpacity(0.2),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding:
+                                        EdgeInsets.symmetric(horizontal: 20),
+                                    child: Row(
+                                      children: [
+                                        Text(
+                                          "利用率（%）",
+                                        ),
+                                        Spacer(),
+                                        Text(
+                                          "${disks.last['total']['utilization']} %",
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    height: 20,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          Card(
+                            margin: EdgeInsets.symmetric(horizontal: 20),
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  SizedBox(
+                                    height: 20,
+                                  ),
+                                  Padding(
+                                    padding:
+                                        EdgeInsets.symmetric(horizontal: 20),
+                                    child: Text(
+                                      "存储空间",
+                                      style: TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.w600),
+                                    ),
+                                  ),
+                                  AspectRatio(
+                                    aspectRatio: 1.70,
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(
+                                          left: 20,
+                                          right: 20,
+                                          top: 20,
+                                          bottom: 5),
+                                      child: Card(
+                                        // padding: EdgeInsets.symmetric(horizontal: 10),
+                                        child: Padding(
+                                          padding: EdgeInsets.all(10),
+                                          child: LineChart(
+                                            LineChartData(
+                                              lineTouchData: LineTouchData(
+                                                touchTooltipData:
+                                                    LineTouchTooltipData(
+                                                        // tooltipBgColor: Colors
+                                                        //     .white
+                                                        //     .withOpacity(0.6),
+                                                        tooltipRoundedRadius:
+                                                            20,
+                                                        fitInsideHorizontally:
+                                                            true,
+                                                        fitInsideVertically:
+                                                            true,
+                                                        getTooltipItems:
+                                                            (items) {
+                                                          return [
+                                                            LineTooltipItem(
+                                                                "利用率：${items[0].y.floor()}%",
+                                                                TextStyle(
+                                                                    color: Colors
+                                                                        .purpleAccent)),
+                                                          ];
+                                                        }),
+                                              ),
+                                              gridData: FlGridData(
+                                                show: false,
+                                              ),
+                                              titlesData: FlTitlesData(
+                                                show: true,
+                                                bottomTitles: AxisTitles(
+                                                  sideTitles: SideTitles(
+                                                    showTitles: false,
+                                                    reservedSize: 22,
+                                                  ),
+                                                ),
+                                                topTitles: AxisTitles(
+                                                    sideTitles: SideTitles(
+                                                        showTitles: false)),
+                                                rightTitles: AxisTitles(
+                                                    sideTitles: SideTitles(
+                                                        showTitles: false)),
+                                                leftTitles: AxisTitles(
+                                                    sideTitles: SideTitles(
+                                                  showTitles: true,
+                                                  getTitlesWidget: (value, _) {
+                                                    return Text(
+                                                      "${value.toInt()}%",
+                                                      style: TextStyle(
+                                                        color:
+                                                            Color(0xff67727d),
+                                                        fontSize: 12,
+                                                      ),
+                                                    );
+                                                  },
+                                                  // getTextStyles: (value, _) => const ,
+                                                  // getTitles: Util.formatSize,
+                                                  // getTitles: (value) {
+                                                  //   value = value / 1000 / 1000;
+                                                  //   return (value.floor() * 1000).toString();
+                                                  // },
+                                                  reservedSize: 35,
+                                                  interval: 10,
+                                                )),
+                                              ),
+                                              minY: 0,
+                                              maxY: 100,
+                                              // maxY: 20,
+                                              borderData: FlBorderData(
+                                                  show: true,
+                                                  border: Border.all(
+                                                      color: Colors.black12,
+                                                      width: 1)),
+                                              lineBarsData: [
+                                                LineChartBarData(
+                                                  spots: spaces.map((space) {
+                                                    return FlSpot(
+                                                        spaces
+                                                            .indexOf(space)
+                                                            .toDouble(),
+                                                        space['total']
+                                                                ['utilization']
+                                                            .toDouble());
+                                                  }).toList(),
+                                                  isCurved: true,
+                                                  color: Colors.purpleAccent,
+                                                  barWidth: 2,
+                                                  isStrokeCapRound: true,
+                                                  dotData: FlDotData(
+                                                    show: false,
+                                                  ),
+                                                  belowBarData: BarAreaData(
+                                                      show: true,
+                                                      color: Colors.purpleAccent
+                                                          .withOpacity(0.2)),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding:
+                                        EdgeInsets.symmetric(horizontal: 20),
+                                    child: Row(
+                                      children: [
+                                        Text(
+                                          "利用率（%）",
+                                        ),
+                                        Spacer(),
+                                        Text(
+                                          "${spaces.last['total']['utilization']} %",
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    height: 20,
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                         ],
@@ -1096,14 +1064,7 @@ class _PerformanceState extends State<Performance>
                             aspectRatio: 1,
                             child: Padding(
                               padding: const EdgeInsets.all(20),
-                              child: NeuCard(
-                                curveType: CurveType.flat,
-                                bevel: 20,
-                                decoration: NeumorphicDecoration(
-                                  color:
-                                      Theme.of(context).scaffoldBackgroundColor,
-                                  borderRadius: BorderRadius.circular(20),
-                                ),
+                              child: Card(
                                 // padding: EdgeInsets.symmetric(horizontal: 10),
                                 child: Padding(
                                   padding: EdgeInsets.all(10),
@@ -1249,15 +1210,9 @@ class _PerformanceState extends State<Performance>
                               ),
                             ),
                           ),
-                          NeuCard(
-                            decoration: NeumorphicDecoration(
-                              color: Theme.of(context).scaffoldBackgroundColor,
-                              borderRadius: BorderRadius.circular(20),
-                            ),
+                          Card(
                             margin: EdgeInsets.symmetric(
                                 vertical: 10, horizontal: 20),
-                            curveType: CurveType.flat,
-                            bevel: 10,
                             child: Padding(
                               padding: EdgeInsets.all(20),
                               child: Column(
@@ -1284,19 +1239,7 @@ class _PerformanceState extends State<Performance>
                                   ),
                                   Row(
                                     children: [
-                                      NeuCard(
-                                        width:
-                                            (MediaQuery.of(context).size.width -
-                                                    120) /
-                                                3,
-                                        decoration: NeumorphicDecoration(
-                                          color: Theme.of(context)
-                                              .scaffoldBackgroundColor,
-                                          borderRadius:
-                                              BorderRadius.circular(20),
-                                        ),
-                                        curveType: CurveType.flat,
-                                        bevel: 10,
+                                      Card(
                                         child: Padding(
                                           padding: EdgeInsets.symmetric(
                                               vertical: 20),
@@ -1328,19 +1271,7 @@ class _PerformanceState extends State<Performance>
                                         ),
                                       ),
                                       Spacer(),
-                                      NeuCard(
-                                        width:
-                                            (MediaQuery.of(context).size.width -
-                                                    120) /
-                                                3,
-                                        decoration: NeumorphicDecoration(
-                                          color: Theme.of(context)
-                                              .scaffoldBackgroundColor,
-                                          borderRadius:
-                                              BorderRadius.circular(20),
-                                        ),
-                                        curveType: CurveType.flat,
-                                        bevel: 10,
+                                      Card(
                                         child: Padding(
                                           padding: EdgeInsets.symmetric(
                                               vertical: 20),
@@ -1372,19 +1303,7 @@ class _PerformanceState extends State<Performance>
                                         ),
                                       ),
                                       Spacer(),
-                                      NeuCard(
-                                        width:
-                                            (MediaQuery.of(context).size.width -
-                                                    120) /
-                                                3,
-                                        decoration: NeumorphicDecoration(
-                                          color: Theme.of(context)
-                                              .scaffoldBackgroundColor,
-                                          borderRadius:
-                                              BorderRadius.circular(20),
-                                        ),
-                                        curveType: CurveType.flat,
-                                        bevel: 10,
+                                      Card(
                                         child: Padding(
                                           padding: EdgeInsets.symmetric(
                                               vertical: 20),
@@ -1421,15 +1340,9 @@ class _PerformanceState extends State<Performance>
                               ),
                             ),
                           ),
-                          NeuCard(
-                            decoration: NeumorphicDecoration(
-                              color: Theme.of(context).scaffoldBackgroundColor,
-                              borderRadius: BorderRadius.circular(20),
-                            ),
+                          Card(
                             margin: EdgeInsets.symmetric(
                                 vertical: 10, horizontal: 20),
-                            curveType: CurveType.flat,
-                            bevel: 10,
                             child: Padding(
                               padding: EdgeInsets.all(20),
                               child: Column(
@@ -1446,19 +1359,7 @@ class _PerformanceState extends State<Performance>
                                   ),
                                   Row(
                                     children: [
-                                      NeuCard(
-                                        width:
-                                            (MediaQuery.of(context).size.width -
-                                                    120) /
-                                                3,
-                                        decoration: NeumorphicDecoration(
-                                          color: Theme.of(context)
-                                              .scaffoldBackgroundColor,
-                                          borderRadius:
-                                              BorderRadius.circular(20),
-                                        ),
-                                        curveType: CurveType.flat,
-                                        bevel: 10,
+                                      Card(
                                         child: Padding(
                                           padding: EdgeInsets.symmetric(
                                               vertical: 20),
@@ -1487,19 +1388,7 @@ class _PerformanceState extends State<Performance>
                                         ),
                                       ),
                                       Spacer(),
-                                      NeuCard(
-                                        width:
-                                            (MediaQuery.of(context).size.width -
-                                                    120) /
-                                                3,
-                                        decoration: NeumorphicDecoration(
-                                          color: Theme.of(context)
-                                              .scaffoldBackgroundColor,
-                                          borderRadius:
-                                              BorderRadius.circular(20),
-                                        ),
-                                        curveType: CurveType.flat,
-                                        bevel: 10,
+                                      Card(
                                         child: Padding(
                                           padding: EdgeInsets.symmetric(
                                               vertical: 20),
@@ -1528,19 +1417,7 @@ class _PerformanceState extends State<Performance>
                                         ),
                                       ),
                                       Spacer(),
-                                      NeuCard(
-                                        width:
-                                            (MediaQuery.of(context).size.width -
-                                                    120) /
-                                                3,
-                                        decoration: NeumorphicDecoration(
-                                          color: Theme.of(context)
-                                              .scaffoldBackgroundColor,
-                                          borderRadius:
-                                              BorderRadius.circular(20),
-                                        ),
-                                        curveType: CurveType.flat,
-                                        bevel: 10,
+                                      Card(
                                         child: Padding(
                                           padding: EdgeInsets.symmetric(
                                               vertical: 20),
@@ -1582,14 +1459,7 @@ class _PerformanceState extends State<Performance>
                             aspectRatio: 1,
                             child: Padding(
                               padding: const EdgeInsets.all(20),
-                              child: NeuCard(
-                                curveType: CurveType.flat,
-                                bevel: 20,
-                                decoration: NeumorphicDecoration(
-                                  color:
-                                      Theme.of(context).scaffoldBackgroundColor,
-                                  borderRadius: BorderRadius.circular(20),
-                                ),
+                              child: Card(
                                 // padding: EdgeInsets.symmetric(horizontal: 10),
                                 child: Padding(
                                   padding: EdgeInsets.all(10),
@@ -1686,15 +1556,9 @@ class _PerformanceState extends State<Performance>
                               ),
                             ),
                           ),
-                          NeuCard(
-                            decoration: NeumorphicDecoration(
-                              color: Theme.of(context).scaffoldBackgroundColor,
-                              borderRadius: BorderRadius.circular(20),
-                            ),
+                          Card(
                             margin: EdgeInsets.symmetric(
                                 vertical: 10, horizontal: 20),
-                            curveType: CurveType.flat,
-                            bevel: 10,
                             child: Padding(
                               padding: EdgeInsets.all(20),
                               child: Column(
@@ -1739,19 +1603,7 @@ class _PerformanceState extends State<Performance>
                                   ),
                                   Row(
                                     children: [
-                                      NeuCard(
-                                        width:
-                                            (MediaQuery.of(context).size.width -
-                                                    120) /
-                                                3,
-                                        decoration: NeumorphicDecoration(
-                                          color: Theme.of(context)
-                                              .scaffoldBackgroundColor,
-                                          borderRadius:
-                                              BorderRadius.circular(20),
-                                        ),
-                                        curveType: CurveType.flat,
-                                        bevel: 10,
+                                      Card(
                                         child: Padding(
                                           padding: EdgeInsets.symmetric(
                                               vertical: 20),
@@ -1784,19 +1636,7 @@ class _PerformanceState extends State<Performance>
                                       SizedBox(
                                         width: 20,
                                       ),
-                                      NeuCard(
-                                        width:
-                                            (MediaQuery.of(context).size.width -
-                                                    120) /
-                                                3,
-                                        decoration: NeumorphicDecoration(
-                                          color: Theme.of(context)
-                                              .scaffoldBackgroundColor,
-                                          borderRadius:
-                                              BorderRadius.circular(20),
-                                        ),
-                                        curveType: CurveType.flat,
-                                        bevel: 10,
+                                      Card(
                                         child: Padding(
                                           padding: EdgeInsets.symmetric(
                                               vertical: 20),
@@ -1829,19 +1669,7 @@ class _PerformanceState extends State<Performance>
                                       SizedBox(
                                         width: 20,
                                       ),
-                                      NeuCard(
-                                        width:
-                                            (MediaQuery.of(context).size.width -
-                                                    120) /
-                                                3,
-                                        decoration: NeumorphicDecoration(
-                                          color: Theme.of(context)
-                                              .scaffoldBackgroundColor,
-                                          borderRadius:
-                                              BorderRadius.circular(20),
-                                        ),
-                                        curveType: CurveType.flat,
-                                        bevel: 10,
+                                      Card(
                                         child: Padding(
                                           padding: EdgeInsets.symmetric(
                                               vertical: 20),
@@ -1878,19 +1706,7 @@ class _PerformanceState extends State<Performance>
                                   ),
                                   Row(
                                     children: [
-                                      NeuCard(
-                                        width:
-                                            (MediaQuery.of(context).size.width -
-                                                    120) /
-                                                3,
-                                        decoration: NeumorphicDecoration(
-                                          color: Theme.of(context)
-                                              .scaffoldBackgroundColor,
-                                          borderRadius:
-                                              BorderRadius.circular(20),
-                                        ),
-                                        curveType: CurveType.flat,
-                                        bevel: 10,
+                                      Card(
                                         child: Padding(
                                           padding: EdgeInsets.symmetric(
                                               vertical: 20),
@@ -1923,19 +1739,7 @@ class _PerformanceState extends State<Performance>
                                       SizedBox(
                                         width: 20,
                                       ),
-                                      NeuCard(
-                                        width:
-                                            (MediaQuery.of(context).size.width -
-                                                    120) /
-                                                3,
-                                        decoration: NeumorphicDecoration(
-                                          color: Theme.of(context)
-                                              .scaffoldBackgroundColor,
-                                          borderRadius:
-                                              BorderRadius.circular(20),
-                                        ),
-                                        curveType: CurveType.flat,
-                                        bevel: 10,
+                                      Card(
                                         child: Padding(
                                           padding: EdgeInsets.symmetric(
                                               vertical: 20),
@@ -1980,16 +1784,267 @@ class _PerformanceState extends State<Performance>
                             height: 20,
                           ),
                           for (int i = 0; i < networkCount; i++)
-                            NeuCard(
-                              curveType: CurveType.flat,
+                            Card(
                               margin: EdgeInsets.only(
                                   left: 20, right: 20, bottom: 20),
-                              bevel: 20,
-                              decoration: NeumorphicDecoration(
-                                color:
-                                    Theme.of(context).scaffoldBackgroundColor,
-                                borderRadius: BorderRadius.circular(20),
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    SizedBox(
+                                      height: 20,
+                                    ),
+                                    Padding(
+                                      padding:
+                                          EdgeInsets.symmetric(horizontal: 20),
+                                      child: Text(
+                                        i == 0 ? "总计" : "局域网 $i",
+                                        style: TextStyle(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.w600),
+                                      ),
+                                    ),
+                                    AspectRatio(
+                                      aspectRatio: 1.70,
+                                      child: Padding(
+                                        padding: const EdgeInsets.only(
+                                            left: 20,
+                                            right: 20,
+                                            top: 20,
+                                            bottom: 5),
+                                        child: Card(
+                                          // padding: EdgeInsets.symmetric(horizontal: 10),
+                                          child: Padding(
+                                            padding: EdgeInsets.all(10),
+                                            child: LineChart(
+                                              LineChartData(
+                                                lineTouchData: LineTouchData(
+                                                  touchTooltipData:
+                                                      LineTouchTooltipData(
+                                                    // tooltipBgColor: Colors.white
+                                                    //     .withOpacity(0.6),
+                                                    tooltipRoundedRadius: 20,
+                                                    fitInsideHorizontally: true,
+                                                    fitInsideVertically: true,
+                                                    getTooltipItems:
+                                                        (List<LineBarSpot>
+                                                            items) {
+                                                      return items.map(
+                                                          (LineBarSpot
+                                                              touchedSpot) {
+                                                        final textStyle =
+                                                            TextStyle(
+                                                          color: touchedSpot
+                                                              .bar.color,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          fontSize: 14,
+                                                        );
+                                                        return LineTooltipItem(
+                                                            '${touchedSpot.bar.color == Colors.blue ? "上传" : "下载"}:${Util.formatSize(touchedSpot.y.floor())}',
+                                                            textStyle);
+                                                      }).toList();
+                                                    },
+                                                  ),
+                                                ),
+                                                gridData: FlGridData(
+                                                  show: false,
+                                                ),
+                                                titlesData: FlTitlesData(
+                                                  show: true,
+                                                  bottomTitles: AxisTitles(
+                                                    sideTitles: SideTitles(
+                                                      showTitles: false,
+                                                      reservedSize: 22,
+                                                    ),
+                                                  ),
+                                                  topTitles: AxisTitles(
+                                                      sideTitles: SideTitles(
+                                                          showTitles: false)),
+                                                  rightTitles: AxisTitles(
+                                                      sideTitles: SideTitles(
+                                                          showTitles: false)),
+                                                  leftTitles: AxisTitles(
+                                                      sideTitles: SideTitles(
+                                                    showTitles: true,
+                                                    getTitlesWidget:
+                                                        (value, _) {
+                                                      return Text(
+                                                        Util.formatSize(value,
+                                                            fixed: 0),
+                                                        style: TextStyle(
+                                                          color:
+                                                              Color(0xff67727d),
+                                                          fontSize: 12,
+                                                        ),
+                                                      );
+                                                    },
+                                                    // getTextStyles: (value, _) => const ,
+                                                    // getTitles: Util.formatSize,
+                                                    // getTitles: (value) {
+                                                    //   value = value / 1000 / 1000;
+                                                    //   return (value.floor() * 1000).toString();
+                                                    // },
+                                                    reservedSize: 28,
+                                                    interval:
+                                                        Util.chartInterval(
+                                                            maxNetworkSpeed),
+                                                  )),
+                                                ),
+                                                // titlesData: FlTitlesData(
+                                                //   show: true,
+                                                //   bottomTitles: SideTitles(
+                                                //     showTitles: false,
+                                                //     reservedSize: 22,
+                                                //   ),
+                                                //   topTitles: SideTitles(showTitles: false),
+                                                //   rightTitles: SideTitles(showTitles: false),
+                                                //   leftTitles: SideTitles(
+                                                //     showTitles: true,
+                                                //     getTextStyles: (value, _) => const TextStyle(
+                                                //       color: Color(0xff67727d),
+                                                //       fontSize: 12,
+                                                //     ),
+                                                //     getTitles: (v) {
+                                                //       return Util.formatSize(v, maxNetworkSpeed);
+                                                //     },
+                                                //     reservedSize: 28,
+                                                //     interval: Util.chartInterval(maxNetworkSpeed),
+                                                //   ),
+                                                // ),
+                                                minY: 0,
+                                                // maxY: 20,
+                                                borderData: FlBorderData(
+                                                    show: true,
+                                                    border: Border.all(
+                                                        color: Colors.black12,
+                                                        width: 1)),
+                                                lineBarsData: [
+                                                  LineChartBarData(
+                                                    spots:
+                                                        networks.map((network) {
+                                                      return FlSpot(
+                                                          networks
+                                                              .indexOf(network)
+                                                              .toDouble(),
+                                                          network[i]['tx']
+                                                              .toDouble());
+                                                    }).toList(),
+                                                    isCurved: true,
+                                                    color: Colors.blue,
+                                                    barWidth: 2,
+                                                    isStrokeCapRound: true,
+                                                    dotData: FlDotData(
+                                                      show: false,
+                                                    ),
+                                                    belowBarData: BarAreaData(
+                                                      show: true,
+                                                      color: Colors.blue
+                                                          .withOpacity(0.2),
+                                                    ),
+                                                  ),
+                                                  LineChartBarData(
+                                                    spots:
+                                                        networks.map((network) {
+                                                      return FlSpot(
+                                                          networks
+                                                              .indexOf(network)
+                                                              .toDouble(),
+                                                          network[i]['rx']
+                                                              .toDouble());
+                                                    }).toList(),
+                                                    isCurved: true,
+                                                    color: Colors.green,
+                                                    barWidth: 2,
+                                                    isStrokeCapRound: true,
+                                                    dotData: FlDotData(
+                                                      show: false,
+                                                    ),
+                                                    belowBarData: BarAreaData(
+                                                      show: true,
+                                                      color: Colors.green
+                                                          .withOpacity(0.2),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    Padding(
+                                      padding:
+                                          EdgeInsets.symmetric(horizontal: 20),
+                                      child: Row(
+                                        children: [
+                                          Icon(
+                                            Icons.upload_sharp,
+                                            color: Colors.blue,
+                                          ),
+                                          Text(
+                                            Util.formatSize(
+                                                    networks.last[i]['tx']) +
+                                                "/S",
+                                            style:
+                                                TextStyle(color: Colors.blue),
+                                          ),
+                                          Spacer(),
+                                          Icon(
+                                            Icons.download_sharp,
+                                            color: Colors.green,
+                                          ),
+                                          Text(
+                                            Util.formatSize(
+                                                    networks.last[i]['rx']) +
+                                                "/S",
+                                            style:
+                                                TextStyle(color: Colors.green),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      height: 20,
+                                    ),
+                                  ],
+                                ),
                               ),
+                            ),
+                        ],
+                      ),
+                      ListView(
+                        children: [
+                          SizedBox(
+                            height: 20,
+                          ),
+                          Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 20),
+                            child: Wrap(
+                              spacing: 10,
+                              runSpacing: 10,
+                              children: [
+                                Label("总计", Colors.blue),
+                                for (int i = 0;
+                                    i < disks.last['disk'].length;
+                                    i++)
+                                  Label(
+                                    "${disks.last['disk'][i]['display_name']}",
+                                    colors[i],
+                                    height: 22,
+                                  ),
+                              ],
+                            ),
+                          ),
+                          SizedBox(
+                            height: 20,
+                          ),
+                          Card(
+                            margin: EdgeInsets.only(
+                                left: 20, right: 20, bottom: 20),
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
@@ -2000,7 +2055,7 @@ class _PerformanceState extends State<Performance>
                                     padding:
                                         EdgeInsets.symmetric(horizontal: 20),
                                     child: Text(
-                                      i == 0 ? "总计" : "局域网 $i",
+                                      "利用率",
                                       style: TextStyle(
                                           fontSize: 18,
                                           fontWeight: FontWeight.w600),
@@ -2014,15 +2069,7 @@ class _PerformanceState extends State<Performance>
                                           right: 20,
                                           top: 20,
                                           bottom: 5),
-                                      child: NeuCard(
-                                        curveType: CurveType.flat,
-                                        bevel: 20,
-                                        decoration: NeumorphicDecoration(
-                                          color: Theme.of(context)
-                                              .scaffoldBackgroundColor,
-                                          borderRadius:
-                                              BorderRadius.circular(20),
-                                        ),
+                                      child: Card(
                                         // padding: EdgeInsets.symmetric(horizontal: 10),
                                         child: Padding(
                                           padding: EdgeInsets.all(10),
@@ -2031,31 +2078,215 @@ class _PerformanceState extends State<Performance>
                                               lineTouchData: LineTouchData(
                                                 touchTooltipData:
                                                     LineTouchTooltipData(
-                                                  // tooltipBgColor: Colors.white
-                                                  //     .withOpacity(0.6),
-                                                  tooltipRoundedRadius: 20,
-                                                  fitInsideHorizontally: true,
-                                                  fitInsideVertically: true,
-                                                  getTooltipItems:
-                                                      (List<LineBarSpot>
-                                                          items) {
-                                                    return items.map(
-                                                        (LineBarSpot
-                                                            touchedSpot) {
-                                                      final textStyle =
-                                                          TextStyle(
-                                                        color: touchedSpot
-                                                            .bar.color,
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        fontSize: 14,
-                                                      );
-                                                      return LineTooltipItem(
-                                                          '${touchedSpot.bar.color == Colors.blue ? "上传" : "下载"}:${Util.formatSize(touchedSpot.y.floor())}',
-                                                          textStyle);
-                                                    }).toList();
-                                                  },
+                                                        // tooltipBgColor: Colors
+                                                        //     .white
+                                                        //     .withOpacity(0.6),
+                                                        tooltipRoundedRadius:
+                                                            20,
+                                                        fitInsideHorizontally:
+                                                            true,
+                                                        fitInsideVertically:
+                                                            true,
+                                                        getTooltipItems:
+                                                            (items) {
+                                                          return [
+                                                            for (int i = 0;
+                                                                i <
+                                                                    disks
+                                                                        .last[
+                                                                            'disk']
+                                                                        .length;
+                                                                i++)
+                                                              LineTooltipItem(
+                                                                "${disks.last['disk'][i]['display_name']}：${disks[items[0].spotIndex]['disk'][i]['utilization'].floor()}%",
+                                                                TextStyle(
+                                                                    color:
+                                                                        colors[
+                                                                            i]),
+                                                              ),
+                                                            LineTooltipItem(
+                                                                "总计：${disks[items[0].spotIndex]['total']['utilization'].floor()}%",
+                                                                TextStyle(
+                                                                    color: Colors
+                                                                        .blue)),
+                                                          ];
+                                                        }),
+                                              ),
+                                              gridData: FlGridData(
+                                                show: false,
+                                              ),
+                                              titlesData: FlTitlesData(
+                                                show: true,
+                                                bottomTitles: AxisTitles(
+                                                  sideTitles: SideTitles(
+                                                    showTitles: false,
+                                                    reservedSize: 22,
+                                                  ),
                                                 ),
+                                                topTitles: AxisTitles(
+                                                    sideTitles: SideTitles(
+                                                        showTitles: false)),
+                                                rightTitles: AxisTitles(
+                                                    sideTitles: SideTitles(
+                                                        showTitles: false)),
+                                                leftTitles: AxisTitles(
+                                                    sideTitles: SideTitles(
+                                                  showTitles: true,
+                                                  getTitlesWidget: (value, _) {
+                                                    return Text(
+                                                      "${value.toInt()}%",
+                                                      style: TextStyle(
+                                                        color:
+                                                            Color(0xff67727d),
+                                                        fontSize: 12,
+                                                      ),
+                                                    );
+                                                  },
+                                                  // getTextStyles: (value, _) => const ,
+                                                  // getTitles: Util.formatSize,
+                                                  // getTitles: (value) {
+                                                  //   value = value / 1000 / 1000;
+                                                  //   return (value.floor() * 1000).toString();
+                                                  // },
+                                                  reservedSize: 35,
+                                                  interval: 10,
+                                                )),
+                                              ),
+                                              minY: 0,
+                                              maxY: 100,
+                                              // maxY: 20,
+                                              borderData: FlBorderData(
+                                                  show: true,
+                                                  border: Border.all(
+                                                      color: Colors.black12,
+                                                      width: 1)),
+                                              lineBarsData: [
+                                                LineChartBarData(
+                                                  spots: disks.map((disk) {
+                                                    return FlSpot(
+                                                        disks
+                                                            .indexOf(disk)
+                                                            .toDouble(),
+                                                        disk['total']
+                                                                ['utilization']
+                                                            .toDouble());
+                                                  }).toList(),
+                                                  isCurved: true,
+                                                  color: Colors.blue,
+                                                  barWidth: 2,
+                                                  isStrokeCapRound: true,
+                                                  dotData: FlDotData(
+                                                    show: false,
+                                                  ),
+                                                ),
+                                                for (int i = 0;
+                                                    i <
+                                                        disks.last['disk']
+                                                            .length;
+                                                    i++)
+                                                  LineChartBarData(
+                                                    spots: disks.map((disk) {
+                                                      return FlSpot(
+                                                          disks
+                                                              .indexOf(disk)
+                                                              .toDouble(),
+                                                          disk['disk'][i][
+                                                                  'utilization']
+                                                              .toDouble());
+                                                    }).toList(),
+                                                    isCurved: true,
+                                                    color: colors[i],
+                                                    barWidth: 2,
+                                                    isStrokeCapRound: true,
+                                                    dotData: FlDotData(
+                                                      show: false,
+                                                    ),
+                                                  ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    height: 20,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          Card(
+                            margin: EdgeInsets.only(
+                                left: 20, right: 20, bottom: 20),
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  SizedBox(
+                                    height: 20,
+                                  ),
+                                  Padding(
+                                    padding:
+                                        EdgeInsets.symmetric(horizontal: 20),
+                                    child: Text(
+                                      "读取速度",
+                                      style: TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.w600),
+                                    ),
+                                  ),
+                                  AspectRatio(
+                                    aspectRatio: 1.70,
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(
+                                          left: 20,
+                                          right: 20,
+                                          top: 20,
+                                          bottom: 5),
+                                      child: Card(
+                                        // padding: EdgeInsets.symmetric(horizontal: 10),
+                                        child: Padding(
+                                          padding: EdgeInsets.all(10),
+                                          child: LineChart(
+                                            LineChartData(
+                                              lineTouchData: LineTouchData(
+                                                touchTooltipData:
+                                                    LineTouchTooltipData(
+                                                        // tooltipBgColor: Colors
+                                                        //     .white
+                                                        //     .withOpacity(0.6),
+                                                        tooltipRoundedRadius:
+                                                            20,
+                                                        fitInsideHorizontally:
+                                                            true,
+                                                        fitInsideVertically:
+                                                            true,
+                                                        getTooltipItems:
+                                                            (items) {
+                                                          return [
+                                                            for (int i = 0;
+                                                                i <
+                                                                    disks
+                                                                        .last[
+                                                                            'disk']
+                                                                        .length;
+                                                                i++)
+                                                              LineTooltipItem(
+                                                                "${disks.last['disk'][i]['display_name']}：${Util.formatSize(disks[items[0].spotIndex]['disk'][i]['read_byte'].floor())}",
+                                                                TextStyle(
+                                                                    color:
+                                                                        colors[
+                                                                            i]),
+                                                              ),
+                                                            LineTooltipItem(
+                                                                "总计：${Util.formatSize(disks[items[0].spotIndex]['total']['read_byte'].floor())}",
+                                                                TextStyle(
+                                                                    color: Colors
+                                                                        .blue)),
+                                                          ];
+                                                        }),
                                               ),
                                               gridData: FlGridData(
                                                 show: false,
@@ -2096,7 +2327,7 @@ class _PerformanceState extends State<Performance>
                                                   // },
                                                   reservedSize: 28,
                                                   interval: Util.chartInterval(
-                                                      maxNetworkSpeed),
+                                                      maxDiskReadSpeed),
                                                 )),
                                               ),
                                               // titlesData: FlTitlesData(
@@ -2114,10 +2345,10 @@ class _PerformanceState extends State<Performance>
                                               //       fontSize: 12,
                                               //     ),
                                               //     getTitles: (v) {
-                                              //       return Util.formatSize(v, maxNetworkSpeed);
+                                              //       return ;
                                               //     },
                                               //     reservedSize: 28,
-                                              //     interval: Util.chartInterval(maxNetworkSpeed),
+                                              //     interval:,
                                               //   ),
                                               // ),
                                               minY: 0,
@@ -2129,13 +2360,13 @@ class _PerformanceState extends State<Performance>
                                                       width: 1)),
                                               lineBarsData: [
                                                 LineChartBarData(
-                                                  spots:
-                                                      networks.map((network) {
+                                                  spots: disks.map((disk) {
                                                     return FlSpot(
-                                                        networks
-                                                            .indexOf(network)
+                                                        disks
+                                                            .indexOf(disk)
                                                             .toDouble(),
-                                                        network[i]['tx']
+                                                        disk['total']
+                                                                ['read_byte']
                                                             .toDouble());
                                                   }).toList(),
                                                   isCurved: true,
@@ -2145,69 +2376,35 @@ class _PerformanceState extends State<Performance>
                                                   dotData: FlDotData(
                                                     show: false,
                                                   ),
-                                                  belowBarData: BarAreaData(
-                                                    show: true,
-                                                    color: Colors.blue
-                                                        .withOpacity(0.2),
-                                                  ),
                                                 ),
-                                                LineChartBarData(
-                                                  spots:
-                                                      networks.map((network) {
-                                                    return FlSpot(
-                                                        networks
-                                                            .indexOf(network)
-                                                            .toDouble(),
-                                                        network[i]['rx']
-                                                            .toDouble());
-                                                  }).toList(),
-                                                  isCurved: true,
-                                                  color: Colors.green,
-                                                  barWidth: 2,
-                                                  isStrokeCapRound: true,
-                                                  dotData: FlDotData(
-                                                    show: false,
+                                                for (int i = 0;
+                                                    i <
+                                                        disks.last['disk']
+                                                            .length;
+                                                    i++)
+                                                  LineChartBarData(
+                                                    spots: disks.map((disk) {
+                                                      return FlSpot(
+                                                          disks
+                                                              .indexOf(disk)
+                                                              .toDouble(),
+                                                          disk['disk'][i]
+                                                                  ['read_byte']
+                                                              .toDouble());
+                                                    }).toList(),
+                                                    isCurved: true,
+                                                    color: colors[i],
+                                                    barWidth: 2,
+                                                    isStrokeCapRound: true,
+                                                    dotData: FlDotData(
+                                                      show: false,
+                                                    ),
                                                   ),
-                                                  belowBarData: BarAreaData(
-                                                    show: true,
-                                                    color: Colors.green
-                                                        .withOpacity(0.2),
-                                                  ),
-                                                ),
                                               ],
                                             ),
                                           ),
                                         ),
                                       ),
-                                    ),
-                                  ),
-                                  Padding(
-                                    padding:
-                                        EdgeInsets.symmetric(horizontal: 20),
-                                    child: Row(
-                                      children: [
-                                        Icon(
-                                          Icons.upload_sharp,
-                                          color: Colors.blue,
-                                        ),
-                                        Text(
-                                          Util.formatSize(
-                                                  networks.last[i]['tx']) +
-                                              "/S",
-                                          style: TextStyle(color: Colors.blue),
-                                        ),
-                                        Spacer(),
-                                        Icon(
-                                          Icons.download_sharp,
-                                          color: Colors.green,
-                                        ),
-                                        Text(
-                                          Util.formatSize(
-                                                  networks.last[i]['rx']) +
-                                              "/S",
-                                          style: TextStyle(color: Colors.green),
-                                        ),
-                                      ],
                                     ),
                                   ),
                                   SizedBox(
@@ -2216,956 +2413,546 @@ class _PerformanceState extends State<Performance>
                                 ],
                               ),
                             ),
-                        ],
-                      ),
-                      ListView(
-                        children: [
-                          SizedBox(
-                            height: 20,
                           ),
-                          Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 20),
-                            child: Wrap(
-                              spacing: 10,
-                              runSpacing: 10,
-                              children: [
-                                Label("总计", Colors.blue),
-                                for (int i = 0;
-                                    i < disks.last['disk'].length;
-                                    i++)
-                                  Label(
-                                    "${disks.last['disk'][i]['display_name']}",
-                                    colors[i],
-                                    height: 22,
-                                  ),
-                              ],
-                            ),
-                          ),
-                          SizedBox(
-                            height: 20,
-                          ),
-                          NeuCard(
-                            curveType: CurveType.flat,
+                          Card(
                             margin: EdgeInsets.only(
                                 left: 20, right: 20, bottom: 20),
-                            bevel: 20,
-                            decoration: NeumorphicDecoration(
-                              color: Theme.of(context).scaffoldBackgroundColor,
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                SizedBox(
-                                  height: 20,
-                                ),
-                                Padding(
-                                  padding: EdgeInsets.symmetric(horizontal: 20),
-                                  child: Text(
-                                    "利用率",
-                                    style: TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.w600),
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  SizedBox(
+                                    height: 20,
                                   ),
-                                ),
-                                AspectRatio(
-                                  aspectRatio: 1.70,
-                                  child: Padding(
-                                    padding: const EdgeInsets.only(
-                                        left: 20,
-                                        right: 20,
-                                        top: 20,
-                                        bottom: 5),
-                                    child: NeuCard(
-                                      curveType: CurveType.flat,
-                                      bevel: 20,
-                                      decoration: NeumorphicDecoration(
-                                        color: Theme.of(context)
-                                            .scaffoldBackgroundColor,
-                                        borderRadius: BorderRadius.circular(20),
-                                      ),
-                                      // padding: EdgeInsets.symmetric(horizontal: 10),
-                                      child: Padding(
-                                        padding: EdgeInsets.all(10),
-                                        child: LineChart(
-                                          LineChartData(
-                                            lineTouchData: LineTouchData(
-                                              touchTooltipData:
-                                                  LineTouchTooltipData(
-                                                      // tooltipBgColor: Colors
-                                                      //     .white
-                                                      //     .withOpacity(0.6),
-                                                      tooltipRoundedRadius: 20,
-                                                      fitInsideHorizontally:
-                                                          true,
-                                                      fitInsideVertically: true,
-                                                      getTooltipItems: (items) {
-                                                        return [
-                                                          for (int i = 0;
-                                                              i <
-                                                                  disks
-                                                                      .last[
-                                                                          'disk']
-                                                                      .length;
-                                                              i++)
-                                                            LineTooltipItem(
-                                                              "${disks.last['disk'][i]['display_name']}：${disks[items[0].spotIndex]['disk'][i]['utilization'].floor()}%",
-                                                              TextStyle(
-                                                                  color: colors[
-                                                                      i]),
-                                                            ),
-                                                          LineTooltipItem(
-                                                              "总计：${disks[items[0].spotIndex]['total']['utilization'].floor()}%",
-                                                              TextStyle(
-                                                                  color: Colors
-                                                                      .blue)),
-                                                        ];
-                                                      }),
-                                            ),
-                                            gridData: FlGridData(
-                                              show: false,
-                                            ),
-                                            titlesData: FlTitlesData(
-                                              show: true,
-                                              bottomTitles: AxisTitles(
-                                                sideTitles: SideTitles(
-                                                  showTitles: false,
-                                                  reservedSize: 22,
-                                                ),
-                                              ),
-                                              topTitles: AxisTitles(
-                                                  sideTitles: SideTitles(
-                                                      showTitles: false)),
-                                              rightTitles: AxisTitles(
-                                                  sideTitles: SideTitles(
-                                                      showTitles: false)),
-                                              leftTitles: AxisTitles(
-                                                  sideTitles: SideTitles(
-                                                showTitles: true,
-                                                getTitlesWidget: (value, _) {
-                                                  return Text(
-                                                    "${value.toInt()}%",
-                                                    style: TextStyle(
-                                                      color: Color(0xff67727d),
-                                                      fontSize: 12,
-                                                    ),
-                                                  );
-                                                },
-                                                // getTextStyles: (value, _) => const ,
-                                                // getTitles: Util.formatSize,
-                                                // getTitles: (value) {
-                                                //   value = value / 1000 / 1000;
-                                                //   return (value.floor() * 1000).toString();
-                                                // },
-                                                reservedSize: 35,
-                                                interval: 10,
-                                              )),
-                                            ),
-                                            minY: 0,
-                                            maxY: 100,
-                                            // maxY: 20,
-                                            borderData: FlBorderData(
-                                                show: true,
-                                                border: Border.all(
-                                                    color: Colors.black12,
-                                                    width: 1)),
-                                            lineBarsData: [
-                                              LineChartBarData(
-                                                spots: disks.map((disk) {
-                                                  return FlSpot(
-                                                      disks
-                                                          .indexOf(disk)
-                                                          .toDouble(),
-                                                      disk['total']
-                                                              ['utilization']
-                                                          .toDouble());
-                                                }).toList(),
-                                                isCurved: true,
-                                                color: Colors.blue,
-                                                barWidth: 2,
-                                                isStrokeCapRound: true,
-                                                dotData: FlDotData(
-                                                  show: false,
-                                                ),
-                                              ),
-                                              for (int i = 0;
-                                                  i < disks.last['disk'].length;
-                                                  i++)
-                                                LineChartBarData(
-                                                  spots: disks.map((disk) {
-                                                    return FlSpot(
-                                                        disks
-                                                            .indexOf(disk)
-                                                            .toDouble(),
-                                                        disk['disk'][i]
-                                                                ['utilization']
-                                                            .toDouble());
-                                                  }).toList(),
-                                                  isCurved: true,
-                                                  color: colors[i],
-                                                  barWidth: 2,
-                                                  isStrokeCapRound: true,
-                                                  dotData: FlDotData(
-                                                    show: false,
-                                                  ),
-                                                ),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
+                                  Padding(
+                                    padding:
+                                        EdgeInsets.symmetric(horizontal: 20),
+                                    child: Text(
+                                      "写入速度",
+                                      style: TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.w600),
                                     ),
                                   ),
-                                ),
-                                SizedBox(
-                                  height: 20,
-                                ),
-                              ],
-                            ),
-                          ),
-                          NeuCard(
-                            curveType: CurveType.flat,
-                            margin: EdgeInsets.only(
-                                left: 20, right: 20, bottom: 20),
-                            bevel: 20,
-                            decoration: NeumorphicDecoration(
-                              color: Theme.of(context).scaffoldBackgroundColor,
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                SizedBox(
-                                  height: 20,
-                                ),
-                                Padding(
-                                  padding: EdgeInsets.symmetric(horizontal: 20),
-                                  child: Text(
-                                    "读取速度",
-                                    style: TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.w600),
-                                  ),
-                                ),
-                                AspectRatio(
-                                  aspectRatio: 1.70,
-                                  child: Padding(
-                                    padding: const EdgeInsets.only(
-                                        left: 20,
-                                        right: 20,
-                                        top: 20,
-                                        bottom: 5),
-                                    child: NeuCard(
-                                      curveType: CurveType.flat,
-                                      bevel: 20,
-                                      decoration: NeumorphicDecoration(
-                                        color: Theme.of(context)
-                                            .scaffoldBackgroundColor,
-                                        borderRadius: BorderRadius.circular(20),
-                                      ),
-                                      // padding: EdgeInsets.symmetric(horizontal: 10),
-                                      child: Padding(
-                                        padding: EdgeInsets.all(10),
-                                        child: LineChart(
-                                          LineChartData(
-                                            lineTouchData: LineTouchData(
-                                              touchTooltipData:
-                                                  LineTouchTooltipData(
-                                                      // tooltipBgColor: Colors
-                                                      //     .white
-                                                      //     .withOpacity(0.6),
-                                                      tooltipRoundedRadius: 20,
-                                                      fitInsideHorizontally:
-                                                          true,
-                                                      fitInsideVertically: true,
-                                                      getTooltipItems: (items) {
-                                                        return [
-                                                          for (int i = 0;
-                                                              i <
-                                                                  disks
-                                                                      .last[
-                                                                          'disk']
-                                                                      .length;
-                                                              i++)
+                                  AspectRatio(
+                                    aspectRatio: 1.70,
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(
+                                          left: 20,
+                                          right: 20,
+                                          top: 20,
+                                          bottom: 5),
+                                      child: Card(
+                                        // padding: EdgeInsets.symmetric(horizontal: 10),
+                                        child: Padding(
+                                          padding: EdgeInsets.all(10),
+                                          child: LineChart(
+                                            LineChartData(
+                                              lineTouchData: LineTouchData(
+                                                touchTooltipData:
+                                                    LineTouchTooltipData(
+                                                        // tooltipBgColor: Colors
+                                                        //     .white
+                                                        //     .withOpacity(0.6),
+                                                        tooltipRoundedRadius:
+                                                            20,
+                                                        fitInsideHorizontally:
+                                                            true,
+                                                        fitInsideVertically:
+                                                            true,
+                                                        getTooltipItems:
+                                                            (items) {
+                                                          return [
+                                                            for (int i = 0;
+                                                                i <
+                                                                    disks
+                                                                        .last[
+                                                                            'disk']
+                                                                        .length;
+                                                                i++)
+                                                              LineTooltipItem(
+                                                                "${disks.last['disk'][i]['display_name']}：${Util.formatSize(disks[items[0].spotIndex]['disk'][i]['write_byte'].floor())}",
+                                                                TextStyle(
+                                                                    color:
+                                                                        colors[
+                                                                            i]),
+                                                              ),
                                                             LineTooltipItem(
-                                                              "${disks.last['disk'][i]['display_name']}：${Util.formatSize(disks[items[0].spotIndex]['disk'][i]['read_byte'].floor())}",
-                                                              TextStyle(
-                                                                  color: colors[
-                                                                      i]),
-                                                            ),
-                                                          LineTooltipItem(
-                                                              "总计：${Util.formatSize(disks[items[0].spotIndex]['total']['read_byte'].floor())}",
-                                                              TextStyle(
-                                                                  color: Colors
-                                                                      .blue)),
-                                                        ];
-                                                      }),
-                                            ),
-                                            gridData: FlGridData(
-                                              show: false,
-                                            ),
-                                            titlesData: FlTitlesData(
-                                              show: true,
-                                              bottomTitles: AxisTitles(
-                                                sideTitles: SideTitles(
-                                                  showTitles: false,
-                                                  reservedSize: 22,
-                                                ),
+                                                                "总计：${Util.formatSize(disks[items[0].spotIndex]['total']['write_byte'].floor())}",
+                                                                TextStyle(
+                                                                    color: Colors
+                                                                        .blue)),
+                                                          ];
+                                                        }),
                                               ),
-                                              topTitles: AxisTitles(
-                                                  sideTitles: SideTitles(
-                                                      showTitles: false)),
-                                              rightTitles: AxisTitles(
-                                                  sideTitles: SideTitles(
-                                                      showTitles: false)),
-                                              leftTitles: AxisTitles(
-                                                  sideTitles: SideTitles(
-                                                showTitles: true,
-                                                getTitlesWidget: (value, _) {
-                                                  return Text(
-                                                    Util.formatSize(value,
-                                                        fixed: 0),
-                                                    style: TextStyle(
-                                                      color: Color(0xff67727d),
-                                                      fontSize: 12,
-                                                    ),
-                                                  );
-                                                },
-                                                // getTextStyles: (value, _) => const ,
-                                                // getTitles: Util.formatSize,
-                                                // getTitles: (value) {
-                                                //   value = value / 1000 / 1000;
-                                                //   return (value.floor() * 1000).toString();
-                                                // },
-                                                reservedSize: 28,
-                                                interval: Util.chartInterval(
-                                                    maxDiskReadSpeed),
-                                              )),
-                                            ),
-                                            // titlesData: FlTitlesData(
-                                            //   show: true,
-                                            //   bottomTitles: SideTitles(
-                                            //     showTitles: false,
-                                            //     reservedSize: 22,
-                                            //   ),
-                                            //   topTitles: SideTitles(showTitles: false),
-                                            //   rightTitles: SideTitles(showTitles: false),
-                                            //   leftTitles: SideTitles(
-                                            //     showTitles: true,
-                                            //     getTextStyles: (value, _) => const TextStyle(
-                                            //       color: Color(0xff67727d),
-                                            //       fontSize: 12,
-                                            //     ),
-                                            //     getTitles: (v) {
-                                            //       return ;
-                                            //     },
-                                            //     reservedSize: 28,
-                                            //     interval:,
-                                            //   ),
-                                            // ),
-                                            minY: 0,
-                                            // maxY: 20,
-                                            borderData: FlBorderData(
+                                              gridData: FlGridData(
+                                                show: false,
+                                              ),
+                                              titlesData: FlTitlesData(
                                                 show: true,
-                                                border: Border.all(
-                                                    color: Colors.black12,
-                                                    width: 1)),
-                                            lineBarsData: [
-                                              LineChartBarData(
-                                                spots: disks.map((disk) {
-                                                  return FlSpot(
-                                                      disks
-                                                          .indexOf(disk)
-                                                          .toDouble(),
-                                                      disk['total']['read_byte']
-                                                          .toDouble());
-                                                }).toList(),
-                                                isCurved: true,
-                                                color: Colors.blue,
-                                                barWidth: 2,
-                                                isStrokeCapRound: true,
-                                                dotData: FlDotData(
-                                                  show: false,
-                                                ),
-                                              ),
-                                              for (int i = 0;
-                                                  i < disks.last['disk'].length;
-                                                  i++)
-                                                LineChartBarData(
-                                                  spots: disks.map((disk) {
-                                                    return FlSpot(
-                                                        disks
-                                                            .indexOf(disk)
-                                                            .toDouble(),
-                                                        disk['disk'][i]
-                                                                ['read_byte']
-                                                            .toDouble());
-                                                  }).toList(),
-                                                  isCurved: true,
-                                                  color: colors[i],
-                                                  barWidth: 2,
-                                                  isStrokeCapRound: true,
-                                                  dotData: FlDotData(
-                                                    show: false,
+                                                bottomTitles: AxisTitles(
+                                                  sideTitles: SideTitles(
+                                                    showTitles: false,
+                                                    reservedSize: 22,
                                                   ),
                                                 ),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                SizedBox(
-                                  height: 20,
-                                ),
-                              ],
-                            ),
-                          ),
-                          NeuCard(
-                            curveType: CurveType.flat,
-                            margin: EdgeInsets.only(
-                                left: 20, right: 20, bottom: 20),
-                            bevel: 20,
-                            decoration: NeumorphicDecoration(
-                              color: Theme.of(context).scaffoldBackgroundColor,
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                SizedBox(
-                                  height: 20,
-                                ),
-                                Padding(
-                                  padding: EdgeInsets.symmetric(horizontal: 20),
-                                  child: Text(
-                                    "写入速度",
-                                    style: TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.w600),
-                                  ),
-                                ),
-                                AspectRatio(
-                                  aspectRatio: 1.70,
-                                  child: Padding(
-                                    padding: const EdgeInsets.only(
-                                        left: 20,
-                                        right: 20,
-                                        top: 20,
-                                        bottom: 5),
-                                    child: NeuCard(
-                                      curveType: CurveType.flat,
-                                      bevel: 20,
-                                      decoration: NeumorphicDecoration(
-                                        color: Theme.of(context)
-                                            .scaffoldBackgroundColor,
-                                        borderRadius: BorderRadius.circular(20),
-                                      ),
-                                      // padding: EdgeInsets.symmetric(horizontal: 10),
-                                      child: Padding(
-                                        padding: EdgeInsets.all(10),
-                                        child: LineChart(
-                                          LineChartData(
-                                            lineTouchData: LineTouchData(
-                                              touchTooltipData:
-                                                  LineTouchTooltipData(
-                                                      // tooltipBgColor: Colors
-                                                      //     .white
-                                                      //     .withOpacity(0.6),
-                                                      tooltipRoundedRadius: 20,
-                                                      fitInsideHorizontally:
-                                                          true,
-                                                      fitInsideVertically: true,
-                                                      getTooltipItems: (items) {
-                                                        return [
-                                                          for (int i = 0;
-                                                              i <
-                                                                  disks
-                                                                      .last[
-                                                                          'disk']
-                                                                      .length;
-                                                              i++)
-                                                            LineTooltipItem(
-                                                              "${disks.last['disk'][i]['display_name']}：${Util.formatSize(disks[items[0].spotIndex]['disk'][i]['write_byte'].floor())}",
-                                                              TextStyle(
-                                                                  color: colors[
-                                                                      i]),
-                                                            ),
-                                                          LineTooltipItem(
-                                                              "总计：${Util.formatSize(disks[items[0].spotIndex]['total']['write_byte'].floor())}",
-                                                              TextStyle(
-                                                                  color: Colors
-                                                                      .blue)),
-                                                        ];
-                                                      }),
-                                            ),
-                                            gridData: FlGridData(
-                                              show: false,
-                                            ),
-                                            titlesData: FlTitlesData(
-                                              show: true,
-                                              bottomTitles: AxisTitles(
-                                                sideTitles: SideTitles(
-                                                  showTitles: false,
-                                                  reservedSize: 22,
-                                                ),
+                                                topTitles: AxisTitles(
+                                                    sideTitles: SideTitles(
+                                                        showTitles: false)),
+                                                rightTitles: AxisTitles(
+                                                    sideTitles: SideTitles(
+                                                        showTitles: false)),
+                                                leftTitles: AxisTitles(
+                                                    sideTitles: SideTitles(
+                                                  showTitles: true,
+                                                  getTitlesWidget: (value, _) {
+                                                    return Text(
+                                                      Util.formatSize(value,
+                                                          fixed: 0),
+                                                      style: TextStyle(
+                                                        color:
+                                                            Color(0xff67727d),
+                                                        fontSize: 12,
+                                                      ),
+                                                    );
+                                                  },
+                                                  // getTextStyles: (value, _) => const ,
+                                                  // getTitles: Util.formatSize,
+                                                  // getTitles: (value) {
+                                                  //   value = value / 1000 / 1000;
+                                                  //   return (value.floor() * 1000).toString();
+                                                  // },
+                                                  reservedSize: 28,
+                                                  interval: Util.chartInterval(
+                                                      maxDiskWriteSpeed),
+                                                )),
                                               ),
-                                              topTitles: AxisTitles(
-                                                  sideTitles: SideTitles(
-                                                      showTitles: false)),
-                                              rightTitles: AxisTitles(
-                                                  sideTitles: SideTitles(
-                                                      showTitles: false)),
-                                              leftTitles: AxisTitles(
-                                                  sideTitles: SideTitles(
-                                                showTitles: true,
-                                                getTitlesWidget: (value, _) {
-                                                  return Text(
-                                                    Util.formatSize(value,
-                                                        fixed: 0),
-                                                    style: TextStyle(
-                                                      color: Color(0xff67727d),
-                                                      fontSize: 12,
-                                                    ),
-                                                  );
-                                                },
-                                                // getTextStyles: (value, _) => const ,
-                                                // getTitles: Util.formatSize,
-                                                // getTitles: (value) {
-                                                //   value = value / 1000 / 1000;
-                                                //   return (value.floor() * 1000).toString();
-                                                // },
-                                                reservedSize: 28,
-                                                interval: Util.chartInterval(
-                                                    maxDiskWriteSpeed),
-                                              )),
-                                            ),
-                                            // titlesData: FlTitlesData(
-                                            //   show: true,
-                                            //   bottomTitles: SideTitles(
-                                            //     showTitles: false,
-                                            //     reservedSize: 22,
-                                            //   ),
-                                            //   topTitles: SideTitles(showTitles: false),
-                                            //   rightTitles: SideTitles(showTitles: false),
-                                            //   leftTitles: SideTitles(
-                                            //     showTitles: true,
-                                            //     getTextStyles: (value, _) => const TextStyle(
-                                            //       color: Color(0xff67727d),
-                                            //       fontSize: 12,
-                                            //     ),
-                                            //     getTitles: (v) {
-                                            //       return ;
-                                            //     },
-                                            //     reservedSize: 28,
-                                            //     interval: ,
-                                            //   ),
-                                            // ),
-                                            minY: 0,
-                                            // maxY: 20,
-                                            borderData: FlBorderData(
-                                                show: true,
-                                                border: Border.all(
-                                                    color: Colors.black12,
-                                                    width: 1)),
-                                            lineBarsData: [
-                                              LineChartBarData(
-                                                spots: disks.map((disk) {
-                                                  return FlSpot(
-                                                      disks
-                                                          .indexOf(disk)
-                                                          .toDouble(),
-                                                      disk['total']
-                                                              ['write_byte']
-                                                          .toDouble());
-                                                }).toList(),
-                                                isCurved: true,
-                                                color: Colors.blue,
-                                                barWidth: 2,
-                                                isStrokeCapRound: true,
-                                                dotData: FlDotData(
-                                                  show: false,
-                                                ),
-                                              ),
-                                              for (int i = 0;
-                                                  i < disks.last['disk'].length;
-                                                  i++)
+                                              // titlesData: FlTitlesData(
+                                              //   show: true,
+                                              //   bottomTitles: SideTitles(
+                                              //     showTitles: false,
+                                              //     reservedSize: 22,
+                                              //   ),
+                                              //   topTitles: SideTitles(showTitles: false),
+                                              //   rightTitles: SideTitles(showTitles: false),
+                                              //   leftTitles: SideTitles(
+                                              //     showTitles: true,
+                                              //     getTextStyles: (value, _) => const TextStyle(
+                                              //       color: Color(0xff67727d),
+                                              //       fontSize: 12,
+                                              //     ),
+                                              //     getTitles: (v) {
+                                              //       return ;
+                                              //     },
+                                              //     reservedSize: 28,
+                                              //     interval: ,
+                                              //   ),
+                                              // ),
+                                              minY: 0,
+                                              // maxY: 20,
+                                              borderData: FlBorderData(
+                                                  show: true,
+                                                  border: Border.all(
+                                                      color: Colors.black12,
+                                                      width: 1)),
+                                              lineBarsData: [
                                                 LineChartBarData(
                                                   spots: disks.map((disk) {
                                                     return FlSpot(
                                                         disks
                                                             .indexOf(disk)
                                                             .toDouble(),
-                                                        disk['disk'][i]
+                                                        disk['total']
                                                                 ['write_byte']
                                                             .toDouble());
                                                   }).toList(),
                                                   isCurved: true,
-                                                  color: colors[i],
+                                                  color: Colors.blue,
                                                   barWidth: 2,
                                                   isStrokeCapRound: true,
                                                   dotData: FlDotData(
                                                     show: false,
                                                   ),
                                                 ),
-                                            ],
+                                                for (int i = 0;
+                                                    i <
+                                                        disks.last['disk']
+                                                            .length;
+                                                    i++)
+                                                  LineChartBarData(
+                                                    spots: disks.map((disk) {
+                                                      return FlSpot(
+                                                          disks
+                                                              .indexOf(disk)
+                                                              .toDouble(),
+                                                          disk['disk'][i]
+                                                                  ['write_byte']
+                                                              .toDouble());
+                                                    }).toList(),
+                                                    isCurved: true,
+                                                    color: colors[i],
+                                                    barWidth: 2,
+                                                    isStrokeCapRound: true,
+                                                    dotData: FlDotData(
+                                                      show: false,
+                                                    ),
+                                                  ),
+                                              ],
+                                            ),
                                           ),
                                         ),
                                       ),
                                     ),
                                   ),
-                                ),
-                                SizedBox(
-                                  height: 20,
-                                ),
-                              ],
+                                  SizedBox(
+                                    height: 20,
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
-                          NeuCard(
-                            curveType: CurveType.flat,
+                          Card(
                             margin: EdgeInsets.only(
                                 left: 20, right: 20, bottom: 20),
-                            bevel: 20,
-                            decoration: NeumorphicDecoration(
-                              color: Theme.of(context).scaffoldBackgroundColor,
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                SizedBox(
-                                  height: 20,
-                                ),
-                                Padding(
-                                  padding: EdgeInsets.symmetric(horizontal: 20),
-                                  child: Text(
-                                    "读取IOPS",
-                                    style: TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.w600),
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  SizedBox(
+                                    height: 20,
                                   ),
-                                ),
-                                AspectRatio(
-                                  aspectRatio: 1.70,
-                                  child: Padding(
-                                    padding: const EdgeInsets.only(
-                                        left: 20,
-                                        right: 20,
-                                        top: 20,
-                                        bottom: 5),
-                                    child: NeuCard(
-                                      curveType: CurveType.flat,
-                                      bevel: 20,
-                                      decoration: NeumorphicDecoration(
-                                        color: Theme.of(context)
-                                            .scaffoldBackgroundColor,
-                                        borderRadius: BorderRadius.circular(20),
-                                      ),
-                                      // padding: EdgeInsets.symmetric(horizontal: 10),
-                                      child: Padding(
-                                        padding: EdgeInsets.all(10),
-                                        child: LineChart(
-                                          LineChartData(
-                                            lineTouchData: LineTouchData(
-                                              touchTooltipData:
-                                                  LineTouchTooltipData(
-                                                      // tooltipBgColor: Colors
-                                                      //     .white
-                                                      //     .withOpacity(0.6),
-                                                      tooltipRoundedRadius: 20,
-                                                      fitInsideHorizontally:
-                                                          true,
-                                                      fitInsideVertically: true,
-                                                      getTooltipItems: (items) {
-                                                        return [
-                                                          for (int i = 0;
-                                                              i <
-                                                                  disks
-                                                                      .last[
-                                                                          'disk']
-                                                                      .length;
-                                                              i++)
+                                  Padding(
+                                    padding:
+                                        EdgeInsets.symmetric(horizontal: 20),
+                                    child: Text(
+                                      "读取IOPS",
+                                      style: TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.w600),
+                                    ),
+                                  ),
+                                  AspectRatio(
+                                    aspectRatio: 1.70,
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(
+                                          left: 20,
+                                          right: 20,
+                                          top: 20,
+                                          bottom: 5),
+                                      child: Card(
+                                        // padding: EdgeInsets.symmetric(horizontal: 10),
+                                        child: Padding(
+                                          padding: EdgeInsets.all(10),
+                                          child: LineChart(
+                                            LineChartData(
+                                              lineTouchData: LineTouchData(
+                                                touchTooltipData:
+                                                    LineTouchTooltipData(
+                                                        // tooltipBgColor: Colors
+                                                        //     .white
+                                                        //     .withOpacity(0.6),
+                                                        tooltipRoundedRadius:
+                                                            20,
+                                                        fitInsideHorizontally:
+                                                            true,
+                                                        fitInsideVertically:
+                                                            true,
+                                                        getTooltipItems:
+                                                            (items) {
+                                                          return [
+                                                            for (int i = 0;
+                                                                i <
+                                                                    disks
+                                                                        .last[
+                                                                            'disk']
+                                                                        .length;
+                                                                i++)
+                                                              LineTooltipItem(
+                                                                "${disks.last['disk'][i]['display_name']}：${disks[items[0].spotIndex]['disk'][i]['read_access'].floor()}",
+                                                                TextStyle(
+                                                                    color:
+                                                                        colors[
+                                                                            i]),
+                                                              ),
                                                             LineTooltipItem(
-                                                              "${disks.last['disk'][i]['display_name']}：${disks[items[0].spotIndex]['disk'][i]['read_access'].floor()}",
-                                                              TextStyle(
-                                                                  color: colors[
-                                                                      i]),
-                                                            ),
-                                                          LineTooltipItem(
-                                                              "总计：${disks[items[0].spotIndex]['total']['read_access'].floor()}",
-                                                              TextStyle(
-                                                                  color: Colors
-                                                                      .blue)),
-                                                        ];
-                                                      }),
-                                            ),
-                                            gridData: FlGridData(
-                                              show: false,
-                                            ),
-                                            titlesData: FlTitlesData(
-                                              show: true,
-                                              bottomTitles: AxisTitles(
-                                                sideTitles: SideTitles(
-                                                  showTitles: false,
-                                                  reservedSize: 22,
-                                                ),
+                                                                "总计：${disks[items[0].spotIndex]['total']['read_access'].floor()}",
+                                                                TextStyle(
+                                                                    color: Colors
+                                                                        .blue)),
+                                                          ];
+                                                        }),
                                               ),
-                                              topTitles: AxisTitles(
-                                                  sideTitles: SideTitles(
-                                                      showTitles: false)),
-                                              rightTitles: AxisTitles(
-                                                  sideTitles: SideTitles(
-                                                      showTitles: false)),
-                                              leftTitles: AxisTitles(
-                                                  sideTitles: SideTitles(
-                                                showTitles: true,
-                                                getTitlesWidget: (value, _) {
-                                                  return Text(
-                                                    "${value.toInt()}",
-                                                    style: TextStyle(
-                                                      color: Color(0xff67727d),
-                                                      fontSize: 12,
-                                                    ),
-                                                  );
-                                                },
-                                                // getTextStyles: (value, _) => const ,
-                                                // getTitles: Util.formatSize,
-                                                // getTitles: (value) {
-                                                //   value = value / 1000 / 1000;
-                                                //   return (value.floor() * 1000).toString();
-                                                // },
-                                                reservedSize: 28,
-                                                // interval: 10,
-                                              )),
-                                            ),
-                                            minY: 0,
-                                            // maxY: 20,
-                                            borderData: FlBorderData(
+                                              gridData: FlGridData(
+                                                show: false,
+                                              ),
+                                              titlesData: FlTitlesData(
                                                 show: true,
-                                                border: Border.all(
-                                                    color: Colors.black12,
-                                                    width: 1)),
-                                            lineBarsData: [
-                                              LineChartBarData(
-                                                spots: disks.map((disk) {
-                                                  return FlSpot(
-                                                      disks
-                                                          .indexOf(disk)
-                                                          .toDouble(),
-                                                      disk['total']
-                                                              ['read_access']
-                                                          .toDouble());
-                                                }).toList(),
-                                                isCurved: true,
-                                                color: Colors.blue,
-                                                barWidth: 2,
-                                                isStrokeCapRound: true,
-                                                dotData: FlDotData(
-                                                  show: false,
+                                                bottomTitles: AxisTitles(
+                                                  sideTitles: SideTitles(
+                                                    showTitles: false,
+                                                    reservedSize: 22,
+                                                  ),
                                                 ),
+                                                topTitles: AxisTitles(
+                                                    sideTitles: SideTitles(
+                                                        showTitles: false)),
+                                                rightTitles: AxisTitles(
+                                                    sideTitles: SideTitles(
+                                                        showTitles: false)),
+                                                leftTitles: AxisTitles(
+                                                    sideTitles: SideTitles(
+                                                  showTitles: true,
+                                                  getTitlesWidget: (value, _) {
+                                                    return Text(
+                                                      "${value.toInt()}",
+                                                      style: TextStyle(
+                                                        color:
+                                                            Color(0xff67727d),
+                                                        fontSize: 12,
+                                                      ),
+                                                    );
+                                                  },
+                                                  // getTextStyles: (value, _) => const ,
+                                                  // getTitles: Util.formatSize,
+                                                  // getTitles: (value) {
+                                                  //   value = value / 1000 / 1000;
+                                                  //   return (value.floor() * 1000).toString();
+                                                  // },
+                                                  reservedSize: 28,
+                                                  // interval: 10,
+                                                )),
                                               ),
-                                              for (int i = 0;
-                                                  i < disks.last['disk'].length;
-                                                  i++)
+                                              minY: 0,
+                                              // maxY: 20,
+                                              borderData: FlBorderData(
+                                                  show: true,
+                                                  border: Border.all(
+                                                      color: Colors.black12,
+                                                      width: 1)),
+                                              lineBarsData: [
                                                 LineChartBarData(
                                                   spots: disks.map((disk) {
                                                     return FlSpot(
                                                         disks
                                                             .indexOf(disk)
                                                             .toDouble(),
-                                                        disk['disk'][i]
+                                                        disk['total']
                                                                 ['read_access']
                                                             .toDouble());
                                                   }).toList(),
                                                   isCurved: true,
-                                                  color: colors[i],
+                                                  color: Colors.blue,
                                                   barWidth: 2,
                                                   isStrokeCapRound: true,
                                                   dotData: FlDotData(
                                                     show: false,
                                                   ),
                                                 ),
-                                            ],
+                                                for (int i = 0;
+                                                    i <
+                                                        disks.last['disk']
+                                                            .length;
+                                                    i++)
+                                                  LineChartBarData(
+                                                    spots: disks.map((disk) {
+                                                      return FlSpot(
+                                                          disks
+                                                              .indexOf(disk)
+                                                              .toDouble(),
+                                                          disk['disk'][i][
+                                                                  'read_access']
+                                                              .toDouble());
+                                                    }).toList(),
+                                                    isCurved: true,
+                                                    color: colors[i],
+                                                    barWidth: 2,
+                                                    isStrokeCapRound: true,
+                                                    dotData: FlDotData(
+                                                      show: false,
+                                                    ),
+                                                  ),
+                                              ],
+                                            ),
                                           ),
                                         ),
                                       ),
                                     ),
                                   ),
-                                ),
-                                SizedBox(
-                                  height: 20,
-                                ),
-                              ],
+                                  SizedBox(
+                                    height: 20,
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
-                          NeuCard(
-                            curveType: CurveType.flat,
+                          Card(
                             margin: EdgeInsets.only(
                                 left: 20, right: 20, bottom: 20),
-                            bevel: 20,
-                            decoration: NeumorphicDecoration(
-                              color: Theme.of(context).scaffoldBackgroundColor,
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                SizedBox(
-                                  height: 20,
-                                ),
-                                Padding(
-                                  padding: EdgeInsets.symmetric(horizontal: 20),
-                                  child: Text(
-                                    "写入IOPS",
-                                    style: TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.w600),
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  SizedBox(
+                                    height: 20,
                                   ),
-                                ),
-                                AspectRatio(
-                                  aspectRatio: 1.70,
-                                  child: Padding(
-                                    padding: const EdgeInsets.only(
-                                        left: 20,
-                                        right: 20,
-                                        top: 20,
-                                        bottom: 5),
-                                    child: NeuCard(
-                                      curveType: CurveType.flat,
-                                      bevel: 20,
-                                      decoration: NeumorphicDecoration(
-                                        color: Theme.of(context)
-                                            .scaffoldBackgroundColor,
-                                        borderRadius: BorderRadius.circular(20),
-                                      ),
-                                      // padding: EdgeInsets.symmetric(horizontal: 10),
-                                      child: Padding(
-                                        padding: EdgeInsets.all(10),
-                                        child: LineChart(
-                                          LineChartData(
-                                            lineTouchData: LineTouchData(
-                                              touchTooltipData:
-                                                  LineTouchTooltipData(
-                                                      // tooltipBgColor: Colors
-                                                      //     .white
-                                                      //     .withOpacity(0.6),
-                                                      tooltipRoundedRadius: 20,
-                                                      fitInsideHorizontally:
-                                                          true,
-                                                      fitInsideVertically: true,
-                                                      getTooltipItems: (items) {
-                                                        return [
-                                                          for (int i = 0;
-                                                              i <
-                                                                  disks
-                                                                      .last[
-                                                                          'disk']
-                                                                      .length;
-                                                              i++)
+                                  Padding(
+                                    padding:
+                                        EdgeInsets.symmetric(horizontal: 20),
+                                    child: Text(
+                                      "写入IOPS",
+                                      style: TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.w600),
+                                    ),
+                                  ),
+                                  AspectRatio(
+                                    aspectRatio: 1.70,
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(
+                                          left: 20,
+                                          right: 20,
+                                          top: 20,
+                                          bottom: 5),
+                                      child: Card(
+                                        // padding: EdgeInsets.symmetric(horizontal: 10),
+                                        child: Padding(
+                                          padding: EdgeInsets.all(10),
+                                          child: LineChart(
+                                            LineChartData(
+                                              lineTouchData: LineTouchData(
+                                                touchTooltipData:
+                                                    LineTouchTooltipData(
+                                                        // tooltipBgColor: Colors
+                                                        //     .white
+                                                        //     .withOpacity(0.6),
+                                                        tooltipRoundedRadius:
+                                                            20,
+                                                        fitInsideHorizontally:
+                                                            true,
+                                                        fitInsideVertically:
+                                                            true,
+                                                        getTooltipItems:
+                                                            (items) {
+                                                          return [
+                                                            for (int i = 0;
+                                                                i <
+                                                                    disks
+                                                                        .last[
+                                                                            'disk']
+                                                                        .length;
+                                                                i++)
+                                                              LineTooltipItem(
+                                                                "${disks.last['disk'][i]['display_name']}：${Util.formatSize(disks[items[0].spotIndex]['disk'][i]['write_access'].floor())}",
+                                                                TextStyle(
+                                                                    color:
+                                                                        colors[
+                                                                            i]),
+                                                              ),
                                                             LineTooltipItem(
-                                                              "${disks.last['disk'][i]['display_name']}：${Util.formatSize(disks[items[0].spotIndex]['disk'][i]['write_access'].floor())}",
-                                                              TextStyle(
-                                                                  color: colors[
-                                                                      i]),
-                                                            ),
-                                                          LineTooltipItem(
-                                                              "总计：${Util.formatSize(disks[items[0].spotIndex]['total']['write_access'].floor())}",
-                                                              TextStyle(
-                                                                  color: Colors
-                                                                      .blue)),
-                                                        ];
-                                                      }),
-                                            ),
-                                            gridData: FlGridData(
-                                              show: false,
-                                            ),
-                                            titlesData: FlTitlesData(
-                                              show: true,
-                                              bottomTitles: AxisTitles(
-                                                sideTitles: SideTitles(
-                                                  showTitles: false,
-                                                  reservedSize: 22,
-                                                ),
+                                                                "总计：${Util.formatSize(disks[items[0].spotIndex]['total']['write_access'].floor())}",
+                                                                TextStyle(
+                                                                    color: Colors
+                                                                        .blue)),
+                                                          ];
+                                                        }),
                                               ),
-                                              topTitles: AxisTitles(
-                                                  sideTitles: SideTitles(
-                                                      showTitles: false)),
-                                              rightTitles: AxisTitles(
-                                                  sideTitles: SideTitles(
-                                                      showTitles: false)),
-                                              leftTitles: AxisTitles(
-                                                  sideTitles: SideTitles(
-                                                showTitles: true,
-                                                getTitlesWidget: (value, _) {
-                                                  return Text(
-                                                    "${value.toInt()}",
-                                                    style: TextStyle(
-                                                      color: Color(0xff67727d),
-                                                      fontSize: 12,
-                                                    ),
-                                                  );
-                                                },
-                                                reservedSize: 28,
-                                                // interval: 10,
-                                              )),
-                                            ),
-                                            // maxY: 20,
-                                            borderData: FlBorderData(
+                                              gridData: FlGridData(
+                                                show: false,
+                                              ),
+                                              titlesData: FlTitlesData(
                                                 show: true,
-                                                border: Border.all(
-                                                    color: Colors.black12,
-                                                    width: 1)),
-                                            lineBarsData: [
-                                              LineChartBarData(
-                                                spots: disks.map((disk) {
-                                                  return FlSpot(
-                                                      disks
-                                                          .indexOf(disk)
-                                                          .toDouble(),
-                                                      disk['total']
-                                                              ['write_access']
-                                                          .toDouble());
-                                                }).toList(),
-                                                isCurved: true,
-                                                color: Colors.blue,
-                                                barWidth: 2,
-                                                isStrokeCapRound: true,
-                                                dotData: FlDotData(
-                                                  show: false,
+                                                bottomTitles: AxisTitles(
+                                                  sideTitles: SideTitles(
+                                                    showTitles: false,
+                                                    reservedSize: 22,
+                                                  ),
                                                 ),
+                                                topTitles: AxisTitles(
+                                                    sideTitles: SideTitles(
+                                                        showTitles: false)),
+                                                rightTitles: AxisTitles(
+                                                    sideTitles: SideTitles(
+                                                        showTitles: false)),
+                                                leftTitles: AxisTitles(
+                                                    sideTitles: SideTitles(
+                                                  showTitles: true,
+                                                  getTitlesWidget: (value, _) {
+                                                    return Text(
+                                                      "${value.toInt()}",
+                                                      style: TextStyle(
+                                                        color:
+                                                            Color(0xff67727d),
+                                                        fontSize: 12,
+                                                      ),
+                                                    );
+                                                  },
+                                                  reservedSize: 28,
+                                                  // interval: 10,
+                                                )),
                                               ),
-                                              for (int i = 0;
-                                                  i < disks.last['disk'].length;
-                                                  i++)
+                                              // maxY: 20,
+                                              borderData: FlBorderData(
+                                                  show: true,
+                                                  border: Border.all(
+                                                      color: Colors.black12,
+                                                      width: 1)),
+                                              lineBarsData: [
                                                 LineChartBarData(
                                                   spots: disks.map((disk) {
                                                     return FlSpot(
                                                         disks
                                                             .indexOf(disk)
                                                             .toDouble(),
-                                                        disk['disk'][i]
+                                                        disk['total']
                                                                 ['write_access']
                                                             .toDouble());
                                                   }).toList(),
                                                   isCurved: true,
-                                                  color: colors[i],
+                                                  color: Colors.blue,
                                                   barWidth: 2,
                                                   isStrokeCapRound: true,
                                                   dotData: FlDotData(
                                                     show: false,
                                                   ),
                                                 ),
-                                            ],
+                                                for (int i = 0;
+                                                    i <
+                                                        disks.last['disk']
+                                                            .length;
+                                                    i++)
+                                                  LineChartBarData(
+                                                    spots: disks.map((disk) {
+                                                      return FlSpot(
+                                                          disks
+                                                              .indexOf(disk)
+                                                              .toDouble(),
+                                                          disk['disk'][i][
+                                                                  'write_access']
+                                                              .toDouble());
+                                                    }).toList(),
+                                                    isCurved: true,
+                                                    color: colors[i],
+                                                    barWidth: 2,
+                                                    isStrokeCapRound: true,
+                                                    dotData: FlDotData(
+                                                      show: false,
+                                                    ),
+                                                  ),
+                                              ],
+                                            ),
                                           ),
                                         ),
                                       ),
                                     ),
                                   ),
-                                ),
-                                SizedBox(
-                                  height: 20,
-                                ),
-                              ],
+                                  SizedBox(
+                                    height: 20,
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                         ],
@@ -3196,885 +2983,865 @@ class _PerformanceState extends State<Performance>
                           SizedBox(
                             height: 20,
                           ),
-                          NeuCard(
-                            curveType: CurveType.flat,
+                          Card(
                             margin: EdgeInsets.only(
                                 left: 20, right: 20, bottom: 20),
-                            bevel: 20,
-                            decoration: NeumorphicDecoration(
-                              color: Theme.of(context).scaffoldBackgroundColor,
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                SizedBox(
-                                  height: 20,
-                                ),
-                                Padding(
-                                  padding: EdgeInsets.symmetric(horizontal: 20),
-                                  child: Text(
-                                    "利用率",
-                                    style: TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.w600),
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  SizedBox(
+                                    height: 20,
                                   ),
-                                ),
-                                AspectRatio(
-                                  aspectRatio: 1.70,
-                                  child: Padding(
-                                    padding: const EdgeInsets.only(
-                                        left: 20,
-                                        right: 20,
-                                        top: 20,
-                                        bottom: 5),
-                                    child: NeuCard(
-                                      curveType: CurveType.flat,
-                                      bevel: 20,
-                                      decoration: NeumorphicDecoration(
-                                        color: Theme.of(context)
-                                            .scaffoldBackgroundColor,
-                                        borderRadius: BorderRadius.circular(20),
-                                      ),
-                                      // padding: EdgeInsets.symmetric(horizontal: 10),
-                                      child: Padding(
-                                        padding: EdgeInsets.all(10),
-                                        child: LineChart(
-                                          LineChartData(
-                                            lineTouchData: LineTouchData(
-                                              touchTooltipData:
-                                                  LineTouchTooltipData(
-                                                      // tooltipBgColor: Colors
-                                                      //     .white
-                                                      //     .withOpacity(0.6),
-                                                      tooltipRoundedRadius: 20,
-                                                      fitInsideHorizontally:
-                                                          true,
-                                                      fitInsideVertically: true,
-                                                      getTooltipItems: (items) {
-                                                        return [
-                                                          for (int i = 0;
-                                                              i <
-                                                                  spaces
-                                                                      .last[
-                                                                          'volume']
-                                                                      .length;
-                                                              i++)
+                                  Padding(
+                                    padding:
+                                        EdgeInsets.symmetric(horizontal: 20),
+                                    child: Text(
+                                      "利用率",
+                                      style: TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.w600),
+                                    ),
+                                  ),
+                                  AspectRatio(
+                                    aspectRatio: 1.70,
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(
+                                          left: 20,
+                                          right: 20,
+                                          top: 20,
+                                          bottom: 5),
+                                      child: Card(
+                                        // padding: EdgeInsets.symmetric(horizontal: 10),
+                                        child: Padding(
+                                          padding: EdgeInsets.all(10),
+                                          child: LineChart(
+                                            LineChartData(
+                                              lineTouchData: LineTouchData(
+                                                touchTooltipData:
+                                                    LineTouchTooltipData(
+                                                        // tooltipBgColor: Colors
+                                                        //     .white
+                                                        //     .withOpacity(0.6),
+                                                        tooltipRoundedRadius:
+                                                            20,
+                                                        fitInsideHorizontally:
+                                                            true,
+                                                        fitInsideVertically:
+                                                            true,
+                                                        getTooltipItems:
+                                                            (items) {
+                                                          return [
+                                                            for (int i = 0;
+                                                                i <
+                                                                    spaces
+                                                                        .last[
+                                                                            'volume']
+                                                                        .length;
+                                                                i++)
+                                                              LineTooltipItem(
+                                                                "${spaces.last['volume'][i]['display_name']}：${spaces[items[0].spotIndex]['volume'][i]['utilization'].floor()}%",
+                                                                TextStyle(
+                                                                    color:
+                                                                        colors[
+                                                                            i]),
+                                                              ),
                                                             LineTooltipItem(
-                                                              "${spaces.last['volume'][i]['display_name']}：${spaces[items[0].spotIndex]['volume'][i]['utilization'].floor()}%",
-                                                              TextStyle(
-                                                                  color: colors[
-                                                                      i]),
-                                                            ),
-                                                          LineTooltipItem(
-                                                              "总计：${spaces[items[0].spotIndex]['total']['utilization'].floor()}%",
-                                                              TextStyle(
-                                                                  color: Colors
-                                                                      .blue)),
-                                                        ];
-                                                      }),
-                                            ),
-                                            gridData: FlGridData(
-                                              show: false,
-                                            ),
-                                            titlesData: FlTitlesData(
-                                              show: true,
-                                              bottomTitles: AxisTitles(
-                                                sideTitles: SideTitles(
-                                                  showTitles: false,
-                                                  reservedSize: 22,
-                                                ),
+                                                                "总计：${spaces[items[0].spotIndex]['total']['utilization'].floor()}%",
+                                                                TextStyle(
+                                                                    color: Colors
+                                                                        .blue)),
+                                                          ];
+                                                        }),
                                               ),
-                                              topTitles: AxisTitles(
-                                                  sideTitles: SideTitles(
-                                                      showTitles: false)),
-                                              rightTitles: AxisTitles(
-                                                  sideTitles: SideTitles(
-                                                      showTitles: false)),
-                                              leftTitles: AxisTitles(
-                                                  sideTitles: SideTitles(
-                                                showTitles: true,
-                                                getTitlesWidget: (value, _) {
-                                                  return Text(
-                                                    "${value.toInt()}%",
-                                                    style: TextStyle(
-                                                      color: Color(0xff67727d),
-                                                      fontSize: 12,
-                                                    ),
-                                                  );
-                                                },
-                                                reservedSize: 35,
-                                                interval: 10,
-                                              )),
-                                            ),
-                                            minY: 0,
-                                            maxY: 100,
-                                            // maxY: 20,
-                                            borderData: FlBorderData(
+                                              gridData: FlGridData(
+                                                show: false,
+                                              ),
+                                              titlesData: FlTitlesData(
                                                 show: true,
-                                                border: Border.all(
-                                                    color: Colors.black12,
-                                                    width: 1)),
-                                            lineBarsData: [
-                                              LineChartBarData(
-                                                spots: spaces.map((volume) {
-                                                  return FlSpot(
-                                                      spaces
-                                                          .indexOf(volume)
-                                                          .toDouble(),
-                                                      volume['total']
-                                                              ['utilization']
-                                                          .toDouble());
-                                                }).toList(),
-                                                isCurved: true,
-                                                color: Colors.blue,
-                                                barWidth: 2,
-                                                isStrokeCapRound: true,
-                                                dotData: FlDotData(
-                                                  show: false,
+                                                bottomTitles: AxisTitles(
+                                                  sideTitles: SideTitles(
+                                                    showTitles: false,
+                                                    reservedSize: 22,
+                                                  ),
                                                 ),
+                                                topTitles: AxisTitles(
+                                                    sideTitles: SideTitles(
+                                                        showTitles: false)),
+                                                rightTitles: AxisTitles(
+                                                    sideTitles: SideTitles(
+                                                        showTitles: false)),
+                                                leftTitles: AxisTitles(
+                                                    sideTitles: SideTitles(
+                                                  showTitles: true,
+                                                  getTitlesWidget: (value, _) {
+                                                    return Text(
+                                                      "${value.toInt()}%",
+                                                      style: TextStyle(
+                                                        color:
+                                                            Color(0xff67727d),
+                                                        fontSize: 12,
+                                                      ),
+                                                    );
+                                                  },
+                                                  reservedSize: 35,
+                                                  interval: 10,
+                                                )),
                                               ),
-                                              for (int i = 0;
-                                                  i <
-                                                      spaces.last['volume']
-                                                          .length;
-                                                  i++)
+                                              minY: 0,
+                                              maxY: 100,
+                                              // maxY: 20,
+                                              borderData: FlBorderData(
+                                                  show: true,
+                                                  border: Border.all(
+                                                      color: Colors.black12,
+                                                      width: 1)),
+                                              lineBarsData: [
                                                 LineChartBarData(
                                                   spots: spaces.map((volume) {
                                                     return FlSpot(
                                                         spaces
                                                             .indexOf(volume)
                                                             .toDouble(),
-                                                        volume['volume'][i]
+                                                        volume['total']
                                                                 ['utilization']
                                                             .toDouble());
                                                   }).toList(),
                                                   isCurved: true,
-                                                  color: colors[i],
+                                                  color: Colors.blue,
                                                   barWidth: 2,
                                                   isStrokeCapRound: true,
                                                   dotData: FlDotData(
                                                     show: false,
                                                   ),
                                                 ),
-                                            ],
+                                                for (int i = 0;
+                                                    i <
+                                                        spaces.last['volume']
+                                                            .length;
+                                                    i++)
+                                                  LineChartBarData(
+                                                    spots: spaces.map((volume) {
+                                                      return FlSpot(
+                                                          spaces
+                                                              .indexOf(volume)
+                                                              .toDouble(),
+                                                          volume['volume'][i][
+                                                                  'utilization']
+                                                              .toDouble());
+                                                    }).toList(),
+                                                    isCurved: true,
+                                                    color: colors[i],
+                                                    barWidth: 2,
+                                                    isStrokeCapRound: true,
+                                                    dotData: FlDotData(
+                                                      show: false,
+                                                    ),
+                                                  ),
+                                              ],
+                                            ),
                                           ),
                                         ),
                                       ),
                                     ),
                                   ),
-                                ),
-                                SizedBox(
-                                  height: 20,
-                                ),
-                              ],
+                                  SizedBox(
+                                    height: 20,
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
-                          NeuCard(
-                            curveType: CurveType.flat,
+                          Card(
                             margin: EdgeInsets.only(
                                 left: 20, right: 20, bottom: 20),
-                            bevel: 20,
-                            decoration: NeumorphicDecoration(
-                              color: Theme.of(context).scaffoldBackgroundColor,
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                SizedBox(
-                                  height: 20,
-                                ),
-                                Padding(
-                                  padding: EdgeInsets.symmetric(horizontal: 20),
-                                  child: Text(
-                                    "读取速度",
-                                    style: TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.w600),
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  SizedBox(
+                                    height: 20,
                                   ),
-                                ),
-                                AspectRatio(
-                                  aspectRatio: 1.70,
-                                  child: Padding(
-                                    padding: const EdgeInsets.only(
-                                        left: 20,
-                                        right: 20,
-                                        top: 20,
-                                        bottom: 5),
-                                    child: NeuCard(
-                                      curveType: CurveType.flat,
-                                      bevel: 20,
-                                      decoration: NeumorphicDecoration(
-                                        color: Theme.of(context)
-                                            .scaffoldBackgroundColor,
-                                        borderRadius: BorderRadius.circular(20),
-                                      ),
-                                      // padding: EdgeInsets.symmetric(horizontal: 10),
-                                      child: Padding(
-                                        padding: EdgeInsets.all(10),
-                                        child: LineChart(
-                                          LineChartData(
-                                            lineTouchData: LineTouchData(
-                                              touchTooltipData:
-                                                  LineTouchTooltipData(
-                                                      // tooltipBgColor: Colors
-                                                      //     .white
-                                                      //     .withOpacity(0.6),
-                                                      tooltipRoundedRadius: 20,
-                                                      fitInsideHorizontally:
-                                                          true,
-                                                      fitInsideVertically: true,
-                                                      getTooltipItems: (items) {
-                                                        return [
-                                                          for (int i = 0;
-                                                              i <
-                                                                  spaces
-                                                                      .last[
-                                                                          'volume']
-                                                                      .length;
-                                                              i++)
+                                  Padding(
+                                    padding:
+                                        EdgeInsets.symmetric(horizontal: 20),
+                                    child: Text(
+                                      "读取速度",
+                                      style: TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.w600),
+                                    ),
+                                  ),
+                                  AspectRatio(
+                                    aspectRatio: 1.70,
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(
+                                          left: 20,
+                                          right: 20,
+                                          top: 20,
+                                          bottom: 5),
+                                      child: Card(
+                                        // padding: EdgeInsets.symmetric(horizontal: 10),
+                                        child: Padding(
+                                          padding: EdgeInsets.all(10),
+                                          child: LineChart(
+                                            LineChartData(
+                                              lineTouchData: LineTouchData(
+                                                touchTooltipData:
+                                                    LineTouchTooltipData(
+                                                        // tooltipBgColor: Colors
+                                                        //     .white
+                                                        //     .withOpacity(0.6),
+                                                        tooltipRoundedRadius:
+                                                            20,
+                                                        fitInsideHorizontally:
+                                                            true,
+                                                        fitInsideVertically:
+                                                            true,
+                                                        getTooltipItems:
+                                                            (items) {
+                                                          return [
+                                                            for (int i = 0;
+                                                                i <
+                                                                    spaces
+                                                                        .last[
+                                                                            'volume']
+                                                                        .length;
+                                                                i++)
+                                                              LineTooltipItem(
+                                                                "${spaces.last['volume'][i]['display_name']}：${Util.formatSize(spaces[items[0].spotIndex]['volume'][i]['read_byte'].floor())}",
+                                                                TextStyle(
+                                                                    color:
+                                                                        colors[
+                                                                            i]),
+                                                              ),
                                                             LineTooltipItem(
-                                                              "${spaces.last['volume'][i]['display_name']}：${Util.formatSize(spaces[items[0].spotIndex]['volume'][i]['read_byte'].floor())}",
-                                                              TextStyle(
-                                                                  color: colors[
-                                                                      i]),
-                                                            ),
-                                                          LineTooltipItem(
-                                                              "总计：${Util.formatSize(spaces[items[0].spotIndex]['total']['read_byte'].floor())}",
-                                                              TextStyle(
-                                                                  color: Colors
-                                                                      .blue)),
-                                                        ];
-                                                      }),
-                                            ),
-                                            gridData: FlGridData(
-                                              show: false,
-                                            ),
-                                            titlesData: FlTitlesData(
-                                              show: true,
-                                              bottomTitles: AxisTitles(
-                                                sideTitles: SideTitles(
-                                                  showTitles: false,
-                                                  reservedSize: 22,
-                                                ),
+                                                                "总计：${Util.formatSize(spaces[items[0].spotIndex]['total']['read_byte'].floor())}",
+                                                                TextStyle(
+                                                                    color: Colors
+                                                                        .blue)),
+                                                          ];
+                                                        }),
                                               ),
-                                              topTitles: AxisTitles(
-                                                  sideTitles: SideTitles(
-                                                      showTitles: false)),
-                                              rightTitles: AxisTitles(
-                                                  sideTitles: SideTitles(
-                                                      showTitles: false)),
-                                              leftTitles: AxisTitles(
-                                                  sideTitles: SideTitles(
-                                                showTitles: true,
-                                                getTitlesWidget: (value, _) {
-                                                  return Text(
-                                                    Util.formatSize(value,
-                                                        fixed: 0),
-                                                    style: TextStyle(
-                                                      color: Color(0xff67727d),
-                                                      fontSize: 12,
-                                                    ),
-                                                  );
-                                                },
-                                                reservedSize: 28,
-                                                interval: Util.chartInterval(
-                                                    maxVolumeReadSpeed),
-                                              )),
-                                            ),
-                                            minY: 0,
-                                            // maxY: 20,
-                                            borderData: FlBorderData(
+                                              gridData: FlGridData(
+                                                show: false,
+                                              ),
+                                              titlesData: FlTitlesData(
                                                 show: true,
-                                                border: Border.all(
-                                                    color: Colors.black12,
-                                                    width: 1)),
-                                            lineBarsData: [
-                                              LineChartBarData(
-                                                spots: spaces.map((volume) {
-                                                  return FlSpot(
-                                                      spaces
-                                                          .indexOf(volume)
-                                                          .toDouble(),
-                                                      volume['total']
-                                                              ['read_byte']
-                                                          .toDouble());
-                                                }).toList(),
-                                                isCurved: true,
-                                                color: Colors.blue,
-                                                barWidth: 2,
-                                                isStrokeCapRound: true,
-                                                dotData: FlDotData(
-                                                  show: false,
+                                                bottomTitles: AxisTitles(
+                                                  sideTitles: SideTitles(
+                                                    showTitles: false,
+                                                    reservedSize: 22,
+                                                  ),
                                                 ),
+                                                topTitles: AxisTitles(
+                                                    sideTitles: SideTitles(
+                                                        showTitles: false)),
+                                                rightTitles: AxisTitles(
+                                                    sideTitles: SideTitles(
+                                                        showTitles: false)),
+                                                leftTitles: AxisTitles(
+                                                    sideTitles: SideTitles(
+                                                  showTitles: true,
+                                                  getTitlesWidget: (value, _) {
+                                                    return Text(
+                                                      Util.formatSize(value,
+                                                          fixed: 0),
+                                                      style: TextStyle(
+                                                        color:
+                                                            Color(0xff67727d),
+                                                        fontSize: 12,
+                                                      ),
+                                                    );
+                                                  },
+                                                  reservedSize: 28,
+                                                  interval: Util.chartInterval(
+                                                      maxVolumeReadSpeed),
+                                                )),
                                               ),
-                                              for (int i = 0;
-                                                  i <
-                                                      spaces.last['volume']
-                                                          .length;
-                                                  i++)
+                                              minY: 0,
+                                              // maxY: 20,
+                                              borderData: FlBorderData(
+                                                  show: true,
+                                                  border: Border.all(
+                                                      color: Colors.black12,
+                                                      width: 1)),
+                                              lineBarsData: [
                                                 LineChartBarData(
                                                   spots: spaces.map((volume) {
                                                     return FlSpot(
                                                         spaces
                                                             .indexOf(volume)
                                                             .toDouble(),
-                                                        volume['volume'][i]
+                                                        volume['total']
                                                                 ['read_byte']
                                                             .toDouble());
                                                   }).toList(),
                                                   isCurved: true,
-                                                  color: colors[i],
+                                                  color: Colors.blue,
                                                   barWidth: 2,
                                                   isStrokeCapRound: true,
                                                   dotData: FlDotData(
                                                     show: false,
                                                   ),
                                                 ),
-                                            ],
+                                                for (int i = 0;
+                                                    i <
+                                                        spaces.last['volume']
+                                                            .length;
+                                                    i++)
+                                                  LineChartBarData(
+                                                    spots: spaces.map((volume) {
+                                                      return FlSpot(
+                                                          spaces
+                                                              .indexOf(volume)
+                                                              .toDouble(),
+                                                          volume['volume'][i]
+                                                                  ['read_byte']
+                                                              .toDouble());
+                                                    }).toList(),
+                                                    isCurved: true,
+                                                    color: colors[i],
+                                                    barWidth: 2,
+                                                    isStrokeCapRound: true,
+                                                    dotData: FlDotData(
+                                                      show: false,
+                                                    ),
+                                                  ),
+                                              ],
+                                            ),
                                           ),
                                         ),
                                       ),
                                     ),
                                   ),
-                                ),
-                                SizedBox(
-                                  height: 20,
-                                ),
-                              ],
+                                  SizedBox(
+                                    height: 20,
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
-                          NeuCard(
-                            curveType: CurveType.flat,
+                          Card(
                             margin: EdgeInsets.only(
                                 left: 20, right: 20, bottom: 20),
-                            bevel: 20,
-                            decoration: NeumorphicDecoration(
-                              color: Theme.of(context).scaffoldBackgroundColor,
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                SizedBox(
-                                  height: 20,
-                                ),
-                                Padding(
-                                  padding: EdgeInsets.symmetric(horizontal: 20),
-                                  child: Text(
-                                    "写入速度",
-                                    style: TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.w600),
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  SizedBox(
+                                    height: 20,
                                   ),
-                                ),
-                                AspectRatio(
-                                  aspectRatio: 1.70,
-                                  child: Padding(
-                                    padding: const EdgeInsets.only(
-                                        left: 20,
-                                        right: 20,
-                                        top: 20,
-                                        bottom: 5),
-                                    child: NeuCard(
-                                      curveType: CurveType.flat,
-                                      bevel: 20,
-                                      decoration: NeumorphicDecoration(
-                                        color: Theme.of(context)
-                                            .scaffoldBackgroundColor,
-                                        borderRadius: BorderRadius.circular(20),
-                                      ),
-                                      // padding: EdgeInsets.symmetric(horizontal: 10),
-                                      child: Padding(
-                                        padding: EdgeInsets.all(10),
-                                        child: LineChart(
-                                          LineChartData(
-                                            lineTouchData: LineTouchData(
-                                              touchTooltipData:
-                                                  LineTouchTooltipData(
-                                                      // tooltipBgColor: Colors
-                                                      //     .white
-                                                      //     .withOpacity(0.6),
-                                                      tooltipRoundedRadius: 20,
-                                                      fitInsideHorizontally:
-                                                          true,
-                                                      fitInsideVertically: true,
-                                                      getTooltipItems: (items) {
-                                                        return [
-                                                          for (int i = 0;
-                                                              i <
-                                                                  spaces
-                                                                      .last[
-                                                                          'volume']
-                                                                      .length;
-                                                              i++)
+                                  Padding(
+                                    padding:
+                                        EdgeInsets.symmetric(horizontal: 20),
+                                    child: Text(
+                                      "写入速度",
+                                      style: TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.w600),
+                                    ),
+                                  ),
+                                  AspectRatio(
+                                    aspectRatio: 1.70,
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(
+                                          left: 20,
+                                          right: 20,
+                                          top: 20,
+                                          bottom: 5),
+                                      child: Card(
+                                        // padding: EdgeInsets.symmetric(horizontal: 10),
+                                        child: Padding(
+                                          padding: EdgeInsets.all(10),
+                                          child: LineChart(
+                                            LineChartData(
+                                              lineTouchData: LineTouchData(
+                                                touchTooltipData:
+                                                    LineTouchTooltipData(
+                                                        // tooltipBgColor: Colors
+                                                        //     .white
+                                                        //     .withOpacity(0.6),
+                                                        tooltipRoundedRadius:
+                                                            20,
+                                                        fitInsideHorizontally:
+                                                            true,
+                                                        fitInsideVertically:
+                                                            true,
+                                                        getTooltipItems:
+                                                            (items) {
+                                                          return [
+                                                            for (int i = 0;
+                                                                i <
+                                                                    spaces
+                                                                        .last[
+                                                                            'volume']
+                                                                        .length;
+                                                                i++)
+                                                              LineTooltipItem(
+                                                                "${spaces.last['volume'][i]['display_name']}：${Util.formatSize(spaces[items[0].spotIndex]['volume'][i]['write_byte'].floor())}",
+                                                                TextStyle(
+                                                                    color:
+                                                                        colors[
+                                                                            i]),
+                                                              ),
                                                             LineTooltipItem(
-                                                              "${spaces.last['volume'][i]['display_name']}：${Util.formatSize(spaces[items[0].spotIndex]['volume'][i]['write_byte'].floor())}",
-                                                              TextStyle(
-                                                                  color: colors[
-                                                                      i]),
-                                                            ),
-                                                          LineTooltipItem(
-                                                              "总计：${Util.formatSize(spaces[items[0].spotIndex]['total']['write_byte'].floor())}",
-                                                              TextStyle(
-                                                                  color: Colors
-                                                                      .blue)),
-                                                        ];
-                                                      }),
-                                            ),
-                                            gridData: FlGridData(
-                                              show: false,
-                                            ),
-                                            titlesData: FlTitlesData(
-                                              show: true,
-                                              bottomTitles: AxisTitles(
-                                                sideTitles: SideTitles(
-                                                  showTitles: false,
-                                                  reservedSize: 22,
-                                                ),
+                                                                "总计：${Util.formatSize(spaces[items[0].spotIndex]['total']['write_byte'].floor())}",
+                                                                TextStyle(
+                                                                    color: Colors
+                                                                        .blue)),
+                                                          ];
+                                                        }),
                                               ),
-                                              topTitles: AxisTitles(
-                                                  sideTitles: SideTitles(
-                                                      showTitles: false)),
-                                              rightTitles: AxisTitles(
-                                                  sideTitles: SideTitles(
-                                                      showTitles: false)),
-                                              leftTitles: AxisTitles(
-                                                  sideTitles: SideTitles(
-                                                showTitles: true,
-                                                getTitlesWidget: (value, _) {
-                                                  return Text(
-                                                    Util.formatSize(value,
-                                                        fixed: 0),
-                                                    style: TextStyle(
-                                                      color: Color(0xff67727d),
-                                                      fontSize: 12,
-                                                    ),
-                                                  );
-                                                },
-                                                // getTextStyles: (value, _) => const ,
-                                                // getTitles: Util.formatSize,
-                                                // getTitles: (value) {
-                                                //   value = value / 1000 / 1000;
-                                                //   return (value.floor() * 1000).toString();
-                                                // },
-                                                reservedSize: 28,
-                                                interval: Util.chartInterval(
-                                                    maxVolumeWriteSpeed),
-                                              )),
-                                            ),
-                                            minY: 0,
-                                            // maxY: 20,
-                                            borderData: FlBorderData(
+                                              gridData: FlGridData(
+                                                show: false,
+                                              ),
+                                              titlesData: FlTitlesData(
                                                 show: true,
-                                                border: Border.all(
-                                                    color: Colors.black12,
-                                                    width: 1)),
-                                            lineBarsData: [
-                                              LineChartBarData(
-                                                spots: spaces.map((volume) {
-                                                  return FlSpot(
-                                                      spaces
-                                                          .indexOf(volume)
-                                                          .toDouble(),
-                                                      volume['total']
-                                                              ['write_byte']
-                                                          .toDouble());
-                                                }).toList(),
-                                                isCurved: true,
-                                                color: Colors.blue,
-                                                barWidth: 2,
-                                                isStrokeCapRound: true,
-                                                dotData: FlDotData(
-                                                  show: false,
+                                                bottomTitles: AxisTitles(
+                                                  sideTitles: SideTitles(
+                                                    showTitles: false,
+                                                    reservedSize: 22,
+                                                  ),
                                                 ),
+                                                topTitles: AxisTitles(
+                                                    sideTitles: SideTitles(
+                                                        showTitles: false)),
+                                                rightTitles: AxisTitles(
+                                                    sideTitles: SideTitles(
+                                                        showTitles: false)),
+                                                leftTitles: AxisTitles(
+                                                    sideTitles: SideTitles(
+                                                  showTitles: true,
+                                                  getTitlesWidget: (value, _) {
+                                                    return Text(
+                                                      Util.formatSize(value,
+                                                          fixed: 0),
+                                                      style: TextStyle(
+                                                        color:
+                                                            Color(0xff67727d),
+                                                        fontSize: 12,
+                                                      ),
+                                                    );
+                                                  },
+                                                  // getTextStyles: (value, _) => const ,
+                                                  // getTitles: Util.formatSize,
+                                                  // getTitles: (value) {
+                                                  //   value = value / 1000 / 1000;
+                                                  //   return (value.floor() * 1000).toString();
+                                                  // },
+                                                  reservedSize: 28,
+                                                  interval: Util.chartInterval(
+                                                      maxVolumeWriteSpeed),
+                                                )),
                                               ),
-                                              for (int i = 0;
-                                                  i <
-                                                      spaces.last['volume']
-                                                          .length;
-                                                  i++)
+                                              minY: 0,
+                                              // maxY: 20,
+                                              borderData: FlBorderData(
+                                                  show: true,
+                                                  border: Border.all(
+                                                      color: Colors.black12,
+                                                      width: 1)),
+                                              lineBarsData: [
                                                 LineChartBarData(
                                                   spots: spaces.map((volume) {
                                                     return FlSpot(
                                                         spaces
                                                             .indexOf(volume)
                                                             .toDouble(),
-                                                        volume['volume'][i]
+                                                        volume['total']
                                                                 ['write_byte']
                                                             .toDouble());
                                                   }).toList(),
                                                   isCurved: true,
-                                                  color: colors[i],
+                                                  color: Colors.blue,
                                                   barWidth: 2,
                                                   isStrokeCapRound: true,
                                                   dotData: FlDotData(
                                                     show: false,
                                                   ),
                                                 ),
-                                            ],
+                                                for (int i = 0;
+                                                    i <
+                                                        spaces.last['volume']
+                                                            .length;
+                                                    i++)
+                                                  LineChartBarData(
+                                                    spots: spaces.map((volume) {
+                                                      return FlSpot(
+                                                          spaces
+                                                              .indexOf(volume)
+                                                              .toDouble(),
+                                                          volume['volume'][i]
+                                                                  ['write_byte']
+                                                              .toDouble());
+                                                    }).toList(),
+                                                    isCurved: true,
+                                                    color: colors[i],
+                                                    barWidth: 2,
+                                                    isStrokeCapRound: true,
+                                                    dotData: FlDotData(
+                                                      show: false,
+                                                    ),
+                                                  ),
+                                              ],
+                                            ),
                                           ),
                                         ),
                                       ),
                                     ),
                                   ),
-                                ),
-                                SizedBox(
-                                  height: 20,
-                                ),
-                              ],
+                                  SizedBox(
+                                    height: 20,
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
-                          NeuCard(
-                            curveType: CurveType.flat,
+                          Card(
                             margin: EdgeInsets.only(
                                 left: 20, right: 20, bottom: 20),
-                            bevel: 20,
-                            decoration: NeumorphicDecoration(
-                              color: Theme.of(context).scaffoldBackgroundColor,
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                SizedBox(
-                                  height: 20,
-                                ),
-                                Padding(
-                                  padding: EdgeInsets.symmetric(horizontal: 20),
-                                  child: Text(
-                                    "读取IOPS",
-                                    style: TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.w600),
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  SizedBox(
+                                    height: 20,
                                   ),
-                                ),
-                                AspectRatio(
-                                  aspectRatio: 1.70,
-                                  child: Padding(
-                                    padding: const EdgeInsets.only(
-                                        left: 20,
-                                        right: 20,
-                                        top: 20,
-                                        bottom: 5),
-                                    child: NeuCard(
-                                      curveType: CurveType.flat,
-                                      bevel: 20,
-                                      decoration: NeumorphicDecoration(
-                                        color: Theme.of(context)
-                                            .scaffoldBackgroundColor,
-                                        borderRadius: BorderRadius.circular(20),
-                                      ),
-                                      // padding: EdgeInsets.symmetric(horizontal: 10),
-                                      child: Padding(
-                                        padding: EdgeInsets.all(10),
-                                        child: LineChart(
-                                          LineChartData(
-                                            lineTouchData: LineTouchData(
-                                              touchTooltipData:
-                                                  LineTouchTooltipData(
-                                                      // tooltipBgColor: Colors
-                                                      //     .white
-                                                      //     .withOpacity(0.6),
-                                                      tooltipRoundedRadius: 20,
-                                                      fitInsideHorizontally:
-                                                          true,
-                                                      fitInsideVertically: true,
-                                                      getTooltipItems: (items) {
-                                                        return [
-                                                          for (int i = 0;
-                                                              i <
-                                                                  spaces
-                                                                      .last[
-                                                                          'volume']
-                                                                      .length;
-                                                              i++)
+                                  Padding(
+                                    padding:
+                                        EdgeInsets.symmetric(horizontal: 20),
+                                    child: Text(
+                                      "读取IOPS",
+                                      style: TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.w600),
+                                    ),
+                                  ),
+                                  AspectRatio(
+                                    aspectRatio: 1.70,
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(
+                                          left: 20,
+                                          right: 20,
+                                          top: 20,
+                                          bottom: 5),
+                                      child: Card(
+                                        // padding: EdgeInsets.symmetric(horizontal: 10),
+                                        child: Padding(
+                                          padding: EdgeInsets.all(10),
+                                          child: LineChart(
+                                            LineChartData(
+                                              lineTouchData: LineTouchData(
+                                                touchTooltipData:
+                                                    LineTouchTooltipData(
+                                                        // tooltipBgColor: Colors
+                                                        //     .white
+                                                        //     .withOpacity(0.6),
+                                                        tooltipRoundedRadius:
+                                                            20,
+                                                        fitInsideHorizontally:
+                                                            true,
+                                                        fitInsideVertically:
+                                                            true,
+                                                        getTooltipItems:
+                                                            (items) {
+                                                          return [
+                                                            for (int i = 0;
+                                                                i <
+                                                                    spaces
+                                                                        .last[
+                                                                            'volume']
+                                                                        .length;
+                                                                i++)
+                                                              LineTooltipItem(
+                                                                "${spaces.last['volume'][i]['display_name']}：${spaces[items[0].spotIndex]['volume'][i]['read_access'].floor()}",
+                                                                TextStyle(
+                                                                    color:
+                                                                        colors[
+                                                                            i]),
+                                                              ),
                                                             LineTooltipItem(
-                                                              "${spaces.last['volume'][i]['display_name']}：${spaces[items[0].spotIndex]['volume'][i]['read_access'].floor()}",
-                                                              TextStyle(
-                                                                  color: colors[
-                                                                      i]),
-                                                            ),
-                                                          LineTooltipItem(
-                                                              "总计：${spaces[items[0].spotIndex]['total']['read_access'].floor()}",
-                                                              TextStyle(
-                                                                  color: Colors
-                                                                      .blue)),
-                                                        ];
-                                                      }),
-                                            ),
-                                            gridData: FlGridData(
-                                              show: false,
-                                            ),
-                                            titlesData: FlTitlesData(
-                                              show: true,
-                                              bottomTitles: AxisTitles(
-                                                sideTitles: SideTitles(
-                                                  showTitles: false,
-                                                  reservedSize: 22,
-                                                ),
+                                                                "总计：${spaces[items[0].spotIndex]['total']['read_access'].floor()}",
+                                                                TextStyle(
+                                                                    color: Colors
+                                                                        .blue)),
+                                                          ];
+                                                        }),
                                               ),
-                                              topTitles: AxisTitles(
-                                                  sideTitles: SideTitles(
-                                                      showTitles: false)),
-                                              rightTitles: AxisTitles(
-                                                  sideTitles: SideTitles(
-                                                      showTitles: false)),
-                                              leftTitles: AxisTitles(
-                                                  sideTitles: SideTitles(
-                                                showTitles: true,
-                                                getTitlesWidget: (value, _) {
-                                                  return Text(
-                                                    "${value.toInt()}",
-                                                    style: TextStyle(
-                                                      color: Color(0xff67727d),
-                                                      fontSize: 12,
-                                                    ),
-                                                  );
-                                                },
-                                                reservedSize: 28,
-                                                // interval: 10,
-                                              )),
-                                            ),
-                                            minY: 0,
-                                            // maxY: 20,
-                                            borderData: FlBorderData(
+                                              gridData: FlGridData(
+                                                show: false,
+                                              ),
+                                              titlesData: FlTitlesData(
                                                 show: true,
-                                                border: Border.all(
-                                                    color: Colors.black12,
-                                                    width: 1)),
-                                            lineBarsData: [
-                                              LineChartBarData(
-                                                spots: spaces.map((volume) {
-                                                  return FlSpot(
-                                                      spaces
-                                                          .indexOf(volume)
-                                                          .toDouble(),
-                                                      volume['total']
-                                                              ['read_access']
-                                                          .toDouble());
-                                                }).toList(),
-                                                isCurved: true,
-                                                color: Colors.blue,
-                                                barWidth: 2,
-                                                isStrokeCapRound: true,
-                                                dotData: FlDotData(
-                                                  show: false,
+                                                bottomTitles: AxisTitles(
+                                                  sideTitles: SideTitles(
+                                                    showTitles: false,
+                                                    reservedSize: 22,
+                                                  ),
                                                 ),
+                                                topTitles: AxisTitles(
+                                                    sideTitles: SideTitles(
+                                                        showTitles: false)),
+                                                rightTitles: AxisTitles(
+                                                    sideTitles: SideTitles(
+                                                        showTitles: false)),
+                                                leftTitles: AxisTitles(
+                                                    sideTitles: SideTitles(
+                                                  showTitles: true,
+                                                  getTitlesWidget: (value, _) {
+                                                    return Text(
+                                                      "${value.toInt()}",
+                                                      style: TextStyle(
+                                                        color:
+                                                            Color(0xff67727d),
+                                                        fontSize: 12,
+                                                      ),
+                                                    );
+                                                  },
+                                                  reservedSize: 28,
+                                                  // interval: 10,
+                                                )),
                                               ),
-                                              for (int i = 0;
-                                                  i <
-                                                      spaces.last['volume']
-                                                          .length;
-                                                  i++)
+                                              minY: 0,
+                                              // maxY: 20,
+                                              borderData: FlBorderData(
+                                                  show: true,
+                                                  border: Border.all(
+                                                      color: Colors.black12,
+                                                      width: 1)),
+                                              lineBarsData: [
                                                 LineChartBarData(
                                                   spots: spaces.map((volume) {
                                                     return FlSpot(
                                                         spaces
                                                             .indexOf(volume)
                                                             .toDouble(),
-                                                        volume['volume'][i]
+                                                        volume['total']
                                                                 ['read_access']
                                                             .toDouble());
                                                   }).toList(),
                                                   isCurved: true,
-                                                  color: colors[i],
+                                                  color: Colors.blue,
                                                   barWidth: 2,
                                                   isStrokeCapRound: true,
                                                   dotData: FlDotData(
                                                     show: false,
                                                   ),
                                                 ),
-                                            ],
+                                                for (int i = 0;
+                                                    i <
+                                                        spaces.last['volume']
+                                                            .length;
+                                                    i++)
+                                                  LineChartBarData(
+                                                    spots: spaces.map((volume) {
+                                                      return FlSpot(
+                                                          spaces
+                                                              .indexOf(volume)
+                                                              .toDouble(),
+                                                          volume['volume'][i][
+                                                                  'read_access']
+                                                              .toDouble());
+                                                    }).toList(),
+                                                    isCurved: true,
+                                                    color: colors[i],
+                                                    barWidth: 2,
+                                                    isStrokeCapRound: true,
+                                                    dotData: FlDotData(
+                                                      show: false,
+                                                    ),
+                                                  ),
+                                              ],
+                                            ),
                                           ),
                                         ),
                                       ),
                                     ),
                                   ),
-                                ),
-                                SizedBox(
-                                  height: 20,
-                                ),
-                              ],
+                                  SizedBox(
+                                    height: 20,
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
-                          NeuCard(
-                            curveType: CurveType.flat,
+                          Card(
                             margin: EdgeInsets.only(
                                 left: 20, right: 20, bottom: 20),
-                            bevel: 20,
-                            decoration: NeumorphicDecoration(
-                              color: Theme.of(context).scaffoldBackgroundColor,
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                SizedBox(
-                                  height: 20,
-                                ),
-                                Padding(
-                                  padding: EdgeInsets.symmetric(horizontal: 20),
-                                  child: Text(
-                                    "写入IOPS",
-                                    style: TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.w600),
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  SizedBox(
+                                    height: 20,
                                   ),
-                                ),
-                                AspectRatio(
-                                  aspectRatio: 1.70,
-                                  child: Padding(
-                                    padding: const EdgeInsets.only(
-                                        left: 20,
-                                        right: 20,
-                                        top: 20,
-                                        bottom: 5),
-                                    child: NeuCard(
-                                      curveType: CurveType.flat,
-                                      bevel: 20,
-                                      decoration: NeumorphicDecoration(
-                                        color: Theme.of(context)
-                                            .scaffoldBackgroundColor,
-                                        borderRadius: BorderRadius.circular(20),
-                                      ),
-                                      // padding: EdgeInsets.symmetric(horizontal: 10),
-                                      child: Padding(
-                                        padding: EdgeInsets.all(10),
-                                        child: LineChart(
-                                          LineChartData(
-                                            lineTouchData: LineTouchData(
-                                              touchTooltipData:
-                                                  LineTouchTooltipData(
-                                                      // tooltipBgColor: Colors
-                                                      //     .white
-                                                      //     .withOpacity(0.6),
-                                                      tooltipRoundedRadius: 20,
-                                                      fitInsideHorizontally:
-                                                          true,
-                                                      fitInsideVertically: true,
-                                                      getTooltipItems: (items) {
-                                                        return [
-                                                          for (int i = 0;
-                                                              i <
-                                                                  spaces
-                                                                      .last[
-                                                                          'volume']
-                                                                      .length;
-                                                              i++)
+                                  Padding(
+                                    padding:
+                                        EdgeInsets.symmetric(horizontal: 20),
+                                    child: Text(
+                                      "写入IOPS",
+                                      style: TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.w600),
+                                    ),
+                                  ),
+                                  AspectRatio(
+                                    aspectRatio: 1.70,
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(
+                                          left: 20,
+                                          right: 20,
+                                          top: 20,
+                                          bottom: 5),
+                                      child: Card(
+                                        // padding: EdgeInsets.symmetric(horizontal: 10),
+                                        child: Padding(
+                                          padding: EdgeInsets.all(10),
+                                          child: LineChart(
+                                            LineChartData(
+                                              lineTouchData: LineTouchData(
+                                                touchTooltipData:
+                                                    LineTouchTooltipData(
+                                                        // tooltipBgColor: Colors
+                                                        //     .white
+                                                        //     .withOpacity(0.6),
+                                                        tooltipRoundedRadius:
+                                                            20,
+                                                        fitInsideHorizontally:
+                                                            true,
+                                                        fitInsideVertically:
+                                                            true,
+                                                        getTooltipItems:
+                                                            (items) {
+                                                          return [
+                                                            for (int i = 0;
+                                                                i <
+                                                                    spaces
+                                                                        .last[
+                                                                            'volume']
+                                                                        .length;
+                                                                i++)
+                                                              LineTooltipItem(
+                                                                "${spaces.last['volume'][i]['display_name']}：${Util.formatSize(spaces[items[0].spotIndex]['volume'][i]['write_access'].floor())}",
+                                                                TextStyle(
+                                                                    color:
+                                                                        colors[
+                                                                            i]),
+                                                              ),
                                                             LineTooltipItem(
-                                                              "${spaces.last['volume'][i]['display_name']}：${Util.formatSize(spaces[items[0].spotIndex]['volume'][i]['write_access'].floor())}",
-                                                              TextStyle(
-                                                                  color: colors[
-                                                                      i]),
-                                                            ),
-                                                          LineTooltipItem(
-                                                              "总计：${Util.formatSize(spaces[items[0].spotIndex]['total']['write_access'].floor())}",
-                                                              TextStyle(
-                                                                  color: Colors
-                                                                      .blue)),
-                                                        ];
-                                                      }),
-                                            ),
-                                            gridData: FlGridData(
-                                              show: false,
-                                            ),
-                                            titlesData: FlTitlesData(
-                                              show: true,
-                                              bottomTitles: AxisTitles(
-                                                sideTitles: SideTitles(
-                                                  showTitles: false,
-                                                  reservedSize: 22,
-                                                ),
+                                                                "总计：${Util.formatSize(spaces[items[0].spotIndex]['total']['write_access'].floor())}",
+                                                                TextStyle(
+                                                                    color: Colors
+                                                                        .blue)),
+                                                          ];
+                                                        }),
                                               ),
-                                              topTitles: AxisTitles(
-                                                  sideTitles: SideTitles(
-                                                      showTitles: false)),
-                                              rightTitles: AxisTitles(
-                                                  sideTitles: SideTitles(
-                                                      showTitles: false)),
-                                              leftTitles: AxisTitles(
-                                                  sideTitles: SideTitles(
-                                                showTitles: true,
-                                                getTitlesWidget: (value, _) {
-                                                  return Text(
-                                                    "${value.toInt()}",
-                                                    style: TextStyle(
-                                                      color: Color(0xff67727d),
-                                                      fontSize: 12,
-                                                    ),
-                                                  );
-                                                },
-                                                // getTextStyles: (value, _) => const ,
-                                                // getTitles: Util.formatSize,
-                                                // getTitles: (value) {
-                                                //   value = value / 1000 / 1000;
-                                                //   return (value.floor() * 1000).toString();
-                                                // },
-                                                reservedSize: 28,
-                                                // interval: 10,
-                                              )),
-                                            ),
-                                            // maxY: 20,
-                                            borderData: FlBorderData(
+                                              gridData: FlGridData(
+                                                show: false,
+                                              ),
+                                              titlesData: FlTitlesData(
                                                 show: true,
-                                                border: Border.all(
-                                                    color: Colors.black12,
-                                                    width: 1)),
-                                            lineBarsData: [
-                                              LineChartBarData(
-                                                spots: spaces.map((volume) {
-                                                  return FlSpot(
-                                                      spaces
-                                                          .indexOf(volume)
-                                                          .toDouble(),
-                                                      volume['total']
-                                                              ['write_access']
-                                                          .toDouble());
-                                                }).toList(),
-                                                isCurved: true,
-                                                color: Colors.blue,
-                                                barWidth: 2,
-                                                isStrokeCapRound: true,
-                                                dotData: FlDotData(
-                                                  show: false,
+                                                bottomTitles: AxisTitles(
+                                                  sideTitles: SideTitles(
+                                                    showTitles: false,
+                                                    reservedSize: 22,
+                                                  ),
                                                 ),
+                                                topTitles: AxisTitles(
+                                                    sideTitles: SideTitles(
+                                                        showTitles: false)),
+                                                rightTitles: AxisTitles(
+                                                    sideTitles: SideTitles(
+                                                        showTitles: false)),
+                                                leftTitles: AxisTitles(
+                                                    sideTitles: SideTitles(
+                                                  showTitles: true,
+                                                  getTitlesWidget: (value, _) {
+                                                    return Text(
+                                                      "${value.toInt()}",
+                                                      style: TextStyle(
+                                                        color:
+                                                            Color(0xff67727d),
+                                                        fontSize: 12,
+                                                      ),
+                                                    );
+                                                  },
+                                                  // getTextStyles: (value, _) => const ,
+                                                  // getTitles: Util.formatSize,
+                                                  // getTitles: (value) {
+                                                  //   value = value / 1000 / 1000;
+                                                  //   return (value.floor() * 1000).toString();
+                                                  // },
+                                                  reservedSize: 28,
+                                                  // interval: 10,
+                                                )),
                                               ),
-                                              for (int i = 0;
-                                                  i <
-                                                      spaces.last['volume']
-                                                          .length;
-                                                  i++)
+                                              // maxY: 20,
+                                              borderData: FlBorderData(
+                                                  show: true,
+                                                  border: Border.all(
+                                                      color: Colors.black12,
+                                                      width: 1)),
+                                              lineBarsData: [
                                                 LineChartBarData(
                                                   spots: spaces.map((volume) {
                                                     return FlSpot(
                                                         spaces
                                                             .indexOf(volume)
                                                             .toDouble(),
-                                                        volume['volume'][i]
+                                                        volume['total']
                                                                 ['write_access']
                                                             .toDouble());
                                                   }).toList(),
                                                   isCurved: true,
-                                                  color: colors[i],
+                                                  color: Colors.blue,
                                                   barWidth: 2,
                                                   isStrokeCapRound: true,
                                                   dotData: FlDotData(
                                                     show: false,
                                                   ),
                                                 ),
-                                            ],
+                                                for (int i = 0;
+                                                    i <
+                                                        spaces.last['volume']
+                                                            .length;
+                                                    i++)
+                                                  LineChartBarData(
+                                                    spots: spaces.map((volume) {
+                                                      return FlSpot(
+                                                          spaces
+                                                              .indexOf(volume)
+                                                              .toDouble(),
+                                                          volume['volume'][i][
+                                                                  'write_access']
+                                                              .toDouble());
+                                                    }).toList(),
+                                                    isCurved: true,
+                                                    color: colors[i],
+                                                    barWidth: 2,
+                                                    isStrokeCapRound: true,
+                                                    dotData: FlDotData(
+                                                      show: false,
+                                                    ),
+                                                  ),
+                                              ],
+                                            ),
                                           ),
                                         ),
                                       ),
                                     ),
                                   ),
-                                ),
-                                SizedBox(
-                                  height: 20,
-                                ),
-                              ],
+                                  SizedBox(
+                                    height: 20,
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                         ],

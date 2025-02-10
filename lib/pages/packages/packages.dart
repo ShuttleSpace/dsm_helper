@@ -6,7 +6,6 @@ import 'package:dsm_helper/widgets/label.dart';
 import 'package:dsm_helper/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:neumorphic/neumorphic.dart';
 
 class Packages extends StatefulWidget {
   final String version;
@@ -208,17 +207,11 @@ class _PackagesState extends State<Packages> with TickerProviderStateMixin {
   Widget _buildButton(package, {bool beta = false}) {
     Widget button;
     if (package['can_update'] == null || package['installed'] == null) {
-      button = NeuCard(
-        padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-        decoration: NeumorphicDecoration(
-          color: Theme.of(context).scaffoldBackgroundColor,
-          borderRadius: BorderRadius.circular(20),
-        ),
-        curveType: CurveType.convex,
+      button = Card(
         child: Text("获取中"),
       );
     } else if (package['can_update']) {
-      button = NeuButton(
+      button = OutlinedButton(
         onPressed: () {
           Navigator.of(context)
               .push(CupertinoPageRoute(
@@ -234,11 +227,6 @@ class _PackagesState extends State<Packages> with TickerProviderStateMixin {
             });
           });
         },
-        padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-        decoration: NeumorphicDecoration(
-          color: Theme.of(context).scaffoldBackgroundColor,
-          borderRadius: BorderRadius.circular(20),
-        ),
         child: Text("更新"),
       );
     } else if (package['installed']) {
@@ -253,7 +241,7 @@ class _PackagesState extends State<Packages> with TickerProviderStateMixin {
       } else {
         text = "已安装";
       }
-      button = NeuButton(
+      button = OutlinedButton(
         onPressed: () async {
           if (text == "启动") {
             setState(() {
@@ -275,99 +263,81 @@ class _PackagesState extends State<Packages> with TickerProviderStateMixin {
               builder: (context) {
                 return Material(
                   color: Colors.transparent,
-                  child: NeuCard(
-                    width: double.infinity,
-                    padding: EdgeInsets.all(22),
-                    bevel: 5,
-                    curveType: CurveType.emboss,
-                    decoration: NeumorphicDecoration(
-                        color: Theme.of(context).scaffoldBackgroundColor,
-                        borderRadius:
-                            BorderRadius.vertical(top: Radius.circular(22))),
+                  child: Card(
                     child: SafeArea(
                       top: false,
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: <Widget>[
-                          Text(
-                            "停用套件",
-                            style: TextStyle(
-                                fontSize: 20, fontWeight: FontWeight.w500),
-                          ),
-                          SizedBox(
-                            height: 12,
-                          ),
-                          Text(
-                            "确认要停用此套件？",
-                            style: TextStyle(
-                                fontSize: 20, fontWeight: FontWeight.w400),
-                          ),
-                          SizedBox(
-                            height: 22,
-                          ),
-                          Row(
-                            children: [
-                              Expanded(
-                                child: NeuButton(
-                                  onPressed: () async {
-                                    Navigator.of(context).pop();
-                                    setState(() {
-                                      loading = true;
-                                    });
-                                    var res = await Api.launchPackage(
-                                        package['id'],
-                                        package['dsm_apps'],
-                                        "stop");
-                                    if (res['success']) {
-                                      Util.toast("已停用");
-                                      // await getLaunchedPackages();
-                                      await getInstalledPackages();
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: <Widget>[
+                            Text(
+                              "停用套件",
+                              style: TextStyle(
+                                  fontSize: 20, fontWeight: FontWeight.w500),
+                            ),
+                            SizedBox(
+                              height: 12,
+                            ),
+                            Text(
+                              "确认要停用此套件？",
+                              style: TextStyle(
+                                  fontSize: 20, fontWeight: FontWeight.w400),
+                            ),
+                            SizedBox(
+                              height: 22,
+                            ),
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: OutlinedButton(
+                                    onPressed: () async {
+                                      Navigator.of(context).pop();
                                       setState(() {
-                                        loading = false;
+                                        loading = true;
                                       });
-                                    }
-                                  },
-                                  decoration: NeumorphicDecoration(
-                                    color: Theme.of(context)
-                                        .scaffoldBackgroundColor,
-                                    borderRadius: BorderRadius.circular(25),
-                                  ),
-                                  bevel: 5,
-                                  padding: EdgeInsets.symmetric(vertical: 10),
-                                  child: Text(
-                                    "停用",
-                                    style: TextStyle(
-                                        fontSize: 18, color: Colors.redAccent),
-                                  ),
-                                ),
-                              ),
-                              SizedBox(
-                                width: 20,
-                              ),
-                              Expanded(
-                                child: NeuButton(
-                                  onPressed: () async {
-                                    Navigator.of(context).pop();
-                                  },
-                                  decoration: NeumorphicDecoration(
-                                    color: Theme.of(context)
-                                        .scaffoldBackgroundColor,
-                                    borderRadius: BorderRadius.circular(25),
-                                  ),
-                                  bevel: 5,
-                                  padding: EdgeInsets.symmetric(vertical: 10),
-                                  child: Text(
-                                    "取消",
-                                    style: TextStyle(fontSize: 18),
+                                      var res = await Api.launchPackage(
+                                          package['id'],
+                                          package['dsm_apps'],
+                                          "stop");
+                                      if (res['success']) {
+                                        Util.toast("已停用");
+                                        // await getLaunchedPackages();
+                                        await getInstalledPackages();
+                                        setState(() {
+                                          loading = false;
+                                        });
+                                      }
+                                    },
+                                    child: Text(
+                                      "停用",
+                                      style: TextStyle(
+                                          fontSize: 18,
+                                          color: Colors.redAccent),
+                                    ),
                                   ),
                                 ),
-                              ),
-                            ],
-                          ),
-                          SizedBox(
-                            height: 8,
-                          ),
-                        ],
+                                SizedBox(
+                                  width: 20,
+                                ),
+                                Expanded(
+                                  child: OutlinedButton(
+                                    onPressed: () async {
+                                      Navigator.of(context).pop();
+                                    },
+                                    child: Text(
+                                      "取消",
+                                      style: TextStyle(fontSize: 18),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            SizedBox(
+                              height: 8,
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),
@@ -376,11 +346,6 @@ class _PackagesState extends State<Packages> with TickerProviderStateMixin {
             );
           }
         },
-        padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-        decoration: NeumorphicDecoration(
-          color: Theme.of(context).scaffoldBackgroundColor,
-          borderRadius: BorderRadius.circular(20),
-        ),
         child: Text(
           "$text",
           style: text == "启动"
@@ -392,7 +357,7 @@ class _PackagesState extends State<Packages> with TickerProviderStateMixin {
         ),
       );
     } else {
-      button = NeuButton(
+      button = OutlinedButton(
         onPressed: () {
           Navigator.of(context)
               .push(CupertinoPageRoute(
@@ -409,11 +374,6 @@ class _PackagesState extends State<Packages> with TickerProviderStateMixin {
             });
           });
         },
-        padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-        decoration: NeumorphicDecoration(
-          color: Theme.of(context).scaffoldBackgroundColor,
-          borderRadius: BorderRadius.circular(20),
-        ),
         child: Text("安装套件"),
       );
     }
@@ -441,15 +401,8 @@ class _PackagesState extends State<Packages> with TickerProviderStateMixin {
           });
         });
       },
-      child: NeuCard(
-        width: (MediaQuery.of(context).size.width - 60) / 2,
+      child: Card(
         margin: EdgeInsets.only(bottom: 20),
-        curveType: CurveType.flat,
-        decoration: NeumorphicDecoration(
-          color: Theme.of(context).scaffoldBackgroundColor,
-          borderRadius: BorderRadius.circular(20),
-        ),
-        bevel: 20,
         child: Padding(
           padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
           child: Row(
@@ -524,75 +477,71 @@ class _PackagesState extends State<Packages> with TickerProviderStateMixin {
           });
         });
       },
-      child: NeuCard(
-        width: (MediaQuery.of(context).size.width - 60) / 2,
-        curveType: CurveType.flat,
-        decoration: NeumorphicDecoration(
-          color: Theme.of(context).scaffoldBackgroundColor,
-          borderRadius: BorderRadius.circular(20),
-        ),
-        bevel: 20,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20),
-              child: Column(
-                children: [
-                  SizedBox(
-                    height: 20,
-                  ),
-                  Stack(
-                    children: [
-                      Align(
-                        alignment: Alignment.center,
-                        child: SizedBox(
-                          height: 80,
-                          child: CupertinoExtendedImage(
-                            thumbnailUrl,
-                            width: 80,
-                          ),
-                        ),
-                      ),
-                      if (isBeta ||
-                          (package['additional'] != null &&
-                              package['additional']['beta']))
-                        Align(
-                          alignment: Alignment.topRight,
-                          child: Label(
-                            "Beta",
-                            Colors.lightBlueAccent,
-                            fill: true,
-                          ),
-                        ),
-                    ],
-                  ),
-                  SizedBox(
-                    height: 10,
-                  ),
-                  SizedBox(
-                    height: 40,
-                    child: Text(
-                      "${package['dname']}",
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      textAlign: TextAlign.center,
+      child: Card(
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 20),
+                child: Column(
+                  children: [
+                    SizedBox(
+                      height: 20,
                     ),
-                  ),
-                  Text(
-                    // "${package['category']}",
-                    "${installed && package['additional']['updated_at'] != null ? package['additional']['updated_at'] : package['category'] is List && getCategoryName(package['category']).length > 0 ? getCategoryName(package['category']).join(",") : package['maintainer']}",
-                    maxLines: 1,
-                    overflow: TextOverflow.clip,
-                    style: TextStyle(color: Colors.grey),
-                  ),
-                ],
+                    Stack(
+                      children: [
+                        Align(
+                          alignment: Alignment.center,
+                          child: SizedBox(
+                            height: 80,
+                            child: CupertinoExtendedImage(
+                              thumbnailUrl,
+                              width: 80,
+                            ),
+                          ),
+                        ),
+                        if (isBeta ||
+                            (package['additional'] != null &&
+                                package['additional']['beta']))
+                          Align(
+                            alignment: Alignment.topRight,
+                            child: Label(
+                              "Beta",
+                              Colors.lightBlueAccent,
+                              fill: true,
+                            ),
+                          ),
+                      ],
+                    ),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    SizedBox(
+                      height: 40,
+                      child: Text(
+                        "${package['dname']}",
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                    Text(
+                      // "${package['category']}",
+                      "${installed && package['additional']['updated_at'] != null ? package['additional']['updated_at'] : package['category'] is List && getCategoryName(package['category']).length > 0 ? getCategoryName(package['category']).join(",") : package['maintainer']}",
+                      maxLines: 1,
+                      overflow: TextOverflow.clip,
+                      style: TextStyle(color: Colors.grey),
+                    ),
+                  ],
+                ),
               ),
-            ),
-            Padding(
-                padding: EdgeInsets.all(20),
-                child: _buildButton(package, beta: isBeta)),
-          ],
+              Padding(
+                  padding: EdgeInsets.all(20),
+                  child: _buildButton(package, beta: isBeta)),
+            ],
+          ),
         ),
       ),
     );
@@ -611,16 +560,10 @@ class _PackagesState extends State<Packages> with TickerProviderStateMixin {
         children: [
           Column(
             children: [
-              NeuCard(
-                width: double.infinity,
-                decoration: NeumorphicDecoration(
-                  color: Theme.of(context).scaffoldBackgroundColor,
-                  borderRadius: BorderRadius.circular(20),
-                ),
+              Card(
                 margin: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-                curveType: CurveType.flat,
-                bevel: 10,
                 child: TabBar(
+                  dividerHeight: 0,
                   isScrollable: true,
                   controller: _tabController,
                   indicatorSize: TabBarIndicatorSize.label,
@@ -665,18 +608,8 @@ class _PackagesState extends State<Packages> with TickerProviderStateMixin {
                     Container(
                       child: loadingInstalled
                           ? Center(
-                              child: NeuCard(
-                                padding: EdgeInsets.all(50),
-                                curveType: CurveType.flat,
-                                decoration: NeumorphicDecoration(
-                                  color:
-                                      Theme.of(context).scaffoldBackgroundColor,
-                                  borderRadius: BorderRadius.circular(20),
-                                ),
-                                bevel: 20,
-                                child: CupertinoActivityIndicator(
-                                  radius: 14,
-                                ),
+                              child: CupertinoActivityIndicator(
+                                radius: 14,
                               ),
                             )
                           : ListView(
@@ -706,18 +639,8 @@ class _PackagesState extends State<Packages> with TickerProviderStateMixin {
                     Container(
                       child: loadingAll
                           ? Center(
-                              child: NeuCard(
-                                padding: EdgeInsets.all(50),
-                                curveType: CurveType.flat,
-                                decoration: NeumorphicDecoration(
-                                  color:
-                                      Theme.of(context).scaffoldBackgroundColor,
-                                  borderRadius: BorderRadius.circular(20),
-                                ),
-                                bevel: 20,
-                                child: CupertinoActivityIndicator(
-                                  radius: 14,
-                                ),
+                              child: CupertinoActivityIndicator(
+                                radius: 14,
                               ),
                             )
                           : ListView(
@@ -737,18 +660,8 @@ class _PackagesState extends State<Packages> with TickerProviderStateMixin {
                     Container(
                       child: loadingOthers
                           ? Center(
-                              child: NeuCard(
-                                padding: EdgeInsets.all(50),
-                                curveType: CurveType.flat,
-                                decoration: NeumorphicDecoration(
-                                  color:
-                                      Theme.of(context).scaffoldBackgroundColor,
-                                  borderRadius: BorderRadius.circular(20),
-                                ),
-                                bevel: 20,
-                                child: CupertinoActivityIndicator(
-                                  radius: 14,
-                                ),
+                              child: CupertinoActivityIndicator(
+                                radius: 14,
                               ),
                             )
                           : ListView(
@@ -791,17 +704,8 @@ class _PackagesState extends State<Packages> with TickerProviderStateMixin {
               height: MediaQuery.of(context).size.height,
               color: Theme.of(context).scaffoldBackgroundColor.withOpacity(0.7),
               child: Center(
-                child: NeuCard(
-                  padding: EdgeInsets.all(50),
-                  curveType: CurveType.flat,
-                  decoration: NeumorphicDecoration(
-                    color: Theme.of(context).scaffoldBackgroundColor,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  bevel: 20,
-                  child: CupertinoActivityIndicator(
-                    radius: 14,
-                  ),
+                child: CupertinoActivityIndicator(
+                  radius: 14,
                 ),
               ),
             ),

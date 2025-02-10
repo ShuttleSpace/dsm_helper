@@ -2,7 +2,6 @@ import 'package:dsm_helper/pages/common/browser.dart';
 import 'package:dsm_helper/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:neumorphic/neumorphic.dart';
 
 class OpenSource extends StatefulWidget {
   @override
@@ -166,13 +165,8 @@ class _OpenSourceState extends State<OpenSource> {
             );
           },
           itemBuilder: (context, i) {
-            return NeuCard(
+            return Card(
               margin: EdgeInsets.symmetric(horizontal: 20),
-              decoration: NeumorphicDecoration(
-                color: Theme.of(context).scaffoldBackgroundColor,
-                borderRadius: BorderRadius.circular(20),
-              ),
-              curveType: CurveType.flat,
               child: Padding(
                 padding: EdgeInsets.all(20),
                 child: Row(
@@ -182,18 +176,14 @@ class _OpenSourceState extends State<OpenSource> {
                       style: TextStyle(fontSize: 16),
                     ),
                     Spacer(),
-                    NeuButton(
-                      decoration: NeumorphicDecoration(
-                        color: Theme.of(context).scaffoldBackgroundColor,
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      padding: EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+                    OutlinedButton(
                       onPressed: () {
                         Navigator.of(context).push(
                           CupertinoPageRoute(builder: (context) {
                             return Browser(
                               title: "${list[i]['name']}",
-                              url: "https://pub.dev/packages/" + list[i]['name'],
+                              url:
+                                  "https://pub.dev/packages/" + list[i]['name'],
                             );
                           }),
                         );

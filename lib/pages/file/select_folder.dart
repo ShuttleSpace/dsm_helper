@@ -3,7 +3,6 @@ import 'package:dsm_helper/util/function.dart';
 import 'package:dsm_helper/widgets/file_icon.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:neumorphic/neumorphic.dart';
 
 class SelectFolder extends StatefulWidget {
   final bool multi;
@@ -108,7 +107,7 @@ class _SelectFolderState extends State<SelectFolder> {
     return Container(
       margin: index == 0 ? EdgeInsets.only(left: 20) : null,
       padding: const EdgeInsets.symmetric(vertical: 10),
-      child: NeuButton(
+      child: OutlinedButton(
         onPressed: () {
           String path = "";
           List<String> items = [];
@@ -120,12 +119,6 @@ class _SelectFolderState extends State<SelectFolder> {
           }
           goPath(path);
         },
-        decoration: NeumorphicDecoration(
-          color: Theme.of(context).scaffoldBackgroundColor,
-          borderRadius: BorderRadius.circular(20),
-        ),
-        bevel: 5,
-        padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
         child: index == 0
             ? Icon(
                 CupertinoIcons.home,
@@ -146,7 +139,7 @@ class _SelectFolderState extends State<SelectFolder> {
       padding: const EdgeInsets.only(top: 20.0, left: 20, right: 20),
       child: Opacity(
         opacity: 1,
-        child: NeuButton(
+        child: OutlinedButton(
           onPressed: () async {
             if (widget.multi) {
             } else {
@@ -156,12 +149,6 @@ class _SelectFolderState extends State<SelectFolder> {
             }
           },
           // margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-          padding: EdgeInsets.symmetric(vertical: 10),
-          decoration: NeumorphicDecoration(
-            color: Theme.of(context).scaffoldBackgroundColor,
-            borderRadius: BorderRadius.circular(20),
-          ),
-          bevel: 8,
           child: Row(
             children: [
               SizedBox(
@@ -209,11 +196,7 @@ class _SelectFolderState extends State<SelectFolder> {
               SizedBox(
                 width: 10,
               ),
-              NeuButton(
-                decoration: NeumorphicDecoration(
-                  color: Theme.of(context).scaffoldBackgroundColor,
-                  borderRadius: BorderRadius.circular(10),
-                ),
+              OutlinedButton(
                 onPressed: () {
                   setState(() {
                     if (widget.multi) {
@@ -227,8 +210,6 @@ class _SelectFolderState extends State<SelectFolder> {
                     }
                   });
                 },
-                padding: EdgeInsets.all(5),
-                bevel: 5,
                 child: SizedBox(
                   width: 20,
                   height: 20,
@@ -309,7 +290,7 @@ class _SelectFolderState extends State<SelectFolder> {
                       if (paths.length > 1)
                         Container(
                           padding: const EdgeInsets.symmetric(vertical: 10),
-                          child: NeuButton(
+                          child: OutlinedButton(
                             onPressed: () {
                               String name = "";
                               showCupertinoDialog(
@@ -321,18 +302,9 @@ class _SelectFolderState extends State<SelectFolder> {
                                         mainAxisAlignment:
                                             MainAxisAlignment.center,
                                         children: [
-                                          NeuCard(
-                                            width: double.infinity,
+                                          Card(
                                             margin: EdgeInsets.symmetric(
                                                 horizontal: 50),
-                                            curveType: CurveType.emboss,
-                                            bevel: 5,
-                                            decoration: NeumorphicDecoration(
-                                              color: Theme.of(context)
-                                                  .scaffoldBackgroundColor,
-                                              borderRadius:
-                                                  BorderRadius.circular(25),
-                                            ),
                                             child: Padding(
                                               padding: EdgeInsets.all(20),
                                               child: Column(
@@ -347,30 +319,21 @@ class _SelectFolderState extends State<SelectFolder> {
                                                   SizedBox(
                                                     height: 16,
                                                   ),
-                                                  NeuCard(
-                                                    decoration:
-                                                        NeumorphicDecoration(
-                                                      color: Theme.of(context)
-                                                          .scaffoldBackgroundColor,
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              20),
-                                                    ),
-                                                    bevel: 20,
-                                                    curveType: CurveType.flat,
-                                                    padding:
-                                                        EdgeInsets.symmetric(
-                                                            horizontal: 20,
-                                                            vertical: 5),
-                                                    child: TextField(
-                                                      onChanged: (v) =>
-                                                          name = v,
-                                                      decoration:
-                                                          InputDecoration(
-                                                        border:
-                                                            InputBorder.none,
-                                                        hintText: "请输入文件夹名",
-                                                        labelText: "文件夹名",
+                                                  Card(
+                                                    child: Padding(
+                                                      padding:
+                                                          const EdgeInsets.all(
+                                                              8.0),
+                                                      child: TextField(
+                                                        onChanged: (v) =>
+                                                            name = v,
+                                                        decoration:
+                                                            InputDecoration(
+                                                          border:
+                                                              InputBorder.none,
+                                                          hintText: "请输入文件夹名",
+                                                          labelText: "文件夹名",
+                                                        ),
                                                       ),
                                                     ),
                                                   ),
@@ -380,7 +343,7 @@ class _SelectFolderState extends State<SelectFolder> {
                                                   Row(
                                                     children: [
                                                       Expanded(
-                                                        child: NeuButton(
+                                                        child: OutlinedButton(
                                                           onPressed: () async {
                                                             if (name.trim() ==
                                                                 "") {
@@ -423,20 +386,6 @@ class _SelectFolderState extends State<SelectFolder> {
                                                               }
                                                             }
                                                           },
-                                                          decoration:
-                                                              NeumorphicDecoration(
-                                                            color: Theme.of(
-                                                                    context)
-                                                                .scaffoldBackgroundColor,
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .circular(
-                                                                        25),
-                                                          ),
-                                                          bevel: 20,
-                                                          padding: EdgeInsets
-                                                              .symmetric(
-                                                                  vertical: 10),
                                                           child: Text(
                                                             "确定",
                                                             style: TextStyle(
@@ -448,26 +397,12 @@ class _SelectFolderState extends State<SelectFolder> {
                                                         width: 16,
                                                       ),
                                                       Expanded(
-                                                        child: NeuButton(
+                                                        child: OutlinedButton(
                                                           onPressed: () async {
                                                             Navigator.of(
                                                                     context)
                                                                 .pop();
                                                           },
-                                                          decoration:
-                                                              NeumorphicDecoration(
-                                                            color: Theme.of(
-                                                                    context)
-                                                                .scaffoldBackgroundColor,
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .circular(
-                                                                        25),
-                                                          ),
-                                                          bevel: 20,
-                                                          padding: EdgeInsets
-                                                              .symmetric(
-                                                                  vertical: 10),
                                                           child: Text(
                                                             "取消",
                                                             style: TextStyle(
@@ -486,13 +421,6 @@ class _SelectFolderState extends State<SelectFolder> {
                                     );
                                   });
                             },
-                            decoration: NeumorphicDecoration(
-                              color: Theme.of(context).scaffoldBackgroundColor,
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            bevel: 5,
-                            padding: EdgeInsets.symmetric(
-                                horizontal: 10, vertical: 2),
                             child: Text(
                               "新建",
                               style: TextStyle(fontSize: 14),
@@ -504,7 +432,7 @@ class _SelectFolderState extends State<SelectFolder> {
                       ),
                       Container(
                         padding: const EdgeInsets.symmetric(vertical: 10),
-                        child: NeuButton(
+                        child: OutlinedButton(
                           onPressed: () {
                             if (selectedFiles.length > 0) {
                               Navigator.of(context).pop(selectedFiles);
@@ -517,13 +445,6 @@ class _SelectFolderState extends State<SelectFolder> {
                               }
                             }
                           },
-                          decoration: NeumorphicDecoration(
-                            color: Theme.of(context).scaffoldBackgroundColor,
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          bevel: 5,
-                          padding:
-                              EdgeInsets.symmetric(horizontal: 10, vertical: 2),
                           child: Text(
                             "选择",
                             style: TextStyle(fontSize: 14),
@@ -539,17 +460,8 @@ class _SelectFolderState extends State<SelectFolder> {
                 Expanded(
                   child: loading
                       ? Center(
-                          child: NeuCard(
-                            padding: EdgeInsets.all(50),
-                            curveType: CurveType.flat,
-                            decoration: NeumorphicDecoration(
-                              color: Theme.of(context).scaffoldBackgroundColor,
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            bevel: 20,
-                            child: CupertinoActivityIndicator(
-                              radius: 14,
-                            ),
+                          child: CupertinoActivityIndicator(
+                            radius: 14,
                           ),
                         )
                       : success
@@ -571,15 +483,7 @@ class _SelectFolderState extends State<SelectFolder> {
                                   ),
                                   SizedBox(
                                     width: 200,
-                                    child: NeuButton(
-                                      padding: EdgeInsets.symmetric(
-                                          horizontal: 10, vertical: 10),
-                                      decoration: NeumorphicDecoration(
-                                        color: Theme.of(context)
-                                            .scaffoldBackgroundColor,
-                                        borderRadius: BorderRadius.circular(20),
-                                      ),
-                                      bevel: 5,
+                                    child: OutlinedButton(
                                       onPressed: () {
                                         String path =
                                             paths.join("/").substring(1);

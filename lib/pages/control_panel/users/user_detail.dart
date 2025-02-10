@@ -5,7 +5,6 @@ import 'package:dsm_helper/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
-import 'package:neumorphic/neumorphic.dart';
 
 class UserDetail extends StatefulWidget {
   final Map user;
@@ -52,13 +51,7 @@ class _UserDetailState extends State<UserDetail>
           group['is_member'] = !group['is_member'];
         });
       },
-      child: NeuCard(
-        curveType: group['is_member'] ? CurveType.emboss : CurveType.flat,
-        decoration: NeumorphicDecoration(
-          color: Theme.of(context).scaffoldBackgroundColor,
-          borderRadius: BorderRadius.circular(20),
-        ),
-        bevel: 20,
+      child: Card(
         child: Padding(
           padding: EdgeInsets.all(20),
           child: Row(
@@ -103,13 +96,7 @@ class _UserDetailState extends State<UserDetail>
           // group['is_member'] = !group['is_member'];
         });
       },
-      child: NeuCard(
-        curveType: CurveType.flat,
-        decoration: NeumorphicDecoration(
-          color: Theme.of(context).scaffoldBackgroundColor,
-          borderRadius: BorderRadius.circular(20),
-        ),
-        bevel: 20,
+      child: Card(
         child: Padding(
           padding: EdgeInsets.all(20),
           child: Column(
@@ -144,14 +131,8 @@ class _UserDetailState extends State<UserDetail>
           // group['is_member'] = !group['is_member'];
         });
       },
-      child: NeuCard(
-        curveType: CurveType.flat,
-        decoration: NeumorphicDecoration(
-          color: Theme.of(context).scaffoldBackgroundColor,
-          borderRadius: BorderRadius.circular(20),
-        ),
+      child: Card(
         margin: EdgeInsets.symmetric(vertical: 10),
-        bevel: 20,
         child: Padding(
           padding: EdgeInsets.all(20),
           child: Row(
@@ -227,13 +208,7 @@ class _UserDetailState extends State<UserDetail>
           // group['is_member'] = !group['is_member'];
         });
       },
-      child: NeuCard(
-        curveType: CurveType.flat,
-        decoration: NeumorphicDecoration(
-          color: Theme.of(context).scaffoldBackgroundColor,
-          borderRadius: BorderRadius.circular(20),
-        ),
-        bevel: 20,
+      child: Card(
         child: Padding(
           padding: EdgeInsets.all(20),
           child: Row(
@@ -337,16 +312,10 @@ class _UserDetailState extends State<UserDetail>
       ),
       body: Column(
         children: [
-          NeuCard(
-            width: double.infinity,
-            decoration: NeumorphicDecoration(
-              color: Theme.of(context).scaffoldBackgroundColor,
-              borderRadius: BorderRadius.circular(20),
-            ),
+          Card(
             margin: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-            curveType: CurveType.flat,
-            bevel: 10,
             child: TabBar(
+              dividerHeight: 0,
               isScrollable: true,
               controller: _tabController,
               indicatorSize: TabBarIndicatorSize.label,
@@ -394,105 +363,80 @@ class _UserDetailState extends State<UserDetail>
                 ListView(
                   padding: EdgeInsets.all(20),
                   children: [
-                    NeuCard(
-                      decoration: NeumorphicDecoration(
-                        color: Theme.of(context).scaffoldBackgroundColor,
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      bevel: 20,
-                      curveType: CurveType.flat,
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-                      child: TextField(
-                        controller: _nameController,
-                        onChanged: (v) => user?['new_name'] = v,
-                        decoration: InputDecoration(
-                          border: InputBorder.none,
-                          labelText: '名称',
+                    Card(
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: TextField(
+                          controller: _nameController,
+                          onChanged: (v) => user?['new_name'] = v,
+                          decoration: InputDecoration(
+                            border: InputBorder.none,
+                            labelText: '名称',
+                          ),
                         ),
                       ),
                     ),
                     SizedBox(
                       height: 20,
                     ),
-                    NeuCard(
-                      decoration: NeumorphicDecoration(
-                        color: Theme.of(context).scaffoldBackgroundColor,
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      bevel: 12,
-                      curveType: CurveType.flat,
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-                      child: TextField(
-                        controller: _descriptionController,
-                        onChanged: (v) => user?['description'] = v,
-                        decoration: InputDecoration(
-                          border: InputBorder.none,
-                          labelText: '描述',
+                    Card(
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: TextField(
+                          controller: _descriptionController,
+                          onChanged: (v) => user?['description'] = v,
+                          decoration: InputDecoration(
+                            border: InputBorder.none,
+                            labelText: '描述',
+                          ),
                         ),
                       ),
                     ),
                     SizedBox(
                       height: 20,
                     ),
-                    NeuCard(
-                      decoration: NeumorphicDecoration(
-                        color: Theme.of(context).scaffoldBackgroundColor,
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      bevel: 12,
-                      curveType: CurveType.flat,
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-                      child: TextField(
-                        controller: _emailController,
-                        onChanged: (v) => user?['email'] = v,
-                        decoration: InputDecoration(
-                          border: InputBorder.none,
-                          labelText: '电子邮件',
+                    Card(
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: TextField(
+                          controller: _emailController,
+                          onChanged: (v) => user?['email'] = v,
+                          decoration: InputDecoration(
+                            border: InputBorder.none,
+                            labelText: '电子邮件',
+                          ),
                         ),
                       ),
                     ),
                     SizedBox(
                       height: 20,
                     ),
-                    NeuCard(
-                      decoration: NeumorphicDecoration(
-                        color: Theme.of(context).scaffoldBackgroundColor,
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      bevel: 12,
-                      curveType: CurveType.flat,
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-                      child: TextField(
-                        onChanged: (v) => password = v,
-                        obscureText: true,
-                        decoration: InputDecoration(
-                          border: InputBorder.none,
-                          labelText: '修改密码',
+                    Card(
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: TextField(
+                          onChanged: (v) => password = v,
+                          obscureText: true,
+                          decoration: InputDecoration(
+                            border: InputBorder.none,
+                            labelText: '修改密码',
+                          ),
                         ),
                       ),
                     ),
                     SizedBox(
                       height: 20,
                     ),
-                    NeuCard(
-                      decoration: NeumorphicDecoration(
-                        color: Theme.of(context).scaffoldBackgroundColor,
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      bevel: 12,
-                      curveType: CurveType.flat,
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-                      child: TextField(
-                        obscureText: true,
-                        onChanged: (v) => confirmPassword = v,
-                        decoration: InputDecoration(
-                          border: InputBorder.none,
-                          labelText: '确认密码',
+                    Card(
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: TextField(
+                          obscureText: true,
+                          onChanged: (v) => confirmPassword = v,
+                          decoration: InputDecoration(
+                            border: InputBorder.none,
+                            labelText: '确认密码',
+                          ),
                         ),
                       ),
                     ),
@@ -506,28 +450,20 @@ class _UserDetailState extends State<UserDetail>
                               !user?['cannot_chg_passwd'];
                         });
                       },
-                      child: NeuCard(
-                        decoration: NeumorphicDecoration(
-                          color: Theme.of(context).scaffoldBackgroundColor,
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        curveType: user?['cannot_chg_passwd'] ?? false
-                            ? CurveType.emboss
-                            : CurveType.flat,
-                        bevel: 12,
-                        height: 60,
-                        padding:
-                            EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-                        child: Row(
-                          children: [
-                            Text("不允许此用户修改密码"),
-                            Spacer(),
-                            if (user?['cannot_chg_passwd'] ?? false)
-                              Icon(
-                                CupertinoIcons.checkmark_alt,
-                                color: Color(0xffff9813),
-                              ),
-                          ],
+                      child: Card(
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Row(
+                            children: [
+                              Text("不允许此用户修改密码"),
+                              Spacer(),
+                              if (user?['cannot_chg_passwd'] ?? false)
+                                Icon(
+                                  CupertinoIcons.checkmark_alt,
+                                  color: Color(0xffff9813),
+                                ),
+                            ],
+                          ),
                         ),
                       ),
                     ),
@@ -540,28 +476,20 @@ class _UserDetailState extends State<UserDetail>
                           // user['passwd_never_expire'] = !user['passwd_never_expire'];
                         });
                       },
-                      child: NeuCard(
-                        decoration: NeumorphicDecoration(
-                          color: Theme.of(context).scaffoldBackgroundColor,
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        curveType: user?['passwd_never_expire'] ?? false
-                            ? CurveType.emboss
-                            : CurveType.flat,
-                        bevel: 12,
-                        height: 60,
-                        padding:
-                            EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-                        child: Row(
-                          children: [
-                            Text("密码始终有效"),
-                            Spacer(),
-                            if (user?['passwd_never_expire'] ?? false)
-                              Icon(
-                                CupertinoIcons.checkmark_alt,
-                                color: Color(0xffff9813),
-                              ),
-                          ],
+                      child: Card(
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Row(
+                            children: [
+                              Text("密码始终有效"),
+                              Spacer(),
+                              if (user?['passwd_never_expire'] ?? false)
+                                Icon(
+                                  CupertinoIcons.checkmark_alt,
+                                  color: Color(0xffff9813),
+                                ),
+                            ],
+                          ),
                         ),
                       ),
                     ),
@@ -578,15 +506,7 @@ class _UserDetailState extends State<UserDetail>
                           }
                         });
                       },
-                      child: NeuCard(
-                        decoration: NeumorphicDecoration(
-                          color: Theme.of(context).scaffoldBackgroundColor,
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        curveType: user?['expired'] != "normal"
-                            ? CurveType.emboss
-                            : CurveType.flat,
-                        bevel: 20,
+                      child: Card(
                         child: Padding(
                           padding: EdgeInsets.all(20),
                           child: Column(
@@ -606,15 +526,8 @@ class _UserDetailState extends State<UserDetail>
                                 ],
                               ),
                               if (user?['expired'] != "normal")
-                                NeuCard(
+                                Card(
                                   margin: EdgeInsets.only(top: 20),
-                                  decoration: NeumorphicDecoration(
-                                    color: Theme.of(context)
-                                        .scaffoldBackgroundColor,
-                                    borderRadius: BorderRadius.circular(20),
-                                  ),
-                                  curveType: CurveType.flat,
-                                  bevel: 20,
                                   child: Padding(
                                     padding: EdgeInsets.all(20),
                                     child: Row(
@@ -627,42 +540,34 @@ class _UserDetailState extends State<UserDetail>
                                                 user?['expired'] = "now";
                                               });
                                             },
-                                            child: NeuCard(
+                                            child: Card(
                                               // margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                                              padding: EdgeInsets.all(15),
-                                              decoration: NeumorphicDecoration(
-                                                color: Theme.of(context)
-                                                    .scaffoldBackgroundColor,
-                                                borderRadius:
-                                                    BorderRadius.circular(15),
-                                              ),
-                                              curveType:
-                                                  user?['expired'] == "now"
-                                                      ? CurveType.emboss
-                                                      : CurveType.flat,
-                                              bevel: 20,
-                                              child: Column(
-                                                children: [
-                                                  Row(
-                                                    children: [
-                                                      Text(
-                                                        "立即",
-                                                        style: TextStyle(
-                                                            fontSize: 16,
-                                                            height: 1.6),
-                                                      ),
-                                                      Spacer(),
-                                                      if (user?['expired'] ==
-                                                          "now")
-                                                        Icon(
-                                                          CupertinoIcons
-                                                              .checkmark_alt,
-                                                          color:
-                                                              Color(0xffff9813),
+                                              child: Padding(
+                                                padding:
+                                                    const EdgeInsets.all(8.0),
+                                                child: Column(
+                                                  children: [
+                                                    Row(
+                                                      children: [
+                                                        Text(
+                                                          "立即",
+                                                          style: TextStyle(
+                                                              fontSize: 16,
+                                                              height: 1.6),
                                                         ),
-                                                    ],
-                                                  ),
-                                                ],
+                                                        Spacer(),
+                                                        if (user?['expired'] ==
+                                                            "now")
+                                                          Icon(
+                                                            CupertinoIcons
+                                                                .checkmark_alt,
+                                                            color: Color(
+                                                                0xffff9813),
+                                                          ),
+                                                      ],
+                                                    ),
+                                                  ],
+                                                ),
                                               ),
                                             ),
                                           ),
@@ -685,42 +590,34 @@ class _UserDetailState extends State<UserDetail>
                                                 });
                                               });
                                             },
-                                            child: NeuCard(
+                                            child: Card(
                                               // margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                                              padding: EdgeInsets.all(15),
-                                              decoration: NeumorphicDecoration(
-                                                color: Theme.of(context)
-                                                    .scaffoldBackgroundColor,
-                                                borderRadius:
-                                                    BorderRadius.circular(15),
-                                              ),
-                                              curveType:
-                                                  user?['expired'] != "now"
-                                                      ? CurveType.emboss
-                                                      : CurveType.flat,
-                                              bevel: 20,
-                                              child: Column(
-                                                children: [
-                                                  Row(
-                                                    children: [
-                                                      Text(
-                                                        "${user?['expired'] == "now" ? "到期于：" : user?['expired']}",
-                                                        style: TextStyle(
-                                                            fontSize: 16,
-                                                            height: 1.6),
-                                                      ),
-                                                      Spacer(),
-                                                      if (user?['expired'] !=
-                                                          "now")
-                                                        Icon(
-                                                          CupertinoIcons
-                                                              .checkmark_alt,
-                                                          color:
-                                                              Color(0xffff9813),
+                                              child: Padding(
+                                                padding:
+                                                    const EdgeInsets.all(8.0),
+                                                child: Column(
+                                                  children: [
+                                                    Row(
+                                                      children: [
+                                                        Text(
+                                                          "${user?['expired'] == "now" ? "到期于：" : user?['expired']}",
+                                                          style: TextStyle(
+                                                              fontSize: 16,
+                                                              height: 1.6),
                                                         ),
-                                                    ],
-                                                  ),
-                                                ],
+                                                        Spacer(),
+                                                        if (user?['expired'] !=
+                                                            "now")
+                                                          Icon(
+                                                            CupertinoIcons
+                                                                .checkmark_alt,
+                                                            color: Color(
+                                                                0xffff9813),
+                                                          ),
+                                                      ],
+                                                    ),
+                                                  ],
+                                                ),
                                               ),
                                             ),
                                           ),
@@ -783,12 +680,7 @@ class _UserDetailState extends State<UserDetail>
           SafeArea(
             child: Padding(
               padding: EdgeInsets.all(20),
-              child: NeuButton(
-                padding: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-                decoration: NeumorphicDecoration(
-                  color: Theme.of(context).scaffoldBackgroundColor,
-                  borderRadius: BorderRadius.circular(20),
-                ),
+              child: OutlinedButton(
                 onPressed: () async {
                   if (password.isNotBlank || confirmPassword.isNotBlank) {
                     if (password != confirmPassword) {

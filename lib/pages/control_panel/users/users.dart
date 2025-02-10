@@ -5,7 +5,6 @@ import 'package:dsm_helper/widgets/label.dart';
 import 'package:dsm_helper/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:neumorphic/neumorphic.dart';
 
 class Users extends StatefulWidget {
   @override
@@ -47,14 +46,8 @@ class _UsersState extends State<Users> with SingleTickerProviderStateMixin {
   }
 
   Widget _buildGroupItem(group) {
-    return NeuCard(
-      curveType: CurveType.flat,
-      decoration: NeumorphicDecoration(
-        color: Theme.of(context).scaffoldBackgroundColor,
-        borderRadius: BorderRadius.circular(20),
-      ),
+    return Card(
       margin: EdgeInsets.symmetric(vertical: 10),
-      bevel: 20,
       child: Padding(
         padding: EdgeInsets.all(20),
         child: Row(
@@ -97,14 +90,8 @@ class _UsersState extends State<Users> with SingleTickerProviderStateMixin {
           setState(() {});
         });
       },
-      child: NeuCard(
-        curveType: CurveType.flat,
-        decoration: NeumorphicDecoration(
-          color: Theme.of(context).scaffoldBackgroundColor,
-          borderRadius: BorderRadius.circular(20),
-        ),
+      child: Card(
         margin: EdgeInsets.symmetric(vertical: 10),
-        bevel: 20,
         child: Padding(
           padding: EdgeInsets.all(20),
           child: Row(
@@ -166,33 +153,18 @@ class _UsersState extends State<Users> with SingleTickerProviderStateMixin {
               height: MediaQuery.of(context).size.height,
               color: Theme.of(context).scaffoldBackgroundColor.withOpacity(0.7),
               child: Center(
-                child: NeuCard(
-                  padding: EdgeInsets.all(50),
-                  curveType: CurveType.flat,
-                  decoration: NeumorphicDecoration(
-                    color: Theme.of(context).scaffoldBackgroundColor,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  bevel: 20,
-                  child: CupertinoActivityIndicator(
-                    radius: 14,
-                  ),
+                child: CupertinoActivityIndicator(
+                  radius: 14,
                 ),
               ),
             )
           : Column(
               children: [
                 if (Util.version >= 7)
-                  NeuCard(
-                    width: double.infinity,
-                    decoration: NeumorphicDecoration(
-                      color: Theme.of(context).scaffoldBackgroundColor,
-                      borderRadius: BorderRadius.circular(20),
-                    ),
+                  Card(
                     margin: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-                    curveType: CurveType.flat,
-                    bevel: 10,
                     child: TabBar(
+                      dividerHeight: 0,
                       isScrollable: false,
                       controller: _tabController,
                       indicatorSize: TabBarIndicatorSize.label,
