@@ -87,7 +87,7 @@ class _PackagesState extends State<Packages> with TickerProviderStateMixin {
         loadingAll = false;
       });
     } else {
-      Util.toast("数据加载失败");
+      Util.instance.toast("数据加载失败");
       Navigator.of(context).pop();
       return;
     }
@@ -170,7 +170,7 @@ class _PackagesState extends State<Packages> with TickerProviderStateMixin {
         if (installedPackageInfo['id'] == package['id']) {
           package['installed'] = true;
           package['installed_version'] = installedPackageInfo['version'];
-          package['can_update'] = Util.versionCompare(
+          package['can_update'] = Util.instance.versionCompare(
                   package['installed_version'], package['version']) <
               0;
           package['additional'] = installedPackageInfo['additional'];
@@ -208,6 +208,8 @@ class _PackagesState extends State<Packages> with TickerProviderStateMixin {
     Widget button;
     if (package['can_update'] == null || package['installed'] == null) {
       button = Card(
+        shape: RoundedRectangleBorder(
+            side: BorderSide(), borderRadius: BorderRadius.circular(5)),
         child: Text("获取中"),
       );
     } else if (package['can_update']) {
@@ -250,7 +252,7 @@ class _PackagesState extends State<Packages> with TickerProviderStateMixin {
             var res = await Api.launchPackage(
                 package['id'], package['dsm_apps'], "start");
             if (res['success']) {
-              Util.toast("已启动");
+              Util.instance.toast("已启动");
               // await getLaunchedPackages();
               await getInstalledPackages();
               setState(() {
@@ -264,6 +266,9 @@ class _PackagesState extends State<Packages> with TickerProviderStateMixin {
                 return Material(
                   color: Colors.transparent,
                   child: Card(
+                    shape: RoundedRectangleBorder(
+                        side: BorderSide(),
+                        borderRadius: BorderRadius.circular(5)),
                     child: SafeArea(
                       top: false,
                       child: Padding(
@@ -301,7 +306,7 @@ class _PackagesState extends State<Packages> with TickerProviderStateMixin {
                                           package['dsm_apps'],
                                           "stop");
                                       if (res['success']) {
-                                        Util.toast("已停用");
+                                        Util.instance.toast("已停用");
                                         // await getLaunchedPackages();
                                         await getInstalledPackages();
                                         setState(() {
@@ -383,7 +388,7 @@ class _PackagesState extends State<Packages> with TickerProviderStateMixin {
   Widget _buildUpdateItem(update) {
     String thumbnailUrl = update['thumbnail'].last;
     if (!thumbnailUrl.startsWith("http")) {
-      thumbnailUrl = Util.baseUrl + thumbnailUrl;
+      thumbnailUrl = Util.instance.baseUrl + thumbnailUrl;
     }
     return GestureDetector(
       onTap: () {
@@ -402,6 +407,8 @@ class _PackagesState extends State<Packages> with TickerProviderStateMixin {
         });
       },
       child: Card(
+        shape: RoundedRectangleBorder(
+            side: BorderSide(), borderRadius: BorderRadius.circular(5)),
         margin: EdgeInsets.only(bottom: 20),
         child: Padding(
           padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
@@ -457,7 +464,7 @@ class _PackagesState extends State<Packages> with TickerProviderStateMixin {
     if (package['thumbnail'].length > 0) {
       thumbnailUrl = package['thumbnail'].last;
       if (!thumbnailUrl.startsWith("http")) {
-        thumbnailUrl = Util.baseUrl + thumbnailUrl;
+        thumbnailUrl = Util.instance.baseUrl + thumbnailUrl;
       }
     }
 
@@ -478,6 +485,8 @@ class _PackagesState extends State<Packages> with TickerProviderStateMixin {
         });
       },
       child: Card(
+        shape: RoundedRectangleBorder(
+            side: BorderSide(), borderRadius: BorderRadius.circular(5)),
         child: Padding(
           padding: const EdgeInsets.all(8.0),
           child: Column(
@@ -561,6 +570,8 @@ class _PackagesState extends State<Packages> with TickerProviderStateMixin {
           Column(
             children: [
               Card(
+                shape: RoundedRectangleBorder(
+                    side: BorderSide(), borderRadius: BorderRadius.circular(5)),
                 margin: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
                 child: TabBar(
                   dividerHeight: 0,
@@ -573,7 +584,7 @@ class _PackagesState extends State<Packages> with TickerProviderStateMixin {
                   unselectedLabelColor: Colors.grey,
                   indicator: BubbleTabIndicator(
                     indicatorColor: Theme.of(context).scaffoldBackgroundColor,
-                    shadowColor: Util.getAdjustColor(
+                    shadowColor: Util.instance.getAdjustColor(
                         Theme.of(context).scaffoldBackgroundColor, -20),
                   ),
                   tabs: [

@@ -30,7 +30,7 @@ class _UsersState extends State<Users> with SingleTickerProviderStateMixin {
         users = res['data']['users'];
       });
     } else {
-      Util.toast("加载失败");
+      Util.instance.toast("加载失败");
       Navigator.of(context).pop();
     }
     var group = await Api.userGroups();
@@ -40,13 +40,15 @@ class _UsersState extends State<Users> with SingleTickerProviderStateMixin {
         groups = group['data']['groups'];
       });
     } else {
-      Util.toast("加载失败");
+      Util.instance.toast("加载失败");
       Navigator.of(context).pop();
     }
   }
 
   Widget _buildGroupItem(group) {
     return Card(
+      shape: RoundedRectangleBorder(
+          side: BorderSide(), borderRadius: BorderRadius.circular(5)),
       margin: EdgeInsets.symmetric(vertical: 10),
       child: Padding(
         padding: EdgeInsets.all(20),
@@ -91,6 +93,8 @@ class _UsersState extends State<Users> with SingleTickerProviderStateMixin {
         });
       },
       child: Card(
+        shape: RoundedRectangleBorder(
+            side: BorderSide(), borderRadius: BorderRadius.circular(5)),
         margin: EdgeInsets.symmetric(vertical: 10),
         child: Padding(
           padding: EdgeInsets.all(20),
@@ -145,7 +149,7 @@ class _UsersState extends State<Users> with SingleTickerProviderStateMixin {
     return Scaffold(
       appBar: AppBar(
         leading: AppBackButton(context),
-        title: Text(Util.version < 7 ? "用户账户" : "用户与群组"),
+        title: Text(Util.instance.version < 7 ? "用户账户" : "用户与群组"),
       ),
       body: loading
           ? Container(
@@ -160,8 +164,11 @@ class _UsersState extends State<Users> with SingleTickerProviderStateMixin {
             )
           : Column(
               children: [
-                if (Util.version >= 7)
+                if (Util.instance.version >= 7)
                   Card(
+                    shape: RoundedRectangleBorder(
+                        side: BorderSide(),
+                        borderRadius: BorderRadius.circular(5)),
                     margin: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
                     child: TabBar(
                       dividerHeight: 0,
@@ -176,7 +183,7 @@ class _UsersState extends State<Users> with SingleTickerProviderStateMixin {
                       indicator: BubbleTabIndicator(
                         indicatorColor:
                             Theme.of(context).scaffoldBackgroundColor,
-                        shadowColor: Util.getAdjustColor(
+                        shadowColor: Util.instance.getAdjustColor(
                             Theme.of(context).scaffoldBackgroundColor, -20),
                       ),
                       tabs: [
@@ -194,7 +201,7 @@ class _UsersState extends State<Users> with SingleTickerProviderStateMixin {
                     ),
                   ),
                 Expanded(
-                  child: Util.version < 7
+                  child: Util.instance.version < 7
                       ? ListView.builder(
                           padding: EdgeInsets.all(20),
                           itemBuilder: (context, i) {

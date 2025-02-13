@@ -39,7 +39,7 @@ class _TaskManagerState extends State<TaskManager>
         loading = false;
         try {
           processes = process['data']['process'];
-          if (Util.version == 7) {
+          if (Util.instance.version == 7) {
             slices = group['data']['slices'];
           } else {
             services = group['data']['services'];
@@ -65,20 +65,28 @@ class _TaskManagerState extends State<TaskManager>
         if (webManagerStrings[titles[0]][titles[1]] != null) {
           title = webManagerStrings[titles[0]][titles[1]];
         }
-      } else if (Util.strings[service['display_name']][titles[0]] != null &&
-          Util.strings[service['display_name']][titles[0]][titles[1]] != null) {
-        title = Util.strings[service['display_name']][titles[0]][titles[1]];
-      } else if (Util.strings[service['display_name']] != null &&
-          Util.strings[service['display_name']]['common'] != null &&
-          Util.strings[service['display_name']]['common']['displayname'] !=
+      } else if (Util.instance.strings[service['display_name']][titles[0]] !=
+              null &&
+          Util.instance.strings[service['display_name']][titles[0]]
+                  [titles[1]] !=
               null) {
-        title = Util.strings[service['display_name']]['common']['displayname'];
+        title = Util.instance.strings[service['display_name']][titles[0]]
+            [titles[1]];
+      } else if (Util.instance.strings[service['display_name']] != null &&
+          Util.instance.strings[service['display_name']]['common'] != null &&
+          Util.instance.strings[service['display_name']]['common']
+                  ['displayname'] !=
+              null) {
+        title = Util.instance.strings[service['display_name']]['common']
+            ['displayname'];
       }
     } else {
       title = service['display_name'];
     }
 
     return Card(
+      shape: RoundedRectangleBorder(
+          side: BorderSide(), borderRadius: BorderRadius.circular(5)),
       margin: EdgeInsets.all(10),
       child: Padding(
         padding: const EdgeInsets.all(8.0),
@@ -102,9 +110,11 @@ class _TaskManagerState extends State<TaskManager>
   Widget _buildSliceItem(slice) {
     var cpuTime;
     if (slice['cpu_time'] is num) {
-      cpuTime = Util.timeLong(slice['cpu_time'].toInt());
+      cpuTime = Util.instance.timeLong(slice['cpu_time'].toInt());
     }
     return Card(
+      shape: RoundedRectangleBorder(
+          side: BorderSide(), borderRadius: BorderRadius.circular(5)),
       margin: EdgeInsets.all(10),
       child: Padding(
         padding: const EdgeInsets.all(8.0),
@@ -121,7 +131,7 @@ class _TaskManagerState extends State<TaskManager>
                   ),
                 ),
                 Text(
-                    "内存：${slice['memory'] is num ? Util.formatSize(slice['memory'], fixed: 1) : slice['memory']}")
+                    "内存：${slice['memory'] is num ? Util.instance.formatSize(slice['memory'], fixed: 1) : slice['memory']}")
               ],
             ),
             SizedBox(
@@ -141,10 +151,10 @@ class _TaskManagerState extends State<TaskManager>
               children: [
                 Expanded(
                     child: Text(
-                        "读取(秒)：${slice['byte_read_per_sec'] is num ? Util.formatSize(slice['byte_read_per_sec'], fixed: 1, showByte: true) : slice['byte_read_per_sec']}")),
+                        "读取(秒)：${slice['byte_read_per_sec'] is num ? Util.instance.formatSize(slice['byte_read_per_sec'], fixed: 1, showByte: true) : slice['byte_read_per_sec']}")),
                 Expanded(
                     child: Text(
-                        "写入(秒)：${slice['byte_write_per_sec'] is num ? Util.formatSize(slice['byte_write_per_sec'], fixed: 1, showByte: true) : slice['byte_write_per_sec']}")),
+                        "写入(秒)：${slice['byte_write_per_sec'] is num ? Util.instance.formatSize(slice['byte_write_per_sec'], fixed: 1, showByte: true) : slice['byte_write_per_sec']}")),
               ],
             ),
           ],
@@ -155,6 +165,8 @@ class _TaskManagerState extends State<TaskManager>
 
   Widget _buildProcessItem(process) {
     return Card(
+      shape: RoundedRectangleBorder(
+          side: BorderSide(), borderRadius: BorderRadius.circular(5)),
       margin: EdgeInsets.all(10),
       child: Padding(
         padding: const EdgeInsets.all(8.0),
@@ -193,10 +205,10 @@ class _TaskManagerState extends State<TaskManager>
               children: [
                 Expanded(
                     child: Text(
-                        "私有内存：${Util.formatSize(process['mem'] * 97, fixed: 1)}")),
+                        "私有内存：${Util.instance.formatSize(process['mem'] * 97, fixed: 1)}")),
                 Expanded(
                     child: Text(
-                        "共享内存：${Util.formatSize(process['mem_shared'] * 1024, fixed: 2)}")),
+                        "共享内存：${Util.instance.formatSize(process['mem_shared'] * 1024, fixed: 2)}")),
               ],
             ),
           ],
@@ -233,7 +245,7 @@ class _TaskManagerState extends State<TaskManager>
                     unselectedLabelColor: Colors.grey,
                     indicator: BubbleTabIndicator(
                       indicatorColor: Theme.of(context).scaffoldBackgroundColor,
-                      shadowColor: Util.getAdjustColor(
+                      shadowColor: Util.instance.getAdjustColor(
                           Theme.of(context).scaffoldBackgroundColor, -20),
                     ),
                     tabs: [
@@ -254,7 +266,7 @@ class _TaskManagerState extends State<TaskManager>
                   child: TabBarView(
                     controller: _tabController,
                     children: [
-                      if (Util.version == 7)
+                      if (Util.instance.version == 7)
                         ListView.builder(
                           padding: EdgeInsets.all(20),
                           itemBuilder: (context, i) {

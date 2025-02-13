@@ -156,9 +156,9 @@ class _VideoPlayerState extends State<VideoPlayer> {
   parseNfo() async {
     if (widget.nfo != null) {
       final myTransformer = Xml2Json();
-      String nfoUrl = Util.baseUrl +
-          "/fbdownload/info.nfo?dlink=%22${Util.utf8Encode(widget.nfo ?? '')}%22&_sid=%22${Util.sid}%22&mode=open";
-      var res = await Util.get(nfoUrl, decode: false);
+      String nfoUrl = Util.instance.baseUrl +
+          "/fbdownload/info.nfo?dlink=%22${Util.instance.utf8Encode(widget.nfo ?? '')}%22&_sid=%22${Util.instance.sid}%22&mode=open";
+      var res = await Util.instance.get(nfoUrl, decode: false);
       try {
         myTransformer.parse(res);
         var json = jsonDecode(myTransformer.toParker());
@@ -228,8 +228,8 @@ class _VideoPlayerState extends State<VideoPlayer> {
             fsFit: FFit.contain, // 全屏模式下的填充
             fit: FFit.contain, // 正常模式下的填充
             cover: widget.cover != null
-                ? ExtendedNetworkImageProvider(Util.baseUrl +
-                    "/webapi/entry.cgi?path=${Uri.encodeComponent(widget.cover ?? '')}&size=original&api=SYNO.FileStation.Thumb&method=get&version=2&_sid=${Util.sid}&animate=true")
+                ? ExtendedNetworkImageProvider(Util.instance.baseUrl +
+                    "/webapi/entry.cgi?path=${Uri.encodeComponent(widget.cover ?? '')}&size=original&api=SYNO.FileStation.Thumb&method=get&version=2&_sid=${Util.instance.sid}&animate=true")
                 : null,
 
             panelBuilder: fPanelBuilder(

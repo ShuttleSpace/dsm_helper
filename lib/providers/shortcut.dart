@@ -8,6 +8,6 @@ class ShortcutProvider with ChangeNotifier {
   void changeMode(bool showShortcut) async {
     _showShortcut = showShortcut;
     notifyListeners();
-    Util.setStorage("show_shortcut", showShortcut ? "1" : "0");
+    Util.instance.setStorage("show_shortcut", showShortcut ? "1" : "0");
   }
 }

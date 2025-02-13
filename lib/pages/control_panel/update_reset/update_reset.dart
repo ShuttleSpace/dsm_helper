@@ -68,6 +68,8 @@ class _UpdateResetState extends State<UpdateReset>
       body: Column(
         children: [
           Card(
+            shape: RoundedRectangleBorder(
+                side: BorderSide(), borderRadius: BorderRadius.circular(5)),
             margin: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
             child: TabBar(
               dividerHeight: 0,
@@ -80,7 +82,7 @@ class _UpdateResetState extends State<UpdateReset>
               unselectedLabelColor: Colors.grey,
               indicator: BubbleTabIndicator(
                 indicatorColor: Theme.of(context).scaffoldBackgroundColor,
-                shadowColor: Util.getAdjustColor(
+                shadowColor: Util.instance.getAdjustColor(
                     Theme.of(context).scaffoldBackgroundColor, -20),
               ),
               tabs: [
@@ -114,6 +116,9 @@ class _UpdateResetState extends State<UpdateReset>
                       height: 20,
                     ),
                     Card(
+                      shape: RoundedRectangleBorder(
+                          side: BorderSide(),
+                          borderRadius: BorderRadius.circular(5)),
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: Text("产品型号: $model"),
@@ -123,6 +128,9 @@ class _UpdateResetState extends State<UpdateReset>
                       height: 20,
                     ),
                     Card(
+                      shape: RoundedRectangleBorder(
+                          side: BorderSide(),
+                          borderRadius: BorderRadius.circular(5)),
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: Text("DSM 版本: $firmwareVer"),
@@ -132,6 +140,9 @@ class _UpdateResetState extends State<UpdateReset>
                       height: 20,
                     ),
                     Card(
+                      shape: RoundedRectangleBorder(
+                          side: BorderSide(),
+                          borderRadius: BorderRadius.circular(5)),
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: Row(

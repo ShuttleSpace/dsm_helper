@@ -52,6 +52,8 @@ class _UserDetailState extends State<UserDetail>
         });
       },
       child: Card(
+        shape: RoundedRectangleBorder(
+            side: BorderSide(), borderRadius: BorderRadius.circular(5)),
         child: Padding(
           padding: EdgeInsets.all(20),
           child: Row(
@@ -97,6 +99,8 @@ class _UserDetailState extends State<UserDetail>
         });
       },
       child: Card(
+        shape: RoundedRectangleBorder(
+            side: BorderSide(), borderRadius: BorderRadius.circular(5)),
         child: Padding(
           padding: EdgeInsets.all(20),
           child: Column(
@@ -132,6 +136,8 @@ class _UserDetailState extends State<UserDetail>
         });
       },
       child: Card(
+        shape: RoundedRectangleBorder(
+            side: BorderSide(), borderRadius: BorderRadius.circular(5)),
         margin: EdgeInsets.symmetric(vertical: 10),
         child: Padding(
           padding: EdgeInsets.all(20),
@@ -156,7 +162,7 @@ class _UserDetailState extends State<UserDetail>
                 ),
               ),
               Text(
-                "${Util.formatSize(quota['used'] * 1024 * 1024)}",
+                "${Util.instance.formatSize(quota['used'] * 1024 * 1024)}",
                 style: TextStyle(fontSize: 16),
               ),
               Text(
@@ -164,7 +170,7 @@ class _UserDetailState extends State<UserDetail>
                 style: TextStyle(fontSize: 16),
               ),
               Text(
-                "${quota['quota'] == 0 ? "无限制" : Util.formatSize(quota['quota'] * 1024 * 1024)}",
+                "${quota['quota'] == 0 ? "无限制" : Util.instance.formatSize(quota['quota'] * 1024 * 1024)}",
                 style: TextStyle(fontSize: 16),
               ),
             ],
@@ -209,6 +215,8 @@ class _UserDetailState extends State<UserDetail>
         });
       },
       child: Card(
+        shape: RoundedRectangleBorder(
+            side: BorderSide(), borderRadius: BorderRadius.circular(5)),
         child: Padding(
           padding: EdgeInsets.all(20),
           child: Row(
@@ -313,6 +321,8 @@ class _UserDetailState extends State<UserDetail>
       body: Column(
         children: [
           Card(
+            shape: RoundedRectangleBorder(
+                side: BorderSide(), borderRadius: BorderRadius.circular(5)),
             margin: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
             child: TabBar(
               dividerHeight: 0,
@@ -325,7 +335,7 @@ class _UserDetailState extends State<UserDetail>
               unselectedLabelColor: Colors.grey,
               indicator: BubbleTabIndicator(
                 indicatorColor: Theme.of(context).scaffoldBackgroundColor,
-                shadowColor: Util.getAdjustColor(
+                shadowColor: Util.instance.getAdjustColor(
                     Theme.of(context).scaffoldBackgroundColor, -20),
               ),
               tabs: [
@@ -364,6 +374,9 @@ class _UserDetailState extends State<UserDetail>
                   padding: EdgeInsets.all(20),
                   children: [
                     Card(
+                      shape: RoundedRectangleBorder(
+                          side: BorderSide(),
+                          borderRadius: BorderRadius.circular(5)),
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: TextField(
@@ -380,6 +393,9 @@ class _UserDetailState extends State<UserDetail>
                       height: 20,
                     ),
                     Card(
+                      shape: RoundedRectangleBorder(
+                          side: BorderSide(),
+                          borderRadius: BorderRadius.circular(5)),
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: TextField(
@@ -396,6 +412,9 @@ class _UserDetailState extends State<UserDetail>
                       height: 20,
                     ),
                     Card(
+                      shape: RoundedRectangleBorder(
+                          side: BorderSide(),
+                          borderRadius: BorderRadius.circular(5)),
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: TextField(
@@ -412,6 +431,9 @@ class _UserDetailState extends State<UserDetail>
                       height: 20,
                     ),
                     Card(
+                      shape: RoundedRectangleBorder(
+                          side: BorderSide(),
+                          borderRadius: BorderRadius.circular(5)),
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: TextField(
@@ -428,6 +450,9 @@ class _UserDetailState extends State<UserDetail>
                       height: 20,
                     ),
                     Card(
+                      shape: RoundedRectangleBorder(
+                          side: BorderSide(),
+                          borderRadius: BorderRadius.circular(5)),
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: TextField(
@@ -451,6 +476,9 @@ class _UserDetailState extends State<UserDetail>
                         });
                       },
                       child: Card(
+                        shape: RoundedRectangleBorder(
+                            side: BorderSide(),
+                            borderRadius: BorderRadius.circular(5)),
                         child: Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: Row(
@@ -477,6 +505,9 @@ class _UserDetailState extends State<UserDetail>
                         });
                       },
                       child: Card(
+                        shape: RoundedRectangleBorder(
+                            side: BorderSide(),
+                            borderRadius: BorderRadius.circular(5)),
                         child: Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: Row(
@@ -507,6 +538,9 @@ class _UserDetailState extends State<UserDetail>
                         });
                       },
                       child: Card(
+                        shape: RoundedRectangleBorder(
+                            side: BorderSide(),
+                            borderRadius: BorderRadius.circular(5)),
                         child: Padding(
                           padding: EdgeInsets.all(20),
                           child: Column(
@@ -527,6 +561,9 @@ class _UserDetailState extends State<UserDetail>
                               ),
                               if (user?['expired'] != "normal")
                                 Card(
+                                  shape: RoundedRectangleBorder(
+                                      side: BorderSide(),
+                                      borderRadius: BorderRadius.circular(5)),
                                   margin: EdgeInsets.only(top: 20),
                                   child: Padding(
                                     padding: EdgeInsets.all(20),
@@ -541,6 +578,10 @@ class _UserDetailState extends State<UserDetail>
                                               });
                                             },
                                             child: Card(
+                                              shape: RoundedRectangleBorder(
+                                                  side: BorderSide(),
+                                                  borderRadius:
+                                                      BorderRadius.circular(5)),
                                               // margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                                               child: Padding(
                                                 padding:
@@ -591,6 +632,10 @@ class _UserDetailState extends State<UserDetail>
                                               });
                                             },
                                             child: Card(
+                                              shape: RoundedRectangleBorder(
+                                                  side: BorderSide(),
+                                                  borderRadius:
+                                                      BorderRadius.circular(5)),
                                               // margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                                               child: Padding(
                                                 padding:
@@ -684,11 +729,11 @@ class _UserDetailState extends State<UserDetail>
                 onPressed: () async {
                   if (password.isNotBlank || confirmPassword.isNotBlank) {
                     if (password != confirmPassword) {
-                      Util.toast("密码输入不一致");
+                      Util.instance.toast("密码输入不一致");
                       return;
                     }
                     if (password != '' && password.length < 6) {
-                      Util.toast("密码最低6位");
+                      Util.instance.toast("密码最低6位");
                       return;
                     }
                     user?['password'] = password;
@@ -718,9 +763,9 @@ class _UserDetailState extends State<UserDetail>
                   if (res['success']) {
                     widget.user['name'] = user?['new_name'];
                     widget.user['email'] = user?['email'];
-                    Util.toast("保存成功");
+                    Util.instance.toast("保存成功");
                   } else {
-                    Util.toast("保存失败,代码${res['error']['code']}");
+                    Util.instance.toast("保存失败,代码${res['error']['code']}");
                   }
                 },
                 child: saving

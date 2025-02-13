@@ -69,6 +69,8 @@ class _MediaIndexState extends State<MediaIndex> {
       body: ListView(
         children: [
           Card(
+            shape: RoundedRectangleBorder(
+                side: BorderSide(), borderRadius: BorderRadius.circular(5)),
             margin: EdgeInsets.only(top: 20, left: 20, right: 20),
             child: Padding(
               padding: const EdgeInsets.all(20.0),
@@ -143,6 +145,8 @@ class _MediaIndexState extends State<MediaIndex> {
             ),
           ),
           Card(
+            shape: RoundedRectangleBorder(
+                side: BorderSide(), borderRadius: BorderRadius.circular(5)),
             margin: EdgeInsets.only(top: 20, left: 20, right: 20),
             child: Padding(
               padding: const EdgeInsets.all(20.0),
@@ -182,6 +186,9 @@ class _MediaIndexState extends State<MediaIndex> {
                                 getData();
                               },
                               child: Card(
+                                shape: RoundedRectangleBorder(
+                                    side: BorderSide(),
+                                    borderRadius: BorderRadius.circular(5)),
                                 child: Padding(
                                   padding: const EdgeInsets.all(8.0),
                                   child: Row(
@@ -213,6 +220,9 @@ class _MediaIndexState extends State<MediaIndex> {
                                 getData();
                               },
                               child: Card(
+                                shape: RoundedRectangleBorder(
+                                    side: BorderSide(),
+                                    borderRadius: BorderRadius.circular(5)),
                                 child: Padding(
                                   padding: const EdgeInsets.all(8.0),
                                   child: Row(
@@ -239,6 +249,8 @@ class _MediaIndexState extends State<MediaIndex> {
             ),
           ),
           Card(
+            shape: RoundedRectangleBorder(
+                side: BorderSide(), borderRadius: BorderRadius.circular(5)),
             margin: EdgeInsets.only(top: 20, left: 20, right: 20),
             child: Padding(
               padding: const EdgeInsets.all(20.0),
@@ -274,6 +286,9 @@ class _MediaIndexState extends State<MediaIndex> {
                           getData();
                         },
                         child: Card(
+                          shape: RoundedRectangleBorder(
+                              side: BorderSide(),
+                              borderRadius: BorderRadius.circular(5)),
                           child: Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: Row(

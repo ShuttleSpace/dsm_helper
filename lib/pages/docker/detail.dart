@@ -69,7 +69,7 @@ class _ContainerDetailState extends State<ContainerDetail>
       }
       getLogDates();
     } else {
-      Util.toast("获取详情失败");
+      Util.instance.toast("获取详情失败");
     }
   }
 
@@ -219,6 +219,8 @@ class _ContainerDetailState extends State<ContainerDetail>
 
   Widget _buildProcessItem(process) {
     return Card(
+      shape: RoundedRectangleBorder(
+          side: BorderSide(), borderRadius: BorderRadius.circular(5)),
       margin: EdgeInsets.symmetric(horizontal: 20),
       child: Padding(
         padding: EdgeInsets.all(20),
@@ -241,7 +243,7 @@ class _ContainerDetailState extends State<ContainerDetail>
                 ),
                 Expanded(
                   child: Text(
-                    "RAM：${Util.formatSize(process['memory'], fixed: 0)}",
+                    "RAM：${Util.instance.formatSize(process['memory'], fixed: 0)}",
                     textAlign: TextAlign.center,
                   ),
                 ),
@@ -259,6 +261,8 @@ class _ContainerDetailState extends State<ContainerDetail>
 
   Widget _buildLogItem(log) {
     return Card(
+      shape: RoundedRectangleBorder(
+          side: BorderSide(), borderRadius: BorderRadius.circular(5)),
       child: Padding(
         padding: EdgeInsets.all(20),
         child: Column(
@@ -294,6 +298,8 @@ class _ContainerDetailState extends State<ContainerDetail>
         getLog();
       },
       child: Card(
+        shape: RoundedRectangleBorder(
+            side: BorderSide(), borderRadius: BorderRadius.circular(5)),
         child: Padding(
           padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
           child: Column(
@@ -328,6 +334,9 @@ class _ContainerDetailState extends State<ContainerDetail>
           : Column(
               children: [
                 Card(
+                  shape: RoundedRectangleBorder(
+                      side: BorderSide(),
+                      borderRadius: BorderRadius.circular(5)),
                   margin: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
                   child: TabBar(
                     dividerHeight: 0,
@@ -340,7 +349,7 @@ class _ContainerDetailState extends State<ContainerDetail>
                     unselectedLabelColor: Colors.grey,
                     indicator: BubbleTabIndicator(
                       indicatorColor: Theme.of(context).scaffoldBackgroundColor,
-                      shadowColor: Util.getAdjustColor(
+                      shadowColor: Util.instance.getAdjustColor(
                           Theme.of(context).scaffoldBackgroundColor, -20),
                     ),
                     tabs: [
@@ -369,6 +378,9 @@ class _ContainerDetailState extends State<ContainerDetail>
                       ListView(
                         children: [
                           Card(
+                            shape: RoundedRectangleBorder(
+                                side: BorderSide(),
+                                borderRadius: BorderRadius.circular(5)),
                             margin: EdgeInsets.symmetric(
                                 horizontal: 20, vertical: 10),
                             child: Padding(
@@ -447,7 +459,7 @@ class _ContainerDetailState extends State<ContainerDetail>
                                       Expanded(
                                         child: Text(
                                           memory > 0
-                                              ? Util.formatSize(memory)
+                                              ? Util.instance.formatSize(memory)
                                               : "自动",
                                         ),
                                       ),
@@ -471,6 +483,9 @@ class _ContainerDetailState extends State<ContainerDetail>
                             ),
                           ),
                           Card(
+                            shape: RoundedRectangleBorder(
+                                side: BorderSide(),
+                                borderRadius: BorderRadius.circular(5)),
                             margin: EdgeInsets.symmetric(
                                 horizontal: 20, vertical: 10),
                             child: Padding(
@@ -516,6 +531,9 @@ class _ContainerDetailState extends State<ContainerDetail>
                             ),
                           ),
                           Card(
+                            shape: RoundedRectangleBorder(
+                                side: BorderSide(),
+                                borderRadius: BorderRadius.circular(5)),
                             margin: EdgeInsets.symmetric(
                                 horizontal: 20, vertical: 10),
                             child: Padding(
@@ -563,6 +581,9 @@ class _ContainerDetailState extends State<ContainerDetail>
                             ),
                           ),
                           Card(
+                            shape: RoundedRectangleBorder(
+                                side: BorderSide(),
+                                borderRadius: BorderRadius.circular(5)),
                             margin: EdgeInsets.symmetric(
                                 horizontal: 20, vertical: 10),
                             child: Padding(
@@ -602,6 +623,9 @@ class _ContainerDetailState extends State<ContainerDetail>
                             ),
                           ),
                           Card(
+                            shape: RoundedRectangleBorder(
+                                side: BorderSide(),
+                                borderRadius: BorderRadius.circular(5)),
                             margin: EdgeInsets.symmetric(
                                 horizontal: 20, vertical: 10),
                             child: Padding(
@@ -641,6 +665,9 @@ class _ContainerDetailState extends State<ContainerDetail>
                             ),
                           ),
                           Card(
+                            shape: RoundedRectangleBorder(
+                                side: BorderSide(),
+                                borderRadius: BorderRadius.circular(5)),
                             margin: EdgeInsets.symmetric(
                                 horizontal: 20, vertical: 10),
                             child: Padding(

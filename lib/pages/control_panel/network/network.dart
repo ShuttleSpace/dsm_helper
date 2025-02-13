@@ -109,6 +109,9 @@ class _NetworkState extends State<Network> with SingleTickerProviderStateMixin {
           : Column(
               children: [
                 Card(
+                  shape: RoundedRectangleBorder(
+                      side: BorderSide(),
+                      borderRadius: BorderRadius.circular(5)),
                   margin: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
                   child: TabBar(
                     dividerHeight: 0,
@@ -121,7 +124,7 @@ class _NetworkState extends State<Network> with SingleTickerProviderStateMixin {
                     unselectedLabelColor: Colors.grey,
                     indicator: BubbleTabIndicator(
                       indicatorColor: Theme.of(context).scaffoldBackgroundColor,
-                      shadowColor: Util.getAdjustColor(
+                      shadowColor: Util.instance.getAdjustColor(
                           Theme.of(context).scaffoldBackgroundColor, -20),
                     ),
                     tabs: [
@@ -160,6 +163,9 @@ class _NetworkState extends State<Network> with SingleTickerProviderStateMixin {
                       ListView(
                         children: [
                           Card(
+                            shape: RoundedRectangleBorder(
+                                side: BorderSide(),
+                                borderRadius: BorderRadius.circular(5)),
                             margin:
                                 EdgeInsets.only(top: 20, left: 20, right: 20),
                             child: Padding(
@@ -181,6 +187,9 @@ class _NetworkState extends State<Network> with SingleTickerProviderStateMixin {
                                     height: 20,
                                   ),
                                   Card(
+                                    shape: RoundedRectangleBorder(
+                                        side: BorderSide(),
+                                        borderRadius: BorderRadius.circular(5)),
                                     child: Padding(
                                       padding: const EdgeInsets.all(8.0),
                                       child: TextField(
@@ -215,6 +224,10 @@ class _NetworkState extends State<Network> with SingleTickerProviderStateMixin {
                                       });
                                     },
                                     child: Card(
+                                      shape: RoundedRectangleBorder(
+                                          side: BorderSide(),
+                                          borderRadius:
+                                              BorderRadius.circular(5)),
                                       child: Padding(
                                         padding: const EdgeInsets.all(8.0),
                                         child: Row(
@@ -236,6 +249,9 @@ class _NetworkState extends State<Network> with SingleTickerProviderStateMixin {
                                     height: 20,
                                   ),
                                   Card(
+                                    shape: RoundedRectangleBorder(
+                                        side: BorderSide(),
+                                        borderRadius: BorderRadius.circular(5)),
                                     child: Padding(
                                       padding: const EdgeInsets.all(8.0),
                                       child: TextField(
@@ -254,6 +270,9 @@ class _NetworkState extends State<Network> with SingleTickerProviderStateMixin {
                                     height: 20,
                                   ),
                                   Card(
+                                    shape: RoundedRectangleBorder(
+                                        side: BorderSide(),
+                                        borderRadius: BorderRadius.circular(5)),
                                     child: Padding(
                                       padding: const EdgeInsets.all(8.0),
                                       child: TextField(
@@ -276,6 +295,9 @@ class _NetworkState extends State<Network> with SingleTickerProviderStateMixin {
                             height: 20,
                           ),
                           Card(
+                            shape: RoundedRectangleBorder(
+                                side: BorderSide(),
+                                borderRadius: BorderRadius.circular(5)),
                             margin:
                                 EdgeInsets.only(top: 20, left: 20, right: 20),
                             child: Padding(
@@ -300,6 +322,10 @@ class _NetworkState extends State<Network> with SingleTickerProviderStateMixin {
                                       });
                                     },
                                     child: Card(
+                                      shape: RoundedRectangleBorder(
+                                          side: BorderSide(),
+                                          borderRadius:
+                                              BorderRadius.circular(5)),
                                       child: Padding(
                                         padding: const EdgeInsets.all(8.0),
                                         child: Row(
@@ -321,6 +347,9 @@ class _NetworkState extends State<Network> with SingleTickerProviderStateMixin {
                                     height: 20,
                                   ),
                                   Card(
+                                    shape: RoundedRectangleBorder(
+                                        side: BorderSide(),
+                                        borderRadius: BorderRadius.circular(5)),
                                     child: Padding(
                                       padding: const EdgeInsets.all(8.0),
                                       child: TextField(
@@ -339,6 +368,9 @@ class _NetworkState extends State<Network> with SingleTickerProviderStateMixin {
                                     height: 20,
                                   ),
                                   Card(
+                                    shape: RoundedRectangleBorder(
+                                        side: BorderSide(),
+                                        borderRadius: BorderRadius.circular(5)),
                                     child: Padding(
                                       padding: const EdgeInsets.all(8.0),
                                       child: TextField(
@@ -366,6 +398,9 @@ class _NetworkState extends State<Network> with SingleTickerProviderStateMixin {
                         children: [
                           ...ethernets.map((ethernet) {
                             return Card(
+                              shape: RoundedRectangleBorder(
+                                  side: BorderSide(),
+                                  borderRadius: BorderRadius.circular(5)),
                               margin:
                                   EdgeInsets.only(left: 20, right: 20, top: 20),
                               // padding: EdgeInsets.symmetric(horizontal: 20),
@@ -484,6 +519,9 @@ class _NetworkState extends State<Network> with SingleTickerProviderStateMixin {
                           }).toList(),
                           ...pppoes.map((pppoe) {
                             return Card(
+                              shape: RoundedRectangleBorder(
+                                  side: BorderSide(),
+                                  borderRadius: BorderRadius.circular(5)),
                               margin:
                                   EdgeInsets.only(left: 20, right: 20, top: 20),
                               // padding: EdgeInsets.symmetric(horizontal: 20),

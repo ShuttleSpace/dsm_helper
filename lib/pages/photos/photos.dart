@@ -57,6 +57,9 @@ class _PhotosState extends State<Photos> {
                       return Material(
                         color: Colors.transparent,
                         child: Card(
+                          shape: RoundedRectangleBorder(
+                              side: BorderSide(),
+                              borderRadius: BorderRadius.circular(5)),
                           child: SafeArea(
                             top: false,
                             child: Padding(

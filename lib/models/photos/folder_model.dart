@@ -29,11 +29,11 @@ class FolderModel {
   });
   static Future<FolderModel> fetch(
       {List<String> additional = const [], bool isTeam = false}) async {
-    var res = await Util.post("entry.cgi", data: {
+    var res = await Util.instance.post("entry.cgi", data: {
       "api": 'SYNO.Foto${isTeam ? 'Team' : ''}.Browse.Folder',
       "method": 'get',
       "version": 2,
-      "_sid": Util.sid,
+      "_sid": Util.instance.sid,
       "additional": jsonEncode(additional),
     });
     if (res['success']) {
@@ -50,14 +50,14 @@ class FolderModel {
       "api": 'SYNO.Foto${isTeam ? 'Team' : ''}.Browse.Folder',
       "method": 'list',
       "version": 2,
-      "_sid": Util.sid,
+      "_sid": Util.instance.sid,
       "additional": jsonEncode(additional),
       "sort_by": "filename",
       "sort_direction": "asc",
       "offset": 0,
       "limit": 5000,
     };
-    var res = await Util.post("entry.cgi", data: data);
+    var res = await Util.instance.post("entry.cgi", data: data);
     if (res['success']) {
       List list = res['data']['list'];
       folders = [];
@@ -72,12 +72,12 @@ class FolderModel {
 
   Future<List<PhotoModel>> fetchPhotos(
       {List<String> additional = const [], bool isTeam = false}) async {
-    var res = await Util.post("entry.cgi", data: {
+    var res = await Util.instance.post("entry.cgi", data: {
       "folder_id": id,
       "api": 'SYNO.Foto${isTeam ? 'Team' : ''}.Browse.Item',
       "method": 'list',
       "version": 1,
-      "_sid": Util.sid,
+      "_sid": Util.instance.sid,
       "additional": jsonEncode(additional),
       "sort_by": "takentime",
       "sort_direction": "asc",

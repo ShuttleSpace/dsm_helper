@@ -35,12 +35,12 @@ class _SelectFileState extends State<SelectFile> {
         size = res['data']['size'];
       });
     } else {
-      Util.toast("获取文件列表失败，代码${res['error']['code']}");
+      Util.instance.toast("获取文件列表失败，代码${res['error']['code']}");
     }
   }
 
   Widget _buildFileItem(file) {
-    FileTypeEnum fileType = Util.fileType(file['name']);
+    FileTypeEnum fileType = Util.instance.fileType(file['name']);
     return GestureDetector(
       onTap: () {
         if (selectedFiles.contains(file['index'])) {
@@ -54,6 +54,8 @@ class _SelectFileState extends State<SelectFile> {
         }
       },
       child: Card(
+        shape: RoundedRectangleBorder(
+            side: BorderSide(), borderRadius: BorderRadius.circular(5)),
         child: Padding(
           padding: EdgeInsets.symmetric(vertical: 20),
           child: Row(
@@ -81,7 +83,7 @@ class _SelectFileState extends State<SelectFile> {
                       height: 5,
                     ),
                     Text(
-                      "${Util.formatSize(file['size'])}",
+                      "${Util.instance.formatSize(file['size'])}",
                       style: TextStyle(fontSize: 12, color: Colors.grey),
                     ),
                   ],
@@ -91,6 +93,8 @@ class _SelectFileState extends State<SelectFile> {
                 width: 10,
               ),
               Card(
+                shape: RoundedRectangleBorder(
+                    side: BorderSide(), borderRadius: BorderRadius.circular(5)),
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: SizedBox(
@@ -128,6 +132,8 @@ class _SelectFileState extends State<SelectFile> {
             height: 20,
           ),
           Card(
+            shape: RoundedRectangleBorder(
+                side: BorderSide(), borderRadius: BorderRadius.circular(5)),
             margin: EdgeInsets.symmetric(horizontal: 20),
             child: Padding(
               padding: const EdgeInsets.all(8.0),
@@ -139,7 +145,7 @@ class _SelectFileState extends State<SelectFile> {
                     height: 10,
                   ),
                   Text(
-                    "${Util.formatSize(size)}",
+                    "${Util.instance.formatSize(size)}",
                     style: TextStyle(fontSize: 12, color: Colors.grey),
                   ),
                 ],
@@ -220,12 +226,12 @@ class _SelectFileState extends State<SelectFile> {
                   var res = await Api.downloadCreate(
                       widget.listId[0], widget.destination, selectedFiles);
                   if (res['success']) {
-                    Util.toast("下载任务创建成功");
+                    Util.instance.toast("下载任务创建成功");
                     Navigator.of(context).pop();
                     Navigator.of(context).pop();
                   }
                 } else {
-                  Util.toast("请选择要下载的文件");
+                  Util.instance.toast("请选择要下载的文件");
                 }
               },
               // margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),

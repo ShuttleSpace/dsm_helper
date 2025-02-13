@@ -27,7 +27,7 @@ class _LogoutState extends State<Logout> {
             onTap: () {
               setState(() {
                 read = !read;
-                Util.setStorage("read", read ? "1" : "0");
+                Util.instance.setStorage("read", read ? "1" : "0");
               });
             },
             child: Row(
@@ -74,7 +74,7 @@ class _LogoutState extends State<Logout> {
           ),
           OutlinedButton(
               onPressed: () {
-                Util.toast("我们已收到您的账号注销申请，将在3个工作日内处理。");
+                Util.instance.toast("我们已收到您的账号注销申请，将在3个工作日内处理。");
                 Navigator.of(context).pop();
               },
               child: Row(

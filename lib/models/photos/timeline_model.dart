@@ -24,7 +24,7 @@ class TimelineModel {
           "SYNO.Foto${isTeam ? 'Team' : ''}.Browse.${recentlyAdd ? 'RecentlyAdded' : 'Timeline'}",
       "method": recentlyAdd ? "get_timeline" : 'get',
       "version": 2,
-      "_sid": Util.sid,
+      "_sid": Util.instance.sid,
     };
     data['type'] = type;
     data['geocoding_id'] = geocodingId;
@@ -34,7 +34,7 @@ class TimelineModel {
     //   data['method'] = "get_with_filter";
     // }
     print(data);
-    var res = await Util.post("entry.cgi", data: data);
+    var res = await Util.instance.post("entry.cgi", data: data);
     print(res);
     if (res['success']) {
       List data = res['data']['section'];
@@ -125,7 +125,7 @@ class Day {
           "SYNO.Foto${isTeam ? 'Team' : ''}.Browse.${recentlyAdd ? 'RecentlyAdded' : 'Item'}",
       "method": 'list',
       "version": 1,
-      "_sid": Util.sid,
+      "_sid": Util.instance.sid,
       "timeline_group_unit": "day",
     };
     data['type'] = type;
@@ -147,7 +147,7 @@ class Day {
       //   ]);
       // }
     }
-    var res = await Util.post("entry.cgi", data: data);
+    var res = await Util.instance.post("entry.cgi", data: data);
     // print(res);
     if (res['success']) {
       photos = [];
@@ -165,12 +165,12 @@ class Day {
     Map<String, dynamic> data = {
       "start_time": start,
       "end_time": end,
-      "api": '"SYNO.${Util.version == 7 ? "Foto" : "Photo"}.Browse.Timeline"',
+      "api": '"SYNO.${Util.instance.version == 7 ? "Foto" : "Photo"}.Browse.Timeline"',
       "method": '"get_geocoding"',
       "version": 1,
-      "_sid": Util.sid,
+      "_sid": Util.instance.sid,
     };
-    var res = await Util.post("entry.cgi", data: data);
+    var res = await Util.instance.post("entry.cgi", data: data);
     return res;
   }
 

@@ -31,7 +31,7 @@ class _AccountsState extends State<Accounts> {
   }
 
   getData() async {
-    String serverString = await Util.getStorage("servers") ?? '';
+    String serverString = await Util.instance.getStorage("servers") ?? '';
     if (serverString.isNotBlank) {
       setState(() {
         servers = json.decode(serverString);
@@ -114,7 +114,7 @@ class _AccountsState extends State<Accounts> {
         "sid": server['sid'],
       });
     });
-    Util.setStorage("servers", json.encode(accounts));
+    Util.instance.setStorage("servers", json.encode(accounts));
   }
 
   serverInfo(server) async {
@@ -166,28 +166,30 @@ class _AccountsState extends State<Accounts> {
       onTap: () {
         print(server);
         if (server['is_login']) {
-          Util.account = "${server['account']}";
-          Util.baseUrl = "${server['base_url']}";
-          Util.checkSsl = server['check_ssl'];
-          Util.setStorage("base_url", Util.baseUrl);
+          Util.instance.account = "${server['account']}";
+          Util.instance.baseUrl = "${server['base_url']}";
+          Util.instance.checkSsl = server['check_ssl'];
+          Util.instance.setStorage("base_url", Util.instance.baseUrl);
 
-          Util.setStorage("https", server['https'] ? "1" : "0");
-          Util.setStorage("host", server['host']);
-          Util.setStorage("port", server['port']);
-          Util.setStorage("account", server['account']);
-          Util.setStorage("note", server['note'] ?? '');
-          Util.setStorage(
+          Util.instance.setStorage("https", server['https'] ? "1" : "0");
+          Util.instance.setStorage("host", server['host']);
+          Util.instance.setStorage("port", server['port']);
+          Util.instance.setStorage("account", server['account']);
+          Util.instance.setStorage("note", server['note'] ?? '');
+          Util.instance.setStorage(
               "remember_password", server['remember_password'] ? "1" : "0");
           if (server['remember_password']) {
-            Util.setStorage("password", server['password']);
+            Util.instance.setStorage("password", server['password']);
           } else {
-            Util.setStorage("password", "");
+            Util.instance.setStorage("password", "");
           }
-          Util.setStorage("auto_login", server['auto_login'] ? "1" : "0");
-          Util.setStorage("check_ssl", server['check_ssl'] ? "1" : "0");
-          Util.setStorage("sid", server['sid']);
-          Util.sid = server['sid'];
-          Util.cookie = server['cookie'];
+          Util.instance
+              .setStorage("auto_login", server['auto_login'] ? "1" : "0");
+          Util.instance
+              .setStorage("check_ssl", server['check_ssl'] ? "1" : "0");
+          Util.instance.setStorage("sid", server['sid']);
+          Util.instance.sid = server['sid'];
+          Util.instance.cookie = server['cookie'];
           Navigator.of(context)
               .pushNamedAndRemoveUntil("/home", (route) => false);
         } else {
@@ -198,6 +200,8 @@ class _AccountsState extends State<Accounts> {
         }
       },
       child: Card(
+        shape: RoundedRectangleBorder(
+            side: BorderSide(), borderRadius: BorderRadius.circular(5)),
         child: Padding(
           padding: EdgeInsets.all(20),
           child: Row(
@@ -278,7 +282,7 @@ class _AccountsState extends State<Accounts> {
                             });
 
                             saveAccounts();
-                            Util.toast("删除成功");
+                            Util.instance.toast("删除成功");
                           },
                           child: Image.asset(
                             "assets/icons/delete.png",
@@ -293,6 +297,9 @@ class _AccountsState extends State<Accounts> {
                           Column(
                             children: [
                               Card(
+                                shape: RoundedRectangleBorder(
+                                    side: BorderSide(),
+                                    borderRadius: BorderRadius.circular(5)),
                                 margin: EdgeInsets.only(top: 10, right: 10),
                                 child: Padding(
                                   padding: const EdgeInsets.all(8.0),
@@ -338,6 +345,9 @@ class _AccountsState extends State<Accounts> {
                           Column(
                             children: [
                               Card(
+                                shape: RoundedRectangleBorder(
+                                    side: BorderSide(),
+                                    borderRadius: BorderRadius.circular(5)),
                                 margin: EdgeInsets.only(top: 10, right: 10),
                                 child: Padding(
                                   padding: const EdgeInsets.all(8.0),
@@ -398,7 +408,7 @@ class _AccountsState extends State<Accounts> {
                                             size: 16,
                                           ),
                                           Text(
-                                            "${server['loading'] ? "-" : "${Util.formatSize(server['tx'], fixed: 0)}/S"}",
+                                            "${server['loading'] ? "-" : "${Util.instance.formatSize(server['tx'], fixed: 0)}/S"}",
                                             style: TextStyle(
                                                 color: Colors.blue,
                                                 fontSize: 12),
@@ -418,7 +428,7 @@ class _AccountsState extends State<Accounts> {
                                             size: 16,
                                           ),
                                           Text(
-                                            "${server['loading'] ? "-" : "${Util.formatSize(server['rx'], fixed: 0)}/S"}",
+                                            "${server['loading'] ? "-" : "${Util.instance.formatSize(server['rx'], fixed: 0)}/S"}",
                                             style: TextStyle(
                                                 color: Colors.green,
                                                 fontSize: 12),
@@ -441,7 +451,7 @@ class _AccountsState extends State<Accounts> {
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
                                       Text(
-                                        "R:${server['loading'] ? "-" : "${Util.formatSize(server['read'], fixed: 0)}/S"}",
+                                        "R:${server['loading'] ? "-" : "${Util.instance.formatSize(server['read'], fixed: 0)}/S"}",
                                         style: TextStyle(
                                             color: Colors.blue, fontSize: 12),
                                       ),
@@ -449,7 +459,7 @@ class _AccountsState extends State<Accounts> {
                                         height: 10,
                                       ),
                                       Text(
-                                        "W:${server['loading'] ? "-" : "${Util.formatSize(server['write'], fixed: 0)}/S"}",
+                                        "W:${server['loading'] ? "-" : "${Util.instance.formatSize(server['write'], fixed: 0)}/S"}",
                                         style: TextStyle(
                                             color: Colors.green, fontSize: 12),
                                       )
@@ -493,6 +503,8 @@ class _AccountsState extends State<Accounts> {
                 });
               },
               child: Card(
+                shape: RoundedRectangleBorder(
+                    side: BorderSide(), borderRadius: BorderRadius.circular(5)),
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Icon(visible

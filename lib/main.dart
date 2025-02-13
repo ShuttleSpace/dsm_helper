@@ -36,7 +36,7 @@ void main() async {
   };
 
   WidgetsFlutterBinding.ensureInitialized();
-  String agreement = await Util.getStorage("agreement") ?? '';
+  String agreement = await Util.instance.getStorage("agreement") ?? '';
   Fluwx fluwx = Fluwx();
   Log.init();
   if (agreement == "1") {
@@ -47,20 +47,20 @@ void main() async {
         .then((value) {
       // stopLog();
     });
-    Util.appUrl = '';
-    Util.baseUrl = '';
+    Util.instance.appUrl = '';
+    Util.instance.baseUrl = '';
     // 是否关闭广告
     // 判断是否登录
     bool isForever = true;
     DateTime noAdTime = DateTime.now();
-    Util.isWechatInstalled = await fluwx.isWeChatInstalled;
-    String userToken = await Util.getStorage("user_token") ?? '';
-    String noAdTimeStr = await Util.getStorage("no_ad_time") ?? '';
+    Util.instance.isWechatInstalled = await fluwx.isWeChatInstalled;
+    String userToken = await Util.instance.getStorage("user_token") ?? '';
+    String noAdTimeStr = await Util.instance.getStorage("no_ad_time") ?? '';
     if (noAdTimeStr.isNotBlank) {
       noAdTime = DateTime.parse(noAdTimeStr);
     }
     if (userToken.isNotBlank) {
-      isForever = Util.vipForever = true;
+      isForever = Util.instance.vipForever = true;
     }
 
     if (isForever || (noAdTime.isAfter(DateTime.now()))) {
@@ -69,15 +69,16 @@ void main() async {
         debugPrint("免广告有效期内");
       }
     } else {
-      Util.removeStorage("no_ad_time");
+      Util.instance.removeStorage("no_ad_time");
     }
   }
   await FlutterDownloader.initialize(debug: true, ignoreSsl: true);
 
-  Util.downloadSavePath = await Util.getStorage("download_save_path") ??
-      "/storage/emulated/0/dsm_helper/Download";
-  Util.getStorage("download_wifi_only").then((value) {
-    Util.downloadWifiOnly = value == "1";
+  Util.instance.downloadSavePath =
+      await Util.instance.getStorage("download_save_path") ??
+          "/storage/emulated/0/dsm_helper/Download";
+  Util.instance.getStorage("download_wifi_only").then((value) {
+    Util.instance.downloadWifiOnly = value == "1";
   });
   //判断是否需要启动密码
   bool launchAuth = false;
@@ -87,15 +88,15 @@ void main() async {
   bool showWallpaper = true;
   int refreshDuration = 10;
   bool launchAccountPage = false;
-  String launchAuthStr = await Util.getStorage("launch_auth") ?? '';
+  String launchAuthStr = await Util.instance.getStorage("launch_auth") ?? '';
   String launchAuthPasswordStr =
-      await Util.getStorage("launch_auth_password") ?? '';
+      await Util.instance.getStorage("launch_auth_password") ?? '';
   String launchAuthBiometricsStr =
-      await Util.getStorage("launch_auth_biometrics") ?? '';
+      await Util.instance.getStorage("launch_auth_biometrics") ?? '';
   String launchAccountPageStr =
-      await Util.getStorage('launch_account_page') ?? '';
+      await Util.instance.getStorage('launch_account_page') ?? '';
   PackageInfo packageInfo = await PackageInfo.fromPlatform();
-  Util.appName = packageInfo.appName;
+  Util.instance.appName = packageInfo.appName;
   launchAuth = launchAuthStr == "1";
   password = launchAuthPasswordStr == "1";
   biometrics = launchAuthBiometricsStr == "1";
@@ -105,48 +106,52 @@ void main() async {
   bool authPage = launchAuth && (password || biometrics);
 
   //暗色模式
-  String darkModeStr = await Util.getStorage("dark_mode") ?? '';
+  String darkModeStr = await Util.instance.getStorage("dark_mode") ?? '';
   int darkMode = 2;
   if (darkModeStr.isNotBlank) {
     darkMode = int.parse(darkModeStr);
   }
 
   //震动开关
-  String vibrateOn = await Util.getStorage("vibrate_on") ?? '';
-  String vibrateNormal = await Util.getStorage("vibrate_normal") ?? '';
-  String vibrateWarning = await Util.getStorage("vibrate_warning") ?? '';
-  String showShortcutsStr = await Util.getStorage("show_shortcut") ?? '';
+  String vibrateOn = await Util.instance.getStorage("vibrate_on") ?? '';
+  String vibrateNormal = await Util.instance.getStorage("vibrate_normal") ?? '';
+  String vibrateWarning =
+      await Util.instance.getStorage("vibrate_warning") ?? '';
+  String showShortcutsStr =
+      await Util.instance.getStorage("show_shortcut") ?? '';
   if (showShortcutsStr.isNotBlank) {
     showShortcuts = showShortcutsStr == "1";
   }
-  String showWallpaperStr = await Util.getStorage("show_wallpaper") ?? '';
+  String showWallpaperStr =
+      await Util.instance.getStorage("show_wallpaper") ?? '';
   if (showWallpaperStr.isNotBlank) {
     showWallpaper = showWallpaperStr == "1";
   }
-  String refreshDurationStr = await Util.getStorage("refresh_duration") ?? '';
+  String refreshDurationStr =
+      await Util.instance.getStorage("refresh_duration") ?? '';
   if (refreshDurationStr.isNotBlank) {
     refreshDuration = int.parse(refreshDurationStr);
   }
   if (vibrateOn.isNotBlank) {
-    Util.vibrateOn = vibrateOn == "1";
+    Util.instance.vibrateOn = vibrateOn == "1";
   } else {
-    Util.vibrateOn = true;
+    Util.instance.vibrateOn = true;
   }
   if (vibrateNormal.isNotBlank) {
-    Util.vibrateNormal = vibrateNormal == "1";
+    Util.instance.vibrateNormal = vibrateNormal == "1";
   } else {
-    Util.vibrateNormal = true;
+    Util.instance.vibrateNormal = true;
   }
   if (vibrateWarning.isNotBlank) {
-    Util.vibrateWarning = vibrateWarning == "1";
+    Util.instance.vibrateWarning = vibrateWarning == "1";
   } else {
-    Util.vibrateWarning = true;
+    Util.instance.vibrateWarning = true;
   }
-  String checkSsl = await Util.getStorage("check_ssl") ?? '';
+  String checkSsl = await Util.instance.getStorage("check_ssl") ?? '';
   if (checkSsl.isNotBlank) {
-    Util.checkSsl = checkSsl == "1";
+    Util.instance.checkSsl = checkSsl == "1";
   } else {
-    Util.checkSsl = true;
+    Util.instance.checkSsl = true;
   }
   runApp(
     MultiProvider(
@@ -198,7 +203,7 @@ class _MyAppState extends State<MyApp> {
                 loadingBackButtonClose: true,
               ),
               child: MaterialApp(
-                title: '${Util.appName}',
+                title: '${Util.instance.appName}',
                 debugShowCheckedModeBanner: false,
                 theme: darkModeProvider.darkMode == 2
                     ? lightTheme

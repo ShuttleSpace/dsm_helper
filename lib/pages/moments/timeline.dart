@@ -34,7 +34,7 @@ class _TimelineState extends State<Timeline> {
     if (res['success'] && mounted) {
       setState(() {
         timeline = [];
-        if (Util.version == 7) {
+        if (Util.instance.version == 7) {
           for (var section in res['data']['section']) {
             timeline.addAll(section['list']);
           }
@@ -100,7 +100,7 @@ class _TimelineState extends State<Timeline> {
         duration = photo['additional']['video_convert'][0]['metadata']
                 ['duration'] ~/
             1000;
-        timeLong = Util.timeLong(duration);
+        timeLong = Util.instance.timeLong(duration);
       } else {
         timeLong = {
           "hours": 0,
@@ -110,9 +110,9 @@ class _TimelineState extends State<Timeline> {
       }
     }
     String thumbUrl =
-        '${Util.baseUrl}/webapi/entry.cgi?id=${photo['additional']['thumbnail']['unit_id']}&cache_key="${photo['additional']['thumbnail']['cache_key']}"&type="unit"&size="sm"&api="SYNO.${Util.version == 7 ? "Foto" : "Photo"}.Thumbnail"&method="get"&version=1&_sid=${Util.sid}';
+        '${Util.instance.baseUrl}/webapi/entry.cgi?id=${photo['additional']['thumbnail']['unit_id']}&cache_key="${photo['additional']['thumbnail']['cache_key']}"&type="unit"&size="sm"&api="SYNO.${Util.instance.version == 7 ? "Foto" : "Photo"}.Thumbnail"&method="get"&version=1&_sid=${Util.instance.sid}';
     String originalUrl =
-        '${Util.baseUrl}/webapi/entry.cgi?id=${photo['additional']['thumbnail']['unit_id']}&cache_key="${photo['additional']['thumbnail']['cache_key']}"&type="unit"&size="xl"&api="SYNO.${Util.version == 7 ? "Foto" : "Photo"}.Thumbnail"&method="get"&version=1&_sid=${Util.sid}';
+        '${Util.instance.baseUrl}/webapi/entry.cgi?id=${photo['additional']['thumbnail']['unit_id']}&cache_key="${photo['additional']['thumbnail']['cache_key']}"&type="unit"&size="xl"&api="SYNO.${Util.instance.version == 7 ? "Foto" : "Photo"}.Thumbnail"&method="get"&version=1&_sid=${Util.instance.sid}';
     return GestureDetector(
       onTap: () {
         Navigator.of(context).push(TransparentPageRoute(

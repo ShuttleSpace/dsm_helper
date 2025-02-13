@@ -76,6 +76,8 @@ class _LogCenterState extends State<LogCenter>
 
   Widget _buildRecentLogItem(log) {
     return Card(
+      shape: RoundedRectangleBorder(
+          side: BorderSide(), borderRadius: BorderRadius.circular(5)),
       child: Padding(
         padding: EdgeInsets.all(20),
         child: Column(
@@ -116,6 +118,8 @@ class _LogCenterState extends State<LogCenter>
 
   Widget _buildHistoryItem(log) {
     return Card(
+      shape: RoundedRectangleBorder(
+          side: BorderSide(), borderRadius: BorderRadius.circular(5)),
       child: Padding(
         padding: EdgeInsets.all(20),
         child: Column(
@@ -156,6 +160,8 @@ class _LogCenterState extends State<LogCenter>
 
   Widget _buildLogItem(log) {
     return Card(
+      shape: RoundedRectangleBorder(
+          side: BorderSide(), borderRadius: BorderRadius.circular(5)),
       child: Padding(
         padding: EdgeInsets.all(20),
         child: Column(
@@ -221,6 +227,8 @@ class _LogCenterState extends State<LogCenter>
       body: Column(
         children: [
           Card(
+            shape: RoundedRectangleBorder(
+                side: BorderSide(), borderRadius: BorderRadius.circular(5)),
             margin: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
             child: Padding(
               padding: const EdgeInsets.all(8.0),
@@ -235,7 +243,7 @@ class _LogCenterState extends State<LogCenter>
                 unselectedLabelColor: Colors.grey,
                 indicator: BubbleTabIndicator(
                   indicatorColor: Theme.of(context).scaffoldBackgroundColor,
-                  shadowColor: Util.getAdjustColor(
+                  shadowColor: Util.instance.getAdjustColor(
                       Theme.of(context).scaffoldBackgroundColor, -20),
                 ),
                 tabs: [
@@ -287,6 +295,9 @@ class _LogCenterState extends State<LogCenter>
                             height: 20,
                           ),
                           Card(
+                            shape: RoundedRectangleBorder(
+                                side: BorderSide(),
+                                borderRadius: BorderRadius.circular(5)),
                             margin: EdgeInsets.symmetric(horizontal: 20),
                             child: Padding(
                               padding: const EdgeInsets.all(8.0),
@@ -324,6 +335,9 @@ class _LogCenterState extends State<LogCenter>
                             height: 20,
                           ),
                           Card(
+                            shape: RoundedRectangleBorder(
+                                side: BorderSide(),
+                                borderRadius: BorderRadius.circular(5)),
                             margin: EdgeInsets.symmetric(horizontal: 20),
                             child: Padding(
                               padding: const EdgeInsets.all(8.0),

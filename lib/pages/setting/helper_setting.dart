@@ -47,14 +47,15 @@ class _HelperSettingState extends State<HelperSetting> {
   }
 
   initAuth() async {
-    String launchAuthStr = await Util.getStorage("launch_auth") ?? '';
+    String launchAuthStr = await Util.instance.getStorage("launch_auth") ?? '';
     String launchAuthPasswordStr =
-        await Util.getStorage("launch_auth_password") ?? '';
+        await Util.instance.getStorage("launch_auth_password") ?? '';
     String launchAuthBiometricsStr =
-        await Util.getStorage("launch_auth_biometrics") ?? '';
-    String videoPlayerStr = await Util.getStorage("video_player") ?? '';
+        await Util.instance.getStorage("launch_auth_biometrics") ?? '';
+    String videoPlayerStr =
+        await Util.instance.getStorage("video_player") ?? '';
     String launchAccountPageStr =
-        await Util.getStorage('launch_account_page') ?? '';
+        await Util.instance.getStorage('launch_account_page') ?? '';
     videoPlayer = videoPlayerStr == '1';
     launchAuth = launchAuthStr == "1";
     password = launchAuthPasswordStr == "1";
@@ -92,14 +93,17 @@ class _HelperSettingState extends State<HelperSetting> {
           GestureDetector(
             onTap: () {
               setState(() {
-                Util.vibrateOn = !Util.vibrateOn;
-                Util.setStorage("vibrate_on", Util.vibrateOn ? "1" : "0");
-                if (Util.vibrateOn) {
-                  Util.vibrate(FeedbackType.light);
+                Util.instance.vibrateOn = !Util.instance.vibrateOn;
+                Util.instance.setStorage(
+                    "vibrate_on", Util.instance.vibrateOn ? "1" : "0");
+                if (Util.instance.vibrateOn) {
+                  Util.instance.vibrate(FeedbackType.light);
                 }
               });
             },
             child: Card(
+              shape: RoundedRectangleBorder(
+                  side: BorderSide(), borderRadius: BorderRadius.circular(5)),
               child: Padding(
                 padding: EdgeInsets.all(20),
                 child: Column(
@@ -118,15 +122,18 @@ class _HelperSettingState extends State<HelperSetting> {
                           style: TextStyle(fontSize: 16),
                         ),
                         Spacer(),
-                        if (Util.vibrateOn)
+                        if (Util.instance.vibrateOn)
                           Icon(
                             CupertinoIcons.checkmark_alt,
                             color: Color(0xffff9813),
                           ),
                       ],
                     ),
-                    if (Util.vibrateOn)
+                    if (Util.instance.vibrateOn)
                       Card(
+                        shape: RoundedRectangleBorder(
+                            side: BorderSide(),
+                            borderRadius: BorderRadius.circular(5)),
                         margin: EdgeInsets.only(top: 20),
                         child: Padding(
                           padding: EdgeInsets.all(20),
@@ -135,15 +142,22 @@ class _HelperSettingState extends State<HelperSetting> {
                               GestureDetector(
                                 onTap: () {
                                   setState(() {
-                                    Util.vibrateNormal = !Util.vibrateNormal;
-                                    Util.setStorage("vibrate_warning",
-                                        Util.vibrateNormal ? "1" : "0");
-                                    if (Util.vibrateNormal) {
-                                      Util.vibrate(FeedbackType.light);
+                                    Util.instance.vibrateNormal =
+                                        !Util.instance.vibrateNormal;
+                                    Util.instance.setStorage(
+                                        "vibrate_warning",
+                                        Util.instance.vibrateNormal
+                                            ? "1"
+                                            : "0");
+                                    if (Util.instance.vibrateNormal) {
+                                      Util.instance.vibrate(FeedbackType.light);
                                     }
                                   });
                                 },
                                 child: Card(
+                                  shape: RoundedRectangleBorder(
+                                      side: BorderSide(),
+                                      borderRadius: BorderRadius.circular(5)),
                                   // margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                                   child: Padding(
                                     padding: const EdgeInsets.all(8.0),
@@ -155,7 +169,7 @@ class _HelperSettingState extends State<HelperSetting> {
                                               fontSize: 16, height: 1.6),
                                         ),
                                         Spacer(),
-                                        if (Util.vibrateNormal)
+                                        if (Util.instance.vibrateNormal)
                                           Icon(
                                             CupertinoIcons.checkmark_alt,
                                             color: Color(0xffff9813),
@@ -171,15 +185,23 @@ class _HelperSettingState extends State<HelperSetting> {
                               GestureDetector(
                                 onTap: () {
                                   setState(() {
-                                    Util.vibrateWarning = !Util.vibrateWarning;
-                                    Util.setStorage("vibrate_warning",
-                                        Util.vibrateWarning ? "1" : "0");
-                                    if (Util.vibrateWarning) {
-                                      Util.vibrate(FeedbackType.warning);
+                                    Util.instance.vibrateWarning =
+                                        !Util.instance.vibrateWarning;
+                                    Util.instance.setStorage(
+                                        "vibrate_warning",
+                                        Util.instance.vibrateWarning
+                                            ? "1"
+                                            : "0");
+                                    if (Util.instance.vibrateWarning) {
+                                      Util.instance
+                                          .vibrate(FeedbackType.warning);
                                     }
                                   });
                                 },
                                 child: Card(
+                                  shape: RoundedRectangleBorder(
+                                      side: BorderSide(),
+                                      borderRadius: BorderRadius.circular(5)),
                                   // margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                                   child: Padding(
                                     padding: const EdgeInsets.all(8.0),
@@ -191,7 +213,7 @@ class _HelperSettingState extends State<HelperSetting> {
                                               fontSize: 16, height: 1.6),
                                         ),
                                         Spacer(),
-                                        if (Util.vibrateWarning)
+                                        if (Util.instance.vibrateWarning)
                                           Icon(
                                             CupertinoIcons.checkmark_alt,
                                             color: Color(0xffff9813),
@@ -217,10 +239,13 @@ class _HelperSettingState extends State<HelperSetting> {
             onTap: () {
               setState(() {
                 videoPlayer = !videoPlayer;
-                Util.setStorage("video_player", videoPlayer ? "1" : "0");
+                Util.instance
+                    .setStorage("video_player", videoPlayer ? "1" : "0");
               });
             },
             child: Card(
+              shape: RoundedRectangleBorder(
+                  side: BorderSide(), borderRadius: BorderRadius.circular(5)),
               // margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
@@ -269,6 +294,8 @@ class _HelperSettingState extends State<HelperSetting> {
                 );
               },
               child: Card(
+                shape: RoundedRectangleBorder(
+                    side: BorderSide(), borderRadius: BorderRadius.circular(5)),
                 // margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
@@ -300,11 +327,13 @@ class _HelperSettingState extends State<HelperSetting> {
             onTap: () {
               setState(() {
                 launchAccountPage = !launchAccountPage;
-                Util.setStorage(
+                Util.instance.setStorage(
                     "launch_account_page", launchAccountPage ? "1" : "0");
               });
             },
             child: Card(
+              shape: RoundedRectangleBorder(
+                  side: BorderSide(), borderRadius: BorderRadius.circular(5)),
               // margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
@@ -339,10 +368,12 @@ class _HelperSettingState extends State<HelperSetting> {
             onTap: () {
               setState(() {
                 launchAuth = !launchAuth;
-                Util.setStorage("launch_auth", launchAuth ? "1" : "0");
+                Util.instance.setStorage("launch_auth", launchAuth ? "1" : "0");
               });
             },
             child: Card(
+              shape: RoundedRectangleBorder(
+                  side: BorderSide(), borderRadius: BorderRadius.circular(5)),
               child: Padding(
                 padding: EdgeInsets.all(20),
                 child: Column(
@@ -370,6 +401,9 @@ class _HelperSettingState extends State<HelperSetting> {
                     ),
                     if (launchAuth)
                       Card(
+                        shape: RoundedRectangleBorder(
+                            side: BorderSide(),
+                            borderRadius: BorderRadius.circular(5)),
                         margin: EdgeInsets.only(top: 20),
                         child: Padding(
                           padding: EdgeInsets.all(20),
@@ -381,10 +415,10 @@ class _HelperSettingState extends State<HelperSetting> {
                                     if (password) {
                                       setState(() {
                                         password = false;
-                                        Util.setStorage(
+                                        Util.instance.setStorage(
                                             "launch_auth_password", "0");
                                         biometrics = false;
-                                        Util.setStorage(
+                                        Util.instance.setStorage(
                                             "launch_auth_biometrics", "0");
                                       });
                                     } else {
@@ -396,7 +430,7 @@ class _HelperSettingState extends State<HelperSetting> {
                                         if (res != null && res) {
                                           setState(() {
                                             password = true;
-                                            Util.setStorage(
+                                            Util.instance.setStorage(
                                                 "launch_auth_password",
                                                 password ? "1" : "0");
                                           });
@@ -408,6 +442,9 @@ class _HelperSettingState extends State<HelperSetting> {
                                   });
                                 },
                                 child: Card(
+                                  shape: RoundedRectangleBorder(
+                                      side: BorderSide(),
+                                      borderRadius: BorderRadius.circular(5)),
                                   // margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                                   child: Padding(
                                     padding: const EdgeInsets.all(8.0),
@@ -441,8 +478,9 @@ class _HelperSettingState extends State<HelperSetting> {
                                   onTap: () async {
                                     if (biometrics == false) {
                                       if (password == false) {
-                                        Util.vibrate(FeedbackType.warning);
-                                        Util.toast("请先开启图形密码后再开启指纹");
+                                        Util.instance
+                                            .vibrate(FeedbackType.warning);
+                                        Util.instance.toast("请先开启图形密码后再开启指纹");
                                         return;
                                       }
                                       try {
@@ -479,27 +517,27 @@ class _HelperSettingState extends State<HelperSetting> {
                                         auth.stopAuthentication();
                                         setState(() {
                                           biometrics = didAuthenticate;
-                                          Util.setStorage(
+                                          Util.instance.setStorage(
                                               "launch_auth_biometrics",
                                               biometrics ? "1" : "0");
                                         });
                                       } on PlatformException catch (e) {
                                         if (e.code == auth_error.notAvailable) {
-                                          Util.toast("生物验证不可用");
+                                          Util.instance.toast("生物验证不可用");
                                         } else if (e.code ==
                                             auth_error.passcodeNotSet) {
-                                          Util.toast("系统未设置密码");
+                                          Util.instance.toast("系统未设置密码");
                                         } else if (e.code ==
                                             auth_error.lockedOut) {
-                                          Util.toast("认证失败次数过多，请稍后再试");
+                                          Util.instance.toast("认证失败次数过多，请稍后再试");
                                         } else {
-                                          Util.toast(e.message ?? '');
+                                          Util.instance.toast(e.message ?? '');
                                         }
                                       }
                                     } else {
                                       setState(() {
                                         biometrics = false;
-                                        Util.setStorage(
+                                        Util.instance.setStorage(
                                             "launch_auth_biometrics",
                                             biometrics ? "1" : "0");
                                       });
@@ -511,6 +549,9 @@ class _HelperSettingState extends State<HelperSetting> {
                                     // });
                                   },
                                   child: Card(
+                                    shape: RoundedRectangleBorder(
+                                        side: BorderSide(),
+                                        borderRadius: BorderRadius.circular(5)),
                                     // margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                                     child: Padding(
                                       padding: const EdgeInsets.all(8.0),
@@ -546,7 +587,7 @@ class _HelperSettingState extends State<HelperSetting> {
               ),
             ),
           ),
-          if (!Util.notReviewAccount) ...[
+          if (!Util.instance.notReviewAccount) ...[
             SizedBox(
               height: 20,
             ),
@@ -584,7 +625,7 @@ class _HelperSettingState extends State<HelperSetting> {
               var hide = showWeuiLoadingToast(context: context);
               clearDiskCachedImages();
               hide();
-              Util.toast("图片缓存清理完成");
+              Util.instance.toast("图片缓存清理完成");
             },
             // margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
             child: Row(
@@ -625,7 +666,7 @@ class _HelperSettingState extends State<HelperSetting> {
                   width: 8,
                 ),
                 Text(
-                  "关于${Util.appName}",
+                  "关于${Util.instance.appName}",
                   style: TextStyle(fontSize: 16),
                 ),
               ],
@@ -634,7 +675,7 @@ class _HelperSettingState extends State<HelperSetting> {
           SizedBox(
             height: 20,
           ),
-          if (Util.notReviewAccount)
+          if (Util.instance.notReviewAccount)
             OutlinedButton(
               onPressed: () {
                 Navigator.of(context).push(CupertinoPageRoute(

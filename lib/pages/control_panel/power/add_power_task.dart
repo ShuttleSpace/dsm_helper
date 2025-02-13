@@ -42,6 +42,8 @@ class _AddPowerTaskState extends State<AddPowerTask> {
         padding: EdgeInsets.all(20),
         children: [
           Card(
+            shape: RoundedRectangleBorder(
+                side: BorderSide(), borderRadius: BorderRadius.circular(5)),
             child: Padding(
               padding: EdgeInsets.all(20),
               child: Column(
@@ -64,6 +66,9 @@ class _AddPowerTaskState extends State<AddPowerTask> {
                             });
                           },
                           child: Card(
+                            shape: RoundedRectangleBorder(
+                                side: BorderSide(),
+                                borderRadius: BorderRadius.circular(5)),
                             child: Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: Row(
@@ -92,6 +97,9 @@ class _AddPowerTaskState extends State<AddPowerTask> {
                             });
                           },
                           child: Card(
+                            shape: RoundedRectangleBorder(
+                                side: BorderSide(),
+                                borderRadius: BorderRadius.circular(5)),
                             child: Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: Row(
@@ -119,6 +127,8 @@ class _AddPowerTaskState extends State<AddPowerTask> {
             height: 20,
           ),
           Card(
+            shape: RoundedRectangleBorder(
+                side: BorderSide(), borderRadius: BorderRadius.circular(5)),
             child: Padding(
               padding: EdgeInsets.all(20),
               child: Column(
@@ -149,6 +159,9 @@ class _AddPowerTaskState extends State<AddPowerTask> {
                             });
                           },
                           child: Card(
+                            shape: RoundedRectangleBorder(
+                                side: BorderSide(),
+                                borderRadius: BorderRadius.circular(5)),
                             child: Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: Row(
@@ -185,6 +198,9 @@ class _AddPowerTaskState extends State<AddPowerTask> {
                             });
                           },
                           child: Card(
+                            shape: RoundedRectangleBorder(
+                                side: BorderSide(),
+                                borderRadius: BorderRadius.circular(5)),
                             child: Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: Row(
@@ -221,6 +237,9 @@ class _AddPowerTaskState extends State<AddPowerTask> {
                             });
                           },
                           child: Card(
+                            shape: RoundedRectangleBorder(
+                                side: BorderSide(),
+                                borderRadius: BorderRadius.circular(5)),
                             child: Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: Row(
@@ -257,6 +276,9 @@ class _AddPowerTaskState extends State<AddPowerTask> {
                             });
                           },
                           child: Card(
+                            shape: RoundedRectangleBorder(
+                                side: BorderSide(),
+                                borderRadius: BorderRadius.circular(5)),
                             child: Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: Row(
@@ -297,6 +319,9 @@ class _AddPowerTaskState extends State<AddPowerTask> {
                             });
                           },
                           child: Card(
+                            shape: RoundedRectangleBorder(
+                                side: BorderSide(),
+                                borderRadius: BorderRadius.circular(5)),
                             child: Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: Row(
@@ -333,6 +358,9 @@ class _AddPowerTaskState extends State<AddPowerTask> {
                             });
                           },
                           child: Card(
+                            shape: RoundedRectangleBorder(
+                                side: BorderSide(),
+                                borderRadius: BorderRadius.circular(5)),
                             child: Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: Row(
@@ -369,6 +397,9 @@ class _AddPowerTaskState extends State<AddPowerTask> {
                             });
                           },
                           child: Card(
+                            shape: RoundedRectangleBorder(
+                                side: BorderSide(),
+                                borderRadius: BorderRadius.circular(5)),
                             child: Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: Row(
@@ -400,6 +431,8 @@ class _AddPowerTaskState extends State<AddPowerTask> {
             height: 20,
           ),
           Card(
+            shape: RoundedRectangleBorder(
+                side: BorderSide(), borderRadius: BorderRadius.circular(5)),
             child: Padding(
               padding: EdgeInsets.all(20),
               child: Column(
@@ -432,6 +465,9 @@ class _AddPowerTaskState extends State<AddPowerTask> {
                             );
                           },
                           child: Card(
+                            shape: RoundedRectangleBorder(
+                                side: BorderSide(),
+                                borderRadius: BorderRadius.circular(5)),
                             child: Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: Row(

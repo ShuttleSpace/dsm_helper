@@ -42,7 +42,7 @@ class _FavoriteState extends State<Favorite> {
       child: OutlinedButton(
         onPressed: () {
           if (favorite['status'] == "broken") {
-            Util.toast("文件或目录不存在");
+            Util.instance.toast("文件或目录不存在");
           } else {
             Navigator.of(context).pop(favorite['path']);
             widget.callback(favorite['path']);
@@ -64,13 +64,16 @@ class _FavoriteState extends State<Favorite> {
               ),
               OutlinedButton(
                 onPressed: () {
-                  Util.vibrate(FeedbackType.light);
+                  Util.instance.vibrate(FeedbackType.light);
                   showCupertinoModalPopup(
                     context: context,
                     builder: (context) {
                       return Material(
                         color: Colors.transparent,
                         child: Card(
+                          shape: RoundedRectangleBorder(
+                              side: BorderSide(),
+                              borderRadius: BorderRadius.circular(5)),
                           child: SafeArea(
                             top: false,
                             child: Padding(
@@ -118,6 +121,12 @@ class _FavoriteState extends State<Favorite> {
                                                             .center,
                                                     children: [
                                                       Card(
+                                                        shape: RoundedRectangleBorder(
+                                                            side: BorderSide(),
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        5)),
                                                         margin: EdgeInsets
                                                             .symmetric(
                                                                 horizontal: 50),
@@ -140,6 +149,12 @@ class _FavoriteState extends State<Favorite> {
                                                                 height: 16,
                                                               ),
                                                               Card(
+                                                                shape: RoundedRectangleBorder(
+                                                                    side:
+                                                                        BorderSide(),
+                                                                    borderRadius:
+                                                                        BorderRadius.circular(
+                                                                            5)),
                                                                 child: Padding(
                                                                   padding:
                                                                       const EdgeInsets
@@ -177,8 +192,8 @@ class _FavoriteState extends State<Favorite> {
                                                                           () async {
                                                                         if (name.trim() ==
                                                                             "") {
-                                                                          Util.toast(
-                                                                              "请输入新文件名");
+                                                                          Util.instance
+                                                                              .toast("请输入新文件名");
                                                                           return;
                                                                         }
                                                                         Navigator.of(context)
@@ -188,16 +203,16 @@ class _FavoriteState extends State<Favorite> {
                                                                             name);
                                                                         if (res[
                                                                             'success']) {
-                                                                          Util.toast(
-                                                                              "重命名成功");
+                                                                          Util.instance
+                                                                              .toast("重命名成功");
                                                                           getData();
                                                                         } else {
                                                                           if (res['error']['errors'] != null &&
                                                                               res['error']['errors'].length > 0 &&
                                                                               res['error']['errors'][0]['code'] == 414) {
-                                                                            Util.toast("重命名失败：指定的名称已存在");
+                                                                            Util.instance.toast("重命名失败：指定的名称已存在");
                                                                           } else {
-                                                                            Util.toast("重命名失败");
+                                                                            Util.instance.toast("重命名失败");
                                                                           }
                                                                         }
                                                                       },
@@ -264,13 +279,21 @@ class _FavoriteState extends State<Favorite> {
                                         child: OutlinedButton(
                                           onPressed: () async {
                                             Navigator.of(context).pop();
-                                            Util.vibrate(FeedbackType.warning);
+                                            Util.instance
+                                                .vibrate(FeedbackType.warning);
                                             showCupertinoModalPopup(
                                               context: context,
                                               builder: (context) {
                                                 return Material(
                                                   color: Colors.transparent,
                                                   child: Card(
+                                                    shape:
+                                                        RoundedRectangleBorder(
+                                                            side: BorderSide(),
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        5)),
                                                     child: Padding(
                                                       padding:
                                                           const EdgeInsets.all(
@@ -316,11 +339,12 @@ class _FavoriteState extends State<Favorite> {
                                                                             favorite['path']);
                                                                     if (res[
                                                                         'success']) {
-                                                                      Util.vibrate(
-                                                                          FeedbackType
-                                                                              .light);
-                                                                      Util.toast(
-                                                                          "取消收藏成功");
+                                                                      Util.instance
+                                                                          .vibrate(
+                                                                              FeedbackType.light);
+                                                                      Util.instance
+                                                                          .toast(
+                                                                              "取消收藏成功");
                                                                       getData();
                                                                     }
                                                                   },

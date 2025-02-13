@@ -25,14 +25,15 @@ class _NotifyState extends State<Notify> {
       List msgContent = [];
       String title = "";
       List<String> titles = notify['title'].split(":");
-      if (Util.version == 7) {
-        if (Util.notifyStrings[notify['title']] != null) {
+      if (Util.instance.version == 7) {
+        if (Util.instance.notifyStrings[notify['title']] != null) {
           // print(Util.notifyStrings[notify['title']]);
-          title = Util.notifyStrings[notify['title']]['title'];
+          title = Util.instance.notifyStrings[notify['title']]['title'];
 
           for (String content in msgs) {
             Map msgMap = json.decode(content);
-            String replaceContent = Util.notifyStrings[notify['title']]['msg'];
+            String replaceContent =
+                Util.instance.notifyStrings[notify['title']]['msg'];
 
             replaceContent = replaceContent
                 .replaceAll("%LINK_BEGIN%", "")
@@ -66,15 +67,20 @@ class _NotifyState extends State<Notify> {
             title = webManagerStrings[titles[0]][titles[1]];
           }
           msgContent = msgs;
-        } else if (Util.strings[notify['className']] != null) {
-          if (Util.strings[notify['className']][titles[0]] != null &&
-              Util.strings[notify['className']][titles[0]][titles[1]] != null) {
-            title = Util.strings[notify['className']][titles[0]][titles[1]];
-          } else if (Util.strings[notify['className']] != null &&
-              Util.strings[notify['className']]['common'] != null &&
-              Util.strings[notify['className']]['common']['displayname'] !=
+        } else if (Util.instance.strings[notify['className']] != null) {
+          if (Util.instance.strings[notify['className']][titles[0]] != null &&
+              Util.instance.strings[notify['className']][titles[0]]
+                      [titles[1]] !=
                   null) {
-            title = Util.strings[notify['className']]['common']['displayname'];
+            title = Util.instance.strings[notify['className']][titles[0]]
+                [titles[1]];
+          } else if (Util.instance.strings[notify['className']] != null &&
+              Util.instance.strings[notify['className']]['common'] != null &&
+              Util.instance.strings[notify['className']]['common']
+                      ['displayname'] !=
+                  null) {
+            title = Util.instance.strings[notify['className']]['common']
+                ['displayname'];
           }
           msgContent = msgs;
         } else {
@@ -97,6 +103,8 @@ class _NotifyState extends State<Notify> {
 
   Widget _buildNotifyGroup(groupName, List group) {
     return Card(
+      shape: RoundedRectangleBorder(
+          side: BorderSide(), borderRadius: BorderRadius.circular(5)),
       margin: EdgeInsets.only(left: 20, right: 20, top: 20),
       child: Padding(
         padding: const EdgeInsets.all(8.0),
@@ -116,6 +124,8 @@ class _NotifyState extends State<Notify> {
 
   Widget _buildNotifyItem(notify) {
     return Card(
+      shape: RoundedRectangleBorder(
+          side: BorderSide(), borderRadius: BorderRadius.circular(5)),
       margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
       child: Padding(
         padding: const EdgeInsets.all(8.0),
@@ -173,7 +183,7 @@ class _NotifyState extends State<Notify> {
                     onPressed: () async {
                       var res = await Api.clearNotify();
                       if (res['success']) {
-                        Util.toast("清除成功");
+                        Util.instance.toast("清除成功");
                         Navigator.of(context).pop(true);
                       }
                     },

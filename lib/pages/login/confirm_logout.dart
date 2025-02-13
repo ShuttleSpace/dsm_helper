@@ -16,6 +16,8 @@ class _ConfirmLogoutState extends State<ConfirmLogout> {
     return Material(
       color: Colors.transparent,
       child: Card(
+        shape: RoundedRectangleBorder(
+            side: BorderSide(), borderRadius: BorderRadius.circular(5)),
         child: SafeArea(
           top: false,
           child: Padding(
@@ -45,6 +47,9 @@ class _ConfirmLogoutState extends State<ConfirmLogout> {
                       });
                     },
                     child: Card(
+                      shape: RoundedRectangleBorder(
+                          side: BorderSide(),
+                          borderRadius: BorderRadius.circular(5)),
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: Row(
@@ -73,7 +78,7 @@ class _ConfirmLogoutState extends State<ConfirmLogout> {
                           if (forget) {
                             Api.trustDevice("delete");
                           }
-                          Util.removeStorage("sid");
+                          Util.instance.removeStorage("sid");
                           // Util.removeStorage("smid");
                           Navigator.of(context).pushNamedAndRemoveUntil(
                               "/login", (route) => false);

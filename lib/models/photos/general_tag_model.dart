@@ -12,12 +12,12 @@ class GeneralTagModel {
   });
   static Future<List<GeneralTagModel>> fetch(
       {List<String>? additional, int limit = 5000, bool isTeam = false}) async {
-    var res = await Util.post("entry.cgi", data: {
+    var res = await Util.instance.post("entry.cgi", data: {
       // "folder_id": id,
       "api": 'SYNO.Foto${isTeam ? 'Team' : ''}.Browse.GeneralTag',
       "method": 'list',
       "version": 1,
-      "_sid": Util.sid,
+      "_sid": Util.instance.sid,
       "additional": jsonEncode(additional),
       "offset": 0,
       "limit": limit,

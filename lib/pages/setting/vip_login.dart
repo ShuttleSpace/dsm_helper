@@ -18,58 +18,60 @@ class _VipLoginState extends State<VipLogin> {
   String confirmPassword = "";
   _login() async {
     if (account.isBlank) {
-      Util.toast("请输入用户名");
+      Util.instance.toast("请输入用户名");
       return;
     }
     if (password.length < 8 || password.length > 16) {
-      Util.toast("请输入8-16位密码");
+      Util.instance.toast("请输入8-16位密码");
       return;
     }
 
     try {
-      var res = await Util.post("${Util.appUrl}/login/password", data: {
+      var res = await Util.instance
+          .post("${Util.instance.appUrl}/login/password", data: {
         "account": account,
         "password": password,
       });
       if (res['code'] == 1) {
-        Util.toast("登录成功");
-        Util.setStorage("user_token", res['data']['token']);
+        Util.instance.toast("登录成功");
+        Util.instance.setStorage("user_token", res['data']['token']);
         Navigator.of(context).pop(true);
       } else {
-        Util.toast(res['msg'] ?? '登录失败，请检查网络');
+        Util.instance.toast(res['msg'] ?? '登录失败，请检查网络');
       }
     } catch (e) {
-      Util.toast("登录失败");
+      Util.instance.toast("登录失败");
     }
   }
 
   _register() async {
     if (account.length < 6 || password.length > 30) {
-      Util.toast("请输入6-30位用户名");
+      Util.instance.toast("请输入6-30位用户名");
       return;
     }
     if (password.length < 8 || password.length > 16) {
-      Util.toast("请输入8-16位密码");
+      Util.instance.toast("请输入8-16位密码");
       return;
     }
     if (confirmPassword != password) {
-      Util.toast("两次密码输入不一致");
+      Util.instance.toast("两次密码输入不一致");
       return;
     }
     try {
-      var res = await Util.post("${Util.appUrl}/login/register", data: {
+      var res = await Util.instance
+          .post("${Util.instance.appUrl}/login/register", data: {
         "account": account,
         "password": password,
       });
       if (res['code'] == 1) {
-        Util.toast("注册成功");
-        Util.setStorage("user_token", res['data']['token']);
+        Util.instance.toast("注册成功");
+        Util.instance.setStorage("user_token", res['data']['token']);
         Navigator.of(context).pop(true);
       } else {
-        Util.toast(res['msg'] ?? '注册失败，请检查网络');
+        Util.instance.toast(res['msg'] ?? '注册失败，请检查网络');
       }
     } catch (e) {
-      Util.toast("注册失败");
+      Util.instance.toast("注册失败");
     }
   }
 
@@ -94,6 +96,9 @@ class _VipLoginState extends State<VipLogin> {
               children: [
                 Expanded(
                   child: Card(
+                    shape: RoundedRectangleBorder(
+                        side: BorderSide(),
+                        borderRadius: BorderRadius.circular(5)),
                     child: TextField(
                       autocorrect: false,
                       keyboardAppearance: Brightness.light,
@@ -115,6 +120,8 @@ class _VipLoginState extends State<VipLogin> {
               height: 20,
             ),
             Card(
+              shape: RoundedRectangleBorder(
+                  side: BorderSide(), borderRadius: BorderRadius.circular(5)),
               child: TextField(
                 onChanged: (v) => password = v,
                 obscureText: true,
@@ -134,6 +141,8 @@ class _VipLoginState extends State<VipLogin> {
             ),
             if (isRegister) ...[
               Card(
+                shape: RoundedRectangleBorder(
+                    side: BorderSide(), borderRadius: BorderRadius.circular(5)),
                 child: TextField(
                   onChanged: (v) => confirmPassword = v,
                   obscureText: true,

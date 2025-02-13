@@ -65,6 +65,8 @@ class _FileDetailState extends State<FileDetail> {
             height: 30,
           ),
           Card(
+            shape: RoundedRectangleBorder(
+                side: BorderSide(), borderRadius: BorderRadius.circular(5)),
             margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
             child: Padding(
               padding: const EdgeInsets.all(8.0),
@@ -79,6 +81,8 @@ class _FileDetailState extends State<FileDetail> {
             ),
           ),
           Card(
+            shape: RoundedRectangleBorder(
+                side: BorderSide(), borderRadius: BorderRadius.circular(5)),
             margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
             child: Padding(
               padding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
@@ -95,7 +99,7 @@ class _FileDetailState extends State<FileDetail> {
                       ClipboardData data =
                           new ClipboardData(text: widget.file['path']);
                       Clipboard.setData(data);
-                      Util.toast("已复制到剪贴板");
+                      Util.instance.toast("已复制到剪贴板");
                     },
                     child: SizedBox(
                       width: 20,
@@ -112,6 +116,8 @@ class _FileDetailState extends State<FileDetail> {
             ),
           ),
           Card(
+            shape: RoundedRectangleBorder(
+                side: BorderSide(), borderRadius: BorderRadius.circular(5)),
             margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
             child: Padding(
               padding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
@@ -128,7 +134,7 @@ class _FileDetailState extends State<FileDetail> {
                       ClipboardData data = new ClipboardData(
                           text: widget.file['additional']['real_path']);
                       Clipboard.setData(data);
-                      Util.toast("已复制到剪贴板");
+                      Util.instance.toast("已复制到剪贴板");
                     },
                     child: SizedBox(
                       width: 20,
@@ -145,6 +151,8 @@ class _FileDetailState extends State<FileDetail> {
             ),
           ),
           Card(
+            shape: RoundedRectangleBorder(
+                side: BorderSide(), borderRadius: BorderRadius.circular(5)),
             margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
             child: Padding(
               padding: const EdgeInsets.all(8.0),
@@ -153,13 +161,15 @@ class _FileDetailState extends State<FileDetail> {
                   Text("大小："),
                   loadingSize
                       ? CupertinoActivityIndicator()
-                      : Text(Util.formatSize(size))
+                      : Text(Util.instance.formatSize(size))
                 ],
               ),
             ),
           ),
           if (widget.file['isdir'])
             Card(
+              shape: RoundedRectangleBorder(
+                  side: BorderSide(), borderRadius: BorderRadius.circular(5)),
               margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
@@ -174,6 +184,8 @@ class _FileDetailState extends State<FileDetail> {
               ),
             ),
           Card(
+            shape: RoundedRectangleBorder(
+                side: BorderSide(), borderRadius: BorderRadius.circular(5)),
             margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
             child: Padding(
               padding: const EdgeInsets.all(8.0),
@@ -188,6 +200,8 @@ class _FileDetailState extends State<FileDetail> {
             ),
           ),
           Card(
+            shape: RoundedRectangleBorder(
+                side: BorderSide(), borderRadius: BorderRadius.circular(5)),
             margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
             child: Padding(
               padding: const EdgeInsets.all(8.0),

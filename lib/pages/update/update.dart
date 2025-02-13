@@ -51,7 +51,7 @@ class _UpdateState extends State<Update> {
         },
       );
     } catch (e) {
-      Util.toast("下载失败");
+      Util.instance.toast("下载失败");
     }
     setState(() {
       downloading = false;
@@ -77,6 +77,9 @@ class _UpdateState extends State<Update> {
                 ),
                 Center(
                   child: Card(
+                    shape: RoundedRectangleBorder(
+                        side: BorderSide(),
+                        borderRadius: BorderRadius.circular(5)),
                     child: CircleAvatar(
                       backgroundImage: AssetImage(
                         "assets/logo.png",
@@ -100,6 +103,9 @@ class _UpdateState extends State<Update> {
                   height: 40,
                 ),
                 Card(
+                  shape: RoundedRectangleBorder(
+                      side: BorderSide(),
+                      borderRadius: BorderRadius.circular(5)),
                   margin: EdgeInsets.symmetric(horizontal: 20),
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
@@ -159,6 +165,8 @@ class _UpdateState extends State<Update> {
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 20),
               child: Card(
+                shape: RoundedRectangleBorder(
+                    side: BorderSide(), borderRadius: BorderRadius.circular(5)),
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: ClipRRect(

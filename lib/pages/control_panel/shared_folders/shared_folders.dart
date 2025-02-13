@@ -88,6 +88,8 @@ class _SharedFoldersState extends State<SharedFolders> {
         return Material(
           color: Colors.transparent,
           child: Card(
+            shape: RoundedRectangleBorder(
+                side: BorderSide(), borderRadius: BorderRadius.circular(5)),
             child: SafeArea(
               top: false,
               child: Column(
@@ -119,10 +121,10 @@ class _SharedFoldersState extends State<SharedFolders> {
                             var res = await Api.deleteSharedFolder([folder]);
                             print(res);
                             if (res['success']) {
-                              Util.toast("共享文件夹删除成功");
+                              Util.instance.toast("共享文件夹删除成功");
                               getData();
                             } else {
-                              Util.toast("共享文件夹删除出错");
+                              Util.instance.toast("共享文件夹删除出错");
                             }
                           },
                           child: Text(
@@ -238,7 +240,7 @@ class _SharedFoldersState extends State<SharedFolders> {
                         height: 5,
                       ),
                       Text(
-                        "共享文件夹配额：${folder['quota_value'] > 0 ? Util.formatSize(folder['quota_value'] * 1024 * 1024) : "已停用"}",
+                        "共享文件夹配额：${folder['quota_value'] > 0 ? Util.instance.formatSize(folder['quota_value'] * 1024 * 1024) : "已停用"}",
                         style: TextStyle(
                             fontSize: 12,
                             color: Theme.of(context)
@@ -252,7 +254,7 @@ class _SharedFoldersState extends State<SharedFolders> {
                         height: 5,
                       ),
                       Text(
-                        "共享文件夹大小：${Util.formatSize(folder['share_quota_used'] * 1024 * 1024)}",
+                        "共享文件夹大小：${Util.instance.formatSize(folder['share_quota_used'] * 1024 * 1024)}",
                         style: TextStyle(
                             fontSize: 12,
                             color: Theme.of(context)
@@ -305,6 +307,9 @@ class _SharedFoldersState extends State<SharedFolders> {
                             return Material(
                               color: Colors.transparent,
                               child: Card(
+                                shape: RoundedRectangleBorder(
+                                    side: BorderSide(),
+                                    borderRadius: BorderRadius.circular(5)),
                                 child: SafeArea(
                                   top: false,
                                   child: Column(
@@ -367,7 +372,7 @@ class _SharedFoldersState extends State<SharedFolders> {
                                             Api.cleanRecycleBin(folder['name'])
                                                 .then((res) {
                                               if (res['success']) {
-                                                Util.toast("请求已发送");
+                                                Util.instance.toast("请求已发送");
                                               }
                                             });
                                           },

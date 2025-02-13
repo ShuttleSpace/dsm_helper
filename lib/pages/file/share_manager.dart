@@ -32,7 +32,7 @@ class _ShareManagerState extends State<ShareManager> {
   }
 
   Widget _buildLinkItem(link) {
-    FileTypeEnum fileType = Util.fileType(link['path']);
+    FileTypeEnum fileType = Util.instance.fileType(link['path']);
     return Padding(
       padding: EdgeInsets.symmetric(vertical: 10),
       child: OutlinedButton(

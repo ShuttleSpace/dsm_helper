@@ -38,7 +38,7 @@ class _AboutState extends State<About> {
       appBar: AppBar(
         leading: AppBackButton(context),
         title: Text(
-          "关于${Util.appName}",
+          "关于${Util.instance.appName}",
         ),
       ),
       body: Column(
@@ -53,6 +53,9 @@ class _AboutState extends State<About> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Card(
+                      shape: RoundedRectangleBorder(
+                          side: BorderSide(),
+                          borderRadius: BorderRadius.circular(5)),
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: CircleAvatar(
@@ -69,7 +72,7 @@ class _AboutState extends State<About> {
                     Column(
                       children: [
                         Text(
-                          "${Util.appName}",
+                          "${Util.instance.appName}",
                           style: TextStyle(fontSize: 32),
                         ),
                         if (packageInfo != null)
@@ -88,6 +91,9 @@ class _AboutState extends State<About> {
                   height: 20,
                 ),
                 Card(
+                  shape: RoundedRectangleBorder(
+                      side: BorderSide(),
+                      borderRadius: BorderRadius.circular(5)),
                   margin: EdgeInsets.symmetric(horizontal: 20),
                   child: Padding(
                     padding: EdgeInsets.all(20),
@@ -140,7 +146,7 @@ class _AboutState extends State<About> {
                                     Navigator.of(context).push(
                                         CupertinoPageRoute(builder: (context) {
                                       return Browser(
-                                        url: '${Util.appUrl}/privacy',
+                                        url: '${Util.instance.appUrl}/privacy',
                                         title: "隐私政策",
                                       );
                                     }));
@@ -154,16 +160,19 @@ class _AboutState extends State<About> {
                     ),
                   ),
                 ),
-                if (Util.notReviewAccount) ...[
+                if (Util.instance.notReviewAccount) ...[
                   SizedBox(
                     height: 20,
                   ),
                   Card(
+                    shape: RoundedRectangleBorder(
+                        side: BorderSide(),
+                        borderRadius: BorderRadius.circular(5)),
                     margin: EdgeInsets.symmetric(horizontal: 20),
                     child: Padding(
                         padding: EdgeInsets.all(15),
                         child: Column(
-                          children: Util.groups.channel?.map((e) {
+                          children: Util.instance.groups.channel?.map((e) {
                                 return Padding(
                                   padding: EdgeInsets.symmetric(vertical: 5),
                                   child: Row(
@@ -199,11 +208,14 @@ class _AboutState extends State<About> {
                     height: 20,
                   ),
                   Card(
+                    shape: RoundedRectangleBorder(
+                        side: BorderSide(),
+                        borderRadius: BorderRadius.circular(5)),
                     margin: EdgeInsets.symmetric(horizontal: 20),
                     child: Padding(
                         padding: EdgeInsets.all(15),
                         child: Column(
-                          children: Util.groups.qq?.map((e) {
+                          children: Util.instance.groups.qq?.map((e) {
                                 return Padding(
                                   padding: EdgeInsets.symmetric(vertical: 5),
                                   child: Row(
@@ -238,11 +250,14 @@ class _AboutState extends State<About> {
                     height: 20,
                   ),
                   Card(
+                    shape: RoundedRectangleBorder(
+                        side: BorderSide(),
+                        borderRadius: BorderRadius.circular(5)),
                     margin: EdgeInsets.symmetric(horizontal: 20),
                     child: Padding(
                       padding: EdgeInsets.all(15),
                       child: Column(
-                        children: Util.groups.wechat?.map((e) {
+                        children: Util.instance.groups.wechat?.map((e) {
                               return Padding(
                                 padding: EdgeInsets.symmetric(vertical: 5),
                                 child: Row(
@@ -264,7 +279,7 @@ class _AboutState extends State<About> {
                                         ClipboardData data = new ClipboardData(
                                             text: e.name ?? '');
                                         Clipboard.setData(data);
-                                        Util.toast("已复制到剪贴板");
+                                        Util.instance.toast("已复制到剪贴板");
                                       },
                                       child: Text("复制"),
                                     ),
@@ -281,6 +296,9 @@ class _AboutState extends State<About> {
                   height: 20,
                 ),
                 Card(
+                  shape: RoundedRectangleBorder(
+                      side: BorderSide(),
+                      borderRadius: BorderRadius.circular(5)),
                   margin: EdgeInsets.symmetric(horizontal: 20),
                   child: Padding(
                     padding: EdgeInsets.all(20),
@@ -294,7 +312,7 @@ class _AboutState extends State<About> {
                           width: 10,
                         ),
                         Text(
-                          "${Util.appName}开源地址",
+                          "${Util.instance.appName}开源地址",
                           style: TextStyle(fontSize: 16),
                         ),
                         Spacer(),
@@ -317,6 +335,9 @@ class _AboutState extends State<About> {
                   height: 20,
                 ),
                 Card(
+                  shape: RoundedRectangleBorder(
+                      side: BorderSide(),
+                      borderRadius: BorderRadius.circular(5)),
                   margin: EdgeInsets.symmetric(horizontal: 20),
                   child: Padding(
                     padding: EdgeInsets.all(20),
@@ -354,6 +375,9 @@ class _AboutState extends State<About> {
                   height: 20,
                 ),
                 Card(
+                  shape: RoundedRectangleBorder(
+                      side: BorderSide(),
+                      borderRadius: BorderRadius.circular(5)),
                   margin: EdgeInsets.symmetric(horizontal: 20),
                   child: Padding(
                     padding: EdgeInsets.all(20),
@@ -404,7 +428,7 @@ class _AboutState extends State<About> {
                   setState(() {
                     checking = true;
                   });
-                  await Util.checkUpdate(true, context, force: true);
+                  await Util.instance.checkUpdate(true, context, force: true);
                   setState(() {
                     checking = false;
                   });

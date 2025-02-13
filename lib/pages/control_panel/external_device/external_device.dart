@@ -49,12 +49,14 @@ class _ExternalDeviceState extends State<ExternalDevice>
         }
       });
     } else {
-      Util.toast("获取外接设备失败，code${res['error']['code']}");
+      Util.instance.toast("获取外接设备失败，code${res['error']['code']}");
     }
   }
 
   Widget _buildPartitionItem(partition) {
     return Card(
+      shape: RoundedRectangleBorder(
+          side: BorderSide(), borderRadius: BorderRadius.circular(5)),
       margin: EdgeInsets.only(top: 20),
       child: Padding(
         padding: const EdgeInsets.all(8.0),
@@ -92,6 +94,9 @@ class _ExternalDeviceState extends State<ExternalDevice>
             Row(
               children: [
                 Card(
+                  shape: RoundedRectangleBorder(
+                      side: BorderSide(),
+                      borderRadius: BorderRadius.circular(5)),
                   margin: EdgeInsets.all(10),
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
@@ -158,17 +163,17 @@ class _ExternalDeviceState extends State<ExternalDevice>
                         height: 5,
                       ),
                       Text(
-                          "已用：${Util.formatSize(partition['used_size_mb'] * 1024 * 1024)}"),
+                          "已用：${Util.instance.formatSize(partition['used_size_mb'] * 1024 * 1024)}"),
                       SizedBox(
                         height: 5,
                       ),
                       Text(
-                          "可用：${Util.formatSize(partition['total_size_mb'] * 1024 * 1024 - partition['used_size_mb'] * 1024 * 1024)}"),
+                          "可用：${Util.instance.formatSize(partition['total_size_mb'] * 1024 * 1024 - partition['used_size_mb'] * 1024 * 1024)}"),
                       SizedBox(
                         height: 5,
                       ),
                       Text(
-                          "容量：${Util.formatSize(partition['total_size_mb'] * 1024 * 1024)}"),
+                          "容量：${Util.instance.formatSize(partition['total_size_mb'] * 1024 * 1024)}"),
                     ],
                   ),
                 )
@@ -183,6 +188,8 @@ class _ExternalDeviceState extends State<ExternalDevice>
   Widget _buildESataItem(esata) {
     List partitions = esata['partitions'];
     return Card(
+      shape: RoundedRectangleBorder(
+          side: BorderSide(), borderRadius: BorderRadius.circular(5)),
       child: Padding(
         padding: EdgeInsets.all(20),
         child: Column(
@@ -216,10 +223,10 @@ class _ExternalDeviceState extends State<ExternalDevice>
                   onPressed: () async {
                     var res = await Api.ejectEsata(esata['dev_id']);
                     if (res['success']) {
-                      Util.toast("设备已退出");
+                      Util.instance.toast("设备已退出");
                       getData();
                     } else {
-                      Util.toast("设备退出失败，代码${res['error']['code']}");
+                      Util.instance.toast("设备退出失败，代码${res['error']['code']}");
                     }
                   },
                   child: SizedBox(
@@ -251,6 +258,8 @@ class _ExternalDeviceState extends State<ExternalDevice>
       body: Column(
         children: [
           Card(
+            shape: RoundedRectangleBorder(
+                side: BorderSide(), borderRadius: BorderRadius.circular(5)),
             margin: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
             child: Padding(
               padding: const EdgeInsets.all(8.0),
@@ -265,7 +274,7 @@ class _ExternalDeviceState extends State<ExternalDevice>
                 unselectedLabelColor: Colors.grey,
                 indicator: BubbleTabIndicator(
                   indicatorColor: Theme.of(context).scaffoldBackgroundColor,
-                  shadowColor: Util.getAdjustColor(
+                  shadowColor: Util.instance.getAdjustColor(
                       Theme.of(context).scaffoldBackgroundColor, -20),
                 ),
                 tabs: [

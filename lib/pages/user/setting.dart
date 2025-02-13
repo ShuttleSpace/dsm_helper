@@ -43,7 +43,7 @@ class _UserSettingState extends State<UserSetting> {
           TextEditingValue(text: normalUser['fullname']);
       _emailController.value = TextEditingValue(text: normalUser['email']);
     } else {
-      Util.toast("加载失败，code:${res['error']['code']}");
+      Util.instance.toast("加载失败，code:${res['error']['code']}");
       Navigator.of(context).pop();
     }
   }
@@ -65,6 +65,9 @@ class _UserSettingState extends State<UserSetting> {
               padding: EdgeInsets.all(20),
               children: [
                 Card(
+                  shape: RoundedRectangleBorder(
+                      side: BorderSide(),
+                      borderRadius: BorderRadius.circular(5)),
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: TextField(
@@ -82,6 +85,9 @@ class _UserSettingState extends State<UserSetting> {
                   height: 20,
                 ),
                 Card(
+                  shape: RoundedRectangleBorder(
+                      side: BorderSide(),
+                      borderRadius: BorderRadius.circular(5)),
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: TextField(
@@ -99,6 +105,9 @@ class _UserSettingState extends State<UserSetting> {
                     height: 20,
                   ),
                   Card(
+                    shape: RoundedRectangleBorder(
+                        side: BorderSide(),
+                        borderRadius: BorderRadius.circular(5)),
                     child: Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: TextField(
@@ -114,6 +123,9 @@ class _UserSettingState extends State<UserSetting> {
                     height: 20,
                   ),
                   Card(
+                    shape: RoundedRectangleBorder(
+                        side: BorderSide(),
+                        borderRadius: BorderRadius.circular(5)),
                     child: Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: TextField(
@@ -129,6 +141,9 @@ class _UserSettingState extends State<UserSetting> {
                     height: 20,
                   ),
                   Card(
+                    shape: RoundedRectangleBorder(
+                        side: BorderSide(),
+                        borderRadius: BorderRadius.circular(5)),
                     child: Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: TextField(
@@ -145,6 +160,9 @@ class _UserSettingState extends State<UserSetting> {
                   height: 20,
                 ),
                 Card(
+                  shape: RoundedRectangleBorder(
+                      side: BorderSide(),
+                      borderRadius: BorderRadius.circular(5)),
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: TextField(
@@ -186,6 +204,9 @@ class _UserSettingState extends State<UserSetting> {
                     }
                   },
                   child: Card(
+                    shape: RoundedRectangleBorder(
+                        side: BorderSide(),
+                        borderRadius: BorderRadius.circular(5)),
                     child: Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: Row(
@@ -220,12 +241,12 @@ class _UserSettingState extends State<UserSetting> {
                       changedData.remove("confirm_password");
                     } else {
                       if (changedData['password'] == "") {
-                        Util.toast("请输入新密码");
+                        Util.instance.toast("请输入新密码");
                         return;
                       }
                       if (changedData['confirm_password'] !=
                           changedData['password']) {
-                        Util.toast("确认密码与新密码不一致");
+                        Util.instance.toast("确认密码与新密码不一致");
                         return;
                       }
                     }
@@ -240,13 +261,13 @@ class _UserSettingState extends State<UserSetting> {
                     });
                     var res = await Api.normalUser("set", changedData: data);
                     if (res['success']) {
-                      Util.toast("保存成功");
+                      Util.instance.toast("保存成功");
                       Navigator.of(context).pop(true);
                     } else {
                       setState(() {
                         saving = false;
                       });
-                      Util.toast("保存失败，原因:${res['error']['code']}");
+                      Util.instance.toast("保存失败，原因:${res['error']['code']}");
                     }
                   },
                   child: saving

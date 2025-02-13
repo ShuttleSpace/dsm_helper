@@ -9,6 +9,6 @@ class DarkModeProvider with ChangeNotifier {
   void changeMode(int darkMode) async {
     _darkMode = darkMode;
     notifyListeners();
-    Util.setStorage("dark_mode", _darkMode.toString());
+    Util.instance.setStorage("dark_mode", _darkMode.toString());
   }
 }

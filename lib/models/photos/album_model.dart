@@ -63,13 +63,13 @@ class AlbumModel {
       "api": "SYNO.Foto${isTeam ? 'Team' : ''}.Browse.Album",
       "method": "list",
       "version": shared ? 2 : 1,
-      "_sid": Util.sid,
+      "_sid": Util.instance.sid,
     };
     if (shared) {
       data['category'] = '"shared"';
     }
     print(data);
-    var res = await Util.post("entry.cgi", data: data);
+    var res = await Util.instance.post("entry.cgi", data: data);
     print(res);
     if (res['success']) {
       List<AlbumModel> albums = [];

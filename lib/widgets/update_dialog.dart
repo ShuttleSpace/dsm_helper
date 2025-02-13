@@ -135,13 +135,14 @@ class UpdateDialog extends StatelessWidget {
                         onPressed: () async {
                           Navigator.of(context).pop();
                           List<String> ignoredVersions = [];
-                          String ignoredVersionsString =
-                              await Util.getStorage("ignoredVersions") ?? '';
+                          String ignoredVersionsString = await Util.instance
+                                  .getStorage("ignoredVersions") ??
+                              '';
                           if (ignoredVersionsString.isNotBlank) {
                             ignoredVersions = ignoredVersionsString.split(",");
                           }
                           ignoredVersions.add(packageInfo?.buildNumber ?? '');
-                          Util.setStorage(
+                          Util.instance.setStorage(
                               "ignoredVersions", ignoredVersions.join(","));
                         },
                         color:

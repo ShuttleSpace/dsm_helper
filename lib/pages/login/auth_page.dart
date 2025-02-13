@@ -27,7 +27,7 @@ class _AuthPageState extends State<AuthPage> {
   String password = "";
   @override
   void initState() {
-    Util.isAuthPage = true;
+    Util.instance.isAuthPage = true;
     getData();
     super.initState();
   }
@@ -39,16 +39,16 @@ class _AuthPageState extends State<AuthPage> {
   };
   @override
   void dispose() {
-    Util.isAuthPage = false;
+    Util.instance.isAuthPage = false;
     auth.stopAuthentication();
     super.dispose();
   }
 
   getData() async {
-    String pass = await Util.getStorage("gesture_password") ?? '';
+    String pass = await Util.instance.getStorage("gesture_password") ?? '';
     password = pass ?? "";
     String launchAuthBiometricsStr =
-        await Util.getStorage("launch_auth_biometrics") ?? '';
+        await Util.instance.getStorage("launch_auth_biometrics") ?? '';
     if (launchAuthBiometricsStr == "1") {
       canCheckBiometrics = await auth.canCheckBiometrics;
       setState(() {});
@@ -101,36 +101,38 @@ class _AuthPageState extends State<AuthPage> {
         auth.stopAuthentication();
         if (didAuthenticate) {
           //验证成功
-          Util.vibrate(FeedbackType.light);
+          Util.instance.vibrate(FeedbackType.light);
           if (widget.launch) {
             Navigator.of(context).pushReplacementNamed("/login");
           } else {
             Navigator.of(context).pop();
           }
         } else {
-          Util.vibrate(FeedbackType.warning);
-          Util.toast("${biometricTypeName[biometricsType]}验证失败，请使用图形密码登录");
+          Util.instance.vibrate(FeedbackType.warning);
+          Util.instance
+              .toast("${biometricTypeName[biometricsType]}验证失败，请使用图形密码登录");
         }
       } on PlatformException catch (e) {
-        Util.vibrate(FeedbackType.warning);
+        Util.instance.vibrate(FeedbackType.warning);
         if (e.code == auth_error.notAvailable) {
-          Util.toast("${biometricTypeName[biometricsType]}验证不可用，请使用图形密码登录");
+          Util.instance
+              .toast("${biometricTypeName[biometricsType]}验证不可用，请使用图形密码登录");
         } else if (e.code == auth_error.passcodeNotSet) {
-          Util.toast("系统未设置密码");
+          Util.instance.toast("系统未设置密码");
         } else if (e.code == auth_error.lockedOut) {
-          Util.toast("认证失败次数过多，请使用图形密码登录");
+          Util.instance.toast("认证失败次数过多，请使用图形密码登录");
         } else {
-          Util.toast(e.message ?? '');
+          Util.instance.toast(e.message ?? '');
         }
       }
     }
   }
 
   Future<bool> onWillPop() {
-    Util.vibrate(FeedbackType.light);
+    Util.instance.vibrate(FeedbackType.light);
     if (DateTime.now().difference(lastPopTime) > Duration(seconds: 2)) {
       lastPopTime = DateTime.now();
-      Util.toast('再按一次退出${Util.appName}');
+      Util.instance.toast('再按一次退出${Util.instance.appName}');
     } else {
       lastPopTime = DateTime.now();
       // 退出app
@@ -180,23 +182,23 @@ class _AuthPageState extends State<AuthPage> {
                     } else {
                       //密码验证不通过
                       if (errorCount < 2) {
-                        Util.toast("密码错误");
-                        Util.vibrate(FeedbackType.warning);
+                        Util.instance.toast("密码错误");
+                        Util.instance.vibrate(FeedbackType.warning);
                       } else if (errorCount < 5) {
                         errorCount++;
-                        Util.toast("密码错误，连续错误5次将清空登录历史");
-                        Util.vibrate(FeedbackType.warning);
+                        Util.instance.toast("密码错误，连续错误5次将清空登录历史");
+                        Util.instance.vibrate(FeedbackType.warning);
                       } else {
-                        Util.toast("密码错误已达5次");
-                        Util.vibrate(FeedbackType.warning);
-                        Util.removeStorage("servers");
-                        Util.removeStorage("https");
-                        Util.removeStorage("host");
-                        Util.removeStorage("port");
-                        Util.removeStorage("account");
-                        Util.removeStorage("remember_password");
-                        Util.removeStorage("auto_login");
-                        Util.removeStorage("check_ssl");
+                        Util.instance.toast("密码错误已达5次");
+                        Util.instance.vibrate(FeedbackType.warning);
+                        Util.instance.removeStorage("servers");
+                        Util.instance.removeStorage("https");
+                        Util.instance.removeStorage("host");
+                        Util.instance.removeStorage("port");
+                        Util.instance.removeStorage("account");
+                        Util.instance.removeStorage("remember_password");
+                        Util.instance.removeStorage("auto_login");
+                        Util.instance.removeStorage("check_ssl");
                         Navigator.of(context).pushReplacementNamed("/login");
                       }
                     }

@@ -5,6 +5,7 @@ import 'dart:ui';
 import 'package:android_intent_plus/android_intent.dart';
 import 'package:dsm_helper/pages/common/video_player.dart';
 import 'package:dsm_helper/pages/download/download_setting.dart';
+import 'package:dsm_helper/pages/download/download_state.dart';
 import 'package:dsm_helper/themes/app_theme.dart';
 import 'package:dsm_helper/widgets/transparent_router.dart';
 import 'package:dsm_helper/pages/common/image_preview.dart';
@@ -54,110 +55,23 @@ class Download extends StatefulWidget {
 }
 
 class DownloadState extends State<Download> {
-  List<DownloadInfo> tasks = [];
-  bool loading = true;
-  List<DownloadInfo> selectedTasks = [];
-  late Timer timer;
-  bool multiSelect = false;
-  String downloadPath = '';
-
-  ReceivePort _receiverPort = ReceivePort();
   @override
   void initState() {
-    Util.getDownloadPath().then((value) {
-      setState(() {
-        downloadPath = value;
-      });
-    });
-    _bindBackgroundIsolate();
-    FlutterDownloader.registerCallback(downloadCallback as DownloadCallback,
-        step: 1);
-    getData();
+    DownloadStateInherited.of(context).notifier.init();
     super.initState();
-  }
-
-  static void downloadCallback(
-      String id, DownloadTaskStatus status, int progress) {
-    debugPrint(
-        'Background Isolate Callback: task ($id) is in status ($status) and process ($progress)');
-    IsolateNameServer.lookupPortByName('downloader_send_port')
-        ?.send([id, status.index, progress]);
-  }
-
-  void _bindBackgroundIsolate() {
-    bool isSuccess = IsolateNameServer.registerPortWithName(
-        _receiverPort.sendPort, 'downloader_send_port');
-    if (!isSuccess) {
-      _unbindBackgroundIsolate();
-      _bindBackgroundIsolate();
-      return;
-    }
-    _receiverPort.listen((dynamic data) {
-      debugPrint('UI Isolate Callback: $data');
-      String id = data[0];
-      DownloadTaskStatus status = DownloadTaskStatus.fromInt(data[1]);
-      int progress = data[2];
-
-      if (tasks.isNotEmpty) {
-        tasks.forEach((task) {
-          if (task.taskId == id) {
-            setState(() {
-              task.status = status;
-              task.progress = progress;
-            });
-          }
-        });
-      }
-    });
-  }
-
-  void _unbindBackgroundIsolate() {
-    IsolateNameServer.removePortNameMapping('downloader_send_port');
   }
 
   @override
   void dispose() {
-    _unbindBackgroundIsolate();
+    DownloadStateInherited.of(context).notifier.unbindBackgroundIsolate();
     super.dispose();
-  }
-
-  getData() async {
-    List<DownloadTask> downloadTasks =
-        await FlutterDownloader.loadTasks() ?? [];
-    tasks = downloadTasks.map((e) => DownloadInfo.formTask(e)).toList();
-    setState(() {
-      loading = false;
-    });
-    // 如果存在下载中任务，每秒刷新一次
-    if (tasks
-            .where((task) =>
-                task.status == DownloadTaskStatus.running ||
-                task.status == DownloadTaskStatus.enqueued ||
-                task.status == DownloadTaskStatus.undefined)
-            .length >
-        0) {
-    } else {
-      timer.cancel();
-    }
-  }
-
-  Future<bool> onWillPop() {
-    if (multiSelect) {
-      setState(() {
-        multiSelect = false;
-        selectedTasks = [];
-      });
-    } else {
-      debugPrint("可以返回");
-      return Future.value(true);
-    }
-
-    return Future.value(false);
   }
 
   Widget _buildDownloadStatus(DownloadTaskStatus status, int progress) {
     if (status == DownloadTaskStatus.complete) {
       return Card(
+        shape: RoundedRectangleBorder(
+            side: BorderSide(), borderRadius: BorderRadius.circular(5)),
         margin: EdgeInsets.only(bottom: 3),
         child: Padding(
           padding: const EdgeInsets.all(8.0),
@@ -169,6 +83,8 @@ class DownloadState extends State<Download> {
       );
     } else if (status == DownloadTaskStatus.failed) {
       return Card(
+        shape: RoundedRectangleBorder(
+            side: BorderSide(), borderRadius: BorderRadius.circular(5)),
         margin: EdgeInsets.only(bottom: 3),
         child: Padding(
           padding: const EdgeInsets.all(8.0),
@@ -180,6 +96,8 @@ class DownloadState extends State<Download> {
       );
     } else if (status == DownloadTaskStatus.canceled) {
       return Card(
+        shape: RoundedRectangleBorder(
+            side: BorderSide(), borderRadius: BorderRadius.circular(5)),
         margin: EdgeInsets.only(bottom: 3),
         child: Padding(
           padding: const EdgeInsets.all(8.0),
@@ -191,6 +109,8 @@ class DownloadState extends State<Download> {
       );
     } else if (status == DownloadTaskStatus.paused) {
       return Card(
+        shape: RoundedRectangleBorder(
+            side: BorderSide(), borderRadius: BorderRadius.circular(5)),
         margin: EdgeInsets.only(bottom: 3),
         child: Padding(
           padding: const EdgeInsets.all(8.0),
@@ -202,6 +122,8 @@ class DownloadState extends State<Download> {
       );
     } else if (status == DownloadTaskStatus.running) {
       return Card(
+        shape: RoundedRectangleBorder(
+            side: BorderSide(), borderRadius: BorderRadius.circular(5)),
         margin: EdgeInsets.only(bottom: 3),
         child: Padding(
           padding: const EdgeInsets.all(8.0),
@@ -213,6 +135,8 @@ class DownloadState extends State<Download> {
       );
     } else if (status == DownloadTaskStatus.enqueued) {
       return Card(
+        shape: RoundedRectangleBorder(
+            side: BorderSide(), borderRadius: BorderRadius.circular(5)),
         margin: EdgeInsets.only(bottom: 3),
         child: Padding(
           padding: const EdgeInsets.all(8.0),
@@ -228,40 +152,41 @@ class DownloadState extends State<Download> {
   }
 
   Widget _buildTaskItem(DownloadInfo task) {
-    FileTypeEnum fileType = Util.fileType(task.filename);
+    final notifier = DownloadStateInherited.of(context).notifier;
+    FileTypeEnum fileType = Util.instance.fileType(task.filename);
     // String path = file['path'];
     return Padding(
       padding:
           const EdgeInsets.only(top: 10.0, bottom: 10.0, left: 20, right: 20),
       child: OutlinedButton(
         onLongPress: () {
-          Util.vibrate(FeedbackType.light);
-          setState(() {
-            multiSelect = true;
-            selectedTasks.add(task);
-          });
+          Util.instance.vibrate(FeedbackType.light);
+          notifier
+            ..multiSelectVaule = true
+            ..addSelectedTask(task);
         },
         onPressed: () async {
           // print(task.savedDir + "/" + task.filename);
           // return;
-          if (multiSelect) {
-            setState(() {
-              if (selectedTasks.contains(task)) {
-                selectedTasks.remove(task);
-              } else {
-                selectedTasks.add(task);
-              }
-            });
+          if (notifier.multiSelectVaule) {
+            if (notifier.selectedTasks.contains(task)) {
+              notifier.removeSelectedTask(task);
+            } else {
+              notifier.addSelectedTask(task);
+            }
           } else {
             if (fileType == FileTypeEnum.image) {
               //获取当前目录全部图片文件
               List<String> images = [];
               int index = 0;
-              for (int i = 0; i < tasks.length; i++) {
+              for (int i = 0; i < notifier.tasks.length; i++) {
                 if (task.status == DownloadTaskStatus.complete &&
-                    Util.fileType(task.filename) == FileTypeEnum.image) {
-                  images.add(tasks[i].savedDir + "/" + tasks[i].filename);
-                  if (tasks[i] == task) {
+                    Util.instance.fileType(task.filename) ==
+                        FileTypeEnum.image) {
+                  images.add(notifier.tasks[i].savedDir +
+                      "/" +
+                      notifier.tasks[i].filename);
+                  if (notifier.tasks[i] == task) {
                     index = images.length - 1;
                   }
                 }
@@ -276,7 +201,8 @@ class DownloadState extends State<Download> {
                   },
                   settings: RouteSettings(name: "preview_image")));
             } else if (fileType == FileTypeEnum.movie) {
-              String videoPlayer = await Util.getStorage("video_player") ?? '';
+              String videoPlayer =
+                  await Util.instance.getStorage("video_player") ?? '';
               debugPrint(videoPlayer);
               if (videoPlayer == '1') {
                 AndroidIntent intent = AndroidIntent(
@@ -301,7 +227,7 @@ class DownloadState extends State<Download> {
             } else {
               var result = await FlutterDownloader.open(taskId: task.taskId);
               if (!result) {
-                Util.toast("不支持打开此文件");
+                Util.instance.toast("不支持打开此文件");
               }
             }
           }
@@ -357,12 +283,15 @@ class DownloadState extends State<Download> {
             SizedBox(
               width: 10,
             ),
-            multiSelect
+            notifier.multiSelectVaule
                 ? Card(
+                    shape: RoundedRectangleBorder(
+                        side: BorderSide(),
+                        borderRadius: BorderRadius.circular(5)),
                     child: SizedBox(
                       width: 20,
                       height: 20,
-                      child: selectedTasks.contains(task)
+                      child: notifier.selectedTasks.contains(task)
                           ? Icon(
                               CupertinoIcons.checkmark_alt,
                               color: Color(0xffff9813),
@@ -378,6 +307,9 @@ class DownloadState extends State<Download> {
                           return Material(
                             color: Colors.transparent,
                             child: Card(
+                              shape: RoundedRectangleBorder(
+                                  side: BorderSide(),
+                                  borderRadius: BorderRadius.circular(5)),
                               child: SafeArea(
                                 top: false,
                                 child: Padding(
@@ -401,7 +333,7 @@ class DownloadState extends State<Download> {
                                             Navigator.of(context).pop();
                                             await FlutterDownloader.retry(
                                                 taskId: task.taskId);
-                                            await getData();
+                                            await notifier.getData();
                                           },
                                           child: Text(
                                             "重试",
@@ -415,7 +347,7 @@ class DownloadState extends State<Download> {
                                             Navigator.of(context).pop();
                                             await FlutterDownloader.pause(
                                                 taskId: task.taskId);
-                                            await getData();
+                                            await notifier.getData();
                                           },
                                           child: Text(
                                             "暂停",
@@ -432,7 +364,7 @@ class DownloadState extends State<Download> {
                                                 await FlutterDownloader.resume(
                                                     taskId: task.taskId);
                                             debugPrint(res);
-                                            await getData();
+                                            await notifier.getData();
                                           },
                                           child: Text(
                                             "继续下载",
@@ -450,13 +382,19 @@ class DownloadState extends State<Download> {
                                       OutlinedButton(
                                         onPressed: () async {
                                           Navigator.of(context).pop();
-                                          Util.vibrate(FeedbackType.warning);
+                                          Util.instance
+                                              .vibrate(FeedbackType.warning);
                                           showCupertinoModalPopup(
                                             context: context,
                                             builder: (context) {
                                               return Material(
                                                 color: Colors.transparent,
                                                 child: Card(
+                                                  shape: RoundedRectangleBorder(
+                                                      side: BorderSide(),
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              5)),
                                                   child: SafeArea(
                                                     top: false,
                                                     child: Padding(
@@ -500,7 +438,8 @@ class DownloadState extends State<Download> {
                                                                       .taskId,
                                                                   shouldDeleteContent:
                                                                       true);
-                                                              await getData();
+                                                              await notifier
+                                                                  .getData();
                                                             },
                                                             child: Text(
                                                               "同时删除已下载文件",
@@ -528,7 +467,8 @@ class DownloadState extends State<Download> {
                                                                             .taskId,
                                                                         shouldDeleteContent:
                                                                             false);
-                                                                    await getData();
+                                                                    await notifier
+                                                                        .getData();
                                                                   },
                                                                   child: Text(
                                                                     "确认删除",
@@ -621,15 +561,14 @@ class DownloadState extends State<Download> {
 
   @override
   Widget build(BuildContext context) {
+    final notifier = DownloadStateInherited.of(context).notifier;
     return Scaffold(
       appBar: AppBar(
-        leading: multiSelect
+        leading: notifier.multiSelectVaule
             ? GestureDetector(
                 onTap: () {
-                  setState(() {
-                    multiSelect = false;
-                    selectedTasks = [];
-                  });
+                  notifier.multiSelectVaule = false;
+                  notifier.resetSelectedTasks();
                 },
                 child: Icon(Icons.close),
               )
@@ -640,31 +579,29 @@ class DownloadState extends State<Download> {
               "下载",
             ),
             if (Platform.isAndroid)
-              Text(
-                downloadPath,
-                style: TextStyle(
-                  fontSize: 12,
-                  color: Colors.grey,
-                ),
-              ),
+              ValueListenableBuilder(
+                  valueListenable: notifier.downloadPath,
+                  builder: (context, value, child) {
+                    return Text(
+                      value,
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.grey,
+                      ),
+                    );
+                  })
           ],
         ),
         actions: [
-          if (multiSelect)
+          if (notifier.multiSelectVaule)
             Padding(
               padding: EdgeInsets.only(right: 10, top: 8, bottom: 8),
               child: OutlinedButton(
                 onPressed: () {
-                  if (selectedTasks.length == tasks.length) {
-                    selectedTasks = [];
-                  } else {
-                    selectedTasks = [];
-                    tasks.forEach((task) {
-                      selectedTasks.add(task);
-                    });
+                  notifier.resetSelectedTasks();
+                  if (notifier.selectedTasks.length != notifier.tasks.length) {
+                    notifier.addSelectedTasks(notifier.tasks);
                   }
-
-                  setState(() {});
                 },
                 child: Image.asset(
                   "assets/icons/select_all.png",
@@ -713,6 +650,9 @@ class DownloadState extends State<Download> {
                       bottom: selectedTasks.length > 0 ? 0 : -100,
                       duration: Duration(milliseconds: 200),
                       child: Card(
+                        shape: RoundedRectangleBorder(
+                            side: BorderSide(),
+                            borderRadius: BorderRadius.circular(5)),
                         margin: EdgeInsets.all(20),
                         child: Padding(
                           padding: const EdgeInsets.all(8.0),
@@ -721,13 +661,17 @@ class DownloadState extends State<Download> {
                             children: [
                               GestureDetector(
                                 onTap: () async {
-                                  Util.vibrate(FeedbackType.warning);
+                                  Util.instance.vibrate(FeedbackType.warning);
                                   showCupertinoModalPopup(
                                     context: context,
                                     builder: (context) {
                                       return Material(
                                         color: Colors.transparent,
                                         child: Card(
+                                          shape: RoundedRectangleBorder(
+                                              side: BorderSide(),
+                                              borderRadius:
+                                                  BorderRadius.circular(5)),
                                           child: SafeArea(
                                             top: false,
                                             child: Padding(

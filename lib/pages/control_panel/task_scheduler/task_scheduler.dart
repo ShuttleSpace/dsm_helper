@@ -27,7 +27,7 @@ class _TaskSchedulerState extends State<TaskScheduler> {
         tasks = res['data']['tasks'];
       });
     } else {
-      Util.toast("加载失败");
+      Util.instance.toast("加载失败");
       Navigator.of(context).pop();
     }
   }
@@ -36,6 +36,8 @@ class _TaskSchedulerState extends State<TaskScheduler> {
     task['running'] = task['running'] ?? false;
     task['set'] = task['set'] ?? false;
     return Card(
+      shape: RoundedRectangleBorder(
+          side: BorderSide(), borderRadius: BorderRadius.circular(5)),
       margin: EdgeInsets.symmetric(vertical: 10),
       child: Padding(
         padding: EdgeInsets.all(20),
@@ -94,10 +96,13 @@ class _TaskSchedulerState extends State<TaskScheduler> {
                         task['enable'] = !task['enable'];
                       });
                     } else {
-                      Util.toast("操作失败，code：${res['error']['code']}");
+                      Util.instance.toast("操作失败，code：${res['error']['code']}");
                     }
                   },
                   child: Card(
+                    shape: RoundedRectangleBorder(
+                        side: BorderSide(),
+                        borderRadius: BorderRadius.circular(5)),
                     child: Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: SizedBox(
@@ -154,7 +159,7 @@ class _TaskSchedulerState extends State<TaskScheduler> {
                     } else if (task['type'] == 'event_script') {
                       res = await Api.eventRun([task['name']]);
                     } else {
-                      Util.toast("暂不支持此类型任务");
+                      Util.instance.toast("暂不支持此类型任务");
                       return;
                     }
 
@@ -162,9 +167,10 @@ class _TaskSchedulerState extends State<TaskScheduler> {
                       task['running'] = false;
                     });
                     if (res['success']) {
-                      Util.toast("任务计划执行成功");
+                      Util.instance.toast("任务计划执行成功");
                     } else {
-                      Util.toast("任务计划执行失败，code：${res['error']['code']}");
+                      Util.instance
+                          .toast("任务计划执行失败，code：${res['error']['code']}");
                     }
                   },
                   child: SizedBox(

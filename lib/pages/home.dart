@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:dsm_helper/pages/download/download.dart';
+import 'package:dsm_helper/pages/download/download_state.dart';
 import 'package:dsm_helper/pages/file/file.dart';
 import 'package:dsm_helper/pages/setting/setting.dart';
 import 'package:dsm_helper/util/function.dart';
@@ -41,7 +42,7 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
   void initState() {
     WidgetsBinding.instance.addObserver(this);
     getData();
-    Util.setStorage("agreement", "1");
+    Util.instance.setStorage("agreement", "1");
     FlutterSharingIntent.instance
         .getInitialSharing()
         .then((List<SharedFile> value) {
@@ -152,17 +153,17 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
 
   checkAuth() async {
     // print("是否需要启动密码")
-    String launchAuthStr = await Util.getStorage("launch_auth") ?? '';
+    String launchAuthStr = await Util.instance.getStorage("launch_auth") ?? '';
     String launchAuthPasswordStr =
-        await Util.getStorage("launch_auth_password") ?? '';
+        await Util.instance.getStorage("launch_auth_password") ?? '';
     String launchAuthBiometricsStr =
-        await Util.getStorage("launch_auth_biometrics") ?? '';
+        await Util.instance.getStorage("launch_auth_biometrics") ?? '';
     launchAuth = launchAuthStr == "1";
     password = launchAuthPasswordStr == "1";
     biometrics = launchAuthBiometricsStr == "1";
 
     authPage = launchAuth && (password || biometrics);
-    if (Util.isAuthPage == false && authPage) {
+    if (Util.instance.isAuthPage == false && authPage) {
       Navigator.of(context).push(CupertinoPageRoute(builder: (context) {
         return AuthPage(
           launch: false,
@@ -191,7 +192,7 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
   }
 
   Future<bool> onWillPop() {
-    Util.vibrate(FeedbackType.light);
+    Util.instance.vibrate(FeedbackType.light);
     Future<bool> value = Future.value(true);
     if (_currentIndex == 0) {
       if (_dashboardStateKey.currentState?.isDrawerOpen == true) {
@@ -205,13 +206,13 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
       }
       value = _filesStateKey.currentState?.onWillPop() ?? Future.value(false);
     } else if (_currentIndex == 2) {
-      value = Util.downloadKey.currentState?.onWillPop() ?? Future.value(false);
+      value = DownloadStateInherited.of(context).notifier.onWillPop();
     }
     value.then((v) {
       if (v) {
         if (DateTime.now().difference(lastPopTime) > Duration(seconds: 2)) {
           lastPopTime = DateTime.now();
-          Util.toast('再按一次退出${Util.appName}');
+          Util.instance.toast('再按一次退出${Util.instance.appName}');
         } else {
           lastPopTime = DateTime.now();
           // 退出app
@@ -228,14 +229,17 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
       onWillPop: onWillPop,
       child: Scaffold(
         appBar: null,
-        body: IndexedStack(
-          children: [
-            Dashboard(key: _dashboardStateKey),
-            Files(key: _filesStateKey),
-            Download(key: Util.downloadKey),
-            Setting(),
-          ],
-          index: _currentIndex,
+        body: DownloadStateInherited(
+          notifier: DownloadStateNotifier(),
+          child: IndexedStack(
+            children: [
+              Dashboard(key: _dashboardStateKey),
+              Files(key: _filesStateKey),
+              Download(key: UniqueKey()),
+              Setting(),
+            ],
+            index: _currentIndex,
+          ),
         ),
         bottomNavigationBar: BottomNavigationBar(
           backgroundColor: Theme.of(context).scaffoldBackgroundColor,

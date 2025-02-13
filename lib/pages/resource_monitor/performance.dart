@@ -134,6 +134,9 @@ class _PerformanceState extends State<Performance>
           : Column(
               children: [
                 Card(
+                  shape: RoundedRectangleBorder(
+                      side: BorderSide(),
+                      borderRadius: BorderRadius.circular(5)),
                   margin: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
                   child: TabBar(
                     dividerHeight: 0,
@@ -146,7 +149,7 @@ class _PerformanceState extends State<Performance>
                     unselectedLabelColor: Colors.grey,
                     indicator: BubbleTabIndicator(
                       indicatorColor: Theme.of(context).scaffoldBackgroundColor,
-                      shadowColor: Util.getAdjustColor(
+                      shadowColor: Util.instance.getAdjustColor(
                           Theme.of(context).scaffoldBackgroundColor, -20),
                     ),
                     tabs: [
@@ -193,6 +196,9 @@ class _PerformanceState extends State<Performance>
                             height: 20,
                           ),
                           Card(
+                            shape: RoundedRectangleBorder(
+                                side: BorderSide(),
+                                borderRadius: BorderRadius.circular(5)),
                             margin: EdgeInsets.symmetric(horizontal: 20),
                             child: Padding(
                               padding: const EdgeInsets.all(8.0),
@@ -221,6 +227,10 @@ class _PerformanceState extends State<Performance>
                                           top: 20,
                                           bottom: 5),
                                       child: Card(
+                                        shape: RoundedRectangleBorder(
+                                            side: BorderSide(),
+                                            borderRadius:
+                                                BorderRadius.circular(5)),
                                         // padding: EdgeInsets.symmetric(horizontal: 10),
                                         child: Padding(
                                           padding: EdgeInsets.all(10),
@@ -354,6 +364,9 @@ class _PerformanceState extends State<Performance>
                             height: 20,
                           ),
                           Card(
+                            shape: RoundedRectangleBorder(
+                                side: BorderSide(),
+                                borderRadius: BorderRadius.circular(5)),
                             margin: EdgeInsets.symmetric(horizontal: 20),
                             child: Padding(
                               padding: const EdgeInsets.all(8.0),
@@ -382,6 +395,10 @@ class _PerformanceState extends State<Performance>
                                           top: 20,
                                           bottom: 5),
                                       child: Card(
+                                        shape: RoundedRectangleBorder(
+                                            side: BorderSide(),
+                                            borderRadius:
+                                                BorderRadius.circular(5)),
                                         // padding: EdgeInsets.symmetric(horizontal: 10),
                                         child: Padding(
                                           padding: EdgeInsets.all(10),
@@ -514,6 +531,9 @@ class _PerformanceState extends State<Performance>
                             height: 20,
                           ),
                           Card(
+                            shape: RoundedRectangleBorder(
+                                side: BorderSide(),
+                                borderRadius: BorderRadius.circular(5)),
                             margin: EdgeInsets.symmetric(horizontal: 20),
                             child: Padding(
                               padding: const EdgeInsets.all(8.0),
@@ -542,6 +562,10 @@ class _PerformanceState extends State<Performance>
                                           top: 20,
                                           bottom: 5),
                                       child: Card(
+                                        shape: RoundedRectangleBorder(
+                                            side: BorderSide(),
+                                            borderRadius:
+                                                BorderRadius.circular(5)),
                                         // padding: EdgeInsets.symmetric(horizontal: 10),
                                         child: Padding(
                                           padding: EdgeInsets.all(10),
@@ -570,7 +594,7 @@ class _PerformanceState extends State<Performance>
                                                         fontSize: 14,
                                                       );
                                                       return LineTooltipItem(
-                                                          '${touchedSpot.bar.color == Colors.blue ? "上传" : "下载"}:${Util.formatSize(touchedSpot.y.floor())}',
+                                                          '${touchedSpot.bar.color == Colors.blue ? "上传" : "下载"}:${Util.instance.formatSize(touchedSpot.y.floor())}',
                                                           textStyle);
                                                     }).toList();
                                                   },
@@ -598,7 +622,8 @@ class _PerformanceState extends State<Performance>
                                                   showTitles: true,
                                                   getTitlesWidget: (value, _) {
                                                     return Text(
-                                                      Util.formatSize(value,
+                                                      Util.instance.formatSize(
+                                                          value,
                                                           fixed: 0),
                                                       style: TextStyle(
                                                         color:
@@ -614,8 +639,9 @@ class _PerformanceState extends State<Performance>
                                                   //   return (value.floor() * 1000).toString();
                                                   // },
                                                   reservedSize: 28,
-                                                  interval: Util.chartInterval(
-                                                      maxNetworkSpeed),
+                                                  interval: Util.instance
+                                                      .chartInterval(
+                                                          maxNetworkSpeed),
                                                 )),
                                               ),
                                               // titlesData: FlTitlesData(
@@ -710,7 +736,7 @@ class _PerformanceState extends State<Performance>
                                           color: Colors.blue,
                                         ),
                                         Text(
-                                          Util.formatSize(
+                                          Util.instance.formatSize(
                                                   networks.last[0]['tx'],
                                                   fixed: 0) +
                                               "/S",
@@ -722,7 +748,7 @@ class _PerformanceState extends State<Performance>
                                           color: Colors.green,
                                         ),
                                         Text(
-                                          Util.formatSize(
+                                          Util.instance.formatSize(
                                                   networks.last[0]['rx'],
                                                   fixed: 0) +
                                               "/S",
@@ -742,6 +768,9 @@ class _PerformanceState extends State<Performance>
                             height: 20,
                           ),
                           Card(
+                            shape: RoundedRectangleBorder(
+                                side: BorderSide(),
+                                borderRadius: BorderRadius.circular(5)),
                             margin: EdgeInsets.symmetric(horizontal: 20),
                             child: Padding(
                               padding: const EdgeInsets.all(8.0),
@@ -770,6 +799,10 @@ class _PerformanceState extends State<Performance>
                                           top: 20,
                                           bottom: 5),
                                       child: Card(
+                                        shape: RoundedRectangleBorder(
+                                            side: BorderSide(),
+                                            borderRadius:
+                                                BorderRadius.circular(5)),
                                         // padding: EdgeInsets.symmetric(horizontal: 10),
                                         child: Padding(
                                           padding: EdgeInsets.all(10),
@@ -900,6 +933,9 @@ class _PerformanceState extends State<Performance>
                             ),
                           ),
                           Card(
+                            shape: RoundedRectangleBorder(
+                                side: BorderSide(),
+                                borderRadius: BorderRadius.circular(5)),
                             margin: EdgeInsets.symmetric(horizontal: 20),
                             child: Padding(
                               padding: const EdgeInsets.all(8.0),
@@ -928,6 +964,10 @@ class _PerformanceState extends State<Performance>
                                           top: 20,
                                           bottom: 5),
                                       child: Card(
+                                        shape: RoundedRectangleBorder(
+                                            side: BorderSide(),
+                                            borderRadius:
+                                                BorderRadius.circular(5)),
                                         // padding: EdgeInsets.symmetric(horizontal: 10),
                                         child: Padding(
                                           padding: EdgeInsets.all(10),
@@ -1065,6 +1105,9 @@ class _PerformanceState extends State<Performance>
                             child: Padding(
                               padding: const EdgeInsets.all(20),
                               child: Card(
+                                shape: RoundedRectangleBorder(
+                                    side: BorderSide(),
+                                    borderRadius: BorderRadius.circular(5)),
                                 // padding: EdgeInsets.symmetric(horizontal: 10),
                                 child: Padding(
                                   padding: EdgeInsets.all(10),
@@ -1211,6 +1254,9 @@ class _PerformanceState extends State<Performance>
                             ),
                           ),
                           Card(
+                            shape: RoundedRectangleBorder(
+                                side: BorderSide(),
+                                borderRadius: BorderRadius.circular(5)),
                             margin: EdgeInsets.symmetric(
                                 vertical: 10, horizontal: 20),
                             child: Padding(
@@ -1240,6 +1286,10 @@ class _PerformanceState extends State<Performance>
                                   Row(
                                     children: [
                                       Card(
+                                        shape: RoundedRectangleBorder(
+                                            side: BorderSide(),
+                                            borderRadius:
+                                                BorderRadius.circular(5)),
                                         child: Padding(
                                           padding: EdgeInsets.symmetric(
                                               vertical: 20),
@@ -1272,6 +1322,10 @@ class _PerformanceState extends State<Performance>
                                       ),
                                       Spacer(),
                                       Card(
+                                        shape: RoundedRectangleBorder(
+                                            side: BorderSide(),
+                                            borderRadius:
+                                                BorderRadius.circular(5)),
                                         child: Padding(
                                           padding: EdgeInsets.symmetric(
                                               vertical: 20),
@@ -1304,6 +1358,10 @@ class _PerformanceState extends State<Performance>
                                       ),
                                       Spacer(),
                                       Card(
+                                        shape: RoundedRectangleBorder(
+                                            side: BorderSide(),
+                                            borderRadius:
+                                                BorderRadius.circular(5)),
                                         child: Padding(
                                           padding: EdgeInsets.symmetric(
                                               vertical: 20),
@@ -1341,6 +1399,9 @@ class _PerformanceState extends State<Performance>
                             ),
                           ),
                           Card(
+                            shape: RoundedRectangleBorder(
+                                side: BorderSide(),
+                                borderRadius: BorderRadius.circular(5)),
                             margin: EdgeInsets.symmetric(
                                 vertical: 10, horizontal: 20),
                             child: Padding(
@@ -1360,6 +1421,10 @@ class _PerformanceState extends State<Performance>
                                   Row(
                                     children: [
                                       Card(
+                                        shape: RoundedRectangleBorder(
+                                            side: BorderSide(),
+                                            borderRadius:
+                                                BorderRadius.circular(5)),
                                         child: Padding(
                                           padding: EdgeInsets.symmetric(
                                               vertical: 20),
@@ -1389,6 +1454,10 @@ class _PerformanceState extends State<Performance>
                                       ),
                                       Spacer(),
                                       Card(
+                                        shape: RoundedRectangleBorder(
+                                            side: BorderSide(),
+                                            borderRadius:
+                                                BorderRadius.circular(5)),
                                         child: Padding(
                                           padding: EdgeInsets.symmetric(
                                               vertical: 20),
@@ -1418,6 +1487,10 @@ class _PerformanceState extends State<Performance>
                                       ),
                                       Spacer(),
                                       Card(
+                                        shape: RoundedRectangleBorder(
+                                            side: BorderSide(),
+                                            borderRadius:
+                                                BorderRadius.circular(5)),
                                         child: Padding(
                                           padding: EdgeInsets.symmetric(
                                               vertical: 20),
@@ -1460,6 +1533,9 @@ class _PerformanceState extends State<Performance>
                             child: Padding(
                               padding: const EdgeInsets.all(20),
                               child: Card(
+                                shape: RoundedRectangleBorder(
+                                    side: BorderSide(),
+                                    borderRadius: BorderRadius.circular(5)),
                                 // padding: EdgeInsets.symmetric(horizontal: 10),
                                 child: Padding(
                                   padding: EdgeInsets.all(10),
@@ -1557,6 +1633,9 @@ class _PerformanceState extends State<Performance>
                             ),
                           ),
                           Card(
+                            shape: RoundedRectangleBorder(
+                                side: BorderSide(),
+                                borderRadius: BorderRadius.circular(5)),
                             margin: EdgeInsets.symmetric(
                                 vertical: 10, horizontal: 20),
                             child: Padding(
@@ -1591,7 +1670,7 @@ class _PerformanceState extends State<Performance>
                                         width: 20,
                                       ),
                                       Text(
-                                        "${Util.formatSize(memories.last['memory_size'] * 1024, fixed: 0)}",
+                                        "${Util.instance.formatSize(memories.last['memory_size'] * 1024, fixed: 0)}",
                                         style: TextStyle(
                                             fontSize: 18,
                                             fontWeight: FontWeight.w600),
@@ -1604,6 +1683,10 @@ class _PerformanceState extends State<Performance>
                                   Row(
                                     children: [
                                       Card(
+                                        shape: RoundedRectangleBorder(
+                                            side: BorderSide(),
+                                            borderRadius:
+                                                BorderRadius.circular(5)),
                                         child: Padding(
                                           padding: EdgeInsets.symmetric(
                                               vertical: 20),
@@ -1614,7 +1697,7 @@ class _PerformanceState extends State<Performance>
                                                   children: [
                                                     TextSpan(
                                                         text:
-                                                            "${Util.formatSize((memories.last['memory_size'] - memories.last['total_real']) * 1024, fixed: 1)}",
+                                                            "${Util.instance.formatSize((memories.last['memory_size'] - memories.last['total_real']) * 1024, fixed: 1)}",
                                                         style: TextStyle(
                                                             fontSize: 18,
                                                             fontWeight:
@@ -1637,6 +1720,10 @@ class _PerformanceState extends State<Performance>
                                         width: 20,
                                       ),
                                       Card(
+                                        shape: RoundedRectangleBorder(
+                                            side: BorderSide(),
+                                            borderRadius:
+                                                BorderRadius.circular(5)),
                                         child: Padding(
                                           padding: EdgeInsets.symmetric(
                                               vertical: 20),
@@ -1647,7 +1734,7 @@ class _PerformanceState extends State<Performance>
                                                   children: [
                                                     TextSpan(
                                                         text:
-                                                            "${Util.formatSize(memories.last['real_usage'] * memories.last['memory_size'] * 10.24, fixed: 1)}",
+                                                            "${Util.instance.formatSize(memories.last['real_usage'] * memories.last['memory_size'] * 10.24, fixed: 1)}",
                                                         style: TextStyle(
                                                             fontSize: 18,
                                                             fontWeight:
@@ -1670,6 +1757,10 @@ class _PerformanceState extends State<Performance>
                                         width: 20,
                                       ),
                                       Card(
+                                        shape: RoundedRectangleBorder(
+                                            side: BorderSide(),
+                                            borderRadius:
+                                                BorderRadius.circular(5)),
                                         child: Padding(
                                           padding: EdgeInsets.symmetric(
                                               vertical: 20),
@@ -1680,7 +1771,7 @@ class _PerformanceState extends State<Performance>
                                                   children: [
                                                     TextSpan(
                                                         text:
-                                                            "${Util.formatSize(memories.last['buffer'] * 1024, fixed: 1)}",
+                                                            "${Util.instance.formatSize(memories.last['buffer'] * 1024, fixed: 1)}",
                                                         style: TextStyle(
                                                             fontSize: 18,
                                                             fontWeight:
@@ -1707,6 +1798,10 @@ class _PerformanceState extends State<Performance>
                                   Row(
                                     children: [
                                       Card(
+                                        shape: RoundedRectangleBorder(
+                                            side: BorderSide(),
+                                            borderRadius:
+                                                BorderRadius.circular(5)),
                                         child: Padding(
                                           padding: EdgeInsets.symmetric(
                                               vertical: 20),
@@ -1717,7 +1812,7 @@ class _PerformanceState extends State<Performance>
                                                   children: [
                                                     TextSpan(
                                                         text:
-                                                            "${Util.formatSize(memories.last['cached'] * 1024, fixed: 1)}",
+                                                            "${Util.instance.formatSize(memories.last['cached'] * 1024, fixed: 1)}",
                                                         style: TextStyle(
                                                             fontSize: 18,
                                                             fontWeight:
@@ -1740,6 +1835,10 @@ class _PerformanceState extends State<Performance>
                                         width: 20,
                                       ),
                                       Card(
+                                        shape: RoundedRectangleBorder(
+                                            side: BorderSide(),
+                                            borderRadius:
+                                                BorderRadius.circular(5)),
                                         child: Padding(
                                           padding: EdgeInsets.symmetric(
                                               vertical: 20),
@@ -1750,7 +1849,7 @@ class _PerformanceState extends State<Performance>
                                                   children: [
                                                     TextSpan(
                                                         text:
-                                                            "${Util.formatSize(memories.last['avail_real'] * 1024, fixed: 1)}",
+                                                            "${Util.instance.formatSize(memories.last['avail_real'] * 1024, fixed: 1)}",
                                                         style: TextStyle(
                                                             fontSize: 18,
                                                             fontWeight:
@@ -1785,6 +1884,9 @@ class _PerformanceState extends State<Performance>
                           ),
                           for (int i = 0; i < networkCount; i++)
                             Card(
+                              shape: RoundedRectangleBorder(
+                                  side: BorderSide(),
+                                  borderRadius: BorderRadius.circular(5)),
                               margin: EdgeInsets.only(
                                   left: 20, right: 20, bottom: 20),
                               child: Padding(
@@ -1814,6 +1916,10 @@ class _PerformanceState extends State<Performance>
                                             top: 20,
                                             bottom: 5),
                                         child: Card(
+                                          shape: RoundedRectangleBorder(
+                                              side: BorderSide(),
+                                              borderRadius:
+                                                  BorderRadius.circular(5)),
                                           // padding: EdgeInsets.symmetric(horizontal: 10),
                                           child: Padding(
                                             padding: EdgeInsets.all(10),
@@ -1842,7 +1948,7 @@ class _PerformanceState extends State<Performance>
                                                           fontSize: 14,
                                                         );
                                                         return LineTooltipItem(
-                                                            '${touchedSpot.bar.color == Colors.blue ? "上传" : "下载"}:${Util.formatSize(touchedSpot.y.floor())}',
+                                                            '${touchedSpot.bar.color == Colors.blue ? "上传" : "下载"}:${Util.instance.formatSize(touchedSpot.y.floor())}',
                                                             textStyle);
                                                       }).toList();
                                                     },
@@ -1871,8 +1977,9 @@ class _PerformanceState extends State<Performance>
                                                     getTitlesWidget:
                                                         (value, _) {
                                                       return Text(
-                                                        Util.formatSize(value,
-                                                            fixed: 0),
+                                                        Util.instance
+                                                            .formatSize(value,
+                                                                fixed: 0),
                                                         style: TextStyle(
                                                           color:
                                                               Color(0xff67727d),
@@ -1887,8 +1994,8 @@ class _PerformanceState extends State<Performance>
                                                     //   return (value.floor() * 1000).toString();
                                                     // },
                                                     reservedSize: 28,
-                                                    interval:
-                                                        Util.chartInterval(
+                                                    interval: Util.instance
+                                                        .chartInterval(
                                                             maxNetworkSpeed),
                                                   )),
                                                 ),
@@ -1984,7 +2091,7 @@ class _PerformanceState extends State<Performance>
                                             color: Colors.blue,
                                           ),
                                           Text(
-                                            Util.formatSize(
+                                            Util.instance.formatSize(
                                                     networks.last[i]['tx']) +
                                                 "/S",
                                             style:
@@ -1996,7 +2103,7 @@ class _PerformanceState extends State<Performance>
                                             color: Colors.green,
                                           ),
                                           Text(
-                                            Util.formatSize(
+                                            Util.instance.formatSize(
                                                     networks.last[i]['rx']) +
                                                 "/S",
                                             style:
@@ -2041,6 +2148,9 @@ class _PerformanceState extends State<Performance>
                             height: 20,
                           ),
                           Card(
+                            shape: RoundedRectangleBorder(
+                                side: BorderSide(),
+                                borderRadius: BorderRadius.circular(5)),
                             margin: EdgeInsets.only(
                                 left: 20, right: 20, bottom: 20),
                             child: Padding(
@@ -2070,6 +2180,10 @@ class _PerformanceState extends State<Performance>
                                           top: 20,
                                           bottom: 5),
                                       child: Card(
+                                        shape: RoundedRectangleBorder(
+                                            side: BorderSide(),
+                                            borderRadius:
+                                                BorderRadius.circular(5)),
                                         // padding: EdgeInsets.symmetric(horizontal: 10),
                                         child: Padding(
                                           padding: EdgeInsets.all(10),
@@ -2217,6 +2331,9 @@ class _PerformanceState extends State<Performance>
                             ),
                           ),
                           Card(
+                            shape: RoundedRectangleBorder(
+                                side: BorderSide(),
+                                borderRadius: BorderRadius.circular(5)),
                             margin: EdgeInsets.only(
                                 left: 20, right: 20, bottom: 20),
                             child: Padding(
@@ -2246,6 +2363,10 @@ class _PerformanceState extends State<Performance>
                                           top: 20,
                                           bottom: 5),
                                       child: Card(
+                                        shape: RoundedRectangleBorder(
+                                            side: BorderSide(),
+                                            borderRadius:
+                                                BorderRadius.circular(5)),
                                         // padding: EdgeInsets.symmetric(horizontal: 10),
                                         child: Padding(
                                           padding: EdgeInsets.all(10),
@@ -2274,14 +2395,14 @@ class _PerformanceState extends State<Performance>
                                                                         .length;
                                                                 i++)
                                                               LineTooltipItem(
-                                                                "${disks.last['disk'][i]['display_name']}：${Util.formatSize(disks[items[0].spotIndex]['disk'][i]['read_byte'].floor())}",
+                                                                "${disks.last['disk'][i]['display_name']}：${Util.instance.formatSize(disks[items[0].spotIndex]['disk'][i]['read_byte'].floor())}",
                                                                 TextStyle(
                                                                     color:
                                                                         colors[
                                                                             i]),
                                                               ),
                                                             LineTooltipItem(
-                                                                "总计：${Util.formatSize(disks[items[0].spotIndex]['total']['read_byte'].floor())}",
+                                                                "总计：${Util.instance.formatSize(disks[items[0].spotIndex]['total']['read_byte'].floor())}",
                                                                 TextStyle(
                                                                     color: Colors
                                                                         .blue)),
@@ -2310,7 +2431,8 @@ class _PerformanceState extends State<Performance>
                                                   showTitles: true,
                                                   getTitlesWidget: (value, _) {
                                                     return Text(
-                                                      Util.formatSize(value,
+                                                      Util.instance.formatSize(
+                                                          value,
                                                           fixed: 0),
                                                       style: TextStyle(
                                                         color:
@@ -2326,8 +2448,9 @@ class _PerformanceState extends State<Performance>
                                                   //   return (value.floor() * 1000).toString();
                                                   // },
                                                   reservedSize: 28,
-                                                  interval: Util.chartInterval(
-                                                      maxDiskReadSpeed),
+                                                  interval: Util.instance
+                                                      .chartInterval(
+                                                          maxDiskReadSpeed),
                                                 )),
                                               ),
                                               // titlesData: FlTitlesData(
@@ -2415,6 +2538,9 @@ class _PerformanceState extends State<Performance>
                             ),
                           ),
                           Card(
+                            shape: RoundedRectangleBorder(
+                                side: BorderSide(),
+                                borderRadius: BorderRadius.circular(5)),
                             margin: EdgeInsets.only(
                                 left: 20, right: 20, bottom: 20),
                             child: Padding(
@@ -2444,6 +2570,10 @@ class _PerformanceState extends State<Performance>
                                           top: 20,
                                           bottom: 5),
                                       child: Card(
+                                        shape: RoundedRectangleBorder(
+                                            side: BorderSide(),
+                                            borderRadius:
+                                                BorderRadius.circular(5)),
                                         // padding: EdgeInsets.symmetric(horizontal: 10),
                                         child: Padding(
                                           padding: EdgeInsets.all(10),
@@ -2472,14 +2602,14 @@ class _PerformanceState extends State<Performance>
                                                                         .length;
                                                                 i++)
                                                               LineTooltipItem(
-                                                                "${disks.last['disk'][i]['display_name']}：${Util.formatSize(disks[items[0].spotIndex]['disk'][i]['write_byte'].floor())}",
+                                                                "${disks.last['disk'][i]['display_name']}：${Util.instance.formatSize(disks[items[0].spotIndex]['disk'][i]['write_byte'].floor())}",
                                                                 TextStyle(
                                                                     color:
                                                                         colors[
                                                                             i]),
                                                               ),
                                                             LineTooltipItem(
-                                                                "总计：${Util.formatSize(disks[items[0].spotIndex]['total']['write_byte'].floor())}",
+                                                                "总计：${Util.instance.formatSize(disks[items[0].spotIndex]['total']['write_byte'].floor())}",
                                                                 TextStyle(
                                                                     color: Colors
                                                                         .blue)),
@@ -2508,7 +2638,8 @@ class _PerformanceState extends State<Performance>
                                                   showTitles: true,
                                                   getTitlesWidget: (value, _) {
                                                     return Text(
-                                                      Util.formatSize(value,
+                                                      Util.instance.formatSize(
+                                                          value,
                                                           fixed: 0),
                                                       style: TextStyle(
                                                         color:
@@ -2524,8 +2655,9 @@ class _PerformanceState extends State<Performance>
                                                   //   return (value.floor() * 1000).toString();
                                                   // },
                                                   reservedSize: 28,
-                                                  interval: Util.chartInterval(
-                                                      maxDiskWriteSpeed),
+                                                  interval: Util.instance
+                                                      .chartInterval(
+                                                          maxDiskWriteSpeed),
                                                 )),
                                               ),
                                               // titlesData: FlTitlesData(
@@ -2613,6 +2745,9 @@ class _PerformanceState extends State<Performance>
                             ),
                           ),
                           Card(
+                            shape: RoundedRectangleBorder(
+                                side: BorderSide(),
+                                borderRadius: BorderRadius.circular(5)),
                             margin: EdgeInsets.only(
                                 left: 20, right: 20, bottom: 20),
                             child: Padding(
@@ -2642,6 +2777,10 @@ class _PerformanceState extends State<Performance>
                                           top: 20,
                                           bottom: 5),
                                       child: Card(
+                                        shape: RoundedRectangleBorder(
+                                            side: BorderSide(),
+                                            borderRadius:
+                                                BorderRadius.circular(5)),
                                         // padding: EdgeInsets.symmetric(horizontal: 10),
                                         child: Padding(
                                           padding: EdgeInsets.all(10),
@@ -2788,6 +2927,9 @@ class _PerformanceState extends State<Performance>
                             ),
                           ),
                           Card(
+                            shape: RoundedRectangleBorder(
+                                side: BorderSide(),
+                                borderRadius: BorderRadius.circular(5)),
                             margin: EdgeInsets.only(
                                 left: 20, right: 20, bottom: 20),
                             child: Padding(
@@ -2817,6 +2959,10 @@ class _PerformanceState extends State<Performance>
                                           top: 20,
                                           bottom: 5),
                                       child: Card(
+                                        shape: RoundedRectangleBorder(
+                                            side: BorderSide(),
+                                            borderRadius:
+                                                BorderRadius.circular(5)),
                                         // padding: EdgeInsets.symmetric(horizontal: 10),
                                         child: Padding(
                                           padding: EdgeInsets.all(10),
@@ -2845,14 +2991,14 @@ class _PerformanceState extends State<Performance>
                                                                         .length;
                                                                 i++)
                                                               LineTooltipItem(
-                                                                "${disks.last['disk'][i]['display_name']}：${Util.formatSize(disks[items[0].spotIndex]['disk'][i]['write_access'].floor())}",
+                                                                "${disks.last['disk'][i]['display_name']}：${Util.instance.formatSize(disks[items[0].spotIndex]['disk'][i]['write_access'].floor())}",
                                                                 TextStyle(
                                                                     color:
                                                                         colors[
                                                                             i]),
                                                               ),
                                                             LineTooltipItem(
-                                                                "总计：${Util.formatSize(disks[items[0].spotIndex]['total']['write_access'].floor())}",
+                                                                "总计：${Util.instance.formatSize(disks[items[0].spotIndex]['total']['write_access'].floor())}",
                                                                 TextStyle(
                                                                     color: Colors
                                                                         .blue)),
@@ -2984,6 +3130,9 @@ class _PerformanceState extends State<Performance>
                             height: 20,
                           ),
                           Card(
+                            shape: RoundedRectangleBorder(
+                                side: BorderSide(),
+                                borderRadius: BorderRadius.circular(5)),
                             margin: EdgeInsets.only(
                                 left: 20, right: 20, bottom: 20),
                             child: Padding(
@@ -3013,6 +3162,10 @@ class _PerformanceState extends State<Performance>
                                           top: 20,
                                           bottom: 5),
                                       child: Card(
+                                        shape: RoundedRectangleBorder(
+                                            side: BorderSide(),
+                                            borderRadius:
+                                                BorderRadius.circular(5)),
                                         // padding: EdgeInsets.symmetric(horizontal: 10),
                                         child: Padding(
                                           padding: EdgeInsets.all(10),
@@ -3154,6 +3307,9 @@ class _PerformanceState extends State<Performance>
                             ),
                           ),
                           Card(
+                            shape: RoundedRectangleBorder(
+                                side: BorderSide(),
+                                borderRadius: BorderRadius.circular(5)),
                             margin: EdgeInsets.only(
                                 left: 20, right: 20, bottom: 20),
                             child: Padding(
@@ -3183,6 +3339,10 @@ class _PerformanceState extends State<Performance>
                                           top: 20,
                                           bottom: 5),
                                       child: Card(
+                                        shape: RoundedRectangleBorder(
+                                            side: BorderSide(),
+                                            borderRadius:
+                                                BorderRadius.circular(5)),
                                         // padding: EdgeInsets.symmetric(horizontal: 10),
                                         child: Padding(
                                           padding: EdgeInsets.all(10),
@@ -3211,14 +3371,14 @@ class _PerformanceState extends State<Performance>
                                                                         .length;
                                                                 i++)
                                                               LineTooltipItem(
-                                                                "${spaces.last['volume'][i]['display_name']}：${Util.formatSize(spaces[items[0].spotIndex]['volume'][i]['read_byte'].floor())}",
+                                                                "${spaces.last['volume'][i]['display_name']}：${Util.instance.formatSize(spaces[items[0].spotIndex]['volume'][i]['read_byte'].floor())}",
                                                                 TextStyle(
                                                                     color:
                                                                         colors[
                                                                             i]),
                                                               ),
                                                             LineTooltipItem(
-                                                                "总计：${Util.formatSize(spaces[items[0].spotIndex]['total']['read_byte'].floor())}",
+                                                                "总计：${Util.instance.formatSize(spaces[items[0].spotIndex]['total']['read_byte'].floor())}",
                                                                 TextStyle(
                                                                     color: Colors
                                                                         .blue)),
@@ -3247,7 +3407,8 @@ class _PerformanceState extends State<Performance>
                                                   showTitles: true,
                                                   getTitlesWidget: (value, _) {
                                                     return Text(
-                                                      Util.formatSize(value,
+                                                      Util.instance.formatSize(
+                                                          value,
                                                           fixed: 0),
                                                       style: TextStyle(
                                                         color:
@@ -3257,8 +3418,9 @@ class _PerformanceState extends State<Performance>
                                                     );
                                                   },
                                                   reservedSize: 28,
-                                                  interval: Util.chartInterval(
-                                                      maxVolumeReadSpeed),
+                                                  interval: Util.instance
+                                                      .chartInterval(
+                                                          maxVolumeReadSpeed),
                                                 )),
                                               ),
                                               minY: 0,
@@ -3325,6 +3487,9 @@ class _PerformanceState extends State<Performance>
                             ),
                           ),
                           Card(
+                            shape: RoundedRectangleBorder(
+                                side: BorderSide(),
+                                borderRadius: BorderRadius.circular(5)),
                             margin: EdgeInsets.only(
                                 left: 20, right: 20, bottom: 20),
                             child: Padding(
@@ -3354,6 +3519,10 @@ class _PerformanceState extends State<Performance>
                                           top: 20,
                                           bottom: 5),
                                       child: Card(
+                                        shape: RoundedRectangleBorder(
+                                            side: BorderSide(),
+                                            borderRadius:
+                                                BorderRadius.circular(5)),
                                         // padding: EdgeInsets.symmetric(horizontal: 10),
                                         child: Padding(
                                           padding: EdgeInsets.all(10),
@@ -3382,14 +3551,14 @@ class _PerformanceState extends State<Performance>
                                                                         .length;
                                                                 i++)
                                                               LineTooltipItem(
-                                                                "${spaces.last['volume'][i]['display_name']}：${Util.formatSize(spaces[items[0].spotIndex]['volume'][i]['write_byte'].floor())}",
+                                                                "${spaces.last['volume'][i]['display_name']}：${Util.instance.formatSize(spaces[items[0].spotIndex]['volume'][i]['write_byte'].floor())}",
                                                                 TextStyle(
                                                                     color:
                                                                         colors[
                                                                             i]),
                                                               ),
                                                             LineTooltipItem(
-                                                                "总计：${Util.formatSize(spaces[items[0].spotIndex]['total']['write_byte'].floor())}",
+                                                                "总计：${Util.instance.formatSize(spaces[items[0].spotIndex]['total']['write_byte'].floor())}",
                                                                 TextStyle(
                                                                     color: Colors
                                                                         .blue)),
@@ -3418,7 +3587,8 @@ class _PerformanceState extends State<Performance>
                                                   showTitles: true,
                                                   getTitlesWidget: (value, _) {
                                                     return Text(
-                                                      Util.formatSize(value,
+                                                      Util.instance.formatSize(
+                                                          value,
                                                           fixed: 0),
                                                       style: TextStyle(
                                                         color:
@@ -3434,8 +3604,9 @@ class _PerformanceState extends State<Performance>
                                                   //   return (value.floor() * 1000).toString();
                                                   // },
                                                   reservedSize: 28,
-                                                  interval: Util.chartInterval(
-                                                      maxVolumeWriteSpeed),
+                                                  interval: Util.instance
+                                                      .chartInterval(
+                                                          maxVolumeWriteSpeed),
                                                 )),
                                               ),
                                               minY: 0,
@@ -3502,6 +3673,9 @@ class _PerformanceState extends State<Performance>
                             ),
                           ),
                           Card(
+                            shape: RoundedRectangleBorder(
+                                side: BorderSide(),
+                                borderRadius: BorderRadius.circular(5)),
                             margin: EdgeInsets.only(
                                 left: 20, right: 20, bottom: 20),
                             child: Padding(
@@ -3531,6 +3705,10 @@ class _PerformanceState extends State<Performance>
                                           top: 20,
                                           bottom: 5),
                                       child: Card(
+                                        shape: RoundedRectangleBorder(
+                                            side: BorderSide(),
+                                            borderRadius:
+                                                BorderRadius.circular(5)),
                                         // padding: EdgeInsets.symmetric(horizontal: 10),
                                         child: Padding(
                                           padding: EdgeInsets.all(10),
@@ -3671,6 +3849,9 @@ class _PerformanceState extends State<Performance>
                             ),
                           ),
                           Card(
+                            shape: RoundedRectangleBorder(
+                                side: BorderSide(),
+                                borderRadius: BorderRadius.circular(5)),
                             margin: EdgeInsets.only(
                                 left: 20, right: 20, bottom: 20),
                             child: Padding(
@@ -3700,6 +3881,10 @@ class _PerformanceState extends State<Performance>
                                           top: 20,
                                           bottom: 5),
                                       child: Card(
+                                        shape: RoundedRectangleBorder(
+                                            side: BorderSide(),
+                                            borderRadius:
+                                                BorderRadius.circular(5)),
                                         // padding: EdgeInsets.symmetric(horizontal: 10),
                                         child: Padding(
                                           padding: EdgeInsets.all(10),
@@ -3728,14 +3913,14 @@ class _PerformanceState extends State<Performance>
                                                                         .length;
                                                                 i++)
                                                               LineTooltipItem(
-                                                                "${spaces.last['volume'][i]['display_name']}：${Util.formatSize(spaces[items[0].spotIndex]['volume'][i]['write_access'].floor())}",
+                                                                "${spaces.last['volume'][i]['display_name']}：${Util.instance.formatSize(spaces[items[0].spotIndex]['volume'][i]['write_access'].floor())}",
                                                                 TextStyle(
                                                                     color:
                                                                         colors[
                                                                             i]),
                                                               ),
                                                             LineTooltipItem(
-                                                                "总计：${Util.formatSize(spaces[items[0].spotIndex]['total']['write_access'].floor())}",
+                                                                "总计：${Util.instance.formatSize(spaces[items[0].spotIndex]['total']['write_access'].floor())}",
                                                                 TextStyle(
                                                                     color: Colors
                                                                         .blue)),

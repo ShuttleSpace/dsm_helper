@@ -38,7 +38,7 @@ class _SshSettingState extends State<SshSetting>
         _portController.value = TextEditingValue(text: sshPort);
       });
     } else {
-      Util.toast("获取失败，code：${res['error']['code']}");
+      Util.instance.toast("获取失败，code：${res['error']['code']}");
       Navigator.of(context).pop();
     }
   }
@@ -59,6 +59,9 @@ class _SshSettingState extends State<SshSetting>
           : Column(
               children: [
                 Card(
+                  shape: RoundedRectangleBorder(
+                      side: BorderSide(),
+                      borderRadius: BorderRadius.circular(5)),
                   margin: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
                   child: TabBar(
                     dividerHeight: 0,
@@ -71,7 +74,7 @@ class _SshSettingState extends State<SshSetting>
                     unselectedLabelColor: Colors.grey,
                     indicator: BubbleTabIndicator(
                       indicatorColor: Theme.of(context).scaffoldBackgroundColor,
-                      shadowColor: Util.getAdjustColor(
+                      shadowColor: Util.instance.getAdjustColor(
                           Theme.of(context).scaffoldBackgroundColor, -20),
                     ),
                     tabs: [
@@ -102,6 +105,9 @@ class _SshSettingState extends State<SshSetting>
                               });
                             },
                             child: Card(
+                              shape: RoundedRectangleBorder(
+                                  side: BorderSide(),
+                                  borderRadius: BorderRadius.circular(5)),
                               child: Padding(
                                 padding: EdgeInsets.all(20),
                                 child: Row(
@@ -131,6 +137,9 @@ class _SshSettingState extends State<SshSetting>
                               });
                             },
                             child: Card(
+                              shape: RoundedRectangleBorder(
+                                  side: BorderSide(),
+                                  borderRadius: BorderRadius.circular(5)),
                               child: Padding(
                                 padding: EdgeInsets.all(20),
                                 child: Row(
@@ -154,6 +163,9 @@ class _SshSettingState extends State<SshSetting>
                             height: 20,
                           ),
                           Card(
+                            shape: RoundedRectangleBorder(
+                                side: BorderSide(),
+                                borderRadius: BorderRadius.circular(5)),
                             child: Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: TextField(
@@ -178,11 +190,12 @@ class _SshSettingState extends State<SshSetting>
                               var res =
                                   await Api.setTerminal(ssh, telnet, sshPort);
                               if (res['success']) {
-                                Util.vibrate(FeedbackType.light);
-                                Util.toast("应用成功");
+                                Util.instance.vibrate(FeedbackType.light);
+                                Util.instance.toast("应用成功");
                               } else {
-                                Util.vibrate(FeedbackType.warning);
-                                Util.toast("应用失败，code：${res['error']['code']}");
+                                Util.instance.vibrate(FeedbackType.warning);
+                                Util.instance
+                                    .toast("应用失败，code：${res['error']['code']}");
                               }
                             },
                             child: Text(

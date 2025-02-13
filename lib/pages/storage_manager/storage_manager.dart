@@ -51,7 +51,7 @@ class _StorageManagerState extends State<StorageManager>
         hotSpares = res['data']['hotSpares'];
       });
     } else {
-      Util.toast("获取存储空间信息失败，代码${res['error']['code']}");
+      Util.instance.toast("获取存储空间信息失败，代码${res['error']['code']}");
       Navigator.of(context).pop();
     }
   }
@@ -61,10 +61,14 @@ class _StorageManagerState extends State<StorageManager>
         int.parse(volume['size']['used'] ?? volume['size']['reusable']) /
             int.parse(volume['size']['total']);
     return Card(
+      shape: RoundedRectangleBorder(
+          side: BorderSide(), borderRadius: BorderRadius.circular(5)),
       margin: EdgeInsets.only(top: 20, left: 20, right: 20),
       child: Row(
         children: [
           Card(
+            shape: RoundedRectangleBorder(
+                side: BorderSide(), borderRadius: BorderRadius.circular(5)),
             margin: EdgeInsets.all(10),
             child: Padding(
               padding: const EdgeInsets.all(8.0),
@@ -124,17 +128,17 @@ class _StorageManagerState extends State<StorageManager>
                   height: 5,
                 ),
                 Text(
-                    "已用：${Util.formatSize(int.parse(volume['size']['used'] ?? volume['size']['reusable']))}"),
+                    "已用：${Util.instance.formatSize(int.parse(volume['size']['used'] ?? volume['size']['reusable']))}"),
                 SizedBox(
                   height: 5,
                 ),
                 Text(
-                    "可用：${Util.formatSize(int.parse(volume['size']['total']) - int.parse(volume['size']['used'] ?? volume['size']['reusable']))}"),
+                    "可用：${Util.instance.formatSize(int.parse(volume['size']['total']) - int.parse(volume['size']['used'] ?? volume['size']['reusable']))}"),
                 SizedBox(
                   height: 5,
                 ),
                 Text(
-                    "容量：${Util.formatSize(int.parse(volume['size']['total']))}"),
+                    "容量：${Util.instance.formatSize(int.parse(volume['size']['total']))}"),
               ],
             ),
           )
@@ -145,12 +149,16 @@ class _StorageManagerState extends State<StorageManager>
 
   Widget _buildVolumeItem(volume) {
     return Card(
+      shape: RoundedRectangleBorder(
+          side: BorderSide(), borderRadius: BorderRadius.circular(5)),
       margin: EdgeInsets.only(top: 20, left: 20, right: 20),
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Row(
           children: [
             Card(
+              shape: RoundedRectangleBorder(
+                  side: BorderSide(), borderRadius: BorderRadius.circular(5)),
               margin: EdgeInsets.all(10),
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
@@ -243,17 +251,17 @@ class _StorageManagerState extends State<StorageManager>
                     height: 5,
                   ),
                   Text(
-                      "已用：${Util.formatSize(int.parse(volume['size']['used']))}"),
+                      "已用：${Util.instance.formatSize(int.parse(volume['size']['used']))}"),
                   SizedBox(
                     height: 5,
                   ),
                   Text(
-                      "可用：${Util.formatSize(int.parse(volume['size']['total']) - int.parse(volume['size']['used']))}"),
+                      "可用：${Util.instance.formatSize(int.parse(volume['size']['total']) - int.parse(volume['size']['used']))}"),
                   SizedBox(
                     height: 5,
                   ),
                   Text(
-                      "全部：${Util.formatSize(int.parse(volume['size']['total']))}"),
+                      "全部：${Util.instance.formatSize(int.parse(volume['size']['total']))}"),
                 ],
               ),
             )
@@ -273,6 +281,8 @@ class _StorageManagerState extends State<StorageManager>
             settings: RouteSettings(name: "disk_smart")));
       },
       child: Card(
+        shape: RoundedRectangleBorder(
+            side: BorderSide(), borderRadius: BorderRadius.circular(5)),
         margin: EdgeInsets.only(top: 10),
         child: Padding(
           padding: const EdgeInsets.all(8.0),
@@ -281,6 +291,9 @@ class _StorageManagerState extends State<StorageManager>
               Row(
                 children: [
                   Card(
+                    shape: RoundedRectangleBorder(
+                        side: BorderSide(),
+                        borderRadius: BorderRadius.circular(5)),
                     margin: EdgeInsets.all(10),
                     child: Image.asset(
                       disk['isSsd']
@@ -334,7 +347,7 @@ class _StorageManagerState extends State<StorageManager>
                           height: 5,
                         ),
                         Text(
-                            "${Util.formatSize(int.parse(disk['size_total']))}"),
+                            "${Util.instance.formatSize(int.parse(disk['size_total']))}"),
                       ],
                     ),
                   )
@@ -561,6 +574,8 @@ class _StorageManagerState extends State<StorageManager>
 
   Widget _buildPoolDetail(pool) {
     return Card(
+      shape: RoundedRectangleBorder(
+          side: BorderSide(), borderRadius: BorderRadius.circular(5)),
       child: Padding(
         padding: EdgeInsets.all(20),
         child: Column(
@@ -599,7 +614,7 @@ class _StorageManagerState extends State<StorageManager>
                               ),
                 Spacer(),
                 Text(
-                    "${Util.formatSize(int.parse(pool['size']['used']))} / ${Util.formatSize(int.parse(pool['size']['total']))}"),
+                    "${Util.instance.formatSize(int.parse(pool['size']['used']))} / ${Util.instance.formatSize(int.parse(pool['size']['total']))}"),
               ],
             ),
             Row(
@@ -649,13 +664,15 @@ class _StorageManagerState extends State<StorageManager>
                   ),
                 ),
                 Text(
-                    "${Util.formatSize(int.parse(pool['size']['total']) - int.parse(pool['size']['used']))}"),
+                    "${Util.instance.formatSize(int.parse(pool['size']['total']) - int.parse(pool['size']['used']))}"),
               ],
             ),
             SizedBox(
               height: 20,
             ),
             Card(
+              shape: RoundedRectangleBorder(
+                  side: BorderSide(), borderRadius: BorderRadius.circular(5)),
               child: Padding(
                 padding: EdgeInsets.all(20),
                 child: Column(
@@ -677,6 +694,8 @@ class _StorageManagerState extends State<StorageManager>
               height: 20,
             ),
             Card(
+              shape: RoundedRectangleBorder(
+                  side: BorderSide(), borderRadius: BorderRadius.circular(5)),
               child: Padding(
                 padding: EdgeInsets.all(20),
                 child: Column(
@@ -703,6 +722,8 @@ class _StorageManagerState extends State<StorageManager>
               height: 20,
             ),
             Card(
+              shape: RoundedRectangleBorder(
+                  side: BorderSide(), borderRadius: BorderRadius.circular(5)),
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Column(
@@ -734,6 +755,8 @@ class _StorageManagerState extends State<StorageManager>
 
   Widget _buildPoolItem(pool) {
     return Card(
+      shape: RoundedRectangleBorder(
+          side: BorderSide(), borderRadius: BorderRadius.circular(5)),
       margin: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
       child: Padding(
         padding: EdgeInsets.all(10),
@@ -770,7 +793,8 @@ class _StorageManagerState extends State<StorageManager>
                                 fill: true,
                               ),
                 Spacer(),
-                Text(Util.formatSize(int.parse(pool['size']['total']))),
+                Text(
+                    Util.instance.formatSize(int.parse(pool['size']['total']))),
               ],
             ),
             SizedBox(
@@ -817,6 +841,9 @@ class _StorageManagerState extends State<StorageManager>
           : Column(
               children: [
                 Card(
+                  shape: RoundedRectangleBorder(
+                      side: BorderSide(),
+                      borderRadius: BorderRadius.circular(5)),
                   margin: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
                   child: TabBar(
                     dividerHeight: 0,
@@ -829,7 +856,7 @@ class _StorageManagerState extends State<StorageManager>
                     unselectedLabelColor: Colors.grey,
                     indicator: BubbleTabIndicator(
                       indicatorColor: Theme.of(context).scaffoldBackgroundColor,
-                      shadowColor: Util.getAdjustColor(
+                      shadowColor: Util.instance.getAdjustColor(
                           Theme.of(context).scaffoldBackgroundColor, -20),
                     ),
                     tabs: [
@@ -873,6 +900,9 @@ class _StorageManagerState extends State<StorageManager>
                       ListView(
                         children: [
                           Card(
+                            shape: RoundedRectangleBorder(
+                                side: BorderSide(),
+                                borderRadius: BorderRadius.circular(5)),
                             margin: EdgeInsets.symmetric(
                                 horizontal: 20, vertical: 15),
                             child: Padding(
@@ -902,6 +932,9 @@ class _StorageManagerState extends State<StorageManager>
                             ),
                           ),
                           Card(
+                            shape: RoundedRectangleBorder(
+                                side: BorderSide(),
+                                borderRadius: BorderRadius.circular(5)),
                             margin: EdgeInsets.symmetric(
                                 horizontal: 20, vertical: 15),
                             child: Padding(
@@ -933,6 +966,9 @@ class _StorageManagerState extends State<StorageManager>
                             ),
                           ),
                           Card(
+                            shape: RoundedRectangleBorder(
+                                side: BorderSide(),
+                                borderRadius: BorderRadius.circular(5)),
                             margin: EdgeInsets.symmetric(
                                 horizontal: 20, vertical: 15),
                             child: Padding(

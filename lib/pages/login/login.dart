@@ -57,7 +57,7 @@ class _LoginState extends State<Login> {
   CancelToken cancelToken = CancelToken();
   @override
   initState() {
-    Util.getStorage("read").then((value) {
+    Util.instance.getStorage("read").then((value) {
       if (value != null && value.isNotBlank && value == "1") {
         setState(() {
           read = true;
@@ -72,7 +72,7 @@ class _LoginState extends State<Login> {
         read = true;
       });
     }
-    Util.getStorage("servers").then((serverString) {
+    Util.instance.getStorage("servers").then((serverString) {
       if (serverString != null && serverString.isNotBlank) {
         servers = jsonDecode(serverString);
       }
@@ -103,8 +103,8 @@ class _LoginState extends State<Login> {
             _passwordController.value = TextEditingValue(text: password);
           }
         });
-        Util.cookie = widget.server?['cookie'];
-        Util.sid = widget.server?['sid'];
+        Util.instance.cookie = widget.server?['cookie'];
+        Util.instance.sid = widget.server?['sid'];
         if (widget.server?['action'] == "login") {
           _login();
         }
@@ -121,7 +121,7 @@ class _LoginState extends State<Login> {
   }
 
   checkAgreement() async {
-    String agreement = await Util.getStorage("agreement") ?? '';
+    String agreement = await Util.instance.getStorage("agreement") ?? '';
     if (agreement != '1') {
       showCupertinoDialog(
         context: context,
@@ -132,12 +132,18 @@ class _LoginState extends State<Login> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Card(
+                  shape: RoundedRectangleBorder(
+                      side: BorderSide(),
+                      borderRadius: BorderRadius.circular(5)),
                   margin: EdgeInsets.symmetric(horizontal: 50),
                   child: Padding(
                     padding: EdgeInsets.all(20),
                     child: Column(
                       children: [
                         Card(
+                          shape: RoundedRectangleBorder(
+                              side: BorderSide(),
+                              borderRadius: BorderRadius.circular(5)),
                           child: Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: Text.rich(
@@ -145,7 +151,7 @@ class _LoginState extends State<Login> {
                                 children: [
                                   TextSpan(
                                       text:
-                                          "感谢您使用${Util.appName}，为保护您的个人信息安全，我们将依据${Util.appName}的"),
+                                          "感谢您使用${Util.instance.appName}，为保护您的个人信息安全，我们将依据${Util.instance.appName}的"),
                                   TextSpan(
                                     text: "用户协议",
                                     style: TextStyle(
@@ -174,7 +180,8 @@ class _LoginState extends State<Login> {
                                             CupertinoPageRoute(
                                                 builder: (context) {
                                           return dsm.Browser(
-                                            url: '${Util.appUrl}/privacy',
+                                            url:
+                                                '${Util.instance.appUrl}/privacy',
                                             title: "隐私政策",
                                           );
                                         }));
@@ -184,7 +191,8 @@ class _LoginState extends State<Login> {
                                       text:
                                           "来帮助您了解：我们如何收集个人信息、如何使用及存储个人信息以及您享有的相关权利\n"),
                                   TextSpan(
-                                      text: "在您使用${Util.appName}前，请务必仔细阅读"),
+                                      text:
+                                          "在您使用${Util.instance.appName}前，请务必仔细阅读"),
                                   TextSpan(
                                     text: "用户协议",
                                     style: TextStyle(
@@ -213,7 +221,8 @@ class _LoginState extends State<Login> {
                                             CupertinoPageRoute(
                                                 builder: (context) {
                                           return dsm.Browser(
-                                            url: '${Util.appUrl}/privacy',
+                                            url:
+                                                '${Util.instance.appUrl}/privacy',
                                             title: "隐私政策",
                                           );
                                         }));
@@ -235,8 +244,8 @@ class _LoginState extends State<Login> {
                               child: OutlinedButton(
                                 onPressed: () async {
                                   Navigator.of(context).pop();
-                                  Util.setStorage("read", "1");
-                                  Util.setStorage(
+                                  Util.instance.setStorage("read", "1");
+                                  Util.instance.setStorage(
                                       "agreement", read ? "1" : "0");
                                   context.read<FluwxProvider>().wx.registerApi(
                                       appId: "wxabdf23571f34b49b",
@@ -301,21 +310,21 @@ class _LoginState extends State<Login> {
   }
 
   getInfo() async {
-    sid = await Util.getStorage("sid") ?? '';
-    smid = await Util.getStorage("smid") ?? '';
-    String httpsString = await Util.getStorage("https") ?? '';
-    host = await Util.getStorage("host") ?? "";
-    baseUrl = await Util.getStorage("base_url") ?? '';
-    String portString = await Util.getStorage("port") ?? '';
-    account = await Util.getStorage("account") ?? '';
-    note = await Util.getStorage("note") ?? '';
-    password = await Util.getStorage("password") ?? '';
-    String autoLoginString = await Util.getStorage("auto_login") ?? '';
+    sid = await Util.instance.getStorage("sid") ?? '';
+    smid = await Util.instance.getStorage("smid") ?? '';
+    String httpsString = await Util.instance.getStorage("https") ?? '';
+    host = await Util.instance.getStorage("host") ?? "";
+    baseUrl = await Util.instance.getStorage("base_url") ?? '';
+    String portString = await Util.instance.getStorage("port") ?? '';
+    account = await Util.instance.getStorage("account") ?? '';
+    note = await Util.instance.getStorage("note") ?? '';
+    password = await Util.instance.getStorage("password") ?? '';
+    String autoLoginString = await Util.instance.getStorage("auto_login") ?? '';
 
     String rememberPasswordString =
-        await Util.getStorage("remember_password") ?? '';
-    String checkSslString = await Util.getStorage("check_ssl") ?? '';
-    Util.cookie = smid;
+        await Util.instance.getStorage("remember_password") ?? '';
+    String checkSslString = await Util.instance.getStorage("check_ssl") ?? '';
+    Util.instance.cookie = smid;
 
     if (httpsString.isNotBlank) {
       setState(() {
@@ -359,17 +368,17 @@ class _LoginState extends State<Login> {
   }
 
   checkLogin() async {
-    Util.account = account;
+    Util.instance.account = account;
     if (sid.isNotBlank && host.isNotBlank) {
       if (baseUrl.isNotBlank) {
-        Util.baseUrl = baseUrl;
+        Util.instance.baseUrl = baseUrl;
       } else {
-        Util.baseUrl = "${https ? "https" : "http"}://$host:$port";
+        Util.instance.baseUrl = "${https ? "https" : "http"}://$host:$port";
       }
       //开始自动登录
       debugPrint("BaseUrl:$baseUrl");
-      debugPrint("Util.BaseUrl:${Util.baseUrl}");
-      Util.sid = sid;
+      debugPrint("Util.BaseUrl:${Util.instance.baseUrl}");
+      Util.instance.sid = sid;
       //如果开启了自动登录，则判断当前登录状态
       if (autoLogin) {
         setState(() {
@@ -397,14 +406,14 @@ class _LoginState extends State<Login> {
   }
 
   _login() async {
-    Util.checkSsl = checkSsl;
+    Util.instance.checkSsl = checkSsl;
     FocusScope.of(context).unfocus();
     if (host.trim() == "") {
-      Util.toast("请输入网址/IP/QuickConnect ID");
+      Util.instance.toast("请输入网址/IP/QuickConnect ID");
       return;
     }
     if (account == "") {
-      Util.toast("请输入账号");
+      Util.instance.toast("请输入账号");
       return;
     }
     setState(() {
@@ -481,7 +490,7 @@ class _LoginState extends State<Login> {
         res['sites'].length > 0) {
       qcLogin(qcHost: res['sites'][0]);
     } else {
-      Util.toast("无法连接到服务器，请检查QuickConnect ID是否正确");
+      Util.instance.toast("无法连接到服务器，请检查QuickConnect ID是否正确");
       setState(() {
         login = false;
       });
@@ -501,27 +510,28 @@ class _LoginState extends State<Login> {
     });
     if (res['success'] == true) {
       //记住登录信息
-      Util.account = account;
-      Util.setStorage("https", https ? "1" : "0");
-      Util.setStorage("host", host.trim());
-      Util.setStorage("port", port);
-      Util.setStorage("base_url", baseUri);
-      Util.setStorage("account", account);
-      Util.setStorage("note", note);
-      Util.setStorage("remember_password", rememberPassword ? "1" : "0");
-      Util.setStorage("auto_login", autoLogin ? "1" : "0");
-      Util.setStorage("check_ssl", checkSsl ? "1" : "0");
-      Util.sid = res['data']['sid'];
+      Util.instance.account = account;
+      Util.instance.setStorage("https", https ? "1" : "0");
+      Util.instance.setStorage("host", host.trim());
+      Util.instance.setStorage("port", port);
+      Util.instance.setStorage("base_url", baseUri);
+      Util.instance.setStorage("account", account);
+      Util.instance.setStorage("note", note);
+      Util.instance
+          .setStorage("remember_password", rememberPassword ? "1" : "0");
+      Util.instance.setStorage("auto_login", autoLogin ? "1" : "0");
+      Util.instance.setStorage("check_ssl", checkSsl ? "1" : "0");
+      Util.instance.sid = res['data']['sid'];
       if (rememberPassword) {
-        Util.setStorage("password", password);
+        Util.instance.setStorage("password", password);
       } else {
-        Util.removeStorage("password");
+        Util.instance.removeStorage("password");
       }
       if (autoLogin) {
-        Util.setStorage("sid", res['data']['sid']);
+        Util.instance.setStorage("sid", res['data']['sid']);
       }
 
-      Util.baseUrl = baseUri;
+      Util.instance.baseUrl = baseUri;
 
       //添加服务器记录
       bool exist = false;
@@ -541,7 +551,7 @@ class _LoginState extends State<Login> {
           servers[i]['note'] = note;
           servers[i]['auto_login'] = autoLogin;
           servers[i]['check_ssl'] = checkSsl;
-          servers[i]['cookie'] = Util.cookie;
+          servers[i]['cookie'] = Util.instance.cookie;
           servers[i]['sid'] = res['data']['sid'];
           servers[i]['base_url'] = baseUri;
           exist = true;
@@ -559,7 +569,7 @@ class _LoginState extends State<Login> {
           "remember_password": rememberPassword,
           "auto_login": autoLogin,
           "check_ssl": checkSsl,
-          "cookie": Util.cookie,
+          "cookie": Util.instance.cookie,
           "sid": res['data']['sid'],
         };
         if (rememberPassword) {
@@ -569,7 +579,7 @@ class _LoginState extends State<Login> {
         }
         servers.add(server);
       }
-      Util.setStorage("servers", jsonEncode(servers));
+      Util.instance.setStorage("servers", jsonEncode(servers));
       if (widget.type == "login") {
         Navigator.of(context)
             .pushNamedAndRemoveUntil("/home", (route) => false);
@@ -577,19 +587,19 @@ class _LoginState extends State<Login> {
         Navigator.of(context).pop(true);
       }
     } else {
-      Util.vibrate(FeedbackType.warning);
+      Util.instance.vibrate(FeedbackType.warning);
       if (res['error']['code'] == 400) {
-        Util.toast("用户名/密码有误");
+        Util.instance.toast("用户名/密码有误");
       } else if (res['error']['code'] == 403) {
-        Util.toast("请输入二次验证代码");
+        Util.instance.toast("请输入二次验证代码");
         setState(() {
           needOtp = true;
         });
       } else if (res['error']['code'] == 404) {
         _otpController.clear();
-        Util.toast("错误的验证代码。请再试一次。");
+        Util.instance.toast("错误的验证代码。请再试一次。");
       } else {
-        Util.toast("登录失败，code:${res['error']['code']}");
+        Util.instance.toast("登录失败，code:${res['error']['code']}");
       }
     }
   }
@@ -694,6 +704,8 @@ class _LoginState extends State<Login> {
               height: 20,
             ),
             Card(
+              shape: RoundedRectangleBorder(
+                  side: BorderSide(), borderRadius: BorderRadius.circular(5)),
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 8.0),
                 child: Row(
@@ -781,6 +793,9 @@ class _LoginState extends State<Login> {
               children: [
                 Expanded(
                   child: Card(
+                    shape: RoundedRectangleBorder(
+                        side: BorderSide(),
+                        borderRadius: BorderRadius.circular(5)),
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 8.0),
                       child: TextField(
@@ -805,6 +820,9 @@ class _LoginState extends State<Login> {
                 ),
                 Expanded(
                   child: Card(
+                    shape: RoundedRectangleBorder(
+                        side: BorderSide(),
+                        borderRadius: BorderRadius.circular(5)),
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 8.0),
                       child: TextField(
@@ -829,6 +847,8 @@ class _LoginState extends State<Login> {
               height: 20,
             ),
             Card(
+              shape: RoundedRectangleBorder(
+                  side: BorderSide(), borderRadius: BorderRadius.circular(5)),
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 8.0),
                 child: TextField(
@@ -854,6 +874,9 @@ class _LoginState extends State<Login> {
                 children: [
                   Expanded(
                     child: Card(
+                      shape: RoundedRectangleBorder(
+                          side: BorderSide(),
+                          borderRadius: BorderRadius.circular(5)),
                       child: Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 8.0),
                         child: TextField(
@@ -884,6 +907,9 @@ class _LoginState extends State<Login> {
                         });
                       },
                       child: Card(
+                        shape: RoundedRectangleBorder(
+                            side: BorderSide(),
+                            borderRadius: BorderRadius.circular(5)),
                         child: Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: Row(
@@ -920,6 +946,9 @@ class _LoginState extends State<Login> {
                       });
                     },
                     child: Card(
+                      shape: RoundedRectangleBorder(
+                          side: BorderSide(),
+                          borderRadius: BorderRadius.circular(5)),
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: Row(
@@ -951,6 +980,9 @@ class _LoginState extends State<Login> {
                       });
                     },
                     child: Card(
+                      shape: RoundedRectangleBorder(
+                          side: BorderSide(),
+                          borderRadius: BorderRadius.circular(5)),
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: Row(
@@ -983,6 +1015,9 @@ class _LoginState extends State<Login> {
                     });
                   },
                   child: Card(
+                    shape: RoundedRectangleBorder(
+                        side: BorderSide(),
+                        borderRadius: BorderRadius.circular(5)),
                     child: Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: Row(
@@ -1008,7 +1043,7 @@ class _LoginState extends State<Login> {
               onPressed: () {
                 print(login);
                 if (!read) {
-                  Util.toast("请先阅读并同意用户协议和隐私政策");
+                  Util.instance.toast("请先阅读并同意用户协议和隐私政策");
                   return;
                 }
                 if (login) {

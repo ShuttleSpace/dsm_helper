@@ -46,13 +46,15 @@ class _EditDdnsState extends State<EditDdns> {
   }
 
   deleteDdns() async {
-    Util.vibrate(FeedbackType.warning);
+    Util.instance.vibrate(FeedbackType.warning);
     showCupertinoModalPopup(
       context: context,
       builder: (context) {
         return Material(
           color: Colors.transparent,
           child: Card(
+            shape: RoundedRectangleBorder(
+                side: BorderSide(), borderRadius: BorderRadius.circular(5)),
             child: SafeArea(
               top: false,
               child: Padding(
@@ -82,7 +84,7 @@ class _EditDdnsState extends State<EditDdns> {
                           child: OutlinedButton(
                             onPressed: () async {
                               if (widget.ddns == null) {
-                                Util.toast('ddns 为空!');
+                                Util.instance.toast('ddns 为空!');
                                 return;
                               }
                               Navigator.of(context).pop();
@@ -90,10 +92,11 @@ class _EditDdnsState extends State<EditDdns> {
                                   await Api.ddnsDelete(widget.ddns!['id']);
                               print(res);
                               if (res['success']) {
-                                Util.toast("DDNS删除成功");
+                                Util.instance.toast("DDNS删除成功");
                                 Navigator.of(context).pop(true);
                               } else {
-                                Util.toast("删除失败，代码:${res['error']['code']}");
+                                Util.instance
+                                    .toast("删除失败，代码:${res['error']['code']}");
                               }
                             },
                             child: Text(
@@ -134,17 +137,17 @@ class _EditDdnsState extends State<EditDdns> {
 
   bool checkForm() {
     if (ddns['provider'] == null || ddns['provider'] == "") {
-      Util.toast("请选择服务供应商");
+      Util.instance.toast("请选择服务供应商");
       return false;
     } else if (ddns['hostname'] == null || ddns['hostname'] == "") {
-      Util.toast("请输入主机名称");
+      Util.instance.toast("请输入主机名称");
       return false;
     } else if (ddns['username'] == null || ddns['username'] == "") {
-      Util.toast("请输入用户名/电子邮件");
+      Util.instance.toast("请输入用户名/电子邮件");
       return false;
     } else if (widget.ddns == null &&
         (ddns['passwd'] == null || ddns['passwd'] == "")) {
-      Util.toast("请输入密码/密钥");
+      Util.instance.toast("请输入密码/密钥");
       return false;
     }
 
@@ -184,6 +187,9 @@ class _EditDdnsState extends State<EditDdns> {
                       });
                     },
                     child: Card(
+                      shape: RoundedRectangleBorder(
+                          side: BorderSide(),
+                          borderRadius: BorderRadius.circular(5)),
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: Row(
@@ -230,6 +236,9 @@ class _EditDdnsState extends State<EditDdns> {
                     );
                   },
                   child: Card(
+                    shape: RoundedRectangleBorder(
+                        side: BorderSide(),
+                        borderRadius: BorderRadius.circular(5)),
                     child: Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: Row(
@@ -247,6 +256,9 @@ class _EditDdnsState extends State<EditDdns> {
                   height: 20,
                 ),
                 Card(
+                  shape: RoundedRectangleBorder(
+                      side: BorderSide(),
+                      borderRadius: BorderRadius.circular(5)),
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: TextField(
@@ -263,6 +275,9 @@ class _EditDdnsState extends State<EditDdns> {
                   height: 20,
                 ),
                 Card(
+                  shape: RoundedRectangleBorder(
+                      side: BorderSide(),
+                      borderRadius: BorderRadius.circular(5)),
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: TextField(
@@ -279,6 +294,9 @@ class _EditDdnsState extends State<EditDdns> {
                   height: 20,
                 ),
                 Card(
+                  shape: RoundedRectangleBorder(
+                      side: BorderSide(),
+                      borderRadius: BorderRadius.circular(5)),
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: TextField(
@@ -294,6 +312,9 @@ class _EditDdnsState extends State<EditDdns> {
                   height: 20,
                 ),
                 Card(
+                  shape: RoundedRectangleBorder(
+                      side: BorderSide(),
+                      borderRadius: BorderRadius.circular(5)),
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Row(
@@ -309,6 +330,9 @@ class _EditDdnsState extends State<EditDdns> {
                   height: 20,
                 ),
                 Card(
+                  shape: RoundedRectangleBorder(
+                      side: BorderSide(),
+                      borderRadius: BorderRadius.circular(5)),
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Row(
@@ -328,6 +352,9 @@ class _EditDdnsState extends State<EditDdns> {
                   children: [
                     Expanded(
                       child: Card(
+                        shape: RoundedRectangleBorder(
+                            side: BorderSide(),
+                            borderRadius: BorderRadius.circular(5)),
                         child: Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: Row(
@@ -368,7 +395,7 @@ class _EditDdnsState extends State<EditDdns> {
                               ddns['status'] = res['data']['status'];
                             });
                           } else {
-                            Util.toast(
+                            Util.instance.toast(
                                 "测试失败，${res['error']['errors']},code:${res['error']['code']}");
                           }
                         }
@@ -388,10 +415,10 @@ class _EditDdnsState extends State<EditDdns> {
                   if (checkForm()) {
                     var res = await Api.ddnsSave(ddns);
                     if (res['success']) {
-                      Util.toast("保存成功");
+                      Util.instance.toast("保存成功");
                       Navigator.of(context).pop(true);
                     } else {
-                      Util.toast("保存失败,代码${res['error']['code']}");
+                      Util.instance.toast("保存失败,代码${res['error']['code']}");
                     }
                   }
                 },

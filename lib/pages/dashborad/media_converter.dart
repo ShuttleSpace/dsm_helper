@@ -50,6 +50,8 @@ class _MediaConverterState extends State<MediaConverter> {
     return Material(
       color: Colors.transparent,
       child: Card(
+        shape: RoundedRectangleBorder(
+            side: BorderSide(), borderRadius: BorderRadius.circular(5)),
         child: SafeArea(
           top: false,
           child: Padding(
@@ -68,6 +70,9 @@ class _MediaConverterState extends State<MediaConverter> {
                   height: 12,
                 ),
                 Card(
+                  shape: RoundedRectangleBorder(
+                      side: BorderSide(),
+                      borderRadius: BorderRadius.circular(5)),
                   child: Padding(
                     padding: const EdgeInsets.all(20.0),
                     child: Column(
@@ -116,6 +121,9 @@ class _MediaConverterState extends State<MediaConverter> {
                   height: 20,
                 ),
                 Card(
+                  shape: RoundedRectangleBorder(
+                      side: BorderSide(),
+                      borderRadius: BorderRadius.circular(5)),
                   child: Padding(
                     padding: const EdgeInsets.all(20.0),
                     child: Column(
@@ -154,6 +162,9 @@ class _MediaConverterState extends State<MediaConverter> {
                   height: 20,
                 ),
                 Card(
+                  shape: RoundedRectangleBorder(
+                      side: BorderSide(),
+                      borderRadius: BorderRadius.circular(5)),
                   child: Padding(
                     padding: const EdgeInsets.all(20.0),
                     child: Row(
@@ -215,6 +226,11 @@ class _MediaConverterState extends State<MediaConverter> {
                                                 Navigator.of(context).pop(1);
                                               },
                                               child: Card(
+                                                shape: RoundedRectangleBorder(
+                                                    side: BorderSide(),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            5)),
                                                 margin:
                                                     EdgeInsets.only(bottom: 20),
                                                 child: Padding(
@@ -230,6 +246,11 @@ class _MediaConverterState extends State<MediaConverter> {
                                                 Navigator.of(context).pop(3);
                                               },
                                               child: Card(
+                                                shape: RoundedRectangleBorder(
+                                                    side: BorderSide(),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            5)),
                                                 margin:
                                                     EdgeInsets.only(bottom: 20),
                                                 child: Padding(
@@ -245,6 +266,11 @@ class _MediaConverterState extends State<MediaConverter> {
                                                 Navigator.of(context).pop(6);
                                               },
                                               child: Card(
+                                                shape: RoundedRectangleBorder(
+                                                    side: BorderSide(),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            5)),
                                                 margin:
                                                     EdgeInsets.only(bottom: 20),
                                                 child: Padding(
@@ -260,6 +286,11 @@ class _MediaConverterState extends State<MediaConverter> {
                                                 Navigator.of(context).pop(-1);
                                               },
                                               child: Card(
+                                                shape: RoundedRectangleBorder(
+                                                    side: BorderSide(),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            5)),
                                                 margin:
                                                     EdgeInsets.only(bottom: 20),
                                                 child: Padding(
@@ -295,6 +326,9 @@ class _MediaConverterState extends State<MediaConverter> {
                             }
                           },
                           child: Card(
+                            shape: RoundedRectangleBorder(
+                                side: BorderSide(),
+                                borderRadius: BorderRadius.circular(5)),
                             child: Icon(
                               converter['status'] == "paused"
                                   ? CupertinoIcons.play_arrow_solid

@@ -25,13 +25,15 @@ class _UserGroupsState extends State<UserGroups> {
         groups = res['data']['groups'];
       });
     } else {
-      Util.toast("加载失败");
+      Util.instance.toast("加载失败");
       Navigator.of(context).pop();
     }
   }
 
   Widget _buildGroupItem(group) {
     return Card(
+      shape: RoundedRectangleBorder(
+          side: BorderSide(), borderRadius: BorderRadius.circular(5)),
       margin: EdgeInsets.symmetric(vertical: 10),
       child: Padding(
         padding: EdgeInsets.all(20),

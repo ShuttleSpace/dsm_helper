@@ -34,8 +34,8 @@ class _AddDownloadTaskState extends State<AddDownloadTask> {
         saveFolder = res['data']['default_destination'];
       });
     } else {
-      Util.vibrate(FeedbackType.warning);
-      Util.toast("获取默认保存位置失败");
+      Util.instance.vibrate(FeedbackType.warning);
+      Util.instance.toast("获取默认保存位置失败");
     }
   }
 
@@ -94,6 +94,8 @@ class _AddDownloadTaskState extends State<AddDownloadTask> {
             height: 20,
           ),
           Card(
+            shape: RoundedRectangleBorder(
+                side: BorderSide(), borderRadius: BorderRadius.circular(5)),
             child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: TextField(
@@ -116,7 +118,7 @@ class _AddDownloadTaskState extends State<AddDownloadTask> {
               if (_pickedFile != null && _pickedFile.count > 0) {
                 String? path = _pickedFile.paths[0];
                 if (path == null) {
-                  Util.toast('文件路径为空!');
+                  Util.instance.toast('文件路径为空!');
                   return;
                 }
                 String ext = path.split(".").last;
@@ -125,7 +127,7 @@ class _AddDownloadTaskState extends State<AddDownloadTask> {
                     torrentPath = path;
                   });
                 } else {
-                  Util.toast("无效的种子文件");
+                  Util.instance.toast("无效的种子文件");
                 }
               }
             },
@@ -156,12 +158,12 @@ class _AddDownloadTaskState extends State<AddDownloadTask> {
           OutlinedButton(
             onPressed: () async {
               if (saveFolder == "") {
-                Util.toast("请选择保存位置");
-                Util.vibrate(FeedbackType.impact);
+                Util.instance.toast("请选择保存位置");
+                Util.instance.vibrate(FeedbackType.impact);
                 return;
               }
               if (url.trim() == "" && torrentPath == "") {
-                Util.toast("请输入下载链接或选择种子文件");
+                Util.instance.toast("请输入下载链接或选择种子文件");
                 return;
               }
               var res;
@@ -174,20 +176,20 @@ class _AddDownloadTaskState extends State<AddDownloadTask> {
                     return SelectFile(res['data']['list_id'], saveFolder);
                   }));
                 } else {
-                  Util.toast("创建任务失败，code：${res['error']['code']}");
+                  Util.instance.toast("创建任务失败，code：${res['error']['code']}");
                 }
               } else {
                 if (url.trim() == "") {
-                  Util.toast("请输入下载链接");
-                  Util.vibrate(FeedbackType.light);
+                  Util.instance.toast("请输入下载链接");
+                  Util.instance.vibrate(FeedbackType.light);
                   return;
                 }
                 res = await Api.downloadTaskCreate(saveFolder, "url", url: url);
                 if (res['success']) {
-                  Util.toast("创建任务成功");
+                  Util.instance.toast("创建任务成功");
                   Navigator.of(context).pop(true);
                 } else {
-                  Util.toast("创建任务失败，code：${res['error']['code']}");
+                  Util.instance.toast("创建任务失败，code：${res['error']['code']}");
                 }
               }
             },

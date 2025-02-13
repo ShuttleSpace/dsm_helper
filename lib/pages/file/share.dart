@@ -72,14 +72,14 @@ class _ShareState extends State<Share> {
   deleteShare() async {
     var res = await Api.deleteShare([link['id']]);
     if (res['success']) {
-      Util.toast("取消共享成功");
+      Util.instance.toast("取消共享成功");
       Navigator.of(context).pop();
     }
   }
 
   getData() async {
     if (widget.fileRequest == true) {
-      requestName = await Util.getStorage("account") ?? '';
+      requestName = await Util.instance.getStorage("account") ?? '';
       requestInfo = "嗨，我的朋友！请将文件上传到此处。";
     }
     if (widget.paths == null || widget.paths!.isEmpty) {
@@ -131,6 +131,8 @@ class _ShareState extends State<Share> {
             height: 20,
           ),
           Card(
+            shape: RoundedRectangleBorder(
+                side: BorderSide(), borderRadius: BorderRadius.circular(5)),
             child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: Image.memory(
@@ -153,6 +155,8 @@ class _ShareState extends State<Share> {
             height: 20,
           ),
           Card(
+            shape: RoundedRectangleBorder(
+                side: BorderSide(), borderRadius: BorderRadius.circular(5)),
             child: Padding(
               padding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
               child: Row(
@@ -169,7 +173,7 @@ class _ShareState extends State<Share> {
                     onPressed: () async {
                       ClipboardData data = new ClipboardData(text: link['url']);
                       Clipboard.setData(data);
-                      Util.toast("已复制到剪贴板");
+                      Util.instance.toast("已复制到剪贴板");
                     },
                     child: SizedBox(
                       width: 20,
@@ -205,6 +209,8 @@ class _ShareState extends State<Share> {
               );
             },
             child: Card(
+              shape: RoundedRectangleBorder(
+                  side: BorderSide(), borderRadius: BorderRadius.circular(5)),
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: TextField(
@@ -239,6 +245,8 @@ class _ShareState extends State<Share> {
               );
             },
             child: Card(
+              shape: RoundedRectangleBorder(
+                  side: BorderSide(), borderRadius: BorderRadius.circular(5)),
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: TextField(
@@ -256,6 +264,8 @@ class _ShareState extends State<Share> {
             height: 20,
           ),
           Card(
+            shape: RoundedRectangleBorder(
+                side: BorderSide(), borderRadius: BorderRadius.circular(5)),
             child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: TextField(
@@ -274,6 +284,8 @@ class _ShareState extends State<Share> {
               height: 20,
             ),
             Card(
+              shape: RoundedRectangleBorder(
+                  side: BorderSide(), borderRadius: BorderRadius.circular(5)),
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: TextField(
@@ -290,6 +302,8 @@ class _ShareState extends State<Share> {
               height: 20,
             ),
             Card(
+              shape: RoundedRectangleBorder(
+                  side: BorderSide(), borderRadius: BorderRadius.circular(5)),
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: TextField(
@@ -353,7 +367,7 @@ class _ShareState extends State<Share> {
                                   requestName: requestName,
                                   requestInfo: requestInfo);
                               if (res['success']) {
-                                Util.toast("保存成功");
+                                Util.instance.toast("保存成功");
                               }
                             },
                             child: Text("保存修改"),
@@ -371,6 +385,10 @@ class _ShareState extends State<Share> {
                                   return Material(
                                     color: Colors.transparent,
                                     child: Card(
+                                      shape: RoundedRectangleBorder(
+                                          side: BorderSide(),
+                                          borderRadius:
+                                              BorderRadius.circular(5)),
                                       child: SafeArea(
                                         top: false,
                                         child: Padding(

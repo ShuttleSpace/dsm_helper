@@ -8,6 +8,6 @@ class SettingProvider with ChangeNotifier {
   void setRefreshDuration(int duration) async {
     _refreshDuration = duration;
     notifyListeners();
-    Util.setStorage("refresh_duration", duration.toString());
+    Util.instance.setStorage("refresh_duration", duration.toString());
   }
 }

@@ -40,6 +40,8 @@ class _SearchState extends State<Search> {
           padding: EdgeInsets.all(20),
           children: [
             Card(
+              shape: RoundedRectangleBorder(
+                  side: BorderSide(), borderRadius: BorderRadius.circular(5)),
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: TextField(
@@ -63,6 +65,9 @@ class _SearchState extends State<Search> {
                   });
                 },
                 child: Card(
+                  shape: RoundedRectangleBorder(
+                      side: BorderSide(),
+                      borderRadius: BorderRadius.circular(5)),
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Row(
@@ -81,6 +86,8 @@ class _SearchState extends State<Search> {
               ),
             ),
             Card(
+              shape: RoundedRectangleBorder(
+                  side: BorderSide(), borderRadius: BorderRadius.circular(5)),
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: TextField(

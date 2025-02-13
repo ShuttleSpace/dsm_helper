@@ -34,7 +34,7 @@ class _PhotosState extends State<Photos> {
 
   Widget _buildPhotoItem(photo) {
     String thumbUrl =
-        '${Util.baseUrl}/webapi/entry.cgi?id=${photo['additional']['thumbnail']['unit_id']}&cache_key="${photo['additional']['thumbnail']['cache_key']}"&type="unit"&size="sm"&api="SYNO.${Util.version == 7 ? "Foto" : "Photo"}.Thumbnail"&method="get"&version=1&_sid=${Util.sid}';
+        '${Util.instance.baseUrl}/webapi/entry.cgi?id=${photo['additional']['thumbnail']['unit_id']}&cache_key="${photo['additional']['thumbnail']['cache_key']}"&type="unit"&size="sm"&api="SYNO.${Util.instance.version == 7 ? "Foto" : "Photo"}.Thumbnail"&method="get"&version=1&_sid=${Util.instance.sid}';
     return GestureDetector(
       onTap: () {
         Navigator.of(context).push(TransparentPageRoute(
@@ -42,7 +42,7 @@ class _PhotosState extends State<Photos> {
             return ImagePreview(
               photos
                   .map((photo) =>
-                      '${Util.baseUrl}/webapi/entry.cgi?id=${photo['additional']['thumbnail']['unit_id']}&cache_key="${photo['additional']['thumbnail']['cache_key']}"&type="unit"&size="xl"&api="SYNO.${Util.version == 7 ? "Foto" : "Photo"}.Thumbnail"&method="get"&version=1&_sid=${Util.sid}')
+                      '${Util.instance.baseUrl}/webapi/entry.cgi?id=${photo['additional']['thumbnail']['unit_id']}&cache_key="${photo['additional']['thumbnail']['cache_key']}"&type="unit"&size="xl"&api="SYNO.${Util.instance.version == 7 ? "Foto" : "Photo"}.Thumbnail"&method="get"&version=1&_sid=${Util.instance.sid}')
                   .toList(),
               photos.indexOf(photo),
               tag: "photo-ablum-${photo['additional']['thumbnail']['unit_id']}",
@@ -83,7 +83,7 @@ class _PhotosState extends State<Photos> {
                     ),
                     SizedBox(height: 5),
                     Text(
-                      "${Util.timeLong(5235)['hours'].toString().padLeft(2, "0")}:${Util.timeLong(5235)['minutes'].toString().padLeft(2, "0")}:${Util.timeLong(5235)['seconds'].toString().padLeft(2, "0")}",
+                      "${Util.instance.timeLong(5235)['hours'].toString().padLeft(2, "0")}:${Util.instance.timeLong(5235)['minutes'].toString().padLeft(2, "0")}:${Util.instance.timeLong(5235)['seconds'].toString().padLeft(2, "0")}",
                       style: TextStyle(color: Colors.white, fontSize: 12),
                     ),
                   ],
@@ -125,11 +125,11 @@ class _PhotosState extends State<Photos> {
                 background: Hero(
                   tag: widget.tag ?? '',
                   child: CupertinoExtendedImage(
-                    '${Util.baseUrl}/webapi/entry.cgi?id=${widget.album['additional']['thumbnail']['unit_id']}&cache_key="${widget.album['additional']['thumbnail']['cache_key']}"&type="unit"&size="xl"&api="SYNO.${Util.version == 7 ? "Foto" : "Photo"}.Thumbnail"&method="get"&version=1&_sid=${Util.sid}',
+                    '${Util.instance.baseUrl}/webapi/entry.cgi?id=${widget.album['additional']['thumbnail']['unit_id']}&cache_key="${widget.album['additional']['thumbnail']['cache_key']}"&type="unit"&size="xl"&api="SYNO.${Util.instance.version == 7 ? "Foto" : "Photo"}.Thumbnail"&method="get"&version=1&_sid=${Util.instance.sid}',
                     fit: BoxFit.cover,
                     height: 200,
                     placeholder: CupertinoExtendedImage(
-                      '${Util.baseUrl}/webapi/entry.cgi?id=${widget.album['additional']['thumbnail']['unit_id']}&cache_key="${widget.album['additional']['thumbnail']['cache_key']}"&type="unit"&size="sm"&api="SYNO.${Util.version == 7 ? "Foto" : "Photo"}.Thumbnail"&method="get"&version=1&_sid=${Util.sid}',
+                      '${Util.instance.baseUrl}/webapi/entry.cgi?id=${widget.album['additional']['thumbnail']['unit_id']}&cache_key="${widget.album['additional']['thumbnail']['cache_key']}"&type="unit"&size="sm"&api="SYNO.${Util.instance.version == 7 ? "Foto" : "Photo"}.Thumbnail"&method="get"&version=1&_sid=${Util.instance.sid}',
                       fit: BoxFit.cover,
                     ),
                   ),

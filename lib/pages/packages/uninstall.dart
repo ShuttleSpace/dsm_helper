@@ -32,7 +32,7 @@ class _UninstallPackageState extends State<UninstallPackage> {
         print(pageData);
       });
     } else {
-      Util.toast("获取卸载信息失败，代码${res['error']['code']}");
+      Util.instance.toast("获取卸载信息失败，代码${res['error']['code']}");
     }
   }
 
@@ -45,6 +45,8 @@ class _UninstallPackageState extends State<UninstallPackage> {
         });
       },
       child: Card(
+        shape: RoundedRectangleBorder(
+            side: BorderSide(), borderRadius: BorderRadius.circular(5)),
         child: Padding(
           padding: EdgeInsets.all(20),
           child: Row(
@@ -53,6 +55,8 @@ class _UninstallPackageState extends State<UninstallPackage> {
                 child: Text(item['desc']),
               ),
               Card(
+                shape: RoundedRectangleBorder(
+                    side: BorderSide(), borderRadius: BorderRadius.circular(5)),
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: SizedBox(
@@ -77,6 +81,8 @@ class _UninstallPackageState extends State<UninstallPackage> {
   Widget _buildItem(item) {
     List subItems = item['subitems'];
     return Card(
+      shape: RoundedRectangleBorder(
+          side: BorderSide(), borderRadius: BorderRadius.circular(5)),
       child: Padding(
         padding: EdgeInsets.all(20),
         child: Column(
@@ -170,7 +176,7 @@ class _UninstallPackageState extends State<UninstallPackage> {
                           });
                           await Api.uninstallPackageTask(widget.package['id'],
                               extra: extra);
-                          Util.toast("卸载成功");
+                          Util.instance.toast("卸载成功");
                           Navigator.of(context).pop();
                           Navigator.of(context).pop();
                         },

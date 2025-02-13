@@ -22,7 +22,7 @@ class _SelectServerState extends State<SelectServer> {
   }
 
   getData() async {
-    String str = await Util.getStorage("terminal_servers") ?? '';
+    String str = await Util.instance.getStorage("terminal_servers") ?? '';
     setState(() {
       loading = false;
       if (str.isNotBlank) {
@@ -95,8 +95,9 @@ class _SelectServerState extends State<SelectServer> {
                     servers.remove(server);
                   });
 
-                  Util.setStorage("terminal_servers", jsonEncode(servers));
-                  Util.toast("删除成功");
+                  Util.instance
+                      .setStorage("terminal_servers", jsonEncode(servers));
+                  Util.instance.toast("删除成功");
                 },
                 child: Image.asset(
                   "assets/icons/delete.png",

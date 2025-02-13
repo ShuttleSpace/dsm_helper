@@ -41,6 +41,8 @@ class _ControlPanelState extends State<ControlPanel> {
       body: ListView(
         children: [
           Card(
+            shape: RoundedRectangleBorder(
+                side: BorderSide(), borderRadius: BorderRadius.circular(5)),
             margin: EdgeInsets.only(top: 20, left: 20, right: 20),
             child: Padding(
               padding: const EdgeInsets.all(8.0),
@@ -71,13 +73,16 @@ class _ControlPanelState extends State<ControlPanel> {
                                     RouteSettings(name: "share_folders")));
                           },
                           child: Card(
+                            shape: RoundedRectangleBorder(
+                                side: BorderSide(),
+                                borderRadius: BorderRadius.circular(5)),
                             child: Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Image.asset(
-                                    "assets/control_panel/${Util.version}/shared_folders.png",
+                                    "assets/control_panel/${Util.instance.version}/shared_folders.png",
                                     height: 30,
                                     width: 30,
                                     fit: BoxFit.contain,
@@ -103,13 +108,16 @@ class _ControlPanelState extends State<ControlPanel> {
                                 settings: RouteSettings(name: "file_service")));
                           },
                           child: Card(
+                            shape: RoundedRectangleBorder(
+                                side: BorderSide(),
+                                borderRadius: BorderRadius.circular(5)),
                             child: Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Image.asset(
-                                    "assets/control_panel/${Util.version}/file_services.png",
+                                    "assets/control_panel/${Util.instance.version}/file_services.png",
                                     height: 30,
                                     width: 30,
                                     fit: BoxFit.contain,
@@ -135,13 +143,16 @@ class _ControlPanelState extends State<ControlPanel> {
                                 settings: RouteSettings(name: "users")));
                           },
                           child: Card(
+                            shape: RoundedRectangleBorder(
+                                side: BorderSide(),
+                                borderRadius: BorderRadius.circular(5)),
                             child: Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Image.asset(
-                                    "assets/control_panel/${Util.version}/users.png",
+                                    "assets/control_panel/${Util.instance.version}/users.png",
                                     height: 30,
                                     width: 30,
                                     fit: BoxFit.contain,
@@ -150,7 +161,9 @@ class _ControlPanelState extends State<ControlPanel> {
                                     height: 5,
                                   ),
                                   Text(
-                                    Util.version < 7 ? "用户账户" : "用户与群组",
+                                    Util.instance.version < 7
+                                        ? "用户账户"
+                                        : "用户与群组",
                                     style: TextStyle(fontSize: 12),
                                   ),
                                 ],
@@ -158,7 +171,7 @@ class _ControlPanelState extends State<ControlPanel> {
                             ),
                           ),
                         ),
-                        if (Util.version < 7)
+                        if (Util.instance.version < 7)
                           GestureDetector(
                             onTap: () {
                               Navigator.of(context).push(CupertinoPageRoute(
@@ -169,13 +182,16 @@ class _ControlPanelState extends State<ControlPanel> {
                                       RouteSettings(name: "user_groups")));
                             },
                             child: Card(
+                              shape: RoundedRectangleBorder(
+                                  side: BorderSide(),
+                                  borderRadius: BorderRadius.circular(5)),
                               child: Padding(
                                 padding: const EdgeInsets.all(8.0),
                                 child: Column(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
                                     Image.asset(
-                                      "assets/control_panel/${Util.version}/groups.png",
+                                      "assets/control_panel/${Util.instance.version}/groups.png",
                                       height: 30,
                                       width: 30,
                                       fit: BoxFit.contain,
@@ -231,6 +247,8 @@ class _ControlPanelState extends State<ControlPanel> {
             ),
           ),
           Card(
+            shape: RoundedRectangleBorder(
+                side: BorderSide(), borderRadius: BorderRadius.circular(5)),
             margin: EdgeInsets.only(top: 20, left: 20, right: 20),
             child: Padding(
               padding: const EdgeInsets.all(8.0),
@@ -290,13 +308,16 @@ class _ControlPanelState extends State<ControlPanel> {
                                     RouteSettings(name: "public_access")));
                           },
                           child: Card(
+                            shape: RoundedRectangleBorder(
+                                side: BorderSide(),
+                                borderRadius: BorderRadius.circular(5)),
                             child: Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Image.asset(
-                                    "assets/control_panel/${Util.version}/public_access.png",
+                                    "assets/control_panel/${Util.instance.version}/public_access.png",
                                     height: 30,
                                     width: 30,
                                     fit: BoxFit.contain,
@@ -322,13 +343,16 @@ class _ControlPanelState extends State<ControlPanel> {
                                 settings: RouteSettings(name: "network")));
                           },
                           child: Card(
+                            shape: RoundedRectangleBorder(
+                                side: BorderSide(),
+                                borderRadius: BorderRadius.circular(5)),
                             child: Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Image.asset(
-                                    "assets/control_panel/${Util.version}/network.png",
+                                    "assets/control_panel/${Util.instance.version}/network.png",
                                     height: 30,
                                     width: 30,
                                     fit: BoxFit.contain,
@@ -431,7 +455,7 @@ class _ControlPanelState extends State<ControlPanel> {
                         //     ],
                         //   ),
                         // ),
-                        if (Util.version >= 7)
+                        if (Util.instance.version >= 7)
                           GestureDetector(
                             onTap: () {
                               Navigator.of(context).push(CupertinoPageRoute(
@@ -442,13 +466,16 @@ class _ControlPanelState extends State<ControlPanel> {
                                       RouteSettings(name: "ssh_setting")));
                             },
                             child: Card(
+                              shape: RoundedRectangleBorder(
+                                  side: BorderSide(),
+                                  borderRadius: BorderRadius.circular(5)),
                               child: Padding(
                                 padding: const EdgeInsets.all(8.0),
                                 child: Column(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
                                     Image.asset(
-                                      "assets/control_panel/${Util.version}/terminal_and_SNMP.png",
+                                      "assets/control_panel/${Util.instance.version}/terminal_and_SNMP.png",
                                       height: 30,
                                       width: 30,
                                       fit: BoxFit.contain,
@@ -478,6 +505,8 @@ class _ControlPanelState extends State<ControlPanel> {
             ),
           ),
           Card(
+            shape: RoundedRectangleBorder(
+                side: BorderSide(), borderRadius: BorderRadius.circular(5)),
             margin: EdgeInsets.only(top: 20, left: 20, right: 20),
             child: Padding(
               padding: const EdgeInsets.all(8.0),
@@ -509,13 +538,16 @@ class _ControlPanelState extends State<ControlPanel> {
                                     RouteSettings(name: "system_info_all")));
                           },
                           child: Card(
+                            shape: RoundedRectangleBorder(
+                                side: BorderSide(),
+                                borderRadius: BorderRadius.circular(5)),
                             child: Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Image.asset(
-                                    "assets/control_panel/${Util.version}/info_center.png",
+                                    "assets/control_panel/${Util.instance.version}/info_center.png",
                                     height: 30,
                                     width: 30,
                                     fit: BoxFit.contain,
@@ -616,7 +648,7 @@ class _ControlPanelState extends State<ControlPanel> {
                         //     ],
                         //   ),
                         // ),
-                        if (Util.version < 7)
+                        if (Util.instance.version < 7)
                           GestureDetector(
                             onTap: () {
                               Navigator.of(context).push(CupertinoPageRoute(
@@ -627,13 +659,16 @@ class _ControlPanelState extends State<ControlPanel> {
                                       RouteSettings(name: "task_scheduler")));
                             },
                             child: Card(
+                              shape: RoundedRectangleBorder(
+                                  side: BorderSide(),
+                                  borderRadius: BorderRadius.circular(5)),
                               child: Padding(
                                 padding: const EdgeInsets.all(8.0),
                                 child: Column(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
                                     Image.asset(
-                                      "assets/control_panel/${Util.version}/task_scheduler.png",
+                                      "assets/control_panel/${Util.instance.version}/task_scheduler.png",
                                       height: 30,
                                       width: 30,
                                       fit: BoxFit.contain,
@@ -659,13 +694,16 @@ class _ControlPanelState extends State<ControlPanel> {
                                 settings: RouteSettings(name: "power")));
                           },
                           child: Card(
+                            shape: RoundedRectangleBorder(
+                                side: BorderSide(),
+                                borderRadius: BorderRadius.circular(5)),
                             child: Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Image.asset(
-                                    "assets/control_panel/${Util.version}/hardware_and_power.png",
+                                    "assets/control_panel/${Util.instance.version}/hardware_and_power.png",
                                     height: 30,
                                     width: 30,
                                     fit: BoxFit.contain,
@@ -694,13 +732,16 @@ class _ControlPanelState extends State<ControlPanel> {
                                     RouteSettings(name: "external_device")));
                           },
                           child: Card(
+                            shape: RoundedRectangleBorder(
+                                side: BorderSide(),
+                                borderRadius: BorderRadius.circular(5)),
                             child: Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Image.asset(
-                                    "assets/control_panel/${Util.version}/external_devices.png",
+                                    "assets/control_panel/${Util.instance.version}/external_devices.png",
                                     height: 30,
                                     width: 30,
                                     fit: BoxFit.contain,
@@ -725,6 +766,9 @@ class _ControlPanelState extends State<ControlPanel> {
                             }));
                           },
                           child: Card(
+                            shape: RoundedRectangleBorder(
+                                side: BorderSide(),
+                                borderRadius: BorderRadius.circular(5)),
                             child: Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: Stack(
@@ -735,7 +779,7 @@ class _ControlPanelState extends State<ControlPanel> {
                                           MainAxisAlignment.center,
                                       children: [
                                         Image.asset(
-                                          "assets/control_panel/${Util.version}/update_and_reset.png",
+                                          "assets/control_panel/${Util.instance.version}/update_and_reset.png",
                                           height: 30,
                                           width: 30,
                                           fit: BoxFit.contain,
@@ -785,6 +829,8 @@ class _ControlPanelState extends State<ControlPanel> {
             ),
           ),
           Card(
+            shape: RoundedRectangleBorder(
+                side: BorderSide(), borderRadius: BorderRadius.circular(5)),
             margin: EdgeInsets.only(top: 20, left: 20, right: 20),
             child: Padding(
               padding: const EdgeInsets.all(8.0),
@@ -904,13 +950,16 @@ class _ControlPanelState extends State<ControlPanel> {
                                 settings: RouteSettings(name: "media_index")));
                           },
                           child: Card(
+                            shape: RoundedRectangleBorder(
+                                side: BorderSide(),
+                                borderRadius: BorderRadius.circular(5)),
                             child: Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Image.asset(
-                                    "assets/control_panel/${Util.version}/file_index.png",
+                                    "assets/control_panel/${Util.instance.version}/file_index.png",
                                     height: 30,
                                     width: 30,
                                     fit: BoxFit.contain,
@@ -958,7 +1007,7 @@ class _ControlPanelState extends State<ControlPanel> {
                         //       ],
                         //     ),
                         //   ),
-                        if (Util.version < 7)
+                        if (Util.instance.version < 7)
                           GestureDetector(
                             onTap: () {
                               Navigator.of(context).push(CupertinoPageRoute(
@@ -969,13 +1018,16 @@ class _ControlPanelState extends State<ControlPanel> {
                                       RouteSettings(name: "ssh_setting")));
                             },
                             child: Card(
+                              shape: RoundedRectangleBorder(
+                                  side: BorderSide(),
+                                  borderRadius: BorderRadius.circular(5)),
                               child: Padding(
                                 padding: const EdgeInsets.all(8.0),
                                 child: Column(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
                                     Image.asset(
-                                      "assets/control_panel/${Util.version}/terminal_and_SNMP.png",
+                                      "assets/control_panel/${Util.instance.version}/terminal_and_SNMP.png",
                                       height: 30,
                                       width: 30,
                                       fit: BoxFit.contain,
@@ -994,7 +1046,7 @@ class _ControlPanelState extends State<ControlPanel> {
                               ),
                             ),
                           ),
-                        if (Util.version >= 7)
+                        if (Util.instance.version >= 7)
                           GestureDetector(
                             onTap: () {
                               Navigator.of(context).push(CupertinoPageRoute(
@@ -1005,13 +1057,16 @@ class _ControlPanelState extends State<ControlPanel> {
                                       RouteSettings(name: "task_scheduler")));
                             },
                             child: Card(
+                              shape: RoundedRectangleBorder(
+                                  side: BorderSide(),
+                                  borderRadius: BorderRadius.circular(5)),
                               child: Padding(
                                 padding: const EdgeInsets.all(8.0),
                                 child: Column(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
                                     Image.asset(
-                                      "assets/control_panel/${Util.version}/task_scheduler.png",
+                                      "assets/control_panel/${Util.instance.version}/task_scheduler.png",
                                       height: 30,
                                       width: 30,
                                       fit: BoxFit.contain,

@@ -17,7 +17,7 @@ class _DownloadSettingState extends State<DownloadSetting> {
   String downloadPath = '';
   @override
   void initState() {
-    Util.getDownloadPath().then((value) {
+    Util.instance.getDownloadPath().then((value) {
       setState(() {
         downloadPath = value;
       });
@@ -46,14 +46,14 @@ class _DownloadSettingState extends State<DownloadSetting> {
                       .request()
                       .isGranted;
                   if (!permission) {
-                    Util.toast("安卓11以上需授权文件管理权限");
+                    Util.instance.toast("安卓11以上需授权文件管理权限");
                     return;
                   }
                 } else {
                   bool permission = false;
                   permission = await Permission.storage.request().isGranted;
                   if (!permission) {
-                    Util.toast("请先授权APP访问存储权限");
+                    Util.instance.toast("请先授权APP访问存储权限");
                     return;
                   }
                 }
@@ -70,8 +70,9 @@ class _DownloadSettingState extends State<DownloadSetting> {
                   if (res != null && res.length == 1) {
                     setState(() {
                       downloadPath = res[0].path;
-                      Util.downloadSavePath = res[0].path;
-                      Util.setStorage("download_save_path", res[0].path);
+                      Util.instance.downloadSavePath = res[0].path;
+                      Util.instance
+                          .setStorage("download_save_path", res[0].path);
                     });
                   }
                 });

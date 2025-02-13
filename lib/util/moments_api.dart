@@ -6,15 +6,17 @@ class MomentsApi {
       {String? category = "Timeline", String? type}) async {
     Map<String, dynamic> data = {
       "timeline_group_unit": '"day"',
-      "api": '"SYNO.${Util.version == 7 ? "Foto" : "Photo"}.Browse.$category"',
+      "api":
+          '"SYNO.${Util.instance.version == 7 ? "Foto" : "Photo"}.Browse.$category"',
       "method": category == "Timeline" ? '"get"' : '"get_timeline"',
-      "version": Util.version == 7 ? (category == "Timeline" ? 2 : 3) : 1,
-      "_sid": Util.sid,
+      "version":
+          Util.instance.version == 7 ? (category == "Timeline" ? 2 : 3) : 1,
+      "_sid": Util.instance.sid,
     };
     if (type != null) {
       data['type'] = '"$type"';
     }
-    var res = await Util.post("entry.cgi", data: data);
+    var res = await Util.instance.post("entry.cgi", data: data);
     return res;
   }
 
@@ -32,10 +34,11 @@ class MomentsApi {
       "limit": 5000,
       "additional":
           '["thumbnail","resolution","orientation","video_convert","video_meta","address"]',
-      "api": '"SYNO.${Util.version == 7 ? "Foto" : "Photo"}.Browse.$category"',
+      "api":
+          '"SYNO.${Util.instance.version == 7 ? "Foto" : "Photo"}.Browse.$category"',
       "method": '"list"',
-      "version": Util.version == 7 ? 1 : 2,
-      "_sid": Util.sid,
+      "version": Util.instance.version == 7 ? 1 : 2,
+      "_sid": Util.instance.sid,
     };
     if (type != null) {
       data['type'] = '"$type"';
@@ -49,18 +52,19 @@ class MomentsApi {
     if (albumId != null) {
       data['album_id'] = albumId;
     }
-    var res = await Util.post("entry.cgi", data: data);
+    var res = await Util.instance.post("entry.cgi", data: data);
     return res;
   }
 
   static Future<Map> category() async {
     Map<String, dynamic> data = {
-      "api": '"SYNO.${Util.version == 7 ? "Foto" : "Photo"}.Browse.Category"',
+      "api":
+          '"SYNO.${Util.instance.version == 7 ? "Foto" : "Photo"}.Browse.Category"',
       "method": '"get"',
       "version": 1,
-      "_sid": Util.sid,
+      "_sid": Util.instance.sid,
     };
-    var res = await Util.post("entry.cgi", data: data);
+    var res = await Util.instance.post("entry.cgi", data: data);
     return res;
   }
 
@@ -78,12 +82,13 @@ class MomentsApi {
       "shared": shared,
       "sort_by": '"$sortBy"',
       "sort_direction": '"$sortDirection"',
-      "api": '"SYNO.${Util.version == 7 ? "Foto" : "Photo"}.Browse.Album"',
+      "api":
+          '"SYNO.${Util.instance.version == 7 ? "Foto" : "Photo"}.Browse.Album"',
       "method": '"list"',
-      "version": Util.version == 7 ? 1 : 2,
-      "_sid": Util.sid,
+      "version": Util.instance.version == 7 ? 1 : 2,
+      "_sid": Util.instance.sid,
     };
-    var res = await Util.post("entry.cgi", data: data);
+    var res = await Util.instance.post("entry.cgi", data: data);
     return res;
   }
 
@@ -98,9 +103,9 @@ class MomentsApi {
       "api": '"SYNO.Foto.Browse.Geocoding"',
       "method": '"list"',
       "version": 1,
-      "_sid": Util.sid,
+      "_sid": Util.instance.sid,
     };
-    var res = await Util.post("entry.cgi", data: data);
+    var res = await Util.instance.post("entry.cgi", data: data);
     return res;
   }
 
@@ -116,9 +121,9 @@ class MomentsApi {
       "api": '"SYNO.Foto${isTeam ? 'Team' : ''}.Browse.GeneralTag"',
       "method": '"list"',
       "version": 1,
-      "_sid": Util.sid,
+      "_sid": Util.instance.sid,
     };
-    var res = await Util.post("entry.cgi", data: data);
+    var res = await Util.instance.post("entry.cgi", data: data);
     return res;
   }
 
@@ -129,12 +134,13 @@ class MomentsApi {
     Map<String, dynamic> data = {
       "start_time": start,
       "end_time": end,
-      "api": '"SYNO.${Util.version == 7 ? "Foto" : "Photo"}.Browse.Timeline"',
+      "api":
+          '"SYNO.${Util.instance.version == 7 ? "Foto" : "Photo"}.Browse.Timeline"',
       "method": '"get_geocoding"',
       "version": 1,
-      "_sid": Util.sid,
+      "_sid": Util.instance.sid,
     };
-    var res = await Util.post("entry.cgi", data: data);
+    var res = await Util.instance.post("entry.cgi", data: data);
     return res;
   }
 
@@ -144,12 +150,12 @@ class MomentsApi {
       "limit": 4,
       "additional": '["thumbnail"]',
       "api":
-          '"SYNO.${Util.version == 7 ? "Foto" : "Photo"}.Browse.RecentlyAdded"',
+          '"SYNO.${Util.instance.version == 7 ? "Foto" : "Photo"}.Browse.RecentlyAdded"',
       "method": '"list"',
       "version": 3,
-      "_sid": Util.sid,
+      "_sid": Util.instance.sid,
     };
-    var res = await Util.post("entry.cgi", data: data);
+    var res = await Util.instance.post("entry.cgi", data: data);
     return res;
   }
 
@@ -157,12 +163,12 @@ class MomentsApi {
     Map<String, dynamic> data = {
       "timeline_group_unit": '"day"',
       "api":
-          '"SYNO.${Util.version == 7 ? "Foto" : "Photo"}.Browse.RecentlyAdded"',
+          '"SYNO.${Util.instance.version == 7 ? "Foto" : "Photo"}.Browse.RecentlyAdded"',
       "method": '"get_timeline"',
-      "version": Util.version == 7 ? 3 : 1,
-      "_sid": Util.sid,
+      "version": Util.instance.version == 7 ? 3 : 1,
+      "_sid": Util.instance.sid,
     };
-    var res = await Util.post("entry.cgi", data: data);
+    var res = await Util.instance.post("entry.cgi", data: data);
     return res;
   }
 
@@ -174,10 +180,10 @@ class MomentsApi {
       "additional":
           '["thumbnail","resolution","orientation","video_convert","video_meta","address"]',
       "api":
-          '"SYNO.${Util.version == 7 ? "Foto" : "Photo"}.Browse.RecentlyAdded"',
+          '"SYNO.${Util.instance.version == 7 ? "Foto" : "Photo"}.Browse.RecentlyAdded"',
       "method": '"list"',
-      "version": Util.version == 7 ? 1 : 2,
-      "_sid": Util.sid,
+      "version": Util.instance.version == 7 ? 1 : 2,
+      "_sid": Util.instance.sid,
     };
     if (year != null && month != null && day != null) {
       int start = DateTime(year, month, day, 8).secondsSinceEpoch;
@@ -188,7 +194,7 @@ class MomentsApi {
     if (albumId != null) {
       data['album_id'] = albumId;
     }
-    var res = await Util.post("entry.cgi", data: data);
+    var res = await Util.instance.post("entry.cgi", data: data);
     return res;
   }
 }

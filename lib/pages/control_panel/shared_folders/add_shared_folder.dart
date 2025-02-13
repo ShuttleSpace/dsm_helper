@@ -49,7 +49,7 @@ class _AddSharedFoldersState extends State<AddSharedFolders> {
     }
 
     volumeController.text =
-        "${widget.volumes[selectedVolumeIndex]['display_name']}(可用容量：${Util.formatSize(int.parse(widget.volumes[selectedVolumeIndex]['size_free_byte']))}) - ${widget.volumes[selectedVolumeIndex]['fs_type']}";
+        "${widget.volumes[selectedVolumeIndex]['display_name']}(可用容量：${Util.instance.formatSize(int.parse(widget.volumes[selectedVolumeIndex]['size_free_byte']))}) - ${widget.volumes[selectedVolumeIndex]['fs_type']}";
     unitController.text = units[selectedUnitIndex];
     super.initState();
   }
@@ -94,7 +94,7 @@ class _AddSharedFoldersState extends State<AddSharedFolders> {
         if (widget.volumes[i]['volume_path'] == folder['vol_path']) {
           selectedVolumeIndex = i;
           volumeController.text =
-              "${widget.volumes[selectedVolumeIndex]['display_name']}(可用容量：${Util.formatSize(int.parse(widget.volumes[selectedVolumeIndex]['size_free_byte']))}) - ${widget.volumes[selectedVolumeIndex]['fs_type']}";
+              "${widget.volumes[selectedVolumeIndex]['display_name']}(可用容量：${Util.instance.formatSize(int.parse(widget.volumes[selectedVolumeIndex]['size_free_byte']))}) - ${widget.volumes[selectedVolumeIndex]['fs_type']}";
           break;
         }
       }
@@ -104,9 +104,9 @@ class _AddSharedFoldersState extends State<AddSharedFolders> {
       });
     } else {
       if (res['error']['code'] == 402) {
-        Util.toast("此共享文件夹不存在");
+        Util.instance.toast("此共享文件夹不存在");
       } else {
-        Util.toast("加载失败，code: ${res['error']['code']}");
+        Util.instance.toast("加载失败，code: ${res['error']['code']}");
       }
 
       Navigator.of(context).pop();
@@ -117,29 +117,29 @@ class _AddSharedFoldersState extends State<AddSharedFolders> {
     FocusScope.of(context).unfocus();
     print(name);
     if (name.trim() == "") {
-      Util.toast("请输入共享文件夹名称");
+      Util.instance.toast("请输入共享文件夹名称");
       return;
     }
     if (encryption) {
       if (password.length < 8) {
-        Util.toast("加密密钥最短为8位");
+        Util.instance.toast("加密密钥最短为8位");
         return;
       }
       if (password != confirmPassword) {
-        Util.toast("加密密钥和确认密钥不一致");
+        Util.instance.toast("加密密钥和确认密钥不一致");
         return;
       }
     }
     if (enableShareQuota) {
       if (shareQuotaController.text.trim() == "") {
-        Util.toast("请输入共享文件夹配额");
+        Util.instance.toast("请输入共享文件夹配额");
         return;
       }
       try {
         shareQuota =
             "${int.parse(shareQuotaController.text) * pow(1024, 2 - selectedUnitIndex)}";
       } catch (e) {
-        Util.toast("共享文件夹配额仅支持输入整数");
+        Util.instance.toast("共享文件夹配额仅支持输入整数");
         return;
       }
     }
@@ -170,7 +170,7 @@ class _AddSharedFoldersState extends State<AddSharedFolders> {
     });
     print(res);
     if (res['success']) {
-      Util.toast("${widget.folder != null ? '修改' : '新增'}共享文件夹成功");
+      Util.instance.toast("${widget.folder != null ? '修改' : '新增'}共享文件夹成功");
       Navigator.of(context).pop(true);
     }
   }
@@ -198,6 +198,9 @@ class _AddSharedFoldersState extends State<AddSharedFolders> {
                     height: 20,
                   ),
                   Card(
+                    shape: RoundedRectangleBorder(
+                        side: BorderSide(),
+                        borderRadius: BorderRadius.circular(5)),
                     child: Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: TextField(
@@ -214,6 +217,9 @@ class _AddSharedFoldersState extends State<AddSharedFolders> {
                     height: 20,
                   ),
                   Card(
+                    shape: RoundedRectangleBorder(
+                        side: BorderSide(),
+                        borderRadius: BorderRadius.circular(5)),
                     child: Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: TextField(
@@ -238,6 +244,9 @@ class _AddSharedFoldersState extends State<AddSharedFolders> {
                           return Material(
                             color: Colors.transparent,
                             child: Card(
+                              shape: RoundedRectangleBorder(
+                                  side: BorderSide(),
+                                  borderRadius: BorderRadius.circular(5)),
                               child: SafeArea(
                                 top: false,
                                 child: Padding(
@@ -267,7 +276,7 @@ class _AddSharedFoldersState extends State<AddSharedFolders> {
                                               volumeController.value =
                                                   TextEditingValue(
                                                       text:
-                                                          "${widget.volumes[selectedVolumeIndex]['display_name']}(可用容量：${Util.formatSize(int.parse(widget.volumes[selectedVolumeIndex]['size_free_byte']))}) - ${widget.volumes[selectedVolumeIndex]['fs_type']}");
+                                                          "${widget.volumes[selectedVolumeIndex]['display_name']}(可用容量：${Util.instance.formatSize(int.parse(widget.volumes[selectedVolumeIndex]['size_free_byte']))}) - ${widget.volumes[selectedVolumeIndex]['fs_type']}");
                                               Navigator.of(context).pop();
                                             },
                                             child: Container(
@@ -279,7 +288,7 @@ class _AddSharedFoldersState extends State<AddSharedFolders> {
                                                     CrossAxisAlignment.start,
                                                 children: [
                                                   Text(
-                                                      "${volume['display_name']}(可用容量：${Util.formatSize(int.parse(volume['size_free_byte']))}) - ${volume['fs_type']}"),
+                                                      "${volume['display_name']}(可用容量：${Util.instance.formatSize(int.parse(volume['size_free_byte']))}) - ${volume['fs_type']}"),
                                                   SizedBox(
                                                     height: 5,
                                                   ),
@@ -316,6 +325,9 @@ class _AddSharedFoldersState extends State<AddSharedFolders> {
                       );
                     },
                     child: Card(
+                      shape: RoundedRectangleBorder(
+                          side: BorderSide(),
+                          borderRadius: BorderRadius.circular(5)),
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: TextField(
@@ -340,6 +352,9 @@ class _AddSharedFoldersState extends State<AddSharedFolders> {
                       });
                     },
                     child: Card(
+                      shape: RoundedRectangleBorder(
+                          side: BorderSide(),
+                          borderRadius: BorderRadius.circular(5)),
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: Row(
@@ -367,6 +382,9 @@ class _AddSharedFoldersState extends State<AddSharedFolders> {
                       });
                     },
                     child: Card(
+                      shape: RoundedRectangleBorder(
+                          side: BorderSide(),
+                          borderRadius: BorderRadius.circular(5)),
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: Row(
@@ -398,6 +416,9 @@ class _AddSharedFoldersState extends State<AddSharedFolders> {
                             });
                           },
                           child: Card(
+                            shape: RoundedRectangleBorder(
+                                side: BorderSide(),
+                                borderRadius: BorderRadius.circular(5)),
                             child: Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: Row(
@@ -435,6 +456,9 @@ class _AddSharedFoldersState extends State<AddSharedFolders> {
                             }
                           },
                           child: Card(
+                            shape: RoundedRectangleBorder(
+                                side: BorderSide(),
+                                borderRadius: BorderRadius.circular(5)),
                             child: Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: Row(
@@ -470,6 +494,9 @@ class _AddSharedFoldersState extends State<AddSharedFolders> {
                       });
                     },
                     child: Card(
+                      shape: RoundedRectangleBorder(
+                          side: BorderSide(),
+                          borderRadius: BorderRadius.circular(5)),
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: Row(
@@ -494,6 +521,9 @@ class _AddSharedFoldersState extends State<AddSharedFolders> {
                       children: [
                         Expanded(
                           child: Card(
+                            shape: RoundedRectangleBorder(
+                                side: BorderSide(),
+                                borderRadius: BorderRadius.circular(5)),
                             child: Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: TextField(
@@ -513,6 +543,9 @@ class _AddSharedFoldersState extends State<AddSharedFolders> {
                         ),
                         Expanded(
                           child: Card(
+                            shape: RoundedRectangleBorder(
+                                side: BorderSide(),
+                                borderRadius: BorderRadius.circular(5)),
                             child: Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: TextField(
@@ -544,6 +577,9 @@ class _AddSharedFoldersState extends State<AddSharedFolders> {
                       }
                     },
                     child: Card(
+                      shape: RoundedRectangleBorder(
+                          side: BorderSide(),
+                          borderRadius: BorderRadius.circular(5)),
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: Row(
@@ -574,6 +610,9 @@ class _AddSharedFoldersState extends State<AddSharedFolders> {
                       }
                     },
                     child: Card(
+                      shape: RoundedRectangleBorder(
+                          side: BorderSide(),
+                          borderRadius: BorderRadius.circular(5)),
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: Row(
@@ -604,13 +643,16 @@ class _AddSharedFoldersState extends State<AddSharedFolders> {
                       }
                     },
                     child: Card(
+                      shape: RoundedRectangleBorder(
+                          side: BorderSide(),
+                          borderRadius: BorderRadius.circular(5)),
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: Row(
                           children: [
                             Text("启用共享文件夹配额"),
                             Text(
-                              "(已使用${Util.formatSize((shareQuotaUsed * 1024 * 1024).toInt())})",
+                              "(已使用${Util.instance.formatSize((shareQuotaUsed * 1024 * 1024).toInt())})",
                               style: TextStyle(color: Colors.blue),
                             ),
                             Spacer(),
@@ -633,6 +675,9 @@ class _AddSharedFoldersState extends State<AddSharedFolders> {
                         Expanded(
                           flex: 2,
                           child: Card(
+                            shape: RoundedRectangleBorder(
+                                side: BorderSide(),
+                                borderRadius: BorderRadius.circular(5)),
                             child: Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: TextField(
@@ -663,6 +708,10 @@ class _AddSharedFoldersState extends State<AddSharedFolders> {
                                   return Material(
                                     color: Colors.transparent,
                                     child: Card(
+                                      shape: RoundedRectangleBorder(
+                                          side: BorderSide(),
+                                          borderRadius:
+                                              BorderRadius.circular(5)),
                                       child: SafeArea(
                                         top: false,
                                         child: Padding(
@@ -731,6 +780,9 @@ class _AddSharedFoldersState extends State<AddSharedFolders> {
                               );
                             },
                             child: Card(
+                              shape: RoundedRectangleBorder(
+                                  side: BorderSide(),
+                                  borderRadius: BorderRadius.circular(5)),
                               child: Padding(
                                 padding: const EdgeInsets.all(8.0),
                                 child: TextField(

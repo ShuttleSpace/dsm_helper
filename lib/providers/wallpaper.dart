@@ -8,6 +8,6 @@ class WallpaperProvider with ChangeNotifier {
   void changeMode(bool showWallpaper) async {
     _showWallpaper = showWallpaper;
     notifyListeners();
-    Util.setStorage("show_wallpaper", showWallpaper ? "1" : "0");
+    Util.instance.setStorage("show_wallpaper", showWallpaper ? "1" : "0");
   }
 }

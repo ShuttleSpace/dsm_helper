@@ -18,6 +18,8 @@ class _AddTrackerState extends State<AddTracker> {
         padding: EdgeInsets.all(20),
         children: [
           Card(
+            shape: RoundedRectangleBorder(
+                side: BorderSide(), borderRadius: BorderRadius.circular(5)),
             child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: TextField(
@@ -43,15 +45,15 @@ class _AddTrackerState extends State<AddTracker> {
                 }
               });
               if (tracker.length == 0) {
-                Util.toast("请填写Tacker");
+                Util.instance.toast("请填写Tacker");
                 return;
               }
               var res = await Api.downloadTrackerAdd(widget.id, trackers);
               if (res['success']) {
-                Util.toast("添加Tracker成功");
+                Util.instance.toast("添加Tracker成功");
                 Navigator.of(context).pop(true);
               } else {
-                Util.toast("添加Tracker失败，代码${res['error']['code']}");
+                Util.instance.toast("添加Tracker失败，代码${res['error']['code']}");
               }
             },
             child: Text(

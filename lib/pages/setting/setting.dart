@@ -120,14 +120,17 @@ class _SettingState extends State<Setting> {
     getData();
     getServers();
     getNormalUser();
-    Util.getStorage("account")
+    Util.instance
+        .getStorage("account")
         .then((value) => setState(() => account = value ?? ''));
-    Util.getStorage("host").then((value) => setState(() => host = value ?? ''));
+    Util.instance
+        .getStorage("host")
+        .then((value) => setState(() => host = value ?? ''));
     super.initState();
   }
 
   getServers() async {
-    String serverString = await Util.getStorage("servers") ?? '';
+    String serverString = await Util.instance.getStorage("servers") ?? '';
     if (serverString.isNotBlank) {
       servers = json.decode(serverString);
     }
@@ -178,14 +181,14 @@ class _SettingState extends State<Setting> {
       }
     });
     if (res['success']) {
-      Util.toast("已发送指令");
+      Util.instance.toast("已发送指令");
     } else if (res['error']['code'] == 117) {
       List errors = res['error']['errors']['runningTasks'];
       List msgs = [];
       for (int i = 0; i < errors.length; i++) {
         List titles = errors[i].split(":");
         if (titles.length == 3) {
-          msgs.add(Util.strings[titles[0]][titles[1]][titles[2]]);
+          msgs.add(Util.instance.strings[titles[0]][titles[1]][titles[2]]);
         }
         //系统正在处理下列任务。现在关机可能会导致套件异常或数据丢失。是否确定要继续？
         showCupertinoModalPopup(
@@ -194,6 +197,8 @@ class _SettingState extends State<Setting> {
             return Material(
               color: Colors.transparent,
               child: Card(
+                shape: RoundedRectangleBorder(
+                    side: BorderSide(), borderRadius: BorderRadius.circular(5)),
                 child: SafeArea(
                   top: false,
                   child: Padding(
@@ -261,7 +266,7 @@ class _SettingState extends State<Setting> {
         );
       }
     } else {
-      Util.toast("操作失败，code:${res['error']['code']}");
+      Util.instance.toast("操作失败，code:${res['error']['code']}");
     }
   }
 
@@ -275,6 +280,8 @@ class _SettingState extends State<Setting> {
         return Material(
           color: Colors.transparent,
           child: Card(
+            shape: RoundedRectangleBorder(
+                side: BorderSide(), borderRadius: BorderRadius.circular(5)),
             child: SafeArea(
               top: false,
               child: Padding(
@@ -352,6 +359,8 @@ class _SettingState extends State<Setting> {
         return Material(
           color: Colors.transparent,
           child: Card(
+            shape: RoundedRectangleBorder(
+                side: BorderSide(), borderRadius: BorderRadius.circular(5)),
             child: SafeArea(
               top: false,
               child: Padding(
@@ -426,6 +435,8 @@ class _SettingState extends State<Setting> {
         return Material(
           color: Colors.transparent,
           child: Card(
+            shape: RoundedRectangleBorder(
+                side: BorderSide(), borderRadius: BorderRadius.circular(5)),
             child: SafeArea(
               top: false,
               child: Padding(
@@ -541,6 +552,8 @@ class _SettingState extends State<Setting> {
               });
             },
             child: Card(
+              shape: RoundedRectangleBorder(
+                  side: BorderSide(), borderRadius: BorderRadius.circular(5)),
               child: Padding(
                 padding: EdgeInsets.all(20.0),
                 child: Row(
@@ -616,7 +629,7 @@ class _SettingState extends State<Setting> {
             spacing: 20,
             runSpacing: 20,
             children: [
-              if (Util.notReviewAccount) ...[
+              if (Util.instance.notReviewAccount) ...[
                 SettingButton(
                     name: "关机",
                     icon: "shutdown",
@@ -638,6 +651,9 @@ class _SettingState extends State<Setting> {
                         return Material(
                           color: Colors.transparent,
                           child: Card(
+                            shape: RoundedRectangleBorder(
+                                side: BorderSide(),
+                                borderRadius: BorderRadius.circular(5)),
                             child: SafeArea(
                               top: false,
                               child: Padding(
@@ -676,7 +692,7 @@ class _SettingState extends State<Setting> {
                                                   !ssh, telnet, sshPort);
                                               print(res);
                                               if (!res['success']) {
-                                                Util.toast(
+                                                Util.instance.toast(
                                                     "操作失败，代码：${res['error']['code']}");
                                               }
                                               await getData();
@@ -725,6 +741,9 @@ class _SettingState extends State<Setting> {
                         settings: RouteSettings(name: "ssh_setting")));
                   },
                   child: Card(
+                    shape: RoundedRectangleBorder(
+                        side: BorderSide(),
+                        borderRadius: BorderRadius.circular(5)),
                     // margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                     child: Column(
                       children: [
@@ -782,13 +801,16 @@ class _SettingState extends State<Setting> {
                 name: "问题反馈",
                 icon: "edit",
                 onPressed: () async {
-                  if (Util.notReviewAccount) {
+                  if (Util.instance.notReviewAccount) {
                     showCupertinoModalPopup(
                       context: context,
                       builder: (context) {
                         return Material(
                           color: Colors.transparent,
                           child: Card(
+                            shape: RoundedRectangleBorder(
+                                side: BorderSide(),
+                                borderRadius: BorderRadius.circular(5)),
                             child: SafeArea(
                               top: false,
                               child: Padding(
@@ -862,9 +884,12 @@ class _SettingState extends State<Setting> {
                   }
                 },
               ),
-              if (Util.notReviewAccount &&
-                  Util.vipExpireTime.difference(DateTime.now()).inDays < 7 &&
-                  !Util.vipForever)
+              if (Util.instance.notReviewAccount &&
+                  Util.instance.vipExpireTime
+                          .difference(DateTime.now())
+                          .inDays <
+                      7 &&
+                  !Util.instance.vipForever)
                 SettingButton(
                   name: "关闭广告",
                   icon: "no_ad",

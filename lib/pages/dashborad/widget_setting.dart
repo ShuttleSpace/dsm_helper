@@ -40,7 +40,7 @@ class _WidgetSettingState extends State<WidgetSetting> {
   List selectedWidgets = [];
   @override
   void initState() {
-    Util.getStorage("show_shortcut").then((showShortcutStr) {
+    Util.instance.getStorage("show_shortcut").then((showShortcutStr) {
       setState(() {
         if (showShortcutStr != null) {
           showShortcut = showShortcutStr == "1";
@@ -49,7 +49,7 @@ class _WidgetSettingState extends State<WidgetSetting> {
         }
       });
     });
-    Util.getStorage("show_wallpaper").then((showWallpaperStr) {
+    Util.instance.getStorage("show_wallpaper").then((showWallpaperStr) {
       setState(() {
         if (showWallpaperStr != null) {
           showWallpaper = showWallpaperStr == "1";
@@ -95,10 +95,10 @@ class _WidgetSettingState extends State<WidgetSetting> {
                 };
                 var res = await Api.userSetting(data);
                 if (res['success']) {
-                  Util.toast("保存小组件成功");
+                  Util.instance.toast("保存小组件成功");
                   Navigator.of(context).pop(saveWidgets);
                 } else {
-                  Util.toast("保存小组件失败，代码${res['error']['code']}");
+                  Util.instance.toast("保存小组件失败，代码${res['error']['code']}");
                 }
               },
               child: Image.asset(
@@ -125,6 +125,8 @@ class _WidgetSettingState extends State<WidgetSetting> {
                 });
               },
               child: Card(
+                shape: RoundedRectangleBorder(
+                    side: BorderSide(), borderRadius: BorderRadius.circular(5)),
                 child: Padding(
                   padding: EdgeInsets.all(20),
                   child: Column(
@@ -169,6 +171,8 @@ class _WidgetSettingState extends State<WidgetSetting> {
                 });
               },
               child: Card(
+                shape: RoundedRectangleBorder(
+                    side: BorderSide(), borderRadius: BorderRadius.circular(5)),
                 child: Padding(
                   padding: EdgeInsets.all(20),
                   child: Column(
@@ -219,6 +223,9 @@ class _WidgetSettingState extends State<WidgetSetting> {
                     });
                   },
                   child: Card(
+                    shape: RoundedRectangleBorder(
+                        side: BorderSide(),
+                        borderRadius: BorderRadius.circular(5)),
                     margin: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
                     child: Padding(
                       padding: EdgeInsets.all(20),
@@ -231,6 +238,9 @@ class _WidgetSettingState extends State<WidgetSetting> {
                             ),
                           ),
                           Card(
+                            shape: RoundedRectangleBorder(
+                                side: BorderSide(),
+                                borderRadius: BorderRadius.circular(5)),
                             child: SizedBox(
                               width: 20,
                               height: 20,

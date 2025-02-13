@@ -4,6 +4,7 @@ import 'package:android_intent_plus/android_intent.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:draggable_scrollbar/draggable_scrollbar.dart';
+import 'package:dsm_helper/pages/download/download_state.dart';
 import 'package:dsm_helper/util/log.dart';
 import 'package:flutter_floating/floating/listener/event_listener.dart';
 import 'package:flutter_vibrate/flutter_vibrate.dart';
@@ -155,7 +156,7 @@ class FilesState extends State<Files> {
       });
       if (result['data']['finished']) {
         if (showProcessList = true) {
-          Util.toast(
+          Util.instance.toast(
               "${result['data']['path']} ${backgroundProcess[taskId]['type'] == 'copy' ? '复制' : '移动'}到 ${result['data']['dest_folder_path']} 完成");
         }
 
@@ -174,7 +175,7 @@ class FilesState extends State<Files> {
       if (result['success'] != null && result['success']) {
         if (result['data']['finished']) {
           if (showProcessList = true) {
-            Util.toast("文件删除完成");
+            Util.instance.toast("文件删除完成");
           }
           backgroundProcess[taskId]['timer']?.cancel();
           backgroundProcess[taskId]['timer'] = null;
@@ -183,7 +184,7 @@ class FilesState extends State<Files> {
         }
       }
     } catch (e) {
-      Util.toast("文件删除出错");
+      Util.instance.toast("文件删除出错");
       backgroundProcess[taskId]['timer']?.cancel();
       backgroundProcess[taskId]['timer'] = null;
       backgroundProcess.remove(taskId);
@@ -207,6 +208,9 @@ class FilesState extends State<Files> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Card(
+                          shape: RoundedRectangleBorder(
+                              side: BorderSide(),
+                              borderRadius: BorderRadius.circular(5)),
                           margin: EdgeInsets.symmetric(horizontal: 50),
                           child: Padding(
                             padding: EdgeInsets.all(20),
@@ -222,6 +226,9 @@ class FilesState extends State<Files> {
                                   height: 16,
                                 ),
                                 Card(
+                                  shape: RoundedRectangleBorder(
+                                      side: BorderSide(),
+                                      borderRadius: BorderRadius.circular(5)),
                                   child: Padding(
                                     padding: const EdgeInsets.all(8.0),
                                     child: TextField(
@@ -243,7 +250,7 @@ class FilesState extends State<Files> {
                                       child: OutlinedButton(
                                         onPressed: () async {
                                           if (password == "") {
-                                            Util.toast("请输入解压密码");
+                                            Util.instance.toast("请输入解压密码");
                                             return;
                                           }
                                           Navigator.of(context).pop();
@@ -283,7 +290,7 @@ class FilesState extends State<Files> {
           }
         } else {
           if (showProcessList = true) {
-            Util.toast("文件解压完成");
+            Util.instance.toast("文件解压完成");
           }
         }
         backgroundProcess[taskId]['timer']?.cancel();
@@ -305,7 +312,7 @@ class FilesState extends State<Files> {
       if (result['success'] != null && result['success']) {
         if (result['data']['finished']) {
           if (showProcessList = true) {
-            Util.toast("文件压缩完成");
+            Util.instance.toast("文件压缩完成");
           }
 
           backgroundProcess[taskId]['timer']?.cancel();
@@ -315,7 +322,7 @@ class FilesState extends State<Files> {
         }
       }
     } catch (e) {
-      Util.toast("文件压缩出错");
+      Util.instance.toast("文件压缩出错");
       backgroundProcess[taskId]['timer']?.cancel();
       backgroundProcess[taskId]['timer'] = null;
       backgroundProcess.remove(taskId);
@@ -419,7 +426,7 @@ class FilesState extends State<Files> {
     if (res['success']) {
       bool? r = await result(res['data']['taskid']);
       if (r == null) {
-        Util.toast('Wrong State!');
+        Util.instance.toast('Wrong State!');
         return;
       }
       if (r == false) {
@@ -430,20 +437,22 @@ class FilesState extends State<Files> {
       }
     } else {
       debugPrint("搜索出错");
-      Util.toast('搜索出错!');
+      Util.instance.toast('搜索出错!');
     }
   }
 
   downloadFiles(List files) async {
     Connectivity().onConnectivityChanged.listen((result) {
       if (result.contains(ConnectivityResult.mobile)) {
-        Util.vibrate(FeedbackType.warning);
+        Util.instance.vibrate(FeedbackType.warning);
         showCupertinoModalPopup(
           context: context,
           builder: (context) {
             return Material(
               color: Colors.transparent,
               child: Card(
+                shape: RoundedRectangleBorder(
+                    side: BorderSide(), borderRadius: BorderRadius.circular(5)),
                 child: SafeArea(
                   top: false,
                   child: Padding(
@@ -528,32 +537,33 @@ class FilesState extends State<Files> {
         bool permission = false;
         permission = await Permission.manageExternalStorage.request().isGranted;
         if (!permission) {
-          Util.toast("安卓11以上需授权文件管理权限");
+          Util.instance.toast("安卓11以上需授权文件管理权限");
           return;
         }
       } else {
         bool permission = false;
         permission = await Permission.storage.request().isGranted;
         if (!permission) {
-          Util.toast("请先授权APP访问存储权限");
+          Util.instance.toast("请先授权APP访问存储权限");
           return;
         }
       }
     }
 
     for (var file in files) {
-      String url = Util.baseUrl +
-          "/webapi/entry.cgi?api=SYNO.FileStation.Download&version=2&method=download&path=${Uri.encodeComponent(file['path'])}&mode=download&_sid=${Util.sid}";
+      String url = Util.instance.baseUrl +
+          "/webapi/entry.cgi?api=SYNO.FileStation.Download&version=2&method=download&path=${Uri.encodeComponent(file['path'])}&mode=download&_sid=${Util.instance.sid}";
       String filename = "";
       if (file['isdir']) {
         filename = file['name'] + ".zip";
       } else {
         filename = file['name'];
       }
-      await Util.download(filename, url);
+      await Util.instance.download(filename, url);
     }
-    Util.toast("已添加${files.length > 1 ? "${files.length}个" : ""}下载任务，请至下载页面查看");
-    Util.downloadKey.currentState?.getData();
+    Util.instance
+        .toast("已添加${files.length > 1 ? "${files.length}个" : ""}下载任务，请至下载页面查看");
+    DownloadStateInherited.of(context).notifier.getData();
   }
 
   Future<bool?> result(String taskId) async {
@@ -616,7 +626,7 @@ class FilesState extends State<Files> {
   }
 
   getShareList() async {
-    String listTypeStr = await Util.getStorage("file_list_type") ?? '';
+    String listTypeStr = await Util.instance.getStorage("file_list_type") ?? '';
 
     setState(() {
       if (listTypeStr.isNotBlank) {
@@ -665,7 +675,7 @@ class FilesState extends State<Files> {
       });
     } else {
       setState(() {
-        msg = res['msg'] ?? Util.notReviewAccount
+        msg = res['msg'] ?? Util.instance.notReviewAccount
             ? '暂无文件'
             : "加载失败，code:${res['error']['code']}";
       });
@@ -674,7 +684,7 @@ class FilesState extends State<Files> {
 
   goPath(String path) async {
     debugPrint("path:$path");
-    Util.vibrate(FeedbackType.light);
+    Util.instance.vibrate(FeedbackType.light);
     setState(() {
       success = true;
     });
@@ -694,9 +704,9 @@ class FilesState extends State<Files> {
     setState(() {
       loading = true;
     });
-    var res = await Util.get(
-        Util.baseUrl +
-            "/webapi/entry.cgi?api=SYNO.FileStation.Download&version=1&method=download&path=${Uri.encodeComponent(file['path'])}&mode=open&_sid=${Util.sid}",
+    var res = await Util.instance.get(
+        Util.instance.baseUrl +
+            "/webapi/entry.cgi?api=SYNO.FileStation.Download&version=1&method=download&path=${Uri.encodeComponent(file['path'])}&mode=open&_sid=${Util.instance.sid}",
         decode: false);
     setState(() {
       loading = false;
@@ -713,12 +723,16 @@ class FilesState extends State<Files> {
     return Material(
       color: Colors.transparent,
       child: Card(
+        shape: RoundedRectangleBorder(
+            side: BorderSide(), borderRadius: BorderRadius.circular(5)),
         child: Padding(
           padding: EdgeInsets.all(20),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
               Card(
+                shape: RoundedRectangleBorder(
+                    side: BorderSide(), borderRadius: BorderRadius.circular(5)),
                 child: SafeArea(
                   top: false,
                   child: Padding(
@@ -737,6 +751,9 @@ class FilesState extends State<Files> {
                                 child: Text("名称"),
                               ),
                               Card(
+                                shape: RoundedRectangleBorder(
+                                    side: BorderSide(),
+                                    borderRadius: BorderRadius.circular(5)),
                                 child: Padding(
                                   padding: const EdgeInsets.all(8.0),
                                   child: SizedBox(
@@ -767,6 +784,9 @@ class FilesState extends State<Files> {
                                 child: Text("大小"),
                               ),
                               Card(
+                                shape: RoundedRectangleBorder(
+                                    side: BorderSide(),
+                                    borderRadius: BorderRadius.circular(5)),
                                 child: Padding(
                                   padding: const EdgeInsets.all(8.0),
                                   child: SizedBox(
@@ -797,6 +817,9 @@ class FilesState extends State<Files> {
                                 child: Text("文件类型"),
                               ),
                               Card(
+                                shape: RoundedRectangleBorder(
+                                    side: BorderSide(),
+                                    borderRadius: BorderRadius.circular(5)),
                                 child: Padding(
                                   padding: const EdgeInsets.all(8.0),
                                   child: SizedBox(
@@ -827,6 +850,9 @@ class FilesState extends State<Files> {
                                 child: Text("修改日期"),
                               ),
                               Card(
+                                shape: RoundedRectangleBorder(
+                                    side: BorderSide(),
+                                    borderRadius: BorderRadius.circular(5)),
                                 child: Padding(
                                   padding: const EdgeInsets.all(8.0),
                                   child: SizedBox(
@@ -857,6 +883,9 @@ class FilesState extends State<Files> {
                                 child: Text("创建日期"),
                               ),
                               Card(
+                                shape: RoundedRectangleBorder(
+                                    side: BorderSide(),
+                                    borderRadius: BorderRadius.circular(5)),
                                 child: Padding(
                                   padding: const EdgeInsets.all(8.0),
                                   child: SizedBox(
@@ -887,6 +916,9 @@ class FilesState extends State<Files> {
                                 child: Text("最近访问时间"),
                               ),
                               Card(
+                                shape: RoundedRectangleBorder(
+                                    side: BorderSide(),
+                                    borderRadius: BorderRadius.circular(5)),
                                 child: Padding(
                                   padding: const EdgeInsets.all(8.0),
                                   child: SizedBox(
@@ -917,6 +949,9 @@ class FilesState extends State<Files> {
                                 child: Text("权限"),
                               ),
                               Card(
+                                shape: RoundedRectangleBorder(
+                                    side: BorderSide(),
+                                    borderRadius: BorderRadius.circular(5)),
                                 child: Padding(
                                   padding: const EdgeInsets.all(8.0),
                                   child: SizedBox(
@@ -947,6 +982,9 @@ class FilesState extends State<Files> {
                                 child: Text("拥有者"),
                               ),
                               Card(
+                                shape: RoundedRectangleBorder(
+                                    side: BorderSide(),
+                                    borderRadius: BorderRadius.circular(5)),
                                 child: Padding(
                                   padding: const EdgeInsets.all(8.0),
                                   child: SizedBox(
@@ -977,6 +1015,9 @@ class FilesState extends State<Files> {
                                 child: Text("群组"),
                               ),
                               Card(
+                                shape: RoundedRectangleBorder(
+                                    side: BorderSide(),
+                                    borderRadius: BorderRadius.circular(5)),
                                 child: Padding(
                                   padding: const EdgeInsets.all(8.0),
                                   child: SizedBox(
@@ -1003,6 +1044,8 @@ class FilesState extends State<Files> {
                 height: 20,
               ),
               Card(
+                shape: RoundedRectangleBorder(
+                    side: BorderSide(), borderRadius: BorderRadius.circular(5)),
                 child: Padding(
                   padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                   child: Column(
@@ -1019,6 +1062,9 @@ class FilesState extends State<Files> {
                               child: Text("由小至大"),
                             ),
                             Card(
+                              shape: RoundedRectangleBorder(
+                                  side: BorderSide(),
+                                  borderRadius: BorderRadius.circular(5)),
                               child: Padding(
                                 padding: const EdgeInsets.all(8.0),
                                 child: SizedBox(
@@ -1049,6 +1095,9 @@ class FilesState extends State<Files> {
                               child: Text("由大至小"),
                             ),
                             Card(
+                              shape: RoundedRectangleBorder(
+                                  side: BorderSide(),
+                                  borderRadius: BorderRadius.circular(5)),
                               child: Padding(
                                 padding: const EdgeInsets.all(8.0),
                                 child: SizedBox(
@@ -1093,13 +1142,15 @@ class FilesState extends State<Files> {
   }
 
   deleteFile(List<String> files) {
-    Util.vibrate(FeedbackType.warning);
+    Util.instance.vibrate(FeedbackType.warning);
     showCupertinoModalPopup(
       context: context,
       builder: (context) {
         return Material(
           color: Colors.transparent,
           child: Card(
+            shape: RoundedRectangleBorder(
+                side: BorderSide(), borderRadius: BorderRadius.circular(5)),
             child: SafeArea(
               top: false,
               child: Padding(
@@ -1211,6 +1262,8 @@ class FilesState extends State<Files> {
         return Material(
           color: Colors.transparent,
           child: Card(
+            shape: RoundedRectangleBorder(
+                side: BorderSide(), borderRadius: BorderRadius.circular(5)),
             child: SafeArea(
               top: false,
               child: Padding(
@@ -1266,7 +1319,7 @@ class FilesState extends State<Files> {
                     OutlinedButton(
                       onPressed: () async {
                         // Navigator.of(context).pop();
-                        Util.toast("敬请期待");
+                        Util.instance.toast("敬请期待");
                       },
                       child: Text(
                         "更多选项",
@@ -1324,11 +1377,12 @@ class FilesState extends State<Files> {
             List<String> paths = [];
             int index = 0;
             for (int i = 0; i < files.length; i++) {
-              if (Util.fileType(files[i]['name']) == FileTypeEnum.image) {
-                images.add(Util.baseUrl +
-                    "/webapi/entry.cgi?path=${Uri.encodeComponent(files[i]['path'])}&size=original&api=SYNO.FileStation.Thumb&method=get&version=2&_sid=${Util.sid}&animate=true");
-                thumbs.add(Util.baseUrl +
-                    "/webapi/entry.cgi?path=${Uri.encodeComponent(files[i]['path'])}&size=small&api=SYNO.FileStation.Thumb&method=get&version=2&_sid=${Util.sid}&animate=true");
+              if (Util.instance.fileType(files[i]['name']) ==
+                  FileTypeEnum.image) {
+                images.add(Util.instance.baseUrl +
+                    "/webapi/entry.cgi?path=${Uri.encodeComponent(files[i]['path'])}&size=original&api=SYNO.FileStation.Thumb&method=get&version=2&_sid=${Util.instance.sid}&animate=true");
+                thumbs.add(Util.instance.baseUrl +
+                    "/webapi/entry.cgi?path=${Uri.encodeComponent(files[i]['path'])}&size=small&api=SYNO.FileStation.Thumb&method=get&version=2&_sid=${Util.instance.sid}&animate=true");
                 names.add(files[i]['name']);
                 paths.add(files[i]['path']);
                 if (files[i]['name'] == file['name']) {
@@ -1352,9 +1406,10 @@ class FilesState extends State<Files> {
             ));
             break;
           case FileTypeEnum.movie:
-            String videoPlayer = await Util.getStorage("video_player") ?? '';
-            String url = Util.baseUrl +
-                "/fbdownload/${Uri.encodeComponent(file['name'])}?dlink=%22${Util.utf8Encode(file['path'])}%22&_sid=%22${Util.sid}%22&mode=open";
+            String videoPlayer =
+                await Util.instance.getStorage("video_player") ?? '';
+            String url = Util.instance.baseUrl +
+                "/fbdownload/${Uri.encodeComponent(file['name'])}?dlink=%22${Util.instance.utf8Encode(file['path'])}%22&_sid=%22${Util.instance.sid}%22&mode=open";
             // String url = Util.baseUrl + "/fbdownload/${file['name']}?dlink=%22${Util.utf8Encode(file['path'])}%22&_sid=%22${Util.sid}%22&mode=open";
             // print(url);
             // 调用nplayer
@@ -1423,8 +1478,8 @@ class FilesState extends State<Files> {
             if (audioPlayerFloating?.isShowing == true) {
               audioPlayerFloating?.close();
             }
-            String url = Util.baseUrl +
-                "/fbdownload/${file['name']}?dlink=%22${Util.utf8Encode(file['path'])}%22&_sid=%22${Util.sid}%22&mode=open";
+            String url = Util.instance.baseUrl +
+                "/fbdownload/${file['name']}?dlink=%22${Util.instance.utf8Encode(file['path'])}%22&_sid=%22${Util.instance.sid}%22&mode=open";
             Navigator.of(context).push(CupertinoPageRoute(builder: (context) {
               return AudioPlayer(
                 url: url,
@@ -1485,16 +1540,16 @@ class FilesState extends State<Files> {
           case FileTypeEnum.pdf:
             Navigator.of(context).push(CupertinoPageRoute(builder: (context) {
               return PdfViewer(
-                  Util.baseUrl +
-                      "/fbdownload/${file['name']}?dlink=%22${Util.utf8Encode(file['path'])}%22&_sid=%22${Util.sid}%22&mode=open",
+                  Util.instance.baseUrl +
+                      "/fbdownload/${file['name']}?dlink=%22${Util.instance.utf8Encode(file['path'])}%22&_sid=%22${Util.instance.sid}%22&mode=open",
                   file['name']);
             }));
             break;
           default:
             AndroidIntent intent = AndroidIntent(
               action: 'action_view',
-              data: Util.baseUrl +
-                  "/fbdownload/${file['name']}?dlink=%22${Util.utf8Encode(file['path'])}%22&_sid=%22${Util.sid}%22&mode=open",
+              data: Util.instance.baseUrl +
+                  "/fbdownload/${file['name']}?dlink=%22${Util.instance.utf8Encode(file['path'])}%22&_sid=%22${Util.instance.sid}%22&mode=open",
               arguments: {},
               // type: "application/vnd.ms-powerpoint|application/vnd.openxmlformats-officedocument.presentationml.presentation",
             );
@@ -1506,13 +1561,15 @@ class FilesState extends State<Files> {
   }
 
   fileAction(file, {bool remote = false}) async {
-    Util.vibrate(FeedbackType.light);
+    Util.instance.vibrate(FeedbackType.light);
     showCupertinoModalPopup(
       context: context,
       builder: (context) {
         return Material(
           color: Colors.transparent,
           child: Card(
+            shape: RoundedRectangleBorder(
+                side: BorderSide(), borderRadius: BorderRadius.circular(5)),
             child: SafeArea(
               top: false,
               child: Padding(
@@ -1621,7 +1678,8 @@ class FilesState extends State<Files> {
                               ),
                             ),
                           ),
-                          if (Util.fileType(file['name']) == FileTypeEnum.zip &&
+                          if (Util.instance.fileType(file['name']) ==
+                                  FileTypeEnum.zip &&
                               !remote &&
                               file['path'].startsWith("/"))
                             Container(
@@ -1761,6 +1819,10 @@ class FilesState extends State<Files> {
                                               MainAxisAlignment.center,
                                           children: [
                                             Card(
+                                              shape: RoundedRectangleBorder(
+                                                  side: BorderSide(),
+                                                  borderRadius:
+                                                      BorderRadius.circular(5)),
                                               margin: EdgeInsets.symmetric(
                                                   horizontal: 50),
                                               child: Padding(
@@ -1778,6 +1840,14 @@ class FilesState extends State<Files> {
                                                       height: 16,
                                                     ),
                                                     Card(
+                                                      shape:
+                                                          RoundedRectangleBorder(
+                                                              side:
+                                                                  BorderSide(),
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          5)),
                                                       child: Padding(
                                                         padding:
                                                             const EdgeInsets
@@ -1808,8 +1878,9 @@ class FilesState extends State<Files> {
                                                                 () async {
                                                               if (name.trim() ==
                                                                   "") {
-                                                                Util.toast(
-                                                                    "请输入新文件名");
+                                                                Util.instance
+                                                                    .toast(
+                                                                        "请输入新文件名");
                                                                 return;
                                                               }
                                                               Navigator.of(
@@ -1822,8 +1893,9 @@ class FilesState extends State<Files> {
                                                                       name);
                                                               if (res[
                                                                   'success']) {
-                                                                Util.toast(
-                                                                    "重命名成功");
+                                                                Util.instance
+                                                                    .toast(
+                                                                        "重命名成功");
                                                                 refresh();
                                                               } else {
                                                                 if (res['error']
@@ -1837,11 +1909,13 @@ class FilesState extends State<Files> {
                                                                             [
                                                                             'code'] ==
                                                                         414) {
-                                                                  Util.toast(
-                                                                      "重命名失败：指定的名称已存在");
+                                                                  Util.instance
+                                                                      .toast(
+                                                                          "重命名失败：指定的名称已存在");
                                                                 } else {
-                                                                  Util.toast(
-                                                                      "重命名失败");
+                                                                  Util.instance
+                                                                      .toast(
+                                                                          "重命名失败");
                                                                 }
                                                               }
                                                             },
@@ -1911,9 +1985,9 @@ class FilesState extends State<Files> {
                                       "${file['name']} - ${paths[1]}",
                                       file['path']);
                                   if (res['success']) {
-                                    Util.toast("收藏成功");
+                                    Util.instance.toast("收藏成功");
                                   } else {
-                                    Util.toast(
+                                    Util.instance.toast(
                                         "收藏失败，代码${res['error']['code']}");
                                   }
                                 },
@@ -1944,11 +2018,11 @@ class FilesState extends State<Files> {
                                   var res =
                                       await Api.unMountFolder(file['path']);
                                   if (res['success']) {
-                                    Util.toast("卸载成功");
+                                    Util.instance.toast("卸载成功");
                                     refresh();
                                     getSmbFolder();
                                   } else {
-                                    Util.toast(
+                                    Util.instance.toast(
                                         "卸载失败，代码${res['error']['code']}");
                                   }
                                 },
@@ -1977,11 +2051,11 @@ class FilesState extends State<Files> {
                                   var res =
                                       await Api.remoteUnConnect(file['path']);
                                   if (res['success']) {
-                                    Util.toast("远程连接已断开");
+                                    Util.instance.toast("远程连接已断开");
                                     refresh();
                                     getSmbFolder();
                                   } else {
-                                    Util.toast(
+                                    Util.instance.toast(
                                         "断开连接失败，代码${res['error']['code']}");
                                   }
                                 },
@@ -2054,10 +2128,12 @@ class FilesState extends State<Files> {
   }
 
   Widget _buildFileItem(file, {bool remote = false}) {
-    FileTypeEnum fileType = Util.fileType(file['name']);
+    FileTypeEnum fileType = Util.instance.fileType(file['name']);
     String path = file['path'];
     Widget actionButton = multiSelect
         ? Card(
+            shape: RoundedRectangleBorder(
+                side: BorderSide(), borderRadius: BorderRadius.circular(5)),
             child: SizedBox(
               width: 20,
               height: 20,
@@ -2074,6 +2150,8 @@ class FilesState extends State<Files> {
               fileAction(file, remote: remote);
             },
             child: Card(
+              shape: RoundedRectangleBorder(
+                  side: BorderSide(), borderRadius: BorderRadius.circular(5)),
               // padding: EdgeInsets.zero,
               child: Icon(
                 CupertinoIcons.right_chevron,
@@ -2093,7 +2171,7 @@ class FilesState extends State<Files> {
           : EdgeInsets.only(bottom: 20.0),
       child: OutlinedButton(
         onLongPress: () {
-          Util.vibrate(FeedbackType.light);
+          Util.instance.vibrate(FeedbackType.light);
           fileAction(file, remote: remote);
           // if (paths.length > 1) {
           //   Util.vibrate(FeedbackType.light);
@@ -2117,8 +2195,8 @@ class FilesState extends State<Files> {
                       width: 10,
                     ),
                     Hero(
-                      tag: Util.baseUrl +
-                          "/webapi/entry.cgi?path=${Uri.encodeComponent(path)}&size=original&api=SYNO.FileStation.Thumb&method=get&version=2&_sid=${Util.sid}&animate=true",
+                      tag: Util.instance.baseUrl +
+                          "/webapi/entry.cgi?path=${Uri.encodeComponent(path)}&size=original&api=SYNO.FileStation.Thumb&method=get&version=2&_sid=${Util.instance.sid}&animate=true",
                       child: FileIcon(
                         file['isdir'] ? FileTypeEnum.folder : fileType,
                         thumb: file['path'],
@@ -2137,8 +2215,8 @@ class FilesState extends State<Files> {
                                 fontSize: 14,
                                 color: file['additional']['mount_point_type'] ==
                                         "remotefail"
-                                    ? AppTheme.of(context).placeholderColor
-                                    : null),
+                                    ? AppTheme.of(context).titleColor
+                                    : Colors.black),
                             overflowWidget: TextOverflowWidget(
                               position: TextOverflowPosition.middle,
                               align: TextOverflowAlign.right,
@@ -2161,7 +2239,7 @@ class FilesState extends State<Files> {
                                   if (!file['isdir'])
                                     TextSpan(
                                         text:
-                                            "${Util.formatSize(file['additional']['size'])}"),
+                                            "${Util.instance.formatSize(file['additional']['size'])}"),
                                   if (file['additional'] != null &&
                                       file['additional']['time'] != null &&
                                       file['additional']['time']['mtime'] !=
@@ -2210,8 +2288,8 @@ class FilesState extends State<Files> {
                       child: Column(
                         children: [
                           Hero(
-                            tag: Util.baseUrl +
-                                "/webapi/entry.cgi?path=${Uri.encodeComponent(path)}&size=original&api=SYNO.FileStation.Thumb&method=get&version=2&_sid=${Util.sid}&animate=true",
+                            tag: Util.instance.baseUrl +
+                                "/webapi/entry.cgi?path=${Uri.encodeComponent(path)}&size=original&api=SYNO.FileStation.Thumb&method=get&version=2&_sid=${Util.instance.sid}&animate=true",
                             child: FileIcon(
                               file['isdir'] ? FileTypeEnum.folder : fileType,
                               thumb: file['path'],
@@ -2322,6 +2400,8 @@ class FilesState extends State<Files> {
       var value = task['data'];
       children.add(
         Card(
+          shape: RoundedRectangleBorder(
+              side: BorderSide(), borderRadius: BorderRadius.circular(5)),
           margin: EdgeInsets.only(left: 20, right: 20, bottom: 20),
           child: Padding(
             padding: EdgeInsets.all(20),
@@ -2435,6 +2515,9 @@ class FilesState extends State<Files> {
                       return Material(
                         color: Colors.transparent,
                         child: Card(
+                          shape: RoundedRectangleBorder(
+                              side: BorderSide(),
+                              borderRadius: BorderRadius.circular(5)),
                           child: SafeArea(
                             top: false,
                             child: Padding(
@@ -2460,7 +2543,7 @@ class FilesState extends State<Files> {
                                           height: 30,
                                           child: OutlinedButton(
                                             onPressed: () async {
-                                              Util.toast("重新加载远程连接中");
+                                              Util.instance.toast("重新加载远程连接中");
                                               Navigator.of(context).pop();
                                               getFtpFolder();
                                               getSftpFolder();
@@ -2546,7 +2629,9 @@ class FilesState extends State<Files> {
                 ),
               ),
             ),
-            if (Util.notReviewAccount && paths.length > 0 && !multiSelect)
+            if (Util.instance.notReviewAccount &&
+                paths.length > 0 &&
+                !multiSelect)
               Padding(
                 padding: EdgeInsets.only(left: 10, top: 8, bottom: 8),
                 child: OutlinedButton(
@@ -2616,7 +2701,7 @@ class FilesState extends State<Files> {
                         ? ListType.icon
                         : ListType.list;
                   });
-                  Util.setStorage("file_list_type",
+                  Util.instance.setStorage("file_list_type",
                       listType == ListType.list ? "list" : "icon");
                 },
                 child: Image.asset(
@@ -2684,6 +2769,9 @@ class FilesState extends State<Files> {
                       return Material(
                         color: Colors.transparent,
                         child: Card(
+                          shape: RoundedRectangleBorder(
+                              side: BorderSide(),
+                              borderRadius: BorderRadius.circular(5)),
                           child: SafeArea(
                             top: false,
                             child: Padding(
@@ -2736,7 +2824,8 @@ class FilesState extends State<Files> {
                                                     }
                                                   });
                                                 } else {
-                                                  Util.toast("未获取到存储空间");
+                                                  Util.instance
+                                                      .toast("未获取到存储空间");
                                                 }
                                               },
                                               child: Column(
@@ -2780,6 +2869,13 @@ class FilesState extends State<Files> {
                                                                   .center,
                                                           children: [
                                                             Card(
+                                                              shape: RoundedRectangleBorder(
+                                                                  side:
+                                                                      BorderSide(),
+                                                                  borderRadius:
+                                                                      BorderRadius
+                                                                          .circular(
+                                                                              5)),
                                                               child: Padding(
                                                                 padding:
                                                                     EdgeInsets
@@ -2800,6 +2896,11 @@ class FilesState extends State<Files> {
                                                                           16,
                                                                     ),
                                                                     Card(
+                                                                      shape: RoundedRectangleBorder(
+                                                                          side:
+                                                                              BorderSide(),
+                                                                          borderRadius:
+                                                                              BorderRadius.circular(5)),
                                                                       child:
                                                                           Padding(
                                                                         padding: const EdgeInsets
@@ -2833,20 +2934,20 @@ class FilesState extends State<Files> {
                                                                             onPressed:
                                                                                 () async {
                                                                               if (name.trim() == "") {
-                                                                                Util.toast("请输入文件夹名");
+                                                                                Util.instance.toast("请输入文件夹名");
                                                                                 return;
                                                                               }
                                                                               Navigator.of(context).pop();
                                                                               String path = "/" + paths.join("/");
                                                                               var res = await Api.createFolder(path, name);
                                                                               if (res['success']) {
-                                                                                Util.toast("文件夹创建成功");
+                                                                                Util.instance.toast("文件夹创建成功");
                                                                                 refresh();
                                                                               } else {
                                                                                 if (res['error']['errors'] != null && res['error']['errors'].length > 0 && res['error']['errors'][0]['code'] == 414) {
-                                                                                  Util.toast("文件夹创建失败：指定的名称已存在");
+                                                                                  Util.instance.toast("文件夹创建失败：指定的名称已存在");
                                                                                 } else {
-                                                                                  Util.toast("文件夹创建失败");
+                                                                                  Util.instance.toast("文件夹创建失败");
                                                                                 }
                                                                               }
                                                                             },
@@ -3104,6 +3205,9 @@ class FilesState extends State<Files> {
                     margin: EdgeInsets.only(left: 20),
                     padding: const EdgeInsets.symmetric(vertical: 10),
                     child: Card(
+                      shape: RoundedRectangleBorder(
+                          side: BorderSide(),
+                          borderRadius: BorderRadius.circular(5)),
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: Text(
@@ -3127,6 +3231,9 @@ class FilesState extends State<Files> {
                       margin: EdgeInsets.only(right: 20),
                       padding: const EdgeInsets.symmetric(vertical: 10),
                       child: Card(
+                        shape: RoundedRectangleBorder(
+                            side: BorderSide(),
+                            borderRadius: BorderRadius.circular(5)),
                         child: Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: searching
@@ -3254,6 +3361,9 @@ class FilesState extends State<Files> {
                         bottom: selectedFiles.length > 0 ? 0 : -100,
                         duration: Duration(milliseconds: 200),
                         child: Card(
+                          shape: RoundedRectangleBorder(
+                              side: BorderSide(),
+                              borderRadius: BorderRadius.circular(5)),
                           margin: EdgeInsets.all(20),
                           child: Padding(
                             padding: const EdgeInsets.all(8.0),

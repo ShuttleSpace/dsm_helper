@@ -110,7 +110,7 @@ class _UploadState extends State<Upload> {
   }
 
   Widget _buildUploadItem(UploadItem upload) {
-    FileTypeEnum fileType = Util.fileType(upload.path);
+    FileTypeEnum fileType = Util.instance.fileType(upload.path);
     // String path = file['path'];
     return Padding(
       padding:
@@ -171,6 +171,9 @@ class _UploadState extends State<Upload> {
                       return Material(
                         color: Colors.transparent,
                         child: Card(
+                          shape: RoundedRectangleBorder(
+                              side: BorderSide(),
+                              borderRadius: BorderRadius.circular(5)),
                           child: SafeArea(
                             top: false,
                             child: Padding(
@@ -336,6 +339,9 @@ class _UploadState extends State<Upload> {
                             return Material(
                               color: Colors.transparent,
                               child: Card(
+                                shape: RoundedRectangleBorder(
+                                    side: BorderSide(),
+                                    borderRadius: BorderRadius.circular(5)),
                                 child: SafeArea(
                                   top: false,
                                   child: Padding(
@@ -405,7 +411,8 @@ class _UploadState extends State<Upload> {
                                                     .request()
                                                     .isGranted;
                                                 if (!permission) {
-                                                  Util.toast("安卓11需授权文件管理权限");
+                                                  Util.instance
+                                                      .toast("安卓11需授权文件管理权限");
                                                   return;
                                                 }
                                               } else {
@@ -415,7 +422,8 @@ class _UploadState extends State<Upload> {
                                                     .request()
                                                     .isGranted;
                                                 if (!permission) {
-                                                  Util.toast("请先授权APP访问存储权限");
+                                                  Util.instance
+                                                      .toast("请先授权APP访问存储权限");
                                                   return;
                                                 }
                                               }
@@ -494,7 +502,7 @@ class _UploadState extends State<Upload> {
                                                       .pickFiles(
                                                           allowMultiple: true);
                                               if (result == null) {
-                                                Util.toast('选择文件为空!');
+                                                Util.instance.toast('选择文件为空!');
                                                 return;
                                               }
                                               setState(() {
@@ -548,8 +556,8 @@ class _UploadState extends State<Upload> {
                     child: OutlinedButton(
                       onPressed: () async {
                         if (savePath.isBlank) {
-                          Util.vibrate(FeedbackType.warning);
-                          Util.toast("请选择上传位置");
+                          Util.instance.vibrate(FeedbackType.warning);
+                          Util.instance.toast("请选择上传位置");
                           return;
                         }
                         // return;

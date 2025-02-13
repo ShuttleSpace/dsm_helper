@@ -40,7 +40,7 @@ class _MomentsState extends State<Moments> {
     getRecently();
     getVideos();
     getShares();
-    if (Util.version == 7) {
+    if (Util.instance.version == 7) {
       debugPrint("DSM 版本为7");
       getGeocoding();
       getGeneral();
@@ -54,7 +54,7 @@ class _MomentsState extends State<Moments> {
     if (res['success'] && mounted) {
       setState(() {
         timeline = [];
-        if (Util.version == 7) {
+        if (Util.instance.version == 7) {
           for (var section in res['data']['section']) {
             timeline.addAll(section['list']);
           }
@@ -181,7 +181,7 @@ class _MomentsState extends State<Moments> {
         duration = photo['additional']['video_convert'][0]['metadata']
                 ['duration'] ~/
             1000;
-        timeLong = Util.timeLong(duration);
+        timeLong = Util.instance.timeLong(duration);
       } else {
         timeLong = {
           "hours": 0,
@@ -191,7 +191,7 @@ class _MomentsState extends State<Moments> {
       }
     }
     String thumbUrl =
-        '${Util.baseUrl}/webapi/entry.cgi?id=${photo['additional']['thumbnail']['unit_id']}&cache_key="${photo['additional']['thumbnail']['cache_key']}"&type="unit"&size="sm"&api="SYNO.${Util.version == 7 ? "Foto" : "Photo"}.Thumbnail"&method="get"&version=1&_sid=${Util.sid}';
+        '${Util.instance.baseUrl}/webapi/entry.cgi?id=${photo['additional']['thumbnail']['unit_id']}&cache_key="${photo['additional']['thumbnail']['cache_key']}"&type="unit"&size="sm"&api="SYNO.${Util.instance.version == 7 ? "Foto" : "Photo"}.Thumbnail"&method="get"&version=1&_sid=${Util.instance.sid}';
     return GestureDetector(
       onTap: () {
         Navigator.of(context).push(TransparentPageRoute(
@@ -199,7 +199,7 @@ class _MomentsState extends State<Moments> {
             return ImagePreview(
               photos
                   .map((photo) =>
-                      '${Util.baseUrl}/webapi/entry.cgi?id=${photo['additional']['thumbnail']['unit_id']}&cache_key="${photo['additional']['thumbnail']['cache_key']}"&type="unit"&size="xl"&api="SYNO.${Util.version == 7 ? "Foto" : "Photo"}.Thumbnail"&method="get"&version=1&_sid=${Util.sid}')
+                      '${Util.instance.baseUrl}/webapi/entry.cgi?id=${photo['additional']['thumbnail']['unit_id']}&cache_key="${photo['additional']['thumbnail']['cache_key']}"&type="unit"&size="xl"&api="SYNO.${Util.instance.version == 7 ? "Foto" : "Photo"}.Thumbnail"&method="get"&version=1&_sid=${Util.instance.sid}')
                   .toList(),
               photos.indexOf(photo),
               tag: "photo-${photo['additional']['thumbnail']['unit_id']}",
@@ -298,7 +298,7 @@ class _MomentsState extends State<Moments> {
 
   Widget _buildAlbumItem(album) {
     String thumbUrl =
-        '${Util.baseUrl}/webapi/entry.cgi?id=${album['additional']['thumbnail']['unit_id']}&cache_key="${album['additional']['thumbnail']['cache_key']}"&type="unit"&size="sm"&api="SYNO.${Util.version == 7 ? "Foto" : "Photo"}.Thumbnail"&method="get"&version=1&_sid=${Util.sid}';
+        '${Util.instance.baseUrl}/webapi/entry.cgi?id=${album['additional']['thumbnail']['unit_id']}&cache_key="${album['additional']['thumbnail']['cache_key']}"&type="unit"&size="sm"&api="SYNO.${Util.instance.version == 7 ? "Foto" : "Photo"}.Thumbnail"&method="get"&version=1&_sid=${Util.instance.sid}';
     String tag = "album-${album['additional']['thumbnail']['unit_id']}";
     return GestureDetector(
       onTap: () {
@@ -353,7 +353,7 @@ class _MomentsState extends State<Moments> {
     if (index < photos.length) {
       Map photo = photos[index];
       String thumbUrl =
-          '${Util.baseUrl}/webapi/entry.cgi?id=${photo['additional']['thumbnail']['unit_id']}&cache_key="${photo['additional']['thumbnail']['cache_key']}"&type="unit"&size="sm"&api="SYNO.${Util.version == 7 ? "Foto" : "Photo"}.Thumbnail"&method="get"&version=1&_sid=${Util.sid}';
+          '${Util.instance.baseUrl}/webapi/entry.cgi?id=${photo['additional']['thumbnail']['unit_id']}&cache_key="${photo['additional']['thumbnail']['cache_key']}"&type="unit"&size="sm"&api="SYNO.${Util.instance.version == 7 ? "Foto" : "Photo"}.Thumbnail"&method="get"&version=1&_sid=${Util.instance.sid}';
       return Container(
         width: itemWidth,
         height: itemWidth,

@@ -133,7 +133,7 @@ class _SelectFolderState extends State<SelectFolder> {
   }
 
   Widget _buildFileItem(file) {
-    FileTypeEnum fileType = Util.fileType(file['name']);
+    FileTypeEnum fileType = Util.instance.fileType(file['name']);
     String path = file['path'];
     return Padding(
       padding: const EdgeInsets.only(top: 20.0, left: 20, right: 20),
@@ -155,8 +155,8 @@ class _SelectFolderState extends State<SelectFolder> {
                 width: 20,
               ),
               Hero(
-                tag: Util.baseUrl +
-                    "/webapi/entry.cgi?path=${Uri.encodeComponent(path)}&size=original&api=SYNO.FileStation.Thumb&method=get&version=2&_sid=${Util.sid}&animate=true",
+                tag: Util.instance.baseUrl +
+                    "/webapi/entry.cgi?path=${Uri.encodeComponent(path)}&size=original&api=SYNO.FileStation.Thumb&method=get&version=2&_sid=${Util.instance.sid}&animate=true",
                 child: FileIcon(
                   file['isdir'] ? FileTypeEnum.folder : fileType,
                   thumb: file['path'],
@@ -181,7 +181,7 @@ class _SelectFolderState extends State<SelectFolder> {
                     Text(
                       (file['isdir']
                               ? ""
-                              : "${Util.formatSize(file['additional']['size'])}" +
+                              : "${Util.instance.formatSize(file['additional']['size'])}" +
                                   " | ") +
                           DateTime.fromMillisecondsSinceEpoch(
                                   file['additional']['time']['crtime'] * 1000)
@@ -303,6 +303,10 @@ class _SelectFolderState extends State<SelectFolder> {
                                             MainAxisAlignment.center,
                                         children: [
                                           Card(
+                                            shape: RoundedRectangleBorder(
+                                                side: BorderSide(),
+                                                borderRadius:
+                                                    BorderRadius.circular(5)),
                                             margin: EdgeInsets.symmetric(
                                                 horizontal: 50),
                                             child: Padding(
@@ -320,6 +324,13 @@ class _SelectFolderState extends State<SelectFolder> {
                                                     height: 16,
                                                   ),
                                                   Card(
+                                                    shape:
+                                                        RoundedRectangleBorder(
+                                                            side: BorderSide(),
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        5)),
                                                     child: Padding(
                                                       padding:
                                                           const EdgeInsets.all(
@@ -347,8 +358,9 @@ class _SelectFolderState extends State<SelectFolder> {
                                                           onPressed: () async {
                                                             if (name.trim() ==
                                                                 "") {
-                                                              Util.toast(
-                                                                  "请输入文件夹名");
+                                                              Util.instance
+                                                                  .toast(
+                                                                      "请输入文件夹名");
                                                               return;
                                                             }
                                                             Navigator.of(
@@ -362,8 +374,9 @@ class _SelectFolderState extends State<SelectFolder> {
                                                                     path, name);
                                                             if (res[
                                                                 'success']) {
-                                                              Util.toast(
-                                                                  "文件夹创建成功");
+                                                              Util.instance
+                                                                  .toast(
+                                                                      "文件夹创建成功");
                                                               refresh();
                                                             } else {
                                                               if (res['error'][
@@ -378,11 +391,12 @@ class _SelectFolderState extends State<SelectFolder> {
                                                                           [
                                                                           'code'] ==
                                                                       414) {
-                                                                Util.toast(
+                                                                Util.instance.toast(
                                                                     "文件夹创建失败：指定的名称已存在");
                                                               } else {
-                                                                Util.toast(
-                                                                    "文件夹创建失败");
+                                                                Util.instance
+                                                                    .toast(
+                                                                        "文件夹创建失败");
                                                               }
                                                             }
                                                           },
@@ -441,7 +455,7 @@ class _SelectFolderState extends State<SelectFolder> {
                                 Navigator.of(context)
                                     .pop([paths.join("/").substring(1)]);
                               } else {
-                                Util.toast("无法选择根目录");
+                                Util.instance.toast("无法选择根目录");
                               }
                             }
                           },

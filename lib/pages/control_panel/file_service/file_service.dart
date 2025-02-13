@@ -51,7 +51,7 @@ class _FileServiceState extends State<FileService>
         loading = false;
       });
       if (res['data']['has_fail']) {
-        Util.toast("加载失败");
+        Util.instance.toast("加载失败");
         Navigator.of(context).pop();
         return;
       }
@@ -152,6 +152,9 @@ class _FileServiceState extends State<FileService>
           : Column(
               children: [
                 Card(
+                  shape: RoundedRectangleBorder(
+                      side: BorderSide(),
+                      borderRadius: BorderRadius.circular(5)),
                   margin: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
@@ -168,7 +171,7 @@ class _FileServiceState extends State<FileService>
                       indicator: BubbleTabIndicator(
                         indicatorColor:
                             Theme.of(context).scaffoldBackgroundColor,
-                        shadowColor: Util.getAdjustColor(
+                        shadowColor: Util.instance.getAdjustColor(
                             Theme.of(context).scaffoldBackgroundColor, -20),
                       ),
                       tabs: [
@@ -206,6 +209,9 @@ class _FileServiceState extends State<FileService>
                         padding: EdgeInsets.symmetric(vertical: 20),
                         children: [
                           Card(
+                            shape: RoundedRectangleBorder(
+                                side: BorderSide(),
+                                borderRadius: BorderRadius.circular(5)),
                             margin: EdgeInsets.only(left: 20, right: 20),
                             child: Padding(
                               padding: EdgeInsets.all(20),
@@ -229,6 +235,10 @@ class _FileServiceState extends State<FileService>
                                       });
                                     },
                                     child: Card(
+                                      shape: RoundedRectangleBorder(
+                                          side: BorderSide(),
+                                          borderRadius:
+                                              BorderRadius.circular(5)),
                                       child: Padding(
                                         padding: const EdgeInsets.all(8.0),
                                         child: Row(
@@ -253,6 +263,10 @@ class _FileServiceState extends State<FileService>
                                       height: 20,
                                     ),
                                     Card(
+                                      shape: RoundedRectangleBorder(
+                                          side: BorderSide(),
+                                          borderRadius:
+                                              BorderRadius.circular(5)),
                                       child: Padding(
                                         padding: const EdgeInsets.all(8.0),
                                         child: TextField(
@@ -277,6 +291,10 @@ class _FileServiceState extends State<FileService>
                                         });
                                       },
                                       child: Card(
+                                        shape: RoundedRectangleBorder(
+                                            side: BorderSide(),
+                                            borderRadius:
+                                                BorderRadius.circular(5)),
                                         child: Padding(
                                           padding: const EdgeInsets.all(8.0),
                                           child: Row(
@@ -314,6 +332,10 @@ class _FileServiceState extends State<FileService>
                                         }
                                       },
                                       child: Card(
+                                        shape: RoundedRectangleBorder(
+                                            side: BorderSide(),
+                                            borderRadius:
+                                                BorderRadius.circular(5)),
                                         child: Padding(
                                           padding: const EdgeInsets.all(8.0),
                                           child: Row(
@@ -382,6 +404,9 @@ class _FileServiceState extends State<FileService>
                             height: 20,
                           ),
                           Card(
+                            shape: RoundedRectangleBorder(
+                                side: BorderSide(),
+                                borderRadius: BorderRadius.circular(5)),
                             margin: EdgeInsets.only(left: 20, right: 20),
                             child: Padding(
                               padding: EdgeInsets.all(20),
@@ -404,6 +429,10 @@ class _FileServiceState extends State<FileService>
                                       });
                                     },
                                     child: Card(
+                                      shape: RoundedRectangleBorder(
+                                          side: BorderSide(),
+                                          borderRadius:
+                                              BorderRadius.circular(5)),
                                       child: Padding(
                                         padding: const EdgeInsets.all(8.0),
                                         child: Row(
@@ -435,6 +464,10 @@ class _FileServiceState extends State<FileService>
                                         });
                                       },
                                       child: Card(
+                                        shape: RoundedRectangleBorder(
+                                            side: BorderSide(),
+                                            borderRadius:
+                                                BorderRadius.circular(5)),
                                         child: Padding(
                                           padding: const EdgeInsets.all(8.0),
                                           child: Row(
@@ -463,6 +496,9 @@ class _FileServiceState extends State<FileService>
                             height: 20,
                           ),
                           Card(
+                            shape: RoundedRectangleBorder(
+                                side: BorderSide(),
+                                borderRadius: BorderRadius.circular(5)),
                             margin: EdgeInsets.only(left: 20, right: 20),
                             child: Padding(
                               padding: EdgeInsets.all(20),
@@ -485,6 +521,10 @@ class _FileServiceState extends State<FileService>
                                       });
                                     },
                                     child: Card(
+                                      shape: RoundedRectangleBorder(
+                                          side: BorderSide(),
+                                          borderRadius:
+                                              BorderRadius.circular(5)),
                                       child: Padding(
                                         padding: const EdgeInsets.all(8.0),
                                         child: Row(
@@ -516,6 +556,10 @@ class _FileServiceState extends State<FileService>
                                         });
                                       },
                                       child: Card(
+                                        shape: RoundedRectangleBorder(
+                                            side: BorderSide(),
+                                            borderRadius:
+                                                BorderRadius.circular(5)),
                                         child: Padding(
                                           padding: const EdgeInsets.all(8.0),
                                           child: Row(
@@ -542,6 +586,10 @@ class _FileServiceState extends State<FileService>
                                       height: 20,
                                     ),
                                     Card(
+                                      shape: RoundedRectangleBorder(
+                                          side: BorderSide(),
+                                          borderRadius:
+                                              BorderRadius.circular(5)),
                                       child: Padding(
                                         padding: const EdgeInsets.all(8.0),
                                         child: TextField(
@@ -569,6 +617,9 @@ class _FileServiceState extends State<FileService>
                         padding: EdgeInsets.symmetric(vertical: 20),
                         children: [
                           Card(
+                            shape: RoundedRectangleBorder(
+                                side: BorderSide(),
+                                borderRadius: BorderRadius.circular(5)),
                             margin: EdgeInsets.only(left: 20, right: 20),
                             child: Padding(
                               padding: EdgeInsets.all(20),
@@ -591,6 +642,10 @@ class _FileServiceState extends State<FileService>
                                       });
                                     },
                                     child: Card(
+                                      shape: RoundedRectangleBorder(
+                                          side: BorderSide(),
+                                          borderRadius:
+                                              BorderRadius.circular(5)),
                                       child: Padding(
                                         padding: const EdgeInsets.all(8.0),
                                         child: Row(
@@ -621,6 +676,10 @@ class _FileServiceState extends State<FileService>
                                       });
                                     },
                                     child: Card(
+                                      shape: RoundedRectangleBorder(
+                                          side: BorderSide(),
+                                          borderRadius:
+                                              BorderRadius.circular(5)),
                                       child: Padding(
                                         padding: const EdgeInsets.all(8.0),
                                         child: Row(
@@ -645,6 +704,10 @@ class _FileServiceState extends State<FileService>
                                       height: 20,
                                     ),
                                     Card(
+                                      shape: RoundedRectangleBorder(
+                                          side: BorderSide(),
+                                          borderRadius:
+                                              BorderRadius.circular(5)),
                                       child: Padding(
                                         padding: const EdgeInsets.all(8.0),
                                         child: TextField(
@@ -672,6 +735,10 @@ class _FileServiceState extends State<FileService>
                                       height: 20,
                                     ),
                                     Card(
+                                      shape: RoundedRectangleBorder(
+                                          side: BorderSide(),
+                                          borderRadius:
+                                              BorderRadius.circular(5)),
                                       child: Padding(
                                         padding: const EdgeInsets.all(8.0),
                                         child: TextField(
@@ -706,6 +773,10 @@ class _FileServiceState extends State<FileService>
                                         });
                                       },
                                       child: Card(
+                                        shape: RoundedRectangleBorder(
+                                            side: BorderSide(),
+                                            borderRadius:
+                                                BorderRadius.circular(5)),
                                         child: Padding(
                                           padding: const EdgeInsets.all(8.0),
                                           child: Row(
@@ -736,6 +807,10 @@ class _FileServiceState extends State<FileService>
                                         });
                                       },
                                       child: Card(
+                                        shape: RoundedRectangleBorder(
+                                            side: BorderSide(),
+                                            borderRadius:
+                                                BorderRadius.circular(5)),
                                         child: Padding(
                                           padding: const EdgeInsets.all(8.0),
                                           child: Row(
@@ -766,6 +841,10 @@ class _FileServiceState extends State<FileService>
                                         });
                                       },
                                       child: Card(
+                                        shape: RoundedRectangleBorder(
+                                            side: BorderSide(),
+                                            borderRadius:
+                                                BorderRadius.circular(5)),
                                         child: Padding(
                                           padding: const EdgeInsets.all(8.0),
                                           child: Row(
@@ -807,6 +886,10 @@ class _FileServiceState extends State<FileService>
                                         );
                                       },
                                       child: Card(
+                                        shape: RoundedRectangleBorder(
+                                            side: BorderSide(),
+                                            borderRadius:
+                                                BorderRadius.circular(5)),
                                         child: Padding(
                                           padding: const EdgeInsets.all(8.0),
                                           child: Row(
@@ -829,6 +912,9 @@ class _FileServiceState extends State<FileService>
                             height: 20,
                           ),
                           Card(
+                            shape: RoundedRectangleBorder(
+                                side: BorderSide(),
+                                borderRadius: BorderRadius.circular(5)),
                             margin: EdgeInsets.only(left: 20, right: 20),
                             child: Padding(
                               padding: EdgeInsets.all(20),
@@ -851,6 +937,10 @@ class _FileServiceState extends State<FileService>
                                       });
                                     },
                                     child: Card(
+                                      shape: RoundedRectangleBorder(
+                                          side: BorderSide(),
+                                          borderRadius:
+                                              BorderRadius.circular(5)),
                                       child: Padding(
                                         padding: const EdgeInsets.all(8.0),
                                         child: Row(
@@ -874,6 +964,9 @@ class _FileServiceState extends State<FileService>
                                     height: 20,
                                   ),
                                   Card(
+                                    shape: RoundedRectangleBorder(
+                                        side: BorderSide(),
+                                        borderRadius: BorderRadius.circular(5)),
                                     child: Padding(
                                       padding: const EdgeInsets.all(8.0),
                                       child: TextField(
@@ -927,7 +1020,7 @@ class _FileServiceState extends State<FileService>
                           setState(() {
                             saving = false;
                           });
-                          Util.toast("保存成功");
+                          Util.instance.toast("保存成功");
                           getData();
                         }
                       },

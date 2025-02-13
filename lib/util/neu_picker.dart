@@ -26,6 +26,8 @@ class _NeuPickerState extends State<NeuPicker> {
   Widget build(BuildContext context) {
     return Material(
       child: Card(
+        shape: RoundedRectangleBorder(
+            side: BorderSide(), borderRadius: BorderRadius.circular(5)),
         child: Column(
           children: [
             Padding(

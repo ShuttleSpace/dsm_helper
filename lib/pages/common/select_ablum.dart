@@ -85,6 +85,8 @@ class _SelectAlbumState extends State<SelectAlbum> {
                 width: 10,
               ),
               Card(
+                shape: RoundedRectangleBorder(
+                    side: BorderSide(), borderRadius: BorderRadius.circular(5)),
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: SizedBox(

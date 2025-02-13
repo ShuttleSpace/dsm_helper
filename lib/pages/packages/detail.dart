@@ -53,7 +53,7 @@ class _PackageDetailState extends State<PackageDetail> {
     }
     thumbnailUrl = widget.package['thumbnail'].last;
     if (!thumbnailUrl.startsWith("http")) {
-      thumbnailUrl = Util.baseUrl + thumbnailUrl;
+      thumbnailUrl = Util.instance.baseUrl + thumbnailUrl;
     }
     getVolumes();
     super.initState();
@@ -75,7 +75,7 @@ class _PackageDetailState extends State<PackageDetail> {
 
   Widget _buildSwiperItem(String url) {
     if (!url.startsWith("http")) {
-      url = Util.baseUrl + url;
+      url = Util.instance.baseUrl + url;
     }
     return CupertinoExtendedImage(
       url,
@@ -91,6 +91,8 @@ class _PackageDetailState extends State<PackageDetail> {
         return Material(
           color: Colors.transparent,
           child: Card(
+            shape: RoundedRectangleBorder(
+                side: BorderSide(), borderRadius: BorderRadius.circular(5)),
             child: SafeArea(
               top: false,
               child: Padding(
@@ -121,7 +123,7 @@ class _PackageDetailState extends State<PackageDetail> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                    "${volume['display_name']}(可用容量：${Util.formatSize(int.parse(volume['size_free_byte']))}) - ${volume['fs_type']}"),
+                                    "${volume['display_name']}(可用容量：${Util.instance.formatSize(int.parse(volume['size_free_byte']))}) - ${volume['fs_type']}"),
                                 SizedBox(
                                   height: 5,
                                 ),
@@ -177,6 +179,8 @@ class _PackageDetailState extends State<PackageDetail> {
             return Material(
               color: Colors.transparent,
               child: Card(
+                shape: RoundedRectangleBorder(
+                    side: BorderSide(), borderRadius: BorderRadius.circular(5)),
                 child: SafeArea(
                   top: false,
                   child: Padding(
@@ -255,10 +259,10 @@ class _PackageDetailState extends State<PackageDetail> {
   uninstallPackage() async {
     var res = await Api.uninstallPackageTask(widget.package['id']);
     if (res['success']) {
-      Util.toast("卸载成功");
+      Util.instance.toast("卸载成功");
       Navigator.of(context).pop();
     } else {
-      Util.toast("套件卸载失败，错误代码：${res['error']['code']}");
+      Util.instance.toast("套件卸载失败，错误代码：${res['error']['code']}");
     }
   }
 
@@ -266,7 +270,7 @@ class _PackageDetailState extends State<PackageDetail> {
     var res = await Api.installPackageTask(widget.package['id'], path);
     print(res);
     if (res['success']) {
-      Util.toast("已开始安装");
+      Util.instance.toast("已开始安装");
       setState(() {
         installing = true;
         installButtonText = "准备安装…";
@@ -298,9 +302,9 @@ class _PackageDetailState extends State<PackageDetail> {
         });
       });
     } else if (res['error']['code'] == 4501) {
-      Util.toast("此套件需配置信息，当前暂不支持，请在WEB端安装");
+      Util.instance.toast("此套件需配置信息，当前暂不支持，请在WEB端安装");
     } else {
-      Util.toast("安装套件失败，代码${res['error']['code']}");
+      Util.instance.toast("安装套件失败，代码${res['error']['code']}");
     }
   }
 
@@ -326,6 +330,9 @@ class _PackageDetailState extends State<PackageDetail> {
               padding: EdgeInsets.all(20),
               children: [
                 Card(
+                  shape: RoundedRectangleBorder(
+                      side: BorderSide(),
+                      borderRadius: BorderRadius.circular(5)),
                   child: Padding(
                     padding: EdgeInsets.all(20),
                     child: Row(
@@ -359,6 +366,9 @@ class _PackageDetailState extends State<PackageDetail> {
                 if (widget.package['snapshot'] != null &&
                     widget.package['snapshot'].length > 0)
                   Card(
+                    shape: RoundedRectangleBorder(
+                        side: BorderSide(),
+                        borderRadius: BorderRadius.circular(5)),
                     margin: EdgeInsets.only(top: 20),
                     child: Padding(
                       padding: EdgeInsets.all(10),
@@ -388,6 +398,9 @@ class _PackageDetailState extends State<PackageDetail> {
                     ),
                   ),
                 Card(
+                  shape: RoundedRectangleBorder(
+                      side: BorderSide(),
+                      borderRadius: BorderRadius.circular(5)),
                   margin: EdgeInsets.only(top: 20),
                   child: Padding(
                     padding: EdgeInsets.all(20),
@@ -409,6 +422,9 @@ class _PackageDetailState extends State<PackageDetail> {
                 ),
                 if (widget.package['changelog'] != "")
                   Card(
+                    shape: RoundedRectangleBorder(
+                        side: BorderSide(),
+                        borderRadius: BorderRadius.circular(5)),
                     margin: EdgeInsets.only(top: 20),
                     child: Padding(
                       padding: EdgeInsets.all(20),
@@ -446,6 +462,9 @@ class _PackageDetailState extends State<PackageDetail> {
                     ),
                   ),
                 Card(
+                  shape: RoundedRectangleBorder(
+                      side: BorderSide(),
+                      borderRadius: BorderRadius.circular(5)),
                   margin: EdgeInsets.only(top: 20),
                   child: Padding(
                     padding: EdgeInsets.all(20),
@@ -465,6 +484,9 @@ class _PackageDetailState extends State<PackageDetail> {
                           runSpacing: 20,
                           children: [
                             Card(
+                              shape: RoundedRectangleBorder(
+                                  side: BorderSide(),
+                                  borderRadius: BorderRadius.circular(5)),
                               child: Padding(
                                 padding: const EdgeInsets.all(8.0),
                                 child: Column(
@@ -503,6 +525,9 @@ class _PackageDetailState extends State<PackageDetail> {
                             if (widget.package['distributor'] != null &&
                                 widget.package['distributor'] != "")
                               Card(
+                                shape: RoundedRectangleBorder(
+                                    side: BorderSide(),
+                                    borderRadius: BorderRadius.circular(5)),
                                 child: Padding(
                                   padding: const EdgeInsets.all(8.0),
                                   child: Column(
@@ -543,6 +568,9 @@ class _PackageDetailState extends State<PackageDetail> {
                                 ),
                               ),
                             Card(
+                              shape: RoundedRectangleBorder(
+                                  side: BorderSide(),
+                                  borderRadius: BorderRadius.circular(5)),
                               child: Padding(
                                 padding: const EdgeInsets.all(8.0),
                                 child: Column(
@@ -559,6 +587,9 @@ class _PackageDetailState extends State<PackageDetail> {
                             ),
                             if (widget.package['installed'])
                               Card(
+                                shape: RoundedRectangleBorder(
+                                    side: BorderSide(),
+                                    borderRadius: BorderRadius.circular(5)),
                                 child: Padding(
                                   padding: const EdgeInsets.all(8.0),
                                   child: Column(
@@ -577,6 +608,9 @@ class _PackageDetailState extends State<PackageDetail> {
                               ),
                             if (widget.package['installed'])
                               Card(
+                                shape: RoundedRectangleBorder(
+                                    side: BorderSide(),
+                                    borderRadius: BorderRadius.circular(5)),
                                 child: Padding(
                                   padding: const EdgeInsets.all(8.0),
                                   child: Column(
@@ -594,6 +628,9 @@ class _PackageDetailState extends State<PackageDetail> {
                                 ),
                               ),
                             Card(
+                              shape: RoundedRectangleBorder(
+                                  side: BorderSide(),
+                                  borderRadius: BorderRadius.circular(5)),
                               child: Padding(
                                 padding: const EdgeInsets.all(8.0),
                                 child: Column(
@@ -642,6 +679,9 @@ class _PackageDetailState extends State<PackageDetail> {
                                 return Material(
                                   color: Colors.transparent,
                                   child: Card(
+                                    shape: RoundedRectangleBorder(
+                                        side: BorderSide(),
+                                        borderRadius: BorderRadius.circular(5)),
                                     child: SafeArea(
                                       top: false,
                                       child: Padding(
@@ -738,6 +778,10 @@ class _PackageDetailState extends State<PackageDetail> {
                                       return Material(
                                         color: Colors.transparent,
                                         child: Card(
+                                          shape: RoundedRectangleBorder(
+                                              side: BorderSide(),
+                                              borderRadius:
+                                                  BorderRadius.circular(5)),
                                           child: SafeArea(
                                             top: false,
                                             child: Padding(
@@ -783,7 +827,8 @@ class _PackageDetailState extends State<PackageDetail> {
                                                                     "stop");
                                                             if (res[
                                                                 'success']) {
-                                                              Util.toast("已停用");
+                                                              Util.instance
+                                                                  .toast("已停用");
                                                               setState(() {
                                                                 widget.package[
                                                                         'launched'] =
@@ -841,7 +886,7 @@ class _PackageDetailState extends State<PackageDetail> {
                                       "start");
                                   print(res);
                                   if (res['success']) {
-                                    Util.toast("已启动");
+                                    Util.instance.toast("已启动");
                                     setState(() {
                                       widget.package['launched'] = true;
                                     });

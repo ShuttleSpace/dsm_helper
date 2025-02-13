@@ -57,14 +57,15 @@ class _BackupState extends State<Backup> {
   }
 
   getData() async {
-    String last = await Util.getStorage("last_backup_time") ?? '';
+    String last = await Util.instance.getStorage("last_backup_time") ?? '';
 
     lastBackupTime = last.isNotBlank
         ? DateTime.fromMillisecondsSinceEpoch(int.parse(last))
         : null;
-    backupFolder = await Util.getStorage("backup_folder") ?? '';
+    backupFolder = await Util.instance.getStorage("backup_folder") ?? '';
     setState(() {});
-    String backupAlbumStr = await Util.getStorage("backup_album") ?? '';
+    String backupAlbumStr =
+        await Util.instance.getStorage("backup_album") ?? '';
     List backupAlbums = [];
     if (await PhotoManager.requestPermissionExtend() ==
         PermissionState.authorized) {
@@ -80,8 +81,8 @@ class _BackupState extends State<Backup> {
         setState(() {});
       }
     } else {
-      Util.vibrate(FeedbackType.warning);
-      Util.toast("请先允许${Util.appName}访问相册");
+      Util.instance.vibrate(FeedbackType.warning);
+      Util.instance.toast("请先允许${Util.instance.appName}访问相册");
     }
 
     getAssetCount();
@@ -167,7 +168,7 @@ class _BackupState extends State<Backup> {
                 var hide = showWeuiLoadingToast(context: context);
                 await PhotoManager.clearFileCache();
                 hide();
-                Util.toast("缓存清理完成");
+                Util.instance.toast("缓存清理完成");
               },
               child: Text(
                 "清理缓存",
@@ -183,6 +184,8 @@ class _BackupState extends State<Backup> {
         children: [
           ...[
             Card(
+              shape: RoundedRectangleBorder(
+                  side: BorderSide(), borderRadius: BorderRadius.circular(5)),
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Stack(
@@ -264,7 +267,7 @@ class _BackupState extends State<Backup> {
                 if (res != null && res.length == 1) {
                   setState(() {
                     backupFolder = res[0];
-                    Util.setStorage("backup_folder", backupFolder);
+                    Util.instance.setStorage("backup_folder", backupFolder);
                   });
                 }
               });
@@ -307,7 +310,8 @@ class _BackupState extends State<Backup> {
                     albums = res;
                   });
                   List backupAlbums = albums.map((e) => e.id).toList();
-                  Util.setStorage("backup_album", json.encode(backupAlbums));
+                  Util.instance
+                      .setStorage("backup_album", json.encode(backupAlbums));
 
                   getAssetCount();
                 }
@@ -349,6 +353,8 @@ class _BackupState extends State<Backup> {
               });
             },
             child: Card(
+              shape: RoundedRectangleBorder(
+                  side: BorderSide(), borderRadius: BorderRadius.circular(5)),
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Row(
@@ -394,6 +400,8 @@ class _BackupState extends State<Backup> {
               });
             },
             child: Card(
+              shape: RoundedRectangleBorder(
+                  side: BorderSide(), borderRadius: BorderRadius.circular(5)),
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Row(
@@ -428,9 +436,11 @@ class _BackupState extends State<Backup> {
           ),
           GestureDetector(
             onTap: () {
-              Util.toast("暂不支持自动备份");
+              Util.instance.toast("暂不支持自动备份");
             },
             child: Card(
+              shape: RoundedRectangleBorder(
+                  side: BorderSide(), borderRadius: BorderRadius.circular(5)),
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Row(
@@ -444,7 +454,7 @@ class _BackupState extends State<Backup> {
                             style: TextStyle(fontSize: 18),
                           ),
                           Text(
-                            "打开${Util.appName}后自动从上次备份位置继续备份",
+                            "打开${Util.instance.appName}后自动从上次备份位置继续备份",
                             style: TextStyle(fontSize: 14, color: Colors.grey),
                           ),
                         ],
@@ -469,13 +479,13 @@ class _BackupState extends State<Backup> {
               ? OutlinedButton(
                   onPressed: () async {
                     if (backupFolder.isBlank) {
-                      Util.vibrate(FeedbackType.warning);
-                      Util.toast("请选择备份目的地");
+                      Util.instance.vibrate(FeedbackType.warning);
+                      Util.instance.toast("请选择备份目的地");
                       return;
                     }
                     if (albums.length == 0) {
-                      Util.vibrate(FeedbackType.warning);
-                      Util.toast("请选择备份源");
+                      Util.instance.vibrate(FeedbackType.warning);
+                      Util.instance.toast("请选择备份源");
                       return;
                     }
                     List<AssetEntity> tasks;
@@ -503,7 +513,7 @@ class _BackupState extends State<Backup> {
                         setState(() {
                           uploading = null;
                         });
-                        Util.toast("备份任务已暂停");
+                        Util.instance.toast("备份任务已暂停");
                         break;
                       }
                       uploading = UploadItem(await tasks[i].originFile,
@@ -532,7 +542,7 @@ class _BackupState extends State<Backup> {
                           uploading!.file!.deleteSync();
                         }
 
-                        Util.setStorage(
+                        Util.instance.setStorage(
                             "last_backup_time",
                             uploading!.modifyTime!.millisecondsSinceEpoch
                                 .toString());
@@ -546,8 +556,8 @@ class _BackupState extends State<Backup> {
                         });
                       }
                       if (i == tasks.length - 1) {
-                        Util.toast("备份已完成");
-                        Util.vibrate(FeedbackType.light);
+                        Util.instance.toast("备份已完成");
+                        Util.instance.vibrate(FeedbackType.light);
                         setState(() {
                           uploading = null;
                           lastBackupTime = DateTime.now();
@@ -560,7 +570,7 @@ class _BackupState extends State<Backup> {
               : OutlinedButton(
                   onPressed: () async {
                     cancel = true;
-                    Util.toast("当前文件上传完成后将暂停任务");
+                    Util.instance.toast("当前文件上传完成后将暂停任务");
                   },
                   child: Text("暂停备份"),
                 ),

@@ -104,7 +104,7 @@ class CupertinoCircleAvatar extends StatelessWidget {
             ),
           )
         : CupertinoExtendedImage(
-            Util.baseUrl + url,
+            Util.instance.baseUrl + url,
             width: size,
             height: size,
             fit: BoxFit.contain,

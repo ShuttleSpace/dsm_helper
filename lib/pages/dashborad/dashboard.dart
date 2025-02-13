@@ -98,8 +98,8 @@ class DashboardState extends State<Dashboard> {
   }
 
   getGroups() async {
-    Util.groups = await GroupsModel.fetch();
-    if (Util.notReviewAccount) {
+    Util.instance.groups = await GroupsModel.fetch();
+    if (Util.instance.notReviewAccount) {
       showFirstLaunchDialog();
     }
   }
@@ -111,7 +111,8 @@ class DashboardState extends State<Dashboard> {
   }
 
   showFirstLaunchDialog() async {
-    bool firstLaunch = await Util.getStorage("first_launch_channel") == null;
+    bool firstLaunch =
+        await Util.instance.getStorage("first_launch_channel") == null;
     if (firstLaunch) {
       showCupertinoDialog(
         context: context,
@@ -122,6 +123,9 @@ class DashboardState extends State<Dashboard> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Card(
+                  shape: RoundedRectangleBorder(
+                      side: BorderSide(),
+                      borderRadius: BorderRadius.circular(5)),
                   margin: EdgeInsets.symmetric(horizontal: 50),
                   child: Padding(
                     padding: EdgeInsets.all(20),
@@ -136,6 +140,9 @@ class DashboardState extends State<Dashboard> {
                           height: 16,
                         ),
                         Card(
+                          shape: RoundedRectangleBorder(
+                              side: BorderSide(),
+                              borderRadius: BorderRadius.circular(5)),
                           child: Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: Text("前往'设置-关闭广告'页面，即可关闭开屏广告。"),
@@ -145,10 +152,14 @@ class DashboardState extends State<Dashboard> {
                           height: 20,
                         ),
                         Card(
+                          shape: RoundedRectangleBorder(
+                              side: BorderSide(),
+                              borderRadius: BorderRadius.circular(5)),
                           child: Padding(
                               padding: EdgeInsets.all(15),
                               child: Column(
-                                children: Util.groups.channel?.map((e) {
+                                children: Util.instance.groups.channel
+                                        ?.map((e) {
                                       return Padding(
                                         padding:
                                             EdgeInsets.symmetric(vertical: 5),
@@ -185,10 +196,13 @@ class DashboardState extends State<Dashboard> {
                           height: 20,
                         ),
                         Card(
+                          shape: RoundedRectangleBorder(
+                              side: BorderSide(),
+                              borderRadius: BorderRadius.circular(5)),
                           child: Padding(
                               padding: EdgeInsets.all(15),
                               child: Column(
-                                children: Util.groups.wechat?.map((e) {
+                                children: Util.instance.groups.wechat?.map((e) {
                                       return Padding(
                                         padding:
                                             EdgeInsets.symmetric(vertical: 5),
@@ -212,7 +226,7 @@ class DashboardState extends State<Dashboard> {
                                                     new ClipboardData(
                                                         text: e.name ?? '');
                                                 Clipboard.setData(data);
-                                                Util.toast("已复制到剪贴板");
+                                                Util.instance.toast("已复制到剪贴板");
                                               },
                                               child: Text("复制"),
                                             ),
@@ -232,7 +246,8 @@ class DashboardState extends State<Dashboard> {
                               child: OutlinedButton(
                                 onPressed: () async {
                                   Navigator.of(context).pop();
-                                  Util.setStorage("first_launch_channel", "0");
+                                  Util.instance
+                                      .setStorage("first_launch_channel", "0");
                                 },
                                 child: Text(
                                   "我知道了",
@@ -259,7 +274,7 @@ class DashboardState extends State<Dashboard> {
     debugPrint("notifyStrings");
     if (res['success']) {
       setState(() {
-        Util.notifyStrings = res['data'] ?? {};
+        Util.instance.notifyStrings = res['data'] ?? {};
       });
     }
   }
@@ -332,10 +347,10 @@ class DashboardState extends State<Dashboard> {
         }
         if (init['data']['Session'] != null) {
           hostname = init['data']['Session']['hostname'];
-          Util.hostname = hostname;
+          Util.instance.hostname = hostname;
         }
         if (init['data']['Strings'] != null) {
-          Util.strings = init['data']['Strings'] ?? {};
+          Util.instance.strings = init['data']['Strings'] ?? {};
         }
       });
     }
@@ -372,7 +387,7 @@ class DashboardState extends State<Dashboard> {
             case "SYNO.Core.System":
               setState(() {
                 system = item['data'];
-                Util.systemVersion(system['firmware_ver']);
+                Util.instance.systemVersion(system['firmware_ver']);
               });
               break;
             case "SYNO.Core.CurrentConnection":
@@ -444,12 +459,14 @@ class DashboardState extends State<Dashboard> {
     if (widget == "SYNO.SDS.SystemInfoApp.SystemHealthWidget") {
       return GestureDetector(
         onTap: () {
-          if (Util.notReviewAccount)
+          if (Util.instance.notReviewAccount)
             Navigator.of(context).push(CupertinoPageRoute(builder: (context) {
               return SystemInfo(0, system, volumes, disks);
             }));
         },
         child: Card(
+          shape: RoundedRectangleBorder(
+              side: BorderSide(), borderRadius: BorderRadius.circular(5)),
           margin: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
           child: Padding(
             padding: const EdgeInsets.all(8.0),
@@ -464,8 +481,8 @@ class DashboardState extends State<Dashboard> {
                             (wallpaperModel!.customizeWallpaper == true ||
                                 wallpaperModel!.customizeBackground == true))
                           ExtendedImage.network(
-                            Util.baseUrl +
-                                "/webapi/entry.cgi?api=SYNO.Core.PersonalSettings&method=wallpaper&version=1&path=%22%22&retina=true&_sid=${Util.sid}",
+                            Util.instance.baseUrl +
+                                "/webapi/entry.cgi?api=SYNO.Core.PersonalSettings&method=wallpaper&version=1&path=%22%22&retina=true&_sid=${Util.instance.sid}",
                             height: 170,
                             width: double.infinity,
                             fit: BoxFit.cover,
@@ -567,7 +584,7 @@ class DashboardState extends State<Dashboard> {
                                         children: [
                                           Text("运行时间："),
                                           Text(
-                                              "${Util.parseOpTime(system['up_time'])}"),
+                                              "${Util.instance.parseOpTime(system['up_time'])}"),
                                         ],
                                       ),
                                     ),
@@ -588,6 +605,8 @@ class DashboardState extends State<Dashboard> {
     } else if (widget == "SYNO.SDS.SystemInfoApp.ConnectionLogWidget" &&
         connectedUsers.length > 0) {
       return Card(
+        shape: RoundedRectangleBorder(
+            side: BorderSide(), borderRadius: BorderRadius.circular(5)),
         margin: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
         child: Padding(
           padding: const EdgeInsets.all(8.0),
@@ -632,6 +651,8 @@ class DashboardState extends State<Dashboard> {
           }));
         },
         child: Card(
+          shape: RoundedRectangleBorder(
+              side: BorderSide(), borderRadius: BorderRadius.circular(5)),
           margin: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
           child: Padding(
             padding: const EdgeInsets.all(8.0),
@@ -679,6 +700,8 @@ class DashboardState extends State<Dashboard> {
               settings: RouteSettings(name: "log_center")));
         },
         child: Card(
+          shape: RoundedRectangleBorder(
+              side: BorderSide(), borderRadius: BorderRadius.circular(5)),
           margin: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
           child: Padding(
             padding: const EdgeInsets.all(8.0),
@@ -745,6 +768,8 @@ class DashboardState extends State<Dashboard> {
           }));
         },
         child: Card(
+          shape: RoundedRectangleBorder(
+              side: BorderSide(), borderRadius: BorderRadius.circular(5)),
           margin: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
           child: Padding(
             padding: const EdgeInsets.all(8.0),
@@ -872,7 +897,7 @@ class DashboardState extends State<Dashboard> {
                             color: Colors.blue,
                           ),
                           Text(
-                            Util.formatSize(
+                            Util.instance.formatSize(
                                     utilization['network']?[0]?['tx'] ?? 0) +
                                 "/S",
                             style: TextStyle(color: Colors.blue),
@@ -885,7 +910,7 @@ class DashboardState extends State<Dashboard> {
                             color: Colors.green,
                           ),
                           Text(
-                            Util.formatSize(
+                            Util.instance.formatSize(
                                     utilization['network'][0]['rx'] ?? 0) +
                                 "/S",
                             style: TextStyle(color: Colors.green),
@@ -912,6 +937,9 @@ class DashboardState extends State<Dashboard> {
                       child: Padding(
                         padding: const EdgeInsets.all(20),
                         child: Card(
+                          shape: RoundedRectangleBorder(
+                              side: BorderSide(),
+                              borderRadius: BorderRadius.circular(5)),
                           child: Padding(
                             padding: EdgeInsets.all(10),
                             child: LineChart(
@@ -934,7 +962,7 @@ class DashboardState extends State<Dashboard> {
                                           fontSize: 14,
                                         );
                                         return LineTooltipItem(
-                                            '${touchedSpot.bar.color == Colors.blue ? "上传" : "下载"}:${Util.formatSize(touchedSpot.y.floor())}',
+                                            '${touchedSpot.bar.color == Colors.blue ? "上传" : "下载"}:${Util.instance.formatSize(touchedSpot.y.floor())}',
                                             textStyle);
                                       }).toList();
                                     },
@@ -967,15 +995,16 @@ class DashboardState extends State<Dashboard> {
                                       // getTitles: chartTitle,
                                       getTitlesWidget: (value, _) {
                                         return Text(
-                                            Util.formatSize(value, fixed: 0),
+                                            Util.instance
+                                                .formatSize(value, fixed: 0),
                                             style: TextStyle(
                                               color: Color(0xff67727d),
                                               fontSize: 12,
                                             ));
                                       },
                                       reservedSize: 35,
-                                      interval:
-                                          Util.chartInterval(maxNetworkSpeed),
+                                      interval: Util.instance
+                                          .chartInterval(maxNetworkSpeed),
                                     ),
                                   ),
                                 ),
@@ -1046,6 +1075,8 @@ class DashboardState extends State<Dashboard> {
               }));
             },
             child: Card(
+              shape: RoundedRectangleBorder(
+                  side: BorderSide(), borderRadius: BorderRadius.circular(5)),
               margin: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
@@ -1085,6 +1116,8 @@ class DashboardState extends State<Dashboard> {
           ),
           if (ssdCaches.length > 0)
             Card(
+              shape: RoundedRectangleBorder(
+                  side: BorderSide(), borderRadius: BorderRadius.circular(5)),
               margin: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
@@ -1125,6 +1158,8 @@ class DashboardState extends State<Dashboard> {
       );
     } else if (widget == "SYNO.SDS.SystemInfoApp.FileChangeLogWidget") {
       return Card(
+        shape: RoundedRectangleBorder(
+            side: BorderSide(), borderRadius: BorderRadius.circular(5)),
         margin: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
         child: Padding(
           padding: const EdgeInsets.all(8.0),
@@ -1192,8 +1227,11 @@ class DashboardState extends State<Dashboard> {
     DateTime loginTime =
         DateTime.parse(user['time'].toString().replaceAll("/", "-"));
     DateTime currentTime = DateTime.now();
-    Map timeLong = Util.timeLong(currentTime.difference(loginTime).inSeconds);
+    Map timeLong =
+        Util.instance.timeLong(currentTime.difference(loginTime).inSeconds);
     return Card(
+      shape: RoundedRectangleBorder(
+          side: BorderSide(), borderRadius: BorderRadius.circular(5)),
       margin: EdgeInsets.only(top: 20, left: 20, right: 20),
       child: Padding(
         padding: EdgeInsets.all(10),
@@ -1232,6 +1270,9 @@ class DashboardState extends State<Dashboard> {
                     return Material(
                       color: Colors.transparent,
                       child: Card(
+                        shape: RoundedRectangleBorder(
+                            side: BorderSide(),
+                            borderRadius: BorderRadius.circular(5)),
                         child: SafeArea(
                           top: false,
                           child: Padding(
@@ -1277,7 +1318,7 @@ class DashboardState extends State<Dashboard> {
                                           });
 
                                           if (res['success']) {
-                                            Util.toast("连接已终止");
+                                            Util.instance.toast("连接已终止");
                                           }
                                         },
                                         child: Text(
@@ -1337,6 +1378,8 @@ class DashboardState extends State<Dashboard> {
   Widget _buildTaskItem(task) {
     task['running'] = task['running'] ?? false;
     return Card(
+      shape: RoundedRectangleBorder(
+          side: BorderSide(), borderRadius: BorderRadius.circular(5)),
       margin: EdgeInsets.only(top: 20, left: 20, right: 20),
       child: Padding(
         padding: EdgeInsets.all(10),
@@ -1373,9 +1416,9 @@ class DashboardState extends State<Dashboard> {
                   task['running'] = false;
                 });
                 if (res['success']) {
-                  Util.toast("任务计划执行成功");
+                  Util.instance.toast("任务计划执行成功");
                 } else {
-                  Util.toast("任务计划执行失败，code：${res['error']['code']}");
+                  Util.instance.toast("任务计划执行失败，code：${res['error']['code']}");
                 }
               },
               child: SizedBox(
@@ -1398,6 +1441,9 @@ class DashboardState extends State<Dashboard> {
 
   Widget _buildLogItem(log) {
     return Card(
+      shape: RoundedRectangleBorder(
+          side: BorderSide(), borderRadius: BorderRadius.circular(5)),
+      clipBehavior: Clip.hardEdge,
       margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
       child: Padding(
         padding: const EdgeInsets.all(10.0),
@@ -1412,6 +1458,8 @@ class DashboardState extends State<Dashboard> {
 
   Widget _buildFileLogItem(log) {
     return Card(
+      shape: RoundedRectangleBorder(
+          side: BorderSide(), borderRadius: BorderRadius.circular(5)),
       margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
       child: Padding(
         padding: const EdgeInsets.all(8.0),
@@ -1447,6 +1495,8 @@ class DashboardState extends State<Dashboard> {
     double used =
         int.parse(volume['size']['used']) / int.parse(volume['size']['total']);
     return Card(
+      shape: RoundedRectangleBorder(
+          side: BorderSide(), borderRadius: BorderRadius.circular(5)),
       margin: EdgeInsets.only(top: 20, left: 20, right: 20),
       child: Padding(
         padding: const EdgeInsets.all(8.0),
@@ -1523,17 +1573,17 @@ class DashboardState extends State<Dashboard> {
                     height: 5,
                   ),
                   Text(
-                      "已用：${Util.formatSize(int.parse(volume['size']['used']))}"),
+                      "已用：${Util.instance.formatSize(int.parse(volume['size']['used']))}"),
                   SizedBox(
                     height: 5,
                   ),
                   Text(
-                      "可用：${Util.formatSize(int.parse(volume['size']['total']) - int.parse(volume['size']['used']))}"),
+                      "可用：${Util.instance.formatSize(int.parse(volume['size']['total']) - int.parse(volume['size']['used']))}"),
                   SizedBox(
                     height: 5,
                   ),
                   Text(
-                      "容量：${Util.formatSize(int.parse(volume['size']['total']))}"),
+                      "容量：${Util.instance.formatSize(int.parse(volume['size']['total']))}"),
                 ],
               ),
             )
@@ -1548,6 +1598,8 @@ class DashboardState extends State<Dashboard> {
         int.parse(volume['size']['used'] ?? volume['size']['reusable']) /
             int.parse(volume['size']['total']);
     return Card(
+      shape: RoundedRectangleBorder(
+          side: BorderSide(), borderRadius: BorderRadius.circular(5)),
       margin: EdgeInsets.only(top: 20, left: 20, right: 20),
       child: Padding(
         padding: const EdgeInsets.all(8.0),
@@ -1624,17 +1676,17 @@ class DashboardState extends State<Dashboard> {
                     height: 5,
                   ),
                   Text(
-                      "已用：${Util.formatSize(int.parse(volume['size']['used'] ?? volume['size']['reusable']))}"),
+                      "已用：${Util.instance.formatSize(int.parse(volume['size']['used'] ?? volume['size']['reusable']))}"),
                   SizedBox(
                     height: 5,
                   ),
                   Text(
-                      "可用：${Util.formatSize(int.parse(volume['size']['total']) - int.parse(volume['size']['used'] ?? volume['size']['reusable']))}"),
+                      "可用：${Util.instance.formatSize(int.parse(volume['size']['total']) - int.parse(volume['size']['used'] ?? volume['size']['reusable']))}"),
                   SizedBox(
                     height: 5,
                   ),
                   Text(
-                      "容量：${Util.formatSize(int.parse(volume['size']['total']))}"),
+                      "容量：${Util.instance.formatSize(int.parse(volume['size']['total']))}"),
                 ],
               ),
             )
@@ -1646,6 +1698,8 @@ class DashboardState extends State<Dashboard> {
 
   Widget _buildESataItem(esata) {
     return Card(
+      shape: RoundedRectangleBorder(
+          side: BorderSide(), borderRadius: BorderRadius.circular(5)),
       margin: EdgeInsets.only(bottom: 20),
       child: Padding(
         padding: EdgeInsets.all(20),
@@ -1679,10 +1733,10 @@ class DashboardState extends State<Dashboard> {
                   onPressed: () async {
                     var res = await Api.ejectEsata(esata['dev_id']);
                     if (res['success']) {
-                      Util.toast("设备已退出");
+                      Util.instance.toast("设备已退出");
                       getData();
                     } else {
-                      Util.toast("设备退出失败，代码${res['error']['code']}");
+                      Util.instance.toast("设备退出失败，代码${res['error']['code']}");
                     }
                   },
                   child: SizedBox(
@@ -1715,7 +1769,7 @@ class DashboardState extends State<Dashboard> {
           children: [
             Row(
               children: [
-                if (Util.notReviewAccount)
+                if (Util.instance.notReviewAccount)
                   Padding(
                     padding: EdgeInsets.only(left: 10, top: 8, bottom: 8),
                     child: OutlinedButton(
@@ -1739,6 +1793,9 @@ class DashboardState extends State<Dashboard> {
                             return Material(
                               color: Colors.transparent,
                               child: Card(
+                                shape: RoundedRectangleBorder(
+                                    side: BorderSide(),
+                                    borderRadius: BorderRadius.circular(5)),
                                 child: SafeArea(
                                   top: false,
                                   child: Padding(
@@ -1836,7 +1893,7 @@ class DashboardState extends State<Dashboard> {
                     ),
                   ),
                 Spacer(),
-                if (Util.notReviewAccount)
+                if (Util.instance.notReviewAccount)
                   Padding(
                     padding: EdgeInsets.only(right: 10, top: 8, bottom: 8),
                     child: OutlinedButton(
@@ -1921,7 +1978,7 @@ class DashboardState extends State<Dashboard> {
                                     .contains(element.className))
                                 .length >
                             0 &&
-                        Util.notReviewAccount &&
+                        Util.instance.notReviewAccount &&
                         shortcutProvider.showShortcut)
                       ShortcutList(
                         shortcutItems,

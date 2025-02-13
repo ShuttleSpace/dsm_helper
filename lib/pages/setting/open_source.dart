@@ -166,6 +166,8 @@ class _OpenSourceState extends State<OpenSource> {
           },
           itemBuilder: (context, i) {
             return Card(
+              shape: RoundedRectangleBorder(
+                  side: BorderSide(), borderRadius: BorderRadius.circular(5)),
               margin: EdgeInsets.symmetric(horizontal: 20),
               child: Padding(
                 padding: EdgeInsets.all(20),

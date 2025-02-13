@@ -63,7 +63,7 @@ class _SmartState extends State<Smart> with SingleTickerProviderStateMixin {
         getSmartLog();
       });
     } else {
-      Util.toast("执行检测失败，代码${res['error']['code']}");
+      Util.instance.toast("执行检测失败，代码${res['error']['code']}");
       setState(() {
         testing = false;
       });
@@ -90,7 +90,7 @@ class _SmartState extends State<Smart> with SingleTickerProviderStateMixin {
         smartInfo = res['data']['healthInfo']['smartInfo'];
       });
     } else {
-      Util.toast("获取失败");
+      Util.instance.toast("获取失败");
     }
   }
 
@@ -113,6 +113,8 @@ class _SmartState extends State<Smart> with SingleTickerProviderStateMixin {
 
   Widget _buildSmartItem(smart) {
     return Card(
+      shape: RoundedRectangleBorder(
+          side: BorderSide(), borderRadius: BorderRadius.circular(5)),
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Column(
@@ -202,6 +204,8 @@ class _SmartState extends State<Smart> with SingleTickerProviderStateMixin {
 
   Widget _buildLogItem(log) {
     return Card(
+      shape: RoundedRectangleBorder(
+          side: BorderSide(), borderRadius: BorderRadius.circular(5)),
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Column(
@@ -247,6 +251,9 @@ class _SmartState extends State<Smart> with SingleTickerProviderStateMixin {
           : Column(
               children: [
                 Card(
+                  shape: RoundedRectangleBorder(
+                      side: BorderSide(),
+                      borderRadius: BorderRadius.circular(5)),
                   margin: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
                   child: TabBar(
                     dividerHeight: 0,
@@ -259,7 +266,7 @@ class _SmartState extends State<Smart> with SingleTickerProviderStateMixin {
                     unselectedLabelColor: Colors.grey,
                     indicator: BubbleTabIndicator(
                       indicatorColor: Theme.of(context).scaffoldBackgroundColor,
-                      shadowColor: Util.getAdjustColor(
+                      shadowColor: Util.instance.getAdjustColor(
                           Theme.of(context).scaffoldBackgroundColor, -20),
                     ),
                     tabs: [
@@ -293,6 +300,9 @@ class _SmartState extends State<Smart> with SingleTickerProviderStateMixin {
                       ListView(
                         children: [
                           Card(
+                            shape: RoundedRectangleBorder(
+                                side: BorderSide(),
+                                borderRadius: BorderRadius.circular(5)),
                             margin: EdgeInsets.symmetric(
                                 horizontal: 20, vertical: 15),
                             child: Padding(
@@ -345,6 +355,9 @@ class _SmartState extends State<Smart> with SingleTickerProviderStateMixin {
                             ),
                           ),
                           Card(
+                            shape: RoundedRectangleBorder(
+                                side: BorderSide(),
+                                borderRadius: BorderRadius.circular(5)),
                             margin: EdgeInsets.symmetric(
                                 horizontal: 20, vertical: 15),
                             child: Padding(
@@ -463,6 +476,9 @@ class _SmartState extends State<Smart> with SingleTickerProviderStateMixin {
                         padding: EdgeInsets.all(20),
                         children: [
                           Card(
+                            shape: RoundedRectangleBorder(
+                                side: BorderSide(),
+                                borderRadius: BorderRadius.circular(5)),
                             child: Padding(
                               padding: EdgeInsets.all(20),
                               child: Column(
@@ -548,6 +564,9 @@ class _SmartState extends State<Smart> with SingleTickerProviderStateMixin {
                             height: 20,
                           ),
                           Card(
+                            shape: RoundedRectangleBorder(
+                                side: BorderSide(),
+                                borderRadius: BorderRadius.circular(5)),
                             child: Padding(
                               padding: EdgeInsets.all(20),
                               child: Column(
@@ -570,6 +589,10 @@ class _SmartState extends State<Smart> with SingleTickerProviderStateMixin {
                                   ),
                                   if (testing) ...[
                                     Card(
+                                      shape: RoundedRectangleBorder(
+                                          side: BorderSide(),
+                                          borderRadius:
+                                              BorderRadius.circular(5)),
                                       child: Padding(
                                         padding: EdgeInsets.symmetric(
                                             vertical: 15, horizontal: 20),
@@ -601,6 +624,10 @@ class _SmartState extends State<Smart> with SingleTickerProviderStateMixin {
                                     ),
                                   ] else ...[
                                     Card(
+                                      shape: RoundedRectangleBorder(
+                                          side: BorderSide(),
+                                          borderRadius:
+                                              BorderRadius.circular(5)),
                                       child: Padding(
                                         padding: EdgeInsets.symmetric(
                                             vertical: 15, horizontal: 20),
@@ -647,6 +674,10 @@ class _SmartState extends State<Smart> with SingleTickerProviderStateMixin {
                                       height: 20,
                                     ),
                                     Card(
+                                      shape: RoundedRectangleBorder(
+                                          side: BorderSide(),
+                                          borderRadius:
+                                              BorderRadius.circular(5)),
                                       child: Padding(
                                         padding: EdgeInsets.symmetric(
                                             vertical: 15, horizontal: 20),

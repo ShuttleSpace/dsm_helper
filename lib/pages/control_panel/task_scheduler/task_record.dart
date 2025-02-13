@@ -28,13 +28,15 @@ class _TaskRecordState extends State<TaskRecord> {
         records = res['data'];
       });
     } else {
-      Util.toast("加载失败");
+      Util.instance.toast("加载失败");
       Navigator.of(context).pop();
     }
   }
 
   Widget _buildRecordItem(record) {
     return Card(
+      shape: RoundedRectangleBorder(
+          side: BorderSide(), borderRadius: BorderRadius.circular(5)),
       margin: EdgeInsets.symmetric(vertical: 10),
       child: Padding(
         padding: EdgeInsets.all(20),

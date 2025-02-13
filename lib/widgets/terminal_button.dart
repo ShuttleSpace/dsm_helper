@@ -15,7 +15,7 @@ class TerminalButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        Util.vibrate(FeedbackType.light);
+        Util.instance.vibrate(FeedbackType.light);
         onPressed?.call();
       },
       child: Container(

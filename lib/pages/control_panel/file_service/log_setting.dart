@@ -28,7 +28,7 @@ class _LogSettingState extends State<LogSetting> {
         loading = false;
       });
     } else {
-      Util.toast("获取失败，code：${res['error']['code']}");
+      Util.instance.toast("获取失败，code：${res['error']['code']}");
       Navigator.of(context).pop();
     }
   }
@@ -60,6 +60,9 @@ class _LogSettingState extends State<LogSetting> {
                           });
                         },
                         child: Card(
+                          shape: RoundedRectangleBorder(
+                              side: BorderSide(),
+                              borderRadius: BorderRadius.circular(5)),
                           child: Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: Row(
@@ -90,6 +93,9 @@ class _LogSettingState extends State<LogSetting> {
                           });
                         },
                         child: Card(
+                          shape: RoundedRectangleBorder(
+                              side: BorderSide(),
+                              borderRadius: BorderRadius.circular(5)),
                           child: Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: Row(
@@ -120,6 +126,9 @@ class _LogSettingState extends State<LogSetting> {
                           });
                         },
                         child: Card(
+                          shape: RoundedRectangleBorder(
+                              side: BorderSide(),
+                              borderRadius: BorderRadius.circular(5)),
                           child: Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: Row(
@@ -150,6 +159,9 @@ class _LogSettingState extends State<LogSetting> {
                           });
                         },
                         child: Card(
+                          shape: RoundedRectangleBorder(
+                              side: BorderSide(),
+                              borderRadius: BorderRadius.circular(5)),
                           child: Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: Row(
@@ -180,6 +192,9 @@ class _LogSettingState extends State<LogSetting> {
                           });
                         },
                         child: Card(
+                          shape: RoundedRectangleBorder(
+                              side: BorderSide(),
+                              borderRadius: BorderRadius.circular(5)),
                           child: Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: Row(
@@ -210,6 +225,9 @@ class _LogSettingState extends State<LogSetting> {
                           });
                         },
                         child: Card(
+                          shape: RoundedRectangleBorder(
+                              side: BorderSide(),
+                              borderRadius: BorderRadius.circular(5)),
                           child: Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: Row(
@@ -243,12 +261,13 @@ class _LogSettingState extends State<LogSetting> {
                           widget.protocol, setting);
                       print(res);
                       if (res['success']) {
-                        Util.vibrate(FeedbackType.light);
-                        Util.toast("应用成功");
+                        Util.instance.vibrate(FeedbackType.light);
+                        Util.instance.toast("应用成功");
                         Navigator.of(context).pop();
                       } else {
-                        Util.vibrate(FeedbackType.warning);
-                        Util.toast("应用失败，code:${res['error']['code']}");
+                        Util.instance.vibrate(FeedbackType.warning);
+                        Util.instance
+                            .toast("应用失败，code:${res['error']['code']}");
                       }
                     },
                     child: Text(

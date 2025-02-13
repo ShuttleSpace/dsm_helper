@@ -39,7 +39,7 @@ class PhotoModel {
       "api": 'SYNO.Foto${isTeam ? 'Team' : ''}.Browse.Item',
       "method": 'list',
       "version": 1,
-      "_sid": Util.sid,
+      "_sid": Util.instance.sid,
       "additional": jsonEncode(additional),
       "sort_by": "takentime",
       "sort_direction": "asc",
@@ -50,7 +50,7 @@ class PhotoModel {
     data['geocoding_id'] = geocodingId;
     data['folderId'] = folderId;
     data['type'] = type;
-    var res = await Util.post("entry.cgi", data: data);
+    var res = await Util.instance.post("entry.cgi", data: data);
     if (res['success']) {
       List list = res['data']['list'];
       List<PhotoModel> photos = [];
@@ -73,13 +73,13 @@ class PhotoModel {
       "api": 'SYNO.Foto${isTeam ? 'Team' : ''}.Browse.RecentlyAdded',
       "method": 'list',
       "version": 1,
-      "_sid": Util.sid,
+      "_sid": Util.instance.sid,
       "additional": jsonEncode(additional),
       "offset": 0,
       "limit": limit ?? 5000,
     };
     print(data);
-    var res = await Util.post("entry.cgi", data: data);
+    var res = await Util.instance.post("entry.cgi", data: data);
     print(res);
     if (res['success']) {
       List list = res['data']['list'];
@@ -117,11 +117,11 @@ class PhotoModel {
   PhotoAdditional? additional;
 
   String videoUrl({bool isTeam = false}) {
-    return '${Util.baseUrl}/webapi/entry.cgi?item_id=%5B$id%5D&api=%22SYNO.Foto${isTeam ? 'Team' : ''}.Download%22&method=%22download%22&version=1&_sid=${Util.sid}';
+    return '${Util.instance.baseUrl}/webapi/entry.cgi?item_id=%5B$id%5D&api=%22SYNO.Foto${isTeam ? 'Team' : ''}.Download%22&method=%22download%22&version=1&_sid=${Util.instance.sid}';
   }
 
   String thumbUrl({String size = 'sm', bool isTeam = false}) {
-    return '${Util.baseUrl}/webapi/entry.cgi?id=${additional!.thumbnail?.unitId}&cache_key="${additional?.thumbnail?.cacheKey}"&type="unit"&size="$size"&api="SYNO.Foto${isTeam ? 'Team' : ''}.Thumbnail"&method="get"&version=1&_sid=${Util.sid}';
+    return '${Util.instance.baseUrl}/webapi/entry.cgi?id=${additional!.thumbnail?.unitId}&cache_key="${additional?.thumbnail?.cacheKey}"&type="unit"&size="$size"&api="SYNO.Foto${isTeam ? 'Team' : ''}.Thumbnail"&method="get"&version=1&_sid=${Util.instance.sid}';
   }
 
   PhotoModel copyWith({

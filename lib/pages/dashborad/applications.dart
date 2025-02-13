@@ -67,6 +67,8 @@ class ApplicationList extends StatelessWidget {
                     settings: RouteSettings(name: "control_panel")));
               },
               child: Card(
+                shape: RoundedRectangleBorder(
+                    side: BorderSide(), borderRadius: BorderRadius.circular(5)),
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Stack(
@@ -76,7 +78,7 @@ class ApplicationList extends StatelessWidget {
                         child: Column(
                           children: [
                             Image.asset(
-                              "assets/applications/${Util.version}/control_panel.png",
+                              "assets/applications/${Util.instance.version}/control_panel.png",
                               height: 45,
                               width: 45,
                               fit: BoxFit.contain,
@@ -116,6 +118,8 @@ class ApplicationList extends StatelessWidget {
                     settings: RouteSettings(name: "packages")));
               },
               child: Card(
+                shape: RoundedRectangleBorder(
+                    side: BorderSide(), borderRadius: BorderRadius.circular(5)),
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Stack(
@@ -125,7 +129,7 @@ class ApplicationList extends StatelessWidget {
                         child: Column(
                           children: [
                             Image.asset(
-                              "assets/applications/${Util.version}/package_center.png",
+                              "assets/applications/${Util.instance.version}/package_center.png",
                               height: 45,
                               width: 45,
                               fit: BoxFit.contain,
@@ -164,12 +168,14 @@ class ApplicationList extends StatelessWidget {
                     settings: RouteSettings(name: "resource_monitor")));
               },
               child: Card(
+                shape: RoundedRectangleBorder(
+                    side: BorderSide(), borderRadius: BorderRadius.circular(5)),
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Column(
                     children: [
                       Image.asset(
-                        "assets/applications/${Util.version}/resource_monitor.png",
+                        "assets/applications/${Util.instance.version}/resource_monitor.png",
                         height: 45,
                         width: 45,
                         fit: BoxFit.contain,
@@ -197,12 +203,14 @@ class ApplicationList extends StatelessWidget {
                     settings: RouteSettings(name: "storage_manager")));
               },
               child: Card(
+                shape: RoundedRectangleBorder(
+                    side: BorderSide(), borderRadius: BorderRadius.circular(5)),
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Column(
                     children: [
                       Image.asset(
-                        "assets/applications/${Util.version}/storage_manager.png",
+                        "assets/applications/${Util.instance.version}/storage_manager.png",
                         height: 45,
                         width: 45,
                         fit: BoxFit.contain,
@@ -230,12 +238,14 @@ class ApplicationList extends StatelessWidget {
                     settings: RouteSettings(name: "log_center")));
               },
               child: Card(
+                shape: RoundedRectangleBorder(
+                    side: BorderSide(), borderRadius: BorderRadius.circular(5)),
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Column(
                     children: [
                       Image.asset(
-                        "assets/applications/${Util.version}/log_center.png",
+                        "assets/applications/${Util.instance.version}/log_center.png",
                         height: 45,
                         width: 45,
                         fit: BoxFit.contain,
@@ -265,6 +275,8 @@ class ApplicationList extends StatelessWidget {
                 );
               },
               child: Card(
+                shape: RoundedRectangleBorder(
+                    side: BorderSide(), borderRadius: BorderRadius.circular(5)),
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Stack(
@@ -274,7 +286,7 @@ class ApplicationList extends StatelessWidget {
                         child: Column(
                           children: [
                             Image.asset(
-                              "assets/applications/${Util.version}/security_scan.png",
+                              "assets/applications/${Util.instance.version}/security_scan.png",
                               height: 45,
                               width: 45,
                               fit: BoxFit.contain,
@@ -316,6 +328,8 @@ class ApplicationList extends StatelessWidget {
                 );
               },
               child: Card(
+                shape: RoundedRectangleBorder(
+                    side: BorderSide(), borderRadius: BorderRadius.circular(5)),
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Column(
@@ -350,12 +364,14 @@ class ApplicationList extends StatelessWidget {
                 ));
               },
               child: Card(
+                shape: RoundedRectangleBorder(
+                    side: BorderSide(), borderRadius: BorderRadius.circular(5)),
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Column(
                     children: [
                       Image.asset(
-                        "assets/applications/${Util.version}/virtual_machine.png",
+                        "assets/applications/${Util.instance.version}/virtual_machine.png",
                         height: 45,
                         width: 45,
                         fit: BoxFit.contain,
@@ -389,6 +405,8 @@ class ApplicationList extends StatelessWidget {
                 ));
               },
               child: Card(
+                shape: RoundedRectangleBorder(
+                    side: BorderSide(), borderRadius: BorderRadius.circular(5)),
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Column(
@@ -428,6 +446,8 @@ class ApplicationList extends StatelessWidget {
                 ));
               },
               child: Card(
+                shape: RoundedRectangleBorder(
+                    side: BorderSide(), borderRadius: BorderRadius.circular(5)),
                 child: Column(
                   children: [
                     Column(
@@ -468,6 +488,8 @@ class ApplicationList extends StatelessWidget {
                 ));
               },
               child: Card(
+                shape: RoundedRectangleBorder(
+                    side: BorderSide(), borderRadius: BorderRadius.circular(5)),
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Column(
@@ -507,6 +529,8 @@ class ApplicationList extends StatelessWidget {
                 ));
               },
               child: Card(
+                shape: RoundedRectangleBorder(
+                    side: BorderSide(), borderRadius: BorderRadius.circular(5)),
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Column(
@@ -546,6 +570,8 @@ class ApplicationList extends StatelessWidget {
                 ));
               },
               child: Card(
+                shape: RoundedRectangleBorder(
+                    side: BorderSide(), borderRadius: BorderRadius.circular(5)),
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Column(

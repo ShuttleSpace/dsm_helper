@@ -36,7 +36,7 @@ class _AlbumState extends State<Album> {
 
   Widget _buildAlbumItem(album) {
     String thumbUrl =
-        '${Util.baseUrl}/webapi/entry.cgi?id=${album['additional']['thumbnail']['unit_id']}&cache_key="${album['additional']['thumbnail']['cache_key']}"&type="unit"&size="sm"&api="SYNO.${Util.version == 7 ? "Foto" : "Photo"}.Thumbnail"&method="get"&version=1&_sid=${Util.sid}';
+        '${Util.instance.baseUrl}/webapi/entry.cgi?id=${album['additional']['thumbnail']['unit_id']}&cache_key="${album['additional']['thumbnail']['cache_key']}"&type="unit"&size="sm"&api="SYNO.${Util.instance.version == 7 ? "Foto" : "Photo"}.Thumbnail"&method="get"&version=1&_sid=${Util.instance.sid}';
     String tag = "album-${album['additional']['thumbnail']['unit_id']}";
     return GestureDetector(
       onTap: () {

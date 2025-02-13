@@ -103,7 +103,7 @@ class _SelectLocalFolderState extends State<SelectLocalFolder> {
   }
 
   Widget _buildFileItem(FileSystemEntity file) {
-    FileTypeEnum fileType = Util.fileType(file.path);
+    FileTypeEnum fileType = Util.instance.fileType(file.path);
     bool isFile = FileSystemEntity.isFileSync(file.path);
     return Padding(
       padding: const EdgeInsets.only(top: 20.0, left: 20, right: 20),

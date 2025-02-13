@@ -56,9 +56,9 @@ class _VipState extends State<Vip> {
           checkPayment();
         } else {
           if (res.errCode == -2) {
-            Util.toast("已取消支付");
+            Util.instance.toast("已取消支付");
           } else {
-            Util.toast(
+            Util.instance.toast(
                 res.errStr?.isNotBlank == true ? res.errStr ?? '' : '支付失败');
           }
         }
@@ -69,10 +69,11 @@ class _VipState extends State<Vip> {
   checkPayment() async {
     var hide = showWeuiLoadingToast(context: context, backButtonClose: true);
     timer = Timer.periodic(Duration(seconds: 1), (_) async {
-      var res = await Util.post("${Util.appUrl}/payment/check",
+      var res = await Util.instance.post(
+          "${Util.instance.appUrl}/payment/check",
           data: {"out_trade_no": outTradeNo});
       if (res['code'] == 1) {
-        Util.toast("支付成功");
+        Util.instance.toast("支付成功");
         timer?.cancel();
         initData(tips: true);
         hide();
@@ -87,32 +88,33 @@ class _VipState extends State<Vip> {
   }
 
   initData({bool tips = false}) async {
-    String noAdTimeStr = await Util.getStorage("no_ad_time") ?? '';
+    String noAdTimeStr = await Util.instance.getStorage("no_ad_time") ?? '';
     if (noAdTimeStr.isNotBlank) {
       noAdTime = DateTime.parse(noAdTimeStr);
       if (noAdTime.isBefore(DateTime.now())) {
-        Util.removeStorage("no_ad_time");
+        Util.instance.removeStorage("no_ad_time");
         noAdTime = DateTime.now();
       }
     }
-    String lastVideoTimeStr = await Util.getStorage("last_video_time") ?? '';
+    String lastVideoTimeStr =
+        await Util.instance.getStorage("last_video_time") ?? '';
     if (lastVideoTimeStr.isNotBlank) {
       setState(() {
         lastVideoTime = DateTime.parse(lastVideoTimeStr);
       });
     }
-    userToken = await Util.getStorage("user_token") ?? '';
+    userToken = await Util.instance.getStorage("user_token") ?? '';
     if (userToken.isNotBlank) {
-      var res = await Util.post("${Util.appUrl}/vip/info",
-          data: {"token": userToken});
+      var res = await Util.instance
+          .post("${Util.instance.appUrl}/vip/info", data: {"token": userToken});
       if (res['code'] == 1) {
         isLogin = true;
         if (res['data']['is_forever'] == 1) {
-          isForever = Util.vipForever = true;
+          isForever = Util.instance.vipForever = true;
         }
         // isForever = Util.vipForever = true;
         if (res['data']['vip_expire_time'] != null) {
-          Util.vipExpireTime =
+          Util.instance.vipExpireTime =
               vipExpireTime = DateTime.parse(res['data']['vip_expire_time']);
           if (vipExpireTime.isAfter(noAdTime)) {
             noAdTime = vipExpireTime;
@@ -126,21 +128,21 @@ class _VipState extends State<Vip> {
   login(String code) async {
     var hide = showWeuiLoadingToast(context: context);
     try {
-      var res =
-          await Util.post("${Util.appUrl}/login/app", data: {"code": code});
+      var res = await Util.instance
+          .post("${Util.instance.appUrl}/login/app", data: {"code": code});
       if (res['code'] == 1) {
-        Util.setStorage("user_openid", res['data']['openid']);
-        Util.setStorage("user_token", res['data']['token']);
+        Util.instance.setStorage("user_openid", res['data']['openid']);
+        Util.instance.setStorage("user_token", res['data']['token']);
         setState(() {
           isLogin = true;
         });
-        Util.toast("登录成功");
+        Util.instance.toast("登录成功");
         initData();
       } else {
-        Util.toast(res['msg']);
+        Util.instance.toast(res['msg']);
       }
     } catch (e) {
-      Util.toast("登录失败：${e.toString()}");
+      Util.instance.toast("登录失败：${e.toString()}");
     } finally {
       hide();
     }
@@ -155,10 +157,11 @@ class _VipState extends State<Vip> {
       });
       lastVideoTime = DateTime.now();
       // Util.toast("恭喜您成功获得3天免广告特权");
-      Util.setStorage("no_ad_time", noAdTime.format("Y-m-d H:i:s"));
-      Util.setStorage("last_video_time", lastVideoTime.format("Y-m-d H:i:s"));
+      Util.instance.setStorage("no_ad_time", noAdTime.format("Y-m-d H:i:s"));
+      Util.instance
+          .setStorage("last_video_time", lastVideoTime.format("Y-m-d H:i:s"));
     } catch (e) {
-      Util.toast("广告播放失败");
+      Util.instance.toast("广告播放失败");
     } finally {
       hide();
     }
@@ -166,7 +169,7 @@ class _VipState extends State<Vip> {
 
   close3() {
     if (lastVideoTime.isSameDay(DateTime.now())) {
-      Util.toast("今天已经领取过，明天再来吧~");
+      Util.instance.toast("今天已经领取过，明天再来吧~");
       return;
     }
     showCupertinoDialog(
@@ -178,6 +181,8 @@ class _VipState extends State<Vip> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Card(
+                shape: RoundedRectangleBorder(
+                    side: BorderSide(), borderRadius: BorderRadius.circular(5)),
                 margin: EdgeInsets.symmetric(horizontal: 50),
                 child: Padding(
                   padding: EdgeInsets.all(20),
@@ -192,6 +197,9 @@ class _VipState extends State<Vip> {
                         height: 16,
                       ),
                       Card(
+                        shape: RoundedRectangleBorder(
+                            side: BorderSide(),
+                            borderRadius: BorderRadius.circular(5)),
                         child: Text("通过观看视频广告，可关闭3天开屏广告"),
                       ),
                       SizedBox(
@@ -249,6 +257,9 @@ class _VipState extends State<Vip> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Card(
+                  shape: RoundedRectangleBorder(
+                      side: BorderSide(),
+                      borderRadius: BorderRadius.circular(5)),
                   margin: EdgeInsets.symmetric(horizontal: 50),
                   child: Padding(
                     padding: EdgeInsets.all(20),
@@ -271,6 +282,9 @@ class _VipState extends State<Vip> {
                           height: 16,
                         ),
                         Card(
+                          shape: RoundedRectangleBorder(
+                              side: BorderSide(),
+                              borderRadius: BorderRadius.circular(5)),
                           child: Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: TextField(
@@ -292,19 +306,19 @@ class _VipState extends State<Vip> {
                               child: OutlinedButton(
                                 onPressed: () async {
                                   if (code.trim() == "") {
-                                    Util.toast("请输入兑换码");
+                                    Util.instance.toast("请输入兑换码");
                                     return;
                                   }
-                                  var res = await Util.post(
-                                      "${Util.appUrl}/vip/exchange",
+                                  var res = await Util.instance.post(
+                                      "${Util.instance.appUrl}/vip/exchange",
                                       data: {
                                         "token": userToken,
                                         "code": code.trim()
                                       });
                                   if (res['code'] == 0) {
-                                    Util.toast(res['msg']);
+                                    Util.instance.toast(res['msg']);
                                   } else {
-                                    Util.toast("兑换成功");
+                                    Util.instance.toast("兑换成功");
                                     initData(tips: true);
                                     Navigator.of(context).pop();
                                   }
@@ -360,6 +374,8 @@ class _VipState extends State<Vip> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Card(
+                shape: RoundedRectangleBorder(
+                    side: BorderSide(), borderRadius: BorderRadius.circular(5)),
                 margin: EdgeInsets.symmetric(horizontal: 50),
                 child: Padding(
                   padding: EdgeInsets.all(20),
@@ -448,7 +464,7 @@ class _VipState extends State<Vip> {
     if (!isLogin) {
       loginDialog();
     } else if (isForever) {
-      Util.toast("您已开通永久免广告特权，无需继续购买");
+      Util.instance.toast("您已开通永久免广告特权，无需继续购买");
     } else {
       var hide = showWeuiLoadingToast(context: context);
 
@@ -461,17 +477,18 @@ class _VipState extends State<Vip> {
   }
 
   getActivity() async {
-    var res = await Util.post("${Util.appUrl}/activity/activity");
+    var res =
+        await Util.instance.post("${Util.instance.appUrl}/activity/activity");
     if (res['code'] == 1) {
       activity = res['data'];
       setState(() {});
     } else {
-      Util.toast(res['msg']);
+      Util.instance.toast(res['msg']);
     }
   }
 
   payOrder(String type) async {
-    var res = await Util.post("${Util.appUrl}/payment/wechat",
+    var res = await Util.instance.post("${Util.instance.appUrl}/payment/wechat",
         data: {"token": userToken, "type": type});
     if (res['code'] == 1) {
       var data = res['data'];
@@ -487,7 +504,7 @@ class _VipState extends State<Vip> {
                 sign: data['sign']),
           );
     } else {
-      Util.toast(res['msg']);
+      Util.instance.toast(res['msg']);
     }
   }
 
@@ -543,6 +560,8 @@ class _VipState extends State<Vip> {
               ),
             ),
           Card(
+            shape: RoundedRectangleBorder(
+                side: BorderSide(), borderRadius: BorderRadius.circular(5)),
             child: Padding(
               padding: EdgeInsets.all(20.0),
               child: Row(
@@ -634,6 +653,8 @@ class NoAdButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
+      shape: RoundedRectangleBorder(
+          side: BorderSide(), borderRadius: BorderRadius.circular(5)),
       margin: EdgeInsets.only(top: 20),
       child: Padding(
         padding: EdgeInsets.all(20.0),

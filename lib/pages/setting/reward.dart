@@ -25,13 +25,15 @@ class _RewardState extends State<Reward> {
         rewards = res['data'];
       });
     } else {
-      Util.toast("获取列表失败");
+      Util.instance.toast("获取列表失败");
       Navigator.of(context).pop();
     }
   }
 
   Widget _buildRewardItem(reward) {
     return Card(
+      shape: RoundedRectangleBorder(
+          side: BorderSide(), borderRadius: BorderRadius.circular(5)),
       child: Row(
         children: [
           Expanded(child: Text(reward['name'])),

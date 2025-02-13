@@ -22,6 +22,8 @@ class _FeedbackState extends State<Feedback> {
         padding: EdgeInsets.all(20),
         children: [
           Card(
+            shape: RoundedRectangleBorder(
+                side: BorderSide(), borderRadius: BorderRadius.circular(5)),
             child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: TextField(
@@ -39,7 +41,7 @@ class _FeedbackState extends State<Feedback> {
           ),
           OutlinedButton(
               onPressed: () {
-                Util.toast("感谢您的反馈");
+                Util.instance.toast("感谢您的反馈");
                 Navigator.of(context).pop();
               },
               child: Row(

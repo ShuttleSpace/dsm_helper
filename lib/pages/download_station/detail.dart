@@ -101,6 +101,8 @@ class _DownloadDetailState extends State<DownloadDetail>
 
   Widget _buildFileItem(file) {
     return Card(
+      shape: RoundedRectangleBorder(
+          side: BorderSide(), borderRadius: BorderRadius.circular(5)),
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Column(
@@ -114,8 +116,8 @@ class _DownloadDetailState extends State<DownloadDetail>
             ),
             Row(
               children: [
-                Text("${Util.formatSize(file['size_downloaded'])} / "),
-                Text("${Util.formatSize(file['size'])}"),
+                Text("${Util.instance.formatSize(file['size_downloaded'])} / "),
+                Text("${Util.instance.formatSize(file['size'])}"),
                 SizedBox(
                   width: 10,
                 ),
@@ -147,6 +149,8 @@ class _DownloadDetailState extends State<DownloadDetail>
 
   Widget _buildPeerItem(peer) {
     return Card(
+      shape: RoundedRectangleBorder(
+          side: BorderSide(), borderRadius: BorderRadius.circular(5)),
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Column(
@@ -171,7 +175,7 @@ class _DownloadDetailState extends State<DownloadDetail>
                   size: 16,
                 ),
                 Text(
-                  "${Util.formatSize(peer['speed_download'])}",
+                  "${Util.instance.formatSize(peer['speed_download'])}",
                   style: TextStyle(color: Colors.green),
                 ),
                 SizedBox(
@@ -183,7 +187,7 @@ class _DownloadDetailState extends State<DownloadDetail>
                   size: 16,
                 ),
                 Text(
-                  "${Util.formatSize(peer['speed_upload'])}",
+                  "${Util.instance.formatSize(peer['speed_upload'])}",
                   style: TextStyle(color: Colors.blue),
                 ),
               ],
@@ -196,6 +200,8 @@ class _DownloadDetailState extends State<DownloadDetail>
 
   Widget _buildTrackerItem(tracker) {
     return Card(
+      shape: RoundedRectangleBorder(
+          side: BorderSide(), borderRadius: BorderRadius.circular(5)),
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Column(
@@ -249,13 +255,16 @@ class _DownloadDetailState extends State<DownloadDetail>
             padding: EdgeInsets.only(right: 10, top: 8, bottom: 8),
             child: OutlinedButton(
               onPressed: () {
-                Util.vibrate(FeedbackType.warning);
+                Util.instance.vibrate(FeedbackType.warning);
                 showCupertinoModalPopup(
                   context: context,
                   builder: (context) {
                     return Material(
                       color: Colors.transparent,
                       child: Card(
+                        shape: RoundedRectangleBorder(
+                            side: BorderSide(),
+                            borderRadius: BorderRadius.circular(5)),
                         child: SafeArea(
                           top: false,
                           child: Padding(
@@ -291,10 +300,10 @@ class _DownloadDetailState extends State<DownloadDetail>
                                               await Api.downloadTaskAction(
                                                   [task['id']], "delete");
                                           if (res['success']) {
-                                            Util.toast("任务删除成功");
+                                            Util.instance.toast("任务删除成功");
                                             Navigator.of(context).pop(true);
                                           } else {
-                                            Util.toast(
+                                            Util.instance.toast(
                                                 "任务删除失败，代码：${res['error']['code']}");
                                           }
                                         },
@@ -352,6 +361,9 @@ class _DownloadDetailState extends State<DownloadDetail>
           : Column(
               children: [
                 Card(
+                  shape: RoundedRectangleBorder(
+                      side: BorderSide(),
+                      borderRadius: BorderRadius.circular(5)),
                   margin: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
                   child: TabBar(
                     dividerHeight: 0,
@@ -364,7 +376,7 @@ class _DownloadDetailState extends State<DownloadDetail>
                     unselectedLabelColor: Colors.grey,
                     indicator: BubbleTabIndicator(
                       indicatorColor: Theme.of(context).scaffoldBackgroundColor,
-                      shadowColor: Util.getAdjustColor(
+                      shadowColor: Util.instance.getAdjustColor(
                           Theme.of(context).scaffoldBackgroundColor, -20),
                     ),
                     tabs: [
@@ -410,6 +422,9 @@ class _DownloadDetailState extends State<DownloadDetail>
                       ListView(
                         children: [
                           Card(
+                            shape: RoundedRectangleBorder(
+                                side: BorderSide(),
+                                borderRadius: BorderRadius.circular(5)),
                             margin: EdgeInsets.symmetric(
                                 horizontal: 20, vertical: 10),
                             child: Padding(
@@ -426,6 +441,9 @@ class _DownloadDetailState extends State<DownloadDetail>
                             ),
                           ),
                           Card(
+                            shape: RoundedRectangleBorder(
+                                side: BorderSide(),
+                                borderRadius: BorderRadius.circular(5)),
                             margin: EdgeInsets.symmetric(
                                 horizontal: 20, vertical: 10),
                             child: Padding(
@@ -445,6 +463,9 @@ class _DownloadDetailState extends State<DownloadDetail>
                             ),
                           ),
                           Card(
+                            shape: RoundedRectangleBorder(
+                                side: BorderSide(),
+                                borderRadius: BorderRadius.circular(5)),
                             margin: EdgeInsets.symmetric(
                                 horizontal: 20, vertical: 10),
                             child: Padding(
@@ -455,7 +476,7 @@ class _DownloadDetailState extends State<DownloadDetail>
                                   Text("文件大小："),
                                   Expanded(
                                     child: Text(
-                                      "${task['size'] > 0 ? Util.formatSize(task['size']) : "未取得"}",
+                                      "${task['size'] > 0 ? Util.instance.formatSize(task['size']) : "未取得"}",
                                     ),
                                   ),
                                 ],
@@ -463,6 +484,9 @@ class _DownloadDetailState extends State<DownloadDetail>
                             ),
                           ),
                           Card(
+                            shape: RoundedRectangleBorder(
+                                side: BorderSide(),
+                                borderRadius: BorderRadius.circular(5)),
                             margin: EdgeInsets.symmetric(
                                 horizontal: 20, vertical: 10),
                             child: Padding(
@@ -476,6 +500,9 @@ class _DownloadDetailState extends State<DownloadDetail>
                             ),
                           ),
                           Card(
+                            shape: RoundedRectangleBorder(
+                                side: BorderSide(),
+                                borderRadius: BorderRadius.circular(5)),
                             margin: EdgeInsets.symmetric(
                                 horizontal: 20, vertical: 10),
                             child: Padding(
@@ -493,7 +520,7 @@ class _DownloadDetailState extends State<DownloadDetail>
                                           text: task['additional']['detail']
                                               ['uri']);
                                       Clipboard.setData(data);
-                                      Util.toast("已复制到剪贴板");
+                                      Util.instance.toast("已复制到剪贴板");
                                     },
                                     child: SizedBox(
                                       width: 20,
@@ -510,6 +537,9 @@ class _DownloadDetailState extends State<DownloadDetail>
                             ),
                           ),
                           Card(
+                            shape: RoundedRectangleBorder(
+                                side: BorderSide(),
+                                borderRadius: BorderRadius.circular(5)),
                             margin: EdgeInsets.symmetric(
                                 horizontal: 20, vertical: 10),
                             child: Padding(
@@ -527,6 +557,9 @@ class _DownloadDetailState extends State<DownloadDetail>
                             ),
                           ),
                           Card(
+                            shape: RoundedRectangleBorder(
+                                side: BorderSide(),
+                                borderRadius: BorderRadius.circular(5)),
                             margin: EdgeInsets.symmetric(
                                 horizontal: 20, vertical: 10),
                             child: Padding(
@@ -548,6 +581,9 @@ class _DownloadDetailState extends State<DownloadDetail>
                             ),
                           ),
                           Card(
+                            shape: RoundedRectangleBorder(
+                                side: BorderSide(),
+                                borderRadius: BorderRadius.circular(5)),
                             margin: EdgeInsets.symmetric(
                                 horizontal: 20, vertical: 10),
                             child: Padding(
@@ -558,8 +594,9 @@ class _DownloadDetailState extends State<DownloadDetail>
                                   Text(task['additional']['detail']
                                               ['waiting_seconds'] >
                                           0
-                                      ? Util.timeRemaining(task['additional']
-                                          ['detail']['waiting_seconds'])
+                                      ? Util.instance.timeRemaining(
+                                          task['additional']['detail']
+                                              ['waiting_seconds'])
                                       : "无法取得"),
                                 ],
                               ),
@@ -570,6 +607,9 @@ class _DownloadDetailState extends State<DownloadDetail>
                       ListView(
                         children: [
                           Card(
+                            shape: RoundedRectangleBorder(
+                                side: BorderSide(),
+                                borderRadius: BorderRadius.circular(5)),
                             margin: EdgeInsets.symmetric(
                                 horizontal: 20, vertical: 10),
                             child: Padding(
@@ -587,7 +627,7 @@ class _DownloadDetailState extends State<DownloadDetail>
                                           )
                                         : task['status'] == 2
                                             ? Text(
-                                                "${Util.formatSize(task['additional']['transfer']['speed_download'])}/s",
+                                                "${Util.instance.formatSize(task['additional']['transfer']['speed_download'])}/s",
                                                 style: TextStyle(
                                                     color:
                                                         Colors.lightBlueAccent),
@@ -647,6 +687,9 @@ class _DownloadDetailState extends State<DownloadDetail>
                             ),
                           ),
                           Card(
+                            shape: RoundedRectangleBorder(
+                                side: BorderSide(),
+                                borderRadius: BorderRadius.circular(5)),
                             margin: EdgeInsets.symmetric(
                                 horizontal: 20, vertical: 10),
                             child: Padding(
@@ -657,8 +700,9 @@ class _DownloadDetailState extends State<DownloadDetail>
                                   Text("已下载："),
                                   Expanded(
                                     child: Text(
-                                      Util.formatSize(task['additional']
-                                          ['transfer']['size_downloaded']),
+                                      Util.instance.formatSize(
+                                          task['additional']['transfer']
+                                              ['size_downloaded']),
                                     ),
                                   ),
                                 ],
@@ -666,6 +710,9 @@ class _DownloadDetailState extends State<DownloadDetail>
                             ),
                           ),
                           Card(
+                            shape: RoundedRectangleBorder(
+                                side: BorderSide(),
+                                borderRadius: BorderRadius.circular(5)),
                             margin: EdgeInsets.symmetric(
                                 horizontal: 20, vertical: 10),
                             child: Padding(
@@ -676,7 +723,7 @@ class _DownloadDetailState extends State<DownloadDetail>
                                   Text("已上传："),
                                   Expanded(
                                     child: Text(
-                                      "${Util.formatSize(task['additional']['transfer']['size_uploaded'])} （${task['additional']['transfer']['size_downloaded'] > 0 ? (task['additional']['transfer']['size_uploaded'] / task['additional']['transfer']['size_downloaded'] * 100).toStringAsFixed(2) : "0"}%)",
+                                      "${Util.instance.formatSize(task['additional']['transfer']['size_uploaded'])} （${task['additional']['transfer']['size_downloaded'] > 0 ? (task['additional']['transfer']['size_uploaded'] / task['additional']['transfer']['size_downloaded'] * 100).toStringAsFixed(2) : "0"}%)",
                                     ),
                                   ),
                                 ],
@@ -684,6 +731,9 @@ class _DownloadDetailState extends State<DownloadDetail>
                             ),
                           ),
                           Card(
+                            shape: RoundedRectangleBorder(
+                                side: BorderSide(),
+                                borderRadius: BorderRadius.circular(5)),
                             margin: EdgeInsets.symmetric(
                                 horizontal: 20, vertical: 10),
                             child: Padding(
@@ -702,6 +752,9 @@ class _DownloadDetailState extends State<DownloadDetail>
                             ),
                           ),
                           Card(
+                            shape: RoundedRectangleBorder(
+                                side: BorderSide(),
+                                borderRadius: BorderRadius.circular(5)),
                             margin: EdgeInsets.symmetric(
                                 horizontal: 20, vertical: 10),
                             child: Padding(
@@ -710,12 +763,15 @@ class _DownloadDetailState extends State<DownloadDetail>
                                 children: [
                                   Text("速度："),
                                   Text(
-                                      "${task['additional']['transfer']['speed_download'] > 0 ? Util.formatSize(task['additional']['transfer']['speed_download']) : "无法取得"}"),
+                                      "${task['additional']['transfer']['speed_download'] > 0 ? Util.instance.formatSize(task['additional']['transfer']['speed_download']) : "无法取得"}"),
                                 ],
                               ),
                             ),
                           ),
                           Card(
+                            shape: RoundedRectangleBorder(
+                                side: BorderSide(),
+                                borderRadius: BorderRadius.circular(5)),
                             margin: EdgeInsets.symmetric(
                                 horizontal: 20, vertical: 10),
                             child: Padding(
@@ -732,6 +788,9 @@ class _DownloadDetailState extends State<DownloadDetail>
                             ),
                           ),
                           Card(
+                            shape: RoundedRectangleBorder(
+                                side: BorderSide(),
+                                borderRadius: BorderRadius.circular(5)),
                             margin: EdgeInsets.symmetric(
                                 horizontal: 20, vertical: 10),
                             child: Padding(
@@ -747,6 +806,9 @@ class _DownloadDetailState extends State<DownloadDetail>
                             ),
                           ),
                           Card(
+                            shape: RoundedRectangleBorder(
+                                side: BorderSide(),
+                                borderRadius: BorderRadius.circular(5)),
                             margin: EdgeInsets.symmetric(
                                 horizontal: 20, vertical: 10),
                             child: Padding(
@@ -761,6 +823,9 @@ class _DownloadDetailState extends State<DownloadDetail>
                             ),
                           ),
                           Card(
+                            shape: RoundedRectangleBorder(
+                                side: BorderSide(),
+                                borderRadius: BorderRadius.circular(5)),
                             margin: EdgeInsets.symmetric(
                                 horizontal: 20, vertical: 10),
                             child: Padding(
@@ -769,12 +834,15 @@ class _DownloadDetailState extends State<DownloadDetail>
                                 children: [
                                   Text("已做种时间："),
                                   Text(
-                                      "${Util.timeRemaining(task['additional']['detail']['seed_elapsed'])}"),
+                                      "${Util.instance.timeRemaining(task['additional']['detail']['seed_elapsed'])}"),
                                 ],
                               ),
                             ),
                           ),
                           Card(
+                            shape: RoundedRectangleBorder(
+                                side: BorderSide(),
+                                borderRadius: BorderRadius.circular(5)),
                             margin: EdgeInsets.symmetric(
                                 horizontal: 20, vertical: 10),
                             child: Padding(
@@ -789,6 +857,9 @@ class _DownloadDetailState extends State<DownloadDetail>
                             ),
                           ),
                           Card(
+                            shape: RoundedRectangleBorder(
+                                side: BorderSide(),
+                                borderRadius: BorderRadius.circular(5)),
                             margin: EdgeInsets.symmetric(
                                 horizontal: 20, vertical: 10),
                             child: Padding(
@@ -797,7 +868,7 @@ class _DownloadDetailState extends State<DownloadDetail>
                                 children: [
                                   Text("剩余时间："),
                                   Text(
-                                      "${task['additional']['transfer']['speed_download'] > 0 ? Util.timeRemaining(((task['size'] - task['additional']['transfer']['size_downloaded']) / task['additional']['transfer']['speed_download']).ceil()) : "无法取得"}"),
+                                      "${task['additional']['transfer']['speed_download'] > 0 ? Util.instance.timeRemaining(((task['size'] - task['additional']['transfer']['size_downloaded']) / task['additional']['transfer']['speed_download']).ceil()) : "无法取得"}"),
                                 ],
                               ),
                             ),

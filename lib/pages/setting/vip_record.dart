@@ -30,7 +30,7 @@ class _VipRecordState extends State<VipRecord> {
         loading = false;
       });
     } catch (e) {
-      Util.toast(e.toString());
+      Util.instance.toast(e.toString());
       Navigator.of(context).pop(false);
     }
   }
@@ -76,6 +76,8 @@ class _VipRecordState extends State<VipRecord> {
 
   Widget _buildRecordItem(VipRecordModel record) {
     return Card(
+      shape: RoundedRectangleBorder(
+          side: BorderSide(), borderRadius: BorderRadius.circular(5)),
       margin: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -96,13 +98,15 @@ class _VipRecordState extends State<VipRecord> {
             OutlinedButton(
               onPressed: () async {
                 var hide = showWeuiLoadingToast(context: context);
-                String userToken = await Util.getStorage("user_token") ?? '';
-                var res = await Util.post("${Util.appUrl}/vip/redemption",
+                String userToken =
+                    await Util.instance.getStorage("user_token") ?? '';
+                var res = await Util.instance.post(
+                    "${Util.instance.appUrl}/vip/redemption",
                     data: {"token": userToken, "id": record.id});
                 print(res);
                 hide();
                 if (res['code'] == 0) {
-                  Util.toast(res['msg']);
+                  Util.instance.toast(res['msg']);
                 } else {
                   showCupertinoDialog(
                     context: context,
@@ -113,6 +117,9 @@ class _VipRecordState extends State<VipRecord> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Card(
+                              shape: RoundedRectangleBorder(
+                                  side: BorderSide(),
+                                  borderRadius: BorderRadius.circular(5)),
                               margin: EdgeInsets.symmetric(horizontal: 50),
                               child: Padding(
                                 padding: EdgeInsets.all(20),
@@ -128,6 +135,10 @@ class _VipRecordState extends State<VipRecord> {
                                       height: 16,
                                     ),
                                     Card(
+                                      shape: RoundedRectangleBorder(
+                                          side: BorderSide(),
+                                          borderRadius:
+                                              BorderRadius.circular(5)),
                                       child: Text("${res['data']['code']}"),
                                     ),
                                     SizedBox(
@@ -154,7 +165,7 @@ class _VipRecordState extends State<VipRecord> {
                                             onPressed: () async {
                                               Clipboard.setData(ClipboardData(
                                                   text: res['data']['code']));
-                                              Util.toast("兑换码已复制到剪贴板");
+                                              Util.instance.toast("兑换码已复制到剪贴板");
                                             },
                                             child: Text(
                                               "复制",

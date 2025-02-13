@@ -55,7 +55,11 @@ enum UploadStatus {
 }
 
 class Util {
-  static GroupsModel groups = GroupsModel(
+  Util._internal();
+  factory Util() => _instance;
+  static late final Util _instance = Util._internal();
+  static Util get instance => _instance;
+  GroupsModel groups = GroupsModel(
     qq: [
       GroupModel(
           name: "交流群①",
@@ -86,43 +90,43 @@ class Util {
       GroupModel(name: "群晖助手APP", no: "", key: "", status: ""),
     ],
   );
-  static bool isWechatInstalled = false;
-  static DateTime vipExpireTime = DateTime.now();
-  static bool vipForever = false;
-  static String appUrl = "http://humphreyd.cn";
-  static String sid = "";
-  static String account = "";
-  static String baseUrl = "http://humphreyd.cn";
-  static String hostname = "";
-  static int version = 6;
-  static bool checkSsl = true;
-  static bool vibrateOn = true;
-  static bool vibrateWarning = true;
-  static bool vibrateNormal = true;
-  static String cookie = "";
-  static Map strings = {};
-  static Map notifyStrings = {};
-  static bool isAuthPage = false;
-  static GlobalKey<DownloadState> downloadKey = GlobalKey<DownloadState>();
-  static String appName = "";
+  bool isWechatInstalled = false;
+  DateTime vipExpireTime = DateTime.now();
+  bool vipForever = false;
+  String appUrl = "https://dang8080.quickconnect.to";
+  String sid = "";
+  String account = "";
+  String baseUrl = "https://dang8080.quickconnect.to";
+  String hostname = "";
+  int version = 6;
+  bool checkSsl = true;
+  bool vibrateOn = true;
+  bool vibrateWarning = true;
+  bool vibrateNormal = true;
+  String cookie = "";
+  Map strings = {};
+  Map notifyStrings = {};
+  bool isAuthPage = false;
+  GlobalKey<DownloadState> downloadKey = GlobalKey<DownloadState>();
+  String appName = "";
 
-  static String downloadSavePath = "";
-  static bool downloadWifiOnly = true;
+  String downloadSavePath = "";
+  bool downloadWifiOnly = true;
 
-  static bool get notReviewAccount => account != "jinx";
-  static toast(String text) {
+  bool get notReviewAccount => account != "jinx";
+  toast(String text) {
     showToast(text ?? "",
         dismissOtherToast: true,
         textPadding: EdgeInsets.symmetric(horizontal: 15, vertical: 8));
   }
 
-  static String systemVersion(String version) {
+  String systemVersion(String version) {
     version = version.replaceAll("DSM ", "");
-    Util.version = int.parse(version.split(".").first);
+    Util.instance.version = int.parse(version.split(".").first);
     return version;
   }
 
-  static vibrate(FeedbackType type) async {
+  vibrate(FeedbackType type) async {
     if (vibrateOn) {
       bool canVibrate = await Vibrate.canVibrate;
       if (canVibrate) {
@@ -139,7 +143,7 @@ class Util {
     }
   }
 
-  static int versionCompare(String v1, String v2) {
+  int versionCompare(String v1, String v2) {
     String buildNumber1 = '';
     String buildNumber2 = '';
     List version1 = v1.split("-");
@@ -154,7 +158,7 @@ class Util {
     return int.parse(buildNumber1).compareTo(int.parse(buildNumber2));
   }
 
-  static String parseOpTime(String optime) {
+  String parseOpTime(String optime) {
     List items = optime.split(":");
     int days = int.parse(items[0]) ~/ 24;
     items[0] = (int.parse(items[0]) % 24).toString().padLeft(2, "0");
@@ -163,7 +167,7 @@ class Util {
     return "${days > 0 ? "$days天" : ""} ${items.join(":")}";
   }
 
-  static Map timeLong(int ticket) {
+  Map timeLong(int ticket) {
     int seconds = ticket % 60;
     int minutes = ticket ~/ 60 % 60;
     int hours = ticket ~/ 60 ~/ 60;
@@ -174,13 +178,13 @@ class Util {
     };
   }
 
-  static String utf8Encode(String data) {
+  String utf8Encode(String data) {
     List<int> utf8Str = utf8.encode(data);
     String encoded = utf8Str.map((e) => e.toRadixString(16)).join("");
     return encoded;
   }
 
-  static Color getAdjustColor(Color baseColor, double amount) {
+  Color getAdjustColor(Color baseColor, double amount) {
     Map<String, int> colors = {
       'r': baseColor.red,
       'g': baseColor.green,
@@ -200,7 +204,7 @@ class Util {
         colors['r'] ?? 0, colors['g'] ?? 0, colors['b'] ?? 0, 1);
   }
 
-  static FileTypeEnum fileType(String name) {
+  FileTypeEnum fileType(String name) {
     List<String> image = [
       "png",
       "jpg",
@@ -345,7 +349,7 @@ class Util {
     }
   }
 
-  static Future<dynamic> get(String url,
+  Future<dynamic> get(String url,
       {Map<String, dynamic>? data,
       bool login = true,
       String? host,
@@ -356,7 +360,7 @@ class Util {
       int timeout = 20,
       bool decode = true}) async {
     headers = headers ?? {};
-    headers['Cookie'] = cookie ?? Util.cookie;
+    headers['Cookie'] = cookie ?? Util.instance.cookie;
 
     headers["Accept-Language"] =
         "zh-CN,zh;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6,zh-TW;q=0.5";
@@ -378,7 +382,7 @@ class Util {
     //   }; //
     // }
     //忽略Https校验
-    if (!(checkSsl ?? Util.checkSsl)) {
+    if (!(checkSsl ?? Util.instance.checkSsl)) {
       (dio.httpClientAdapter as IOHttpClientAdapter).onHttpClientCreate =
           (client) {
         client.badCertificateCallback = (cert, host, port) {
@@ -398,8 +402,8 @@ class Util {
           List cookies = [];
           //从原始cookie中提取did
           String did = "";
-          if (Util.cookie != '') {
-            List originCookies = Util.cookie.split("; ");
+          if (Util.instance.cookie != '') {
+            List originCookies = Util.instance.cookie.split("; ");
             for (int i = 0; i < originCookies.length; i++) {
               Cookie cookie = Cookie.fromSetCookieValue(originCookies[i]);
               if (cookie.name == "did") {
@@ -421,8 +425,8 @@ class Util {
             cookies.add("did=$did");
           }
 
-          Util.cookie = cookies.join("; ");
-          setStorage("smid", Util.cookie);
+          Util.instance.cookie = cookies.join("; ");
+          setStorage("smid", Util.instance.cookie);
         }
       }
 
@@ -456,18 +460,18 @@ class Util {
     }
   }
 
-  static String base64ToString(String source) {
+  String base64ToString(String source) {
     List<int> bytes = base64.decode(source);
     String result = utf8.decode(bytes);
 
     return result;
   }
 
-  static void logPrint(Object obj) {
+  void logPrint(Object obj) {
     Log.logger.info(obj);
   }
 
-  static Future<dynamic> post(String url,
+  Future<dynamic> post(String url,
       {Map<String, dynamic>? data,
       bool login = true,
       String? host,
@@ -477,7 +481,7 @@ class Util {
       String? cookie,
       int timeout = 20}) async {
     headers = headers ?? {};
-    headers['Cookie'] = cookie ?? Util.cookie;
+    headers['Cookie'] = cookie ?? Util.instance.cookie;
     headers["Accept-Language"] =
         "zh-CN,zh;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6,zh-TW;q=0.5";
     headers['origin'] = host ?? baseUrl;
@@ -512,7 +516,7 @@ class Util {
     //   responseHeader: false,
     //   logPrint: logPrint,
     // ));
-    if (!(checkSsl ?? Util.checkSsl)) {
+    if (!(checkSsl ?? Util.instance.checkSsl)) {
       (dio.httpClientAdapter as IOHttpClientAdapter).onHttpClientCreate =
           (client) {
         client.badCertificateCallback = (cert, host, port) {
@@ -536,7 +540,7 @@ class Util {
     }
   }
 
-  static Future<dynamic> upload(String url,
+  Future<dynamic> upload(String url,
       {Map<String, dynamic>? params,
       required Map<String, dynamic> data,
       bool login = true,
@@ -545,7 +549,7 @@ class Util {
       Function(int, int)? onSendProgress,
       Map<String, dynamic>? headers}) async {
     headers = headers ?? {};
-    headers['Cookie'] = Util.cookie;
+    headers['Cookie'] = Util.instance.cookie;
     headers['Accept-Encoding'] = "gzip, deflate";
     headers['Accept'] = "*/*";
     // headers["Accept-Language"] = "zh-CN,zh;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6,zh-TW;q=0.5";
@@ -612,7 +616,7 @@ class Util {
     }
   }
 
-  static Future<String> getDownloadPath() async {
+  Future<String> getDownloadPath() async {
     // final directory = Platform.isAndroid ? await getExternalStorageDirectory() : await getApplicationDocumentsDirectory();
     if (Platform.isAndroid) {
       // DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
@@ -630,8 +634,8 @@ class Util {
     }
   }
 
-  static Future<dynamic> downloadPkg(String saveName, String url,
-      onReceiveProgress, CancelToken cancelToken) async {
+  Future<dynamic> downloadPkg(String saveName, String url, onReceiveProgress,
+      CancelToken cancelToken) async {
     Dio dio = new Dio();
     Directory tempDir = await getTemporaryDirectory();
     String tempPath = tempDir.path;
@@ -658,7 +662,7 @@ class Util {
     }
   }
 
-  static String getUniqueName(String path, String name) {
+  String getUniqueName(String path, String name) {
     bool unique = true;
     int num = 0;
     String uniqueName = '';
@@ -683,7 +687,7 @@ class Util {
     // return fullPath;
   }
 
-  static Future<String?> download(String saveName, String url) async {
+  Future<String?> download(String saveName, String url) async {
     //检查权限
     // bool permission = false;
     // permission = await Permission.storage.request().isGranted;
@@ -715,7 +719,7 @@ class Util {
     return taskId;
   }
 
-  static String formatSize(num size,
+  String formatSize(num size,
       {int format = 1024, int fixed = 2, bool showByte = false}) {
     if (size == 0) {
       return "0${showByte ? 'Bytes' : ''}";
@@ -732,7 +736,7 @@ class Util {
     }
   }
 
-  static double chartInterval(num maxNetworkSpeed) {
+  double chartInterval(num maxNetworkSpeed) {
     if (maxNetworkSpeed < 1024) {
       return 102.4;
     } else if (maxNetworkSpeed < 1024 * 2) {
@@ -760,29 +764,29 @@ class Util {
     }
   }
 
-  static String timeRemaining(int seconds) {
+  String timeRemaining(int seconds) {
     int hour = seconds / 60 ~/ 60;
     int minute = (seconds - hour * 60 * 60) ~/ 60;
     int second = seconds ~/ 60;
     return "${hour.toString().padLeft(2, "0")}:${minute.toString().padLeft(2, "0")}:${second.toString().padLeft(2, "0")}";
   }
 
-  static Future<bool> setStorage(String name, String value) async {
+  Future<bool> setStorage(String name, String value) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     return prefs.setString(name, value ?? "");
   }
 
-  static Future<String?> getStorage(String name) async {
+  Future<String?> getStorage(String name) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     return prefs.getString(name);
   }
 
-  static Future<bool> removeStorage(String name) async {
+  Future<bool> removeStorage(String name) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     return prefs.remove(name);
   }
 
-  static Future<Map> saveImage(String url,
+  Future<Map> saveImage(String url,
       {required BuildContext context, bool showLoading = true}) async {
     var hide;
     try {
@@ -814,7 +818,7 @@ class Util {
       bool result = false;
       if (save != null) {
         result = await ImageGallerySaver.saveImage(save.readAsBytesSync(),
-            name: Util.appName);
+            name: Util.instance.appName);
       } else {
         toast('获取缓存文件失败!');
       }
@@ -843,13 +847,12 @@ class Util {
     }
   }
 
-  static String rand() {
+  String rand() {
     var r = Random().nextInt(2147483646);
     return r.toString();
   }
 
-  static checkUpdate(bool showMsg, BuildContext context,
-      {bool force = false}) async {
+  checkUpdate(bool showMsg, BuildContext context, {bool force = false}) async {
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
     String buildNumber = packageInfo.buildNumber;
     if (kDebugMode) {

@@ -120,9 +120,11 @@ class _SecurityScanState extends State<SecurityScan>
       return webManagerStrings['rules'][
           "${strId}_desc_${status == 2 ? "good" : status == 0 ? "running" : "bad"}"];
     } else {
-      if (Util.strings['SYNO.SDS.SecurityScan.Instance'] != null &&
-          Util.strings['SYNO.SDS.SecurityScan.Instance']['rules'] != null) {
-        return (Util.strings['SYNO.SDS.SecurityScan.Instance']['rules'][
+      if (Util.instance.strings['SYNO.SDS.SecurityScan.Instance'] != null &&
+          Util.instance.strings['SYNO.SDS.SecurityScan.Instance']['rules'] !=
+              null) {
+        return (Util.instance.strings['SYNO.SDS.SecurityScan.Instance']['rules']
+                [
                 "${strId}_desc_${status == 2 ? "good" : status == 0 ? "running" : "bad"}"] ??
             "$strId");
       } else {
@@ -137,6 +139,8 @@ class _SecurityScanState extends State<SecurityScan>
     rules.forEach((value) {
       value['strId'] = value['strId'].replaceAll("_v2", "");
       list.add(Card(
+        shape: RoundedRectangleBorder(
+            side: BorderSide(), borderRadius: BorderRadius.circular(5)),
         margin: EdgeInsets.only(bottom: 20),
         child: Padding(
           padding: const EdgeInsets.all(20.0),
@@ -180,6 +184,9 @@ class _SecurityScanState extends State<SecurityScan>
           : Column(
               children: [
                 Card(
+                  shape: RoundedRectangleBorder(
+                      side: BorderSide(),
+                      borderRadius: BorderRadius.circular(5)),
                   margin: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
                   child: TabBar(
                     dividerHeight: 0,
@@ -192,7 +199,7 @@ class _SecurityScanState extends State<SecurityScan>
                     unselectedLabelColor: Colors.grey,
                     indicator: BubbleTabIndicator(
                       indicatorColor: Theme.of(context).scaffoldBackgroundColor,
-                      shadowColor: Util.getAdjustColor(
+                      shadowColor: Util.instance.getAdjustColor(
                           Theme.of(context).scaffoldBackgroundColor, -20),
                     ),
                     tabs: [
@@ -227,6 +234,9 @@ class _SecurityScanState extends State<SecurityScan>
                         padding: EdgeInsets.all(20),
                         children: [
                           Card(
+                            shape: RoundedRectangleBorder(
+                                side: BorderSide(),
+                                borderRadius: BorderRadius.circular(5)),
                             child: Padding(
                               padding: EdgeInsets.all(20),
                               child: Row(
@@ -295,7 +305,7 @@ class _SecurityScanState extends State<SecurityScan>
                                         )
                                       else
                                         Text(
-                                          "已运行：${Util.timeRemaining(DateTime.now().secondsSinceEpoch - int.parse(startTime))}",
+                                          "已运行：${Util.instance.timeRemaining(DateTime.now().secondsSinceEpoch - int.parse(startTime))}",
                                           style: TextStyle(fontSize: 14),
                                         ),
                                     ],

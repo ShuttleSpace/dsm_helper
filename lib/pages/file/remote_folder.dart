@@ -35,6 +35,8 @@ class _RemoteFolderState extends State<RemoteFolder>
       body: Column(
         children: [
           Card(
+            shape: RoundedRectangleBorder(
+                side: BorderSide(), borderRadius: BorderRadius.circular(5)),
             margin: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
             child: TabBar(
               dividerHeight: 0,
@@ -46,7 +48,7 @@ class _RemoteFolderState extends State<RemoteFolder>
               unselectedLabelColor: Colors.grey,
               indicator: BubbleTabIndicator(
                 indicatorColor: Theme.of(context).scaffoldBackgroundColor,
-                shadowColor: Util.getAdjustColor(
+                shadowColor: Util.instance.getAdjustColor(
                     Theme.of(context).scaffoldBackgroundColor, -20),
               ),
               tabs: [
@@ -69,6 +71,9 @@ class _RemoteFolderState extends State<RemoteFolder>
                   padding: EdgeInsets.all(20),
                   children: [
                     Card(
+                      shape: RoundedRectangleBorder(
+                          side: BorderSide(),
+                          borderRadius: BorderRadius.circular(5)),
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: TextField(
@@ -84,6 +89,9 @@ class _RemoteFolderState extends State<RemoteFolder>
                       height: 20,
                     ),
                     Card(
+                      shape: RoundedRectangleBorder(
+                          side: BorderSide(),
+                          borderRadius: BorderRadius.circular(5)),
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: TextField(
@@ -99,6 +107,9 @@ class _RemoteFolderState extends State<RemoteFolder>
                       height: 20,
                     ),
                     Card(
+                      shape: RoundedRectangleBorder(
+                          side: BorderSide(),
+                          borderRadius: BorderRadius.circular(5)),
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: TextField(
@@ -168,6 +179,9 @@ class _RemoteFolderState extends State<RemoteFolder>
                         });
                       },
                       child: Card(
+                        shape: RoundedRectangleBorder(
+                            side: BorderSide(),
+                            borderRadius: BorderRadius.circular(5)),
                         child: Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: Row(
@@ -190,25 +204,26 @@ class _RemoteFolderState extends State<RemoteFolder>
                     OutlinedButton(
                       onPressed: () async {
                         if (mountPoint == "") {
-                          Util.toast("请选择保存位置");
-                          Util.vibrate(FeedbackType.impact);
+                          Util.instance.toast("请选择保存位置");
+                          Util.instance.vibrate(FeedbackType.impact);
                           return;
                         }
                         if (serverIp.trim() == "") {
-                          Util.toast("请输入远程文件夹地址");
+                          Util.instance.toast("请输入远程文件夹地址");
                           return;
                         }
                         var res = await Api.mountFolder(
                             serverIp, account, passwd, mountPoint, autoMount);
                         if (res['success']) {
-                          Util.toast("装载成功");
-                          Util.vibrate(FeedbackType.light);
+                          Util.instance.toast("装载成功");
+                          Util.instance.vibrate(FeedbackType.light);
                         } else {
-                          Util.vibrate(FeedbackType.warning);
+                          Util.instance.vibrate(FeedbackType.warning);
                           if (res['error']['code'] == 436) {
-                            Util.toast("远程文件夹地址有误");
+                            Util.instance.toast("远程文件夹地址有误");
                           } else {
-                            Util.toast("装载失败，代码${res['error']['code']}");
+                            Util.instance
+                                .toast("装载失败，代码${res['error']['code']}");
                           }
                         }
                       },

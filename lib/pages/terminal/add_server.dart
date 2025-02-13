@@ -31,7 +31,7 @@ class _AddServerState extends State<AddServer> {
   }
 
   getData() async {
-    String str = await Util.getStorage("terminal_servers") ?? '';
+    String str = await Util.instance.getStorage("terminal_servers") ?? '';
     setState(() {
       if (str.isNotBlank) {
         servers = json.decode(str);
@@ -61,7 +61,7 @@ class _AddServerState extends State<AddServer> {
     servers[widget.index] = server;
 
     // print(servers);
-    Util.setStorage("terminal_servers", jsonEncode(servers));
+    Util.instance.setStorage("terminal_servers", jsonEncode(servers));
     Navigator.of(context).pop();
   }
 
@@ -83,6 +83,8 @@ class _AddServerState extends State<AddServer> {
               height: 20,
             ),
             Card(
+              shape: RoundedRectangleBorder(
+                  side: BorderSide(), borderRadius: BorderRadius.circular(5)),
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Row(
@@ -118,6 +120,8 @@ class _AddServerState extends State<AddServer> {
               height: 20,
             ),
             Card(
+              shape: RoundedRectangleBorder(
+                  side: BorderSide(), borderRadius: BorderRadius.circular(5)),
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: TextField(
@@ -134,6 +138,8 @@ class _AddServerState extends State<AddServer> {
               height: 20,
             ),
             Card(
+              shape: RoundedRectangleBorder(
+                  side: BorderSide(), borderRadius: BorderRadius.circular(5)),
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: TextField(

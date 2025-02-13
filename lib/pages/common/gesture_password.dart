@@ -47,19 +47,19 @@ class _GesturePasswordPageState extends State<GesturePasswordPage> {
                 minLength: 4,
                 onComplete: (s) {
                   if (step == 1) {
-                    Util.vibrate(FeedbackType.light);
+                    Util.instance.vibrate(FeedbackType.light);
                     setState(() {
                       newPassword = s.join('');
                       step = 2;
                     });
                   } else if (step == 2) {
                     if (s == newPassword) {
-                      Util.vibrate(FeedbackType.success);
-                      Util.setStorage("gesture_password", s.join(''));
+                      Util.instance.vibrate(FeedbackType.success);
+                      Util.instance.setStorage("gesture_password", s.join(''));
                       Navigator.of(context).pop(true);
                     } else {
-                      Util.toast("两次图案不一致，请重新设置");
-                      Util.vibrate(FeedbackType.warning);
+                      Util.instance.toast("两次图案不一致，请重新设置");
+                      Util.instance.vibrate(FeedbackType.warning);
                       setState(() {
                         step = 1;
                         newPassword = "";

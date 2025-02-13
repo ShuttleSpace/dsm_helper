@@ -184,6 +184,8 @@ class _PowerState extends State<Power> with SingleTickerProviderStateMixin {
         });
       },
       child: Card(
+        shape: RoundedRectangleBorder(
+            side: BorderSide(), borderRadius: BorderRadius.circular(5)),
         margin: EdgeInsets.only(top: 20, left: 20, right: 20),
         child: Padding(
           padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
@@ -263,8 +265,8 @@ class _PowerState extends State<Power> with SingleTickerProviderStateMixin {
                             if (item != task &&
                                 item['hour'] == value['hour'] &&
                                 item['min'] == value['min']) {
-                              Util.toast("无效或重复规则");
-                              Util.vibrate(FeedbackType.warning);
+                              Util.instance.toast("无效或重复规则");
+                              Util.instance.vibrate(FeedbackType.warning);
                               return;
                             }
                           }
@@ -304,6 +306,9 @@ class _PowerState extends State<Power> with SingleTickerProviderStateMixin {
           : Column(
               children: [
                 Card(
+                  shape: RoundedRectangleBorder(
+                      side: BorderSide(),
+                      borderRadius: BorderRadius.circular(5)),
                   margin: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
                   child: TabBar(
                     dividerHeight: 0,
@@ -316,7 +321,7 @@ class _PowerState extends State<Power> with SingleTickerProviderStateMixin {
                     unselectedLabelColor: Colors.grey,
                     indicator: BubbleTabIndicator(
                       indicatorColor: Theme.of(context).scaffoldBackgroundColor,
-                      shadowColor: Util.getAdjustColor(
+                      shadowColor: Util.instance.getAdjustColor(
                           Theme.of(context).scaffoldBackgroundColor, -20),
                     ),
                     tabs: [
@@ -353,6 +358,9 @@ class _PowerState extends State<Power> with SingleTickerProviderStateMixin {
                             child: ListView(
                               children: [
                                 Card(
+                                  shape: RoundedRectangleBorder(
+                                      side: BorderSide(),
+                                      borderRadius: BorderRadius.circular(5)),
                                   margin: EdgeInsets.only(
                                       top: 20, left: 20, right: 20),
                                   child: Padding(
@@ -381,6 +389,11 @@ class _PowerState extends State<Power> with SingleTickerProviderStateMixin {
                                                 });
                                               },
                                               child: Card(
+                                                shape: RoundedRectangleBorder(
+                                                    side: BorderSide(),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            5)),
                                                 child: Padding(
                                                   padding:
                                                       const EdgeInsets.all(8.0),
@@ -408,6 +421,9 @@ class _PowerState extends State<Power> with SingleTickerProviderStateMixin {
                                   ),
                                 ),
                                 Card(
+                                  shape: RoundedRectangleBorder(
+                                      side: BorderSide(),
+                                      borderRadius: BorderRadius.circular(5)),
                                   margin: EdgeInsets.only(
                                       top: 20, left: 20, right: 20),
                                   child: Padding(
@@ -439,6 +455,11 @@ class _PowerState extends State<Power> with SingleTickerProviderStateMixin {
                                                 });
                                               },
                                               child: Card(
+                                                shape: RoundedRectangleBorder(
+                                                    side: BorderSide(),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            5)),
                                                 child: Padding(
                                                   padding:
                                                       const EdgeInsets.all(8.0),
@@ -482,6 +503,14 @@ class _PowerState extends State<Power> with SingleTickerProviderStateMixin {
                                                       });
                                                     },
                                                     child: Card(
+                                                      shape:
+                                                          RoundedRectangleBorder(
+                                                              side:
+                                                                  BorderSide(),
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          5)),
                                                       child: Padding(
                                                         padding:
                                                             const EdgeInsets
@@ -513,6 +542,9 @@ class _PowerState extends State<Power> with SingleTickerProviderStateMixin {
                                   ),
                                 ),
                                 Card(
+                                  shape: RoundedRectangleBorder(
+                                      side: BorderSide(),
+                                      borderRadius: BorderRadius.circular(5)),
                                   margin: EdgeInsets.only(
                                       top: 20, left: 20, right: 20),
                                   child: Padding(
@@ -548,6 +580,11 @@ class _PowerState extends State<Power> with SingleTickerProviderStateMixin {
                                                   });
                                                 },
                                                 child: Card(
+                                                  shape: RoundedRectangleBorder(
+                                                      side: BorderSide(),
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              5)),
                                                   child: Padding(
                                                     padding:
                                                         const EdgeInsets.all(
@@ -589,6 +626,11 @@ class _PowerState extends State<Power> with SingleTickerProviderStateMixin {
                                                   });
                                                 },
                                                 child: Card(
+                                                  shape: RoundedRectangleBorder(
+                                                      side: BorderSide(),
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              5)),
                                                   child: Padding(
                                                     padding:
                                                         const EdgeInsets.all(
@@ -630,6 +672,11 @@ class _PowerState extends State<Power> with SingleTickerProviderStateMixin {
                                                   });
                                                 },
                                                 child: Card(
+                                                  shape: RoundedRectangleBorder(
+                                                      side: BorderSide(),
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              5)),
                                                   child: Padding(
                                                     padding:
                                                         const EdgeInsets.all(
@@ -671,6 +718,11 @@ class _PowerState extends State<Power> with SingleTickerProviderStateMixin {
                                                   });
                                                 },
                                                 child: Card(
+                                                  shape: RoundedRectangleBorder(
+                                                      side: BorderSide(),
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              5)),
                                                   child: Padding(
                                                     padding:
                                                         const EdgeInsets.all(
@@ -712,6 +764,11 @@ class _PowerState extends State<Power> with SingleTickerProviderStateMixin {
                                                   });
                                                 },
                                                 child: Card(
+                                                  shape: RoundedRectangleBorder(
+                                                      side: BorderSide(),
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              5)),
                                                   child: Padding(
                                                     padding:
                                                         const EdgeInsets.all(
@@ -753,6 +810,11 @@ class _PowerState extends State<Power> with SingleTickerProviderStateMixin {
                                                   });
                                                 },
                                                 child: Card(
+                                                  shape: RoundedRectangleBorder(
+                                                      side: BorderSide(),
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              5)),
                                                   child: Padding(
                                                     padding:
                                                         const EdgeInsets.all(
@@ -794,6 +856,11 @@ class _PowerState extends State<Power> with SingleTickerProviderStateMixin {
                                                   });
                                                 },
                                                 child: Card(
+                                                  shape: RoundedRectangleBorder(
+                                                      side: BorderSide(),
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              5)),
                                                   child: Padding(
                                                     padding:
                                                         const EdgeInsets.all(
@@ -834,6 +901,11 @@ class _PowerState extends State<Power> with SingleTickerProviderStateMixin {
                                                   });
                                                 },
                                                 child: Card(
+                                                  shape: RoundedRectangleBorder(
+                                                      side: BorderSide(),
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              5)),
                                                   child: Padding(
                                                     padding:
                                                         const EdgeInsets.all(
@@ -867,6 +939,9 @@ class _PowerState extends State<Power> with SingleTickerProviderStateMixin {
                                   ),
                                 ),
                                 Card(
+                                  shape: RoundedRectangleBorder(
+                                      side: BorderSide(),
+                                      borderRadius: BorderRadius.circular(5)),
                                   margin: EdgeInsets.only(
                                       top: 20, left: 20, right: 20),
                                   child: Padding(
@@ -896,6 +971,11 @@ class _PowerState extends State<Power> with SingleTickerProviderStateMixin {
                                                 });
                                               },
                                               child: Card(
+                                                shape: RoundedRectangleBorder(
+                                                    side: BorderSide(),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            5)),
                                                 child: Padding(
                                                   padding:
                                                       const EdgeInsets.all(8.0),
@@ -951,6 +1031,11 @@ class _PowerState extends State<Power> with SingleTickerProviderStateMixin {
                                                 });
                                               },
                                               child: Card(
+                                                shape: RoundedRectangleBorder(
+                                                    side: BorderSide(),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            5)),
                                                 child: Padding(
                                                   padding:
                                                       const EdgeInsets.all(8.0),
@@ -1006,6 +1091,11 @@ class _PowerState extends State<Power> with SingleTickerProviderStateMixin {
                                                 });
                                               },
                                               child: Card(
+                                                shape: RoundedRectangleBorder(
+                                                    side: BorderSide(),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            5)),
                                                 child: Padding(
                                                   padding:
                                                       const EdgeInsets.all(8.0),
@@ -1060,6 +1150,9 @@ class _PowerState extends State<Power> with SingleTickerProviderStateMixin {
                                   height: 20,
                                 ),
                                 Card(
+                                  shape: RoundedRectangleBorder(
+                                      side: BorderSide(),
+                                      borderRadius: BorderRadius.circular(5)),
                                   child: Padding(
                                     padding: const EdgeInsets.all(20.0),
                                     child: Column(
@@ -1104,15 +1197,16 @@ class _PowerState extends State<Power> with SingleTickerProviderStateMixin {
                                     powerRecovery, beepControl, fanSpeed, led);
                                 if (res['success']) {
                                   if (res['data']['has_fail'] == false) {
-                                    Util.vibrate(FeedbackType.light);
-                                    Util.toast("保存成功");
+                                    Util.instance.vibrate(FeedbackType.light);
+                                    Util.instance.toast("保存成功");
                                   } else {
-                                    Util.vibrate(FeedbackType.warning);
-                                    Util.toast("设置未完全保存成功");
+                                    Util.instance.vibrate(FeedbackType.warning);
+                                    Util.instance.toast("设置未完全保存成功");
                                   }
                                   getData();
                                 } else {
-                                  Util.toast("保存失败,代码${res['error']['code']}");
+                                  Util.instance
+                                      .toast("保存失败,代码${res['error']['code']}");
                                 }
                               },
                               child: Text(
@@ -1163,8 +1257,8 @@ class _PowerState extends State<Power> with SingleTickerProviderStateMixin {
                                           for (var item in powerTasks) {
                                             if (item['hour'] == value['hour'] &&
                                                 item['min'] == value['min']) {
-                                              Util.toast("无效或重复规则");
-                                              Util.vibrate(
+                                              Util.instance.toast("无效或重复规则");
+                                              Util.instance.vibrate(
                                                   FeedbackType.warning);
                                               return;
                                             }
@@ -1204,10 +1298,10 @@ class _PowerState extends State<Power> with SingleTickerProviderStateMixin {
                                       var res = await Api.powerScheduleSave(
                                           powerOns, powerOffs);
                                       if (res['success']) {
-                                        Util.toast("保存成功");
+                                        Util.instance.toast("保存成功");
                                         getData();
                                       } else {
-                                        Util.toast(
+                                        Util.instance.toast(
                                             "保存失败,代码${res['error']['code']}");
                                       }
                                     },
@@ -1228,6 +1322,9 @@ class _PowerState extends State<Power> with SingleTickerProviderStateMixin {
                             child: ListView(
                               children: [
                                 Card(
+                                  shape: RoundedRectangleBorder(
+                                      side: BorderSide(),
+                                      borderRadius: BorderRadius.circular(5)),
                                   margin: EdgeInsets.only(
                                       top: 20, left: 20, right: 20),
                                   child: Padding(
@@ -1271,6 +1368,10 @@ class _PowerState extends State<Power> with SingleTickerProviderStateMixin {
                                                 });
                                           },
                                           child: Card(
+                                            shape: RoundedRectangleBorder(
+                                                side: BorderSide(),
+                                                borderRadius:
+                                                    BorderRadius.circular(5)),
                                             child: Padding(
                                               padding:
                                                   const EdgeInsets.all(8.0),
@@ -1302,6 +1403,10 @@ class _PowerState extends State<Power> with SingleTickerProviderStateMixin {
                                               });
                                           },
                                           child: Card(
+                                            shape: RoundedRectangleBorder(
+                                                side: BorderSide(),
+                                                borderRadius:
+                                                    BorderRadius.circular(5)),
                                             child: Padding(
                                               padding:
                                                   const EdgeInsets.all(8.0),
@@ -1338,6 +1443,9 @@ class _PowerState extends State<Power> with SingleTickerProviderStateMixin {
                                   ),
                                 ),
                                 Card(
+                                  shape: RoundedRectangleBorder(
+                                      side: BorderSide(),
+                                      borderRadius: BorderRadius.circular(5)),
                                   margin: EdgeInsets.only(
                                       top: 20, left: 20, right: 20),
                                   child: Padding(
@@ -1381,6 +1489,10 @@ class _PowerState extends State<Power> with SingleTickerProviderStateMixin {
                                                 });
                                           },
                                           child: Card(
+                                            shape: RoundedRectangleBorder(
+                                                side: BorderSide(),
+                                                borderRadius:
+                                                    BorderRadius.circular(5)),
                                             child: Padding(
                                               padding:
                                                   const EdgeInsets.all(8.0),
@@ -1410,6 +1522,10 @@ class _PowerState extends State<Power> with SingleTickerProviderStateMixin {
                                               });
                                           },
                                           child: Card(
+                                            shape: RoundedRectangleBorder(
+                                                side: BorderSide(),
+                                                borderRadius:
+                                                    BorderRadius.circular(5)),
                                             child: Padding(
                                               padding:
                                                   const EdgeInsets.all(8.0),
@@ -1445,6 +1561,9 @@ class _PowerState extends State<Power> with SingleTickerProviderStateMixin {
                                 ),
                                 if (powerRecovery['wol1'] != null)
                                   Card(
+                                    shape: RoundedRectangleBorder(
+                                        side: BorderSide(),
+                                        borderRadius: BorderRadius.circular(5)),
                                     margin: EdgeInsets.only(
                                         top: 20, left: 20, right: 20),
                                     child: Padding(
@@ -1478,6 +1597,10 @@ class _PowerState extends State<Power> with SingleTickerProviderStateMixin {
                                                 });
                                             },
                                             child: Card(
+                                              shape: RoundedRectangleBorder(
+                                                  side: BorderSide(),
+                                                  borderRadius:
+                                                      BorderRadius.circular(5)),
                                               child: Padding(
                                                 padding:
                                                     const EdgeInsets.all(8.0),
@@ -1544,6 +1667,10 @@ class _PowerState extends State<Power> with SingleTickerProviderStateMixin {
                                                     });
                                             },
                                             child: Card(
+                                              shape: RoundedRectangleBorder(
+                                                  side: BorderSide(),
+                                                  borderRadius:
+                                                      BorderRadius.circular(5)),
                                               child: Padding(
                                                 padding:
                                                     const EdgeInsets.all(8.0),
@@ -1582,10 +1709,11 @@ class _PowerState extends State<Power> with SingleTickerProviderStateMixin {
                                       hibernation['auto_poweroff_time'],
                                 );
                                 if (res['success']) {
-                                  Util.toast("保存成功");
+                                  Util.instance.toast("保存成功");
                                   getData();
                                 } else {
-                                  Util.toast("保存失败,代码${res['error']['code']}");
+                                  Util.instance
+                                      .toast("保存失败,代码${res['error']['code']}");
                                 }
                               },
                               child: Text(

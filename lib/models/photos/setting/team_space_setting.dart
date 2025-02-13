@@ -10,12 +10,12 @@ class TeamSpaceSetting {
 
   static Future<TeamSpaceSetting> fetch() async {
     Map<String, dynamic> data = {
-      "api": '"SYNO.${Util.version == 7 ? "Foto" : "Photo"}.Setting.TeamSpace',
+      "api": '"SYNO.${Util.instance.version == 7 ? "Foto" : "Photo"}.Setting.TeamSpace',
       "method": "get",
       "version": 1,
-      "_sid": Util.sid,
+      "_sid": Util.instance.sid,
     };
-    var res = await Util.post("entry.cgi", data: data);
+    var res = await Util.instance.post("entry.cgi", data: data);
     if (res['success']) {
       return TeamSpaceSetting.fromJson(res['data']);
     } else {

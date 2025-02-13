@@ -73,13 +73,15 @@ class _ImagePreviewState extends State<ImagePreview>
   }
 
   deleteFile(int index) {
-    Util.vibrate(FeedbackType.warning);
+    Util.instance.vibrate(FeedbackType.warning);
     showCupertinoModalPopup(
       context: context,
       builder: (context) {
         return Material(
           color: Colors.transparent,
           child: Card(
+            shape: RoundedRectangleBorder(
+                side: BorderSide(), borderRadius: BorderRadius.circular(5)),
             child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: SafeArea(
@@ -112,7 +114,7 @@ class _ImagePreviewState extends State<ImagePreview>
                               var res =
                                   await Api.deleteTask([widget.paths[index]]);
                               if (res['success']) {
-                                Util.toast("文件删除成功");
+                                Util.instance.toast("文件删除成功");
                                 if (widget.thumbs.length > index) {
                                   widget.thumbs.removeAt(index);
                                 }
@@ -422,7 +424,7 @@ class _ImagePreviewState extends State<ImagePreview>
 
               return Column(
                 children: [
-                  if (Util.isWechatInstalled)
+                  if (Util.instance.isWechatInstalled)
                     SafeArea(
                       child: Container(
                         height: 56,
@@ -451,7 +453,7 @@ class _ImagePreviewState extends State<ImagePreview>
                                           File(widget.images[currentIndex])
                                               .readAsBytesSync());
                                 } else {
-                                  Util.toast("暂不支持分享此图片");
+                                  Util.instance.toast("暂不支持分享此图片");
                                   return;
                                 }
                                 c.read<FluwxProvider>().wx.share(
@@ -553,15 +555,16 @@ class MySwiperPlugin extends StatelessWidget {
                 OutlinedButton(
                   onPressed: () {
                     if (data.data == null) {
-                      Util.toast('图片下载失败');
+                      Util.instance.toast('图片下载失败');
                       return;
                     }
-                    Util.saveImage(pics[data.data!], context: context)
+                    Util.instance
+                        .saveImage(pics[data.data!], context: context)
                         .then((res) {
                       if (res['code'] == 1) {
-                        Util.toast("已保存到相册");
+                        Util.instance.toast("已保存到相册");
                       } else {
-                        Util.toast("图片下载失败");
+                        Util.instance.toast("图片下载失败");
                       }
                     });
                   },
@@ -582,7 +585,7 @@ class MySwiperPlugin extends StatelessWidget {
                 OutlinedButton(
                   onPressed: () {
                     if (data.data == null) {
-                      Util.toast('图片下载失败,请重试!');
+                      Util.instance.toast('图片下载失败,请重试!');
                       return;
                     }
                     onDelete?.call(data.data!);
@@ -596,6 +599,9 @@ class MySwiperPlugin extends StatelessWidget {
                   width: 10,
                 ),
                 Card(
+                  shape: RoundedRectangleBorder(
+                      side: BorderSide(),
+                      borderRadius: BorderRadius.circular(5)),
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Text(

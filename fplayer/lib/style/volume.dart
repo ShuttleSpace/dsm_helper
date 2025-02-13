@@ -82,6 +82,8 @@ class _FSliderToastState extends State<_FSliderToast> {
     return Align(
       alignment: const Alignment(0, -0.4),
       child: Card(
+        shape: RoundedRectangleBorder(
+            side: const BorderSide(), borderRadius: BorderRadius.circular(5)),
         color: const Color(0x33000000),
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 8),

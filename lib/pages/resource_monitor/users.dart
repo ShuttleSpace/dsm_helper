@@ -26,7 +26,7 @@ class _UsersState extends State<Users> {
         users = res['data']['items'];
       });
     } else {
-      Util.toast("获取目前连接用户失败，代码${res['error']['code']}");
+      Util.instance.toast("获取目前连接用户失败，代码${res['error']['code']}");
       Navigator.of(context).pop();
     }
   }
@@ -34,6 +34,8 @@ class _UsersState extends State<Users> {
   Widget _buildUserItem(user) {
     user['running'] = user['running'] ?? false;
     return Card(
+      shape: RoundedRectangleBorder(
+          side: BorderSide(), borderRadius: BorderRadius.circular(5)),
       margin: EdgeInsets.only(top: 20, left: 20, right: 20),
       child: Padding(
         padding: EdgeInsets.all(20),
@@ -116,6 +118,9 @@ class _UsersState extends State<Users> {
                     return Material(
                       color: Colors.transparent,
                       child: Card(
+                        shape: RoundedRectangleBorder(
+                            side: BorderSide(),
+                            borderRadius: BorderRadius.circular(5)),
                         child: SafeArea(
                           top: false,
                           child: Padding(
@@ -161,7 +166,7 @@ class _UsersState extends State<Users> {
                                           });
 
                                           if (res['success']) {
-                                            Util.toast("连接已终止");
+                                            Util.instance.toast("连接已终止");
                                           }
                                         },
                                         child: Text(

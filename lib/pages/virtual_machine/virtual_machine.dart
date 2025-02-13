@@ -53,6 +53,8 @@ class _VirtualMachineState extends State<VirtualMachine> {
         return Material(
           color: Colors.transparent,
           child: Card(
+            shape: RoundedRectangleBorder(
+                side: BorderSide(), borderRadius: BorderRadius.circular(5)),
             child: SafeArea(
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
@@ -88,10 +90,11 @@ class _VirtualMachineState extends State<VirtualMachine> {
                               });
                               var res = await Api.vmmPower(guest['id'], action);
                               if (res['success']) {
-                                Util.toast("请求发送成功");
+                                Util.instance.toast("请求发送成功");
                                 getGuests();
                               } else {
-                                Util.toast("请求发送失败，代码：${res['error']['code']}");
+                                Util.instance
+                                    .toast("请求发送失败，代码：${res['error']['code']}");
                               }
                               setState(() {
                                 powerLoading[guest['id']] = false;
@@ -204,7 +207,7 @@ class _VirtualMachineState extends State<VirtualMachine> {
             color: Colors.blue,
           ),
           Text(
-            Util.formatSize(network['tx']) + "/S",
+            Util.instance.formatSize(network['tx']) + "/S",
             style: TextStyle(color: Colors.blue),
           ),
           Spacer(),
@@ -213,7 +216,7 @@ class _VirtualMachineState extends State<VirtualMachine> {
             color: Colors.green,
           ),
           Text(
-            Util.formatSize(network['rx']) + "/S",
+            Util.instance.formatSize(network['rx']) + "/S",
             style: TextStyle(color: Colors.green),
           ),
         ],
@@ -224,6 +227,8 @@ class _VirtualMachineState extends State<VirtualMachine> {
   Widget _buildHostItem(host) {
     List networks = host['nics'];
     return Card(
+      shape: RoundedRectangleBorder(
+          side: BorderSide(), borderRadius: BorderRadius.circular(5)),
       child: Padding(
         padding: const EdgeInsets.all(20.0),
         child: Column(
@@ -254,6 +259,9 @@ class _VirtualMachineState extends State<VirtualMachine> {
                 ),
                 Expanded(
                   child: Card(
+                    shape: RoundedRectangleBorder(
+                        side: BorderSide(),
+                        borderRadius: BorderRadius.circular(5)),
                     child: Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: FAProgressBar(
@@ -280,6 +288,9 @@ class _VirtualMachineState extends State<VirtualMachine> {
                 ),
                 Expanded(
                   child: Card(
+                    shape: RoundedRectangleBorder(
+                        side: BorderSide(),
+                        borderRadius: BorderRadius.circular(5)),
                     child: Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: FAProgressBar(
@@ -310,6 +321,8 @@ class _VirtualMachineState extends State<VirtualMachine> {
     }
     List networks = guest['nics'];
     return Card(
+      shape: RoundedRectangleBorder(
+          side: BorderSide(), borderRadius: BorderRadius.circular(5)),
       margin: EdgeInsets.only(bottom: 20),
       child: Padding(
         padding: const EdgeInsets.all(20.0),
@@ -352,6 +365,9 @@ class _VirtualMachineState extends State<VirtualMachine> {
                             return Material(
                               color: Colors.transparent,
                               child: Card(
+                                shape: RoundedRectangleBorder(
+                                    side: BorderSide(),
+                                    borderRadius: BorderRadius.circular(5)),
                                 child: SafeArea(
                                   top: false,
                                   child: Padding(
@@ -431,17 +447,18 @@ class _VirtualMachineState extends State<VirtualMachine> {
                         if (check['success']) {
                           var res = await Api.vmmPower(guest['id'], "poweron");
                           if (res['success']) {
-                            Util.toast("开机请求发送成功");
+                            Util.instance.toast("开机请求发送成功");
                             getGuests();
                           } else {
-                            Util.toast("开机请求发送失败，代码：${res['error']['code']}");
+                            Util.instance
+                                .toast("开机请求发送失败，代码：${res['error']['code']}");
                           }
                         } else {
-                          Util.toast("无法开机");
+                          Util.instance.toast("无法开机");
                         }
                       }
                     } else {
-                      Util.toast("虚拟机状态未知，无法操作");
+                      Util.instance.toast("虚拟机状态未知，无法操作");
                     }
                   },
                   child: powerLoading[guest['id']] == true
@@ -465,6 +482,9 @@ class _VirtualMachineState extends State<VirtualMachine> {
                   ),
                   Expanded(
                     child: Card(
+                      shape: RoundedRectangleBorder(
+                          side: BorderSide(),
+                          borderRadius: BorderRadius.circular(5)),
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: FAProgressBar(
@@ -491,6 +511,9 @@ class _VirtualMachineState extends State<VirtualMachine> {
                   ),
                   Expanded(
                     child: Card(
+                      shape: RoundedRectangleBorder(
+                          side: BorderSide(),
+                          borderRadius: BorderRadius.circular(5)),
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: FAProgressBar(
@@ -519,6 +542,8 @@ class _VirtualMachineState extends State<VirtualMachine> {
 
   Widget _buildRepoItem(repo) {
     return Card(
+      shape: RoundedRectangleBorder(
+          side: BorderSide(), borderRadius: BorderRadius.circular(5)),
       margin: EdgeInsets.only(bottom: 20),
       child: Padding(
         padding: const EdgeInsets.all(20.0),
@@ -548,7 +573,7 @@ class _VirtualMachineState extends State<VirtualMachine> {
               child: Row(
                 children: [
                   Text(
-                    Util.formatSize(int.parse(repo['used'])),
+                    Util.instance.formatSize(int.parse(repo['used'])),
                     style: TextStyle(color: Colors.blue),
                   ),
                   Text(
@@ -556,7 +581,7 @@ class _VirtualMachineState extends State<VirtualMachine> {
                     style: TextStyle(color: Colors.grey),
                   ),
                   Text(
-                    Util.formatSize(int.parse(repo['size'])),
+                    Util.instance.formatSize(int.parse(repo['size'])),
                     style: TextStyle(color: Colors.grey),
                   ),
                 ],
@@ -569,6 +594,9 @@ class _VirtualMachineState extends State<VirtualMachine> {
               children: [
                 Expanded(
                   child: Card(
+                    shape: RoundedRectangleBorder(
+                        side: BorderSide(),
+                        borderRadius: BorderRadius.circular(5)),
                     child: Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: FAProgressBar(
@@ -616,6 +644,9 @@ class _VirtualMachineState extends State<VirtualMachine> {
                     getHosts();
                   },
                   child: Card(
+                    shape: RoundedRectangleBorder(
+                        side: BorderSide(),
+                        borderRadius: BorderRadius.circular(5)),
                     margin: EdgeInsets.all(20),
                     child: Padding(
                       padding: const EdgeInsets.all(20.0),
@@ -623,6 +654,9 @@ class _VirtualMachineState extends State<VirtualMachine> {
                         children: [
                           Expanded(
                             child: Card(
+                              shape: RoundedRectangleBorder(
+                                  side: BorderSide(),
+                                  borderRadius: BorderRadius.circular(5)),
                               child: Padding(
                                 padding: const EdgeInsets.all(8.0),
                                 child: Column(
@@ -674,6 +708,9 @@ class _VirtualMachineState extends State<VirtualMachine> {
                                 getGuests();
                               },
                               child: Card(
+                                shape: RoundedRectangleBorder(
+                                    side: BorderSide(),
+                                    borderRadius: BorderRadius.circular(5)),
                                 child: Padding(
                                   padding: const EdgeInsets.all(8.0),
                                   child: Column(
@@ -729,6 +766,9 @@ class _VirtualMachineState extends State<VirtualMachine> {
                                 getRepos();
                               },
                               child: Card(
+                                shape: RoundedRectangleBorder(
+                                    side: BorderSide(),
+                                    borderRadius: BorderRadius.circular(5)),
                                 child: Padding(
                                   padding: const EdgeInsets.all(8.0),
                                   child: Column(

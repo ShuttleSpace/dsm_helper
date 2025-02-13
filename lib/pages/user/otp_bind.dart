@@ -50,6 +50,8 @@ class _OtpBindState extends State<OtpBind> {
               height: 20,
             ),
             Card(
+              shape: RoundedRectangleBorder(
+                  side: BorderSide(), borderRadius: BorderRadius.circular(5)),
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: TextField(
@@ -68,7 +70,7 @@ class _OtpBindState extends State<OtpBind> {
             OutlinedButton(
               onPressed: () async {
                 if (email.isBlank) {
-                  Util.toast("请输入邮箱");
+                  Util.instance.toast("请输入邮箱");
                   return;
                 }
                 if (emailSaving) {
@@ -81,7 +83,7 @@ class _OtpBindState extends State<OtpBind> {
 
                 if (res['success']) {
                   var qrcode = await Api.getQrCode(
-                      "${widget.username}@${Util.hostname}");
+                      "${widget.username}@${Util.instance.hostname}");
                   if (qrcode['success']) {
                     setState(() {
                       qrData = Base64Decoder().convert(qrcode['data']['img']);
@@ -89,10 +91,10 @@ class _OtpBindState extends State<OtpBind> {
                       step = 1;
                     });
                   } else {
-                    Util.toast("获取二部验证数据出错，代码${res['error']['code']}");
+                    Util.instance.toast("获取二部验证数据出错，代码${res['error']['code']}");
                   }
                 } else {
-                  Util.toast("保存邮箱出错，代码${res['error']['code']}");
+                  Util.instance.toast("保存邮箱出错，代码${res['error']['code']}");
                 }
                 setState(() {
                   emailSaving = false;
@@ -120,21 +122,24 @@ class _OtpBindState extends State<OtpBind> {
               height: 20,
             ),
             Card(
+              shape: RoundedRectangleBorder(
+                  side: BorderSide(), borderRadius: BorderRadius.circular(5)),
               child: Padding(
                 padding: EdgeInsets.all(20),
                 child: Row(
                   children: [
                     Expanded(
                       child: Text(
-                        "账号：${widget.username}@${Util.hostname}",
+                        "账号：${widget.username}@${Util.instance.hostname}",
                       ),
                     ),
                     OutlinedButton(
                       onPressed: () async {
                         ClipboardData data = new ClipboardData(
-                            text: "${widget.username}@${Util.hostname}");
+                            text:
+                                "${widget.username}@${Util.instance.hostname}");
                         Clipboard.setData(data);
-                        Util.toast("已复制到剪贴板");
+                        Util.instance.toast("已复制到剪贴板");
                       },
                       child: SizedBox(
                         width: 20,
@@ -154,6 +159,8 @@ class _OtpBindState extends State<OtpBind> {
               height: 20,
             ),
             Card(
+              shape: RoundedRectangleBorder(
+                  side: BorderSide(), borderRadius: BorderRadius.circular(5)),
               child: Padding(
                 padding: EdgeInsets.all(20),
                 child: Row(
@@ -167,7 +174,7 @@ class _OtpBindState extends State<OtpBind> {
                       onPressed: () async {
                         ClipboardData data = new ClipboardData(text: "$key");
                         Clipboard.setData(data);
-                        Util.toast("已复制到剪贴板");
+                        Util.instance.toast("已复制到剪贴板");
                       },
                       child: SizedBox(
                         width: 20,
@@ -187,6 +194,8 @@ class _OtpBindState extends State<OtpBind> {
               height: 20,
             ),
             Card(
+              shape: RoundedRectangleBorder(
+                  side: BorderSide(), borderRadius: BorderRadius.circular(5)),
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: TextField(
@@ -204,7 +213,7 @@ class _OtpBindState extends State<OtpBind> {
             OutlinedButton(
               onPressed: () async {
                 if (code.isBlank) {
-                  Util.toast("请输入6位验证代码");
+                  Util.instance.toast("请输入6位验证代码");
                   return;
                 }
                 if (codeChecking) {
@@ -220,7 +229,7 @@ class _OtpBindState extends State<OtpBind> {
                     step = 2;
                   });
                 } else {
-                  Util.toast("保存邮箱出错，代码${res['error']['code']}");
+                  Util.instance.toast("保存邮箱出错，代码${res['error']['code']}");
                 }
                 setState(() {
                   emailSaving = false;
