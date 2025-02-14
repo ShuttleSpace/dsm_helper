@@ -8,53 +8,35 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 
 class DownloadStateNotifier extends ChangeNotifier {
-  ValueNotifier<List<DownloadInfo>> _tasks = ValueNotifier([]);
-  ValueNotifier<bool> _loading = ValueNotifier(true);
-  ValueNotifier<List<DownloadInfo>> _selectedTasks = ValueNotifier([]);
-  ValueNotifier<bool> _multiSelect = ValueNotifier(false);
+  ValueNotifier<List<DownloadInfo>> tasks = ValueNotifier([]);
+  ValueNotifier<bool> loading = ValueNotifier(true);
+  ValueNotifier<List<DownloadInfo>> selectedTasks = ValueNotifier([]);
+  ValueNotifier<bool> multiSelect = ValueNotifier(false);
   ValueNotifier<String> downloadPath = ValueNotifier('');
   ReceivePort _receiverPort = ReceivePort();
 
-  void set loading(bool v) {
-    _loading.value = v;
-    _loading.notifyListeners();
-  }
-
-  void set multiSelectVaule(bool v) {
-    _multiSelect.value = v;
-    _multiSelect.notifyListeners();
-  }
-
-  bool get multiSelectVaule => _multiSelect.value;
-  List<DownloadInfo> get tasks => _tasks.value;
-  bool get loading => _loading.value;
-
-  List<DownloadInfo> get selectedTasks => _selectedTasks.value;
-
   void addSelectedTask(DownloadInfo task) {
-    _selectedTasks.value.add(task);
-    _selectedTasks.notifyListeners();
+    selectedTasks.value.add(task);
+    selectedTasks.notifyListeners();
   }
 
   void addSelectedTasks(List<DownloadInfo> tasks) {
-    _selectedTasks.value.addAll(tasks);
-    _selectedTasks.notifyListeners();
+    selectedTasks.value.addAll(tasks);
+    selectedTasks.notifyListeners();
   }
 
   void removeSelectedTask(DownloadInfo task) {
-    _selectedTasks.value.remove(task);
-    _selectedTasks.notifyListeners();
+    selectedTasks.value.remove(task);
+    selectedTasks.notifyListeners();
   }
 
   void resetSelectedTasks() {
-    _selectedTasks.value = [];
-    _selectedTasks.notifyListeners();
+    selectedTasks.value = [];
   }
 
   void init() {
     Util.instance.getDownloadPath().then((value) {
       downloadPath.value = value;
-      downloadPath.notifyListeners();
     });
     bindBackgroundIsolate();
     FlutterDownloader.registerCallback(downloadCallback as DownloadCallback,
@@ -76,8 +58,8 @@ class DownloadStateNotifier extends ChangeNotifier {
       DownloadTaskStatus status = DownloadTaskStatus.fromInt(data[1]);
       int progress = data[2];
 
-      if (_tasks.value.isNotEmpty) {
-        _tasks.value.forEach((task) {
+      if (tasks.value.isNotEmpty) {
+        tasks.value.forEach((task) {
           if (task.taskId == id) {
             task.status = status;
             task.progress = progress;
@@ -94,11 +76,11 @@ class DownloadStateNotifier extends ChangeNotifier {
   getData() async {
     List<DownloadTask> downloadTasks =
         await FlutterDownloader.loadTasks() ?? [];
-    _tasks = ValueNotifier(
+    tasks = ValueNotifier(
         downloadTasks.map((e) => DownloadInfo.formTask(e)).toList());
-    _loading = ValueNotifier(false);
+    loading = ValueNotifier(false);
     // 如果存在下载中任务，每秒刷新一次
-    if (_tasks.value
+    if (tasks.value
             .where((task) =>
                 task.status == DownloadTaskStatus.running ||
                 task.status == DownloadTaskStatus.enqueued ||
@@ -109,9 +91,9 @@ class DownloadStateNotifier extends ChangeNotifier {
   }
 
   Future<bool> onWillPop() {
-    if (_multiSelect.value) {
-      _multiSelect.value = false;
-      _selectedTasks = ValueNotifier([]);
+    if (multiSelect.value) {
+      multiSelect.value = false;
+      selectedTasks = ValueNotifier([]);
     } else {
       debugPrint("可以返回");
       return Future.value(true);
