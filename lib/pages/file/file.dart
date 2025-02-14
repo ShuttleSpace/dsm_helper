@@ -6,7 +6,6 @@ import 'package:device_info_plus/device_info_plus.dart';
 import 'package:draggable_scrollbar/draggable_scrollbar.dart';
 import 'package:dsm_helper/pages/download/download_state.dart';
 import 'package:dsm_helper/util/log.dart';
-import 'package:flutter_floating/floating/listener/event_listener.dart';
 import 'package:flutter_vibrate/flutter_vibrate.dart';
 import 'package:just_audio/just_audio.dart' as ja;
 import 'package:dsm_helper/pages/common/audio_player.dart';
@@ -29,14 +28,10 @@ import 'package:dsm_helper/util/function.dart';
 import 'package:dsm_helper/widgets/animation_progress_bar.dart';
 import 'package:dsm_helper/widgets/file_icon.dart';
 import 'package:dsm_helper/widgets/transparent_router.dart';
-import 'package:extended_image/extended_image.dart';
 import 'package:extended_text/extended_text.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_floating/floating/assist/floating_slide_type.dart';
 import 'package:flutter_floating/floating/floating.dart';
-import 'package:flutter_floating/floating/manager/floating_manager.dart';
-import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 
@@ -563,7 +558,7 @@ class FilesState extends State<Files> {
     }
     Util.instance
         .toast("已添加${files.length > 1 ? "${files.length}个" : ""}下载任务，请至下载页面查看");
-    DownloadStateInherited.of(context).notifier.getData();
+    DownloadStateInherited.of(context)?.notifier.runLoop();
   }
 
   Future<bool?> result(String taskId) async {

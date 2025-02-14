@@ -39,9 +39,8 @@ class DownloadStateNotifier extends ChangeNotifier {
       downloadPath.value = value;
     });
     bindBackgroundIsolate();
-    FlutterDownloader.registerCallback(downloadCallback as DownloadCallback,
-        step: 1);
-    getData();
+    FlutterDownloader.registerCallback(downloadCallback, step: 1);
+    runLoop();
   }
 
   void bindBackgroundIsolate() {
@@ -65,6 +64,7 @@ class DownloadStateNotifier extends ChangeNotifier {
             task.progress = progress;
           }
         });
+        tasks.notifyListeners();
       }
     });
   }
@@ -73,12 +73,12 @@ class DownloadStateNotifier extends ChangeNotifier {
     IsolateNameServer.removePortNameMapping('downloader_send_port');
   }
 
-  getData() async {
+  runLoop() async {
     List<DownloadTask> downloadTasks =
         await FlutterDownloader.loadTasks() ?? [];
-    tasks = ValueNotifier(
-        downloadTasks.map((e) => DownloadInfo.formTask(e)).toList());
-    loading = ValueNotifier(false);
+    tasks.value = downloadTasks.map((e) => DownloadInfo.formTask(e)).toList();
+    loading.value = false;
+    debugPrint('runLoop: loading= ${loading.value}');
     // 如果存在下载中任务，每秒刷新一次
     if (tasks.value
             .where((task) =>
@@ -93,7 +93,7 @@ class DownloadStateNotifier extends ChangeNotifier {
   Future<bool> onWillPop() {
     if (multiSelect.value) {
       multiSelect.value = false;
-      selectedTasks = ValueNotifier([]);
+      selectedTasks.value = [];
     } else {
       debugPrint("可以返回");
       return Future.value(true);
@@ -102,11 +102,11 @@ class DownloadStateNotifier extends ChangeNotifier {
     return Future.value(false);
   }
 
-  void downloadCallback(String id, DownloadTaskStatus status, int progress) {
+  static void downloadCallback(String id, int status, int progress) {
     debugPrint(
         'Background Isolate Callback: task ($id) is in status ($status) and process ($progress)');
     IsolateNameServer.lookupPortByName('downloader_send_port')
-        ?.send([id, status.index, progress]);
+        ?.send([id, status, progress]);
   }
 }
 
@@ -115,11 +115,9 @@ class DownloadStateInherited extends InheritedWidget {
   final DownloadStateNotifier notifier;
   DownloadStateInherited({required this.notifier, required super.child});
 
-  static DownloadStateInherited of(BuildContext context) {
-    DownloadStateInherited? instance =
-        context.dependOnInheritedWidgetOfExactType<DownloadStateInherited>();
-    assert(instance != null, "not found DownloadStateInherited in tree!");
-    return instance!;
+  static DownloadStateInherited? of(BuildContext context) {
+    return context
+        .dependOnInheritedWidgetOfExactType<DownloadStateInherited>()!;
   }
 
   @override

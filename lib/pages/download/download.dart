@@ -55,17 +55,25 @@ class Download extends StatefulWidget {
 }
 
 class DownloadState extends State<Download> {
+  DownloadStateNotifier? _downloadStateNotifier;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _downloadStateNotifier = DownloadStateInherited.of(context)?.notifier;
+  }
+
   @override
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      DownloadStateInherited.of(context).notifier.init();
+      _downloadStateNotifier?.init();
     });
     super.initState();
   }
 
   @override
   void dispose() {
-    DownloadStateInherited.of(context).notifier.unbindBackgroundIsolate();
+    _downloadStateNotifier?.unbindBackgroundIsolate();
     super.dispose();
   }
 
@@ -154,18 +162,17 @@ class DownloadState extends State<Download> {
   }
 
   Widget _buildTaskItem(DownloadInfo task) {
-    final notifier = DownloadStateInherited.of(context).notifier;
     FileTypeEnum fileType = Util.instance.fileType(task.filename);
     // String path = file['path'];
     return Padding(
       padding:
           const EdgeInsets.only(top: 10.0, bottom: 10.0, left: 20, right: 20),
       child: ValueListenableBuilder(
-        valueListenable: notifier.multiSelect,
+        valueListenable: _downloadStateNotifier!.multiSelect,
         builder: (context, value, child) => OutlinedButton(
           onLongPress: () {
             Util.instance.vibrate(FeedbackType.light);
-            notifier
+            _downloadStateNotifier!
               ..multiSelect.value = true
               ..addSelectedTask(task);
           },
@@ -173,24 +180,26 @@ class DownloadState extends State<Download> {
             // print(task.savedDir + "/" + task.filename);
             // return;
             if (value) {
-              if (notifier.selectedTasks.value.contains(task)) {
-                notifier.removeSelectedTask(task);
+              if (_downloadStateNotifier!.selectedTasks.value.contains(task)) {
+                _downloadStateNotifier!.removeSelectedTask(task);
               } else {
-                notifier.addSelectedTask(task);
+                _downloadStateNotifier!.addSelectedTask(task);
               }
             } else {
               if (fileType == FileTypeEnum.image) {
                 //获取当前目录全部图片文件
                 List<String> images = [];
                 int index = 0;
-                for (int i = 0; i < notifier.tasks.value.length; i++) {
+                for (int i = 0;
+                    i < _downloadStateNotifier!.tasks.value.length;
+                    i++) {
                   if (task.status == DownloadTaskStatus.complete &&
                       Util.instance.fileType(task.filename) ==
                           FileTypeEnum.image) {
-                    images.add(notifier.tasks.value[i].savedDir +
+                    images.add(_downloadStateNotifier!.tasks.value[i].savedDir +
                         "/" +
-                        notifier.tasks.value[i].filename);
-                    if (notifier.tasks.value[i] == task) {
+                        _downloadStateNotifier!.tasks.value[i].filename);
+                    if (_downloadStateNotifier!.tasks.value[i] == task) {
                       index = images.length - 1;
                     }
                   }
@@ -288,7 +297,7 @@ class DownloadState extends State<Download> {
                 width: 10,
               ),
               ValueListenableBuilder(
-                  valueListenable: notifier.multiSelect,
+                  valueListenable: _downloadStateNotifier!.multiSelect,
                   builder: (context, v, child) => v
                       ? Card(
                           shape: RoundedRectangleBorder(
@@ -298,7 +307,8 @@ class DownloadState extends State<Download> {
                             width: 20,
                             height: 20,
                             child: ValueListenableBuilder(
-                                valueListenable: notifier.selectedTasks,
+                                valueListenable:
+                                    _downloadStateNotifier!.selectedTasks,
                                 builder: (context, selectedTasks, chidl) =>
                                     selectedTasks.contains(task)
                                         ? Icon(
@@ -342,7 +352,8 @@ class DownloadState extends State<Download> {
                                                   Navigator.of(context).pop();
                                                   await FlutterDownloader.retry(
                                                       taskId: task.taskId);
-                                                  await notifier.getData();
+                                                  await _downloadStateNotifier!
+                                                      .runLoop();
                                                 },
                                                 child: Text(
                                                   "重试",
@@ -357,7 +368,8 @@ class DownloadState extends State<Download> {
                                                   Navigator.of(context).pop();
                                                   await FlutterDownloader.pause(
                                                       taskId: task.taskId);
-                                                  await notifier.getData();
+                                                  await _downloadStateNotifier!
+                                                      .runLoop();
                                                 },
                                                 child: Text(
                                                   "暂停",
@@ -377,7 +389,8 @@ class DownloadState extends State<Download> {
                                                               taskId:
                                                                   task.taskId);
                                                   debugPrint(res);
-                                                  await notifier.getData();
+                                                  await _downloadStateNotifier!
+                                                      .runLoop();
                                                 },
                                                 child: Text(
                                                   "继续下载",
@@ -456,8 +469,8 @@ class DownloadState extends State<Download> {
                                                                             .taskId,
                                                                         shouldDeleteContent:
                                                                             true);
-                                                                    await notifier
-                                                                        .getData();
+                                                                    await _downloadStateNotifier!
+                                                                        .runLoop();
                                                                   },
                                                                   child: Text(
                                                                     "同时删除已下载文件",
@@ -483,8 +496,8 @@ class DownloadState extends State<Download> {
                                                                           await FlutterDownloader.remove(
                                                                               taskId: task.taskId,
                                                                               shouldDeleteContent: false);
-                                                                          await notifier
-                                                                              .getData();
+                                                                          await _downloadStateNotifier!
+                                                                              .runLoop();
                                                                         },
                                                                         child:
                                                                             Text(
@@ -576,16 +589,15 @@ class DownloadState extends State<Download> {
 
   @override
   Widget build(BuildContext context) {
-    final notifier = DownloadStateInherited.of(context).notifier;
     return Scaffold(
         appBar: AppBar(
           leading: ValueListenableBuilder(
-              valueListenable: notifier.multiSelect,
+              valueListenable: _downloadStateNotifier!.multiSelect,
               builder: (context, v, child) => v
                   ? GestureDetector(
                       onTap: () {
-                        notifier.multiSelect.value = false;
-                        notifier.resetSelectedTasks();
+                        _downloadStateNotifier!.multiSelect.value = false;
+                        _downloadStateNotifier!.resetSelectedTasks();
                       },
                       child: Icon(Icons.close),
                     )
@@ -597,7 +609,7 @@ class DownloadState extends State<Download> {
               ),
               if (Platform.isAndroid)
                 ValueListenableBuilder(
-                    valueListenable: notifier.downloadPath,
+                    valueListenable: _downloadStateNotifier!.downloadPath,
                     builder: (context, value, child) {
                       return Text(
                         value,
@@ -611,16 +623,18 @@ class DownloadState extends State<Download> {
           ),
           actions: [
             ValueListenableBuilder(
-                valueListenable: notifier.multiSelect,
+                valueListenable: _downloadStateNotifier!.multiSelect,
                 builder: (context, v, child) => v
                     ? Padding(
                         padding: EdgeInsets.only(right: 10, top: 8, bottom: 8),
                         child: OutlinedButton(
                           onPressed: () {
-                            notifier.resetSelectedTasks();
-                            if (notifier.selectedTasks.value.length !=
-                                notifier.tasks.value.length) {
-                              notifier.addSelectedTasks(notifier.tasks.value);
+                            _downloadStateNotifier!.resetSelectedTasks();
+                            if (_downloadStateNotifier!
+                                    .selectedTasks.value.length !=
+                                _downloadStateNotifier!.tasks.value.length) {
+                              _downloadStateNotifier!.addSelectedTasks(
+                                  _downloadStateNotifier!.tasks.value);
                             }
                           },
                           child: Image.asset(
@@ -655,13 +669,13 @@ class DownloadState extends State<Download> {
           ],
         ),
         body: ValueListenableBuilder(
-            valueListenable: notifier.loading,
+            valueListenable: _downloadStateNotifier!.loading,
             builder: (context, loading, child) => loading
                 ? Center(
                     child: CupertinoActivityIndicator(),
                   )
                 : ValueListenableBuilder(
-                    valueListenable: notifier.tasks,
+                    valueListenable: _downloadStateNotifier!.tasks,
                     builder: (context, tasks, child) => tasks.length > 0
                         ? Stack(
                             children: [
@@ -673,7 +687,8 @@ class DownloadState extends State<Download> {
                                 },
                               ),
                               ValueListenableBuilder(
-                                valueListenable: notifier.selectedTasks,
+                                valueListenable:
+                                    _downloadStateNotifier!.selectedTasks,
                                 builder: (BuildContext context, value,
                                         Widget? child) =>
                                     AnimatedPositioned(
@@ -758,11 +773,11 @@ class DownloadState extends State<Download> {
                                                                               taskId: task.taskId,
                                                                               shouldDeleteContent: true);
                                                                         }
-                                                                        notifier
-                                                                            .getData();
-                                                                        notifier
+                                                                        _downloadStateNotifier!
+                                                                            .runLoop();
+                                                                        _downloadStateNotifier!
                                                                             .resetSelectedTasks();
-                                                                        notifier
+                                                                        _downloadStateNotifier!
                                                                             .multiSelect
                                                                             .value = false;
                                                                       },

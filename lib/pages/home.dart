@@ -206,7 +206,8 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
       }
       value = _filesStateKey.currentState?.onWillPop() ?? Future.value(false);
     } else if (_currentIndex == 2) {
-      value = DownloadStateInherited.of(context).notifier.onWillPop();
+      value = DownloadStateInherited.of(context)?.notifier.onWillPop() ??
+          Future.value(false);
     }
     value.then((v) {
       if (v) {
