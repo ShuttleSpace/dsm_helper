@@ -1,4 +1,4 @@
-import 'package:dsm_helper/util/function.dart';
+import 'package:humphrey_garden/util/function.dart';
 
 /// id : 1
 /// user_id : 1
@@ -22,8 +22,8 @@ class VipRecordModel {
   });
   static Future<List<VipRecordModel>> fetch() async {
     String userToken = await Util.instance.getStorage("user_token") ?? '';
-    var res = await Util.instance.post("${Util.instance.appUrl}/vip/record",
-        data: {"token": userToken});
+    var res = await Util.instance
+        .post("${Util.instance.appUrl}/vip/record", data: {"token": userToken});
     if (res['code'] == 1) {
       List<VipRecordModel> records = [];
       res['data'].forEach((e) {

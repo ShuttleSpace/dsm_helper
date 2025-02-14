@@ -1,10 +1,10 @@
 import 'dart:async';
 
-import 'package:dsm_helper/util/function.dart';
-import 'package:dsm_helper/util/strings.dart';
-import 'package:dsm_helper/widgets/bubble_tab_indicator.dart';
-import 'package:dsm_helper/widgets/label.dart';
-import 'package:dsm_helper/widgets/neu_back_button.dart';
+import 'package:humphrey_garden/util/function.dart';
+import 'package:humphrey_garden/util/strings.dart';
+import 'package:humphrey_garden/widgets/bubble_tab_indicator.dart';
+import 'package:humphrey_garden/widgets/label.dart';
+import 'package:humphrey_garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -86,7 +86,7 @@ class _TaskManagerState extends State<TaskManager>
 
     return Card(
       shape: RoundedRectangleBorder(
-          side: BorderSide(), borderRadius: BorderRadius.circular(5)),
+          side: BorderSide(), borderRadius: BorderRadius.circular(366)),
       margin: EdgeInsets.all(10),
       child: Padding(
         padding: const EdgeInsets.all(8.0),
@@ -114,7 +114,7 @@ class _TaskManagerState extends State<TaskManager>
     }
     return Card(
       shape: RoundedRectangleBorder(
-          side: BorderSide(), borderRadius: BorderRadius.circular(5)),
+          side: BorderSide(), borderRadius: BorderRadius.circular(366)),
       margin: EdgeInsets.all(10),
       child: Padding(
         padding: const EdgeInsets.all(8.0),
@@ -166,7 +166,7 @@ class _TaskManagerState extends State<TaskManager>
   Widget _buildProcessItem(process) {
     return Card(
       shape: RoundedRectangleBorder(
-          side: BorderSide(), borderRadius: BorderRadius.circular(5)),
+          side: BorderSide(), borderRadius: BorderRadius.circular(366)),
       margin: EdgeInsets.all(10),
       child: Padding(
         padding: const EdgeInsets.all(8.0),

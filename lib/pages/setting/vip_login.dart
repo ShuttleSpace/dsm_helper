@@ -1,5 +1,5 @@
-import 'package:dsm_helper/util/function.dart';
-import 'package:dsm_helper/widgets/neu_back_button.dart';
+import 'package:humphrey_garden/util/function.dart';
+import 'package:humphrey_garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -98,7 +98,7 @@ class _VipLoginState extends State<VipLogin> {
                   child: Card(
                     shape: RoundedRectangleBorder(
                         side: BorderSide(),
-                        borderRadius: BorderRadius.circular(5)),
+                        borderRadius: BorderRadius.circular(36)),
                     child: TextField(
                       autocorrect: false,
                       keyboardAppearance: Brightness.light,
@@ -121,7 +121,7 @@ class _VipLoginState extends State<VipLogin> {
             ),
             Card(
               shape: RoundedRectangleBorder(
-                  side: BorderSide(), borderRadius: BorderRadius.circular(5)),
+                  side: BorderSide(), borderRadius: BorderRadius.circular(36)),
               child: TextField(
                 onChanged: (v) => password = v,
                 obscureText: true,
@@ -142,7 +142,8 @@ class _VipLoginState extends State<VipLogin> {
             if (isRegister) ...[
               Card(
                 shape: RoundedRectangleBorder(
-                    side: BorderSide(), borderRadius: BorderRadius.circular(5)),
+                    side: BorderSide(),
+                    borderRadius: BorderRadius.circular(36)),
                 child: TextField(
                   onChanged: (v) => confirmPassword = v,
                   obscureText: true,

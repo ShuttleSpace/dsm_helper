@@ -3,11 +3,11 @@ import 'dart:io';
 
 import 'package:cool_ui/cool_ui.dart';
 import 'package:dio/dio.dart';
-import 'package:dsm_helper/pages/common/select_ablum.dart';
-import 'package:dsm_helper/util/function.dart';
-import 'package:dsm_helper/widgets/file_icon.dart';
-import 'package:dsm_helper/widgets/label.dart';
-import 'package:dsm_helper/widgets/neu_back_button.dart';
+import 'package:humphrey_garden/pages/common/select_ablum.dart';
+import 'package:humphrey_garden/util/function.dart';
+import 'package:humphrey_garden/widgets/file_icon.dart';
+import 'package:humphrey_garden/widgets/label.dart';
+import 'package:humphrey_garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_vibrate/flutter_vibrate.dart';
@@ -185,7 +185,7 @@ class _BackupState extends State<Backup> {
           ...[
             Card(
               shape: RoundedRectangleBorder(
-                  side: BorderSide(), borderRadius: BorderRadius.circular(5)),
+                  side: BorderSide(), borderRadius: BorderRadius.circular(36)),
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Stack(
@@ -354,7 +354,7 @@ class _BackupState extends State<Backup> {
             },
             child: Card(
               shape: RoundedRectangleBorder(
-                  side: BorderSide(), borderRadius: BorderRadius.circular(5)),
+                  side: BorderSide(), borderRadius: BorderRadius.circular(36)),
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Row(
@@ -401,7 +401,7 @@ class _BackupState extends State<Backup> {
             },
             child: Card(
               shape: RoundedRectangleBorder(
-                  side: BorderSide(), borderRadius: BorderRadius.circular(5)),
+                  side: BorderSide(), borderRadius: BorderRadius.circular(36)),
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Row(
@@ -440,7 +440,7 @@ class _BackupState extends State<Backup> {
             },
             child: Card(
               shape: RoundedRectangleBorder(
-                  side: BorderSide(), borderRadius: BorderRadius.circular(5)),
+                  side: BorderSide(), borderRadius: BorderRadius.circular(36)),
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Row(

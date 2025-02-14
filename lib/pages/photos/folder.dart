@@ -1,6 +1,6 @@
-import 'package:dsm_helper/models/photos/folder_model.dart';
-import 'package:dsm_helper/pages/photos/widgets/photo_item_widget.dart';
-import 'package:dsm_helper/pages/photos/widgets/thumbnail_card.dart';
+import 'package:humphrey_garden/models/photos/folder_model.dart';
+import 'package:humphrey_garden/pages/photos/widgets/photo_item_widget.dart';
+import 'package:humphrey_garden/pages/photos/widgets/thumbnail_card.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 

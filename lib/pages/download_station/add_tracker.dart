@@ -1,4 +1,4 @@
-import 'package:dsm_helper/util/function.dart';
+import 'package:humphrey_garden/util/function.dart';
 import 'package:flutter/material.dart';
 
 class AddTracker extends StatefulWidget {
@@ -19,7 +19,7 @@ class _AddTrackerState extends State<AddTracker> {
         children: [
           Card(
             shape: RoundedRectangleBorder(
-                side: BorderSide(), borderRadius: BorderRadius.circular(5)),
+                side: BorderSide(), borderRadius: BorderRadius.circular(36)),
             child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: TextField(

@@ -1,10 +1,10 @@
-import 'package:dsm_helper/pages/docker/detail.dart';
-import 'package:dsm_helper/util/function.dart';
-import 'package:dsm_helper/util/log.dart';
-import 'package:dsm_helper/widgets/bubble_tab_indicator.dart';
-import 'package:dsm_helper/widgets/animation_progress_bar.dart';
-import 'package:dsm_helper/widgets/label.dart';
-import 'package:dsm_helper/widgets/neu_back_button.dart';
+import 'package:humphrey_garden/pages/docker/detail.dart';
+import 'package:humphrey_garden/util/function.dart';
+import 'package:humphrey_garden/util/log.dart';
+import 'package:humphrey_garden/widgets/bubble_tab_indicator.dart';
+import 'package:humphrey_garden/widgets/animation_progress_bar.dart';
+import 'package:humphrey_garden/widgets/label.dart';
+import 'package:humphrey_garden/widgets/neu_back_button.dart';
 import 'package:extended_text/extended_text.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -115,7 +115,7 @@ class _DockerState extends State<Docker> with SingleTickerProviderStateMixin {
             color: Colors.transparent,
             child: Card(
               shape: RoundedRectangleBorder(
-                  side: BorderSide(), borderRadius: BorderRadius.circular(5)),
+                  side: BorderSide(), borderRadius: BorderRadius.circular(36)),
               child: SafeArea(
                 top: false,
                 child: Padding(
@@ -231,7 +231,7 @@ class _DockerState extends State<Docker> with SingleTickerProviderStateMixin {
       },
       child: Card(
         shape: RoundedRectangleBorder(
-            side: BorderSide(), borderRadius: BorderRadius.circular(5)),
+            side: BorderSide(), borderRadius: BorderRadius.circular(36)),
         margin: EdgeInsets.only(bottom: 20),
         child: Padding(
           padding: EdgeInsets.all(20),
@@ -303,7 +303,7 @@ class _DockerState extends State<Docker> with SingleTickerProviderStateMixin {
                             child: Card(
                               shape: RoundedRectangleBorder(
                                   side: BorderSide(),
-                                  borderRadius: BorderRadius.circular(5)),
+                                  borderRadius: BorderRadius.circular(36)),
                               child: SafeArea(
                                 top: false,
                                 child: Padding(
@@ -422,7 +422,7 @@ class _DockerState extends State<Docker> with SingleTickerProviderStateMixin {
                     child: Card(
                       shape: RoundedRectangleBorder(
                           side: BorderSide(),
-                          borderRadius: BorderRadius.circular(5)),
+                          borderRadius: BorderRadius.circular(36)),
                       child: powerLoading[container['id']] == true
                           ? CupertinoActivityIndicator()
                           : Image.asset(
@@ -515,7 +515,7 @@ class _DockerState extends State<Docker> with SingleTickerProviderStateMixin {
   Widget _buildImageItem(image) {
     return Card(
       shape: RoundedRectangleBorder(
-          side: BorderSide(), borderRadius: BorderRadius.circular(5)),
+          side: BorderSide(), borderRadius: BorderRadius.circular(36)),
       child: Padding(
         padding: EdgeInsets.all(20),
         child: Column(
@@ -575,7 +575,7 @@ class _DockerState extends State<Docker> with SingleTickerProviderStateMixin {
         children: [
           Card(
             shape: RoundedRectangleBorder(
-                side: BorderSide(), borderRadius: BorderRadius.circular(5)),
+                side: BorderSide(), borderRadius: BorderRadius.circular(36)),
             margin: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
             child: TabBar(
               dividerHeight: 0,
@@ -626,7 +626,7 @@ class _DockerState extends State<Docker> with SingleTickerProviderStateMixin {
                                 child: Card(
                                   shape: RoundedRectangleBorder(
                                       side: BorderSide(),
-                                      borderRadius: BorderRadius.circular(5)),
+                                      borderRadius: BorderRadius.circular(36)),
                                   child: Padding(
                                     padding: const EdgeInsets.all(20.0),
                                     child: Column(
@@ -675,7 +675,7 @@ class _DockerState extends State<Docker> with SingleTickerProviderStateMixin {
                                 child: Card(
                                   shape: RoundedRectangleBorder(
                                       side: BorderSide(),
-                                      borderRadius: BorderRadius.circular(5)),
+                                      borderRadius: BorderRadius.circular(36)),
                                   child: Padding(
                                     padding: EdgeInsets.all(20),
                                     child: Column(

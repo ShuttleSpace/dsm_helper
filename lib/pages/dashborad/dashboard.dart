@@ -1,28 +1,28 @@
 import 'dart:async';
 import 'dart:math';
 
-import 'package:dsm_helper/models/api_model.dart';
-import 'package:dsm_helper/models/setting/group_model.dart';
-import 'package:dsm_helper/models/shortcut_item_model.dart';
-import 'package:dsm_helper/models/wallpaper_model.dart';
-import 'package:dsm_helper/pages/control_panel/external_device/external_device.dart';
-import 'package:dsm_helper/pages/control_panel/info/info.dart';
-import 'package:dsm_helper/pages/control_panel/task_scheduler/task_scheduler.dart';
-import 'package:dsm_helper/pages/dashborad/applications.dart';
-import 'package:dsm_helper/pages/dashborad/media_converter.dart';
-import 'package:dsm_helper/pages/dashborad/shortcut_list.dart';
-import 'package:dsm_helper/pages/dashborad/widget_setting.dart';
-import 'package:dsm_helper/pages/log_center/log_center.dart';
-import 'package:dsm_helper/pages/notify/notify.dart';
-import 'package:dsm_helper/pages/resource_monitor/performance.dart';
-import 'package:dsm_helper/pages/resource_monitor/resource_monitor.dart';
-import 'package:dsm_helper/providers/setting.dart';
-import 'package:dsm_helper/providers/shortcut.dart';
-import 'package:dsm_helper/providers/wallpaper.dart';
-import 'package:dsm_helper/themes/app_theme.dart';
-import 'package:dsm_helper/util/function.dart';
-import 'package:dsm_helper/widgets/animation_progress_bar.dart';
-import 'package:dsm_helper/widgets/label.dart';
+import 'package:humphrey_garden/models/api_model.dart';
+import 'package:humphrey_garden/models/setting/group_model.dart';
+import 'package:humphrey_garden/models/shortcut_item_model.dart';
+import 'package:humphrey_garden/models/wallpaper_model.dart';
+import 'package:humphrey_garden/pages/control_panel/external_device/external_device.dart';
+import 'package:humphrey_garden/pages/control_panel/info/info.dart';
+import 'package:humphrey_garden/pages/control_panel/task_scheduler/task_scheduler.dart';
+import 'package:humphrey_garden/pages/dashborad/applications.dart';
+import 'package:humphrey_garden/pages/dashborad/media_converter.dart';
+import 'package:humphrey_garden/pages/dashborad/shortcut_list.dart';
+import 'package:humphrey_garden/pages/dashborad/widget_setting.dart';
+import 'package:humphrey_garden/pages/log_center/log_center.dart';
+import 'package:humphrey_garden/pages/notify/notify.dart';
+import 'package:humphrey_garden/pages/resource_monitor/performance.dart';
+import 'package:humphrey_garden/pages/resource_monitor/resource_monitor.dart';
+import 'package:humphrey_garden/providers/setting.dart';
+import 'package:humphrey_garden/providers/shortcut.dart';
+import 'package:humphrey_garden/providers/wallpaper.dart';
+import 'package:humphrey_garden/themes/app_theme.dart';
+import 'package:humphrey_garden/util/function.dart';
+import 'package:humphrey_garden/widgets/animation_progress_bar.dart';
+import 'package:humphrey_garden/widgets/label.dart';
 import 'package:extended_image/extended_image.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/cupertino.dart';
@@ -125,7 +125,7 @@ class DashboardState extends State<Dashboard> {
                 Card(
                   shape: RoundedRectangleBorder(
                       side: BorderSide(),
-                      borderRadius: BorderRadius.circular(5)),
+                      borderRadius: BorderRadius.circular(366)),
                   margin: EdgeInsets.symmetric(horizontal: 50),
                   child: Padding(
                     padding: EdgeInsets.all(20),
@@ -142,7 +142,7 @@ class DashboardState extends State<Dashboard> {
                         Card(
                           shape: RoundedRectangleBorder(
                               side: BorderSide(),
-                              borderRadius: BorderRadius.circular(5)),
+                              borderRadius: BorderRadius.circular(366)),
                           child: Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: Text("前往'设置-关闭广告'页面，即可关闭开屏广告。"),
@@ -154,7 +154,7 @@ class DashboardState extends State<Dashboard> {
                         Card(
                           shape: RoundedRectangleBorder(
                               side: BorderSide(),
-                              borderRadius: BorderRadius.circular(5)),
+                              borderRadius: BorderRadius.circular(366)),
                           child: Padding(
                               padding: EdgeInsets.all(15),
                               child: Column(
@@ -198,7 +198,7 @@ class DashboardState extends State<Dashboard> {
                         Card(
                           shape: RoundedRectangleBorder(
                               side: BorderSide(),
-                              borderRadius: BorderRadius.circular(5)),
+                              borderRadius: BorderRadius.circular(366)),
                           child: Padding(
                               padding: EdgeInsets.all(15),
                               child: Column(
@@ -466,7 +466,7 @@ class DashboardState extends State<Dashboard> {
         },
         child: Card(
           shape: RoundedRectangleBorder(
-              side: BorderSide(), borderRadius: BorderRadius.circular(5)),
+              side: BorderSide(), borderRadius: BorderRadius.circular(366)),
           margin: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
           child: Padding(
             padding: const EdgeInsets.all(8.0),
@@ -606,7 +606,7 @@ class DashboardState extends State<Dashboard> {
         connectedUsers.length > 0) {
       return Card(
         shape: RoundedRectangleBorder(
-            side: BorderSide(), borderRadius: BorderRadius.circular(5)),
+            side: BorderSide(), borderRadius: BorderRadius.circular(366)),
         margin: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
         child: Padding(
           padding: const EdgeInsets.all(8.0),
@@ -652,7 +652,7 @@ class DashboardState extends State<Dashboard> {
         },
         child: Card(
           shape: RoundedRectangleBorder(
-              side: BorderSide(), borderRadius: BorderRadius.circular(5)),
+              side: BorderSide(), borderRadius: BorderRadius.circular(366)),
           margin: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
           child: Padding(
             padding: const EdgeInsets.all(8.0),
@@ -701,7 +701,7 @@ class DashboardState extends State<Dashboard> {
         },
         child: Card(
           shape: RoundedRectangleBorder(
-              side: BorderSide(), borderRadius: BorderRadius.circular(5)),
+              side: BorderSide(), borderRadius: BorderRadius.circular(366)),
           margin: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
           child: Padding(
             padding: const EdgeInsets.all(8.0),
@@ -769,7 +769,7 @@ class DashboardState extends State<Dashboard> {
         },
         child: Card(
           shape: RoundedRectangleBorder(
-              side: BorderSide(), borderRadius: BorderRadius.circular(5)),
+              side: BorderSide(), borderRadius: BorderRadius.circular(366)),
           margin: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
           child: Padding(
             padding: const EdgeInsets.all(8.0),
@@ -939,7 +939,7 @@ class DashboardState extends State<Dashboard> {
                         child: Card(
                           shape: RoundedRectangleBorder(
                               side: BorderSide(),
-                              borderRadius: BorderRadius.circular(5)),
+                              borderRadius: BorderRadius.circular(366)),
                           child: Padding(
                             padding: EdgeInsets.all(10),
                             child: LineChart(
@@ -1076,7 +1076,7 @@ class DashboardState extends State<Dashboard> {
             },
             child: Card(
               shape: RoundedRectangleBorder(
-                  side: BorderSide(), borderRadius: BorderRadius.circular(5)),
+                  side: BorderSide(), borderRadius: BorderRadius.circular(366)),
               margin: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
@@ -1117,7 +1117,7 @@ class DashboardState extends State<Dashboard> {
           if (ssdCaches.length > 0)
             Card(
               shape: RoundedRectangleBorder(
-                  side: BorderSide(), borderRadius: BorderRadius.circular(5)),
+                  side: BorderSide(), borderRadius: BorderRadius.circular(366)),
               margin: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
@@ -1159,7 +1159,7 @@ class DashboardState extends State<Dashboard> {
     } else if (widget == "SYNO.SDS.SystemInfoApp.FileChangeLogWidget") {
       return Card(
         shape: RoundedRectangleBorder(
-            side: BorderSide(), borderRadius: BorderRadius.circular(5)),
+            side: BorderSide(), borderRadius: BorderRadius.circular(366)),
         margin: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
         child: Padding(
           padding: const EdgeInsets.all(8.0),
@@ -1231,7 +1231,7 @@ class DashboardState extends State<Dashboard> {
         Util.instance.timeLong(currentTime.difference(loginTime).inSeconds);
     return Card(
       shape: RoundedRectangleBorder(
-          side: BorderSide(), borderRadius: BorderRadius.circular(5)),
+          side: BorderSide(), borderRadius: BorderRadius.circular(366)),
       margin: EdgeInsets.only(top: 20, left: 20, right: 20),
       child: Padding(
         padding: EdgeInsets.all(10),
@@ -1272,7 +1272,7 @@ class DashboardState extends State<Dashboard> {
                       child: Card(
                         shape: RoundedRectangleBorder(
                             side: BorderSide(),
-                            borderRadius: BorderRadius.circular(5)),
+                            borderRadius: BorderRadius.circular(366)),
                         child: SafeArea(
                           top: false,
                           child: Padding(
@@ -1379,7 +1379,7 @@ class DashboardState extends State<Dashboard> {
     task['running'] = task['running'] ?? false;
     return Card(
       shape: RoundedRectangleBorder(
-          side: BorderSide(), borderRadius: BorderRadius.circular(5)),
+          side: BorderSide(), borderRadius: BorderRadius.circular(366)),
       margin: EdgeInsets.only(top: 20, left: 20, right: 20),
       child: Padding(
         padding: EdgeInsets.all(10),
@@ -1442,7 +1442,7 @@ class DashboardState extends State<Dashboard> {
   Widget _buildLogItem(log) {
     return Card(
       shape: RoundedRectangleBorder(
-          side: BorderSide(), borderRadius: BorderRadius.circular(5)),
+          side: BorderSide(), borderRadius: BorderRadius.circular(366)),
       clipBehavior: Clip.hardEdge,
       margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
       child: Padding(
@@ -1459,7 +1459,7 @@ class DashboardState extends State<Dashboard> {
   Widget _buildFileLogItem(log) {
     return Card(
       shape: RoundedRectangleBorder(
-          side: BorderSide(), borderRadius: BorderRadius.circular(5)),
+          side: BorderSide(), borderRadius: BorderRadius.circular(366)),
       margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
       child: Padding(
         padding: const EdgeInsets.all(8.0),
@@ -1496,7 +1496,7 @@ class DashboardState extends State<Dashboard> {
         int.parse(volume['size']['used']) / int.parse(volume['size']['total']);
     return Card(
       shape: RoundedRectangleBorder(
-          side: BorderSide(), borderRadius: BorderRadius.circular(5)),
+          side: BorderSide(), borderRadius: BorderRadius.circular(366)),
       margin: EdgeInsets.only(top: 20, left: 20, right: 20),
       child: Padding(
         padding: const EdgeInsets.all(8.0),
@@ -1599,7 +1599,7 @@ class DashboardState extends State<Dashboard> {
             int.parse(volume['size']['total']);
     return Card(
       shape: RoundedRectangleBorder(
-          side: BorderSide(), borderRadius: BorderRadius.circular(5)),
+          side: BorderSide(), borderRadius: BorderRadius.circular(366)),
       margin: EdgeInsets.only(top: 20, left: 20, right: 20),
       child: Padding(
         padding: const EdgeInsets.all(8.0),
@@ -1699,7 +1699,7 @@ class DashboardState extends State<Dashboard> {
   Widget _buildESataItem(esata) {
     return Card(
       shape: RoundedRectangleBorder(
-          side: BorderSide(), borderRadius: BorderRadius.circular(5)),
+          side: BorderSide(), borderRadius: BorderRadius.circular(366)),
       margin: EdgeInsets.only(bottom: 20),
       child: Padding(
         padding: EdgeInsets.all(20),
@@ -1795,7 +1795,7 @@ class DashboardState extends State<Dashboard> {
                               child: Card(
                                 shape: RoundedRectangleBorder(
                                     side: BorderSide(),
-                                    borderRadius: BorderRadius.circular(5)),
+                                    borderRadius: BorderRadius.circular(366)),
                                 child: SafeArea(
                                   top: false,
                                   child: Padding(
@@ -1947,7 +1947,7 @@ class DashboardState extends State<Dashboard> {
                           Container(
                             decoration: BoxDecoration(
                               color: Colors.red,
-                              borderRadius: BorderRadius.circular(5),
+                              borderRadius: BorderRadius.circular(366),
                             ),
                             width: 5,
                             height: 5,

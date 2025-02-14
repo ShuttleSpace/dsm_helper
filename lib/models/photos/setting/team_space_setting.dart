@@ -1,4 +1,4 @@
-import 'package:dsm_helper/util/function.dart';
+import 'package:humphrey_garden/util/function.dart';
 
 class TeamSpaceSetting {
   TeamSpaceSetting({
@@ -10,7 +10,8 @@ class TeamSpaceSetting {
 
   static Future<TeamSpaceSetting> fetch() async {
     Map<String, dynamic> data = {
-      "api": '"SYNO.${Util.instance.version == 7 ? "Foto" : "Photo"}.Setting.TeamSpace',
+      "api":
+          '"SYNO.${Util.instance.version == 7 ? "Foto" : "Photo"}.Setting.TeamSpace',
       "method": "get",
       "version": 1,
       "_sid": Util.instance.sid,

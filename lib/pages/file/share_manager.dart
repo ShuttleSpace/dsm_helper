@@ -1,8 +1,8 @@
-import 'package:dsm_helper/pages/file/share.dart';
-import 'package:dsm_helper/util/function.dart';
-import 'package:dsm_helper/widgets/file_icon.dart';
-import 'package:dsm_helper/widgets/label.dart';
-import 'package:dsm_helper/widgets/neu_back_button.dart';
+import 'package:humphrey_garden/pages/file/share.dart';
+import 'package:humphrey_garden/util/function.dart';
+import 'package:humphrey_garden/widgets/file_icon.dart';
+import 'package:humphrey_garden/widgets/label.dart';
+import 'package:humphrey_garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 

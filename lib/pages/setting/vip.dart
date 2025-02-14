@@ -1,13 +1,13 @@
 import 'dart:async';
 
 import 'package:cool_ui/cool_ui.dart';
-import 'package:dsm_helper/pages/common/browser.dart' as dsm;
-import 'package:dsm_helper/pages/setting/vip_login.dart';
-import 'package:dsm_helper/pages/setting/vip_record.dart';
-import 'package:dsm_helper/providers/flux_provider.dart';
-import 'package:dsm_helper/themes/app_theme.dart';
-import 'package:dsm_helper/util/function.dart';
-import 'package:dsm_helper/widgets/neu_back_button.dart';
+import 'package:humphrey_garden/pages/common/browser.dart' as dsm;
+import 'package:humphrey_garden/pages/setting/vip_login.dart';
+import 'package:humphrey_garden/pages/setting/vip_record.dart';
+import 'package:humphrey_garden/providers/flux_provider.dart';
+import 'package:humphrey_garden/themes/app_theme.dart';
+import 'package:humphrey_garden/util/function.dart';
+import 'package:humphrey_garden/widgets/neu_back_button.dart';
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -182,7 +182,8 @@ class _VipState extends State<Vip> {
             children: [
               Card(
                 shape: RoundedRectangleBorder(
-                    side: BorderSide(), borderRadius: BorderRadius.circular(5)),
+                    side: BorderSide(),
+                    borderRadius: BorderRadius.circular(36)),
                 margin: EdgeInsets.symmetric(horizontal: 50),
                 child: Padding(
                   padding: EdgeInsets.all(20),
@@ -199,7 +200,7 @@ class _VipState extends State<Vip> {
                       Card(
                         shape: RoundedRectangleBorder(
                             side: BorderSide(),
-                            borderRadius: BorderRadius.circular(5)),
+                            borderRadius: BorderRadius.circular(36)),
                         child: Text("通过观看视频广告，可关闭3天开屏广告"),
                       ),
                       SizedBox(
@@ -259,7 +260,7 @@ class _VipState extends State<Vip> {
                 Card(
                   shape: RoundedRectangleBorder(
                       side: BorderSide(),
-                      borderRadius: BorderRadius.circular(5)),
+                      borderRadius: BorderRadius.circular(36)),
                   margin: EdgeInsets.symmetric(horizontal: 50),
                   child: Padding(
                     padding: EdgeInsets.all(20),
@@ -284,7 +285,7 @@ class _VipState extends State<Vip> {
                         Card(
                           shape: RoundedRectangleBorder(
                               side: BorderSide(),
-                              borderRadius: BorderRadius.circular(5)),
+                              borderRadius: BorderRadius.circular(36)),
                           child: Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: TextField(
@@ -375,7 +376,8 @@ class _VipState extends State<Vip> {
             children: [
               Card(
                 shape: RoundedRectangleBorder(
-                    side: BorderSide(), borderRadius: BorderRadius.circular(5)),
+                    side: BorderSide(),
+                    borderRadius: BorderRadius.circular(36)),
                 margin: EdgeInsets.symmetric(horizontal: 50),
                 child: Padding(
                   padding: EdgeInsets.all(20),
@@ -561,7 +563,7 @@ class _VipState extends State<Vip> {
             ),
           Card(
             shape: RoundedRectangleBorder(
-                side: BorderSide(), borderRadius: BorderRadius.circular(5)),
+                side: BorderSide(), borderRadius: BorderRadius.circular(36)),
             child: Padding(
               padding: EdgeInsets.all(20.0),
               child: Row(
@@ -654,7 +656,7 @@ class NoAdButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       shape: RoundedRectangleBorder(
-          side: BorderSide(), borderRadius: BorderRadius.circular(5)),
+          side: BorderSide(), borderRadius: BorderRadius.circular(36)),
       margin: EdgeInsets.only(top: 20),
       child: Padding(
         padding: EdgeInsets.all(20.0),

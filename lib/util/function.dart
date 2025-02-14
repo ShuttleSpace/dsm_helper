@@ -5,11 +5,11 @@ import 'dart:math';
 import 'package:cool_ui/cool_ui.dart';
 import 'package:dio/dio.dart';
 import 'package:dio/io.dart';
-import 'package:dsm_helper/models/setting/group_model.dart';
-import 'package:dsm_helper/pages/download/download.dart';
-import 'package:dsm_helper/pages/update/update.dart';
-import 'package:dsm_helper/util/api.dart';
-import 'package:dsm_helper/util/log.dart';
+import 'package:humphrey_garden/models/setting/group_model.dart';
+import 'package:humphrey_garden/pages/download/download.dart';
+import 'package:humphrey_garden/pages/update/update.dart';
+import 'package:humphrey_garden/util/api.dart';
+import 'package:humphrey_garden/util/log.dart';
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
@@ -22,10 +22,10 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_vibrate/flutter_vibrate.dart';
 
-export 'package:dsm_helper/extensions/datetime.dart';
-export 'package:dsm_helper/extensions/int.dart';
-export 'package:dsm_helper/extensions/string.dart';
-export 'package:dsm_helper/util/api.dart';
+export 'package:humphrey_garden/extensions/datetime.dart';
+export 'package:humphrey_garden/extensions/int.dart';
+export 'package:humphrey_garden/extensions/string.dart';
+export 'package:humphrey_garden/util/api.dart';
 
 enum FileTypeEnum {
   folder,

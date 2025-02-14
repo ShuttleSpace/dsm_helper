@@ -1,5 +1,5 @@
-import 'package:dsm_helper/util/function.dart';
-import 'package:dsm_helper/widgets/neu_back_button.dart';
+import 'package:humphrey_garden/util/function.dart';
+import 'package:humphrey_garden/widgets/neu_back_button.dart';
 import 'package:flutter/material.dart';
 
 class Feedback extends StatefulWidget {
@@ -23,7 +23,7 @@ class _FeedbackState extends State<Feedback> {
         children: [
           Card(
             shape: RoundedRectangleBorder(
-                side: BorderSide(), borderRadius: BorderRadius.circular(5)),
+                side: BorderSide(), borderRadius: BorderRadius.circular(36)),
             child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: TextField(

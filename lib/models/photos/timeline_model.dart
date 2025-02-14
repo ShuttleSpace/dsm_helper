@@ -1,5 +1,5 @@
-import 'package:dsm_helper/models/photos/photo_model.dart';
-import 'package:dsm_helper/util/function.dart';
+import 'package:humphrey_garden/models/photos/photo_model.dart';
+import 'package:humphrey_garden/util/function.dart';
 
 /// limit : 102
 /// list : [{"day":22,"item_count":2,"month":10,"year":2022},{"day":21,"item_count":6,"month":10,"year":2022},{"day":23,"item_count":43,"month":9,"year":2022},{"day":7,"item_count":4,"month":8,"year":2022},{"day":28,"item_count":2,"month":6,"year":2022},{"day":22,"item_count":1,"month":5,"year":2022},{"day":20,"item_count":5,"month":5,"year":2022},{"day":10,"item_count":1,"month":5,"year":2022},{"day":25,"item_count":12,"month":4,"year":2022},{"day":27,"item_count":26,"month":3,"year":2022}]
@@ -165,7 +165,8 @@ class Day {
     Map<String, dynamic> data = {
       "start_time": start,
       "end_time": end,
-      "api": '"SYNO.${Util.instance.version == 7 ? "Foto" : "Photo"}.Browse.Timeline"',
+      "api":
+          '"SYNO.${Util.instance.version == 7 ? "Foto" : "Photo"}.Browse.Timeline"',
       "method": '"get_geocoding"',
       "version": 1,
       "_sid": Util.instance.sid,

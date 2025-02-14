@@ -2,20 +2,20 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:cool_ui/cool_ui.dart';
-import 'package:dsm_helper/pages/home.dart';
-import 'package:dsm_helper/pages/login/accounts.dart';
-import 'package:dsm_helper/pages/login/auth_page.dart';
-import 'package:dsm_helper/pages/login/login.dart';
-import 'package:dsm_helper/providers/audio_player_provider.dart';
-import 'package:dsm_helper/providers/flux_provider.dart';
-import 'package:dsm_helper/providers/setting.dart';
-import 'package:dsm_helper/providers/shortcut.dart';
-import 'package:dsm_helper/providers/wallpaper.dart';
-import 'package:dsm_helper/themes/light.dart';
-import 'package:dsm_helper/themes/dark.dart';
-import 'package:dsm_helper/util/function.dart';
-import 'package:dsm_helper/util/log.dart';
-import 'package:dsm_helper/widgets/keyboard_dismisser.dart';
+import 'package:humphrey_garden/pages/home.dart';
+import 'package:humphrey_garden/pages/login/accounts.dart';
+import 'package:humphrey_garden/pages/login/auth_page.dart';
+import 'package:humphrey_garden/pages/login/login.dart';
+import 'package:humphrey_garden/providers/audio_player_provider.dart';
+import 'package:humphrey_garden/providers/flux_provider.dart';
+import 'package:humphrey_garden/providers/setting.dart';
+import 'package:humphrey_garden/providers/shortcut.dart';
+import 'package:humphrey_garden/providers/wallpaper.dart';
+import 'package:humphrey_garden/themes/light.dart';
+import 'package:humphrey_garden/themes/dark.dart';
+import 'package:humphrey_garden/util/function.dart';
+import 'package:humphrey_garden/util/log.dart';
+import 'package:humphrey_garden/widgets/keyboard_dismisser.dart';
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -76,7 +76,7 @@ void main() async {
 
   Util.instance.downloadSavePath =
       await Util.instance.getStorage("download_save_path") ??
-          "/storage/emulated/0/dsm_helper/Download";
+          "/storage/emulated/0/humphrey_garden/Download";
   Util.instance.getStorage("download_wifi_only").then((value) {
     Util.instance.downloadWifiOnly = value == "1";
   });

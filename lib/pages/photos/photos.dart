@@ -1,9 +1,9 @@
-import 'package:dsm_helper/pages/photos/album_tab.dart';
-import 'package:dsm_helper/pages/photos/folder.dart';
-import 'package:dsm_helper/pages/photos/photo_tab.dart';
-import 'package:dsm_helper/pages/photos/share_tab.dart';
-import 'package:dsm_helper/pages/photos/timeline.dart';
-import 'package:dsm_helper/widgets/neu_back_button.dart';
+import 'package:humphrey_garden/pages/photos/album_tab.dart';
+import 'package:humphrey_garden/pages/photos/folder.dart';
+import 'package:humphrey_garden/pages/photos/photo_tab.dart';
+import 'package:humphrey_garden/pages/photos/share_tab.dart';
+import 'package:humphrey_garden/pages/photos/timeline.dart';
+import 'package:humphrey_garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -59,7 +59,7 @@ class _PhotosState extends State<Photos> {
                         child: Card(
                           shape: RoundedRectangleBorder(
                               side: BorderSide(),
-                              borderRadius: BorderRadius.circular(5)),
+                              borderRadius: BorderRadius.circular(36)),
                           child: SafeArea(
                             top: false,
                             child: Padding(

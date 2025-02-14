@@ -1,5 +1,5 @@
-import 'package:dsm_helper/models/photos/thumbnail_model.dart';
-import 'package:dsm_helper/widgets/cupertino_image.dart';
+import 'package:humphrey_garden/models/photos/thumbnail_model.dart';
+import 'package:humphrey_garden/widgets/cupertino_image.dart';
 import 'package:flutter/material.dart';
 
 class ThumbnailCard extends StatelessWidget {
@@ -18,7 +18,7 @@ class ThumbnailCard extends StatelessWidget {
         height: width,
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(5),
+          borderRadius: BorderRadius.circular(36),
         ),
         child: thumbnails.length == 0
             ? Container(

@@ -1,8 +1,8 @@
-import 'package:dsm_helper/util/function.dart';
-import 'package:dsm_helper/widgets/bubble_tab_indicator.dart';
-import 'package:dsm_helper/widgets/expansion_container.dart';
-import 'package:dsm_helper/widgets/label.dart';
-import 'package:dsm_helper/widgets/neu_back_button.dart';
+import 'package:humphrey_garden/util/function.dart';
+import 'package:humphrey_garden/widgets/bubble_tab_indicator.dart';
+import 'package:humphrey_garden/widgets/expansion_container.dart';
+import 'package:humphrey_garden/widgets/label.dart';
+import 'package:humphrey_garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -111,7 +111,7 @@ class _NetworkState extends State<Network> with SingleTickerProviderStateMixin {
                 Card(
                   shape: RoundedRectangleBorder(
                       side: BorderSide(),
-                      borderRadius: BorderRadius.circular(5)),
+                      borderRadius: BorderRadius.circular(36)),
                   margin: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
                   child: TabBar(
                     dividerHeight: 0,
@@ -165,7 +165,7 @@ class _NetworkState extends State<Network> with SingleTickerProviderStateMixin {
                           Card(
                             shape: RoundedRectangleBorder(
                                 side: BorderSide(),
-                                borderRadius: BorderRadius.circular(5)),
+                                borderRadius: BorderRadius.circular(36)),
                             margin:
                                 EdgeInsets.only(top: 20, left: 20, right: 20),
                             child: Padding(
@@ -189,7 +189,8 @@ class _NetworkState extends State<Network> with SingleTickerProviderStateMixin {
                                   Card(
                                     shape: RoundedRectangleBorder(
                                         side: BorderSide(),
-                                        borderRadius: BorderRadius.circular(5)),
+                                        borderRadius:
+                                            BorderRadius.circular(36)),
                                     child: Padding(
                                       padding: const EdgeInsets.all(8.0),
                                       child: TextField(
@@ -251,7 +252,8 @@ class _NetworkState extends State<Network> with SingleTickerProviderStateMixin {
                                   Card(
                                     shape: RoundedRectangleBorder(
                                         side: BorderSide(),
-                                        borderRadius: BorderRadius.circular(5)),
+                                        borderRadius:
+                                            BorderRadius.circular(36)),
                                     child: Padding(
                                       padding: const EdgeInsets.all(8.0),
                                       child: TextField(
@@ -272,7 +274,8 @@ class _NetworkState extends State<Network> with SingleTickerProviderStateMixin {
                                   Card(
                                     shape: RoundedRectangleBorder(
                                         side: BorderSide(),
-                                        borderRadius: BorderRadius.circular(5)),
+                                        borderRadius:
+                                            BorderRadius.circular(36)),
                                     child: Padding(
                                       padding: const EdgeInsets.all(8.0),
                                       child: TextField(
@@ -297,7 +300,7 @@ class _NetworkState extends State<Network> with SingleTickerProviderStateMixin {
                           Card(
                             shape: RoundedRectangleBorder(
                                 side: BorderSide(),
-                                borderRadius: BorderRadius.circular(5)),
+                                borderRadius: BorderRadius.circular(36)),
                             margin:
                                 EdgeInsets.only(top: 20, left: 20, right: 20),
                             child: Padding(
@@ -349,7 +352,8 @@ class _NetworkState extends State<Network> with SingleTickerProviderStateMixin {
                                   Card(
                                     shape: RoundedRectangleBorder(
                                         side: BorderSide(),
-                                        borderRadius: BorderRadius.circular(5)),
+                                        borderRadius:
+                                            BorderRadius.circular(36)),
                                     child: Padding(
                                       padding: const EdgeInsets.all(8.0),
                                       child: TextField(
@@ -370,7 +374,8 @@ class _NetworkState extends State<Network> with SingleTickerProviderStateMixin {
                                   Card(
                                     shape: RoundedRectangleBorder(
                                         side: BorderSide(),
-                                        borderRadius: BorderRadius.circular(5)),
+                                        borderRadius:
+                                            BorderRadius.circular(36)),
                                     child: Padding(
                                       padding: const EdgeInsets.all(8.0),
                                       child: TextField(
@@ -400,7 +405,7 @@ class _NetworkState extends State<Network> with SingleTickerProviderStateMixin {
                             return Card(
                               shape: RoundedRectangleBorder(
                                   side: BorderSide(),
-                                  borderRadius: BorderRadius.circular(5)),
+                                  borderRadius: BorderRadius.circular(36)),
                               margin:
                                   EdgeInsets.only(left: 20, right: 20, top: 20),
                               // padding: EdgeInsets.symmetric(horizontal: 20),
@@ -521,7 +526,7 @@ class _NetworkState extends State<Network> with SingleTickerProviderStateMixin {
                             return Card(
                               shape: RoundedRectangleBorder(
                                   side: BorderSide(),
-                                  borderRadius: BorderRadius.circular(5)),
+                                  borderRadius: BorderRadius.circular(36)),
                               margin:
                                   EdgeInsets.only(left: 20, right: 20, top: 20),
                               // padding: EdgeInsets.symmetric(horizontal: 20),

@@ -1,12 +1,12 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:dsm_helper/pages/download/download.dart';
-import 'package:dsm_helper/pages/download/download_state.dart';
-import 'package:dsm_helper/pages/file/file.dart';
-import 'package:dsm_helper/pages/setting/setting.dart';
-import 'package:dsm_helper/util/function.dart';
-import 'package:dsm_helper/widgets/update_dialog.dart';
+import 'package:humphrey_garden/pages/download/download.dart';
+import 'package:humphrey_garden/pages/download/download_state.dart';
+import 'package:humphrey_garden/pages/file/file.dart';
+import 'package:humphrey_garden/pages/setting/setting.dart';
+import 'package:humphrey_garden/util/function.dart';
+import 'package:humphrey_garden/widgets/update_dialog.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';

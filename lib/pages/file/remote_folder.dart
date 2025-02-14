@@ -1,7 +1,7 @@
-import 'package:dsm_helper/pages/file/select_folder.dart';
-import 'package:dsm_helper/util/function.dart';
-import 'package:dsm_helper/widgets/bubble_tab_indicator.dart';
-import 'package:dsm_helper/widgets/neu_back_button.dart';
+import 'package:humphrey_garden/pages/file/select_folder.dart';
+import 'package:humphrey_garden/util/function.dart';
+import 'package:humphrey_garden/widgets/bubble_tab_indicator.dart';
+import 'package:humphrey_garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_vibrate/flutter_vibrate.dart';
@@ -36,7 +36,7 @@ class _RemoteFolderState extends State<RemoteFolder>
         children: [
           Card(
             shape: RoundedRectangleBorder(
-                side: BorderSide(), borderRadius: BorderRadius.circular(5)),
+                side: BorderSide(), borderRadius: BorderRadius.circular(366)),
             margin: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
             child: TabBar(
               dividerHeight: 0,
@@ -73,7 +73,7 @@ class _RemoteFolderState extends State<RemoteFolder>
                     Card(
                       shape: RoundedRectangleBorder(
                           side: BorderSide(),
-                          borderRadius: BorderRadius.circular(5)),
+                          borderRadius: BorderRadius.circular(366)),
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: TextField(
@@ -91,7 +91,7 @@ class _RemoteFolderState extends State<RemoteFolder>
                     Card(
                       shape: RoundedRectangleBorder(
                           side: BorderSide(),
-                          borderRadius: BorderRadius.circular(5)),
+                          borderRadius: BorderRadius.circular(366)),
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: TextField(
@@ -109,7 +109,7 @@ class _RemoteFolderState extends State<RemoteFolder>
                     Card(
                       shape: RoundedRectangleBorder(
                           side: BorderSide(),
-                          borderRadius: BorderRadius.circular(5)),
+                          borderRadius: BorderRadius.circular(366)),
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: TextField(
@@ -181,7 +181,7 @@ class _RemoteFolderState extends State<RemoteFolder>
                       child: Card(
                         shape: RoundedRectangleBorder(
                             side: BorderSide(),
-                            borderRadius: BorderRadius.circular(5)),
+                            borderRadius: BorderRadius.circular(366)),
                         child: Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: Row(

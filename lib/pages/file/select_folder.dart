@@ -1,6 +1,6 @@
-import 'package:dsm_helper/themes/app_theme.dart';
-import 'package:dsm_helper/util/function.dart';
-import 'package:dsm_helper/widgets/file_icon.dart';
+import 'package:humphrey_garden/themes/app_theme.dart';
+import 'package:humphrey_garden/util/function.dart';
+import 'package:humphrey_garden/widgets/file_icon.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 

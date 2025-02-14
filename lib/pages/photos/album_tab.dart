@@ -1,13 +1,13 @@
-import 'package:dsm_helper/models/photos/album_model.dart';
-import 'package:dsm_helper/models/photos/general_tag_model.dart';
-import 'package:dsm_helper/models/photos/geocoding_model.dart';
-import 'package:dsm_helper/models/photos/photo_model.dart';
-import 'package:dsm_helper/pages/photos/album_page.dart';
-import 'package:dsm_helper/pages/photos/general_tag_page.dart';
-import 'package:dsm_helper/pages/photos/geocoding_page.dart';
-import 'package:dsm_helper/pages/photos/timeline_page.dart';
-import 'package:dsm_helper/pages/photos/widgets/thumbnail_card.dart';
-import 'package:dsm_helper/widgets/cupertino_image.dart';
+import 'package:humphrey_garden/models/photos/album_model.dart';
+import 'package:humphrey_garden/models/photos/general_tag_model.dart';
+import 'package:humphrey_garden/models/photos/geocoding_model.dart';
+import 'package:humphrey_garden/models/photos/photo_model.dart';
+import 'package:humphrey_garden/pages/photos/album_page.dart';
+import 'package:humphrey_garden/pages/photos/general_tag_page.dart';
+import 'package:humphrey_garden/pages/photos/geocoding_page.dart';
+import 'package:humphrey_garden/pages/photos/timeline_page.dart';
+import 'package:humphrey_garden/pages/photos/widgets/thumbnail_card.dart';
+import 'package:humphrey_garden/widgets/cupertino_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 

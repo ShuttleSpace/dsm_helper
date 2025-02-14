@@ -2,9 +2,9 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:math';
 
-import 'package:dsm_helper/providers/flux_provider.dart';
-import 'package:dsm_helper/util/function.dart';
-import 'package:dsm_helper/widgets/hero_widget.dart';
+import 'package:humphrey_garden/providers/flux_provider.dart';
+import 'package:humphrey_garden/util/function.dart';
+import 'package:humphrey_garden/widgets/hero_widget.dart';
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -81,7 +81,7 @@ class _ImagePreviewState extends State<ImagePreview>
           color: Colors.transparent,
           child: Card(
             shape: RoundedRectangleBorder(
-                side: BorderSide(), borderRadius: BorderRadius.circular(5)),
+                side: BorderSide(), borderRadius: BorderRadius.circular(36)),
             child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: SafeArea(
@@ -601,7 +601,7 @@ class MySwiperPlugin extends StatelessWidget {
                 Card(
                   shape: RoundedRectangleBorder(
                       side: BorderSide(),
-                      borderRadius: BorderRadius.circular(5)),
+                      borderRadius: BorderRadius.circular(36)),
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Text(

@@ -1,5 +1,5 @@
-import 'package:dsm_helper/pages/common/browser.dart';
-import 'package:dsm_helper/widgets/neu_back_button.dart';
+import 'package:humphrey_garden/pages/common/browser.dart';
+import 'package:humphrey_garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -167,7 +167,7 @@ class _OpenSourceState extends State<OpenSource> {
           itemBuilder: (context, i) {
             return Card(
               shape: RoundedRectangleBorder(
-                  side: BorderSide(), borderRadius: BorderRadius.circular(5)),
+                  side: BorderSide(), borderRadius: BorderRadius.circular(36)),
               margin: EdgeInsets.symmetric(horizontal: 20),
               child: Padding(
                 padding: EdgeInsets.all(20),

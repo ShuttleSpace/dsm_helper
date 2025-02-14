@@ -1,5 +1,5 @@
-import 'package:dsm_helper/util/function.dart';
-import 'package:dsm_helper/util/strings.dart';
+import 'package:humphrey_garden/util/function.dart';
+import 'package:humphrey_garden/util/strings.dart';
 import 'package:flutter/material.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 
@@ -37,7 +37,7 @@ class ResultCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       shape: RoundedRectangleBorder(
-          side: BorderSide(), borderRadius: BorderRadius.circular(5)),
+          side: BorderSide(), borderRadius: BorderRadius.circular(36)),
       margin: EdgeInsets.only(bottom: 20),
       child: Padding(
         padding: EdgeInsets.all(20),

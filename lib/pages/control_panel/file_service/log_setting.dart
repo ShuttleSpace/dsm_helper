@@ -1,5 +1,5 @@
-import 'package:dsm_helper/util/function.dart';
-import 'package:dsm_helper/widgets/neu_back_button.dart';
+import 'package:humphrey_garden/util/function.dart';
+import 'package:humphrey_garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_vibrate/flutter_vibrate.dart';
@@ -62,7 +62,7 @@ class _LogSettingState extends State<LogSetting> {
                         child: Card(
                           shape: RoundedRectangleBorder(
                               side: BorderSide(),
-                              borderRadius: BorderRadius.circular(5)),
+                              borderRadius: BorderRadius.circular(36)),
                           child: Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: Row(
@@ -95,7 +95,7 @@ class _LogSettingState extends State<LogSetting> {
                         child: Card(
                           shape: RoundedRectangleBorder(
                               side: BorderSide(),
-                              borderRadius: BorderRadius.circular(5)),
+                              borderRadius: BorderRadius.circular(36)),
                           child: Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: Row(
@@ -128,7 +128,7 @@ class _LogSettingState extends State<LogSetting> {
                         child: Card(
                           shape: RoundedRectangleBorder(
                               side: BorderSide(),
-                              borderRadius: BorderRadius.circular(5)),
+                              borderRadius: BorderRadius.circular(36)),
                           child: Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: Row(
@@ -161,7 +161,7 @@ class _LogSettingState extends State<LogSetting> {
                         child: Card(
                           shape: RoundedRectangleBorder(
                               side: BorderSide(),
-                              borderRadius: BorderRadius.circular(5)),
+                              borderRadius: BorderRadius.circular(36)),
                           child: Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: Row(
@@ -194,7 +194,7 @@ class _LogSettingState extends State<LogSetting> {
                         child: Card(
                           shape: RoundedRectangleBorder(
                               side: BorderSide(),
-                              borderRadius: BorderRadius.circular(5)),
+                              borderRadius: BorderRadius.circular(36)),
                           child: Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: Row(
@@ -227,7 +227,7 @@ class _LogSettingState extends State<LogSetting> {
                         child: Card(
                           shape: RoundedRectangleBorder(
                               side: BorderSide(),
-                              borderRadius: BorderRadius.circular(5)),
+                              borderRadius: BorderRadius.circular(36)),
                           child: Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: Row(

@@ -1,7 +1,7 @@
 import 'dart:convert';
 
-import 'package:dsm_helper/util/function.dart';
-import 'package:dsm_helper/widgets/neu_back_button.dart';
+import 'package:humphrey_garden/util/function.dart';
+import 'package:humphrey_garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -46,7 +46,7 @@ class _UninstallPackageState extends State<UninstallPackage> {
       },
       child: Card(
         shape: RoundedRectangleBorder(
-            side: BorderSide(), borderRadius: BorderRadius.circular(5)),
+            side: BorderSide(), borderRadius: BorderRadius.circular(36)),
         child: Padding(
           padding: EdgeInsets.all(20),
           child: Row(
@@ -56,7 +56,8 @@ class _UninstallPackageState extends State<UninstallPackage> {
               ),
               Card(
                 shape: RoundedRectangleBorder(
-                    side: BorderSide(), borderRadius: BorderRadius.circular(5)),
+                    side: BorderSide(),
+                    borderRadius: BorderRadius.circular(36)),
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: SizedBox(
@@ -82,7 +83,7 @@ class _UninstallPackageState extends State<UninstallPackage> {
     List subItems = item['subitems'];
     return Card(
       shape: RoundedRectangleBorder(
-          side: BorderSide(), borderRadius: BorderRadius.circular(5)),
+          side: BorderSide(), borderRadius: BorderRadius.circular(36)),
       child: Padding(
         padding: EdgeInsets.all(20),
         child: Column(

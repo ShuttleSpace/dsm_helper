@@ -1,7 +1,7 @@
 import 'dart:math';
 
-import 'package:dsm_helper/util/function.dart';
-import 'package:dsm_helper/widgets/neu_back_button.dart';
+import 'package:humphrey_garden/util/function.dart';
+import 'package:humphrey_garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -200,7 +200,7 @@ class _AddSharedFoldersState extends State<AddSharedFolders> {
                   Card(
                     shape: RoundedRectangleBorder(
                         side: BorderSide(),
-                        borderRadius: BorderRadius.circular(5)),
+                        borderRadius: BorderRadius.circular(36)),
                     child: Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: TextField(
@@ -219,7 +219,7 @@ class _AddSharedFoldersState extends State<AddSharedFolders> {
                   Card(
                     shape: RoundedRectangleBorder(
                         side: BorderSide(),
-                        borderRadius: BorderRadius.circular(5)),
+                        borderRadius: BorderRadius.circular(36)),
                     child: Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: TextField(
@@ -246,7 +246,7 @@ class _AddSharedFoldersState extends State<AddSharedFolders> {
                             child: Card(
                               shape: RoundedRectangleBorder(
                                   side: BorderSide(),
-                                  borderRadius: BorderRadius.circular(5)),
+                                  borderRadius: BorderRadius.circular(36)),
                               child: SafeArea(
                                 top: false,
                                 child: Padding(
@@ -327,7 +327,7 @@ class _AddSharedFoldersState extends State<AddSharedFolders> {
                     child: Card(
                       shape: RoundedRectangleBorder(
                           side: BorderSide(),
-                          borderRadius: BorderRadius.circular(5)),
+                          borderRadius: BorderRadius.circular(36)),
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: TextField(
@@ -354,7 +354,7 @@ class _AddSharedFoldersState extends State<AddSharedFolders> {
                     child: Card(
                       shape: RoundedRectangleBorder(
                           side: BorderSide(),
-                          borderRadius: BorderRadius.circular(5)),
+                          borderRadius: BorderRadius.circular(36)),
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: Row(
@@ -384,7 +384,7 @@ class _AddSharedFoldersState extends State<AddSharedFolders> {
                     child: Card(
                       shape: RoundedRectangleBorder(
                           side: BorderSide(),
-                          borderRadius: BorderRadius.circular(5)),
+                          borderRadius: BorderRadius.circular(36)),
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: Row(
@@ -418,7 +418,7 @@ class _AddSharedFoldersState extends State<AddSharedFolders> {
                           child: Card(
                             shape: RoundedRectangleBorder(
                                 side: BorderSide(),
-                                borderRadius: BorderRadius.circular(5)),
+                                borderRadius: BorderRadius.circular(36)),
                             child: Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: Row(
@@ -458,7 +458,7 @@ class _AddSharedFoldersState extends State<AddSharedFolders> {
                           child: Card(
                             shape: RoundedRectangleBorder(
                                 side: BorderSide(),
-                                borderRadius: BorderRadius.circular(5)),
+                                borderRadius: BorderRadius.circular(36)),
                             child: Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: Row(
@@ -496,7 +496,7 @@ class _AddSharedFoldersState extends State<AddSharedFolders> {
                     child: Card(
                       shape: RoundedRectangleBorder(
                           side: BorderSide(),
-                          borderRadius: BorderRadius.circular(5)),
+                          borderRadius: BorderRadius.circular(36)),
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: Row(
@@ -523,7 +523,7 @@ class _AddSharedFoldersState extends State<AddSharedFolders> {
                           child: Card(
                             shape: RoundedRectangleBorder(
                                 side: BorderSide(),
-                                borderRadius: BorderRadius.circular(5)),
+                                borderRadius: BorderRadius.circular(36)),
                             child: Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: TextField(
@@ -545,7 +545,7 @@ class _AddSharedFoldersState extends State<AddSharedFolders> {
                           child: Card(
                             shape: RoundedRectangleBorder(
                                 side: BorderSide(),
-                                borderRadius: BorderRadius.circular(5)),
+                                borderRadius: BorderRadius.circular(36)),
                             child: Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: TextField(
@@ -579,7 +579,7 @@ class _AddSharedFoldersState extends State<AddSharedFolders> {
                     child: Card(
                       shape: RoundedRectangleBorder(
                           side: BorderSide(),
-                          borderRadius: BorderRadius.circular(5)),
+                          borderRadius: BorderRadius.circular(36)),
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: Row(
@@ -612,7 +612,7 @@ class _AddSharedFoldersState extends State<AddSharedFolders> {
                     child: Card(
                       shape: RoundedRectangleBorder(
                           side: BorderSide(),
-                          borderRadius: BorderRadius.circular(5)),
+                          borderRadius: BorderRadius.circular(36)),
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: Row(
@@ -645,7 +645,7 @@ class _AddSharedFoldersState extends State<AddSharedFolders> {
                     child: Card(
                       shape: RoundedRectangleBorder(
                           side: BorderSide(),
-                          borderRadius: BorderRadius.circular(5)),
+                          borderRadius: BorderRadius.circular(36)),
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: Row(
@@ -677,7 +677,7 @@ class _AddSharedFoldersState extends State<AddSharedFolders> {
                           child: Card(
                             shape: RoundedRectangleBorder(
                                 side: BorderSide(),
-                                borderRadius: BorderRadius.circular(5)),
+                                borderRadius: BorderRadius.circular(36)),
                             child: Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: TextField(
@@ -782,7 +782,7 @@ class _AddSharedFoldersState extends State<AddSharedFolders> {
                             child: Card(
                               shape: RoundedRectangleBorder(
                                   side: BorderSide(),
-                                  borderRadius: BorderRadius.circular(5)),
+                                  borderRadius: BorderRadius.circular(36)),
                               child: Padding(
                                 padding: const EdgeInsets.all(8.0),
                                 child: TextField(

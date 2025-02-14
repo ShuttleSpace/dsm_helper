@@ -3,14 +3,14 @@ import 'dart:io';
 import 'dart:isolate';
 import 'dart:ui';
 import 'package:android_intent_plus/android_intent.dart';
-import 'package:dsm_helper/pages/common/video_player.dart';
-import 'package:dsm_helper/pages/download/download_setting.dart';
-import 'package:dsm_helper/pages/download/download_state.dart';
-import 'package:dsm_helper/themes/app_theme.dart';
-import 'package:dsm_helper/widgets/transparent_router.dart';
-import 'package:dsm_helper/pages/common/image_preview.dart';
-import 'package:dsm_helper/util/function.dart';
-import 'package:dsm_helper/widgets/file_icon.dart';
+import 'package:humphrey_garden/pages/common/video_player.dart';
+import 'package:humphrey_garden/pages/download/download_setting.dart';
+import 'package:humphrey_garden/pages/download/download_state.dart';
+import 'package:humphrey_garden/themes/app_theme.dart';
+import 'package:humphrey_garden/widgets/transparent_router.dart';
+import 'package:humphrey_garden/pages/common/image_preview.dart';
+import 'package:humphrey_garden/util/function.dart';
+import 'package:humphrey_garden/widgets/file_icon.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
@@ -81,7 +81,7 @@ class DownloadState extends State<Download> {
     if (status == DownloadTaskStatus.complete) {
       return Card(
         shape: RoundedRectangleBorder(
-            side: BorderSide(), borderRadius: BorderRadius.circular(5)),
+            side: BorderSide(), borderRadius: BorderRadius.circular(36)),
         margin: EdgeInsets.only(bottom: 3),
         child: Padding(
           padding: const EdgeInsets.all(8.0),
@@ -94,7 +94,7 @@ class DownloadState extends State<Download> {
     } else if (status == DownloadTaskStatus.failed) {
       return Card(
         shape: RoundedRectangleBorder(
-            side: BorderSide(), borderRadius: BorderRadius.circular(5)),
+            side: BorderSide(), borderRadius: BorderRadius.circular(36)),
         margin: EdgeInsets.only(bottom: 3),
         child: Padding(
           padding: const EdgeInsets.all(8.0),
@@ -107,7 +107,7 @@ class DownloadState extends State<Download> {
     } else if (status == DownloadTaskStatus.canceled) {
       return Card(
         shape: RoundedRectangleBorder(
-            side: BorderSide(), borderRadius: BorderRadius.circular(5)),
+            side: BorderSide(), borderRadius: BorderRadius.circular(36)),
         margin: EdgeInsets.only(bottom: 3),
         child: Padding(
           padding: const EdgeInsets.all(8.0),
@@ -120,7 +120,7 @@ class DownloadState extends State<Download> {
     } else if (status == DownloadTaskStatus.paused) {
       return Card(
         shape: RoundedRectangleBorder(
-            side: BorderSide(), borderRadius: BorderRadius.circular(5)),
+            side: BorderSide(), borderRadius: BorderRadius.circular(36)),
         margin: EdgeInsets.only(bottom: 3),
         child: Padding(
           padding: const EdgeInsets.all(8.0),
@@ -133,7 +133,7 @@ class DownloadState extends State<Download> {
     } else if (status == DownloadTaskStatus.running) {
       return Card(
         shape: RoundedRectangleBorder(
-            side: BorderSide(), borderRadius: BorderRadius.circular(5)),
+            side: BorderSide(), borderRadius: BorderRadius.circular(36)),
         margin: EdgeInsets.only(bottom: 3),
         child: Padding(
           padding: const EdgeInsets.all(8.0),
@@ -146,7 +146,7 @@ class DownloadState extends State<Download> {
     } else if (status == DownloadTaskStatus.enqueued) {
       return Card(
         shape: RoundedRectangleBorder(
-            side: BorderSide(), borderRadius: BorderRadius.circular(5)),
+            side: BorderSide(), borderRadius: BorderRadius.circular(36)),
         margin: EdgeInsets.only(bottom: 3),
         child: Padding(
           padding: const EdgeInsets.all(8.0),
@@ -302,7 +302,7 @@ class DownloadState extends State<Download> {
                       ? Card(
                           shape: RoundedRectangleBorder(
                               side: BorderSide(),
-                              borderRadius: BorderRadius.circular(5)),
+                              borderRadius: BorderRadius.circular(36)),
                           child: SizedBox(
                             width: 20,
                             height: 20,
@@ -328,7 +328,8 @@ class DownloadState extends State<Download> {
                                   child: Card(
                                     shape: RoundedRectangleBorder(
                                         side: BorderSide(),
-                                        borderRadius: BorderRadius.circular(5)),
+                                        borderRadius:
+                                            BorderRadius.circular(36)),
                                     child: SafeArea(
                                       top: false,
                                       child: Padding(
@@ -697,7 +698,8 @@ class DownloadState extends State<Download> {
                                   child: Card(
                                     shape: RoundedRectangleBorder(
                                         side: BorderSide(),
-                                        borderRadius: BorderRadius.circular(5)),
+                                        borderRadius:
+                                            BorderRadius.circular(36)),
                                     margin: EdgeInsets.all(20),
                                     child: Padding(
                                       padding: const EdgeInsets.all(8.0),

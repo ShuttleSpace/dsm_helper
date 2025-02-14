@@ -1,4 +1,4 @@
-import 'package:dsm_helper/util/api.dart';
+import 'package:humphrey_garden/util/api.dart';
 
 /// maxVersion : 6
 /// minVersion : 1
@@ -13,9 +13,8 @@ class ApiModel {
   static Future<Map<String, ApiModel>> fetch() async {
     Map<String, ApiModel> apis = {};
     Map? res = await Api.api();
-    if (res == null) return apis;
-    if (res['success']) {
-      res['data'].forEach((key, value) {
+    if (res?['success']) {
+      res?['data'].forEach((key, value) {
         apis[key] = ApiModel.fromJson(value);
       });
     }

@@ -1,4 +1,4 @@
-import 'package:dsm_helper/util/function.dart';
+import 'package:humphrey_garden/util/function.dart';
 import 'package:flutter/material.dart';
 
 class DarkModeProvider with ChangeNotifier {

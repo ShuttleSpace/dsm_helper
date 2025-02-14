@@ -1,4 +1,4 @@
-import 'package:dsm_helper/widgets/neu_back_button.dart';
+import 'package:humphrey_garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -41,7 +41,7 @@ class _SearchState extends State<Search> {
           children: [
             Card(
               shape: RoundedRectangleBorder(
-                  side: BorderSide(), borderRadius: BorderRadius.circular(5)),
+                  side: BorderSide(), borderRadius: BorderRadius.circular(366)),
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: TextField(
@@ -67,7 +67,7 @@ class _SearchState extends State<Search> {
                 child: Card(
                   shape: RoundedRectangleBorder(
                       side: BorderSide(),
-                      borderRadius: BorderRadius.circular(5)),
+                      borderRadius: BorderRadius.circular(366)),
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Row(
@@ -87,7 +87,7 @@ class _SearchState extends State<Search> {
             ),
             Card(
               shape: RoundedRectangleBorder(
-                  side: BorderSide(), borderRadius: BorderRadius.circular(5)),
+                  side: BorderSide(), borderRadius: BorderRadius.circular(366)),
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: TextField(

@@ -1,12 +1,12 @@
 import 'dart:async';
 
-import 'package:dsm_helper/pages/download_station/add_task.dart';
-import 'package:dsm_helper/pages/download_station/detail.dart';
-import 'package:dsm_helper/themes/app_theme.dart';
-import 'package:dsm_helper/util/function.dart';
-import 'package:dsm_helper/widgets/file_icon.dart';
-import 'package:dsm_helper/widgets/animation_progress_bar.dart';
-import 'package:dsm_helper/widgets/neu_back_button.dart';
+import 'package:humphrey_garden/pages/download_station/add_task.dart';
+import 'package:humphrey_garden/pages/download_station/detail.dart';
+import 'package:humphrey_garden/themes/app_theme.dart';
+import 'package:humphrey_garden/util/function.dart';
+import 'package:humphrey_garden/widgets/file_icon.dart';
+import 'package:humphrey_garden/widgets/animation_progress_bar.dart';
+import 'package:humphrey_garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -89,7 +89,7 @@ class _DownloadStationState extends State<DownloadStation> {
       },
       child: Card(
         shape: RoundedRectangleBorder(
-            side: BorderSide(), borderRadius: BorderRadius.circular(5)),
+            side: BorderSide(), borderRadius: BorderRadius.circular(36)),
         child: Padding(
           padding: EdgeInsets.all(20),
           child: Column(

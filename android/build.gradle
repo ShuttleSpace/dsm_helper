@@ -22,7 +22,7 @@ rootProject.buildDir = "../build"
 Execution failed for task ':easy_app_installer:verifyReleaseResources'.
 > A failure occurred while executing com.android.build.gradle.tasks.VerifyLibraryResourcesTask$Action
    > Android resource linking failed
-     ERROR: /Users/humphrey/Project/Fork/Flutter/dsm_helper/build/easy_app_installer/intermediates/merged_res/release/mergeReleaseResources/values/values.xml:6124: AAPT: error: resource android:attr/lStar not found.
+     ERROR: /Users/humphrey/Project/Fork/Flutter/humphrey_garden/build/easy_app_installer/intermediates/merged_res/release/mergeReleaseResources/values/values.xml:6124: AAPT: error: resource android:attr/lStar not found.
 */
 subprojects {
     project.afterEvaluate { project ->

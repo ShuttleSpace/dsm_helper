@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'dart:math';
 
-import 'package:dsm_helper/util/function.dart';
-import 'package:dsm_helper/widgets/animation_progress_bar.dart';
+import 'package:humphrey_garden/util/function.dart';
+import 'package:humphrey_garden/widgets/animation_progress_bar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -51,7 +51,7 @@ class _MediaConverterState extends State<MediaConverter> {
       color: Colors.transparent,
       child: Card(
         shape: RoundedRectangleBorder(
-            side: BorderSide(), borderRadius: BorderRadius.circular(5)),
+            side: BorderSide(), borderRadius: BorderRadius.circular(366)),
         child: SafeArea(
           top: false,
           child: Padding(
@@ -72,7 +72,7 @@ class _MediaConverterState extends State<MediaConverter> {
                 Card(
                   shape: RoundedRectangleBorder(
                       side: BorderSide(),
-                      borderRadius: BorderRadius.circular(5)),
+                      borderRadius: BorderRadius.circular(366)),
                   child: Padding(
                     padding: const EdgeInsets.all(20.0),
                     child: Column(
@@ -123,7 +123,7 @@ class _MediaConverterState extends State<MediaConverter> {
                 Card(
                   shape: RoundedRectangleBorder(
                       side: BorderSide(),
-                      borderRadius: BorderRadius.circular(5)),
+                      borderRadius: BorderRadius.circular(366)),
                   child: Padding(
                     padding: const EdgeInsets.all(20.0),
                     child: Column(
@@ -164,7 +164,7 @@ class _MediaConverterState extends State<MediaConverter> {
                 Card(
                   shape: RoundedRectangleBorder(
                       side: BorderSide(),
-                      borderRadius: BorderRadius.circular(5)),
+                      borderRadius: BorderRadius.circular(366)),
                   child: Padding(
                     padding: const EdgeInsets.all(20.0),
                     child: Row(
@@ -328,7 +328,7 @@ class _MediaConverterState extends State<MediaConverter> {
                           child: Card(
                             shape: RoundedRectangleBorder(
                                 side: BorderSide(),
-                                borderRadius: BorderRadius.circular(5)),
+                                borderRadius: BorderRadius.circular(366)),
                             child: Icon(
                               converter['status'] == "paused"
                                   ? CupertinoIcons.play_arrow_solid

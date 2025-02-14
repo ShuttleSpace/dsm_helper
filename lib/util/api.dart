@@ -5,7 +5,7 @@ import 'dart:math';
 
 // import 'package:device_info_plus/device_info_plus.dart';
 import 'package:dio/dio.dart';
-import 'package:dsm_helper/models/api_model.dart';
+import 'package:humphrey_garden/models/api_model.dart';
 import 'package:http_parser/http_parser.dart';
 
 import 'function.dart';

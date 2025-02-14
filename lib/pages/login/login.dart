@@ -2,12 +2,12 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
-import 'package:dsm_helper/pages/common/browser.dart' as dsm;
-import 'package:dsm_helper/pages/login/accounts.dart';
-import 'package:dsm_helper/pages/setting/license.dart';
-import 'package:dsm_helper/pages/update/update.dart';
-import 'package:dsm_helper/providers/flux_provider.dart';
-import 'package:dsm_helper/util/function.dart';
+import 'package:humphrey_garden/pages/common/browser.dart' as dsm;
+import 'package:humphrey_garden/pages/login/accounts.dart';
+import 'package:humphrey_garden/pages/setting/license.dart';
+import 'package:humphrey_garden/pages/update/update.dart';
+import 'package:humphrey_garden/providers/flux_provider.dart';
+import 'package:humphrey_garden/util/function.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
@@ -44,8 +44,8 @@ class _LoginState extends State<Login> {
   bool rememberPassword = true;
   bool autoLogin = true;
   bool checkSsl = true;
-  bool rememberDevice = false;
-  bool read = false;
+  bool rememberDevice = true;
+  bool read = true;
   TextEditingController _hostController = TextEditingController();
   TextEditingController _accountController = TextEditingController();
   TextEditingController _noteController = TextEditingController();
@@ -134,7 +134,7 @@ class _LoginState extends State<Login> {
                 Card(
                   shape: RoundedRectangleBorder(
                       side: BorderSide(),
-                      borderRadius: BorderRadius.circular(5)),
+                      borderRadius: BorderRadius.circular(36)),
                   margin: EdgeInsets.symmetric(horizontal: 50),
                   child: Padding(
                     padding: EdgeInsets.all(20),
@@ -143,7 +143,7 @@ class _LoginState extends State<Login> {
                         Card(
                           shape: RoundedRectangleBorder(
                               side: BorderSide(),
-                              borderRadius: BorderRadius.circular(5)),
+                              borderRadius: BorderRadius.circular(36)),
                           child: Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: Text.rich(
@@ -637,22 +637,6 @@ class _LoginState extends State<Login> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: Padding(
-          padding: EdgeInsets.only(left: 10, top: 8, bottom: 8),
-          child: OutlinedButton(
-            onPressed: () {
-              Navigator.of(context).push(CupertinoPageRoute(builder: (context) {
-                return Update(updateInfo);
-              }));
-            },
-            child: Image.asset(
-              "assets/icons/update.png",
-              width: 20,
-              height: 20,
-              color: Colors.redAccent,
-            ),
-          ),
-        ),
         title: Text(
           widget.type == "login" ? "账号登录" : "添加账号",
         ),
@@ -705,9 +689,9 @@ class _LoginState extends State<Login> {
             ),
             Card(
               shape: RoundedRectangleBorder(
-                  side: BorderSide(), borderRadius: BorderRadius.circular(5)),
+                  side: BorderSide(), borderRadius: BorderRadius.circular(36)),
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                padding: const EdgeInsets.symmetric(horizontal: 12.0),
                 child: Row(
                   children: [
                     SizedBox(
@@ -795,9 +779,9 @@ class _LoginState extends State<Login> {
                   child: Card(
                     shape: RoundedRectangleBorder(
                         side: BorderSide(),
-                        borderRadius: BorderRadius.circular(5)),
+                        borderRadius: BorderRadius.circular(36)),
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                      padding: const EdgeInsets.symmetric(horizontal: 12.0),
                       child: TextField(
                         autocorrect: false,
                         keyboardAppearance: Brightness.light,
@@ -822,9 +806,9 @@ class _LoginState extends State<Login> {
                   child: Card(
                     shape: RoundedRectangleBorder(
                         side: BorderSide(),
-                        borderRadius: BorderRadius.circular(5)),
+                        borderRadius: BorderRadius.circular(36)),
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                      padding: const EdgeInsets.symmetric(horizontal: 12.0),
                       child: TextField(
                         keyboardAppearance: Brightness.light,
                         controller: _noteController,
@@ -848,9 +832,9 @@ class _LoginState extends State<Login> {
             ),
             Card(
               shape: RoundedRectangleBorder(
-                  side: BorderSide(), borderRadius: BorderRadius.circular(5)),
+                  side: BorderSide(), borderRadius: BorderRadius.circular(36)),
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                padding: const EdgeInsets.symmetric(horizontal: 12.0),
                 child: TextField(
                   controller: _passwordController,
                   onChanged: (v) => password = v,
@@ -876,9 +860,9 @@ class _LoginState extends State<Login> {
                     child: Card(
                       shape: RoundedRectangleBorder(
                           side: BorderSide(),
-                          borderRadius: BorderRadius.circular(5)),
+                          borderRadius: BorderRadius.circular(36)),
                       child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                        padding: const EdgeInsets.symmetric(horizontal: 12.0),
                         child: TextField(
                           controller: _otpController,
                           onChanged: (v) => otpCode = v,
@@ -909,9 +893,9 @@ class _LoginState extends State<Login> {
                       child: Card(
                         shape: RoundedRectangleBorder(
                             side: BorderSide(),
-                            borderRadius: BorderRadius.circular(5)),
+                            borderRadius: BorderRadius.circular(36)),
                         child: Padding(
-                          padding: const EdgeInsets.all(8.0),
+                          padding: const EdgeInsets.all(12.0),
                           child: Row(
                             children: [
                               Text("记住设备"),
@@ -948,9 +932,9 @@ class _LoginState extends State<Login> {
                     child: Card(
                       shape: RoundedRectangleBorder(
                           side: BorderSide(),
-                          borderRadius: BorderRadius.circular(5)),
+                          borderRadius: BorderRadius.circular(36)),
                       child: Padding(
-                        padding: const EdgeInsets.all(8.0),
+                        padding: const EdgeInsets.all(12.0),
                         child: Row(
                           children: [
                             Text("记住密码"),
@@ -982,9 +966,9 @@ class _LoginState extends State<Login> {
                     child: Card(
                       shape: RoundedRectangleBorder(
                           side: BorderSide(),
-                          borderRadius: BorderRadius.circular(5)),
+                          borderRadius: BorderRadius.circular(36)),
                       child: Padding(
-                        padding: const EdgeInsets.all(8.0),
+                        padding: const EdgeInsets.all(12.0),
                         child: Row(
                           children: [
                             Text("自动登录"),
@@ -1017,9 +1001,9 @@ class _LoginState extends State<Login> {
                   child: Card(
                     shape: RoundedRectangleBorder(
                         side: BorderSide(),
-                        borderRadius: BorderRadius.circular(5)),
+                        borderRadius: BorderRadius.circular(36)),
                     child: Padding(
-                      padding: const EdgeInsets.all(8.0),
+                      padding: const EdgeInsets.all(12.0),
                       child: Row(
                         children: [
                           Text("验证SSL证书"),
@@ -1042,10 +1026,10 @@ class _LoginState extends State<Login> {
             OutlinedButton(
               onPressed: () {
                 print(login);
-                if (!read) {
-                  Util.instance.toast("请先阅读并同意用户协议和隐私政策");
-                  return;
-                }
+                // if (!read) {
+                //   Util.instance.toast("请先阅读并同意用户协议和隐私政策");
+                //   return;
+                // }
                 if (login) {
                   cancelToken.cancel("取消登录");
                   cancelToken = CancelToken();

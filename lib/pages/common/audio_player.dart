@@ -1,8 +1,8 @@
 import 'dart:math';
 
-import 'package:dsm_helper/providers/audio_player_provider.dart';
-import 'package:dsm_helper/themes/app_theme.dart';
-import 'package:dsm_helper/widgets/neu_back_button.dart';
+import 'package:humphrey_garden/providers/audio_player_provider.dart';
+import 'package:humphrey_garden/themes/app_theme.dart';
+import 'package:humphrey_garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart' as ja;

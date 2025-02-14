@@ -1,11 +1,11 @@
 import 'dart:async';
 
 import 'package:android_intent_plus/android_intent.dart';
-import 'package:dsm_helper/pages/packages/uninstall.dart';
-import 'package:dsm_helper/util/function.dart';
-import 'package:dsm_helper/widgets/cupertino_image.dart';
-import 'package:dsm_helper/widgets/label.dart';
-import 'package:dsm_helper/widgets/neu_back_button.dart';
+import 'package:humphrey_garden/pages/packages/uninstall.dart';
+import 'package:humphrey_garden/util/function.dart';
+import 'package:humphrey_garden/widgets/cupertino_image.dart';
+import 'package:humphrey_garden/widgets/label.dart';
+import 'package:humphrey_garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
@@ -92,7 +92,7 @@ class _PackageDetailState extends State<PackageDetail> {
           color: Colors.transparent,
           child: Card(
             shape: RoundedRectangleBorder(
-                side: BorderSide(), borderRadius: BorderRadius.circular(5)),
+                side: BorderSide(), borderRadius: BorderRadius.circular(36)),
             child: SafeArea(
               top: false,
               child: Padding(
@@ -180,7 +180,8 @@ class _PackageDetailState extends State<PackageDetail> {
               color: Colors.transparent,
               child: Card(
                 shape: RoundedRectangleBorder(
-                    side: BorderSide(), borderRadius: BorderRadius.circular(5)),
+                    side: BorderSide(),
+                    borderRadius: BorderRadius.circular(36)),
                 child: SafeArea(
                   top: false,
                   child: Padding(
@@ -332,7 +333,7 @@ class _PackageDetailState extends State<PackageDetail> {
                 Card(
                   shape: RoundedRectangleBorder(
                       side: BorderSide(),
-                      borderRadius: BorderRadius.circular(5)),
+                      borderRadius: BorderRadius.circular(36)),
                   child: Padding(
                     padding: EdgeInsets.all(20),
                     child: Row(
@@ -368,7 +369,7 @@ class _PackageDetailState extends State<PackageDetail> {
                   Card(
                     shape: RoundedRectangleBorder(
                         side: BorderSide(),
-                        borderRadius: BorderRadius.circular(5)),
+                        borderRadius: BorderRadius.circular(36)),
                     margin: EdgeInsets.only(top: 20),
                     child: Padding(
                       padding: EdgeInsets.all(10),
@@ -400,7 +401,7 @@ class _PackageDetailState extends State<PackageDetail> {
                 Card(
                   shape: RoundedRectangleBorder(
                       side: BorderSide(),
-                      borderRadius: BorderRadius.circular(5)),
+                      borderRadius: BorderRadius.circular(36)),
                   margin: EdgeInsets.only(top: 20),
                   child: Padding(
                     padding: EdgeInsets.all(20),
@@ -424,7 +425,7 @@ class _PackageDetailState extends State<PackageDetail> {
                   Card(
                     shape: RoundedRectangleBorder(
                         side: BorderSide(),
-                        borderRadius: BorderRadius.circular(5)),
+                        borderRadius: BorderRadius.circular(36)),
                     margin: EdgeInsets.only(top: 20),
                     child: Padding(
                       padding: EdgeInsets.all(20),
@@ -464,7 +465,7 @@ class _PackageDetailState extends State<PackageDetail> {
                 Card(
                   shape: RoundedRectangleBorder(
                       side: BorderSide(),
-                      borderRadius: BorderRadius.circular(5)),
+                      borderRadius: BorderRadius.circular(36)),
                   margin: EdgeInsets.only(top: 20),
                   child: Padding(
                     padding: EdgeInsets.all(20),
@@ -486,7 +487,7 @@ class _PackageDetailState extends State<PackageDetail> {
                             Card(
                               shape: RoundedRectangleBorder(
                                   side: BorderSide(),
-                                  borderRadius: BorderRadius.circular(5)),
+                                  borderRadius: BorderRadius.circular(36)),
                               child: Padding(
                                 padding: const EdgeInsets.all(8.0),
                                 child: Column(
@@ -527,7 +528,7 @@ class _PackageDetailState extends State<PackageDetail> {
                               Card(
                                 shape: RoundedRectangleBorder(
                                     side: BorderSide(),
-                                    borderRadius: BorderRadius.circular(5)),
+                                    borderRadius: BorderRadius.circular(36)),
                                 child: Padding(
                                   padding: const EdgeInsets.all(8.0),
                                   child: Column(
@@ -570,7 +571,7 @@ class _PackageDetailState extends State<PackageDetail> {
                             Card(
                               shape: RoundedRectangleBorder(
                                   side: BorderSide(),
-                                  borderRadius: BorderRadius.circular(5)),
+                                  borderRadius: BorderRadius.circular(36)),
                               child: Padding(
                                 padding: const EdgeInsets.all(8.0),
                                 child: Column(
@@ -589,7 +590,7 @@ class _PackageDetailState extends State<PackageDetail> {
                               Card(
                                 shape: RoundedRectangleBorder(
                                     side: BorderSide(),
-                                    borderRadius: BorderRadius.circular(5)),
+                                    borderRadius: BorderRadius.circular(36)),
                                 child: Padding(
                                   padding: const EdgeInsets.all(8.0),
                                   child: Column(
@@ -610,7 +611,7 @@ class _PackageDetailState extends State<PackageDetail> {
                               Card(
                                 shape: RoundedRectangleBorder(
                                     side: BorderSide(),
-                                    borderRadius: BorderRadius.circular(5)),
+                                    borderRadius: BorderRadius.circular(36)),
                                 child: Padding(
                                   padding: const EdgeInsets.all(8.0),
                                   child: Column(
@@ -630,7 +631,7 @@ class _PackageDetailState extends State<PackageDetail> {
                             Card(
                               shape: RoundedRectangleBorder(
                                   side: BorderSide(),
-                                  borderRadius: BorderRadius.circular(5)),
+                                  borderRadius: BorderRadius.circular(36)),
                               child: Padding(
                                 padding: const EdgeInsets.all(8.0),
                                 child: Column(
@@ -681,7 +682,8 @@ class _PackageDetailState extends State<PackageDetail> {
                                   child: Card(
                                     shape: RoundedRectangleBorder(
                                         side: BorderSide(),
-                                        borderRadius: BorderRadius.circular(5)),
+                                        borderRadius:
+                                            BorderRadius.circular(36)),
                                     child: SafeArea(
                                       top: false,
                                       child: Padding(

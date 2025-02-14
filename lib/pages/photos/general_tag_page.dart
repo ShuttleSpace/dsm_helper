@@ -1,6 +1,6 @@
-import 'package:dsm_helper/models/photos/general_tag_model.dart';
-import 'package:dsm_helper/pages/photos/timeline_page.dart';
-import 'package:dsm_helper/widgets/neu_back_button.dart';
+import 'package:humphrey_garden/models/photos/general_tag_model.dart';
+import 'package:humphrey_garden/pages/photos/timeline_page.dart';
+import 'package:humphrey_garden/widgets/neu_back_button.dart';
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';

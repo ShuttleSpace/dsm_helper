@@ -1,18 +1,18 @@
 import 'dart:convert';
 
-import 'package:dsm_helper/pages/backup/backup.dart';
-import 'package:dsm_helper/pages/control_panel/ssh/ssh.dart';
-import 'package:dsm_helper/pages/login/accounts.dart';
-import 'package:dsm_helper/pages/login/confirm_logout.dart';
-import 'package:dsm_helper/pages/setting/vip.dart';
-import 'package:dsm_helper/providers/dark_mode.dart';
-import 'package:dsm_helper/pages/setting/feedback.dart' as fd;
-import 'package:dsm_helper/pages/setting/helper_setting.dart';
-import 'package:dsm_helper/pages/terminal/select_server.dart';
-import 'package:dsm_helper/pages/user/setting.dart';
-import 'package:dsm_helper/providers/flux_provider.dart';
-import 'package:dsm_helper/util/function.dart';
-import 'package:dsm_helper/widgets/terminal_button.dart';
+import 'package:humphrey_garden/pages/backup/backup.dart';
+import 'package:humphrey_garden/pages/control_panel/ssh/ssh.dart';
+import 'package:humphrey_garden/pages/login/accounts.dart';
+import 'package:humphrey_garden/pages/login/confirm_logout.dart';
+import 'package:humphrey_garden/pages/setting/vip.dart';
+import 'package:humphrey_garden/providers/dark_mode.dart';
+import 'package:humphrey_garden/pages/setting/feedback.dart' as fd;
+import 'package:humphrey_garden/pages/setting/helper_setting.dart';
+import 'package:humphrey_garden/pages/terminal/select_server.dart';
+import 'package:humphrey_garden/pages/user/setting.dart';
+import 'package:humphrey_garden/providers/flux_provider.dart';
+import 'package:humphrey_garden/util/function.dart';
+import 'package:humphrey_garden/widgets/terminal_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluwx/fluwx.dart';
@@ -199,7 +199,8 @@ class _SettingState extends State<Setting> {
               color: Colors.transparent,
               child: Card(
                 shape: RoundedRectangleBorder(
-                    side: BorderSide(), borderRadius: BorderRadius.circular(5)),
+                    side: BorderSide(),
+                    borderRadius: BorderRadius.circular(36)),
                 child: SafeArea(
                   top: false,
                   child: Padding(
@@ -282,7 +283,7 @@ class _SettingState extends State<Setting> {
           color: Colors.transparent,
           child: Card(
             shape: RoundedRectangleBorder(
-                side: BorderSide(), borderRadius: BorderRadius.circular(5)),
+                side: BorderSide(), borderRadius: BorderRadius.circular(36)),
             child: SafeArea(
               top: false,
               child: Padding(
@@ -361,7 +362,7 @@ class _SettingState extends State<Setting> {
           color: Colors.transparent,
           child: Card(
             shape: RoundedRectangleBorder(
-                side: BorderSide(), borderRadius: BorderRadius.circular(5)),
+                side: BorderSide(), borderRadius: BorderRadius.circular(36)),
             child: SafeArea(
               top: false,
               child: Padding(
@@ -437,7 +438,7 @@ class _SettingState extends State<Setting> {
           color: Colors.transparent,
           child: Card(
             shape: RoundedRectangleBorder(
-                side: BorderSide(), borderRadius: BorderRadius.circular(5)),
+                side: BorderSide(), borderRadius: BorderRadius.circular(36)),
             child: SafeArea(
               top: false,
               child: Padding(
@@ -554,7 +555,7 @@ class _SettingState extends State<Setting> {
             },
             child: Card(
               shape: RoundedRectangleBorder(
-                  side: BorderSide(), borderRadius: BorderRadius.circular(5)),
+                  side: BorderSide(), borderRadius: BorderRadius.circular(36)),
               child: Padding(
                 padding: EdgeInsets.all(20.0),
                 child: Row(
@@ -654,7 +655,7 @@ class _SettingState extends State<Setting> {
                           child: Card(
                             shape: RoundedRectangleBorder(
                                 side: BorderSide(),
-                                borderRadius: BorderRadius.circular(5)),
+                                borderRadius: BorderRadius.circular(12)),
                             child: SafeArea(
                               top: false,
                               child: Padding(
@@ -742,12 +743,12 @@ class _SettingState extends State<Setting> {
                         settings: RouteSettings(name: "ssh_setting")));
                   },
                   child: Card(
+                    margin: EdgeInsets.zero,
                     shape: RoundedRectangleBorder(
                         side: BorderSide(),
                         borderRadius: BorderRadius.circular(36)),
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 6.0, horizontal: 2),
+                      padding: const EdgeInsets.symmetric(vertical: 6.0),
                       child: Column(
                         children: [
                           sshLoading
@@ -762,7 +763,7 @@ class _SettingState extends State<Setting> {
                                   width: 32,
                                 ),
                           SizedBox(
-                            height: 8,
+                            height: 2,
                           ),
                           Text(
                             "SSH${ssh == null ? "开关" : ssh ? "已开启" : "已关闭"}",
@@ -814,7 +815,7 @@ class _SettingState extends State<Setting> {
                           child: Card(
                             shape: RoundedRectangleBorder(
                                 side: BorderSide(),
-                                borderRadius: BorderRadius.circular(5)),
+                                borderRadius: BorderRadius.circular(36)),
                             child: SafeArea(
                               top: false,
                               child: Padding(

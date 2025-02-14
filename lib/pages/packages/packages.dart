@@ -1,9 +1,9 @@
-import 'package:dsm_helper/pages/packages/detail.dart';
-import 'package:dsm_helper/util/function.dart';
-import 'package:dsm_helper/widgets/bubble_tab_indicator.dart';
-import 'package:dsm_helper/widgets/cupertino_image.dart';
-import 'package:dsm_helper/widgets/label.dart';
-import 'package:dsm_helper/widgets/neu_back_button.dart';
+import 'package:humphrey_garden/pages/packages/detail.dart';
+import 'package:humphrey_garden/util/function.dart';
+import 'package:humphrey_garden/widgets/bubble_tab_indicator.dart';
+import 'package:humphrey_garden/widgets/cupertino_image.dart';
+import 'package:humphrey_garden/widgets/label.dart';
+import 'package:humphrey_garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -209,7 +209,7 @@ class _PackagesState extends State<Packages> with TickerProviderStateMixin {
     if (package['can_update'] == null || package['installed'] == null) {
       button = Card(
         shape: RoundedRectangleBorder(
-            side: BorderSide(), borderRadius: BorderRadius.circular(5)),
+            side: BorderSide(), borderRadius: BorderRadius.circular(36)),
         child: Text("获取中"),
       );
     } else if (package['can_update']) {
@@ -268,7 +268,7 @@ class _PackagesState extends State<Packages> with TickerProviderStateMixin {
                   child: Card(
                     shape: RoundedRectangleBorder(
                         side: BorderSide(),
-                        borderRadius: BorderRadius.circular(5)),
+                        borderRadius: BorderRadius.circular(36)),
                     child: SafeArea(
                       top: false,
                       child: Padding(
@@ -408,7 +408,7 @@ class _PackagesState extends State<Packages> with TickerProviderStateMixin {
       },
       child: Card(
         shape: RoundedRectangleBorder(
-            side: BorderSide(), borderRadius: BorderRadius.circular(5)),
+            side: BorderSide(), borderRadius: BorderRadius.circular(36)),
         margin: EdgeInsets.only(bottom: 20),
         child: Padding(
           padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
@@ -486,7 +486,7 @@ class _PackagesState extends State<Packages> with TickerProviderStateMixin {
       },
       child: Card(
         shape: RoundedRectangleBorder(
-            side: BorderSide(), borderRadius: BorderRadius.circular(5)),
+            side: BorderSide(), borderRadius: BorderRadius.circular(36)),
         child: Padding(
           padding: const EdgeInsets.all(8.0),
           child: Column(
@@ -571,7 +571,8 @@ class _PackagesState extends State<Packages> with TickerProviderStateMixin {
             children: [
               Card(
                 shape: RoundedRectangleBorder(
-                    side: BorderSide(), borderRadius: BorderRadius.circular(5)),
+                    side: BorderSide(),
+                    borderRadius: BorderRadius.circular(36)),
                 margin: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
                 child: TabBar(
                   dividerHeight: 0,

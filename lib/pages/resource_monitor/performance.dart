@@ -1,11 +1,11 @@
 import 'dart:async';
 import 'dart:math';
 
-import 'package:dsm_helper/providers/setting.dart';
-import 'package:dsm_helper/util/function.dart';
-import 'package:dsm_helper/widgets/bubble_tab_indicator.dart';
-import 'package:dsm_helper/widgets/label.dart';
-import 'package:dsm_helper/widgets/neu_back_button.dart';
+import 'package:humphrey_garden/providers/setting.dart';
+import 'package:humphrey_garden/util/function.dart';
+import 'package:humphrey_garden/widgets/bubble_tab_indicator.dart';
+import 'package:humphrey_garden/widgets/label.dart';
+import 'package:humphrey_garden/widgets/neu_back_button.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -136,7 +136,7 @@ class _PerformanceState extends State<Performance>
                 Card(
                   shape: RoundedRectangleBorder(
                       side: BorderSide(),
-                      borderRadius: BorderRadius.circular(5)),
+                      borderRadius: BorderRadius.circular(366)),
                   margin: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
                   child: TabBar(
                     dividerHeight: 0,
@@ -198,7 +198,7 @@ class _PerformanceState extends State<Performance>
                           Card(
                             shape: RoundedRectangleBorder(
                                 side: BorderSide(),
-                                borderRadius: BorderRadius.circular(5)),
+                                borderRadius: BorderRadius.circular(366)),
                             margin: EdgeInsets.symmetric(horizontal: 20),
                             child: Padding(
                               padding: const EdgeInsets.all(8.0),
@@ -366,7 +366,7 @@ class _PerformanceState extends State<Performance>
                           Card(
                             shape: RoundedRectangleBorder(
                                 side: BorderSide(),
-                                borderRadius: BorderRadius.circular(5)),
+                                borderRadius: BorderRadius.circular(366)),
                             margin: EdgeInsets.symmetric(horizontal: 20),
                             child: Padding(
                               padding: const EdgeInsets.all(8.0),
@@ -533,7 +533,7 @@ class _PerformanceState extends State<Performance>
                           Card(
                             shape: RoundedRectangleBorder(
                                 side: BorderSide(),
-                                borderRadius: BorderRadius.circular(5)),
+                                borderRadius: BorderRadius.circular(366)),
                             margin: EdgeInsets.symmetric(horizontal: 20),
                             child: Padding(
                               padding: const EdgeInsets.all(8.0),
@@ -770,7 +770,7 @@ class _PerformanceState extends State<Performance>
                           Card(
                             shape: RoundedRectangleBorder(
                                 side: BorderSide(),
-                                borderRadius: BorderRadius.circular(5)),
+                                borderRadius: BorderRadius.circular(366)),
                             margin: EdgeInsets.symmetric(horizontal: 20),
                             child: Padding(
                               padding: const EdgeInsets.all(8.0),
@@ -935,7 +935,7 @@ class _PerformanceState extends State<Performance>
                           Card(
                             shape: RoundedRectangleBorder(
                                 side: BorderSide(),
-                                borderRadius: BorderRadius.circular(5)),
+                                borderRadius: BorderRadius.circular(366)),
                             margin: EdgeInsets.symmetric(horizontal: 20),
                             child: Padding(
                               padding: const EdgeInsets.all(8.0),
@@ -1107,7 +1107,7 @@ class _PerformanceState extends State<Performance>
                               child: Card(
                                 shape: RoundedRectangleBorder(
                                     side: BorderSide(),
-                                    borderRadius: BorderRadius.circular(5)),
+                                    borderRadius: BorderRadius.circular(366)),
                                 // padding: EdgeInsets.symmetric(horizontal: 10),
                                 child: Padding(
                                   padding: EdgeInsets.all(10),
@@ -1256,7 +1256,7 @@ class _PerformanceState extends State<Performance>
                           Card(
                             shape: RoundedRectangleBorder(
                                 side: BorderSide(),
-                                borderRadius: BorderRadius.circular(5)),
+                                borderRadius: BorderRadius.circular(366)),
                             margin: EdgeInsets.symmetric(
                                 vertical: 10, horizontal: 20),
                             child: Padding(
@@ -1401,7 +1401,7 @@ class _PerformanceState extends State<Performance>
                           Card(
                             shape: RoundedRectangleBorder(
                                 side: BorderSide(),
-                                borderRadius: BorderRadius.circular(5)),
+                                borderRadius: BorderRadius.circular(366)),
                             margin: EdgeInsets.symmetric(
                                 vertical: 10, horizontal: 20),
                             child: Padding(
@@ -1535,7 +1535,7 @@ class _PerformanceState extends State<Performance>
                               child: Card(
                                 shape: RoundedRectangleBorder(
                                     side: BorderSide(),
-                                    borderRadius: BorderRadius.circular(5)),
+                                    borderRadius: BorderRadius.circular(366)),
                                 // padding: EdgeInsets.symmetric(horizontal: 10),
                                 child: Padding(
                                   padding: EdgeInsets.all(10),
@@ -1635,7 +1635,7 @@ class _PerformanceState extends State<Performance>
                           Card(
                             shape: RoundedRectangleBorder(
                                 side: BorderSide(),
-                                borderRadius: BorderRadius.circular(5)),
+                                borderRadius: BorderRadius.circular(366)),
                             margin: EdgeInsets.symmetric(
                                 vertical: 10, horizontal: 20),
                             child: Padding(
@@ -1886,7 +1886,7 @@ class _PerformanceState extends State<Performance>
                             Card(
                               shape: RoundedRectangleBorder(
                                   side: BorderSide(),
-                                  borderRadius: BorderRadius.circular(5)),
+                                  borderRadius: BorderRadius.circular(366)),
                               margin: EdgeInsets.only(
                                   left: 20, right: 20, bottom: 20),
                               child: Padding(
@@ -2150,7 +2150,7 @@ class _PerformanceState extends State<Performance>
                           Card(
                             shape: RoundedRectangleBorder(
                                 side: BorderSide(),
-                                borderRadius: BorderRadius.circular(5)),
+                                borderRadius: BorderRadius.circular(366)),
                             margin: EdgeInsets.only(
                                 left: 20, right: 20, bottom: 20),
                             child: Padding(
@@ -2333,7 +2333,7 @@ class _PerformanceState extends State<Performance>
                           Card(
                             shape: RoundedRectangleBorder(
                                 side: BorderSide(),
-                                borderRadius: BorderRadius.circular(5)),
+                                borderRadius: BorderRadius.circular(366)),
                             margin: EdgeInsets.only(
                                 left: 20, right: 20, bottom: 20),
                             child: Padding(
@@ -2540,7 +2540,7 @@ class _PerformanceState extends State<Performance>
                           Card(
                             shape: RoundedRectangleBorder(
                                 side: BorderSide(),
-                                borderRadius: BorderRadius.circular(5)),
+                                borderRadius: BorderRadius.circular(366)),
                             margin: EdgeInsets.only(
                                 left: 20, right: 20, bottom: 20),
                             child: Padding(
@@ -2747,7 +2747,7 @@ class _PerformanceState extends State<Performance>
                           Card(
                             shape: RoundedRectangleBorder(
                                 side: BorderSide(),
-                                borderRadius: BorderRadius.circular(5)),
+                                borderRadius: BorderRadius.circular(366)),
                             margin: EdgeInsets.only(
                                 left: 20, right: 20, bottom: 20),
                             child: Padding(
@@ -2929,7 +2929,7 @@ class _PerformanceState extends State<Performance>
                           Card(
                             shape: RoundedRectangleBorder(
                                 side: BorderSide(),
-                                borderRadius: BorderRadius.circular(5)),
+                                borderRadius: BorderRadius.circular(366)),
                             margin: EdgeInsets.only(
                                 left: 20, right: 20, bottom: 20),
                             child: Padding(
@@ -3132,7 +3132,7 @@ class _PerformanceState extends State<Performance>
                           Card(
                             shape: RoundedRectangleBorder(
                                 side: BorderSide(),
-                                borderRadius: BorderRadius.circular(5)),
+                                borderRadius: BorderRadius.circular(366)),
                             margin: EdgeInsets.only(
                                 left: 20, right: 20, bottom: 20),
                             child: Padding(
@@ -3309,7 +3309,7 @@ class _PerformanceState extends State<Performance>
                           Card(
                             shape: RoundedRectangleBorder(
                                 side: BorderSide(),
-                                borderRadius: BorderRadius.circular(5)),
+                                borderRadius: BorderRadius.circular(366)),
                             margin: EdgeInsets.only(
                                 left: 20, right: 20, bottom: 20),
                             child: Padding(
@@ -3489,7 +3489,7 @@ class _PerformanceState extends State<Performance>
                           Card(
                             shape: RoundedRectangleBorder(
                                 side: BorderSide(),
-                                borderRadius: BorderRadius.circular(5)),
+                                borderRadius: BorderRadius.circular(366)),
                             margin: EdgeInsets.only(
                                 left: 20, right: 20, bottom: 20),
                             child: Padding(
@@ -3675,7 +3675,7 @@ class _PerformanceState extends State<Performance>
                           Card(
                             shape: RoundedRectangleBorder(
                                 side: BorderSide(),
-                                borderRadius: BorderRadius.circular(5)),
+                                borderRadius: BorderRadius.circular(366)),
                             margin: EdgeInsets.only(
                                 left: 20, right: 20, bottom: 20),
                             child: Padding(
@@ -3851,7 +3851,7 @@ class _PerformanceState extends State<Performance>
                           Card(
                             shape: RoundedRectangleBorder(
                                 side: BorderSide(),
-                                borderRadius: BorderRadius.circular(5)),
+                                borderRadius: BorderRadius.circular(366)),
                             margin: EdgeInsets.only(
                                 left: 20, right: 20, bottom: 20),
                             child: Padding(

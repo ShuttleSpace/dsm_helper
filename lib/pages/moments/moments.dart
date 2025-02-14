@@ -1,13 +1,13 @@
 import 'package:draggable_scrollbar/draggable_scrollbar.dart';
-import 'package:dsm_helper/pages/common/image_preview.dart';
-import 'package:dsm_helper/pages/moments/album.dart';
-import 'package:dsm_helper/pages/moments/photos.dart';
-import 'package:dsm_helper/pages/moments/timeline.dart';
-import 'package:dsm_helper/util/function.dart';
-import 'package:dsm_helper/util/moments_api.dart';
-import 'package:dsm_helper/widgets/cupertino_image.dart';
-import 'package:dsm_helper/widgets/neu_back_button.dart';
-import 'package:dsm_helper/widgets/transparent_router.dart';
+import 'package:humphrey_garden/pages/common/image_preview.dart';
+import 'package:humphrey_garden/pages/moments/album.dart';
+import 'package:humphrey_garden/pages/moments/photos.dart';
+import 'package:humphrey_garden/pages/moments/timeline.dart';
+import 'package:humphrey_garden/util/function.dart';
+import 'package:humphrey_garden/util/moments_api.dart';
+import 'package:humphrey_garden/widgets/cupertino_image.dart';
+import 'package:humphrey_garden/widgets/neu_back_button.dart';
+import 'package:humphrey_garden/widgets/transparent_router.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -500,7 +500,7 @@ class _MomentsState extends State<Moments> {
                                       height: albumWidth,
                                       decoration: BoxDecoration(
                                         color: Colors.white,
-                                        borderRadius: BorderRadius.circular(5),
+                                        borderRadius: BorderRadius.circular(36),
                                       ),
                                       child: Wrap(
                                         runSpacing: 2,
@@ -548,7 +548,7 @@ class _MomentsState extends State<Moments> {
                                       height: albumWidth,
                                       decoration: BoxDecoration(
                                         color: Colors.white,
-                                        borderRadius: BorderRadius.circular(5),
+                                        borderRadius: BorderRadius.circular(36),
                                       ),
                                       child: Wrap(
                                         runSpacing: 2,
@@ -594,7 +594,7 @@ class _MomentsState extends State<Moments> {
                           //           height: albumWidth,
                           //           decoration: BoxDecoration(
                           //             color: Colors.white,
-                          //             borderRadius: BorderRadius.circular(5),
+                          //             borderRadius: BorderRadius.circular(36),
                           //           ),
                           //           child: Wrap(
                           //             runSpacing: 2,
@@ -640,7 +640,7 @@ class _MomentsState extends State<Moments> {
                                     height: albumWidth,
                                     decoration: BoxDecoration(
                                       color: Colors.white,
-                                      borderRadius: BorderRadius.circular(5),
+                                      borderRadius: BorderRadius.circular(36),
                                     ),
                                     child: Wrap(
                                       runSpacing: 2,
@@ -686,7 +686,7 @@ class _MomentsState extends State<Moments> {
                                     height: albumWidth,
                                     decoration: BoxDecoration(
                                       color: Colors.white,
-                                      borderRadius: BorderRadius.circular(5),
+                                      borderRadius: BorderRadius.circular(36),
                                     ),
                                     child: Wrap(
                                       runSpacing: 2,

@@ -4,30 +4,30 @@ import 'package:android_intent_plus/android_intent.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:draggable_scrollbar/draggable_scrollbar.dart';
-import 'package:dsm_helper/pages/download/download_state.dart';
-import 'package:dsm_helper/util/log.dart';
+import 'package:humphrey_garden/pages/download/download_state.dart';
+import 'package:humphrey_garden/util/log.dart';
 import 'package:flutter_vibrate/flutter_vibrate.dart';
 import 'package:just_audio/just_audio.dart' as ja;
-import 'package:dsm_helper/pages/common/audio_player.dart';
-import 'package:dsm_helper/pages/common/image_preview.dart';
-import 'package:dsm_helper/pages/common/pdf_viewer.dart';
-import 'package:dsm_helper/pages/common/text_editor.dart';
-import 'package:dsm_helper/pages/common/video_player.dart';
-import 'package:dsm_helper/pages/control_panel/shared_folders/add_shared_folder.dart';
-import 'package:dsm_helper/pages/file/detail.dart';
-import 'package:dsm_helper/pages/file/favorite.dart';
-import 'package:dsm_helper/pages/file/remote_folder.dart';
-import 'package:dsm_helper/pages/file/search.dart';
-import 'package:dsm_helper/pages/file/select_folder.dart';
-import 'package:dsm_helper/pages/file/share.dart';
-import 'package:dsm_helper/pages/file/share_manager.dart';
-import 'package:dsm_helper/pages/file/upload.dart';
-import 'package:dsm_helper/providers/audio_player_provider.dart';
-import 'package:dsm_helper/themes/app_theme.dart';
-import 'package:dsm_helper/util/function.dart';
-import 'package:dsm_helper/widgets/animation_progress_bar.dart';
-import 'package:dsm_helper/widgets/file_icon.dart';
-import 'package:dsm_helper/widgets/transparent_router.dart';
+import 'package:humphrey_garden/pages/common/audio_player.dart';
+import 'package:humphrey_garden/pages/common/image_preview.dart';
+import 'package:humphrey_garden/pages/common/pdf_viewer.dart';
+import 'package:humphrey_garden/pages/common/text_editor.dart';
+import 'package:humphrey_garden/pages/common/video_player.dart';
+import 'package:humphrey_garden/pages/control_panel/shared_folders/add_shared_folder.dart';
+import 'package:humphrey_garden/pages/file/detail.dart';
+import 'package:humphrey_garden/pages/file/favorite.dart';
+import 'package:humphrey_garden/pages/file/remote_folder.dart';
+import 'package:humphrey_garden/pages/file/search.dart';
+import 'package:humphrey_garden/pages/file/select_folder.dart';
+import 'package:humphrey_garden/pages/file/share.dart';
+import 'package:humphrey_garden/pages/file/share_manager.dart';
+import 'package:humphrey_garden/pages/file/upload.dart';
+import 'package:humphrey_garden/providers/audio_player_provider.dart';
+import 'package:humphrey_garden/themes/app_theme.dart';
+import 'package:humphrey_garden/util/function.dart';
+import 'package:humphrey_garden/widgets/animation_progress_bar.dart';
+import 'package:humphrey_garden/widgets/file_icon.dart';
+import 'package:humphrey_garden/widgets/transparent_router.dart';
 import 'package:extended_text/extended_text.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -205,7 +205,7 @@ class FilesState extends State<Files> {
                         Card(
                           shape: RoundedRectangleBorder(
                               side: BorderSide(),
-                              borderRadius: BorderRadius.circular(5)),
+                              borderRadius: BorderRadius.circular(366)),
                           margin: EdgeInsets.symmetric(horizontal: 50),
                           child: Padding(
                             padding: EdgeInsets.all(20),
@@ -223,7 +223,7 @@ class FilesState extends State<Files> {
                                 Card(
                                   shape: RoundedRectangleBorder(
                                       side: BorderSide(),
-                                      borderRadius: BorderRadius.circular(5)),
+                                      borderRadius: BorderRadius.circular(366)),
                                   child: Padding(
                                     padding: const EdgeInsets.all(8.0),
                                     child: TextField(
@@ -447,7 +447,8 @@ class FilesState extends State<Files> {
               color: Colors.transparent,
               child: Card(
                 shape: RoundedRectangleBorder(
-                    side: BorderSide(), borderRadius: BorderRadius.circular(5)),
+                    side: BorderSide(),
+                    borderRadius: BorderRadius.circular(366)),
                 child: SafeArea(
                   top: false,
                   child: Padding(
@@ -719,7 +720,7 @@ class FilesState extends State<Files> {
       color: Colors.transparent,
       child: Card(
         shape: RoundedRectangleBorder(
-            side: BorderSide(), borderRadius: BorderRadius.circular(5)),
+            side: BorderSide(), borderRadius: BorderRadius.circular(366)),
         child: Padding(
           padding: EdgeInsets.all(20),
           child: Column(
@@ -727,7 +728,8 @@ class FilesState extends State<Files> {
             children: <Widget>[
               Card(
                 shape: RoundedRectangleBorder(
-                    side: BorderSide(), borderRadius: BorderRadius.circular(5)),
+                    side: BorderSide(),
+                    borderRadius: BorderRadius.circular(366)),
                 child: SafeArea(
                   top: false,
                   child: Padding(
@@ -748,7 +750,7 @@ class FilesState extends State<Files> {
                               Card(
                                 shape: RoundedRectangleBorder(
                                     side: BorderSide(),
-                                    borderRadius: BorderRadius.circular(5)),
+                                    borderRadius: BorderRadius.circular(366)),
                                 child: Padding(
                                   padding: const EdgeInsets.all(8.0),
                                   child: SizedBox(
@@ -781,7 +783,7 @@ class FilesState extends State<Files> {
                               Card(
                                 shape: RoundedRectangleBorder(
                                     side: BorderSide(),
-                                    borderRadius: BorderRadius.circular(5)),
+                                    borderRadius: BorderRadius.circular(366)),
                                 child: Padding(
                                   padding: const EdgeInsets.all(8.0),
                                   child: SizedBox(
@@ -814,7 +816,7 @@ class FilesState extends State<Files> {
                               Card(
                                 shape: RoundedRectangleBorder(
                                     side: BorderSide(),
-                                    borderRadius: BorderRadius.circular(5)),
+                                    borderRadius: BorderRadius.circular(366)),
                                 child: Padding(
                                   padding: const EdgeInsets.all(8.0),
                                   child: SizedBox(
@@ -847,7 +849,7 @@ class FilesState extends State<Files> {
                               Card(
                                 shape: RoundedRectangleBorder(
                                     side: BorderSide(),
-                                    borderRadius: BorderRadius.circular(5)),
+                                    borderRadius: BorderRadius.circular(366)),
                                 child: Padding(
                                   padding: const EdgeInsets.all(8.0),
                                   child: SizedBox(
@@ -880,7 +882,7 @@ class FilesState extends State<Files> {
                               Card(
                                 shape: RoundedRectangleBorder(
                                     side: BorderSide(),
-                                    borderRadius: BorderRadius.circular(5)),
+                                    borderRadius: BorderRadius.circular(366)),
                                 child: Padding(
                                   padding: const EdgeInsets.all(8.0),
                                   child: SizedBox(
@@ -913,7 +915,7 @@ class FilesState extends State<Files> {
                               Card(
                                 shape: RoundedRectangleBorder(
                                     side: BorderSide(),
-                                    borderRadius: BorderRadius.circular(5)),
+                                    borderRadius: BorderRadius.circular(366)),
                                 child: Padding(
                                   padding: const EdgeInsets.all(8.0),
                                   child: SizedBox(
@@ -946,7 +948,7 @@ class FilesState extends State<Files> {
                               Card(
                                 shape: RoundedRectangleBorder(
                                     side: BorderSide(),
-                                    borderRadius: BorderRadius.circular(5)),
+                                    borderRadius: BorderRadius.circular(366)),
                                 child: Padding(
                                   padding: const EdgeInsets.all(8.0),
                                   child: SizedBox(
@@ -979,7 +981,7 @@ class FilesState extends State<Files> {
                               Card(
                                 shape: RoundedRectangleBorder(
                                     side: BorderSide(),
-                                    borderRadius: BorderRadius.circular(5)),
+                                    borderRadius: BorderRadius.circular(366)),
                                 child: Padding(
                                   padding: const EdgeInsets.all(8.0),
                                   child: SizedBox(
@@ -1012,7 +1014,7 @@ class FilesState extends State<Files> {
                               Card(
                                 shape: RoundedRectangleBorder(
                                     side: BorderSide(),
-                                    borderRadius: BorderRadius.circular(5)),
+                                    borderRadius: BorderRadius.circular(366)),
                                 child: Padding(
                                   padding: const EdgeInsets.all(8.0),
                                   child: SizedBox(
@@ -1040,7 +1042,8 @@ class FilesState extends State<Files> {
               ),
               Card(
                 shape: RoundedRectangleBorder(
-                    side: BorderSide(), borderRadius: BorderRadius.circular(5)),
+                    side: BorderSide(),
+                    borderRadius: BorderRadius.circular(366)),
                 child: Padding(
                   padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                   child: Column(
@@ -1059,7 +1062,7 @@ class FilesState extends State<Files> {
                             Card(
                               shape: RoundedRectangleBorder(
                                   side: BorderSide(),
-                                  borderRadius: BorderRadius.circular(5)),
+                                  borderRadius: BorderRadius.circular(366)),
                               child: Padding(
                                 padding: const EdgeInsets.all(8.0),
                                 child: SizedBox(
@@ -1092,7 +1095,7 @@ class FilesState extends State<Files> {
                             Card(
                               shape: RoundedRectangleBorder(
                                   side: BorderSide(),
-                                  borderRadius: BorderRadius.circular(5)),
+                                  borderRadius: BorderRadius.circular(366)),
                               child: Padding(
                                 padding: const EdgeInsets.all(8.0),
                                 child: SizedBox(
@@ -1145,7 +1148,7 @@ class FilesState extends State<Files> {
           color: Colors.transparent,
           child: Card(
             shape: RoundedRectangleBorder(
-                side: BorderSide(), borderRadius: BorderRadius.circular(5)),
+                side: BorderSide(), borderRadius: BorderRadius.circular(366)),
             child: SafeArea(
               top: false,
               child: Padding(
@@ -1258,7 +1261,7 @@ class FilesState extends State<Files> {
           color: Colors.transparent,
           child: Card(
             shape: RoundedRectangleBorder(
-                side: BorderSide(), borderRadius: BorderRadius.circular(5)),
+                side: BorderSide(), borderRadius: BorderRadius.circular(366)),
             child: SafeArea(
               top: false,
               child: Padding(
@@ -1564,7 +1567,7 @@ class FilesState extends State<Files> {
           color: Colors.transparent,
           child: Card(
             shape: RoundedRectangleBorder(
-                side: BorderSide(), borderRadius: BorderRadius.circular(5)),
+                side: BorderSide(), borderRadius: BorderRadius.circular(366)),
             child: SafeArea(
               top: false,
               child: Padding(
@@ -2128,7 +2131,7 @@ class FilesState extends State<Files> {
     Widget actionButton = multiSelect
         ? Card(
             shape: RoundedRectangleBorder(
-                side: BorderSide(), borderRadius: BorderRadius.circular(5)),
+                side: BorderSide(), borderRadius: BorderRadius.circular(366)),
             child: SizedBox(
               width: 20,
               height: 20,
@@ -2146,7 +2149,7 @@ class FilesState extends State<Files> {
             },
             child: Card(
               shape: RoundedRectangleBorder(
-                  side: BorderSide(), borderRadius: BorderRadius.circular(5)),
+                  side: BorderSide(), borderRadius: BorderRadius.circular(366)),
               // padding: EdgeInsets.zero,
               child: Icon(
                 CupertinoIcons.right_chevron,
@@ -2396,7 +2399,7 @@ class FilesState extends State<Files> {
       children.add(
         Card(
           shape: RoundedRectangleBorder(
-              side: BorderSide(), borderRadius: BorderRadius.circular(5)),
+              side: BorderSide(), borderRadius: BorderRadius.circular(366)),
           margin: EdgeInsets.only(left: 20, right: 20, bottom: 20),
           child: Padding(
             padding: EdgeInsets.all(20),
@@ -2511,7 +2514,7 @@ class FilesState extends State<Files> {
                         child: Card(
                           shape: RoundedRectangleBorder(
                               side: BorderSide(),
-                              borderRadius: BorderRadius.circular(5)),
+                              borderRadius: BorderRadius.circular(366)),
                           child: SafeArea(
                             top: false,
                             child: Padding(
@@ -2765,7 +2768,7 @@ class FilesState extends State<Files> {
                         child: Card(
                           shape: RoundedRectangleBorder(
                               side: BorderSide(),
-                              borderRadius: BorderRadius.circular(5)),
+                              borderRadius: BorderRadius.circular(366)),
                           child: SafeArea(
                             top: false,
                             child: Padding(
@@ -3213,7 +3216,7 @@ class FilesState extends State<Files> {
                     child: Card(
                       shape: RoundedRectangleBorder(
                           side: BorderSide(),
-                          borderRadius: BorderRadius.circular(5)),
+                          borderRadius: BorderRadius.circular(366)),
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: Text(
@@ -3239,7 +3242,7 @@ class FilesState extends State<Files> {
                       child: Card(
                         shape: RoundedRectangleBorder(
                             side: BorderSide(),
-                            borderRadius: BorderRadius.circular(5)),
+                            borderRadius: BorderRadius.circular(366)),
                         child: Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: searching
@@ -3369,7 +3372,7 @@ class FilesState extends State<Files> {
                         child: Card(
                           shape: RoundedRectangleBorder(
                               side: BorderSide(),
-                              borderRadius: BorderRadius.circular(5)),
+                              borderRadius: BorderRadius.circular(366)),
                           margin: EdgeInsets.all(20),
                           child: Padding(
                             padding: const EdgeInsets.all(8.0),

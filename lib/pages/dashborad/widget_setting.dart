@@ -1,7 +1,7 @@
-import 'package:dsm_helper/providers/shortcut.dart';
-import 'package:dsm_helper/providers/wallpaper.dart';
-import 'package:dsm_helper/util/function.dart';
-import 'package:dsm_helper/widgets/neu_back_button.dart';
+import 'package:humphrey_garden/providers/shortcut.dart';
+import 'package:humphrey_garden/providers/wallpaper.dart';
+import 'package:humphrey_garden/util/function.dart';
+import 'package:humphrey_garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -126,7 +126,8 @@ class _WidgetSettingState extends State<WidgetSetting> {
               },
               child: Card(
                 shape: RoundedRectangleBorder(
-                    side: BorderSide(), borderRadius: BorderRadius.circular(5)),
+                    side: BorderSide(),
+                    borderRadius: BorderRadius.circular(366)),
                 child: Padding(
                   padding: EdgeInsets.all(20),
                   child: Column(
@@ -172,7 +173,8 @@ class _WidgetSettingState extends State<WidgetSetting> {
               },
               child: Card(
                 shape: RoundedRectangleBorder(
-                    side: BorderSide(), borderRadius: BorderRadius.circular(5)),
+                    side: BorderSide(),
+                    borderRadius: BorderRadius.circular(366)),
                 child: Padding(
                   padding: EdgeInsets.all(20),
                   child: Column(
@@ -225,7 +227,7 @@ class _WidgetSettingState extends State<WidgetSetting> {
                   child: Card(
                     shape: RoundedRectangleBorder(
                         side: BorderSide(),
-                        borderRadius: BorderRadius.circular(5)),
+                        borderRadius: BorderRadius.circular(366)),
                     margin: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
                     child: Padding(
                       padding: EdgeInsets.all(20),
@@ -240,7 +242,7 @@ class _WidgetSettingState extends State<WidgetSetting> {
                           Card(
                             shape: RoundedRectangleBorder(
                                 side: BorderSide(),
-                                borderRadius: BorderRadius.circular(5)),
+                                borderRadius: BorderRadius.circular(366)),
                             child: SizedBox(
                               width: 20,
                               height: 20,

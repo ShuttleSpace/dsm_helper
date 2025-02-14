@@ -32,7 +32,7 @@
 群晖助手交流反馈②群：97137990（已满）
 
 # 软件下载
-安卓：https://gitee.com/apaipai/dsm_helper/releases  
+安卓：https://gitee.com/apaipai/humphrey_garden/releases  
 iOS：Appstore搜索：派派助手
 
 # 软件截图

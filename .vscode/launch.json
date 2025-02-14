@@ -6,7 +6,7 @@
   "configurations": [
   
     {
-      "name": "dsm_helper",
+      "name": "humphrey_garden",
       "request": "launch",
       "type": "dart",
       "args": [
@@ -14,13 +14,13 @@
       ]
     },
     {
-      "name": "dsm_helper (profile mode)",
+      "name": "humphrey_garden (profile mode)",
       "request": "launch",
       "type": "dart",
       "flutterMode": "profile"
     },
     {
-      "name": "dsm_helper (release mode)",
+      "name": "humphrey_garden (release mode)",
       "request": "launch",
       "type": "dart",
       "flutterMode": "release"

@@ -1,10 +1,10 @@
 import 'package:draggable_scrollbar/draggable_scrollbar.dart';
-import 'package:dsm_helper/models/photos/photo_model.dart';
-import 'package:dsm_helper/models/photos/timeline_model.dart';
-import 'package:dsm_helper/pages/common/image_preview.dart';
-import 'package:dsm_helper/pages/common/video_player.dart';
-import 'package:dsm_helper/widgets/cupertino_image.dart';
-import 'package:dsm_helper/widgets/transparent_router.dart';
+import 'package:humphrey_garden/models/photos/photo_model.dart';
+import 'package:humphrey_garden/models/photos/timeline_model.dart';
+import 'package:humphrey_garden/pages/common/image_preview.dart';
+import 'package:humphrey_garden/pages/common/video_player.dart';
+import 'package:humphrey_garden/widgets/cupertino_image.dart';
+import 'package:humphrey_garden/widgets/transparent_router.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 

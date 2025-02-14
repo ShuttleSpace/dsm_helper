@@ -1,7 +1,7 @@
-import 'package:dsm_helper/themes/app_theme.dart';
-import 'package:dsm_helper/util/function.dart';
-import 'package:dsm_helper/widgets/animation_progress_bar.dart';
-import 'package:dsm_helper/widgets/neu_back_button.dart';
+import 'package:humphrey_garden/themes/app_theme.dart';
+import 'package:humphrey_garden/util/function.dart';
+import 'package:humphrey_garden/widgets/animation_progress_bar.dart';
+import 'package:humphrey_garden/widgets/neu_back_button.dart';
 import 'package:easy_app_installer/easy_app_installer.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher_string.dart';
@@ -21,7 +21,7 @@ class _UpdateState extends State<Update> {
   String fileName = "";
   @override
   void initState() {
-    fileName = "dsm_helper-${widget.data['buildVersionNo']}.apk";
+    fileName = "humphrey_garden-${widget.data['buildVersionNo']}.apk";
     if (widget.direct) {
       download();
     }
@@ -79,7 +79,7 @@ class _UpdateState extends State<Update> {
                   child: Card(
                     shape: RoundedRectangleBorder(
                         side: BorderSide(),
-                        borderRadius: BorderRadius.circular(5)),
+                        borderRadius: BorderRadius.circular(36)),
                     child: CircleAvatar(
                       backgroundImage: AssetImage(
                         "assets/logo.png",
@@ -105,7 +105,7 @@ class _UpdateState extends State<Update> {
                 Card(
                   shape: RoundedRectangleBorder(
                       side: BorderSide(),
-                      borderRadius: BorderRadius.circular(5)),
+                      borderRadius: BorderRadius.circular(36)),
                   margin: EdgeInsets.symmetric(horizontal: 20),
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
@@ -166,7 +166,8 @@ class _UpdateState extends State<Update> {
               padding: EdgeInsets.symmetric(horizontal: 20),
               child: Card(
                 shape: RoundedRectangleBorder(
-                    side: BorderSide(), borderRadius: BorderRadius.circular(5)),
+                    side: BorderSide(),
+                    borderRadius: BorderRadius.circular(36)),
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: ClipRRect(

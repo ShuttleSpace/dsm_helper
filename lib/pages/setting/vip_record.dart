@@ -1,8 +1,8 @@
 import 'package:cool_ui/cool_ui.dart';
-import 'package:dsm_helper/models/setting/vip_record_model.dart';
-import 'package:dsm_helper/themes/app_theme.dart';
-import 'package:dsm_helper/util/function.dart';
-import 'package:dsm_helper/widgets/neu_back_button.dart';
+import 'package:humphrey_garden/models/setting/vip_record_model.dart';
+import 'package:humphrey_garden/themes/app_theme.dart';
+import 'package:humphrey_garden/util/function.dart';
+import 'package:humphrey_garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -77,7 +77,7 @@ class _VipRecordState extends State<VipRecord> {
   Widget _buildRecordItem(VipRecordModel record) {
     return Card(
       shape: RoundedRectangleBorder(
-          side: BorderSide(), borderRadius: BorderRadius.circular(5)),
+          side: BorderSide(), borderRadius: BorderRadius.circular(36)),
       margin: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -119,7 +119,7 @@ class _VipRecordState extends State<VipRecord> {
                             Card(
                               shape: RoundedRectangleBorder(
                                   side: BorderSide(),
-                                  borderRadius: BorderRadius.circular(5)),
+                                  borderRadius: BorderRadius.circular(36)),
                               margin: EdgeInsets.symmetric(horizontal: 50),
                               child: Padding(
                                 padding: EdgeInsets.all(20),

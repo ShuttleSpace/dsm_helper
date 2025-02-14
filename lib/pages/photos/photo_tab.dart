@@ -1,5 +1,5 @@
-import 'package:dsm_helper/pages/photos/folder.dart';
-import 'package:dsm_helper/pages/photos/timeline.dart';
+import 'package:humphrey_garden/pages/photos/folder.dart';
+import 'package:humphrey_garden/pages/photos/timeline.dart';
 import 'package:flutter/material.dart';
 
 class PhotoTab extends StatelessWidget {

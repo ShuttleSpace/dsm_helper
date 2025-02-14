@@ -1,10 +1,10 @@
-import 'package:dsm_helper/pages/control_panel/power/add_power_task.dart';
-import 'package:dsm_helper/themes/app_theme.dart';
-import 'package:dsm_helper/util/function.dart';
-import 'package:dsm_helper/util/neu_picker.dart';
-import 'package:dsm_helper/widgets/bubble_tab_indicator.dart';
-import 'package:dsm_helper/widgets/label.dart';
-import 'package:dsm_helper/widgets/neu_back_button.dart';
+import 'package:humphrey_garden/pages/control_panel/power/add_power_task.dart';
+import 'package:humphrey_garden/themes/app_theme.dart';
+import 'package:humphrey_garden/util/function.dart';
+import 'package:humphrey_garden/util/neu_picker.dart';
+import 'package:humphrey_garden/widgets/bubble_tab_indicator.dart';
+import 'package:humphrey_garden/widgets/label.dart';
+import 'package:humphrey_garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_vibrate/flutter_vibrate.dart';
@@ -185,7 +185,7 @@ class _PowerState extends State<Power> with SingleTickerProviderStateMixin {
       },
       child: Card(
         shape: RoundedRectangleBorder(
-            side: BorderSide(), borderRadius: BorderRadius.circular(5)),
+            side: BorderSide(), borderRadius: BorderRadius.circular(36)),
         margin: EdgeInsets.only(top: 20, left: 20, right: 20),
         child: Padding(
           padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
@@ -308,7 +308,7 @@ class _PowerState extends State<Power> with SingleTickerProviderStateMixin {
                 Card(
                   shape: RoundedRectangleBorder(
                       side: BorderSide(),
-                      borderRadius: BorderRadius.circular(5)),
+                      borderRadius: BorderRadius.circular(36)),
                   margin: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
                   child: TabBar(
                     dividerHeight: 0,
@@ -360,7 +360,7 @@ class _PowerState extends State<Power> with SingleTickerProviderStateMixin {
                                 Card(
                                   shape: RoundedRectangleBorder(
                                       side: BorderSide(),
-                                      borderRadius: BorderRadius.circular(5)),
+                                      borderRadius: BorderRadius.circular(36)),
                                   margin: EdgeInsets.only(
                                       top: 20, left: 20, right: 20),
                                   child: Padding(
@@ -423,7 +423,7 @@ class _PowerState extends State<Power> with SingleTickerProviderStateMixin {
                                 Card(
                                   shape: RoundedRectangleBorder(
                                       side: BorderSide(),
-                                      borderRadius: BorderRadius.circular(5)),
+                                      borderRadius: BorderRadius.circular(36)),
                                   margin: EdgeInsets.only(
                                       top: 20, left: 20, right: 20),
                                   child: Padding(
@@ -544,7 +544,7 @@ class _PowerState extends State<Power> with SingleTickerProviderStateMixin {
                                 Card(
                                   shape: RoundedRectangleBorder(
                                       side: BorderSide(),
-                                      borderRadius: BorderRadius.circular(5)),
+                                      borderRadius: BorderRadius.circular(36)),
                                   margin: EdgeInsets.only(
                                       top: 20, left: 20, right: 20),
                                   child: Padding(
@@ -941,7 +941,7 @@ class _PowerState extends State<Power> with SingleTickerProviderStateMixin {
                                 Card(
                                   shape: RoundedRectangleBorder(
                                       side: BorderSide(),
-                                      borderRadius: BorderRadius.circular(5)),
+                                      borderRadius: BorderRadius.circular(36)),
                                   margin: EdgeInsets.only(
                                       top: 20, left: 20, right: 20),
                                   child: Padding(
@@ -1152,7 +1152,7 @@ class _PowerState extends State<Power> with SingleTickerProviderStateMixin {
                                 Card(
                                   shape: RoundedRectangleBorder(
                                       side: BorderSide(),
-                                      borderRadius: BorderRadius.circular(5)),
+                                      borderRadius: BorderRadius.circular(36)),
                                   child: Padding(
                                     padding: const EdgeInsets.all(20.0),
                                     child: Column(
@@ -1324,7 +1324,7 @@ class _PowerState extends State<Power> with SingleTickerProviderStateMixin {
                                 Card(
                                   shape: RoundedRectangleBorder(
                                       side: BorderSide(),
-                                      borderRadius: BorderRadius.circular(5)),
+                                      borderRadius: BorderRadius.circular(36)),
                                   margin: EdgeInsets.only(
                                       top: 20, left: 20, right: 20),
                                   child: Padding(
@@ -1445,7 +1445,7 @@ class _PowerState extends State<Power> with SingleTickerProviderStateMixin {
                                 Card(
                                   shape: RoundedRectangleBorder(
                                       side: BorderSide(),
-                                      borderRadius: BorderRadius.circular(5)),
+                                      borderRadius: BorderRadius.circular(36)),
                                   margin: EdgeInsets.only(
                                       top: 20, left: 20, right: 20),
                                   child: Padding(
@@ -1563,7 +1563,8 @@ class _PowerState extends State<Power> with SingleTickerProviderStateMixin {
                                   Card(
                                     shape: RoundedRectangleBorder(
                                         side: BorderSide(),
-                                        borderRadius: BorderRadius.circular(5)),
+                                        borderRadius:
+                                            BorderRadius.circular(36)),
                                     margin: EdgeInsets.only(
                                         top: 20, left: 20, right: 20),
                                     child: Padding(

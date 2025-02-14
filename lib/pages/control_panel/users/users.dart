@@ -1,8 +1,8 @@
-import 'package:dsm_helper/pages/control_panel/users/user_detail.dart';
-import 'package:dsm_helper/util/function.dart';
-import 'package:dsm_helper/widgets/bubble_tab_indicator.dart';
-import 'package:dsm_helper/widgets/label.dart';
-import 'package:dsm_helper/widgets/neu_back_button.dart';
+import 'package:humphrey_garden/pages/control_panel/users/user_detail.dart';
+import 'package:humphrey_garden/util/function.dart';
+import 'package:humphrey_garden/widgets/bubble_tab_indicator.dart';
+import 'package:humphrey_garden/widgets/label.dart';
+import 'package:humphrey_garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -48,7 +48,7 @@ class _UsersState extends State<Users> with SingleTickerProviderStateMixin {
   Widget _buildGroupItem(group) {
     return Card(
       shape: RoundedRectangleBorder(
-          side: BorderSide(), borderRadius: BorderRadius.circular(5)),
+          side: BorderSide(), borderRadius: BorderRadius.circular(36)),
       margin: EdgeInsets.symmetric(vertical: 10),
       child: Padding(
         padding: EdgeInsets.all(20),
@@ -94,7 +94,7 @@ class _UsersState extends State<Users> with SingleTickerProviderStateMixin {
       },
       child: Card(
         shape: RoundedRectangleBorder(
-            side: BorderSide(), borderRadius: BorderRadius.circular(5)),
+            side: BorderSide(), borderRadius: BorderRadius.circular(36)),
         margin: EdgeInsets.symmetric(vertical: 10),
         child: Padding(
           padding: EdgeInsets.all(20),
@@ -168,7 +168,7 @@ class _UsersState extends State<Users> with SingleTickerProviderStateMixin {
                   Card(
                     shape: RoundedRectangleBorder(
                         side: BorderSide(),
-                        borderRadius: BorderRadius.circular(5)),
+                        borderRadius: BorderRadius.circular(36)),
                     margin: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
                     child: TabBar(
                       dividerHeight: 0,

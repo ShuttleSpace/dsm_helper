@@ -1,7 +1,7 @@
-import 'package:dsm_helper/pages/control_panel/task_scheduler/task_record.dart';
-import 'package:dsm_helper/util/function.dart';
-import 'package:dsm_helper/widgets/label.dart';
-import 'package:dsm_helper/widgets/neu_back_button.dart';
+import 'package:humphrey_garden/pages/control_panel/task_scheduler/task_record.dart';
+import 'package:humphrey_garden/util/function.dart';
+import 'package:humphrey_garden/widgets/label.dart';
+import 'package:humphrey_garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -37,7 +37,7 @@ class _TaskSchedulerState extends State<TaskScheduler> {
     task['set'] = task['set'] ?? false;
     return Card(
       shape: RoundedRectangleBorder(
-          side: BorderSide(), borderRadius: BorderRadius.circular(5)),
+          side: BorderSide(), borderRadius: BorderRadius.circular(36)),
       margin: EdgeInsets.symmetric(vertical: 10),
       child: Padding(
         padding: EdgeInsets.all(20),
@@ -102,7 +102,7 @@ class _TaskSchedulerState extends State<TaskScheduler> {
                   child: Card(
                     shape: RoundedRectangleBorder(
                         side: BorderSide(),
-                        borderRadius: BorderRadius.circular(5)),
+                        borderRadius: BorderRadius.circular(36)),
                     child: Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: SizedBox(

@@ -1,9 +1,9 @@
 import 'dart:io';
-import 'package:dsm_helper/pages/common/browser.dart';
-import 'package:dsm_helper/pages/setting/license.dart';
-import 'package:dsm_helper/pages/setting/open_source.dart';
-import 'package:dsm_helper/util/function.dart';
-import 'package:dsm_helper/widgets/neu_back_button.dart';
+import 'package:humphrey_garden/pages/common/browser.dart';
+import 'package:humphrey_garden/pages/setting/license.dart';
+import 'package:humphrey_garden/pages/setting/open_source.dart';
+import 'package:humphrey_garden/util/function.dart';
+import 'package:humphrey_garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -55,7 +55,7 @@ class _AboutState extends State<About> {
                     Card(
                       shape: RoundedRectangleBorder(
                           side: BorderSide(),
-                          borderRadius: BorderRadius.circular(5)),
+                          borderRadius: BorderRadius.circular(36)),
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: CircleAvatar(
@@ -93,7 +93,7 @@ class _AboutState extends State<About> {
                 Card(
                   shape: RoundedRectangleBorder(
                       side: BorderSide(),
-                      borderRadius: BorderRadius.circular(5)),
+                      borderRadius: BorderRadius.circular(36)),
                   margin: EdgeInsets.symmetric(horizontal: 20),
                   child: Padding(
                     padding: EdgeInsets.all(20),
@@ -167,7 +167,7 @@ class _AboutState extends State<About> {
                   Card(
                     shape: RoundedRectangleBorder(
                         side: BorderSide(),
-                        borderRadius: BorderRadius.circular(5)),
+                        borderRadius: BorderRadius.circular(36)),
                     margin: EdgeInsets.symmetric(horizontal: 20),
                     child: Padding(
                         padding: EdgeInsets.all(15),
@@ -210,7 +210,7 @@ class _AboutState extends State<About> {
                   Card(
                     shape: RoundedRectangleBorder(
                         side: BorderSide(),
-                        borderRadius: BorderRadius.circular(5)),
+                        borderRadius: BorderRadius.circular(36)),
                     margin: EdgeInsets.symmetric(horizontal: 20),
                     child: Padding(
                         padding: EdgeInsets.all(15),
@@ -252,7 +252,7 @@ class _AboutState extends State<About> {
                   Card(
                     shape: RoundedRectangleBorder(
                         side: BorderSide(),
-                        borderRadius: BorderRadius.circular(5)),
+                        borderRadius: BorderRadius.circular(36)),
                     margin: EdgeInsets.symmetric(horizontal: 20),
                     child: Padding(
                       padding: EdgeInsets.all(15),
@@ -298,7 +298,7 @@ class _AboutState extends State<About> {
                 Card(
                   shape: RoundedRectangleBorder(
                       side: BorderSide(),
-                      borderRadius: BorderRadius.circular(5)),
+                      borderRadius: BorderRadius.circular(36)),
                   margin: EdgeInsets.symmetric(horizontal: 20),
                   child: Padding(
                     padding: EdgeInsets.all(20),
@@ -321,7 +321,8 @@ class _AboutState extends State<About> {
                             Navigator.of(context)
                                 .push(CupertinoPageRoute(builder: (context) {
                               return Browser(
-                                url: "https://gitee.com/apaipai/dsm_helper",
+                                url:
+                                    "https://gitee.com/apaipai/humphrey_garden",
                               );
                             }));
                           },
@@ -337,7 +338,7 @@ class _AboutState extends State<About> {
                 Card(
                   shape: RoundedRectangleBorder(
                       side: BorderSide(),
-                      borderRadius: BorderRadius.circular(5)),
+                      borderRadius: BorderRadius.circular(36)),
                   margin: EdgeInsets.symmetric(horizontal: 20),
                   child: Padding(
                     padding: EdgeInsets.all(20),
@@ -377,7 +378,7 @@ class _AboutState extends State<About> {
                 Card(
                   shape: RoundedRectangleBorder(
                       side: BorderSide(),
-                      borderRadius: BorderRadius.circular(5)),
+                      borderRadius: BorderRadius.circular(36)),
                   margin: EdgeInsets.symmetric(horizontal: 20),
                   child: Padding(
                     padding: EdgeInsets.all(20),

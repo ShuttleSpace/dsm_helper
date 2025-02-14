@@ -1,7 +1,7 @@
 import 'dart:async';
 
-import 'package:dsm_helper/util/function.dart';
-import 'package:dsm_helper/widgets/neu_back_button.dart';
+import 'package:humphrey_garden/util/function.dart';
+import 'package:humphrey_garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -66,7 +66,7 @@ class _FileDetailState extends State<FileDetail> {
           ),
           Card(
             shape: RoundedRectangleBorder(
-                side: BorderSide(), borderRadius: BorderRadius.circular(5)),
+                side: BorderSide(), borderRadius: BorderRadius.circular(366)),
             margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
             child: Padding(
               padding: const EdgeInsets.all(8.0),
@@ -82,7 +82,7 @@ class _FileDetailState extends State<FileDetail> {
           ),
           Card(
             shape: RoundedRectangleBorder(
-                side: BorderSide(), borderRadius: BorderRadius.circular(5)),
+                side: BorderSide(), borderRadius: BorderRadius.circular(366)),
             margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
             child: Padding(
               padding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
@@ -117,7 +117,7 @@ class _FileDetailState extends State<FileDetail> {
           ),
           Card(
             shape: RoundedRectangleBorder(
-                side: BorderSide(), borderRadius: BorderRadius.circular(5)),
+                side: BorderSide(), borderRadius: BorderRadius.circular(366)),
             margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
             child: Padding(
               padding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
@@ -152,7 +152,7 @@ class _FileDetailState extends State<FileDetail> {
           ),
           Card(
             shape: RoundedRectangleBorder(
-                side: BorderSide(), borderRadius: BorderRadius.circular(5)),
+                side: BorderSide(), borderRadius: BorderRadius.circular(366)),
             margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
             child: Padding(
               padding: const EdgeInsets.all(8.0),
@@ -169,7 +169,7 @@ class _FileDetailState extends State<FileDetail> {
           if (widget.file['isdir'])
             Card(
               shape: RoundedRectangleBorder(
-                  side: BorderSide(), borderRadius: BorderRadius.circular(5)),
+                  side: BorderSide(), borderRadius: BorderRadius.circular(366)),
               margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
@@ -185,7 +185,7 @@ class _FileDetailState extends State<FileDetail> {
             ),
           Card(
             shape: RoundedRectangleBorder(
-                side: BorderSide(), borderRadius: BorderRadius.circular(5)),
+                side: BorderSide(), borderRadius: BorderRadius.circular(366)),
             margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
             child: Padding(
               padding: const EdgeInsets.all(8.0),
@@ -201,7 +201,7 @@ class _FileDetailState extends State<FileDetail> {
           ),
           Card(
             shape: RoundedRectangleBorder(
-                side: BorderSide(), borderRadius: BorderRadius.circular(5)),
+                side: BorderSide(), borderRadius: BorderRadius.circular(366)),
             margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
             child: Padding(
               padding: const EdgeInsets.all(8.0),

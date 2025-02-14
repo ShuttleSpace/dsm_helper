@@ -3,8 +3,8 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:dartssh2/dartssh2.dart';
-import 'package:dsm_helper/widgets/neu_back_button.dart';
-import 'package:dsm_helper/widgets/virtual_keyboard.dart';
+import 'package:humphrey_garden/widgets/neu_back_button.dart';
+import 'package:humphrey_garden/widgets/virtual_keyboard.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:xterm/xterm.dart';
@@ -39,7 +39,8 @@ class _SshState extends State<Ssh> {
     setState(() {
       title = "${widget.username}@${widget.host}:${widget.port}";
     });
-    terminal.write('Connecting to ${widget.username}@${widget.host}:${widget.port}\r\n');
+    terminal.write(
+        'Connecting to ${widget.username}@${widget.host}:${widget.port}\r\n');
 
     final client = SSHClient(
       await SSHSocket.connect(widget.host, int.parse(widget.port)),
@@ -69,12 +70,18 @@ class _SshState extends State<Ssh> {
     };
 
     terminal.onOutput = (data) {
-      session.write(utf8.encode(data) as Uint8List);
+      session.write(utf8.encode(data));
     };
 
-    session.stdout.cast<List<int>>().transform(Utf8Decoder()).listen(terminal.write);
+    session.stdout
+        .cast<List<int>>()
+        .transform(Utf8Decoder())
+        .listen(terminal.write);
 
-    session.stderr.cast<List<int>>().transform(Utf8Decoder()).listen(terminal.write);
+    session.stderr
+        .cast<List<int>>()
+        .transform(Utf8Decoder())
+        .listen(terminal.write);
   }
 
   @override
