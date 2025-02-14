@@ -25,8 +25,8 @@ class _VipState extends State<Vip> {
   DateTime noAdTime = DateTime.now();
   DateTime vipExpireTime = DateTime.now();
   DateTime lastVideoTime = DateTime.now();
-  bool isLogin = false;
-  bool isForever = false;
+  bool isLogin = true;
+  bool isForever = true;
   String outTradeNo = "";
   String userToken = "";
   Map activity = {};

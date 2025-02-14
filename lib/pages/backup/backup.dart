@@ -193,10 +193,10 @@ class _BackupState extends State<Backup> {
                     Container(
                       width: (MediaQuery.of(context).size.width - 40) *
                           (uploading?.uploadSize ??
-                              0 /
+                              1 /
                                   (uploading?.fileSize == 0
                                       ? 1
-                                      : (uploading?.fileSize ?? 0))),
+                                      : (uploading?.fileSize ?? 1))),
                       height: 70,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(20),

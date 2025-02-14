@@ -2458,14 +2458,13 @@ class FilesState extends State<Files> {
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      key: _scaffoldKey,
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        titleSpacing: 0,
-        title: Row(
+  Widget _buildTitlteAction(BuildContext context) {
+    return SizedBox(
+      width: MediaQuery.of(context).size.width,
+      height: 50,
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
           children: [
             Padding(
               padding: EdgeInsets.only(left: 10, top: 8, bottom: 8),
@@ -3186,6 +3185,18 @@ class FilesState extends State<Files> {
             )
           ],
         ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      key: _scaffoldKey,
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
+        titleSpacing: 0,
+        title: _buildTitlteAction(context),
       ),
       body: Column(
         children: [

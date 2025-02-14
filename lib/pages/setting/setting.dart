@@ -14,7 +14,6 @@ import 'package:dsm_helper/providers/flux_provider.dart';
 import 'package:dsm_helper/util/function.dart';
 import 'package:dsm_helper/widgets/terminal_button.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fluwx/fluwx.dart';
 import 'package:provider/provider.dart';
@@ -34,21 +33,23 @@ class SettingButton extends StatelessWidget {
       width: width,
       child: OutlinedButton(
         onPressed: onPressed,
-        // margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+        style: ButtonStyle(
+          padding: WidgetStateProperty.all(EdgeInsets.symmetric(vertical: 6)),
+        ),
         child: Column(
           children: [
             loading
                 ? CupertinoActivityIndicator(radius: 20)
                 : Image.asset(
                     "assets/icons/$icon.png",
-                    width: 40,
+                    width: 32,
                   ),
             SizedBox(
               height: 5,
             ),
             Text(
               "$name",
-              style: TextStyle(fontSize: 16),
+              style: TextStyle(fontSize: 12),
             )
           ],
         ),
@@ -743,29 +744,32 @@ class _SettingState extends State<Setting> {
                   child: Card(
                     shape: RoundedRectangleBorder(
                         side: BorderSide(),
-                        borderRadius: BorderRadius.circular(5)),
-                    // margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                    child: Column(
-                      children: [
-                        sshLoading
-                            ? Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: CupertinoActivityIndicator(
-                                  radius: 20,
+                        borderRadius: BorderRadius.circular(36)),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 6.0, horizontal: 2),
+                      child: Column(
+                        children: [
+                          sshLoading
+                              ? Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: CupertinoActivityIndicator(
+                                    radius: 20,
+                                  ),
+                                )
+                              : Image.asset(
+                                  "assets/icons/ssh.png",
+                                  width: 32,
                                 ),
-                              )
-                            : Image.asset(
-                                "assets/icons/ssh.png",
-                                width: 40,
-                              ),
-                        SizedBox(
-                          height: 8,
-                        ),
-                        Text(
-                          "SSH${ssh == null ? "开关" : ssh ? "已开启" : "已关闭"}",
-                          style: TextStyle(fontSize: 16),
-                        )
-                      ],
+                          SizedBox(
+                            height: 8,
+                          ),
+                          Text(
+                            "SSH${ssh == null ? "开关" : ssh ? "已开启" : "已关闭"}",
+                            style: TextStyle(fontSize: 12),
+                          )
+                        ],
+                      ),
                     ),
                   ),
                 ),
