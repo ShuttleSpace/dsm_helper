@@ -143,6 +143,7 @@ class TimelineState extends State<Timeline> {
           print('_buildTimelineItem: ${day.photos?.length}');
           final i = days.indexWhere((d) => d.day == day.day);
           days.insert(i, days.removeAt(i));
+          days = [...days]; // 强制重建
         });
       });
     }
@@ -170,7 +171,8 @@ class TimelineState extends State<Timeline> {
           children: day.photos == null
               ? List.generate(day.itemCount?.toInt() ?? 0, (index) {
                   return Container(
-                    color: Color(0xffE9E9E9),
+                    // color: Color(0xffE9E9E9),
+                    color: Colors.amber,
                     width: photoWidth,
                     height: photoWidth,
                   );
@@ -178,7 +180,13 @@ class TimelineState extends State<Timeline> {
               : day.photos?.map((item) {
                     return _buildPhotoItem(item, day.photos ?? []);
                   }).toList() ??
-                  [],
+                  [
+                    Container(
+                      color: Colors.red,
+                      width: 10,
+                      height: 10,
+                    )
+                  ],
         ),
       ],
     );
