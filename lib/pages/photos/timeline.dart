@@ -141,6 +141,8 @@ class TimelineState extends State<Timeline> {
           .then((_) {
         setState(() {
           print('_buildTimelineItem: ${day.photos?.length}');
+          final i = days.indexWhere((d) => d.day == day.day);
+          days.insert(i, days.removeAt(i));
         });
       });
     }
