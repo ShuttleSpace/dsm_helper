@@ -62,13 +62,13 @@ class _StorageManagerState extends State<StorageManager>
             int.parse(volume['size']['total']);
     return Card(
       shape: RoundedRectangleBorder(
-          side: BorderSide(), borderRadius: BorderRadius.circular(36)),
+          side: BorderSide(), borderRadius: BorderRadius.circular(18)),
       margin: EdgeInsets.only(top: 20, left: 20, right: 20),
       child: Row(
         children: [
           Card(
             shape: RoundedRectangleBorder(
-                side: BorderSide(), borderRadius: BorderRadius.circular(36)),
+                side: BorderSide(), borderRadius: BorderRadius.circular(18)),
             margin: EdgeInsets.all(10),
             child: Padding(
               padding: const EdgeInsets.all(8.0),
@@ -150,7 +150,7 @@ class _StorageManagerState extends State<StorageManager>
   Widget _buildVolumeItem(volume) {
     return Card(
       shape: RoundedRectangleBorder(
-          side: BorderSide(), borderRadius: BorderRadius.circular(36)),
+          side: BorderSide(), borderRadius: BorderRadius.circular(18)),
       margin: EdgeInsets.only(top: 20, left: 20, right: 20),
       child: Padding(
         padding: const EdgeInsets.all(8.0),
@@ -158,7 +158,7 @@ class _StorageManagerState extends State<StorageManager>
           children: [
             Card(
               shape: RoundedRectangleBorder(
-                  side: BorderSide(), borderRadius: BorderRadius.circular(36)),
+                  side: BorderSide(), borderRadius: BorderRadius.circular(18)),
               margin: EdgeInsets.all(10),
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
@@ -282,7 +282,7 @@ class _StorageManagerState extends State<StorageManager>
       },
       child: Card(
         shape: RoundedRectangleBorder(
-            side: BorderSide(), borderRadius: BorderRadius.circular(36)),
+            side: BorderSide(), borderRadius: BorderRadius.circular(18)),
         margin: EdgeInsets.only(top: 10),
         child: Padding(
           padding: const EdgeInsets.all(8.0),
@@ -293,7 +293,7 @@ class _StorageManagerState extends State<StorageManager>
                   Card(
                     shape: RoundedRectangleBorder(
                         side: BorderSide(),
-                        borderRadius: BorderRadius.circular(36)),
+                        borderRadius: BorderRadius.circular(18)),
                     margin: EdgeInsets.all(10),
                     child: Image.asset(
                       disk['isSsd']
@@ -575,7 +575,7 @@ class _StorageManagerState extends State<StorageManager>
   Widget _buildPoolDetail(pool) {
     return Card(
       shape: RoundedRectangleBorder(
-          side: BorderSide(), borderRadius: BorderRadius.circular(36)),
+          side: BorderSide(), borderRadius: BorderRadius.circular(18)),
       child: Padding(
         padding: EdgeInsets.all(20),
         child: Column(
@@ -672,7 +672,7 @@ class _StorageManagerState extends State<StorageManager>
             ),
             Card(
               shape: RoundedRectangleBorder(
-                  side: BorderSide(), borderRadius: BorderRadius.circular(36)),
+                  side: BorderSide(), borderRadius: BorderRadius.circular(18)),
               child: Padding(
                 padding: EdgeInsets.all(20),
                 child: Column(
@@ -695,7 +695,7 @@ class _StorageManagerState extends State<StorageManager>
             ),
             Card(
               shape: RoundedRectangleBorder(
-                  side: BorderSide(), borderRadius: BorderRadius.circular(36)),
+                  side: BorderSide(), borderRadius: BorderRadius.circular(18)),
               child: Padding(
                 padding: EdgeInsets.all(20),
                 child: Column(
@@ -723,7 +723,7 @@ class _StorageManagerState extends State<StorageManager>
             ),
             Card(
               shape: RoundedRectangleBorder(
-                  side: BorderSide(), borderRadius: BorderRadius.circular(36)),
+                  side: BorderSide(), borderRadius: BorderRadius.circular(18)),
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Column(
@@ -756,7 +756,7 @@ class _StorageManagerState extends State<StorageManager>
   Widget _buildPoolItem(pool) {
     return Card(
       shape: RoundedRectangleBorder(
-          side: BorderSide(), borderRadius: BorderRadius.circular(36)),
+          side: BorderSide(), borderRadius: BorderRadius.circular(18)),
       margin: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
       child: Padding(
         padding: EdgeInsets.all(10),
@@ -843,7 +843,7 @@ class _StorageManagerState extends State<StorageManager>
                 Card(
                   shape: RoundedRectangleBorder(
                       side: BorderSide(),
-                      borderRadius: BorderRadius.circular(36)),
+                      borderRadius: BorderRadius.circular(18)),
                   margin: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
                   child: TabBar(
                     dividerHeight: 0,
@@ -902,7 +902,7 @@ class _StorageManagerState extends State<StorageManager>
                           Card(
                             shape: RoundedRectangleBorder(
                                 side: BorderSide(),
-                                borderRadius: BorderRadius.circular(36)),
+                                borderRadius: BorderRadius.circular(18)),
                             margin: EdgeInsets.symmetric(
                                 horizontal: 20, vertical: 15),
                             child: Padding(
@@ -934,7 +934,7 @@ class _StorageManagerState extends State<StorageManager>
                           Card(
                             shape: RoundedRectangleBorder(
                                 side: BorderSide(),
-                                borderRadius: BorderRadius.circular(36)),
+                                borderRadius: BorderRadius.circular(18)),
                             margin: EdgeInsets.symmetric(
                                 horizontal: 20, vertical: 15),
                             child: Padding(
@@ -968,7 +968,7 @@ class _StorageManagerState extends State<StorageManager>
                           Card(
                             shape: RoundedRectangleBorder(
                                 side: BorderSide(),
-                                borderRadius: BorderRadius.circular(36)),
+                                borderRadius: BorderRadius.circular(18)),
                             margin: EdgeInsets.symmetric(
                                 horizontal: 20, vertical: 15),
                             child: Padding(

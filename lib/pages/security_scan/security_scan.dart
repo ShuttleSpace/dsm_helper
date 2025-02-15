@@ -140,7 +140,7 @@ class _SecurityScanState extends State<SecurityScan>
       value['strId'] = value['strId'].replaceAll("_v2", "");
       list.add(Card(
         shape: RoundedRectangleBorder(
-            side: BorderSide(), borderRadius: BorderRadius.circular(36)),
+            side: BorderSide(), borderRadius: BorderRadius.circular(18)),
         margin: EdgeInsets.only(bottom: 20),
         child: Padding(
           padding: const EdgeInsets.all(20.0),
@@ -186,7 +186,7 @@ class _SecurityScanState extends State<SecurityScan>
                 Card(
                   shape: RoundedRectangleBorder(
                       side: BorderSide(),
-                      borderRadius: BorderRadius.circular(36)),
+                      borderRadius: BorderRadius.circular(18)),
                   margin: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
                   child: TabBar(
                     dividerHeight: 0,
@@ -236,7 +236,7 @@ class _SecurityScanState extends State<SecurityScan>
                           Card(
                             shape: RoundedRectangleBorder(
                                 side: BorderSide(),
-                                borderRadius: BorderRadius.circular(36)),
+                                borderRadius: BorderRadius.circular(18)),
                             child: Padding(
                               padding: EdgeInsets.all(20),
                               child: Row(

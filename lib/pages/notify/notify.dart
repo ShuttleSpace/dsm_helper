@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:cool_ui/cool_ui.dart';
 import 'package:humphrey_garden/themes/app_theme.dart';
 import 'package:humphrey_garden/util/function.dart';
 import 'package:humphrey_garden/util/strings.dart';
@@ -26,7 +25,8 @@ class _NotifyState extends State<Notify> {
       String title = "";
       List<String> titles = notify['title'].split(":");
       if (Util.instance.version == 7) {
-        if (Util.instance.notifyStrings[notify['title']] != null) {
+        if (notify['title'] != null &&
+            Util.instance.notifyStrings.containsKey(notify['title'])) {
           // print(Util.notifyStrings[notify['title']]);
           title = Util.instance.notifyStrings[notify['title']]['title'];
 
@@ -104,7 +104,7 @@ class _NotifyState extends State<Notify> {
   Widget _buildNotifyGroup(groupName, List group) {
     return Card(
       shape: RoundedRectangleBorder(
-          side: BorderSide(), borderRadius: BorderRadius.circular(36)),
+          side: BorderSide(), borderRadius: BorderRadius.circular(18)),
       margin: EdgeInsets.only(left: 20, right: 20, top: 20),
       child: Padding(
         padding: const EdgeInsets.all(8.0),
@@ -125,7 +125,7 @@ class _NotifyState extends State<Notify> {
   Widget _buildNotifyItem(notify) {
     return Card(
       shape: RoundedRectangleBorder(
-          side: BorderSide(), borderRadius: BorderRadius.circular(36)),
+          side: BorderSide(), borderRadius: BorderRadius.circular(18)),
       margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
       child: Padding(
         padding: const EdgeInsets.all(8.0),

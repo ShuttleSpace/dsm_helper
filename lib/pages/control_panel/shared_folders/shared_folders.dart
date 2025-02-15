@@ -89,7 +89,7 @@ class _SharedFoldersState extends State<SharedFolders> {
           color: Colors.transparent,
           child: Card(
             shape: RoundedRectangleBorder(
-                side: BorderSide(), borderRadius: BorderRadius.circular(36)),
+                side: BorderSide(), borderRadius: BorderRadius.circular(18)),
             child: SafeArea(
               top: false,
               child: Column(
@@ -309,7 +309,7 @@ class _SharedFoldersState extends State<SharedFolders> {
                               child: Card(
                                 shape: RoundedRectangleBorder(
                                     side: BorderSide(),
-                                    borderRadius: BorderRadius.circular(36)),
+                                    borderRadius: BorderRadius.circular(18)),
                                 child: SafeArea(
                                   top: false,
                                   child: Column(

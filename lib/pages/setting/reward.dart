@@ -33,7 +33,7 @@ class _RewardState extends State<Reward> {
   Widget _buildRewardItem(reward) {
     return Card(
       shape: RoundedRectangleBorder(
-          side: BorderSide(), borderRadius: BorderRadius.circular(36)),
+          side: BorderSide(), borderRadius: BorderRadius.circular(18)),
       child: Row(
         children: [
           Expanded(child: Text(reward['name'])),

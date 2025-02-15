@@ -56,7 +56,7 @@ class _ExternalDeviceState extends State<ExternalDevice>
   Widget _buildPartitionItem(partition) {
     return Card(
       shape: RoundedRectangleBorder(
-          side: BorderSide(), borderRadius: BorderRadius.circular(36)),
+          side: BorderSide(), borderRadius: BorderRadius.circular(18)),
       margin: EdgeInsets.only(top: 20),
       child: Padding(
         padding: const EdgeInsets.all(8.0),
@@ -96,7 +96,7 @@ class _ExternalDeviceState extends State<ExternalDevice>
                 Card(
                   shape: RoundedRectangleBorder(
                       side: BorderSide(),
-                      borderRadius: BorderRadius.circular(36)),
+                      borderRadius: BorderRadius.circular(18)),
                   margin: EdgeInsets.all(10),
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
@@ -189,7 +189,7 @@ class _ExternalDeviceState extends State<ExternalDevice>
     List partitions = esata['partitions'];
     return Card(
       shape: RoundedRectangleBorder(
-          side: BorderSide(), borderRadius: BorderRadius.circular(36)),
+          side: BorderSide(), borderRadius: BorderRadius.circular(18)),
       child: Padding(
         padding: EdgeInsets.all(20),
         child: Column(
@@ -259,7 +259,7 @@ class _ExternalDeviceState extends State<ExternalDevice>
         children: [
           Card(
             shape: RoundedRectangleBorder(
-                side: BorderSide(), borderRadius: BorderRadius.circular(36)),
+                side: BorderSide(), borderRadius: BorderRadius.circular(18)),
             margin: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
             child: Padding(
               padding: const EdgeInsets.all(8.0),

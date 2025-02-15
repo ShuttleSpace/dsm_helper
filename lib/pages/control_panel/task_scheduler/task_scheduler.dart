@@ -37,7 +37,7 @@ class _TaskSchedulerState extends State<TaskScheduler> {
     task['set'] = task['set'] ?? false;
     return Card(
       shape: RoundedRectangleBorder(
-          side: BorderSide(), borderRadius: BorderRadius.circular(36)),
+          side: BorderSide(), borderRadius: BorderRadius.circular(18)),
       margin: EdgeInsets.symmetric(vertical: 10),
       child: Padding(
         padding: EdgeInsets.all(20),
@@ -102,7 +102,7 @@ class _TaskSchedulerState extends State<TaskScheduler> {
                   child: Card(
                     shape: RoundedRectangleBorder(
                         side: BorderSide(),
-                        borderRadius: BorderRadius.circular(36)),
+                        borderRadius: BorderRadius.circular(18)),
                     child: Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: SizedBox(

@@ -101,7 +101,7 @@ class _PublicAccessState extends State<PublicAccess>
       },
       child: Card(
         shape: RoundedRectangleBorder(
-            side: BorderSide(), borderRadius: BorderRadius.circular(36)),
+            side: BorderSide(), borderRadius: BorderRadius.circular(18)),
         margin: EdgeInsets.only(top: 20, left: 20, right: 20),
         child: Padding(
           padding: const EdgeInsets.all(8.0),

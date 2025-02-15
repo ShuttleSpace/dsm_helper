@@ -29,11 +29,18 @@ class _PhotosState extends State<Photos> {
 
   @override
   Widget build(BuildContext context) {
+    final menuW = MediaQuery.of(context).size.width / 5;
     return Scaffold(
       appBar: AppBar(
         leading: AppBackButton(context),
         title: DropdownMenu(
+          width: menuW,
           initialSelection: currentIndex,
+          enableSearch: false,
+          enableFilter: false,
+          textAlign: TextAlign.center,
+          textStyle: TextStyle(fontSize: 12),
+          inputDecorationTheme: InputDecorationTheme(border: InputBorder.none),
           dropdownMenuEntries: [
             DropdownMenuEntry(value: 0, label: '图片'),
             DropdownMenuEntry(value: 1, label: '相册'),
@@ -59,7 +66,7 @@ class _PhotosState extends State<Photos> {
                         child: Card(
                           shape: RoundedRectangleBorder(
                               side: BorderSide(),
-                              borderRadius: BorderRadius.circular(36)),
+                              borderRadius: BorderRadius.circular(18)),
                           child: SafeArea(
                             top: false,
                             child: Padding(

@@ -103,7 +103,7 @@ class _HelperSettingState extends State<HelperSetting> {
             },
             child: Card(
               shape: RoundedRectangleBorder(
-                  side: BorderSide(), borderRadius: BorderRadius.circular(36)),
+                  side: BorderSide(), borderRadius: BorderRadius.circular(18)),
               child: Padding(
                 padding: EdgeInsets.all(20),
                 child: Column(
@@ -133,7 +133,7 @@ class _HelperSettingState extends State<HelperSetting> {
                       Card(
                         shape: RoundedRectangleBorder(
                             side: BorderSide(),
-                            borderRadius: BorderRadius.circular(36)),
+                            borderRadius: BorderRadius.circular(18)),
                         margin: EdgeInsets.only(top: 20),
                         child: Padding(
                           padding: EdgeInsets.all(20),
@@ -157,7 +157,7 @@ class _HelperSettingState extends State<HelperSetting> {
                                 child: Card(
                                   shape: RoundedRectangleBorder(
                                       side: BorderSide(),
-                                      borderRadius: BorderRadius.circular(36)),
+                                      borderRadius: BorderRadius.circular(18)),
                                   // margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                                   child: Padding(
                                     padding: const EdgeInsets.all(8.0),
@@ -201,7 +201,7 @@ class _HelperSettingState extends State<HelperSetting> {
                                 child: Card(
                                   shape: RoundedRectangleBorder(
                                       side: BorderSide(),
-                                      borderRadius: BorderRadius.circular(36)),
+                                      borderRadius: BorderRadius.circular(18)),
                                   // margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                                   child: Padding(
                                     padding: const EdgeInsets.all(8.0),
@@ -245,7 +245,7 @@ class _HelperSettingState extends State<HelperSetting> {
             },
             child: Card(
               shape: RoundedRectangleBorder(
-                  side: BorderSide(), borderRadius: BorderRadius.circular(36)),
+                  side: BorderSide(), borderRadius: BorderRadius.circular(18)),
               // margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
@@ -296,7 +296,7 @@ class _HelperSettingState extends State<HelperSetting> {
               child: Card(
                 shape: RoundedRectangleBorder(
                     side: BorderSide(),
-                    borderRadius: BorderRadius.circular(36)),
+                    borderRadius: BorderRadius.circular(18)),
                 // margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
@@ -334,7 +334,7 @@ class _HelperSettingState extends State<HelperSetting> {
             },
             child: Card(
               shape: RoundedRectangleBorder(
-                  side: BorderSide(), borderRadius: BorderRadius.circular(36)),
+                  side: BorderSide(), borderRadius: BorderRadius.circular(18)),
               // margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
@@ -374,7 +374,7 @@ class _HelperSettingState extends State<HelperSetting> {
             },
             child: Card(
               shape: RoundedRectangleBorder(
-                  side: BorderSide(), borderRadius: BorderRadius.circular(36)),
+                  side: BorderSide(), borderRadius: BorderRadius.circular(18)),
               child: Padding(
                 padding: EdgeInsets.all(20),
                 child: Column(
@@ -404,7 +404,7 @@ class _HelperSettingState extends State<HelperSetting> {
                       Card(
                         shape: RoundedRectangleBorder(
                             side: BorderSide(),
-                            borderRadius: BorderRadius.circular(36)),
+                            borderRadius: BorderRadius.circular(18)),
                         margin: EdgeInsets.only(top: 20),
                         child: Padding(
                           padding: EdgeInsets.all(20),
@@ -445,7 +445,7 @@ class _HelperSettingState extends State<HelperSetting> {
                                 child: Card(
                                   shape: RoundedRectangleBorder(
                                       side: BorderSide(),
-                                      borderRadius: BorderRadius.circular(36)),
+                                      borderRadius: BorderRadius.circular(18)),
                                   // margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                                   child: Padding(
                                     padding: const EdgeInsets.all(8.0),
@@ -553,7 +553,7 @@ class _HelperSettingState extends State<HelperSetting> {
                                     shape: RoundedRectangleBorder(
                                         side: BorderSide(),
                                         borderRadius:
-                                            BorderRadius.circular(36)),
+                                            BorderRadius.circular(18)),
                                     // margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                                     child: Padding(
                                       padding: const EdgeInsets.all(8.0),

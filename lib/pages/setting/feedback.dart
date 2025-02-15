@@ -23,7 +23,7 @@ class _FeedbackState extends State<Feedback> {
         children: [
           Card(
             shape: RoundedRectangleBorder(
-                side: BorderSide(), borderRadius: BorderRadius.circular(36)),
+                side: BorderSide(), borderRadius: BorderRadius.circular(18)),
             child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: TextField(

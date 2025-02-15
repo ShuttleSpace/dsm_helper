@@ -115,7 +115,7 @@ class _DockerState extends State<Docker> with SingleTickerProviderStateMixin {
             color: Colors.transparent,
             child: Card(
               shape: RoundedRectangleBorder(
-                  side: BorderSide(), borderRadius: BorderRadius.circular(36)),
+                  side: BorderSide(), borderRadius: BorderRadius.circular(18)),
               child: SafeArea(
                 top: false,
                 child: Padding(
@@ -231,7 +231,7 @@ class _DockerState extends State<Docker> with SingleTickerProviderStateMixin {
       },
       child: Card(
         shape: RoundedRectangleBorder(
-            side: BorderSide(), borderRadius: BorderRadius.circular(36)),
+            side: BorderSide(), borderRadius: BorderRadius.circular(18)),
         margin: EdgeInsets.only(bottom: 20),
         child: Padding(
           padding: EdgeInsets.all(20),
@@ -303,7 +303,7 @@ class _DockerState extends State<Docker> with SingleTickerProviderStateMixin {
                             child: Card(
                               shape: RoundedRectangleBorder(
                                   side: BorderSide(),
-                                  borderRadius: BorderRadius.circular(36)),
+                                  borderRadius: BorderRadius.circular(18)),
                               child: SafeArea(
                                 top: false,
                                 child: Padding(
@@ -422,7 +422,7 @@ class _DockerState extends State<Docker> with SingleTickerProviderStateMixin {
                     child: Card(
                       shape: RoundedRectangleBorder(
                           side: BorderSide(),
-                          borderRadius: BorderRadius.circular(36)),
+                          borderRadius: BorderRadius.circular(18)),
                       child: powerLoading[container['id']] == true
                           ? CupertinoActivityIndicator()
                           : Image.asset(
@@ -515,7 +515,7 @@ class _DockerState extends State<Docker> with SingleTickerProviderStateMixin {
   Widget _buildImageItem(image) {
     return Card(
       shape: RoundedRectangleBorder(
-          side: BorderSide(), borderRadius: BorderRadius.circular(36)),
+          side: BorderSide(), borderRadius: BorderRadius.circular(18)),
       child: Padding(
         padding: EdgeInsets.all(20),
         child: Column(
@@ -575,7 +575,7 @@ class _DockerState extends State<Docker> with SingleTickerProviderStateMixin {
         children: [
           Card(
             shape: RoundedRectangleBorder(
-                side: BorderSide(), borderRadius: BorderRadius.circular(36)),
+                side: BorderSide(), borderRadius: BorderRadius.circular(18)),
             margin: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
             child: TabBar(
               dividerHeight: 0,
@@ -626,7 +626,7 @@ class _DockerState extends State<Docker> with SingleTickerProviderStateMixin {
                                 child: Card(
                                   shape: RoundedRectangleBorder(
                                       side: BorderSide(),
-                                      borderRadius: BorderRadius.circular(36)),
+                                      borderRadius: BorderRadius.circular(18)),
                                   child: Padding(
                                     padding: const EdgeInsets.all(20.0),
                                     child: Column(
@@ -675,7 +675,7 @@ class _DockerState extends State<Docker> with SingleTickerProviderStateMixin {
                                 child: Card(
                                   shape: RoundedRectangleBorder(
                                       side: BorderSide(),
-                                      borderRadius: BorderRadius.circular(36)),
+                                      borderRadius: BorderRadius.circular(18)),
                                   child: Padding(
                                     padding: EdgeInsets.all(20),
                                     child: Column(

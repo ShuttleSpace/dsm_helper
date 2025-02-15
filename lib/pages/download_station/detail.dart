@@ -102,7 +102,7 @@ class _DownloadDetailState extends State<DownloadDetail>
   Widget _buildFileItem(file) {
     return Card(
       shape: RoundedRectangleBorder(
-          side: BorderSide(), borderRadius: BorderRadius.circular(36)),
+          side: BorderSide(), borderRadius: BorderRadius.circular(18)),
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Column(
@@ -150,7 +150,7 @@ class _DownloadDetailState extends State<DownloadDetail>
   Widget _buildPeerItem(peer) {
     return Card(
       shape: RoundedRectangleBorder(
-          side: BorderSide(), borderRadius: BorderRadius.circular(36)),
+          side: BorderSide(), borderRadius: BorderRadius.circular(18)),
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Column(
@@ -201,7 +201,7 @@ class _DownloadDetailState extends State<DownloadDetail>
   Widget _buildTrackerItem(tracker) {
     return Card(
       shape: RoundedRectangleBorder(
-          side: BorderSide(), borderRadius: BorderRadius.circular(36)),
+          side: BorderSide(), borderRadius: BorderRadius.circular(18)),
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Column(
@@ -264,7 +264,7 @@ class _DownloadDetailState extends State<DownloadDetail>
                       child: Card(
                         shape: RoundedRectangleBorder(
                             side: BorderSide(),
-                            borderRadius: BorderRadius.circular(36)),
+                            borderRadius: BorderRadius.circular(18)),
                         child: SafeArea(
                           top: false,
                           child: Padding(
@@ -363,7 +363,7 @@ class _DownloadDetailState extends State<DownloadDetail>
                 Card(
                   shape: RoundedRectangleBorder(
                       side: BorderSide(),
-                      borderRadius: BorderRadius.circular(36)),
+                      borderRadius: BorderRadius.circular(18)),
                   margin: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
                   child: TabBar(
                     dividerHeight: 0,
@@ -424,7 +424,7 @@ class _DownloadDetailState extends State<DownloadDetail>
                           Card(
                             shape: RoundedRectangleBorder(
                                 side: BorderSide(),
-                                borderRadius: BorderRadius.circular(36)),
+                                borderRadius: BorderRadius.circular(18)),
                             margin: EdgeInsets.symmetric(
                                 horizontal: 20, vertical: 10),
                             child: Padding(
@@ -443,7 +443,7 @@ class _DownloadDetailState extends State<DownloadDetail>
                           Card(
                             shape: RoundedRectangleBorder(
                                 side: BorderSide(),
-                                borderRadius: BorderRadius.circular(36)),
+                                borderRadius: BorderRadius.circular(18)),
                             margin: EdgeInsets.symmetric(
                                 horizontal: 20, vertical: 10),
                             child: Padding(
@@ -465,7 +465,7 @@ class _DownloadDetailState extends State<DownloadDetail>
                           Card(
                             shape: RoundedRectangleBorder(
                                 side: BorderSide(),
-                                borderRadius: BorderRadius.circular(36)),
+                                borderRadius: BorderRadius.circular(18)),
                             margin: EdgeInsets.symmetric(
                                 horizontal: 20, vertical: 10),
                             child: Padding(
@@ -486,7 +486,7 @@ class _DownloadDetailState extends State<DownloadDetail>
                           Card(
                             shape: RoundedRectangleBorder(
                                 side: BorderSide(),
-                                borderRadius: BorderRadius.circular(36)),
+                                borderRadius: BorderRadius.circular(18)),
                             margin: EdgeInsets.symmetric(
                                 horizontal: 20, vertical: 10),
                             child: Padding(
@@ -502,7 +502,7 @@ class _DownloadDetailState extends State<DownloadDetail>
                           Card(
                             shape: RoundedRectangleBorder(
                                 side: BorderSide(),
-                                borderRadius: BorderRadius.circular(36)),
+                                borderRadius: BorderRadius.circular(18)),
                             margin: EdgeInsets.symmetric(
                                 horizontal: 20, vertical: 10),
                             child: Padding(
@@ -539,7 +539,7 @@ class _DownloadDetailState extends State<DownloadDetail>
                           Card(
                             shape: RoundedRectangleBorder(
                                 side: BorderSide(),
-                                borderRadius: BorderRadius.circular(36)),
+                                borderRadius: BorderRadius.circular(18)),
                             margin: EdgeInsets.symmetric(
                                 horizontal: 20, vertical: 10),
                             child: Padding(
@@ -559,7 +559,7 @@ class _DownloadDetailState extends State<DownloadDetail>
                           Card(
                             shape: RoundedRectangleBorder(
                                 side: BorderSide(),
-                                borderRadius: BorderRadius.circular(36)),
+                                borderRadius: BorderRadius.circular(18)),
                             margin: EdgeInsets.symmetric(
                                 horizontal: 20, vertical: 10),
                             child: Padding(
@@ -583,7 +583,7 @@ class _DownloadDetailState extends State<DownloadDetail>
                           Card(
                             shape: RoundedRectangleBorder(
                                 side: BorderSide(),
-                                borderRadius: BorderRadius.circular(36)),
+                                borderRadius: BorderRadius.circular(18)),
                             margin: EdgeInsets.symmetric(
                                 horizontal: 20, vertical: 10),
                             child: Padding(
@@ -609,7 +609,7 @@ class _DownloadDetailState extends State<DownloadDetail>
                           Card(
                             shape: RoundedRectangleBorder(
                                 side: BorderSide(),
-                                borderRadius: BorderRadius.circular(36)),
+                                borderRadius: BorderRadius.circular(18)),
                             margin: EdgeInsets.symmetric(
                                 horizontal: 20, vertical: 10),
                             child: Padding(
@@ -689,7 +689,7 @@ class _DownloadDetailState extends State<DownloadDetail>
                           Card(
                             shape: RoundedRectangleBorder(
                                 side: BorderSide(),
-                                borderRadius: BorderRadius.circular(36)),
+                                borderRadius: BorderRadius.circular(18)),
                             margin: EdgeInsets.symmetric(
                                 horizontal: 20, vertical: 10),
                             child: Padding(
@@ -712,7 +712,7 @@ class _DownloadDetailState extends State<DownloadDetail>
                           Card(
                             shape: RoundedRectangleBorder(
                                 side: BorderSide(),
-                                borderRadius: BorderRadius.circular(36)),
+                                borderRadius: BorderRadius.circular(18)),
                             margin: EdgeInsets.symmetric(
                                 horizontal: 20, vertical: 10),
                             child: Padding(
@@ -733,7 +733,7 @@ class _DownloadDetailState extends State<DownloadDetail>
                           Card(
                             shape: RoundedRectangleBorder(
                                 side: BorderSide(),
-                                borderRadius: BorderRadius.circular(36)),
+                                borderRadius: BorderRadius.circular(18)),
                             margin: EdgeInsets.symmetric(
                                 horizontal: 20, vertical: 10),
                             child: Padding(
@@ -754,7 +754,7 @@ class _DownloadDetailState extends State<DownloadDetail>
                           Card(
                             shape: RoundedRectangleBorder(
                                 side: BorderSide(),
-                                borderRadius: BorderRadius.circular(36)),
+                                borderRadius: BorderRadius.circular(18)),
                             margin: EdgeInsets.symmetric(
                                 horizontal: 20, vertical: 10),
                             child: Padding(
@@ -771,7 +771,7 @@ class _DownloadDetailState extends State<DownloadDetail>
                           Card(
                             shape: RoundedRectangleBorder(
                                 side: BorderSide(),
-                                borderRadius: BorderRadius.circular(36)),
+                                borderRadius: BorderRadius.circular(18)),
                             margin: EdgeInsets.symmetric(
                                 horizontal: 20, vertical: 10),
                             child: Padding(
@@ -790,7 +790,7 @@ class _DownloadDetailState extends State<DownloadDetail>
                           Card(
                             shape: RoundedRectangleBorder(
                                 side: BorderSide(),
-                                borderRadius: BorderRadius.circular(36)),
+                                borderRadius: BorderRadius.circular(18)),
                             margin: EdgeInsets.symmetric(
                                 horizontal: 20, vertical: 10),
                             child: Padding(
@@ -808,7 +808,7 @@ class _DownloadDetailState extends State<DownloadDetail>
                           Card(
                             shape: RoundedRectangleBorder(
                                 side: BorderSide(),
-                                borderRadius: BorderRadius.circular(36)),
+                                borderRadius: BorderRadius.circular(18)),
                             margin: EdgeInsets.symmetric(
                                 horizontal: 20, vertical: 10),
                             child: Padding(
@@ -825,7 +825,7 @@ class _DownloadDetailState extends State<DownloadDetail>
                           Card(
                             shape: RoundedRectangleBorder(
                                 side: BorderSide(),
-                                borderRadius: BorderRadius.circular(36)),
+                                borderRadius: BorderRadius.circular(18)),
                             margin: EdgeInsets.symmetric(
                                 horizontal: 20, vertical: 10),
                             child: Padding(
@@ -842,7 +842,7 @@ class _DownloadDetailState extends State<DownloadDetail>
                           Card(
                             shape: RoundedRectangleBorder(
                                 side: BorderSide(),
-                                borderRadius: BorderRadius.circular(36)),
+                                borderRadius: BorderRadius.circular(18)),
                             margin: EdgeInsets.symmetric(
                                 horizontal: 20, vertical: 10),
                             child: Padding(
@@ -859,7 +859,7 @@ class _DownloadDetailState extends State<DownloadDetail>
                           Card(
                             shape: RoundedRectangleBorder(
                                 side: BorderSide(),
-                                borderRadius: BorderRadius.circular(36)),
+                                borderRadius: BorderRadius.circular(18)),
                             margin: EdgeInsets.symmetric(
                                 horizontal: 20, vertical: 10),
                             child: Padding(

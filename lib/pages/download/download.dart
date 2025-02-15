@@ -81,7 +81,7 @@ class DownloadState extends State<Download> {
     if (status == DownloadTaskStatus.complete) {
       return Card(
         shape: RoundedRectangleBorder(
-            side: BorderSide(), borderRadius: BorderRadius.circular(36)),
+            side: BorderSide(), borderRadius: BorderRadius.circular(18)),
         margin: EdgeInsets.only(bottom: 3),
         child: Padding(
           padding: const EdgeInsets.all(8.0),
@@ -94,7 +94,7 @@ class DownloadState extends State<Download> {
     } else if (status == DownloadTaskStatus.failed) {
       return Card(
         shape: RoundedRectangleBorder(
-            side: BorderSide(), borderRadius: BorderRadius.circular(36)),
+            side: BorderSide(), borderRadius: BorderRadius.circular(18)),
         margin: EdgeInsets.only(bottom: 3),
         child: Padding(
           padding: const EdgeInsets.all(8.0),
@@ -107,7 +107,7 @@ class DownloadState extends State<Download> {
     } else if (status == DownloadTaskStatus.canceled) {
       return Card(
         shape: RoundedRectangleBorder(
-            side: BorderSide(), borderRadius: BorderRadius.circular(36)),
+            side: BorderSide(), borderRadius: BorderRadius.circular(18)),
         margin: EdgeInsets.only(bottom: 3),
         child: Padding(
           padding: const EdgeInsets.all(8.0),
@@ -120,7 +120,7 @@ class DownloadState extends State<Download> {
     } else if (status == DownloadTaskStatus.paused) {
       return Card(
         shape: RoundedRectangleBorder(
-            side: BorderSide(), borderRadius: BorderRadius.circular(36)),
+            side: BorderSide(), borderRadius: BorderRadius.circular(18)),
         margin: EdgeInsets.only(bottom: 3),
         child: Padding(
           padding: const EdgeInsets.all(8.0),
@@ -133,7 +133,7 @@ class DownloadState extends State<Download> {
     } else if (status == DownloadTaskStatus.running) {
       return Card(
         shape: RoundedRectangleBorder(
-            side: BorderSide(), borderRadius: BorderRadius.circular(36)),
+            side: BorderSide(), borderRadius: BorderRadius.circular(18)),
         margin: EdgeInsets.only(bottom: 3),
         child: Padding(
           padding: const EdgeInsets.all(8.0),
@@ -146,7 +146,7 @@ class DownloadState extends State<Download> {
     } else if (status == DownloadTaskStatus.enqueued) {
       return Card(
         shape: RoundedRectangleBorder(
-            side: BorderSide(), borderRadius: BorderRadius.circular(36)),
+            side: BorderSide(), borderRadius: BorderRadius.circular(18)),
         margin: EdgeInsets.only(bottom: 3),
         child: Padding(
           padding: const EdgeInsets.all(8.0),
@@ -302,7 +302,7 @@ class DownloadState extends State<Download> {
                       ? Card(
                           shape: RoundedRectangleBorder(
                               side: BorderSide(),
-                              borderRadius: BorderRadius.circular(36)),
+                              borderRadius: BorderRadius.circular(18)),
                           child: SizedBox(
                             width: 20,
                             height: 20,
@@ -329,7 +329,7 @@ class DownloadState extends State<Download> {
                                     shape: RoundedRectangleBorder(
                                         side: BorderSide(),
                                         borderRadius:
-                                            BorderRadius.circular(36)),
+                                            BorderRadius.circular(18)),
                                     child: SafeArea(
                                       top: false,
                                       child: Padding(
@@ -699,7 +699,7 @@ class DownloadState extends State<Download> {
                                     shape: RoundedRectangleBorder(
                                         side: BorderSide(),
                                         borderRadius:
-                                            BorderRadius.circular(36)),
+                                            BorderRadius.circular(18)),
                                     margin: EdgeInsets.all(20),
                                     child: Padding(
                                       padding: const EdgeInsets.all(8.0),

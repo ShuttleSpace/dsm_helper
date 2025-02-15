@@ -387,6 +387,9 @@ class _MomentsState extends State<Moments> {
       appBar: AppBar(
         leading: AppBackButton(context),
         title: DropdownMenu(
+          enableFilter: false,
+          enableSearch: false,
+          enabled: false,
           initialSelection: currentIndex,
           dropdownMenuEntries: [
             DropdownMenuEntry(value: 0, label: '图片'),
@@ -500,7 +503,7 @@ class _MomentsState extends State<Moments> {
                                       height: albumWidth,
                                       decoration: BoxDecoration(
                                         color: Colors.white,
-                                        borderRadius: BorderRadius.circular(36),
+                                        borderRadius: BorderRadius.circular(18),
                                       ),
                                       child: Wrap(
                                         runSpacing: 2,
@@ -548,7 +551,7 @@ class _MomentsState extends State<Moments> {
                                       height: albumWidth,
                                       decoration: BoxDecoration(
                                         color: Colors.white,
-                                        borderRadius: BorderRadius.circular(36),
+                                        borderRadius: BorderRadius.circular(18),
                                       ),
                                       child: Wrap(
                                         runSpacing: 2,
@@ -594,7 +597,7 @@ class _MomentsState extends State<Moments> {
                           //           height: albumWidth,
                           //           decoration: BoxDecoration(
                           //             color: Colors.white,
-                          //             borderRadius: BorderRadius.circular(36),
+                          //             borderRadius: BorderRadius.circular(18),
                           //           ),
                           //           child: Wrap(
                           //             runSpacing: 2,
@@ -640,7 +643,7 @@ class _MomentsState extends State<Moments> {
                                     height: albumWidth,
                                     decoration: BoxDecoration(
                                       color: Colors.white,
-                                      borderRadius: BorderRadius.circular(36),
+                                      borderRadius: BorderRadius.circular(18),
                                     ),
                                     child: Wrap(
                                       runSpacing: 2,
@@ -686,7 +689,7 @@ class _MomentsState extends State<Moments> {
                                     height: albumWidth,
                                     decoration: BoxDecoration(
                                       color: Colors.white,
-                                      borderRadius: BorderRadius.circular(36),
+                                      borderRadius: BorderRadius.circular(18),
                                     ),
                                     child: Wrap(
                                       runSpacing: 2,

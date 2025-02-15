@@ -33,7 +33,7 @@ class _UserGroupsState extends State<UserGroups> {
   Widget _buildGroupItem(group) {
     return Card(
       shape: RoundedRectangleBorder(
-          side: BorderSide(), borderRadius: BorderRadius.circular(36)),
+          side: BorderSide(), borderRadius: BorderRadius.circular(18)),
       margin: EdgeInsets.symmetric(vertical: 10),
       child: Padding(
         padding: EdgeInsets.all(20),

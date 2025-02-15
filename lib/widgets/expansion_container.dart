@@ -271,8 +271,8 @@ class _ExpansionContainerState extends State<ExpansionContainer>
     _iconTurns = _controller.drive(_halfTween.chain(_easeInTween));
     _backgroundColor =
         _controller.drive(_backgroundColorTween.chain(_easeOutTween));
-
-    _isExpanded = PageStorage.of(context).readState(context) as bool;
+    dynamic v = PageStorage.of(context).readState(context);
+    _isExpanded = v is bool ? v : false;
     if (_isExpanded) _controller.value = 1.0;
   }
 

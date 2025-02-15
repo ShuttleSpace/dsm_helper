@@ -185,7 +185,7 @@ class _BackupState extends State<Backup> {
           ...[
             Card(
               shape: RoundedRectangleBorder(
-                  side: BorderSide(), borderRadius: BorderRadius.circular(36)),
+                  side: BorderSide(), borderRadius: BorderRadius.circular(18)),
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Stack(
@@ -354,7 +354,7 @@ class _BackupState extends State<Backup> {
             },
             child: Card(
               shape: RoundedRectangleBorder(
-                  side: BorderSide(), borderRadius: BorderRadius.circular(36)),
+                  side: BorderSide(), borderRadius: BorderRadius.circular(18)),
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Row(
@@ -401,7 +401,7 @@ class _BackupState extends State<Backup> {
             },
             child: Card(
               shape: RoundedRectangleBorder(
-                  side: BorderSide(), borderRadius: BorderRadius.circular(36)),
+                  side: BorderSide(), borderRadius: BorderRadius.circular(18)),
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Row(
@@ -440,7 +440,7 @@ class _BackupState extends State<Backup> {
             },
             child: Card(
               shape: RoundedRectangleBorder(
-                  side: BorderSide(), borderRadius: BorderRadius.circular(36)),
+                  side: BorderSide(), borderRadius: BorderRadius.circular(18)),
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Row(

@@ -88,6 +88,7 @@ class AlbumTabState extends State<AlbumTab> {
 
   @override
   Widget build(BuildContext context) {
+    albumWidth = MediaQuery.of(context).size.width / 5;
     return ListView(
       padding: EdgeInsets.all(20),
       children: [

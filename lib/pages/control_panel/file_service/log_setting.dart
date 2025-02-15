@@ -62,7 +62,7 @@ class _LogSettingState extends State<LogSetting> {
                         child: Card(
                           shape: RoundedRectangleBorder(
                               side: BorderSide(),
-                              borderRadius: BorderRadius.circular(36)),
+                              borderRadius: BorderRadius.circular(18)),
                           child: Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: Row(
@@ -95,7 +95,7 @@ class _LogSettingState extends State<LogSetting> {
                         child: Card(
                           shape: RoundedRectangleBorder(
                               side: BorderSide(),
-                              borderRadius: BorderRadius.circular(36)),
+                              borderRadius: BorderRadius.circular(18)),
                           child: Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: Row(
@@ -128,7 +128,7 @@ class _LogSettingState extends State<LogSetting> {
                         child: Card(
                           shape: RoundedRectangleBorder(
                               side: BorderSide(),
-                              borderRadius: BorderRadius.circular(36)),
+                              borderRadius: BorderRadius.circular(18)),
                           child: Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: Row(
@@ -161,7 +161,7 @@ class _LogSettingState extends State<LogSetting> {
                         child: Card(
                           shape: RoundedRectangleBorder(
                               side: BorderSide(),
-                              borderRadius: BorderRadius.circular(36)),
+                              borderRadius: BorderRadius.circular(18)),
                           child: Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: Row(
@@ -194,7 +194,7 @@ class _LogSettingState extends State<LogSetting> {
                         child: Card(
                           shape: RoundedRectangleBorder(
                               side: BorderSide(),
-                              borderRadius: BorderRadius.circular(36)),
+                              borderRadius: BorderRadius.circular(18)),
                           child: Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: Row(
@@ -227,7 +227,7 @@ class _LogSettingState extends State<LogSetting> {
                         child: Card(
                           shape: RoundedRectangleBorder(
                               side: BorderSide(),
-                              borderRadius: BorderRadius.circular(36)),
+                              borderRadius: BorderRadius.circular(18)),
                           child: Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: Row(

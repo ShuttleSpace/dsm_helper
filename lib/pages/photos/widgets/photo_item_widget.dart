@@ -16,6 +16,7 @@ class PhotoItemWidget extends StatelessWidget {
   final bool? showName;
   @override
   Widget build(BuildContext context) {
+    print('PhtoItemWidget: ${width}');
     return GestureDetector(
       onTap: () {
         if (photo.type == 'video') {

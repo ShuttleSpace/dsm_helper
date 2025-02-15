@@ -86,7 +86,7 @@ class _TaskManagerState extends State<TaskManager>
 
     return Card(
       shape: RoundedRectangleBorder(
-          side: BorderSide(), borderRadius: BorderRadius.circular(366)),
+          side: BorderSide(), borderRadius: BorderRadius.circular(18)),
       margin: EdgeInsets.all(10),
       child: Padding(
         padding: const EdgeInsets.all(8.0),
@@ -114,7 +114,7 @@ class _TaskManagerState extends State<TaskManager>
     }
     return Card(
       shape: RoundedRectangleBorder(
-          side: BorderSide(), borderRadius: BorderRadius.circular(366)),
+          side: BorderSide(), borderRadius: BorderRadius.circular(18)),
       margin: EdgeInsets.all(10),
       child: Padding(
         padding: const EdgeInsets.all(8.0),
@@ -166,7 +166,7 @@ class _TaskManagerState extends State<TaskManager>
   Widget _buildProcessItem(process) {
     return Card(
       shape: RoundedRectangleBorder(
-          side: BorderSide(), borderRadius: BorderRadius.circular(366)),
+          side: BorderSide(), borderRadius: BorderRadius.circular(18)),
       margin: EdgeInsets.all(10),
       child: Padding(
         padding: const EdgeInsets.all(8.0),

@@ -36,7 +36,7 @@ class _TaskRecordState extends State<TaskRecord> {
   Widget _buildRecordItem(record) {
     return Card(
       shape: RoundedRectangleBorder(
-          side: BorderSide(), borderRadius: BorderRadius.circular(36)),
+          side: BorderSide(), borderRadius: BorderRadius.circular(18)),
       margin: EdgeInsets.symmetric(vertical: 10),
       child: Padding(
         padding: EdgeInsets.all(20),

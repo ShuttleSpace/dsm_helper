@@ -55,7 +55,7 @@ class _AboutState extends State<About> {
                     Card(
                       shape: RoundedRectangleBorder(
                           side: BorderSide(),
-                          borderRadius: BorderRadius.circular(36)),
+                          borderRadius: BorderRadius.circular(18)),
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: CircleAvatar(
@@ -73,7 +73,7 @@ class _AboutState extends State<About> {
                       children: [
                         Text(
                           "${Util.instance.appName}",
-                          style: TextStyle(fontSize: 32),
+                          style: TextStyle(fontSize: 24),
                         ),
                         if (packageInfo != null)
                           Text(
@@ -93,7 +93,7 @@ class _AboutState extends State<About> {
                 Card(
                   shape: RoundedRectangleBorder(
                       side: BorderSide(),
-                      borderRadius: BorderRadius.circular(36)),
+                      borderRadius: BorderRadius.circular(18)),
                   margin: EdgeInsets.symmetric(horizontal: 20),
                   child: Padding(
                     padding: EdgeInsets.all(20),
@@ -167,7 +167,7 @@ class _AboutState extends State<About> {
                   Card(
                     shape: RoundedRectangleBorder(
                         side: BorderSide(),
-                        borderRadius: BorderRadius.circular(36)),
+                        borderRadius: BorderRadius.circular(18)),
                     margin: EdgeInsets.symmetric(horizontal: 20),
                     child: Padding(
                         padding: EdgeInsets.all(15),
@@ -210,7 +210,7 @@ class _AboutState extends State<About> {
                   Card(
                     shape: RoundedRectangleBorder(
                         side: BorderSide(),
-                        borderRadius: BorderRadius.circular(36)),
+                        borderRadius: BorderRadius.circular(18)),
                     margin: EdgeInsets.symmetric(horizontal: 20),
                     child: Padding(
                         padding: EdgeInsets.all(15),
@@ -252,7 +252,7 @@ class _AboutState extends State<About> {
                   Card(
                     shape: RoundedRectangleBorder(
                         side: BorderSide(),
-                        borderRadius: BorderRadius.circular(36)),
+                        borderRadius: BorderRadius.circular(18)),
                     margin: EdgeInsets.symmetric(horizontal: 20),
                     child: Padding(
                       padding: EdgeInsets.all(15),
@@ -298,7 +298,7 @@ class _AboutState extends State<About> {
                 Card(
                   shape: RoundedRectangleBorder(
                       side: BorderSide(),
-                      borderRadius: BorderRadius.circular(36)),
+                      borderRadius: BorderRadius.circular(18)),
                   margin: EdgeInsets.symmetric(horizontal: 20),
                   child: Padding(
                     padding: EdgeInsets.all(20),
@@ -338,7 +338,7 @@ class _AboutState extends State<About> {
                 Card(
                   shape: RoundedRectangleBorder(
                       side: BorderSide(),
-                      borderRadius: BorderRadius.circular(36)),
+                      borderRadius: BorderRadius.circular(18)),
                   margin: EdgeInsets.symmetric(horizontal: 20),
                   child: Padding(
                     padding: EdgeInsets.all(20),
@@ -378,7 +378,7 @@ class _AboutState extends State<About> {
                 Card(
                   shape: RoundedRectangleBorder(
                       side: BorderSide(),
-                      borderRadius: BorderRadius.circular(36)),
+                      borderRadius: BorderRadius.circular(18)),
                   margin: EdgeInsets.symmetric(horizontal: 20),
                   child: Padding(
                     padding: EdgeInsets.all(20),

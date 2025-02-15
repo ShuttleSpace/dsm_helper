@@ -132,7 +132,7 @@ class _ShareState extends State<Share> {
           ),
           Card(
             shape: RoundedRectangleBorder(
-                side: BorderSide(), borderRadius: BorderRadius.circular(366)),
+                side: BorderSide(), borderRadius: BorderRadius.circular(18)),
             child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: Image.memory(
@@ -156,7 +156,7 @@ class _ShareState extends State<Share> {
           ),
           Card(
             shape: RoundedRectangleBorder(
-                side: BorderSide(), borderRadius: BorderRadius.circular(366)),
+                side: BorderSide(), borderRadius: BorderRadius.circular(18)),
             child: Padding(
               padding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
               child: Row(
@@ -210,7 +210,7 @@ class _ShareState extends State<Share> {
             },
             child: Card(
               shape: RoundedRectangleBorder(
-                  side: BorderSide(), borderRadius: BorderRadius.circular(366)),
+                  side: BorderSide(), borderRadius: BorderRadius.circular(18)),
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: TextField(
@@ -246,7 +246,7 @@ class _ShareState extends State<Share> {
             },
             child: Card(
               shape: RoundedRectangleBorder(
-                  side: BorderSide(), borderRadius: BorderRadius.circular(366)),
+                  side: BorderSide(), borderRadius: BorderRadius.circular(18)),
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: TextField(
@@ -265,7 +265,7 @@ class _ShareState extends State<Share> {
           ),
           Card(
             shape: RoundedRectangleBorder(
-                side: BorderSide(), borderRadius: BorderRadius.circular(366)),
+                side: BorderSide(), borderRadius: BorderRadius.circular(18)),
             child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: TextField(
@@ -285,7 +285,7 @@ class _ShareState extends State<Share> {
             ),
             Card(
               shape: RoundedRectangleBorder(
-                  side: BorderSide(), borderRadius: BorderRadius.circular(366)),
+                  side: BorderSide(), borderRadius: BorderRadius.circular(18)),
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: TextField(
@@ -303,7 +303,7 @@ class _ShareState extends State<Share> {
             ),
             Card(
               shape: RoundedRectangleBorder(
-                  side: BorderSide(), borderRadius: BorderRadius.circular(366)),
+                  side: BorderSide(), borderRadius: BorderRadius.circular(18)),
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: TextField(

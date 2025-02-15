@@ -35,7 +35,7 @@ class _UsersState extends State<Users> {
     user['running'] = user['running'] ?? false;
     return Card(
       shape: RoundedRectangleBorder(
-          side: BorderSide(), borderRadius: BorderRadius.circular(366)),
+          side: BorderSide(), borderRadius: BorderRadius.circular(18)),
       margin: EdgeInsets.only(top: 20, left: 20, right: 20),
       child: Padding(
         padding: EdgeInsets.all(20),
@@ -120,7 +120,7 @@ class _UsersState extends State<Users> {
                       child: Card(
                         shape: RoundedRectangleBorder(
                             side: BorderSide(),
-                            borderRadius: BorderRadius.circular(366)),
+                            borderRadius: BorderRadius.circular(18)),
                         child: SafeArea(
                           top: false,
                           child: Padding(

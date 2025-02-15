@@ -54,7 +54,7 @@ class _EditDdnsState extends State<EditDdns> {
           color: Colors.transparent,
           child: Card(
             shape: RoundedRectangleBorder(
-                side: BorderSide(), borderRadius: BorderRadius.circular(36)),
+                side: BorderSide(), borderRadius: BorderRadius.circular(18)),
             child: SafeArea(
               top: false,
               child: Padding(
@@ -189,7 +189,7 @@ class _EditDdnsState extends State<EditDdns> {
                     child: Card(
                       shape: RoundedRectangleBorder(
                           side: BorderSide(),
-                          borderRadius: BorderRadius.circular(36)),
+                          borderRadius: BorderRadius.circular(18)),
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: Row(
@@ -238,7 +238,7 @@ class _EditDdnsState extends State<EditDdns> {
                   child: Card(
                     shape: RoundedRectangleBorder(
                         side: BorderSide(),
-                        borderRadius: BorderRadius.circular(36)),
+                        borderRadius: BorderRadius.circular(18)),
                     child: Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: Row(
@@ -258,7 +258,7 @@ class _EditDdnsState extends State<EditDdns> {
                 Card(
                   shape: RoundedRectangleBorder(
                       side: BorderSide(),
-                      borderRadius: BorderRadius.circular(36)),
+                      borderRadius: BorderRadius.circular(18)),
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: TextField(
@@ -277,7 +277,7 @@ class _EditDdnsState extends State<EditDdns> {
                 Card(
                   shape: RoundedRectangleBorder(
                       side: BorderSide(),
-                      borderRadius: BorderRadius.circular(36)),
+                      borderRadius: BorderRadius.circular(18)),
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: TextField(
@@ -296,7 +296,7 @@ class _EditDdnsState extends State<EditDdns> {
                 Card(
                   shape: RoundedRectangleBorder(
                       side: BorderSide(),
-                      borderRadius: BorderRadius.circular(36)),
+                      borderRadius: BorderRadius.circular(18)),
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: TextField(
@@ -314,7 +314,7 @@ class _EditDdnsState extends State<EditDdns> {
                 Card(
                   shape: RoundedRectangleBorder(
                       side: BorderSide(),
-                      borderRadius: BorderRadius.circular(36)),
+                      borderRadius: BorderRadius.circular(18)),
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Row(
@@ -332,7 +332,7 @@ class _EditDdnsState extends State<EditDdns> {
                 Card(
                   shape: RoundedRectangleBorder(
                       side: BorderSide(),
-                      borderRadius: BorderRadius.circular(36)),
+                      borderRadius: BorderRadius.circular(18)),
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Row(
@@ -354,7 +354,7 @@ class _EditDdnsState extends State<EditDdns> {
                       child: Card(
                         shape: RoundedRectangleBorder(
                             side: BorderSide(),
-                            borderRadius: BorderRadius.circular(36)),
+                            borderRadius: BorderRadius.circular(18)),
                         child: Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: Row(

@@ -84,7 +84,7 @@ class _AddServerState extends State<AddServer> {
             ),
             Card(
               shape: RoundedRectangleBorder(
-                  side: BorderSide(), borderRadius: BorderRadius.circular(36)),
+                  side: BorderSide(), borderRadius: BorderRadius.circular(18)),
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Row(
@@ -121,7 +121,7 @@ class _AddServerState extends State<AddServer> {
             ),
             Card(
               shape: RoundedRectangleBorder(
-                  side: BorderSide(), borderRadius: BorderRadius.circular(36)),
+                  side: BorderSide(), borderRadius: BorderRadius.circular(18)),
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: TextField(
@@ -139,7 +139,7 @@ class _AddServerState extends State<AddServer> {
             ),
             Card(
               shape: RoundedRectangleBorder(
-                  side: BorderSide(), borderRadius: BorderRadius.circular(36)),
+                  side: BorderSide(), borderRadius: BorderRadius.circular(18)),
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: TextField(

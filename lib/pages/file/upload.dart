@@ -173,7 +173,7 @@ class _UploadState extends State<Upload> {
                         child: Card(
                           shape: RoundedRectangleBorder(
                               side: BorderSide(),
-                              borderRadius: BorderRadius.circular(366)),
+                              borderRadius: BorderRadius.circular(18)),
                           child: SafeArea(
                             top: false,
                             child: Padding(
@@ -341,7 +341,7 @@ class _UploadState extends State<Upload> {
                               child: Card(
                                 shape: RoundedRectangleBorder(
                                     side: BorderSide(),
-                                    borderRadius: BorderRadius.circular(366)),
+                                    borderRadius: BorderRadius.circular(18)),
                                 child: SafeArea(
                                   top: false,
                                   child: Padding(

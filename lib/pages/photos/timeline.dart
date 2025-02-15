@@ -139,7 +139,9 @@ class TimelineState extends State<Timeline> {
         recentlyAdd: widget.recentlyAdd,
       )
           .then((_) {
-        setState(() {});
+        setState(() {
+          print('_buildTimelineItem: ${day.photos?.length}');
+        });
       });
     }
 

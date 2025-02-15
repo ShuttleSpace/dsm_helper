@@ -188,7 +188,7 @@ class ControlButtons extends StatelessWidget {
                 processingState == ja.ProcessingState.buffering) {
               return OutlinedButton(
                 child: const CupertinoActivityIndicator(
-                  radius: 32,
+                  radius: 24,
                 ),
                 onPressed: player.play,
               );

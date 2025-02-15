@@ -98,7 +98,7 @@ class _VipLoginState extends State<VipLogin> {
                   child: Card(
                     shape: RoundedRectangleBorder(
                         side: BorderSide(),
-                        borderRadius: BorderRadius.circular(36)),
+                        borderRadius: BorderRadius.circular(18)),
                     child: TextField(
                       autocorrect: false,
                       keyboardAppearance: Brightness.light,
@@ -121,7 +121,7 @@ class _VipLoginState extends State<VipLogin> {
             ),
             Card(
               shape: RoundedRectangleBorder(
-                  side: BorderSide(), borderRadius: BorderRadius.circular(36)),
+                  side: BorderSide(), borderRadius: BorderRadius.circular(18)),
               child: TextField(
                 onChanged: (v) => password = v,
                 obscureText: true,
@@ -143,7 +143,7 @@ class _VipLoginState extends State<VipLogin> {
               Card(
                 shape: RoundedRectangleBorder(
                     side: BorderSide(),
-                    borderRadius: BorderRadius.circular(36)),
+                    borderRadius: BorderRadius.circular(18)),
                 child: TextField(
                   onChanged: (v) => confirmPassword = v,
                   obscureText: true,

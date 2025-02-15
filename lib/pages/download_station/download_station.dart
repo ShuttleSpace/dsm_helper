@@ -89,7 +89,7 @@ class _DownloadStationState extends State<DownloadStation> {
       },
       child: Card(
         shape: RoundedRectangleBorder(
-            side: BorderSide(), borderRadius: BorderRadius.circular(36)),
+            side: BorderSide(), borderRadius: BorderRadius.circular(18)),
         child: Padding(
           padding: EdgeInsets.all(20),
           child: Column(

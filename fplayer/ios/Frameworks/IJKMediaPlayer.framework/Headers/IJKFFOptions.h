@@ -39,7 +39,7 @@ typedef enum IJKAVDiscard {
     IJK_AVDISCARD_DEFAULT =  0, ///< discard useless packets like 0 size packets in avi
     IJK_AVDISCARD_NONREF  =  8, ///< discard all non reference
     IJK_AVDISCARD_BIDIR   = 16, ///< discard all bidirectional frames
-    IJK_AVDISCARD_NONKEY  = 32, ///< discard all frames except keyframes
+    IJK_AVDISCARD_NONKEY  = 24, ///< discard all frames except keyframes
     IJK_AVDISCARD_ALL     = 48, ///< discard all
 } IJKAVDiscard;
 

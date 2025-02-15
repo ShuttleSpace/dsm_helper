@@ -69,7 +69,7 @@ class _UpdateResetState extends State<UpdateReset>
         children: [
           Card(
             shape: RoundedRectangleBorder(
-                side: BorderSide(), borderRadius: BorderRadius.circular(36)),
+                side: BorderSide(), borderRadius: BorderRadius.circular(18)),
             margin: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
             child: TabBar(
               dividerHeight: 0,
@@ -118,7 +118,7 @@ class _UpdateResetState extends State<UpdateReset>
                     Card(
                       shape: RoundedRectangleBorder(
                           side: BorderSide(),
-                          borderRadius: BorderRadius.circular(36)),
+                          borderRadius: BorderRadius.circular(18)),
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: Text("产品型号: $model"),
@@ -130,7 +130,7 @@ class _UpdateResetState extends State<UpdateReset>
                     Card(
                       shape: RoundedRectangleBorder(
                           side: BorderSide(),
-                          borderRadius: BorderRadius.circular(36)),
+                          borderRadius: BorderRadius.circular(18)),
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: Text("DSM 版本: $firmwareVer"),
@@ -142,7 +142,7 @@ class _UpdateResetState extends State<UpdateReset>
                     Card(
                       shape: RoundedRectangleBorder(
                           side: BorderSide(),
-                          borderRadius: BorderRadius.circular(36)),
+                          borderRadius: BorderRadius.circular(18)),
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: Row(

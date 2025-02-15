@@ -77,7 +77,7 @@ class _VipRecordState extends State<VipRecord> {
   Widget _buildRecordItem(VipRecordModel record) {
     return Card(
       shape: RoundedRectangleBorder(
-          side: BorderSide(), borderRadius: BorderRadius.circular(36)),
+          side: BorderSide(), borderRadius: BorderRadius.circular(18)),
       margin: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -119,7 +119,7 @@ class _VipRecordState extends State<VipRecord> {
                             Card(
                               shape: RoundedRectangleBorder(
                                   side: BorderSide(),
-                                  borderRadius: BorderRadius.circular(36)),
+                                  borderRadius: BorderRadius.circular(18)),
                               margin: EdgeInsets.symmetric(horizontal: 50),
                               child: Padding(
                                 padding: EdgeInsets.all(20),

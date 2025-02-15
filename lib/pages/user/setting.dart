@@ -67,7 +67,7 @@ class _UserSettingState extends State<UserSetting> {
                 Card(
                   shape: RoundedRectangleBorder(
                       side: BorderSide(),
-                      borderRadius: BorderRadius.circular(36)),
+                      borderRadius: BorderRadius.circular(18)),
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: TextField(
@@ -87,7 +87,7 @@ class _UserSettingState extends State<UserSetting> {
                 Card(
                   shape: RoundedRectangleBorder(
                       side: BorderSide(),
-                      borderRadius: BorderRadius.circular(36)),
+                      borderRadius: BorderRadius.circular(18)),
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: TextField(
@@ -107,7 +107,7 @@ class _UserSettingState extends State<UserSetting> {
                   Card(
                     shape: RoundedRectangleBorder(
                         side: BorderSide(),
-                        borderRadius: BorderRadius.circular(36)),
+                        borderRadius: BorderRadius.circular(18)),
                     child: Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: TextField(
@@ -125,7 +125,7 @@ class _UserSettingState extends State<UserSetting> {
                   Card(
                     shape: RoundedRectangleBorder(
                         side: BorderSide(),
-                        borderRadius: BorderRadius.circular(36)),
+                        borderRadius: BorderRadius.circular(18)),
                     child: Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: TextField(
@@ -143,7 +143,7 @@ class _UserSettingState extends State<UserSetting> {
                   Card(
                     shape: RoundedRectangleBorder(
                         side: BorderSide(),
-                        borderRadius: BorderRadius.circular(36)),
+                        borderRadius: BorderRadius.circular(18)),
                     child: Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: TextField(
@@ -162,7 +162,7 @@ class _UserSettingState extends State<UserSetting> {
                 Card(
                   shape: RoundedRectangleBorder(
                       side: BorderSide(),
-                      borderRadius: BorderRadius.circular(36)),
+                      borderRadius: BorderRadius.circular(18)),
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: TextField(
@@ -206,7 +206,7 @@ class _UserSettingState extends State<UserSetting> {
                   child: Card(
                     shape: RoundedRectangleBorder(
                         side: BorderSide(),
-                        borderRadius: BorderRadius.circular(36)),
+                        borderRadius: BorderRadius.circular(18)),
                     child: Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: Row(

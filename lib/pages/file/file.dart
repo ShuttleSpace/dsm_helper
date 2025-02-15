@@ -205,7 +205,7 @@ class FilesState extends State<Files> {
                         Card(
                           shape: RoundedRectangleBorder(
                               side: BorderSide(),
-                              borderRadius: BorderRadius.circular(366)),
+                              borderRadius: BorderRadius.circular(18)),
                           margin: EdgeInsets.symmetric(horizontal: 50),
                           child: Padding(
                             padding: EdgeInsets.all(20),
@@ -223,7 +223,7 @@ class FilesState extends State<Files> {
                                 Card(
                                   shape: RoundedRectangleBorder(
                                       side: BorderSide(),
-                                      borderRadius: BorderRadius.circular(366)),
+                                      borderRadius: BorderRadius.circular(18)),
                                   child: Padding(
                                     padding: const EdgeInsets.all(8.0),
                                     child: TextField(
@@ -448,7 +448,7 @@ class FilesState extends State<Files> {
               child: Card(
                 shape: RoundedRectangleBorder(
                     side: BorderSide(),
-                    borderRadius: BorderRadius.circular(366)),
+                    borderRadius: BorderRadius.circular(18)),
                 child: SafeArea(
                   top: false,
                   child: Padding(
@@ -720,7 +720,7 @@ class FilesState extends State<Files> {
       color: Colors.transparent,
       child: Card(
         shape: RoundedRectangleBorder(
-            side: BorderSide(), borderRadius: BorderRadius.circular(366)),
+            side: BorderSide(), borderRadius: BorderRadius.circular(18)),
         child: Padding(
           padding: EdgeInsets.all(20),
           child: Column(
@@ -729,7 +729,7 @@ class FilesState extends State<Files> {
               Card(
                 shape: RoundedRectangleBorder(
                     side: BorderSide(),
-                    borderRadius: BorderRadius.circular(366)),
+                    borderRadius: BorderRadius.circular(18)),
                 child: SafeArea(
                   top: false,
                   child: Padding(
@@ -750,7 +750,7 @@ class FilesState extends State<Files> {
                               Card(
                                 shape: RoundedRectangleBorder(
                                     side: BorderSide(),
-                                    borderRadius: BorderRadius.circular(366)),
+                                    borderRadius: BorderRadius.circular(18)),
                                 child: Padding(
                                   padding: const EdgeInsets.all(8.0),
                                   child: SizedBox(
@@ -783,7 +783,7 @@ class FilesState extends State<Files> {
                               Card(
                                 shape: RoundedRectangleBorder(
                                     side: BorderSide(),
-                                    borderRadius: BorderRadius.circular(366)),
+                                    borderRadius: BorderRadius.circular(18)),
                                 child: Padding(
                                   padding: const EdgeInsets.all(8.0),
                                   child: SizedBox(
@@ -816,7 +816,7 @@ class FilesState extends State<Files> {
                               Card(
                                 shape: RoundedRectangleBorder(
                                     side: BorderSide(),
-                                    borderRadius: BorderRadius.circular(366)),
+                                    borderRadius: BorderRadius.circular(18)),
                                 child: Padding(
                                   padding: const EdgeInsets.all(8.0),
                                   child: SizedBox(
@@ -849,7 +849,7 @@ class FilesState extends State<Files> {
                               Card(
                                 shape: RoundedRectangleBorder(
                                     side: BorderSide(),
-                                    borderRadius: BorderRadius.circular(366)),
+                                    borderRadius: BorderRadius.circular(18)),
                                 child: Padding(
                                   padding: const EdgeInsets.all(8.0),
                                   child: SizedBox(
@@ -882,7 +882,7 @@ class FilesState extends State<Files> {
                               Card(
                                 shape: RoundedRectangleBorder(
                                     side: BorderSide(),
-                                    borderRadius: BorderRadius.circular(366)),
+                                    borderRadius: BorderRadius.circular(18)),
                                 child: Padding(
                                   padding: const EdgeInsets.all(8.0),
                                   child: SizedBox(
@@ -915,7 +915,7 @@ class FilesState extends State<Files> {
                               Card(
                                 shape: RoundedRectangleBorder(
                                     side: BorderSide(),
-                                    borderRadius: BorderRadius.circular(366)),
+                                    borderRadius: BorderRadius.circular(18)),
                                 child: Padding(
                                   padding: const EdgeInsets.all(8.0),
                                   child: SizedBox(
@@ -948,7 +948,7 @@ class FilesState extends State<Files> {
                               Card(
                                 shape: RoundedRectangleBorder(
                                     side: BorderSide(),
-                                    borderRadius: BorderRadius.circular(366)),
+                                    borderRadius: BorderRadius.circular(18)),
                                 child: Padding(
                                   padding: const EdgeInsets.all(8.0),
                                   child: SizedBox(
@@ -981,7 +981,7 @@ class FilesState extends State<Files> {
                               Card(
                                 shape: RoundedRectangleBorder(
                                     side: BorderSide(),
-                                    borderRadius: BorderRadius.circular(366)),
+                                    borderRadius: BorderRadius.circular(18)),
                                 child: Padding(
                                   padding: const EdgeInsets.all(8.0),
                                   child: SizedBox(
@@ -1014,7 +1014,7 @@ class FilesState extends State<Files> {
                               Card(
                                 shape: RoundedRectangleBorder(
                                     side: BorderSide(),
-                                    borderRadius: BorderRadius.circular(366)),
+                                    borderRadius: BorderRadius.circular(18)),
                                 child: Padding(
                                   padding: const EdgeInsets.all(8.0),
                                   child: SizedBox(
@@ -1043,7 +1043,7 @@ class FilesState extends State<Files> {
               Card(
                 shape: RoundedRectangleBorder(
                     side: BorderSide(),
-                    borderRadius: BorderRadius.circular(366)),
+                    borderRadius: BorderRadius.circular(18)),
                 child: Padding(
                   padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                   child: Column(
@@ -1062,7 +1062,7 @@ class FilesState extends State<Files> {
                             Card(
                               shape: RoundedRectangleBorder(
                                   side: BorderSide(),
-                                  borderRadius: BorderRadius.circular(366)),
+                                  borderRadius: BorderRadius.circular(18)),
                               child: Padding(
                                 padding: const EdgeInsets.all(8.0),
                                 child: SizedBox(
@@ -1095,7 +1095,7 @@ class FilesState extends State<Files> {
                             Card(
                               shape: RoundedRectangleBorder(
                                   side: BorderSide(),
-                                  borderRadius: BorderRadius.circular(366)),
+                                  borderRadius: BorderRadius.circular(18)),
                               child: Padding(
                                 padding: const EdgeInsets.all(8.0),
                                 child: SizedBox(
@@ -1148,7 +1148,7 @@ class FilesState extends State<Files> {
           color: Colors.transparent,
           child: Card(
             shape: RoundedRectangleBorder(
-                side: BorderSide(), borderRadius: BorderRadius.circular(366)),
+                side: BorderSide(), borderRadius: BorderRadius.circular(18)),
             child: SafeArea(
               top: false,
               child: Padding(
@@ -1261,7 +1261,7 @@ class FilesState extends State<Files> {
           color: Colors.transparent,
           child: Card(
             shape: RoundedRectangleBorder(
-                side: BorderSide(), borderRadius: BorderRadius.circular(366)),
+                side: BorderSide(), borderRadius: BorderRadius.circular(18)),
             child: SafeArea(
               top: false,
               child: Padding(
@@ -1567,7 +1567,7 @@ class FilesState extends State<Files> {
           color: Colors.transparent,
           child: Card(
             shape: RoundedRectangleBorder(
-                side: BorderSide(), borderRadius: BorderRadius.circular(366)),
+                side: BorderSide(), borderRadius: BorderRadius.circular(18)),
             child: SafeArea(
               top: false,
               child: Padding(
@@ -2131,7 +2131,7 @@ class FilesState extends State<Files> {
     Widget actionButton = multiSelect
         ? Card(
             shape: RoundedRectangleBorder(
-                side: BorderSide(), borderRadius: BorderRadius.circular(366)),
+                side: BorderSide(), borderRadius: BorderRadius.circular(18)),
             child: SizedBox(
               width: 20,
               height: 20,
@@ -2149,7 +2149,7 @@ class FilesState extends State<Files> {
             },
             child: Card(
               shape: RoundedRectangleBorder(
-                  side: BorderSide(), borderRadius: BorderRadius.circular(366)),
+                  side: BorderSide(), borderRadius: BorderRadius.circular(18)),
               // padding: EdgeInsets.zero,
               child: Icon(
                 CupertinoIcons.right_chevron,
@@ -2399,7 +2399,7 @@ class FilesState extends State<Files> {
       children.add(
         Card(
           shape: RoundedRectangleBorder(
-              side: BorderSide(), borderRadius: BorderRadius.circular(366)),
+              side: BorderSide(), borderRadius: BorderRadius.circular(18)),
           margin: EdgeInsets.only(left: 20, right: 20, bottom: 20),
           child: Padding(
             padding: EdgeInsets.all(20),
@@ -2465,583 +2465,543 @@ class FilesState extends State<Files> {
     return SizedBox(
       width: MediaQuery.of(context).size.width,
       height: 50,
-      child: SingleChildScrollView(
+      child: ListView(
         scrollDirection: Axis.horizontal,
-        child: Row(
-          children: [
-            Padding(
-              padding: EdgeInsets.only(left: 10, top: 8, bottom: 8),
-              child: OutlinedButton(
-                onPressed: () async {
-                  if (multiSelect) {
+        shrinkWrap: true,
+        children: [
+          Padding(
+            padding: EdgeInsets.only(left: 10, top: 8, bottom: 8),
+            child: OutlinedButton(
+              onPressed: () async {
+                if (multiSelect) {
+                  setState(() {
+                    multiSelect = false;
+                    selectedFiles = [];
+                  });
+                } else {
+                  _scaffoldKey.currentState?.openDrawer();
+                  setState(() {
+                    favoriteLoading = true;
+                  });
+                  var res = await Api.favoriteList();
+                  setState(() {
+                    favoriteLoading = false;
+                  });
+                  if (res['success']) {
                     setState(() {
-                      multiSelect = false;
-                      selectedFiles = [];
+                      favorites = res['data']['favorites'];
                     });
-                  } else {
-                    _scaffoldKey.currentState?.openDrawer();
-                    setState(() {
-                      favoriteLoading = true;
-                    });
-                    var res = await Api.favoriteList();
-                    setState(() {
-                      favoriteLoading = false;
-                    });
-                    if (res['success']) {
-                      setState(() {
-                        favorites = res['data']['favorites'];
-                      });
-                    }
                   }
-                },
-                child: multiSelect
-                    ? Icon(Icons.close)
-                    : Image.asset(
-                        "assets/icons/collect.png",
-                        width: 20,
-                      ),
-              ),
+                }
+              },
+              child: multiSelect
+                  ? Icon(Icons.close)
+                  : Image.asset(
+                      "assets/icons/collect.png",
+                      width: 20,
+                    ),
             ),
-            Padding(
-              padding: EdgeInsets.only(left: 10, top: 8, bottom: 8),
-              child: OutlinedButton(
-                onPressed: () async {
-                  showCupertinoModalPopup(
-                    context: context,
-                    builder: (context) {
-                      return Material(
-                        color: Colors.transparent,
-                        child: Card(
-                          shape: RoundedRectangleBorder(
-                              side: BorderSide(),
-                              borderRadius: BorderRadius.circular(366)),
-                          child: SafeArea(
-                            top: false,
-                            child: Padding(
-                              padding: EdgeInsets.all(20),
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: <Widget>[
-                                  Stack(
-                                    children: [
-                                      Align(
-                                        alignment: Alignment.center,
-                                        child: Text(
-                                          "远程文件夹",
-                                          style: TextStyle(
-                                              fontSize: 20,
-                                              fontWeight: FontWeight.w500),
-                                        ),
+          ),
+          Padding(
+            padding: EdgeInsets.only(left: 10, top: 8, bottom: 8),
+            child: OutlinedButton(
+              onPressed: () async {
+                showCupertinoModalPopup(
+                  context: context,
+                  builder: (context) {
+                    return Material(
+                      color: Colors.transparent,
+                      child: Card(
+                        shape: RoundedRectangleBorder(
+                            side: BorderSide(),
+                            borderRadius: BorderRadius.circular(18)),
+                        child: SafeArea(
+                          top: false,
+                          child: Padding(
+                            padding: EdgeInsets.all(20),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: <Widget>[
+                                Stack(
+                                  children: [
+                                    Align(
+                                      alignment: Alignment.center,
+                                      child: Text(
+                                        "远程文件夹",
+                                        style: TextStyle(
+                                            fontSize: 20,
+                                            fontWeight: FontWeight.w500),
                                       ),
-                                      Align(
-                                        alignment: Alignment.centerRight,
-                                        child: Container(
-                                          width: 30,
-                                          height: 30,
-                                          child: OutlinedButton(
-                                            onPressed: () async {
-                                              Util.instance.toast("重新加载远程连接中");
-                                              Navigator.of(context).pop();
-                                              getFtpFolder();
-                                              getSftpFolder();
-                                              getSmbFolder();
-                                              getDavFolder();
-                                            },
-                                            child: Icon(
-                                              Icons.refresh,
-                                              size: 20,
-                                            ),
+                                    ),
+                                    Align(
+                                      alignment: Alignment.centerRight,
+                                      child: Container(
+                                        width: 30,
+                                        height: 30,
+                                        child: OutlinedButton(
+                                          onPressed: () async {
+                                            Util.instance.toast("重新加载远程连接中");
+                                            Navigator.of(context).pop();
+                                            getFtpFolder();
+                                            getSftpFolder();
+                                            getSmbFolder();
+                                            getDavFolder();
+                                          },
+                                          child: Icon(
+                                            Icons.refresh,
+                                            size: 20,
                                           ),
                                         ),
-                                      )
-                                    ],
+                                      ),
+                                    )
+                                  ],
+                                ),
+                                SizedBox(
+                                  height: 20,
+                                ),
+                                Container(
+                                  constraints: BoxConstraints(
+                                    minHeight: 50,
+                                    maxHeight:
+                                        MediaQuery.of(context).size.height *
+                                            0.8,
                                   ),
-                                  SizedBox(
-                                    height: 20,
-                                  ),
-                                  Container(
-                                    constraints: BoxConstraints(
-                                      minHeight: 50,
-                                      maxHeight:
-                                          MediaQuery.of(context).size.height *
-                                              0.8,
-                                    ),
-                                    child: SingleChildScrollView(
-                                      child: Column(
-                                        children: [
-                                          if ((smbFolders +
-                                                      ftpFolders +
-                                                      sftpFolders +
-                                                      davFolders)
-                                                  .length >
-                                              0) ...[
-                                            ...(smbFolders +
+                                  child: SingleChildScrollView(
+                                    child: Column(
+                                      children: [
+                                        if ((smbFolders +
                                                     ftpFolders +
                                                     sftpFolders +
                                                     davFolders)
-                                                .map((folder) {
-                                              return _buildFileItem(folder,
-                                                  remote: true);
-                                            }).toList(),
-                                          ] else
-                                            Center(
-                                              child: Text(
-                                                "未挂载远程文件夹",
-                                                style: TextStyle(
-                                                    color: AppTheme.of(context)
-                                                        .placeholderColor),
-                                              ),
+                                                .length >
+                                            0) ...[
+                                          ...(smbFolders +
+                                                  ftpFolders +
+                                                  sftpFolders +
+                                                  davFolders)
+                                              .map((folder) {
+                                            return _buildFileItem(folder,
+                                                remote: true);
+                                          }).toList(),
+                                        ] else
+                                          Center(
+                                            child: Text(
+                                              "未挂载远程文件夹",
+                                              style: TextStyle(
+                                                  color: AppTheme.of(context)
+                                                      .placeholderColor),
                                             ),
-                                        ],
-                                      ),
+                                          ),
+                                      ],
                                     ),
                                   ),
-                                  SizedBox(
-                                    height: 16,
+                                ),
+                                SizedBox(
+                                  height: 16,
+                                ),
+                                OutlinedButton(
+                                  onPressed: () async {
+                                    Navigator.of(context).pop();
+                                  },
+                                  child: Text(
+                                    "取消",
+                                    style: TextStyle(fontSize: 18),
                                   ),
-                                  OutlinedButton(
-                                    onPressed: () async {
-                                      Navigator.of(context).pop();
-                                    },
-                                    child: Text(
-                                      "取消",
-                                      style: TextStyle(fontSize: 18),
-                                    ),
-                                  ),
-                                  SizedBox(
-                                    height: 8,
-                                  ),
-                                ],
-                              ),
+                                ),
+                                SizedBox(
+                                  height: 8,
+                                ),
+                              ],
                             ),
                           ),
                         ),
-                      );
-                    },
-                  );
+                      ),
+                    );
+                  },
+                );
+              },
+              child: Image.asset(
+                "assets/icons/remote.png",
+                width: 20,
+              ),
+            ),
+          ),
+          if (Util.instance.notReviewAccount &&
+              paths.length > 0 &&
+              !multiSelect)
+            Padding(
+              padding: EdgeInsets.only(left: 10, top: 8, bottom: 8),
+              child: OutlinedButton(
+                onPressed: () async {
+                  Navigator.of(context)
+                      .push(CupertinoPageRoute(
+                          builder: (context) {
+                            return Upload("/" + paths.join("/"));
+                          },
+                          settings: RouteSettings(name: "upload")))
+                      .then((value) {
+                    refresh();
+                  });
                 },
                 child: Image.asset(
-                  "assets/icons/remote.png",
+                  "assets/icons/upload.png",
                   width: 20,
                 ),
               ),
             ),
-            if (Util.instance.notReviewAccount &&
-                paths.length > 0 &&
-                !multiSelect)
-              Padding(
-                padding: EdgeInsets.only(left: 10, top: 8, bottom: 8),
-                child: OutlinedButton(
-                  onPressed: () async {
-                    Navigator.of(context)
-                        .push(CupertinoPageRoute(
-                            builder: (context) {
-                              return Upload("/" + paths.join("/"));
-                            },
-                            settings: RouteSettings(name: "upload")))
-                        .then((value) {
-                      refresh();
-                    });
-                  },
-                  child: Image.asset(
-                    "assets/icons/upload.png",
-                    width: 20,
-                  ),
+          if (backgroundProcess.isNotEmpty)
+            Padding(
+              padding: EdgeInsets.only(left: 10, top: 8, bottom: 8),
+              child: OutlinedButton(
+                onPressed: () async {
+                  setState(() {
+                    showProcessList = !showProcessList;
+                  });
+                },
+                child: Image.asset(
+                  "assets/icons/bgtask.gif",
+                  width: 20,
                 ),
               ),
-            if (backgroundProcess.isNotEmpty)
-              Padding(
-                padding: EdgeInsets.only(left: 10, top: 8, bottom: 8),
-                child: OutlinedButton(
-                  onPressed: () async {
-                    setState(() {
-                      showProcessList = !showProcessList;
-                    });
-                  },
-                  child: Image.asset(
-                    "assets/icons/bgtask.gif",
-                    width: 20,
-                  ),
+            ),
+          SizedBox(
+            width: 24,
+          ),
+          if (paths.length > 0)
+            Padding(
+              padding: EdgeInsets.only(right: 10, top: 8, bottom: 8),
+              child: OutlinedButton(
+                onPressed: () async {
+                  Navigator.of(context)
+                      .push(CupertinoPageRoute(
+                          builder: (content) {
+                            return Search("/" + paths.join("/"));
+                          },
+                          settings: RouteSettings(name: "search")))
+                      .then((res) {
+                    if (res != null) {
+                      search(res['folders'], res['pattern'],
+                          res['search_content']);
+                    }
+                  });
+                },
+                child: Image.asset(
+                  "assets/icons/search.png",
+                  width: 20,
                 ),
               ),
-            Spacer(),
-            if (paths.length > 0)
-              Padding(
-                padding: EdgeInsets.only(right: 10, top: 8, bottom: 8),
-                child: OutlinedButton(
-                  onPressed: () async {
-                    Navigator.of(context)
-                        .push(CupertinoPageRoute(
-                            builder: (content) {
-                              return Search("/" + paths.join("/"));
-                            },
-                            settings: RouteSettings(name: "search")))
-                        .then((res) {
-                      if (res != null) {
-                        search(res['folders'], res['pattern'],
-                            res['search_content']);
-                      }
-                    });
-                  },
-                  child: Image.asset(
-                    "assets/icons/search.png",
-                    width: 20,
-                  ),
-                ),
+            ),
+          Padding(
+            padding: EdgeInsets.only(right: 10, top: 8, bottom: 8),
+            child: OutlinedButton(
+              onPressed: () {
+                setState(() {
+                  listType =
+                      listType == ListType.list ? ListType.icon : ListType.list;
+                });
+                Util.instance.setStorage("file_list_type",
+                    listType == ListType.list ? "list" : "icon");
+              },
+              child: Image.asset(
+                listType == ListType.list
+                    ? "assets/icons/list_list.png"
+                    : "assets/icons/list_icon.png",
+                width: 20,
+                height: 20,
               ),
+            ),
+          ),
+          if (multiSelect)
             Padding(
               padding: EdgeInsets.only(right: 10, top: 8, bottom: 8),
               child: OutlinedButton(
                 onPressed: () {
-                  setState(() {
-                    listType = listType == ListType.list
-                        ? ListType.icon
-                        : ListType.list;
-                  });
-                  Util.instance.setStorage("file_list_type",
-                      listType == ListType.list ? "list" : "icon");
+                  if (selectedFiles.length == files.length) {
+                    selectedFiles = [];
+                  } else {
+                    selectedFiles = [];
+                    files.forEach((file) {
+                      selectedFiles.add(file);
+                    });
+                  }
+
+                  setState(() {});
                 },
                 child: Image.asset(
-                  listType == ListType.list
-                      ? "assets/icons/list_list.png"
-                      : "assets/icons/list_icon.png",
+                  "assets/icons/select_all.png",
+                  width: 20,
+                  height: 20,
+                ),
+              ),
+            )
+          else if (paths.length > 1)
+            Padding(
+              padding: EdgeInsets.only(right: 10, top: 8, bottom: 8),
+              child: OutlinedButton(
+                onPressed: () {
+                  showCupertinoModalPopup(
+                    context: context,
+                    builder: (context) {
+                      return StatefulBuilder(
+                        builder: _buildSortMenu,
+                      );
+                    },
+                  ).then((value) {
+                    refresh();
+                  });
+                },
+                child: Image.asset(
+                  "assets/icons/sort.png",
                   width: 20,
                   height: 20,
                 ),
               ),
             ),
-            if (multiSelect)
-              Padding(
-                padding: EdgeInsets.only(right: 10, top: 8, bottom: 8),
-                child: OutlinedButton(
-                  onPressed: () {
-                    if (selectedFiles.length == files.length) {
-                      selectedFiles = [];
-                    } else {
-                      selectedFiles = [];
-                      files.forEach((file) {
-                        selectedFiles.add(file);
-                      });
-                    }
-
-                    setState(() {});
-                  },
-                  child: Image.asset(
-                    "assets/icons/select_all.png",
-                    width: 20,
-                    height: 20,
-                  ),
-                ),
-              )
-            else if (paths.length > 1)
-              Padding(
-                padding: EdgeInsets.only(right: 10, top: 8, bottom: 8),
-                child: OutlinedButton(
-                  onPressed: () {
-                    showCupertinoModalPopup(
-                      context: context,
-                      builder: (context) {
-                        return StatefulBuilder(
-                          builder: _buildSortMenu,
-                        );
-                      },
-                    ).then((value) {
-                      refresh();
-                    });
-                  },
-                  child: Image.asset(
-                    "assets/icons/sort.png",
-                    width: 20,
-                    height: 20,
-                  ),
-                ),
-              ),
-            Padding(
-              padding: EdgeInsets.only(right: 10, top: 8, bottom: 8),
-              child: OutlinedButton(
-                onPressed: () {
-                  showCupertinoModalPopup(
-                    context: context,
-                    builder: (context) {
-                      return Material(
-                        color: Colors.transparent,
-                        child: Card(
-                          shape: RoundedRectangleBorder(
-                              side: BorderSide(),
-                              borderRadius: BorderRadius.circular(366)),
-                          child: SafeArea(
-                            top: false,
-                            child: Padding(
-                              padding: EdgeInsets.all(20),
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: <Widget>[
-                                  Text(
-                                    "选择操作",
-                                    style: TextStyle(
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.w500),
-                                  ),
-                                  SizedBox(
-                                    height: 12,
-                                  ),
-                                  Container(
-                                    width: double.infinity,
-                                    child: Wrap(
-                                      runSpacing: 20,
-                                      spacing: 20,
-                                      children: [
-                                        if (paths.length == 0) ...[
-                                          Container(
-                                            constraints:
-                                                BoxConstraints(maxWidth: 112),
-                                            width: (MediaQuery.of(context)
-                                                        .size
-                                                        .width -
-                                                    100) /
-                                                4,
-                                            child: OutlinedButton(
-                                              onPressed: () async {
-                                                Navigator.of(context).pop();
-                                                List volumes =
-                                                    await getVolumes();
-                                                if (volumes.length > 0) {
-                                                  Navigator.of(context)
-                                                      .push(CupertinoPageRoute(
-                                                          builder: (context) {
-                                                            return AddSharedFolders(
-                                                                volumes);
-                                                          },
-                                                          settings: RouteSettings(
-                                                              name:
-                                                                  "add_shared_folders")))
-                                                      .then((res) {
-                                                    if (res != null && res) {
-                                                      refresh();
-                                                    }
-                                                  });
-                                                } else {
-                                                  Util.instance
-                                                      .toast("未获取到存储空间");
-                                                }
-                                              },
-                                              child: Column(
-                                                children: [
-                                                  Image.asset(
-                                                    "assets/icons/new_folder.png",
-                                                    width: 30,
-                                                  ),
-                                                  Text(
-                                                    "共享文件夹",
-                                                    style:
-                                                        TextStyle(fontSize: 12),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                        if (paths.length > 0) ...[
-                                          Container(
-                                            constraints:
-                                                BoxConstraints(maxWidth: 112),
-                                            width: (MediaQuery.of(context)
-                                                        .size
-                                                        .width -
-                                                    100) /
-                                                4,
-                                            child: OutlinedButton(
-                                              onPressed: () async {
-                                                Navigator.of(context).pop();
-                                                String name = "";
-                                                showCupertinoDialog(
-                                                    context: context,
-                                                    builder: (context) {
-                                                      return Material(
-                                                        color:
-                                                            Colors.transparent,
-                                                        child: Column(
-                                                          mainAxisAlignment:
-                                                              MainAxisAlignment
-                                                                  .center,
-                                                          children: [
-                                                            Card(
-                                                              shape: RoundedRectangleBorder(
-                                                                  side:
-                                                                      BorderSide(),
-                                                                  borderRadius:
-                                                                      BorderRadius
-                                                                          .circular(
-                                                                              5)),
-                                                              child: Padding(
-                                                                padding:
-                                                                    EdgeInsets
-                                                                        .all(
-                                                                            20),
-                                                                child: Column(
-                                                                  children: [
-                                                                    Text(
-                                                                      "新建文件夹",
-                                                                      style: TextStyle(
-                                                                          fontSize:
-                                                                              20,
-                                                                          fontWeight:
-                                                                              FontWeight.w500),
-                                                                    ),
-                                                                    SizedBox(
-                                                                      height:
-                                                                          16,
-                                                                    ),
-                                                                    Card(
-                                                                      shape: RoundedRectangleBorder(
-                                                                          side:
-                                                                              BorderSide(),
-                                                                          borderRadius:
-                                                                              BorderRadius.circular(5)),
-                                                                      child:
-                                                                          Padding(
-                                                                        padding: const EdgeInsets
-                                                                            .all(
-                                                                            8.0),
-                                                                        child:
-                                                                            TextField(
-                                                                          onChanged: (v) =>
-                                                                              name = v,
-                                                                          decoration:
-                                                                              InputDecoration(
-                                                                            border:
-                                                                                InputBorder.none,
-                                                                            hintText:
-                                                                                "请输入文件夹名",
-                                                                            labelText:
-                                                                                "文件夹名",
-                                                                          ),
-                                                                        ),
-                                                                      ),
-                                                                    ),
-                                                                    SizedBox(
-                                                                      height:
-                                                                          20,
-                                                                    ),
-                                                                    Row(
-                                                                      children: [
-                                                                        Expanded(
-                                                                          child:
-                                                                              OutlinedButton(
-                                                                            onPressed:
-                                                                                () async {
-                                                                              if (name.trim() == "") {
-                                                                                Util.instance.toast("请输入文件夹名");
-                                                                                return;
-                                                                              }
-                                                                              Navigator.of(context).pop();
-                                                                              String path = "/" + paths.join("/");
-                                                                              var res = await Api.createFolder(path, name);
-                                                                              if (res['success']) {
-                                                                                Util.instance.toast("文件夹创建成功");
-                                                                                refresh();
-                                                                              } else {
-                                                                                if (res['error']['errors'] != null && res['error']['errors'].length > 0 && res['error']['errors'][0]['code'] == 414) {
-                                                                                  Util.instance.toast("文件夹创建失败：指定的名称已存在");
-                                                                                } else {
-                                                                                  Util.instance.toast("文件夹创建失败");
-                                                                                }
-                                                                              }
-                                                                            },
-                                                                            child:
-                                                                                Text(
-                                                                              "确定",
-                                                                              style: TextStyle(fontSize: 18),
-                                                                            ),
-                                                                          ),
-                                                                        ),
-                                                                        SizedBox(
-                                                                          width:
-                                                                              16,
-                                                                        ),
-                                                                        Expanded(
-                                                                          child:
-                                                                              OutlinedButton(
-                                                                            onPressed:
-                                                                                () async {
-                                                                              Navigator.of(context).pop();
-                                                                            },
-                                                                            child:
-                                                                                Text(
-                                                                              "取消",
-                                                                              style: TextStyle(fontSize: 18),
-                                                                            ),
-                                                                          ),
-                                                                        ),
-                                                                      ],
-                                                                    )
-                                                                  ],
-                                                                ),
-                                                              ),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                      );
-                                                    });
-                                              },
-                                              child: Column(
-                                                children: [
-                                                  Image.asset(
-                                                    "assets/icons/new_folder.png",
-                                                    width: 30,
-                                                  ),
-                                                  Text(
-                                                    "新建文件夹",
-                                                    style:
-                                                        TextStyle(fontSize: 12),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          ),
-                                          SizedBox(
-                                            width: (MediaQuery.of(context)
-                                                        .size
-                                                        .width -
-                                                    100) /
-                                                4,
-                                            child: OutlinedButton(
-                                              onPressed: () async {
-                                                Navigator.of(context).pop();
-                                                Navigator.of(context).push(
-                                                    CupertinoPageRoute(
-                                                        builder: (context) {
-                                                          return Share(
-                                                            paths: [
-                                                              "/" +
-                                                                  paths
-                                                                      .join("/")
-                                                            ],
-                                                            fileRequest: true,
-                                                          );
-                                                        },
-                                                        settings: RouteSettings(
-                                                            name: "share")));
-                                              },
-                                              child: Column(
-                                                children: [
-                                                  Image.asset(
-                                                    "assets/icons/upload.png",
-                                                    width: 30,
-                                                  ),
-                                                  Text(
-                                                    "创建文件请求",
-                                                    style:
-                                                        TextStyle(fontSize: 12),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          ),
-                                        ],
+          Padding(
+            padding: EdgeInsets.only(right: 10, top: 8, bottom: 8),
+            child: OutlinedButton(
+              onPressed: () {
+                showCupertinoModalPopup(
+                  context: context,
+                  builder: (context) {
+                    return Material(
+                      color: Colors.transparent,
+                      child: Card(
+                        shape: RoundedRectangleBorder(
+                            side: BorderSide(),
+                            borderRadius: BorderRadius.circular(18)),
+                        child: SafeArea(
+                          top: false,
+                          child: Padding(
+                            padding: EdgeInsets.all(20),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: <Widget>[
+                                Text(
+                                  "选择操作",
+                                  style: TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.w500),
+                                ),
+                                SizedBox(
+                                  height: 12,
+                                ),
+                                Container(
+                                  width: double.infinity,
+                                  child: Wrap(
+                                    runSpacing: 20,
+                                    spacing: 20,
+                                    children: [
+                                      if (paths.length == 0) ...[
                                         Container(
                                           constraints:
                                               BoxConstraints(maxWidth: 112),
+                                          width: (MediaQuery.of(context)
+                                                      .size
+                                                      .width -
+                                                  100) /
+                                              4,
+                                          child: OutlinedButton(
+                                            onPressed: () async {
+                                              Navigator.of(context).pop();
+                                              List volumes = await getVolumes();
+                                              if (volumes.length > 0) {
+                                                Navigator.of(context)
+                                                    .push(CupertinoPageRoute(
+                                                        builder: (context) {
+                                                          return AddSharedFolders(
+                                                              volumes);
+                                                        },
+                                                        settings: RouteSettings(
+                                                            name:
+                                                                "add_shared_folders")))
+                                                    .then((res) {
+                                                  if (res != null && res) {
+                                                    refresh();
+                                                  }
+                                                });
+                                              } else {
+                                                Util.instance.toast("未获取到存储空间");
+                                              }
+                                            },
+                                            child: Column(
+                                              children: [
+                                                Image.asset(
+                                                  "assets/icons/new_folder.png",
+                                                  width: 30,
+                                                ),
+                                                Text(
+                                                  "共享文件夹",
+                                                  style:
+                                                      TextStyle(fontSize: 12),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                      if (paths.length > 0) ...[
+                                        Container(
+                                          constraints:
+                                              BoxConstraints(maxWidth: 112),
+                                          width: (MediaQuery.of(context)
+                                                      .size
+                                                      .width -
+                                                  100) /
+                                              4,
+                                          child: OutlinedButton(
+                                            onPressed: () async {
+                                              Navigator.of(context).pop();
+                                              String name = "";
+                                              showCupertinoDialog(
+                                                  context: context,
+                                                  builder: (context) {
+                                                    return Material(
+                                                      color: Colors.transparent,
+                                                      child: Column(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .center,
+                                                        children: [
+                                                          Card(
+                                                            shape: RoundedRectangleBorder(
+                                                                side:
+                                                                    BorderSide(),
+                                                                borderRadius:
+                                                                    BorderRadius
+                                                                        .circular(
+                                                                            5)),
+                                                            child: Padding(
+                                                              padding:
+                                                                  EdgeInsets
+                                                                      .all(20),
+                                                              child: Column(
+                                                                children: [
+                                                                  Text(
+                                                                    "新建文件夹",
+                                                                    style: TextStyle(
+                                                                        fontSize:
+                                                                            20,
+                                                                        fontWeight:
+                                                                            FontWeight.w500),
+                                                                  ),
+                                                                  SizedBox(
+                                                                    height: 16,
+                                                                  ),
+                                                                  Card(
+                                                                    shape: RoundedRectangleBorder(
+                                                                        side:
+                                                                            BorderSide(),
+                                                                        borderRadius:
+                                                                            BorderRadius.circular(5)),
+                                                                    child:
+                                                                        Padding(
+                                                                      padding: const EdgeInsets
+                                                                          .all(
+                                                                          8.0),
+                                                                      child:
+                                                                          TextField(
+                                                                        onChanged:
+                                                                            (v) =>
+                                                                                name = v,
+                                                                        decoration:
+                                                                            InputDecoration(
+                                                                          border:
+                                                                              InputBorder.none,
+                                                                          hintText:
+                                                                              "请输入文件夹名",
+                                                                          labelText:
+                                                                              "文件夹名",
+                                                                        ),
+                                                                      ),
+                                                                    ),
+                                                                  ),
+                                                                  SizedBox(
+                                                                    height: 20,
+                                                                  ),
+                                                                  Row(
+                                                                    children: [
+                                                                      Expanded(
+                                                                        child:
+                                                                            OutlinedButton(
+                                                                          onPressed:
+                                                                              () async {
+                                                                            if (name.trim() ==
+                                                                                "") {
+                                                                              Util.instance.toast("请输入文件夹名");
+                                                                              return;
+                                                                            }
+                                                                            Navigator.of(context).pop();
+                                                                            String
+                                                                                path =
+                                                                                "/" + paths.join("/");
+                                                                            var res =
+                                                                                await Api.createFolder(path, name);
+                                                                            if (res['success']) {
+                                                                              Util.instance.toast("文件夹创建成功");
+                                                                              refresh();
+                                                                            } else {
+                                                                              if (res['error']['errors'] != null && res['error']['errors'].length > 0 && res['error']['errors'][0]['code'] == 414) {
+                                                                                Util.instance.toast("文件夹创建失败：指定的名称已存在");
+                                                                              } else {
+                                                                                Util.instance.toast("文件夹创建失败");
+                                                                              }
+                                                                            }
+                                                                          },
+                                                                          child:
+                                                                              Text(
+                                                                            "确定",
+                                                                            style:
+                                                                                TextStyle(fontSize: 18),
+                                                                          ),
+                                                                        ),
+                                                                      ),
+                                                                      SizedBox(
+                                                                        width:
+                                                                            16,
+                                                                      ),
+                                                                      Expanded(
+                                                                        child:
+                                                                            OutlinedButton(
+                                                                          onPressed:
+                                                                              () async {
+                                                                            Navigator.of(context).pop();
+                                                                          },
+                                                                          child:
+                                                                              Text(
+                                                                            "取消",
+                                                                            style:
+                                                                                TextStyle(fontSize: 18),
+                                                                          ),
+                                                                        ),
+                                                                      ),
+                                                                    ],
+                                                                  )
+                                                                ],
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    );
+                                                  });
+                                            },
+                                            child: Column(
+                                              children: [
+                                                Image.asset(
+                                                  "assets/icons/new_folder.png",
+                                                  width: 30,
+                                                ),
+                                                Text(
+                                                  "新建文件夹",
+                                                  style:
+                                                      TextStyle(fontSize: 12),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                        SizedBox(
                                           width: (MediaQuery.of(context)
                                                       .size
                                                       .width -
@@ -3052,21 +3012,26 @@ class FilesState extends State<Files> {
                                               Navigator.of(context).pop();
                                               Navigator.of(context).push(
                                                   CupertinoPageRoute(
-                                                      builder: (content) {
-                                                        return ShareManager();
+                                                      builder: (context) {
+                                                        return Share(
+                                                          paths: [
+                                                            "/" +
+                                                                paths.join("/")
+                                                          ],
+                                                          fileRequest: true,
+                                                        );
                                                       },
                                                       settings: RouteSettings(
-                                                          name:
-                                                              "share_manager")));
+                                                          name: "share")));
                                             },
                                             child: Column(
                                               children: [
                                                 Image.asset(
-                                                  "assets/icons/link.png",
+                                                  "assets/icons/upload.png",
                                                   width: 30,
                                                 ),
                                                 Text(
-                                                  "共享链接管理",
+                                                  "创建文件请求",
                                                   style:
                                                       TextStyle(fontSize: 12),
                                                 ),
@@ -3074,120 +3039,150 @@ class FilesState extends State<Files> {
                                             ),
                                           ),
                                         ),
-                                        Container(
-                                          constraints:
-                                              BoxConstraints(maxWidth: 112),
-                                          width: (MediaQuery.of(context)
-                                                      .size
-                                                      .width -
-                                                  100) /
-                                              4,
-                                          child: OutlinedButton(
-                                            onPressed: () async {
-                                              Navigator.of(context).pop();
-                                              Navigator.of(context)
-                                                  .push(CupertinoPageRoute(
-                                                      builder: (content) {
-                                                        return RemoteFolder();
-                                                      },
-                                                      settings: RouteSettings(
-                                                          name:
-                                                              "remote_folder")))
-                                                  .then((res) {
-                                                refresh();
-                                                getSmbFolder();
-                                              });
-                                            },
-                                            child: Column(
-                                              children: [
-                                                Image.asset(
-                                                  "assets/icons/remote.png",
-                                                  width: 30,
-                                                ),
-                                                Text(
-                                                  "装载远程",
-                                                  style:
-                                                      TextStyle(fontSize: 12),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                        // if (paths.length > 0)
-                                        //   Container(
-                                        //     constraints: BoxConstraints(maxWidth: 112),
-                                        //     width: (MediaQuery.of(context).size.width - 100) / 4,
-                                        //     child: NeuButton(
-                                        //       onPressed: () async {
-                                        //         Navigator.of(context).pop();
-                                        //         Navigator.of(context)
-                                        //             .push(CupertinoPageRoute(
-                                        //                 builder: (content) {
-                                        //                   return Search("/" + paths.join("/"));
-                                        //                 },
-                                        //                 settings: RouteSettings(name: "search")))
-                                        //             .then((res) {
-                                        //           if (res != null) {
-                                        //             search(res['folders'], res['pattern'], res['search_content']);
-                                        //           }
-                                        //         });
-                                        //       },
-                                        //       decoration: NeumorphicDecoration(
-                                        //         color: Theme.of(context).scaffoldBackgroundColor,
-                                        //         borderRadius: BorderRadius.circular(10),
-                                        //       ),
-                                        //       bevel: 20,
-                                        //       padding: EdgeInsets.symmetric(vertical: 10),
-                                        //       child: Column(
-                                        //         children: [
-                                        //           Image.asset(
-                                        //             "assets/icons/search.png",
-                                        //             width: 30,
-                                        //           ),
-                                        //           Text(
-                                        //             "搜索",
-                                        //             style: TextStyle(fontSize: 12),
-                                        //           ),
-                                        //         ],
-                                        //       ),
-                                        //     ),
-                                        //   ),
                                       ],
-                                    ),
+                                      Container(
+                                        constraints:
+                                            BoxConstraints(maxWidth: 112),
+                                        width:
+                                            (MediaQuery.of(context).size.width -
+                                                    100) /
+                                                4,
+                                        child: OutlinedButton(
+                                          onPressed: () async {
+                                            Navigator.of(context).pop();
+                                            Navigator.of(context).push(
+                                                CupertinoPageRoute(
+                                                    builder: (content) {
+                                                      return ShareManager();
+                                                    },
+                                                    settings: RouteSettings(
+                                                        name:
+                                                            "share_manager")));
+                                          },
+                                          child: Column(
+                                            children: [
+                                              Image.asset(
+                                                "assets/icons/link.png",
+                                                width: 30,
+                                              ),
+                                              Text(
+                                                "共享链接管理",
+                                                style: TextStyle(fontSize: 12),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                      Container(
+                                        constraints:
+                                            BoxConstraints(maxWidth: 112),
+                                        width:
+                                            (MediaQuery.of(context).size.width -
+                                                    100) /
+                                                4,
+                                        child: OutlinedButton(
+                                          onPressed: () async {
+                                            Navigator.of(context).pop();
+                                            Navigator.of(context)
+                                                .push(CupertinoPageRoute(
+                                                    builder: (content) {
+                                                      return RemoteFolder();
+                                                    },
+                                                    settings: RouteSettings(
+                                                        name: "remote_folder")))
+                                                .then((res) {
+                                              refresh();
+                                              getSmbFolder();
+                                            });
+                                          },
+                                          child: Column(
+                                            children: [
+                                              Image.asset(
+                                                "assets/icons/remote.png",
+                                                width: 30,
+                                              ),
+                                              Text(
+                                                "装载远程",
+                                                style: TextStyle(fontSize: 12),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                      // if (paths.length > 0)
+                                      //   Container(
+                                      //     constraints: BoxConstraints(maxWidth: 112),
+                                      //     width: (MediaQuery.of(context).size.width - 100) / 4,
+                                      //     child: NeuButton(
+                                      //       onPressed: () async {
+                                      //         Navigator.of(context).pop();
+                                      //         Navigator.of(context)
+                                      //             .push(CupertinoPageRoute(
+                                      //                 builder: (content) {
+                                      //                   return Search("/" + paths.join("/"));
+                                      //                 },
+                                      //                 settings: RouteSettings(name: "search")))
+                                      //             .then((res) {
+                                      //           if (res != null) {
+                                      //             search(res['folders'], res['pattern'], res['search_content']);
+                                      //           }
+                                      //         });
+                                      //       },
+                                      //       decoration: NeumorphicDecoration(
+                                      //         color: Theme.of(context).scaffoldBackgroundColor,
+                                      //         borderRadius: BorderRadius.circular(10),
+                                      //       ),
+                                      //       bevel: 20,
+                                      //       padding: EdgeInsets.symmetric(vertical: 10),
+                                      //       child: Column(
+                                      //         children: [
+                                      //           Image.asset(
+                                      //             "assets/icons/search.png",
+                                      //             width: 30,
+                                      //           ),
+                                      //           Text(
+                                      //             "搜索",
+                                      //             style: TextStyle(fontSize: 12),
+                                      //           ),
+                                      //         ],
+                                      //       ),
+                                      //     ),
+                                      //   ),
+                                    ],
                                   ),
-                                  SizedBox(
-                                    height: 20,
+                                ),
+                                SizedBox(
+                                  height: 20,
+                                ),
+                                OutlinedButton(
+                                  onPressed: () async {
+                                    Navigator.of(context).pop();
+                                  },
+                                  child: Text(
+                                    "取消",
+                                    style: TextStyle(fontSize: 18),
                                   ),
-                                  OutlinedButton(
-                                    onPressed: () async {
-                                      Navigator.of(context).pop();
-                                    },
-                                    child: Text(
-                                      "取消",
-                                      style: TextStyle(fontSize: 18),
-                                    ),
-                                  ),
-                                  SizedBox(
-                                    height: 8,
-                                  ),
-                                ],
-                              ),
+                                ),
+                                SizedBox(
+                                  height: 8,
+                                ),
+                              ],
                             ),
                           ),
                         ),
-                      );
-                    },
-                  );
-                },
-                child: Image.asset(
-                  "assets/icons/actions.png",
-                  width: 20,
-                  height: 20,
-                ),
+                      ),
+                    );
+                  },
+                );
+              },
+              child: Image.asset(
+                "assets/icons/actions.png",
+                width: 20,
+                height: 20,
               ),
-            )
-          ],
-        ),
+            ),
+          )
+        ],
       ),
     );
   }
@@ -3216,7 +3211,7 @@ class FilesState extends State<Files> {
                     child: Card(
                       shape: RoundedRectangleBorder(
                           side: BorderSide(),
-                          borderRadius: BorderRadius.circular(366)),
+                          borderRadius: BorderRadius.circular(18)),
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: Text(
@@ -3242,7 +3237,7 @@ class FilesState extends State<Files> {
                       child: Card(
                         shape: RoundedRectangleBorder(
                             side: BorderSide(),
-                            borderRadius: BorderRadius.circular(366)),
+                            borderRadius: BorderRadius.circular(18)),
                         child: Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: searching
@@ -3372,7 +3367,7 @@ class FilesState extends State<Files> {
                         child: Card(
                           shape: RoundedRectangleBorder(
                               side: BorderSide(),
-                              borderRadius: BorderRadius.circular(366)),
+                              borderRadius: BorderRadius.circular(18)),
                           margin: EdgeInsets.all(20),
                           child: Padding(
                             padding: const EdgeInsets.all(8.0),

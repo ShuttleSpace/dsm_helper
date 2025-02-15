@@ -183,7 +183,7 @@ class _VipState extends State<Vip> {
               Card(
                 shape: RoundedRectangleBorder(
                     side: BorderSide(),
-                    borderRadius: BorderRadius.circular(36)),
+                    borderRadius: BorderRadius.circular(18)),
                 margin: EdgeInsets.symmetric(horizontal: 50),
                 child: Padding(
                   padding: EdgeInsets.all(20),
@@ -200,7 +200,7 @@ class _VipState extends State<Vip> {
                       Card(
                         shape: RoundedRectangleBorder(
                             side: BorderSide(),
-                            borderRadius: BorderRadius.circular(36)),
+                            borderRadius: BorderRadius.circular(18)),
                         child: Text("通过观看视频广告，可关闭3天开屏广告"),
                       ),
                       SizedBox(
@@ -260,7 +260,7 @@ class _VipState extends State<Vip> {
                 Card(
                   shape: RoundedRectangleBorder(
                       side: BorderSide(),
-                      borderRadius: BorderRadius.circular(36)),
+                      borderRadius: BorderRadius.circular(18)),
                   margin: EdgeInsets.symmetric(horizontal: 50),
                   child: Padding(
                     padding: EdgeInsets.all(20),
@@ -285,7 +285,7 @@ class _VipState extends State<Vip> {
                         Card(
                           shape: RoundedRectangleBorder(
                               side: BorderSide(),
-                              borderRadius: BorderRadius.circular(36)),
+                              borderRadius: BorderRadius.circular(18)),
                           child: Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: TextField(
@@ -377,7 +377,7 @@ class _VipState extends State<Vip> {
               Card(
                 shape: RoundedRectangleBorder(
                     side: BorderSide(),
-                    borderRadius: BorderRadius.circular(36)),
+                    borderRadius: BorderRadius.circular(18)),
                 margin: EdgeInsets.symmetric(horizontal: 50),
                 child: Padding(
                   padding: EdgeInsets.all(20),
@@ -563,7 +563,7 @@ class _VipState extends State<Vip> {
             ),
           Card(
             shape: RoundedRectangleBorder(
-                side: BorderSide(), borderRadius: BorderRadius.circular(36)),
+                side: BorderSide(), borderRadius: BorderRadius.circular(18)),
             child: Padding(
               padding: EdgeInsets.all(20.0),
               child: Row(
@@ -656,7 +656,7 @@ class NoAdButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       shape: RoundedRectangleBorder(
-          side: BorderSide(), borderRadius: BorderRadius.circular(36)),
+          side: BorderSide(), borderRadius: BorderRadius.circular(18)),
       margin: EdgeInsets.only(top: 20),
       child: Padding(
         padding: EdgeInsets.all(20.0),

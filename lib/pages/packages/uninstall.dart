@@ -46,7 +46,7 @@ class _UninstallPackageState extends State<UninstallPackage> {
       },
       child: Card(
         shape: RoundedRectangleBorder(
-            side: BorderSide(), borderRadius: BorderRadius.circular(36)),
+            side: BorderSide(), borderRadius: BorderRadius.circular(18)),
         child: Padding(
           padding: EdgeInsets.all(20),
           child: Row(
@@ -57,7 +57,7 @@ class _UninstallPackageState extends State<UninstallPackage> {
               Card(
                 shape: RoundedRectangleBorder(
                     side: BorderSide(),
-                    borderRadius: BorderRadius.circular(36)),
+                    borderRadius: BorderRadius.circular(18)),
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: SizedBox(
@@ -83,7 +83,7 @@ class _UninstallPackageState extends State<UninstallPackage> {
     List subItems = item['subitems'];
     return Card(
       shape: RoundedRectangleBorder(
-          side: BorderSide(), borderRadius: BorderRadius.circular(36)),
+          side: BorderSide(), borderRadius: BorderRadius.circular(18)),
       child: Padding(
         padding: EdgeInsets.all(20),
         child: Column(

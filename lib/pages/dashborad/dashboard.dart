@@ -125,7 +125,7 @@ class DashboardState extends State<Dashboard> {
                 Card(
                   shape: RoundedRectangleBorder(
                       side: BorderSide(),
-                      borderRadius: BorderRadius.circular(366)),
+                      borderRadius: BorderRadius.circular(18)),
                   margin: EdgeInsets.symmetric(horizontal: 50),
                   child: Padding(
                     padding: EdgeInsets.all(20),
@@ -142,7 +142,7 @@ class DashboardState extends State<Dashboard> {
                         Card(
                           shape: RoundedRectangleBorder(
                               side: BorderSide(),
-                              borderRadius: BorderRadius.circular(366)),
+                              borderRadius: BorderRadius.circular(18)),
                           child: Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: Text("前往'设置-关闭广告'页面，即可关闭开屏广告。"),
@@ -154,7 +154,7 @@ class DashboardState extends State<Dashboard> {
                         Card(
                           shape: RoundedRectangleBorder(
                               side: BorderSide(),
-                              borderRadius: BorderRadius.circular(366)),
+                              borderRadius: BorderRadius.circular(18)),
                           child: Padding(
                               padding: EdgeInsets.all(15),
                               child: Column(
@@ -198,7 +198,7 @@ class DashboardState extends State<Dashboard> {
                         Card(
                           shape: RoundedRectangleBorder(
                               side: BorderSide(),
-                              borderRadius: BorderRadius.circular(366)),
+                              borderRadius: BorderRadius.circular(18)),
                           child: Padding(
                               padding: EdgeInsets.all(15),
                               child: Column(
@@ -466,7 +466,7 @@ class DashboardState extends State<Dashboard> {
         },
         child: Card(
           shape: RoundedRectangleBorder(
-              side: BorderSide(), borderRadius: BorderRadius.circular(366)),
+              side: BorderSide(), borderRadius: BorderRadius.circular(18)),
           margin: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
           child: Padding(
             padding: const EdgeInsets.all(8.0),
@@ -606,7 +606,7 @@ class DashboardState extends State<Dashboard> {
         connectedUsers.length > 0) {
       return Card(
         shape: RoundedRectangleBorder(
-            side: BorderSide(), borderRadius: BorderRadius.circular(366)),
+            side: BorderSide(), borderRadius: BorderRadius.circular(18)),
         margin: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
         child: Padding(
           padding: const EdgeInsets.all(8.0),
@@ -652,7 +652,7 @@ class DashboardState extends State<Dashboard> {
         },
         child: Card(
           shape: RoundedRectangleBorder(
-              side: BorderSide(), borderRadius: BorderRadius.circular(366)),
+              side: BorderSide(), borderRadius: BorderRadius.circular(18)),
           margin: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
           child: Padding(
             padding: const EdgeInsets.all(8.0),
@@ -701,7 +701,7 @@ class DashboardState extends State<Dashboard> {
         },
         child: Card(
           shape: RoundedRectangleBorder(
-              side: BorderSide(), borderRadius: BorderRadius.circular(366)),
+              side: BorderSide(), borderRadius: BorderRadius.circular(18)),
           margin: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
           child: Padding(
             padding: const EdgeInsets.all(8.0),
@@ -769,7 +769,7 @@ class DashboardState extends State<Dashboard> {
         },
         child: Card(
           shape: RoundedRectangleBorder(
-              side: BorderSide(), borderRadius: BorderRadius.circular(366)),
+              side: BorderSide(), borderRadius: BorderRadius.circular(18)),
           margin: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
           child: Padding(
             padding: const EdgeInsets.all(8.0),
@@ -939,7 +939,7 @@ class DashboardState extends State<Dashboard> {
                         child: Card(
                           shape: RoundedRectangleBorder(
                               side: BorderSide(),
-                              borderRadius: BorderRadius.circular(366)),
+                              borderRadius: BorderRadius.circular(18)),
                           child: Padding(
                             padding: EdgeInsets.all(10),
                             child: LineChart(
@@ -1076,7 +1076,7 @@ class DashboardState extends State<Dashboard> {
             },
             child: Card(
               shape: RoundedRectangleBorder(
-                  side: BorderSide(), borderRadius: BorderRadius.circular(366)),
+                  side: BorderSide(), borderRadius: BorderRadius.circular(18)),
               margin: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
@@ -1117,7 +1117,7 @@ class DashboardState extends State<Dashboard> {
           if (ssdCaches.length > 0)
             Card(
               shape: RoundedRectangleBorder(
-                  side: BorderSide(), borderRadius: BorderRadius.circular(366)),
+                  side: BorderSide(), borderRadius: BorderRadius.circular(18)),
               margin: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
@@ -1159,7 +1159,7 @@ class DashboardState extends State<Dashboard> {
     } else if (widget == "SYNO.SDS.SystemInfoApp.FileChangeLogWidget") {
       return Card(
         shape: RoundedRectangleBorder(
-            side: BorderSide(), borderRadius: BorderRadius.circular(366)),
+            side: BorderSide(), borderRadius: BorderRadius.circular(18)),
         margin: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
         child: Padding(
           padding: const EdgeInsets.all(8.0),
@@ -1231,7 +1231,7 @@ class DashboardState extends State<Dashboard> {
         Util.instance.timeLong(currentTime.difference(loginTime).inSeconds);
     return Card(
       shape: RoundedRectangleBorder(
-          side: BorderSide(), borderRadius: BorderRadius.circular(366)),
+          side: BorderSide(), borderRadius: BorderRadius.circular(18)),
       margin: EdgeInsets.only(top: 20, left: 20, right: 20),
       child: Padding(
         padding: EdgeInsets.all(10),
@@ -1272,7 +1272,7 @@ class DashboardState extends State<Dashboard> {
                       child: Card(
                         shape: RoundedRectangleBorder(
                             side: BorderSide(),
-                            borderRadius: BorderRadius.circular(366)),
+                            borderRadius: BorderRadius.circular(18)),
                         child: SafeArea(
                           top: false,
                           child: Padding(
@@ -1379,7 +1379,7 @@ class DashboardState extends State<Dashboard> {
     task['running'] = task['running'] ?? false;
     return Card(
       shape: RoundedRectangleBorder(
-          side: BorderSide(), borderRadius: BorderRadius.circular(366)),
+          side: BorderSide(), borderRadius: BorderRadius.circular(18)),
       margin: EdgeInsets.only(top: 20, left: 20, right: 20),
       child: Padding(
         padding: EdgeInsets.all(10),
@@ -1442,7 +1442,7 @@ class DashboardState extends State<Dashboard> {
   Widget _buildLogItem(log) {
     return Card(
       shape: RoundedRectangleBorder(
-          side: BorderSide(), borderRadius: BorderRadius.circular(366)),
+          side: BorderSide(), borderRadius: BorderRadius.circular(18)),
       clipBehavior: Clip.hardEdge,
       margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
       child: Padding(
@@ -1459,7 +1459,7 @@ class DashboardState extends State<Dashboard> {
   Widget _buildFileLogItem(log) {
     return Card(
       shape: RoundedRectangleBorder(
-          side: BorderSide(), borderRadius: BorderRadius.circular(366)),
+          side: BorderSide(), borderRadius: BorderRadius.circular(18)),
       margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
       child: Padding(
         padding: const EdgeInsets.all(8.0),
@@ -1496,7 +1496,7 @@ class DashboardState extends State<Dashboard> {
         int.parse(volume['size']['used']) / int.parse(volume['size']['total']);
     return Card(
       shape: RoundedRectangleBorder(
-          side: BorderSide(), borderRadius: BorderRadius.circular(366)),
+          side: BorderSide(), borderRadius: BorderRadius.circular(5)),
       margin: EdgeInsets.only(top: 20, left: 20, right: 20),
       child: Padding(
         padding: const EdgeInsets.all(8.0),
@@ -1599,7 +1599,7 @@ class DashboardState extends State<Dashboard> {
             int.parse(volume['size']['total']);
     return Card(
       shape: RoundedRectangleBorder(
-          side: BorderSide(), borderRadius: BorderRadius.circular(366)),
+          side: BorderSide(), borderRadius: BorderRadius.circular(18)),
       margin: EdgeInsets.only(top: 20, left: 20, right: 20),
       child: Padding(
         padding: const EdgeInsets.all(8.0),
@@ -1699,7 +1699,7 @@ class DashboardState extends State<Dashboard> {
   Widget _buildESataItem(esata) {
     return Card(
       shape: RoundedRectangleBorder(
-          side: BorderSide(), borderRadius: BorderRadius.circular(366)),
+          side: BorderSide(), borderRadius: BorderRadius.circular(18)),
       margin: EdgeInsets.only(bottom: 20),
       child: Padding(
         padding: EdgeInsets.all(20),
@@ -1795,7 +1795,7 @@ class DashboardState extends State<Dashboard> {
                               child: Card(
                                 shape: RoundedRectangleBorder(
                                     side: BorderSide(),
-                                    borderRadius: BorderRadius.circular(366)),
+                                    borderRadius: BorderRadius.circular(18)),
                                 child: SafeArea(
                                   top: false,
                                   child: Padding(
@@ -1947,7 +1947,7 @@ class DashboardState extends State<Dashboard> {
                           Container(
                             decoration: BoxDecoration(
                               color: Colors.red,
-                              borderRadius: BorderRadius.circular(366),
+                              borderRadius: BorderRadius.circular(18),
                             ),
                             width: 5,
                             height: 5,

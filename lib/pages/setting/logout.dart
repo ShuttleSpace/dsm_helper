@@ -36,7 +36,7 @@ class _LogoutState extends State<Logout> {
                 Container(
                   decoration: BoxDecoration(
                     color: Theme.of(context).scaffoldBackgroundColor,
-                    borderRadius: BorderRadius.circular(36),
+                    borderRadius: BorderRadius.circular(18),
                     border: Border.all(
                         color: read ? Color(0xffff9813) : Colors.grey),
                   ),

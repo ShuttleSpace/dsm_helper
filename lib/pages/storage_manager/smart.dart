@@ -114,7 +114,7 @@ class _SmartState extends State<Smart> with SingleTickerProviderStateMixin {
   Widget _buildSmartItem(smart) {
     return Card(
       shape: RoundedRectangleBorder(
-          side: BorderSide(), borderRadius: BorderRadius.circular(36)),
+          side: BorderSide(), borderRadius: BorderRadius.circular(18)),
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Column(
@@ -205,7 +205,7 @@ class _SmartState extends State<Smart> with SingleTickerProviderStateMixin {
   Widget _buildLogItem(log) {
     return Card(
       shape: RoundedRectangleBorder(
-          side: BorderSide(), borderRadius: BorderRadius.circular(36)),
+          side: BorderSide(), borderRadius: BorderRadius.circular(18)),
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Column(
@@ -253,7 +253,7 @@ class _SmartState extends State<Smart> with SingleTickerProviderStateMixin {
                 Card(
                   shape: RoundedRectangleBorder(
                       side: BorderSide(),
-                      borderRadius: BorderRadius.circular(36)),
+                      borderRadius: BorderRadius.circular(18)),
                   margin: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
                   child: TabBar(
                     dividerHeight: 0,
@@ -302,7 +302,7 @@ class _SmartState extends State<Smart> with SingleTickerProviderStateMixin {
                           Card(
                             shape: RoundedRectangleBorder(
                                 side: BorderSide(),
-                                borderRadius: BorderRadius.circular(36)),
+                                borderRadius: BorderRadius.circular(18)),
                             margin: EdgeInsets.symmetric(
                                 horizontal: 20, vertical: 15),
                             child: Padding(
@@ -357,7 +357,7 @@ class _SmartState extends State<Smart> with SingleTickerProviderStateMixin {
                           Card(
                             shape: RoundedRectangleBorder(
                                 side: BorderSide(),
-                                borderRadius: BorderRadius.circular(36)),
+                                borderRadius: BorderRadius.circular(18)),
                             margin: EdgeInsets.symmetric(
                                 horizontal: 20, vertical: 15),
                             child: Padding(
@@ -478,7 +478,7 @@ class _SmartState extends State<Smart> with SingleTickerProviderStateMixin {
                           Card(
                             shape: RoundedRectangleBorder(
                                 side: BorderSide(),
-                                borderRadius: BorderRadius.circular(36)),
+                                borderRadius: BorderRadius.circular(18)),
                             child: Padding(
                               padding: EdgeInsets.all(20),
                               child: Column(
@@ -566,7 +566,7 @@ class _SmartState extends State<Smart> with SingleTickerProviderStateMixin {
                           Card(
                             shape: RoundedRectangleBorder(
                                 side: BorderSide(),
-                                borderRadius: BorderRadius.circular(36)),
+                                borderRadius: BorderRadius.circular(18)),
                             child: Padding(
                               padding: EdgeInsets.all(20),
                               child: Column(

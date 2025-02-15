@@ -18,7 +18,7 @@ class ThumbnailCard extends StatelessWidget {
         height: width,
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(36),
+          borderRadius: BorderRadius.circular(18),
         ),
         child: thumbnails.length == 0
             ? Container(

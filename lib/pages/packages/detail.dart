@@ -92,7 +92,7 @@ class _PackageDetailState extends State<PackageDetail> {
           color: Colors.transparent,
           child: Card(
             shape: RoundedRectangleBorder(
-                side: BorderSide(), borderRadius: BorderRadius.circular(36)),
+                side: BorderSide(), borderRadius: BorderRadius.circular(18)),
             child: SafeArea(
               top: false,
               child: Padding(
@@ -181,7 +181,7 @@ class _PackageDetailState extends State<PackageDetail> {
               child: Card(
                 shape: RoundedRectangleBorder(
                     side: BorderSide(),
-                    borderRadius: BorderRadius.circular(36)),
+                    borderRadius: BorderRadius.circular(18)),
                 child: SafeArea(
                   top: false,
                   child: Padding(
@@ -333,7 +333,7 @@ class _PackageDetailState extends State<PackageDetail> {
                 Card(
                   shape: RoundedRectangleBorder(
                       side: BorderSide(),
-                      borderRadius: BorderRadius.circular(36)),
+                      borderRadius: BorderRadius.circular(18)),
                   child: Padding(
                     padding: EdgeInsets.all(20),
                     child: Row(
@@ -369,7 +369,7 @@ class _PackageDetailState extends State<PackageDetail> {
                   Card(
                     shape: RoundedRectangleBorder(
                         side: BorderSide(),
-                        borderRadius: BorderRadius.circular(36)),
+                        borderRadius: BorderRadius.circular(18)),
                     margin: EdgeInsets.only(top: 20),
                     child: Padding(
                       padding: EdgeInsets.all(10),
@@ -401,7 +401,7 @@ class _PackageDetailState extends State<PackageDetail> {
                 Card(
                   shape: RoundedRectangleBorder(
                       side: BorderSide(),
-                      borderRadius: BorderRadius.circular(36)),
+                      borderRadius: BorderRadius.circular(18)),
                   margin: EdgeInsets.only(top: 20),
                   child: Padding(
                     padding: EdgeInsets.all(20),
@@ -425,7 +425,7 @@ class _PackageDetailState extends State<PackageDetail> {
                   Card(
                     shape: RoundedRectangleBorder(
                         side: BorderSide(),
-                        borderRadius: BorderRadius.circular(36)),
+                        borderRadius: BorderRadius.circular(18)),
                     margin: EdgeInsets.only(top: 20),
                     child: Padding(
                       padding: EdgeInsets.all(20),
@@ -465,7 +465,7 @@ class _PackageDetailState extends State<PackageDetail> {
                 Card(
                   shape: RoundedRectangleBorder(
                       side: BorderSide(),
-                      borderRadius: BorderRadius.circular(36)),
+                      borderRadius: BorderRadius.circular(18)),
                   margin: EdgeInsets.only(top: 20),
                   child: Padding(
                     padding: EdgeInsets.all(20),
@@ -487,7 +487,7 @@ class _PackageDetailState extends State<PackageDetail> {
                             Card(
                               shape: RoundedRectangleBorder(
                                   side: BorderSide(),
-                                  borderRadius: BorderRadius.circular(36)),
+                                  borderRadius: BorderRadius.circular(18)),
                               child: Padding(
                                 padding: const EdgeInsets.all(8.0),
                                 child: Column(
@@ -528,7 +528,7 @@ class _PackageDetailState extends State<PackageDetail> {
                               Card(
                                 shape: RoundedRectangleBorder(
                                     side: BorderSide(),
-                                    borderRadius: BorderRadius.circular(36)),
+                                    borderRadius: BorderRadius.circular(18)),
                                 child: Padding(
                                   padding: const EdgeInsets.all(8.0),
                                   child: Column(
@@ -571,7 +571,7 @@ class _PackageDetailState extends State<PackageDetail> {
                             Card(
                               shape: RoundedRectangleBorder(
                                   side: BorderSide(),
-                                  borderRadius: BorderRadius.circular(36)),
+                                  borderRadius: BorderRadius.circular(18)),
                               child: Padding(
                                 padding: const EdgeInsets.all(8.0),
                                 child: Column(
@@ -590,7 +590,7 @@ class _PackageDetailState extends State<PackageDetail> {
                               Card(
                                 shape: RoundedRectangleBorder(
                                     side: BorderSide(),
-                                    borderRadius: BorderRadius.circular(36)),
+                                    borderRadius: BorderRadius.circular(18)),
                                 child: Padding(
                                   padding: const EdgeInsets.all(8.0),
                                   child: Column(
@@ -611,7 +611,7 @@ class _PackageDetailState extends State<PackageDetail> {
                               Card(
                                 shape: RoundedRectangleBorder(
                                     side: BorderSide(),
-                                    borderRadius: BorderRadius.circular(36)),
+                                    borderRadius: BorderRadius.circular(18)),
                                 child: Padding(
                                   padding: const EdgeInsets.all(8.0),
                                   child: Column(
@@ -631,7 +631,7 @@ class _PackageDetailState extends State<PackageDetail> {
                             Card(
                               shape: RoundedRectangleBorder(
                                   side: BorderSide(),
-                                  borderRadius: BorderRadius.circular(36)),
+                                  borderRadius: BorderRadius.circular(18)),
                               child: Padding(
                                 padding: const EdgeInsets.all(8.0),
                                 child: Column(
@@ -683,7 +683,7 @@ class _PackageDetailState extends State<PackageDetail> {
                                     shape: RoundedRectangleBorder(
                                         side: BorderSide(),
                                         borderRadius:
-                                            BorderRadius.circular(36)),
+                                            BorderRadius.circular(18)),
                                     child: SafeArea(
                                       top: false,
                                       child: Padding(

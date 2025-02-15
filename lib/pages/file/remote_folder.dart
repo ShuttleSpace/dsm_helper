@@ -36,7 +36,7 @@ class _RemoteFolderState extends State<RemoteFolder>
         children: [
           Card(
             shape: RoundedRectangleBorder(
-                side: BorderSide(), borderRadius: BorderRadius.circular(366)),
+                side: BorderSide(), borderRadius: BorderRadius.circular(18)),
             margin: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
             child: TabBar(
               dividerHeight: 0,
@@ -73,7 +73,7 @@ class _RemoteFolderState extends State<RemoteFolder>
                     Card(
                       shape: RoundedRectangleBorder(
                           side: BorderSide(),
-                          borderRadius: BorderRadius.circular(366)),
+                          borderRadius: BorderRadius.circular(18)),
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: TextField(
@@ -91,7 +91,7 @@ class _RemoteFolderState extends State<RemoteFolder>
                     Card(
                       shape: RoundedRectangleBorder(
                           side: BorderSide(),
-                          borderRadius: BorderRadius.circular(366)),
+                          borderRadius: BorderRadius.circular(18)),
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: TextField(
@@ -109,7 +109,7 @@ class _RemoteFolderState extends State<RemoteFolder>
                     Card(
                       shape: RoundedRectangleBorder(
                           side: BorderSide(),
-                          borderRadius: BorderRadius.circular(366)),
+                          borderRadius: BorderRadius.circular(18)),
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: TextField(
@@ -181,7 +181,7 @@ class _RemoteFolderState extends State<RemoteFolder>
                       child: Card(
                         shape: RoundedRectangleBorder(
                             side: BorderSide(),
-                            borderRadius: BorderRadius.circular(366)),
+                            borderRadius: BorderRadius.circular(18)),
                         child: Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: Row(

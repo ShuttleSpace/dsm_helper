@@ -74,6 +74,7 @@ class FolderState extends State<Folder> {
 
   @override
   Widget build(BuildContext context) {
+    folderWidth = MediaQuery.of(context).size.width / 4;
     return Stack(
       children: [
         if (folders.length > 0)

@@ -45,7 +45,7 @@ class ShortcutList extends StatelessWidget {
   Widget build(BuildContext ctx) {
     return Card(
       shape: RoundedRectangleBorder(
-          side: BorderSide(), borderRadius: BorderRadius.circular(366)),
+          side: BorderSide(), borderRadius: BorderRadius.circular(18)),
       margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
       child: Container(
         height: 140,
@@ -208,7 +208,7 @@ class ShortcutList extends StatelessWidget {
           },
           child: Card(
             shape: RoundedRectangleBorder(
-                side: BorderSide(), borderRadius: BorderRadius.circular(366)),
+                side: BorderSide(), borderRadius: BorderRadius.circular(18)),
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 8.0),
               child: Stack(

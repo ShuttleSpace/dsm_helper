@@ -70,7 +70,7 @@ class _MediaIndexState extends State<MediaIndex> {
         children: [
           Card(
             shape: RoundedRectangleBorder(
-                side: BorderSide(), borderRadius: BorderRadius.circular(36)),
+                side: BorderSide(), borderRadius: BorderRadius.circular(18)),
             margin: EdgeInsets.only(top: 20, left: 20, right: 20),
             child: Padding(
               padding: const EdgeInsets.all(20.0),
@@ -146,7 +146,7 @@ class _MediaIndexState extends State<MediaIndex> {
           ),
           Card(
             shape: RoundedRectangleBorder(
-                side: BorderSide(), borderRadius: BorderRadius.circular(36)),
+                side: BorderSide(), borderRadius: BorderRadius.circular(18)),
             margin: EdgeInsets.only(top: 20, left: 20, right: 20),
             child: Padding(
               padding: const EdgeInsets.all(20.0),
@@ -188,7 +188,7 @@ class _MediaIndexState extends State<MediaIndex> {
                               child: Card(
                                 shape: RoundedRectangleBorder(
                                     side: BorderSide(),
-                                    borderRadius: BorderRadius.circular(36)),
+                                    borderRadius: BorderRadius.circular(18)),
                                 child: Padding(
                                   padding: const EdgeInsets.all(8.0),
                                   child: Row(
@@ -222,7 +222,7 @@ class _MediaIndexState extends State<MediaIndex> {
                               child: Card(
                                 shape: RoundedRectangleBorder(
                                     side: BorderSide(),
-                                    borderRadius: BorderRadius.circular(36)),
+                                    borderRadius: BorderRadius.circular(18)),
                                 child: Padding(
                                   padding: const EdgeInsets.all(8.0),
                                   child: Row(
@@ -250,7 +250,7 @@ class _MediaIndexState extends State<MediaIndex> {
           ),
           Card(
             shape: RoundedRectangleBorder(
-                side: BorderSide(), borderRadius: BorderRadius.circular(36)),
+                side: BorderSide(), borderRadius: BorderRadius.circular(18)),
             margin: EdgeInsets.only(top: 20, left: 20, right: 20),
             child: Padding(
               padding: const EdgeInsets.all(20.0),
@@ -288,7 +288,7 @@ class _MediaIndexState extends State<MediaIndex> {
                         child: Card(
                           shape: RoundedRectangleBorder(
                               side: BorderSide(),
-                              borderRadius: BorderRadius.circular(36)),
+                              borderRadius: BorderRadius.circular(18)),
                           child: Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: Row(

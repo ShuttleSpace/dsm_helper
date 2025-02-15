@@ -27,7 +27,7 @@ class _NeuPickerState extends State<NeuPicker> {
     return Material(
       child: Card(
         shape: RoundedRectangleBorder(
-            side: BorderSide(), borderRadius: BorderRadius.circular(36)),
+            side: BorderSide(), borderRadius: BorderRadius.circular(18)),
         child: Column(
           children: [
             Padding(

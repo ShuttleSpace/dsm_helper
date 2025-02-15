@@ -127,7 +127,7 @@ class _WidgetSettingState extends State<WidgetSetting> {
               child: Card(
                 shape: RoundedRectangleBorder(
                     side: BorderSide(),
-                    borderRadius: BorderRadius.circular(366)),
+                    borderRadius: BorderRadius.circular(18)),
                 child: Padding(
                   padding: EdgeInsets.all(20),
                   child: Column(
@@ -174,7 +174,7 @@ class _WidgetSettingState extends State<WidgetSetting> {
               child: Card(
                 shape: RoundedRectangleBorder(
                     side: BorderSide(),
-                    borderRadius: BorderRadius.circular(366)),
+                    borderRadius: BorderRadius.circular(18)),
                 child: Padding(
                   padding: EdgeInsets.all(20),
                   child: Column(
@@ -227,7 +227,7 @@ class _WidgetSettingState extends State<WidgetSetting> {
                   child: Card(
                     shape: RoundedRectangleBorder(
                         side: BorderSide(),
-                        borderRadius: BorderRadius.circular(366)),
+                        borderRadius: BorderRadius.circular(18)),
                     margin: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
                     child: Padding(
                       padding: EdgeInsets.all(20),
@@ -242,7 +242,7 @@ class _WidgetSettingState extends State<WidgetSetting> {
                           Card(
                             shape: RoundedRectangleBorder(
                                 side: BorderSide(),
-                                borderRadius: BorderRadius.circular(366)),
+                                borderRadius: BorderRadius.circular(18)),
                             child: SizedBox(
                               width: 20,
                               height: 20,

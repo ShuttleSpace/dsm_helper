@@ -79,7 +79,7 @@ class _UpdateState extends State<Update> {
                   child: Card(
                     shape: RoundedRectangleBorder(
                         side: BorderSide(),
-                        borderRadius: BorderRadius.circular(36)),
+                        borderRadius: BorderRadius.circular(18)),
                     child: CircleAvatar(
                       backgroundImage: AssetImage(
                         "assets/logo.png",
@@ -105,7 +105,7 @@ class _UpdateState extends State<Update> {
                 Card(
                   shape: RoundedRectangleBorder(
                       side: BorderSide(),
-                      borderRadius: BorderRadius.circular(36)),
+                      borderRadius: BorderRadius.circular(18)),
                   margin: EdgeInsets.symmetric(horizontal: 20),
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
@@ -167,7 +167,7 @@ class _UpdateState extends State<Update> {
               child: Card(
                 shape: RoundedRectangleBorder(
                     side: BorderSide(),
-                    borderRadius: BorderRadius.circular(36)),
+                    borderRadius: BorderRadius.circular(18)),
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: ClipRRect(

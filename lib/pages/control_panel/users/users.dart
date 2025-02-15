@@ -48,7 +48,7 @@ class _UsersState extends State<Users> with SingleTickerProviderStateMixin {
   Widget _buildGroupItem(group) {
     return Card(
       shape: RoundedRectangleBorder(
-          side: BorderSide(), borderRadius: BorderRadius.circular(36)),
+          side: BorderSide(), borderRadius: BorderRadius.circular(18)),
       margin: EdgeInsets.symmetric(vertical: 10),
       child: Padding(
         padding: EdgeInsets.all(20),
@@ -94,7 +94,7 @@ class _UsersState extends State<Users> with SingleTickerProviderStateMixin {
       },
       child: Card(
         shape: RoundedRectangleBorder(
-            side: BorderSide(), borderRadius: BorderRadius.circular(36)),
+            side: BorderSide(), borderRadius: BorderRadius.circular(18)),
         margin: EdgeInsets.symmetric(vertical: 10),
         child: Padding(
           padding: EdgeInsets.all(20),
@@ -168,7 +168,7 @@ class _UsersState extends State<Users> with SingleTickerProviderStateMixin {
                   Card(
                     shape: RoundedRectangleBorder(
                         side: BorderSide(),
-                        borderRadius: BorderRadius.circular(36)),
+                        borderRadius: BorderRadius.circular(18)),
                     margin: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
                     child: TabBar(
                       dividerHeight: 0,

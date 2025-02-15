@@ -134,7 +134,7 @@ class _LoginState extends State<Login> {
                 Card(
                   shape: RoundedRectangleBorder(
                       side: BorderSide(),
-                      borderRadius: BorderRadius.circular(36)),
+                      borderRadius: BorderRadius.circular(18)),
                   margin: EdgeInsets.symmetric(horizontal: 50),
                   child: Padding(
                     padding: EdgeInsets.all(20),
@@ -143,7 +143,7 @@ class _LoginState extends State<Login> {
                         Card(
                           shape: RoundedRectangleBorder(
                               side: BorderSide(),
-                              borderRadius: BorderRadius.circular(36)),
+                              borderRadius: BorderRadius.circular(18)),
                           child: Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: Text.rich(
@@ -620,7 +620,7 @@ class _LoginState extends State<Login> {
   //     return;
   //     // Handle invalid address case
   //   }
-  //   String mac = '02-11-32-27-31-2F';
+  //   String mac = '02-11-24-27-31-2F';
   //   if (MACAddress.validate(mac)) {
   //     macAddress = MACAddress(mac);
   //     //Continue execution
@@ -689,7 +689,7 @@ class _LoginState extends State<Login> {
             ),
             Card(
               shape: RoundedRectangleBorder(
-                  side: BorderSide(), borderRadius: BorderRadius.circular(36)),
+                  side: BorderSide(), borderRadius: BorderRadius.circular(18)),
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 12.0),
                 child: Row(
@@ -779,7 +779,7 @@ class _LoginState extends State<Login> {
                   child: Card(
                     shape: RoundedRectangleBorder(
                         side: BorderSide(),
-                        borderRadius: BorderRadius.circular(36)),
+                        borderRadius: BorderRadius.circular(18)),
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 12.0),
                       child: TextField(
@@ -806,7 +806,7 @@ class _LoginState extends State<Login> {
                   child: Card(
                     shape: RoundedRectangleBorder(
                         side: BorderSide(),
-                        borderRadius: BorderRadius.circular(36)),
+                        borderRadius: BorderRadius.circular(18)),
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 12.0),
                       child: TextField(
@@ -832,7 +832,7 @@ class _LoginState extends State<Login> {
             ),
             Card(
               shape: RoundedRectangleBorder(
-                  side: BorderSide(), borderRadius: BorderRadius.circular(36)),
+                  side: BorderSide(), borderRadius: BorderRadius.circular(18)),
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 12.0),
                 child: TextField(
@@ -860,7 +860,7 @@ class _LoginState extends State<Login> {
                     child: Card(
                       shape: RoundedRectangleBorder(
                           side: BorderSide(),
-                          borderRadius: BorderRadius.circular(36)),
+                          borderRadius: BorderRadius.circular(18)),
                       child: Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 12.0),
                         child: TextField(
@@ -893,7 +893,7 @@ class _LoginState extends State<Login> {
                       child: Card(
                         shape: RoundedRectangleBorder(
                             side: BorderSide(),
-                            borderRadius: BorderRadius.circular(36)),
+                            borderRadius: BorderRadius.circular(18)),
                         child: Padding(
                           padding: const EdgeInsets.all(12.0),
                           child: Row(
@@ -932,7 +932,7 @@ class _LoginState extends State<Login> {
                     child: Card(
                       shape: RoundedRectangleBorder(
                           side: BorderSide(),
-                          borderRadius: BorderRadius.circular(36)),
+                          borderRadius: BorderRadius.circular(18)),
                       child: Padding(
                         padding: const EdgeInsets.all(12.0),
                         child: Row(
@@ -966,7 +966,7 @@ class _LoginState extends State<Login> {
                     child: Card(
                       shape: RoundedRectangleBorder(
                           side: BorderSide(),
-                          borderRadius: BorderRadius.circular(36)),
+                          borderRadius: BorderRadius.circular(18)),
                       child: Padding(
                         padding: const EdgeInsets.all(12.0),
                         child: Row(
@@ -1001,7 +1001,7 @@ class _LoginState extends State<Login> {
                   child: Card(
                     shape: RoundedRectangleBorder(
                         side: BorderSide(),
-                        borderRadius: BorderRadius.circular(36)),
+                        borderRadius: BorderRadius.circular(18)),
                     child: Padding(
                       padding: const EdgeInsets.all(12.0),
                       child: Row(

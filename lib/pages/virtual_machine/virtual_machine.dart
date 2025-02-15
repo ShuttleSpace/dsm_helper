@@ -54,7 +54,7 @@ class _VirtualMachineState extends State<VirtualMachine> {
           color: Colors.transparent,
           child: Card(
             shape: RoundedRectangleBorder(
-                side: BorderSide(), borderRadius: BorderRadius.circular(36)),
+                side: BorderSide(), borderRadius: BorderRadius.circular(18)),
             child: SafeArea(
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
@@ -228,7 +228,7 @@ class _VirtualMachineState extends State<VirtualMachine> {
     List networks = host['nics'];
     return Card(
       shape: RoundedRectangleBorder(
-          side: BorderSide(), borderRadius: BorderRadius.circular(36)),
+          side: BorderSide(), borderRadius: BorderRadius.circular(18)),
       child: Padding(
         padding: const EdgeInsets.all(20.0),
         child: Column(
@@ -261,7 +261,7 @@ class _VirtualMachineState extends State<VirtualMachine> {
                   child: Card(
                     shape: RoundedRectangleBorder(
                         side: BorderSide(),
-                        borderRadius: BorderRadius.circular(36)),
+                        borderRadius: BorderRadius.circular(18)),
                     child: Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: FAProgressBar(
@@ -290,7 +290,7 @@ class _VirtualMachineState extends State<VirtualMachine> {
                   child: Card(
                     shape: RoundedRectangleBorder(
                         side: BorderSide(),
-                        borderRadius: BorderRadius.circular(36)),
+                        borderRadius: BorderRadius.circular(18)),
                     child: Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: FAProgressBar(
@@ -322,7 +322,7 @@ class _VirtualMachineState extends State<VirtualMachine> {
     List networks = guest['nics'];
     return Card(
       shape: RoundedRectangleBorder(
-          side: BorderSide(), borderRadius: BorderRadius.circular(36)),
+          side: BorderSide(), borderRadius: BorderRadius.circular(18)),
       margin: EdgeInsets.only(bottom: 20),
       child: Padding(
         padding: const EdgeInsets.all(20.0),
@@ -367,7 +367,7 @@ class _VirtualMachineState extends State<VirtualMachine> {
                               child: Card(
                                 shape: RoundedRectangleBorder(
                                     side: BorderSide(),
-                                    borderRadius: BorderRadius.circular(36)),
+                                    borderRadius: BorderRadius.circular(18)),
                                 child: SafeArea(
                                   top: false,
                                   child: Padding(
@@ -484,7 +484,7 @@ class _VirtualMachineState extends State<VirtualMachine> {
                     child: Card(
                       shape: RoundedRectangleBorder(
                           side: BorderSide(),
-                          borderRadius: BorderRadius.circular(36)),
+                          borderRadius: BorderRadius.circular(18)),
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: FAProgressBar(
@@ -513,7 +513,7 @@ class _VirtualMachineState extends State<VirtualMachine> {
                     child: Card(
                       shape: RoundedRectangleBorder(
                           side: BorderSide(),
-                          borderRadius: BorderRadius.circular(36)),
+                          borderRadius: BorderRadius.circular(18)),
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: FAProgressBar(
@@ -543,7 +543,7 @@ class _VirtualMachineState extends State<VirtualMachine> {
   Widget _buildRepoItem(repo) {
     return Card(
       shape: RoundedRectangleBorder(
-          side: BorderSide(), borderRadius: BorderRadius.circular(36)),
+          side: BorderSide(), borderRadius: BorderRadius.circular(18)),
       margin: EdgeInsets.only(bottom: 20),
       child: Padding(
         padding: const EdgeInsets.all(20.0),
@@ -596,7 +596,7 @@ class _VirtualMachineState extends State<VirtualMachine> {
                   child: Card(
                     shape: RoundedRectangleBorder(
                         side: BorderSide(),
-                        borderRadius: BorderRadius.circular(36)),
+                        borderRadius: BorderRadius.circular(18)),
                     child: Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: FAProgressBar(
@@ -646,7 +646,7 @@ class _VirtualMachineState extends State<VirtualMachine> {
                   child: Card(
                     shape: RoundedRectangleBorder(
                         side: BorderSide(),
-                        borderRadius: BorderRadius.circular(36)),
+                        borderRadius: BorderRadius.circular(18)),
                     margin: EdgeInsets.all(20),
                     child: Padding(
                       padding: const EdgeInsets.all(20.0),
@@ -656,7 +656,7 @@ class _VirtualMachineState extends State<VirtualMachine> {
                             child: Card(
                               shape: RoundedRectangleBorder(
                                   side: BorderSide(),
-                                  borderRadius: BorderRadius.circular(36)),
+                                  borderRadius: BorderRadius.circular(18)),
                               child: Padding(
                                 padding: const EdgeInsets.all(8.0),
                                 child: Column(
@@ -710,7 +710,7 @@ class _VirtualMachineState extends State<VirtualMachine> {
                               child: Card(
                                 shape: RoundedRectangleBorder(
                                     side: BorderSide(),
-                                    borderRadius: BorderRadius.circular(36)),
+                                    borderRadius: BorderRadius.circular(18)),
                                 child: Padding(
                                   padding: const EdgeInsets.all(8.0),
                                   child: Column(
@@ -768,7 +768,7 @@ class _VirtualMachineState extends State<VirtualMachine> {
                               child: Card(
                                 shape: RoundedRectangleBorder(
                                     side: BorderSide(),
-                                    borderRadius: BorderRadius.circular(36)),
+                                    borderRadius: BorderRadius.circular(18)),
                                 child: Padding(
                                   padding: const EdgeInsets.all(8.0),
                                   child: Column(

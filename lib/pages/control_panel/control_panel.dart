@@ -42,7 +42,7 @@ class _ControlPanelState extends State<ControlPanel> {
         children: [
           Card(
             shape: RoundedRectangleBorder(
-                side: BorderSide(), borderRadius: BorderRadius.circular(36)),
+                side: BorderSide(), borderRadius: BorderRadius.circular(18)),
             margin: EdgeInsets.only(top: 20, left: 20, right: 20),
             child: Padding(
               padding: const EdgeInsets.all(8.0),
@@ -75,7 +75,7 @@ class _ControlPanelState extends State<ControlPanel> {
                           child: Card(
                             shape: RoundedRectangleBorder(
                                 side: BorderSide(),
-                                borderRadius: BorderRadius.circular(36)),
+                                borderRadius: BorderRadius.circular(18)),
                             child: Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: Column(
@@ -110,7 +110,7 @@ class _ControlPanelState extends State<ControlPanel> {
                           child: Card(
                             shape: RoundedRectangleBorder(
                                 side: BorderSide(),
-                                borderRadius: BorderRadius.circular(36)),
+                                borderRadius: BorderRadius.circular(18)),
                             child: Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: Column(
@@ -145,7 +145,7 @@ class _ControlPanelState extends State<ControlPanel> {
                           child: Card(
                             shape: RoundedRectangleBorder(
                                 side: BorderSide(),
-                                borderRadius: BorderRadius.circular(36)),
+                                borderRadius: BorderRadius.circular(18)),
                             child: Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: Column(
@@ -184,7 +184,7 @@ class _ControlPanelState extends State<ControlPanel> {
                             child: Card(
                               shape: RoundedRectangleBorder(
                                   side: BorderSide(),
-                                  borderRadius: BorderRadius.circular(36)),
+                                  borderRadius: BorderRadius.circular(18)),
                               child: Padding(
                                 padding: const EdgeInsets.all(8.0),
                                 child: Column(
@@ -248,7 +248,7 @@ class _ControlPanelState extends State<ControlPanel> {
           ),
           Card(
             shape: RoundedRectangleBorder(
-                side: BorderSide(), borderRadius: BorderRadius.circular(36)),
+                side: BorderSide(), borderRadius: BorderRadius.circular(18)),
             margin: EdgeInsets.only(top: 20, left: 20, right: 20),
             child: Padding(
               padding: const EdgeInsets.all(8.0),
@@ -310,7 +310,7 @@ class _ControlPanelState extends State<ControlPanel> {
                           child: Card(
                             shape: RoundedRectangleBorder(
                                 side: BorderSide(),
-                                borderRadius: BorderRadius.circular(36)),
+                                borderRadius: BorderRadius.circular(18)),
                             child: Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: Column(
@@ -345,7 +345,7 @@ class _ControlPanelState extends State<ControlPanel> {
                           child: Card(
                             shape: RoundedRectangleBorder(
                                 side: BorderSide(),
-                                borderRadius: BorderRadius.circular(36)),
+                                borderRadius: BorderRadius.circular(18)),
                             child: Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: Column(
@@ -468,7 +468,7 @@ class _ControlPanelState extends State<ControlPanel> {
                             child: Card(
                               shape: RoundedRectangleBorder(
                                   side: BorderSide(),
-                                  borderRadius: BorderRadius.circular(36)),
+                                  borderRadius: BorderRadius.circular(18)),
                               child: Padding(
                                 padding: const EdgeInsets.all(8.0),
                                 child: Column(
@@ -506,7 +506,7 @@ class _ControlPanelState extends State<ControlPanel> {
           ),
           Card(
             shape: RoundedRectangleBorder(
-                side: BorderSide(), borderRadius: BorderRadius.circular(36)),
+                side: BorderSide(), borderRadius: BorderRadius.circular(18)),
             margin: EdgeInsets.only(top: 20, left: 20, right: 20),
             child: Padding(
               padding: const EdgeInsets.all(8.0),
@@ -540,7 +540,7 @@ class _ControlPanelState extends State<ControlPanel> {
                           child: Card(
                             shape: RoundedRectangleBorder(
                                 side: BorderSide(),
-                                borderRadius: BorderRadius.circular(36)),
+                                borderRadius: BorderRadius.circular(18)),
                             child: Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: Column(
@@ -661,7 +661,7 @@ class _ControlPanelState extends State<ControlPanel> {
                             child: Card(
                               shape: RoundedRectangleBorder(
                                   side: BorderSide(),
-                                  borderRadius: BorderRadius.circular(36)),
+                                  borderRadius: BorderRadius.circular(18)),
                               child: Padding(
                                 padding: const EdgeInsets.all(8.0),
                                 child: Column(
@@ -696,7 +696,7 @@ class _ControlPanelState extends State<ControlPanel> {
                           child: Card(
                             shape: RoundedRectangleBorder(
                                 side: BorderSide(),
-                                borderRadius: BorderRadius.circular(36)),
+                                borderRadius: BorderRadius.circular(18)),
                             child: Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: Column(
@@ -734,7 +734,7 @@ class _ControlPanelState extends State<ControlPanel> {
                           child: Card(
                             shape: RoundedRectangleBorder(
                                 side: BorderSide(),
-                                borderRadius: BorderRadius.circular(36)),
+                                borderRadius: BorderRadius.circular(18)),
                             child: Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: Column(
@@ -768,7 +768,7 @@ class _ControlPanelState extends State<ControlPanel> {
                           child: Card(
                             shape: RoundedRectangleBorder(
                                 side: BorderSide(),
-                                borderRadius: BorderRadius.circular(36)),
+                                borderRadius: BorderRadius.circular(18)),
                             child: Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: Stack(
@@ -830,7 +830,7 @@ class _ControlPanelState extends State<ControlPanel> {
           ),
           Card(
             shape: RoundedRectangleBorder(
-                side: BorderSide(), borderRadius: BorderRadius.circular(36)),
+                side: BorderSide(), borderRadius: BorderRadius.circular(18)),
             margin: EdgeInsets.only(top: 20, left: 20, right: 20),
             child: Padding(
               padding: const EdgeInsets.all(8.0),
@@ -952,7 +952,7 @@ class _ControlPanelState extends State<ControlPanel> {
                           child: Card(
                             shape: RoundedRectangleBorder(
                                 side: BorderSide(),
-                                borderRadius: BorderRadius.circular(36)),
+                                borderRadius: BorderRadius.circular(18)),
                             child: Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: Column(
@@ -1020,7 +1020,7 @@ class _ControlPanelState extends State<ControlPanel> {
                             child: Card(
                               shape: RoundedRectangleBorder(
                                   side: BorderSide(),
-                                  borderRadius: BorderRadius.circular(36)),
+                                  borderRadius: BorderRadius.circular(18)),
                               child: Padding(
                                 padding: const EdgeInsets.all(8.0),
                                 child: Column(
@@ -1059,7 +1059,7 @@ class _ControlPanelState extends State<ControlPanel> {
                             child: Card(
                               shape: RoundedRectangleBorder(
                                   side: BorderSide(),
-                                  borderRadius: BorderRadius.circular(36)),
+                                  borderRadius: BorderRadius.circular(18)),
                               child: Padding(
                                 padding: const EdgeInsets.all(8.0),
                                 child: Column(

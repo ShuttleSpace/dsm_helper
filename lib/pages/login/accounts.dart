@@ -201,7 +201,7 @@ class _AccountsState extends State<Accounts> {
       },
       child: Card(
         shape: RoundedRectangleBorder(
-            side: BorderSide(), borderRadius: BorderRadius.circular(36)),
+            side: BorderSide(), borderRadius: BorderRadius.circular(18)),
         child: Padding(
           padding: EdgeInsets.all(20),
           child: Row(
@@ -299,7 +299,7 @@ class _AccountsState extends State<Accounts> {
                               Card(
                                 shape: RoundedRectangleBorder(
                                     side: BorderSide(),
-                                    borderRadius: BorderRadius.circular(36)),
+                                    borderRadius: BorderRadius.circular(18)),
                                 margin: EdgeInsets.only(top: 10, right: 10),
                                 child: Padding(
                                   padding: const EdgeInsets.all(8.0),
@@ -347,7 +347,7 @@ class _AccountsState extends State<Accounts> {
                               Card(
                                 shape: RoundedRectangleBorder(
                                     side: BorderSide(),
-                                    borderRadius: BorderRadius.circular(36)),
+                                    borderRadius: BorderRadius.circular(18)),
                                 margin: EdgeInsets.only(top: 10, right: 10),
                                 child: Padding(
                                   padding: const EdgeInsets.all(8.0),
@@ -505,7 +505,7 @@ class _AccountsState extends State<Accounts> {
               child: Card(
                 shape: RoundedRectangleBorder(
                     side: BorderSide(),
-                    borderRadius: BorderRadius.circular(36)),
+                    borderRadius: BorderRadius.circular(18)),
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Icon(visible

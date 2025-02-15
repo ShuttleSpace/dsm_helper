@@ -76,7 +76,7 @@ class _SystemInfoState extends State<SystemInfo>
   Widget _buildNifItem(nif) {
     return Card(
       shape: RoundedRectangleBorder(
-          side: BorderSide(), borderRadius: BorderRadius.circular(36)),
+          side: BorderSide(), borderRadius: BorderRadius.circular(18)),
       margin: EdgeInsets.only(top: 20, left: 20, right: 20),
       child: Padding(
         padding: const EdgeInsets.all(8.0),
@@ -92,7 +92,7 @@ class _SystemInfoState extends State<SystemInfo>
             ),
             Card(
               shape: RoundedRectangleBorder(
-                  side: BorderSide(), borderRadius: BorderRadius.circular(36)),
+                  side: BorderSide(), borderRadius: BorderRadius.circular(18)),
               margin: EdgeInsets.only(top: 20, left: 20, right: 20),
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
@@ -117,7 +117,7 @@ class _SystemInfoState extends State<SystemInfo>
             ),
             Card(
               shape: RoundedRectangleBorder(
-                  side: BorderSide(), borderRadius: BorderRadius.circular(36)),
+                  side: BorderSide(), borderRadius: BorderRadius.circular(18)),
               margin: EdgeInsets.only(top: 20, left: 20, right: 20),
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
@@ -143,7 +143,7 @@ class _SystemInfoState extends State<SystemInfo>
             ),
             Card(
               shape: RoundedRectangleBorder(
-                  side: BorderSide(), borderRadius: BorderRadius.circular(36)),
+                  side: BorderSide(), borderRadius: BorderRadius.circular(18)),
               margin: EdgeInsets.only(top: 20, left: 20, right: 20),
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
@@ -179,7 +179,7 @@ class _SystemInfoState extends State<SystemInfo>
   Widget _buildDevItem(dev) {
     return Card(
       shape: RoundedRectangleBorder(
-          side: BorderSide(), borderRadius: BorderRadius.circular(36)),
+          side: BorderSide(), borderRadius: BorderRadius.circular(18)),
       margin: EdgeInsets.only(top: 20, left: 20, right: 20),
       child: Padding(
         padding: const EdgeInsets.all(8.0),
@@ -209,7 +209,7 @@ class _SystemInfoState extends State<SystemInfo>
         int.parse(volume['size']['used']) / int.parse(volume['size']['total']);
     return Card(
       shape: RoundedRectangleBorder(
-          side: BorderSide(), borderRadius: BorderRadius.circular(36)),
+          side: BorderSide(), borderRadius: BorderRadius.circular(18)),
       margin: EdgeInsets.only(top: 20, left: 20, right: 20),
       child: Row(
         children: [
@@ -301,13 +301,13 @@ class _SystemInfoState extends State<SystemInfo>
   Widget _buildDiskItem(disk) {
     return Card(
       shape: RoundedRectangleBorder(
-          side: BorderSide(), borderRadius: BorderRadius.circular(36)),
+          side: BorderSide(), borderRadius: BorderRadius.circular(18)),
       margin: EdgeInsets.only(top: 20, left: 20, right: 20),
       child: Row(
         children: [
           Card(
             shape: RoundedRectangleBorder(
-                side: BorderSide(), borderRadius: BorderRadius.circular(36)),
+                side: BorderSide(), borderRadius: BorderRadius.circular(18)),
             margin: EdgeInsets.all(10),
             child: Padding(
               padding: const EdgeInsets.all(8.0),
@@ -379,7 +379,7 @@ class _SystemInfoState extends State<SystemInfo>
         children: [
           Card(
             shape: RoundedRectangleBorder(
-                side: BorderSide(), borderRadius: BorderRadius.circular(36)),
+                side: BorderSide(), borderRadius: BorderRadius.circular(18)),
             margin: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
             child: TabBar(
               dividerHeight: 0,
@@ -433,7 +433,7 @@ class _SystemInfoState extends State<SystemInfo>
                     Card(
                       shape: RoundedRectangleBorder(
                           side: BorderSide(),
-                          borderRadius: BorderRadius.circular(36)),
+                          borderRadius: BorderRadius.circular(18)),
                       margin: EdgeInsets.only(left: 20, right: 20),
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
@@ -451,7 +451,7 @@ class _SystemInfoState extends State<SystemInfo>
                             Card(
                               shape: RoundedRectangleBorder(
                                   side: BorderSide(),
-                                  borderRadius: BorderRadius.circular(36)),
+                                  borderRadius: BorderRadius.circular(18)),
                               margin:
                                   EdgeInsets.only(top: 20, left: 20, right: 20),
                               child: Padding(
@@ -478,7 +478,7 @@ class _SystemInfoState extends State<SystemInfo>
                             Card(
                               shape: RoundedRectangleBorder(
                                   side: BorderSide(),
-                                  borderRadius: BorderRadius.circular(36)),
+                                  borderRadius: BorderRadius.circular(18)),
                               margin:
                                   EdgeInsets.only(top: 20, left: 20, right: 20),
                               child: Padding(
@@ -505,7 +505,7 @@ class _SystemInfoState extends State<SystemInfo>
                             Card(
                               shape: RoundedRectangleBorder(
                                   side: BorderSide(),
-                                  borderRadius: BorderRadius.circular(36)),
+                                  borderRadius: BorderRadius.circular(18)),
                               margin:
                                   EdgeInsets.only(top: 20, left: 20, right: 20),
                               child: Padding(
@@ -532,7 +532,7 @@ class _SystemInfoState extends State<SystemInfo>
                             Card(
                               shape: RoundedRectangleBorder(
                                   side: BorderSide(),
-                                  borderRadius: BorderRadius.circular(36)),
+                                  borderRadius: BorderRadius.circular(18)),
                               margin:
                                   EdgeInsets.only(top: 20, left: 20, right: 20),
                               child: Padding(
@@ -559,7 +559,7 @@ class _SystemInfoState extends State<SystemInfo>
                             Card(
                               shape: RoundedRectangleBorder(
                                   side: BorderSide(),
-                                  borderRadius: BorderRadius.circular(36)),
+                                  borderRadius: BorderRadius.circular(18)),
                               margin:
                                   EdgeInsets.only(top: 20, left: 20, right: 20),
                               child: Padding(
@@ -586,7 +586,7 @@ class _SystemInfoState extends State<SystemInfo>
                             Card(
                               shape: RoundedRectangleBorder(
                                   side: BorderSide(),
-                                  borderRadius: BorderRadius.circular(36)),
+                                  borderRadius: BorderRadius.circular(18)),
                               margin:
                                   EdgeInsets.only(top: 20, left: 20, right: 20),
                               child: Padding(
@@ -613,7 +613,7 @@ class _SystemInfoState extends State<SystemInfo>
                             Card(
                               shape: RoundedRectangleBorder(
                                   side: BorderSide(),
-                                  borderRadius: BorderRadius.circular(36)),
+                                  borderRadius: BorderRadius.circular(18)),
                               margin:
                                   EdgeInsets.only(top: 20, left: 20, right: 20),
                               child: Padding(
@@ -640,7 +640,7 @@ class _SystemInfoState extends State<SystemInfo>
                             Card(
                               shape: RoundedRectangleBorder(
                                   side: BorderSide(),
-                                  borderRadius: BorderRadius.circular(36)),
+                                  borderRadius: BorderRadius.circular(18)),
                               margin:
                                   EdgeInsets.only(top: 20, left: 20, right: 20),
                               child: Padding(
@@ -668,7 +668,7 @@ class _SystemInfoState extends State<SystemInfo>
                               Card(
                                 shape: RoundedRectangleBorder(
                                     side: BorderSide(),
-                                    borderRadius: BorderRadius.circular(36)),
+                                    borderRadius: BorderRadius.circular(18)),
                                 margin: EdgeInsets.only(
                                     top: 20, left: 20, right: 20),
                                 child: Padding(
@@ -714,7 +714,7 @@ class _SystemInfoState extends State<SystemInfo>
                     Card(
                       shape: RoundedRectangleBorder(
                           side: BorderSide(),
-                          borderRadius: BorderRadius.circular(36)),
+                          borderRadius: BorderRadius.circular(18)),
                       margin: EdgeInsets.only(top: 20, left: 20, right: 20),
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
@@ -732,7 +732,7 @@ class _SystemInfoState extends State<SystemInfo>
                             Card(
                               shape: RoundedRectangleBorder(
                                   side: BorderSide(),
-                                  borderRadius: BorderRadius.circular(36)),
+                                  borderRadius: BorderRadius.circular(18)),
                               margin:
                                   EdgeInsets.only(top: 20, left: 20, right: 20),
                               child: Padding(
@@ -759,7 +759,7 @@ class _SystemInfoState extends State<SystemInfo>
                             Card(
                               shape: RoundedRectangleBorder(
                                   side: BorderSide(),
-                                  borderRadius: BorderRadius.circular(36)),
+                                  borderRadius: BorderRadius.circular(18)),
                               margin:
                                   EdgeInsets.only(top: 20, left: 20, right: 20),
                               child: Padding(

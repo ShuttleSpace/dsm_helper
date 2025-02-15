@@ -42,7 +42,7 @@ class SettingButton extends StatelessWidget {
                 ? CupertinoActivityIndicator(radius: 20)
                 : Image.asset(
                     "assets/icons/$icon.png",
-                    width: 32,
+                    width: 24,
                   ),
             SizedBox(
               height: 5,
@@ -200,7 +200,7 @@ class _SettingState extends State<Setting> {
               child: Card(
                 shape: RoundedRectangleBorder(
                     side: BorderSide(),
-                    borderRadius: BorderRadius.circular(36)),
+                    borderRadius: BorderRadius.circular(18)),
                 child: SafeArea(
                   top: false,
                   child: Padding(
@@ -283,7 +283,7 @@ class _SettingState extends State<Setting> {
           color: Colors.transparent,
           child: Card(
             shape: RoundedRectangleBorder(
-                side: BorderSide(), borderRadius: BorderRadius.circular(36)),
+                side: BorderSide(), borderRadius: BorderRadius.circular(18)),
             child: SafeArea(
               top: false,
               child: Padding(
@@ -362,7 +362,7 @@ class _SettingState extends State<Setting> {
           color: Colors.transparent,
           child: Card(
             shape: RoundedRectangleBorder(
-                side: BorderSide(), borderRadius: BorderRadius.circular(36)),
+                side: BorderSide(), borderRadius: BorderRadius.circular(18)),
             child: SafeArea(
               top: false,
               child: Padding(
@@ -438,7 +438,7 @@ class _SettingState extends State<Setting> {
           color: Colors.transparent,
           child: Card(
             shape: RoundedRectangleBorder(
-                side: BorderSide(), borderRadius: BorderRadius.circular(36)),
+                side: BorderSide(), borderRadius: BorderRadius.circular(18)),
             child: SafeArea(
               top: false,
               child: Padding(
@@ -555,7 +555,7 @@ class _SettingState extends State<Setting> {
             },
             child: Card(
               shape: RoundedRectangleBorder(
-                  side: BorderSide(), borderRadius: BorderRadius.circular(36)),
+                  side: BorderSide(), borderRadius: BorderRadius.circular(18)),
               child: Padding(
                 padding: EdgeInsets.all(20.0),
                 child: Row(
@@ -746,7 +746,7 @@ class _SettingState extends State<Setting> {
                     margin: EdgeInsets.zero,
                     shape: RoundedRectangleBorder(
                         side: BorderSide(),
-                        borderRadius: BorderRadius.circular(36)),
+                        borderRadius: BorderRadius.circular(18)),
                     child: Padding(
                       padding: const EdgeInsets.symmetric(vertical: 6.0),
                       child: Column(
@@ -760,7 +760,7 @@ class _SettingState extends State<Setting> {
                                 )
                               : Image.asset(
                                   "assets/icons/ssh.png",
-                                  width: 32,
+                                  width: 24,
                                 ),
                           SizedBox(
                             height: 2,
@@ -815,7 +815,7 @@ class _SettingState extends State<Setting> {
                           child: Card(
                             shape: RoundedRectangleBorder(
                                 side: BorderSide(),
-                                borderRadius: BorderRadius.circular(36)),
+                                borderRadius: BorderRadius.circular(18)),
                             child: SafeArea(
                               top: false,
                               child: Padding(

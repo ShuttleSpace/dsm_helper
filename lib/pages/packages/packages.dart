@@ -209,7 +209,7 @@ class _PackagesState extends State<Packages> with TickerProviderStateMixin {
     if (package['can_update'] == null || package['installed'] == null) {
       button = Card(
         shape: RoundedRectangleBorder(
-            side: BorderSide(), borderRadius: BorderRadius.circular(36)),
+            side: BorderSide(), borderRadius: BorderRadius.circular(18)),
         child: Text("获取中"),
       );
     } else if (package['can_update']) {
@@ -268,7 +268,7 @@ class _PackagesState extends State<Packages> with TickerProviderStateMixin {
                   child: Card(
                     shape: RoundedRectangleBorder(
                         side: BorderSide(),
-                        borderRadius: BorderRadius.circular(36)),
+                        borderRadius: BorderRadius.circular(18)),
                     child: SafeArea(
                       top: false,
                       child: Padding(
@@ -408,7 +408,7 @@ class _PackagesState extends State<Packages> with TickerProviderStateMixin {
       },
       child: Card(
         shape: RoundedRectangleBorder(
-            side: BorderSide(), borderRadius: BorderRadius.circular(36)),
+            side: BorderSide(), borderRadius: BorderRadius.circular(18)),
         margin: EdgeInsets.only(bottom: 20),
         child: Padding(
           padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
@@ -486,7 +486,7 @@ class _PackagesState extends State<Packages> with TickerProviderStateMixin {
       },
       child: Card(
         shape: RoundedRectangleBorder(
-            side: BorderSide(), borderRadius: BorderRadius.circular(36)),
+            side: BorderSide(), borderRadius: BorderRadius.circular(18)),
         child: Padding(
           padding: const EdgeInsets.all(8.0),
           child: Column(
@@ -572,7 +572,7 @@ class _PackagesState extends State<Packages> with TickerProviderStateMixin {
               Card(
                 shape: RoundedRectangleBorder(
                     side: BorderSide(),
-                    borderRadius: BorderRadius.circular(36)),
+                    borderRadius: BorderRadius.circular(18)),
                 margin: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
                 child: TabBar(
                   dividerHeight: 0,

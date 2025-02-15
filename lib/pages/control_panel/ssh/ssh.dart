@@ -61,7 +61,7 @@ class _SshSettingState extends State<SshSetting>
                 Card(
                   shape: RoundedRectangleBorder(
                       side: BorderSide(),
-                      borderRadius: BorderRadius.circular(36)),
+                      borderRadius: BorderRadius.circular(18)),
                   margin: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
                   child: TabBar(
                     dividerHeight: 0,
@@ -107,7 +107,7 @@ class _SshSettingState extends State<SshSetting>
                             child: Card(
                               shape: RoundedRectangleBorder(
                                   side: BorderSide(),
-                                  borderRadius: BorderRadius.circular(36)),
+                                  borderRadius: BorderRadius.circular(18)),
                               child: Padding(
                                 padding: EdgeInsets.all(20),
                                 child: Row(
@@ -139,7 +139,7 @@ class _SshSettingState extends State<SshSetting>
                             child: Card(
                               shape: RoundedRectangleBorder(
                                   side: BorderSide(),
-                                  borderRadius: BorderRadius.circular(36)),
+                                  borderRadius: BorderRadius.circular(18)),
                               child: Padding(
                                 padding: EdgeInsets.all(20),
                                 child: Row(
@@ -165,7 +165,7 @@ class _SshSettingState extends State<SshSetting>
                           Card(
                             shape: RoundedRectangleBorder(
                                 side: BorderSide(),
-                                borderRadius: BorderRadius.circular(36)),
+                                borderRadius: BorderRadius.circular(18)),
                             child: Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: TextField(

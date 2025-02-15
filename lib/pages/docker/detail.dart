@@ -220,7 +220,7 @@ class _ContainerDetailState extends State<ContainerDetail>
   Widget _buildProcessItem(process) {
     return Card(
       shape: RoundedRectangleBorder(
-          side: BorderSide(), borderRadius: BorderRadius.circular(366)),
+          side: BorderSide(), borderRadius: BorderRadius.circular(18)),
       margin: EdgeInsets.symmetric(horizontal: 20),
       child: Padding(
         padding: EdgeInsets.all(20),
@@ -262,7 +262,7 @@ class _ContainerDetailState extends State<ContainerDetail>
   Widget _buildLogItem(log) {
     return Card(
       shape: RoundedRectangleBorder(
-          side: BorderSide(), borderRadius: BorderRadius.circular(366)),
+          side: BorderSide(), borderRadius: BorderRadius.circular(18)),
       child: Padding(
         padding: EdgeInsets.all(20),
         child: Column(
@@ -299,7 +299,7 @@ class _ContainerDetailState extends State<ContainerDetail>
       },
       child: Card(
         shape: RoundedRectangleBorder(
-            side: BorderSide(), borderRadius: BorderRadius.circular(366)),
+            side: BorderSide(), borderRadius: BorderRadius.circular(18)),
         child: Padding(
           padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
           child: Column(
@@ -336,7 +336,7 @@ class _ContainerDetailState extends State<ContainerDetail>
                 Card(
                   shape: RoundedRectangleBorder(
                       side: BorderSide(),
-                      borderRadius: BorderRadius.circular(366)),
+                      borderRadius: BorderRadius.circular(18)),
                   margin: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
                   child: TabBar(
                     dividerHeight: 0,
@@ -380,7 +380,7 @@ class _ContainerDetailState extends State<ContainerDetail>
                           Card(
                             shape: RoundedRectangleBorder(
                                 side: BorderSide(),
-                                borderRadius: BorderRadius.circular(366)),
+                                borderRadius: BorderRadius.circular(18)),
                             margin: EdgeInsets.symmetric(
                                 horizontal: 20, vertical: 10),
                             child: Padding(
@@ -485,7 +485,7 @@ class _ContainerDetailState extends State<ContainerDetail>
                           Card(
                             shape: RoundedRectangleBorder(
                                 side: BorderSide(),
-                                borderRadius: BorderRadius.circular(366)),
+                                borderRadius: BorderRadius.circular(18)),
                             margin: EdgeInsets.symmetric(
                                 horizontal: 20, vertical: 10),
                             child: Padding(
@@ -533,7 +533,7 @@ class _ContainerDetailState extends State<ContainerDetail>
                           Card(
                             shape: RoundedRectangleBorder(
                                 side: BorderSide(),
-                                borderRadius: BorderRadius.circular(366)),
+                                borderRadius: BorderRadius.circular(18)),
                             margin: EdgeInsets.symmetric(
                                 horizontal: 20, vertical: 10),
                             child: Padding(
@@ -583,7 +583,7 @@ class _ContainerDetailState extends State<ContainerDetail>
                           Card(
                             shape: RoundedRectangleBorder(
                                 side: BorderSide(),
-                                borderRadius: BorderRadius.circular(366)),
+                                borderRadius: BorderRadius.circular(18)),
                             margin: EdgeInsets.symmetric(
                                 horizontal: 20, vertical: 10),
                             child: Padding(
@@ -625,7 +625,7 @@ class _ContainerDetailState extends State<ContainerDetail>
                           Card(
                             shape: RoundedRectangleBorder(
                                 side: BorderSide(),
-                                borderRadius: BorderRadius.circular(366)),
+                                borderRadius: BorderRadius.circular(18)),
                             margin: EdgeInsets.symmetric(
                                 horizontal: 20, vertical: 10),
                             child: Padding(
@@ -667,7 +667,7 @@ class _ContainerDetailState extends State<ContainerDetail>
                           Card(
                             shape: RoundedRectangleBorder(
                                 side: BorderSide(),
-                                borderRadius: BorderRadius.circular(366)),
+                                borderRadius: BorderRadius.circular(18)),
                             margin: EdgeInsets.symmetric(
                                 horizontal: 20, vertical: 10),
                             child: Padding(

@@ -20,7 +20,7 @@ class Label extends StatelessWidget {
       decoration: BoxDecoration(
         border: Border.all(color: color),
         color: fill ? color : Colors.transparent,
-        borderRadius: BorderRadius.circular(36),
+        borderRadius: BorderRadius.circular(18),
       ),
       padding: EdgeInsets.symmetric(horizontal: 5, vertical: 2),
       child: Text(

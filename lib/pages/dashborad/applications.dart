@@ -69,7 +69,7 @@ class ApplicationList extends StatelessWidget {
               child: Card(
                 shape: RoundedRectangleBorder(
                     side: BorderSide(),
-                    borderRadius: BorderRadius.circular(366)),
+                    borderRadius: BorderRadius.circular(18)),
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Stack(
@@ -121,7 +121,7 @@ class ApplicationList extends StatelessWidget {
               child: Card(
                 shape: RoundedRectangleBorder(
                     side: BorderSide(),
-                    borderRadius: BorderRadius.circular(366)),
+                    borderRadius: BorderRadius.circular(18)),
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Stack(
@@ -172,7 +172,7 @@ class ApplicationList extends StatelessWidget {
               child: Card(
                 shape: RoundedRectangleBorder(
                     side: BorderSide(),
-                    borderRadius: BorderRadius.circular(366)),
+                    borderRadius: BorderRadius.circular(18)),
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Column(
@@ -208,7 +208,7 @@ class ApplicationList extends StatelessWidget {
               child: Card(
                 shape: RoundedRectangleBorder(
                     side: BorderSide(),
-                    borderRadius: BorderRadius.circular(366)),
+                    borderRadius: BorderRadius.circular(18)),
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Column(
@@ -244,7 +244,7 @@ class ApplicationList extends StatelessWidget {
               child: Card(
                 shape: RoundedRectangleBorder(
                     side: BorderSide(),
-                    borderRadius: BorderRadius.circular(366)),
+                    borderRadius: BorderRadius.circular(18)),
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Column(
@@ -282,7 +282,7 @@ class ApplicationList extends StatelessWidget {
               child: Card(
                 shape: RoundedRectangleBorder(
                     side: BorderSide(),
-                    borderRadius: BorderRadius.circular(366)),
+                    borderRadius: BorderRadius.circular(18)),
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Stack(
@@ -336,7 +336,7 @@ class ApplicationList extends StatelessWidget {
               child: Card(
                 shape: RoundedRectangleBorder(
                     side: BorderSide(),
-                    borderRadius: BorderRadius.circular(366)),
+                    borderRadius: BorderRadius.circular(18)),
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Column(
@@ -373,7 +373,7 @@ class ApplicationList extends StatelessWidget {
               child: Card(
                 shape: RoundedRectangleBorder(
                     side: BorderSide(),
-                    borderRadius: BorderRadius.circular(366)),
+                    borderRadius: BorderRadius.circular(18)),
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Column(
@@ -415,7 +415,7 @@ class ApplicationList extends StatelessWidget {
               child: Card(
                 shape: RoundedRectangleBorder(
                     side: BorderSide(),
-                    borderRadius: BorderRadius.circular(366)),
+                    borderRadius: BorderRadius.circular(18)),
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Column(
@@ -457,7 +457,7 @@ class ApplicationList extends StatelessWidget {
               child: Card(
                 shape: RoundedRectangleBorder(
                     side: BorderSide(),
-                    borderRadius: BorderRadius.circular(366)),
+                    borderRadius: BorderRadius.circular(18)),
                 child: Column(
                   children: [
                     Column(
@@ -500,7 +500,7 @@ class ApplicationList extends StatelessWidget {
               child: Card(
                 shape: RoundedRectangleBorder(
                     side: BorderSide(),
-                    borderRadius: BorderRadius.circular(366)),
+                    borderRadius: BorderRadius.circular(18)),
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Column(
@@ -542,7 +542,7 @@ class ApplicationList extends StatelessWidget {
               child: Card(
                 shape: RoundedRectangleBorder(
                     side: BorderSide(),
-                    borderRadius: BorderRadius.circular(366)),
+                    borderRadius: BorderRadius.circular(18)),
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Column(
@@ -584,7 +584,7 @@ class ApplicationList extends StatelessWidget {
               child: Card(
                 shape: RoundedRectangleBorder(
                     side: BorderSide(),
-                    borderRadius: BorderRadius.circular(366)),
+                    borderRadius: BorderRadius.circular(18)),
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Column(
