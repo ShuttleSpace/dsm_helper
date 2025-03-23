@@ -153,8 +153,8 @@ class _UsersState extends State<Users> with SingleTickerProviderStateMixin {
       ),
       body: loading
           ? Container(
-              width: MediaQuery.of(context).size.width,
-              height: MediaQuery.of(context).size.height,
+              width: MediaQuery.sizeOf(context).width,
+              height: MediaQuery.sizeOf(context).height,
               color: Theme.of(context).scaffoldBackgroundColor.withOpacity(0.7),
               child: Center(
                 child: CupertinoActivityIndicator(

@@ -469,8 +469,8 @@ class _SharedFoldersState extends State<SharedFolders> {
                 // if (selectedFiles.length > 0)
                 if (loading)
                   Container(
-                    width: MediaQuery.of(context).size.width,
-                    height: MediaQuery.of(context).size.height,
+                    width: MediaQuery.sizeOf(context).width,
+                    height: MediaQuery.sizeOf(context).height,
                     color: Theme.of(context)
                         .scaffoldBackgroundColor
                         .withOpacity(0.7),

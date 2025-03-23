@@ -28,7 +28,7 @@ class SettingButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    double width = (MediaQuery.of(context).size.width - 81) / 3;
+    double width = (MediaQuery.sizeOf(context).width - 81) / 3;
     return SizedBox(
       width: width,
       child: OutlinedButton(
@@ -71,23 +71,26 @@ class ThemeButton extends StatelessWidget {
         Navigator.of(context).pop();
         Provider.of<DarkModeProvider>(context, listen: false).changeMode(type);
       },
-      child: Column(
-        children: [
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 10),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(10),
-              child: Image.asset(image),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8.0),
+        child: Column(
+          children: [
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 10),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(10),
+                child: Image.asset(image),
+              ),
             ),
-          ),
-          SizedBox(
-            height: 10,
-          ),
-          Text(
-            text,
-            style: TextStyle(fontSize: 18),
-          )
-        ],
+            SizedBox(
+              height: 10,
+            ),
+            Text(
+              text,
+              style: TextStyle(fontSize: 14),
+            )
+          ],
+        ),
       ),
     );
   }
@@ -500,7 +503,7 @@ class _SettingState extends State<Setting> {
 
   @override
   Widget build(BuildContext context) {
-    double width = (MediaQuery.of(context).size.width - 81) / 3;
+    double width = (MediaQuery.sizeOf(context).width - 81) / 3;
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -802,117 +805,6 @@ class _SettingState extends State<Setting> {
                   );
                 },
               ),
-              SettingButton(
-                name: "问题反馈",
-                icon: "edit",
-                onPressed: () async {
-                  if (Util.instance.notReviewAccount) {
-                    showCupertinoModalPopup(
-                      context: context,
-                      builder: (context) {
-                        return Material(
-                          color: Colors.transparent,
-                          child: Card(
-                            shape: RoundedRectangleBorder(
-                                side: BorderSide(),
-                                borderRadius: BorderRadius.circular(18)),
-                            child: SafeArea(
-                              top: false,
-                              child: Padding(
-                                padding: EdgeInsets.all(20),
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: <Widget>[
-                                    Text(
-                                      "您将进入“阿派派软件”微信小程序进行问题反馈。是否确定要继续？",
-                                      style: TextStyle(
-                                          fontSize: 20,
-                                          fontWeight: FontWeight.w500),
-                                    ),
-                                    SizedBox(
-                                      height: 22,
-                                    ),
-                                    Row(
-                                      children: [
-                                        Expanded(
-                                          child: OutlinedButton(
-                                            onPressed: () async {
-                                              Navigator.of(context).pop();
-                                              context
-                                                  .read<FluwxProvider>()
-                                                  .wx
-                                                  .open(
-                                                      target: MiniProgram(
-                                                          username:
-                                                              'gh_6c07712ef0fb'));
-                                            },
-                                            child: Text(
-                                              "进入小程序",
-                                              style: TextStyle(
-                                                  fontSize: 18,
-                                                  color: Colors.redAccent),
-                                            ),
-                                          ),
-                                        ),
-                                        SizedBox(
-                                          width: 16,
-                                        ),
-                                        Expanded(
-                                          child: OutlinedButton(
-                                            onPressed: () async {
-                                              Navigator.of(context).pop();
-                                            },
-                                            child: Text(
-                                              "取消",
-                                              style: TextStyle(fontSize: 18),
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    SizedBox(
-                                      height: 8,
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
-                        );
-                      },
-                    );
-                  } else {
-                    Navigator.of(context)
-                        .push(CupertinoPageRoute(builder: (context) {
-                      return fd.Feedback();
-                    }));
-                  }
-                },
-              ),
-              if (Util.instance.notReviewAccount &&
-                  Util.instance.vipExpireTime
-                          .difference(DateTime.now())
-                          .inDays <
-                      7 &&
-                  !Util.instance.vipForever)
-                SettingButton(
-                  name: "关闭广告",
-                  icon: "no_ad",
-                  onPressed: () async {
-                    Navigator.of(context)
-                        .push(
-                      CupertinoPageRoute(
-                        builder: (context) {
-                          return Vip();
-                        },
-                        settings: RouteSettings(name: "vip"),
-                      ),
-                    )
-                        .then((value) {
-                      setState(() {});
-                    });
-                  },
-                )
             ],
           ),
         ],

@@ -96,7 +96,7 @@ class _FavoriteState extends State<Favorite> {
                                     children: [
                                       SizedBox(
                                         width:
-                                            (MediaQuery.of(context).size.width -
+                                            (MediaQuery.sizeOf(context).width -
                                                     100) /
                                                 4,
                                         child: OutlinedButton(
@@ -273,7 +273,7 @@ class _FavoriteState extends State<Favorite> {
                                       ),
                                       SizedBox(
                                         width:
-                                            (MediaQuery.of(context).size.width -
+                                            (MediaQuery.sizeOf(context).width -
                                                     100) /
                                                 4,
                                         child: OutlinedButton(
@@ -447,8 +447,8 @@ class _FavoriteState extends State<Favorite> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: MediaQuery.of(context).size.width * 0.7,
-      height: MediaQuery.of(context).size.height,
+      width: MediaQuery.sizeOf(context).width * 0.7,
+      height: MediaQuery.sizeOf(context).height,
       color: Theme.of(context).scaffoldBackgroundColor,
       child: favoriteLoading
           ? Center(
@@ -459,7 +459,7 @@ class _FavoriteState extends State<Favorite> {
           : Container(
               height: double.infinity,
               color: Theme.of(context).scaffoldBackgroundColor,
-              width: MediaQuery.of(context).size.width * 0.7,
+              width: MediaQuery.sizeOf(context).width * 0.7,
               child: favorites.length > 0
                   ? ListView.builder(
                       padding: EdgeInsets.only(

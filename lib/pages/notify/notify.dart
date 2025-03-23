@@ -117,6 +117,7 @@ class _NotifyState extends State<Notify> {
           showFirst: true,
           first: _buildNotifyItem(group.first),
           children: group.map((_buildNotifyItem)).toList(),
+          trailing: Icon(Icons.unfold_less),
         ),
       ),
     );

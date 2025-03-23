@@ -1,7 +1,4 @@
-import 'dart:async';
 import 'dart:io';
-import 'dart:isolate';
-import 'dart:ui';
 import 'package:android_intent_plus/android_intent.dart';
 import 'package:humphrey_garden/pages/common/video_player.dart';
 import 'package:humphrey_garden/pages/download/download_setting.dart';
@@ -711,122 +708,8 @@ class DownloadState extends State<Download> {
                                             onTap: () async {
                                               Util.instance.vibrate(
                                                   FeedbackType.warning);
-                                              showCupertinoModalPopup(
-                                                context: context,
-                                                builder: (context) {
-                                                  return Material(
-                                                    color: Colors.transparent,
-                                                    child: Card(
-                                                      shape:
-                                                          RoundedRectangleBorder(
-                                                              side:
-                                                                  BorderSide(),
-                                                              borderRadius:
-                                                                  BorderRadius
-                                                                      .circular(
-                                                                          5)),
-                                                      child: SafeArea(
-                                                        top: false,
-                                                        child: Padding(
-                                                          padding:
-                                                              const EdgeInsets
-                                                                  .all(8.0),
-                                                          child: Column(
-                                                            mainAxisSize:
-                                                                MainAxisSize
-                                                                    .min,
-                                                            children: <Widget>[
-                                                              Text(
-                                                                "确认删除",
-                                                                style: TextStyle(
-                                                                    fontSize:
-                                                                        20,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .w500),
-                                                              ),
-                                                              SizedBox(
-                                                                height: 12,
-                                                              ),
-                                                              Text(
-                                                                "确认要删除${value.length}个下载任务？",
-                                                                style: TextStyle(
-                                                                    fontSize:
-                                                                        20,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .w400),
-                                                              ),
-                                                              SizedBox(
-                                                                height: 22,
-                                                              ),
-                                                              Row(
-                                                                children: [
-                                                                  Expanded(
-                                                                    child:
-                                                                        OutlinedButton(
-                                                                      onPressed:
-                                                                          () async {
-                                                                        Navigator.of(context)
-                                                                            .pop();
-                                                                        for (DownloadInfo task
-                                                                            in value) {
-                                                                          await FlutterDownloader.remove(
-                                                                              taskId: task.taskId,
-                                                                              shouldDeleteContent: true);
-                                                                        }
-                                                                        _downloadStateNotifier!
-                                                                            .runLoop();
-                                                                        _downloadStateNotifier!
-                                                                            .resetSelectedTasks();
-                                                                        _downloadStateNotifier!
-                                                                            .multiSelect
-                                                                            .value = false;
-                                                                      },
-                                                                      child:
-                                                                          Text(
-                                                                        "确认删除",
-                                                                        style: TextStyle(
-                                                                            fontSize:
-                                                                                18,
-                                                                            color:
-                                                                                Colors.redAccent),
-                                                                      ),
-                                                                    ),
-                                                                  ),
-                                                                  SizedBox(
-                                                                    width: 20,
-                                                                  ),
-                                                                  Expanded(
-                                                                    child:
-                                                                        OutlinedButton(
-                                                                      onPressed:
-                                                                          () async {
-                                                                        Navigator.of(context)
-                                                                            .pop();
-                                                                      },
-                                                                      child:
-                                                                          Text(
-                                                                        "取消",
-                                                                        style: TextStyle(
-                                                                            fontSize:
-                                                                                18),
-                                                                      ),
-                                                                    ),
-                                                                  ),
-                                                                ],
-                                                              ),
-                                                              SizedBox(
-                                                                height: 8,
-                                                              ),
-                                                            ],
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  );
-                                                },
-                                              );
+                                              _onDeleteActionDialog(
+                                                  context, value);
                                             },
                                             child: Column(
                                               children: [
@@ -872,5 +755,89 @@ class DownloadState extends State<Download> {
                             ),
                           ),
                   )));
+  }
+
+  Future<dynamic> _onDeleteActionDialog(
+      BuildContext context, List<DownloadInfo> value) {
+    return showCupertinoModalPopup(
+      context: context,
+      builder: (context) {
+        return Material(
+          color: Colors.transparent,
+          child: Card(
+            shape: RoundedRectangleBorder(
+                side: BorderSide(), borderRadius: BorderRadius.circular(5)),
+            child: SafeArea(
+              top: false,
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    Text(
+                      "确认删除",
+                      style:
+                          TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
+                    ),
+                    SizedBox(
+                      height: 12,
+                    ),
+                    Text(
+                      "确认要删除${value.length}个下载任务？",
+                      style:
+                          TextStyle(fontSize: 20, fontWeight: FontWeight.w400),
+                    ),
+                    SizedBox(
+                      height: 22,
+                    ),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: OutlinedButton(
+                            onPressed: () async {
+                              Navigator.of(context).pop();
+                              for (DownloadInfo task in value) {
+                                await FlutterDownloader.remove(
+                                    taskId: task.taskId,
+                                    shouldDeleteContent: true);
+                              }
+                              _downloadStateNotifier!.runLoop();
+                              _downloadStateNotifier!.resetSelectedTasks();
+                              _downloadStateNotifier!.multiSelect.value = false;
+                            },
+                            child: Text(
+                              "确认删除",
+                              style: TextStyle(
+                                  fontSize: 18, color: Colors.redAccent),
+                            ),
+                          ),
+                        ),
+                        SizedBox(
+                          width: 20,
+                        ),
+                        Expanded(
+                          child: OutlinedButton(
+                            onPressed: () async {
+                              Navigator.of(context).pop();
+                            },
+                            child: Text(
+                              "取消",
+                              style: TextStyle(fontSize: 18),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(
+                      height: 8,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+    );
   }
 }

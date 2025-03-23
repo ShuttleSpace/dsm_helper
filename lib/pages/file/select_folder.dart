@@ -211,8 +211,6 @@ class _SelectFolderState extends State<SelectFolder> {
                   });
                 },
                 child: SizedBox(
-                  width: 20,
-                  height: 20,
                   child: selectedFiles.contains(file['path'])
                       ? Icon(
                           CupertinoIcons.checkmark_alt,
@@ -220,9 +218,6 @@ class _SelectFolderState extends State<SelectFolder> {
                         )
                       : null,
                 ),
-              ),
-              SizedBox(
-                width: 20,
               ),
             ],
           ),
@@ -261,7 +256,7 @@ class _SelectFolderState extends State<SelectFolder> {
         child: SafeArea(
           top: false,
           child: Container(
-            height: MediaQuery.of(context).size.height * 0.8,
+            height: MediaQuery.sizeOf(context).height * 0.8,
             child: Column(
               children: [
                 Container(

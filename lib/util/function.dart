@@ -92,7 +92,7 @@ class Util {
   );
   bool isWechatInstalled = false;
   DateTime vipExpireTime = DateTime.now();
-  bool vipForever = false;
+  bool vipForever = true;
   String appUrl = "https://dang8080.quickconnect.to";
   String sid = "";
   String account = "";
@@ -103,6 +103,8 @@ class Util {
   bool vibrateOn = true;
   bool vibrateWarning = true;
   bool vibrateNormal = true;
+  bool dashboardCardCollapseSwitch = true;
+  Map<String, bool> dashboardCardCollapseState = {};
   String cookie = "";
   Map strings = {};
   Map notifyStrings = {};

@@ -15,6 +15,8 @@ class _LogCenterState extends State<LogCenter>
   late TabController _tabController;
   List lastLogs = [];
   List logs = [];
+  List logsDisplay = [];
+  String logsDisplayLevel = ''; // null, info, warn, error
   List histories = [];
   bool loadingRecent = true;
   bool loadingLogs = true;
@@ -40,8 +42,8 @@ class _LogCenterState extends State<LogCenter>
     super.initState();
   }
 
-  getData() async {
-    var res = await Api.lastLog(0, 50);
+  getData({int start = 0, int limit = 50}) async {
+    var res = await Api.lastLog(start, limit);
     if (res['success']) {
       setState(() {
         loadingRecent = false;
@@ -56,6 +58,8 @@ class _LogCenterState extends State<LogCenter>
       setState(() {
         loadingLogs = false;
         logs = res['data']['items'];
+        logsDisplay.clear();
+        logsDisplay.addAll(logs);
         errorCount = res['data']['errorCount'];
         warnCount = res['data']['warnCount'];
         infoCount = res['data']['infoCount'];
@@ -217,6 +221,45 @@ class _LogCenterState extends State<LogCenter>
     );
   }
 
+  Widget _buildLogLevelFilter(
+      int count, String type, IconData icondata, Color color) {
+    return InkWell(
+      onTap: () {
+        setState(() {
+          if (logsDisplayLevel == type) {
+            logsDisplayLevel = '';
+          } else {
+            logsDisplayLevel = type;
+          }
+          logsDisplay
+            ..clear()
+            ..addAll(logs.takeWhile((t) => t['level'] == type));
+        });
+      },
+      child: ColorFiltered(
+        colorFilter: logsDisplayLevel == type
+            ? ColorFilter.mode(Colors.transparent, BlendMode.multiply)
+            : ColorFilter.mode(Colors.grey[100]!, BlendMode.saturation),
+        child: Row(
+          children: [
+            Icon(
+              icondata,
+              color: color,
+              size: 20,
+            ),
+            SizedBox(
+              width: 5,
+            ),
+            Text("$count"),
+            SizedBox(
+              width: 5,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -294,31 +337,23 @@ class _LogCenterState extends State<LogCenter>
                           SizedBox(
                             height: 20,
                           ),
-                          Card(
-                            shape: RoundedRectangleBorder(
-                                side: BorderSide(),
-                                borderRadius: BorderRadius.circular(18)),
-                            margin: EdgeInsets.symmetric(horizontal: 20),
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Text("上50个日志"),
-                            ),
-                          ),
-                          SizedBox(
-                            height: 20,
-                          ),
                           Expanded(
-                            child: ListView.separated(
-                              padding: EdgeInsets.symmetric(horizontal: 20),
-                              itemBuilder: (context, i) {
-                                return _buildRecentLogItem(lastLogs[i]);
+                            child: RefreshIndicator(
+                              onRefresh: () {
+                                return getData(start: lastLogs.length);
                               },
-                              itemCount: lastLogs.length,
-                              separatorBuilder: (context, i) {
-                                return SizedBox(
-                                  height: 20,
-                                );
-                              },
+                              child: ListView.separated(
+                                padding: EdgeInsets.symmetric(horizontal: 20),
+                                itemBuilder: (context, i) {
+                                  return _buildRecentLogItem(lastLogs[i]);
+                                },
+                                itemCount: lastLogs.length,
+                                separatorBuilder: (context, i) {
+                                  return SizedBox(
+                                    height: 20,
+                                  );
+                                },
+                              ),
                             ),
                           ),
                         ],
@@ -343,40 +378,35 @@ class _LogCenterState extends State<LogCenter>
                               padding: const EdgeInsets.all(8.0),
                               child: Row(
                                 children: [
-                                  Icon(
-                                    Icons.info,
-                                    color: Colors.lightBlueAccent,
-                                    size: 20,
-                                  ),
-                                  SizedBox(
-                                    width: 5,
-                                  ),
-                                  Text("$infoCount"),
-                                  SizedBox(
-                                    width: 10,
-                                  ),
-                                  Icon(
-                                    Icons.warning,
-                                    color: Colors.orange,
-                                    size: 20,
-                                  ),
-                                  SizedBox(
-                                    width: 5,
-                                  ),
-                                  Text("$warnCount"),
-                                  SizedBox(
-                                    width: 10,
-                                  ),
-                                  Icon(
-                                    Icons.cancel,
-                                    color: Colors.red,
-                                    size: 20,
-                                  ),
-                                  SizedBox(
-                                    width: 5,
-                                  ),
-                                  Text("$errorCount"),
-                                  Spacer(),
+                                  _buildLogLevelFilter(infoCount, 'info',
+                                      Icons.info, Colors.lightBlueAccent),
+                                  _buildLogLevelFilter(warnCount, 'warning',
+                                      Icons.warning, Colors.orange),
+                                  _buildLogLevelFilter(errorCount, 'error',
+                                      Icons.cancel, Colors.red),
+                                  Expanded(
+                                      child: Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: TextField(
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                      ),
+                                      onChanged: (value) {
+                                        setState(() {
+                                          logsDisplay
+                                            ..clear()
+                                            ..addAll(logs.takeWhile((t) =>
+                                                t['descr'].contains(value)));
+                                        });
+                                      },
+                                      decoration: InputDecoration(
+                                          contentPadding:
+                                              EdgeInsets.only(left: 3),
+                                          isCollapsed: true,
+                                          border: OutlineInputBorder(),
+                                          hintText: '搜索'),
+                                    ),
+                                  )),
                                   Text("共$totalCount项"),
                                 ],
                               ),
@@ -389,9 +419,9 @@ class _LogCenterState extends State<LogCenter>
                             child: ListView.separated(
                               padding: EdgeInsets.symmetric(horizontal: 20),
                               itemBuilder: (context, i) {
-                                return _buildLogItem(logs[i]);
+                                return _buildLogItem(logsDisplay[i]);
                               },
-                              itemCount: logs.length,
+                              itemCount: logsDisplay.length,
                               separatorBuilder: (context, i) {
                                 return SizedBox(
                                   height: 20,

@@ -1627,8 +1627,7 @@ class FilesState extends State<Files> {
                         children: [
                           Container(
                             constraints: BoxConstraints(maxWidth: 112),
-                            width:
-                                (MediaQuery.of(context).size.width - 100) / 4,
+                            width: (MediaQuery.sizeOf(context).width - 100) / 3,
                             child: OutlinedButton(
                               onPressed: () async {
                                 Navigator.of(context).pop();
@@ -1655,8 +1654,7 @@ class FilesState extends State<Files> {
                           ),
                           Container(
                             constraints: BoxConstraints(maxWidth: 112),
-                            width:
-                                (MediaQuery.of(context).size.width - 100) / 4,
+                            width: (MediaQuery.sizeOf(context).width - 100) / 3,
                             child: OutlinedButton(
                               onPressed: () async {
                                 Navigator.of(context).pop();
@@ -1683,7 +1681,7 @@ class FilesState extends State<Files> {
                             Container(
                               constraints: BoxConstraints(maxWidth: 112),
                               width:
-                                  (MediaQuery.of(context).size.width - 100) / 4,
+                                  (MediaQuery.sizeOf(context).width - 100) / 3,
                               child: OutlinedButton(
                                 onPressed: () async {
                                   Navigator.of(context).pop();
@@ -1710,7 +1708,7 @@ class FilesState extends State<Files> {
                             Container(
                               constraints: BoxConstraints(maxWidth: 112),
                               width:
-                                  (MediaQuery.of(context).size.width - 100) / 4,
+                                  (MediaQuery.sizeOf(context).width - 100) / 3,
                               child: OutlinedButton(
                                 onPressed: () async {
                                   Navigator.of(context).pop();
@@ -1736,7 +1734,7 @@ class FilesState extends State<Files> {
                             Container(
                               constraints: BoxConstraints(maxWidth: 112),
                               width:
-                                  (MediaQuery.of(context).size.width - 100) / 4,
+                                  (MediaQuery.sizeOf(context).width - 100) / 3,
                               child: OutlinedButton(
                                 onPressed: () async {
                                   Navigator.of(context).pop();
@@ -1767,7 +1765,7 @@ class FilesState extends State<Files> {
                             Container(
                               constraints: BoxConstraints(maxWidth: 112),
                               width:
-                                  (MediaQuery.of(context).size.width - 100) / 4,
+                                  (MediaQuery.sizeOf(context).width - 100) / 3,
                               child: OutlinedButton(
                                 onPressed: () async {
                                   Navigator.of(context).pop();
@@ -1799,7 +1797,7 @@ class FilesState extends State<Files> {
                             Container(
                               constraints: BoxConstraints(maxWidth: 112),
                               width:
-                                  (MediaQuery.of(context).size.width - 100) / 4,
+                                  (MediaQuery.sizeOf(context).width - 100) / 3,
                               child: OutlinedButton(
                                 onPressed: () async {
                                   TextEditingController nameController =
@@ -1975,7 +1973,7 @@ class FilesState extends State<Files> {
                             Container(
                               constraints: BoxConstraints(maxWidth: 112),
                               width:
-                                  (MediaQuery.of(context).size.width - 100) / 4,
+                                  (MediaQuery.sizeOf(context).width - 100) / 3,
                               child: OutlinedButton(
                                 onPressed: () async {
                                   Navigator.of(context).pop();
@@ -2009,7 +2007,7 @@ class FilesState extends State<Files> {
                             Container(
                               constraints: BoxConstraints(maxWidth: 112),
                               width:
-                                  (MediaQuery.of(context).size.width - 100) / 4,
+                                  (MediaQuery.sizeOf(context).width - 100) / 3,
                               child: OutlinedButton(
                                 onPressed: () async {
                                   Navigator.of(context).pop();
@@ -2042,7 +2040,7 @@ class FilesState extends State<Files> {
                             Container(
                               constraints: BoxConstraints(maxWidth: 112),
                               width:
-                                  (MediaQuery.of(context).size.width - 100) / 4,
+                                  (MediaQuery.sizeOf(context).width - 100) / 3,
                               child: OutlinedButton(
                                 onPressed: () async {
                                   Navigator.of(context).pop();
@@ -2075,7 +2073,7 @@ class FilesState extends State<Files> {
                             Container(
                               constraints: BoxConstraints(maxWidth: 112),
                               width:
-                                  (MediaQuery.of(context).size.width - 100) / 4,
+                                  (MediaQuery.sizeOf(context).width - 100) / 3,
                               child: OutlinedButton(
                                 onPressed: () async {
                                   Navigator.of(context).pop();
@@ -2151,9 +2149,12 @@ class FilesState extends State<Files> {
               shape: RoundedRectangleBorder(
                   side: BorderSide(), borderRadius: BorderRadius.circular(18)),
               // padding: EdgeInsets.zero,
-              child: Icon(
-                CupertinoIcons.right_chevron,
-                size: 18,
+              child: Padding(
+                padding: const EdgeInsets.all(2.0),
+                child: Icon(
+                  CupertinoIcons.right_chevron,
+                  size: 14,
+                ),
               ),
             ),
           );
@@ -2162,7 +2163,7 @@ class FilesState extends State<Files> {
           ? BoxConstraints(maxWidth: 112)
           : null,
       width: listType == ListType.icon && !remote
-          ? (MediaQuery.of(context).size.width - 80) / 3
+          ? (MediaQuery.sizeOf(context).width - 80) / 3
           : double.infinity,
       padding: listType == ListType.icon && !remote
           ? EdgeInsets.zero
@@ -2282,7 +2283,9 @@ class FilesState extends State<Files> {
                   Align(
                     alignment: Alignment.center,
                     child: Container(
-                      padding: EdgeInsets.symmetric(vertical: 10),
+                      padding: EdgeInsets.symmetric(
+                        vertical: 5,
+                      ),
                       child: Column(
                         children: [
                           Hero(
@@ -2292,8 +2295,8 @@ class FilesState extends State<Files> {
                               file['isdir'] ? FileTypeEnum.folder : fileType,
                               thumb: file['path'],
                               width:
-                                  (MediaQuery.of(context).size.width - 140) / 3,
-                              height: 60,
+                                  (MediaQuery.sizeOf(context).width - 140) / 3,
+                              height: 30,
                             ),
                           ),
                           SizedBox(
@@ -2463,7 +2466,7 @@ class FilesState extends State<Files> {
 
   Widget _buildTitlteAction(BuildContext context) {
     return SizedBox(
-      width: MediaQuery.of(context).size.width,
+      width: MediaQuery.sizeOf(context).width,
       height: 50,
       child: ListView(
         scrollDirection: Axis.horizontal,
@@ -2563,8 +2566,7 @@ class FilesState extends State<Files> {
                                   constraints: BoxConstraints(
                                     minHeight: 50,
                                     maxHeight:
-                                        MediaQuery.of(context).size.height *
-                                            0.8,
+                                        MediaQuery.sizeOf(context).height * 0.8,
                                   ),
                                   child: SingleChildScrollView(
                                     child: Column(
@@ -2800,7 +2802,7 @@ class FilesState extends State<Files> {
                                                       .size
                                                       .width -
                                                   100) /
-                                              4,
+                                              3,
                                           child: OutlinedButton(
                                             onPressed: () async {
                                               Navigator.of(context).pop();
@@ -2848,7 +2850,7 @@ class FilesState extends State<Files> {
                                                       .size
                                                       .width -
                                                   100) /
-                                              4,
+                                              3,
                                           child: OutlinedButton(
                                             onPressed: () async {
                                               Navigator.of(context).pop();
@@ -3044,9 +3046,9 @@ class FilesState extends State<Files> {
                                         constraints:
                                             BoxConstraints(maxWidth: 112),
                                         width:
-                                            (MediaQuery.of(context).size.width -
+                                            (MediaQuery.sizeOf(context).width -
                                                     100) /
-                                                4,
+                                                3,
                                         child: OutlinedButton(
                                           onPressed: () async {
                                             Navigator.of(context).pop();
@@ -3077,9 +3079,9 @@ class FilesState extends State<Files> {
                                         constraints:
                                             BoxConstraints(maxWidth: 112),
                                         width:
-                                            (MediaQuery.of(context).size.width -
+                                            (MediaQuery.sizeOf(context).width -
                                                     100) /
-                                                4,
+                                                3,
                                         child: OutlinedButton(
                                           onPressed: () async {
                                             Navigator.of(context).pop();
@@ -3112,7 +3114,7 @@ class FilesState extends State<Files> {
                                       // if (paths.length > 0)
                                       //   Container(
                                       //     constraints: BoxConstraints(maxWidth: 112),
-                                      //     width: (MediaQuery.of(context).size.width - 100) / 4,
+                                      //     width: (MediaQuery.sizeOf(context).width - 100) / 3,
                                       //     child: NeuButton(
                                       //       onPressed: () async {
                                       //         Navigator.of(context).pop();
@@ -3207,13 +3209,13 @@ class FilesState extends State<Files> {
                 children: [
                   Container(
                     margin: EdgeInsets.only(left: 20),
-                    padding: const EdgeInsets.symmetric(vertical: 10),
                     child: Card(
                       shape: RoundedRectangleBorder(
                           side: BorderSide(),
                           borderRadius: BorderRadius.circular(18)),
                       child: Padding(
-                        padding: const EdgeInsets.all(8.0),
+                        padding:
+                            EdgeInsets.symmetric(vertical: 3, horizontal: 5),
                         child: Text(
                           "搜索结果",
                           style: TextStyle(fontSize: 12),
@@ -3233,13 +3235,13 @@ class FilesState extends State<Files> {
                     },
                     child: Container(
                       margin: EdgeInsets.only(right: 20),
-                      padding: const EdgeInsets.symmetric(vertical: 10),
                       child: Card(
                         shape: RoundedRectangleBorder(
                             side: BorderSide(),
                             borderRadius: BorderRadius.circular(18)),
                         child: Padding(
-                          padding: const EdgeInsets.all(8.0),
+                          padding:
+                              EdgeInsets.symmetric(vertical: 3, horizontal: 5),
                           child: searching
                               ? Row(
                                   children: [
@@ -3539,8 +3541,8 @@ class FilesState extends State<Files> {
                       ),
                       if (loading)
                         Container(
-                          width: MediaQuery.of(context).size.width,
-                          height: MediaQuery.of(context).size.height,
+                          width: MediaQuery.sizeOf(context).width,
+                          height: MediaQuery.sizeOf(context).height,
                           color: Theme.of(context)
                               .scaffoldBackgroundColor
                               .withOpacity(0.7),

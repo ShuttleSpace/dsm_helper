@@ -23,22 +23,22 @@ class FileIcon extends StatelessWidget {
     if (fileType == FileTypeEnum.folder) {
       return Image.asset(
         "assets/icons/folder.png",
-        width: 40,
-        height: 60,
+        width: width,
+        height: height,
       );
     } else if (fileType == FileTypeEnum.music) {
       return Image.asset(
         "assets/icons/music.png",
-        width: 40,
-        height: 60,
+        width: width,
+        height: height,
       );
     } else if (fileType == FileTypeEnum.movie) {
       print(thumb);
       return thumb == null
           ? Image.asset(
               "assets/icons/movie.png",
-              width: 40,
-              height: 60,
+              width: width,
+              height: height,
             )
           : network
               ? CupertinoExtendedImage(
@@ -48,13 +48,13 @@ class FileIcon extends StatelessWidget {
                   height: height,
                   fit: fit,
                   placeholder: Container(
-                    width: 40,
-                    height: 60,
+                    width: width,
+                    height: height,
                     alignment: Alignment.center,
                     child: Image.asset(
                       "assets/icons/movie.png",
-                      width: 40,
-                      height: 40,
+                      width: width,
+                      height: height,
                     ),
                   ),
                 )
@@ -68,8 +68,8 @@ class FileIcon extends StatelessWidget {
       return thumb == null
           ? Image.asset(
               "assets/icons/image.png",
-              width: 40,
-              height: 60,
+              width: width,
+              height: height,
             )
           : network
               ? CupertinoExtendedImage(
@@ -88,68 +88,68 @@ class FileIcon extends StatelessWidget {
     } else if (fileType == FileTypeEnum.word) {
       return Image.asset(
         "assets/icons/word.png",
-        width: 40,
-        height: 60,
+        width: width,
+        height: height,
       );
     } else if (fileType == FileTypeEnum.ppt) {
       return Image.asset(
         "assets/icons/ppt.png",
-        width: 40,
-        height: 60,
+        width: width,
+        height: height,
       );
     } else if (fileType == FileTypeEnum.excel) {
       return Image.asset(
         "assets/icons/excel.png",
-        width: 40,
-        height: 60,
+        width: width,
+        height: height,
       );
     } else if (fileType == FileTypeEnum.pdf) {
       return Image.asset(
         "assets/icons/pdf.png",
-        width: 40,
-        height: 60,
+        width: width,
+        height: height,
       );
     } else if (fileType == FileTypeEnum.zip) {
       return Image.asset(
         "assets/icons/zip.png",
-        width: 40,
-        height: 60,
+        width: width,
+        height: height,
       );
     } else if (fileType == FileTypeEnum.ps) {
       return Image.asset(
         "assets/icons/psd.png",
-        width: 40,
-        height: 60,
+        width: width,
+        height: height,
       );
     } else if (fileType == FileTypeEnum.text) {
       return Image.asset(
         "assets/icons/txt.png",
-        width: 40,
-        height: 60,
+        width: width,
+        height: height,
       );
     } else if (fileType == FileTypeEnum.code) {
       return Image.asset(
         "assets/icons/code.png",
-        width: 40,
-        height: 60,
+        width: width,
+        height: height,
       );
     } else if (fileType == FileTypeEnum.apk) {
       return Image.asset(
         "assets/icons/apk.png",
-        width: 40,
-        height: 60,
+        width: width,
+        height: height,
       );
     } else if (fileType == FileTypeEnum.iso) {
       return Image.asset(
         "assets/icons/iso.png",
-        width: 40,
-        height: 60,
+        width: width,
+        height: height,
       );
     } else {
       return Image.asset(
         "assets/icons/other.png",
-        width: 40,
-        height: 60,
+        width: width,
+        height: height,
       );
     }
   }

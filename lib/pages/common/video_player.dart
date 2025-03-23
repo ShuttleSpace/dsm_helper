@@ -208,12 +208,12 @@ class _VideoPlayerState extends State<VideoPlayer> {
       body: Column(
         children: [
           // Container(
-          //   width: MediaQuery.of(context).size.width,
-          //   height: MediaQuery.of(context).size.width * 9 / 16,
+          //   width: MediaQuery.sizeOf(context).width,
+          //   height: MediaQuery.sizeOf(context).width * 9 / 16,
           //   alignment: Alignment.center,
           //   child: FijkView(
-          //     width: MediaQuery.of(context).size.width,
-          //     height: MediaQuery.of(context).size.width * 9 / 16,
+          //     width: MediaQuery.sizeOf(context).width,
+          //     height: MediaQuery.sizeOf(context).width * 9 / 16,
           //     fit: FijkFit.contain,
           //     player: player,
           //     color: Colors.black,
@@ -223,7 +223,7 @@ class _VideoPlayerState extends State<VideoPlayer> {
           FView(
             player: player,
             width: double.infinity,
-            height: MediaQuery.of(context).size.width * 9 / 16,
+            height: MediaQuery.sizeOf(context).width * 9 / 16,
             color: Colors.black,
             fsFit: FFit.contain, // 全屏模式下的填充
             fit: FFit.contain, // 正常模式下的填充

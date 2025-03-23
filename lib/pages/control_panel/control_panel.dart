@@ -209,8 +209,8 @@ class _ControlPanelState extends State<ControlPanel> {
                             ),
                           ),
                         // NeuCard(
-                        //   width: (MediaQuery.of(context).size.width - 120) / 3,
-                        //   height: (MediaQuery.of(context).size.width - 120) / 3,
+                        //   width: (MediaQuery.sizeOf(context).width - 120) / 3,
+                        //   height: (MediaQuery.sizeOf(context).width - 120) / 3,
                         //   curveType: CurveType.flat,
                         //   decoration: NeumorphicDecoration(
                         //     color: Theme.of(context).scaffoldBackgroundColor,
@@ -271,8 +271,8 @@ class _ControlPanelState extends State<ControlPanel> {
                       children: [
                         // if (Util.version < 7)
                         //   NeuCard(
-                        //     width: (MediaQuery.of(context).size.width - 120) / 3,
-                        //     height: (MediaQuery.of(context).size.width - 120) / 3,
+                        //     width: (MediaQuery.sizeOf(context).width - 120) / 3,
+                        //     height: (MediaQuery.sizeOf(context).width - 120) / 3,
                         //     curveType: CurveType.convex,
                         //     decoration: NeumorphicDecoration(
                         //       color: Theme.of(context).scaffoldBackgroundColor,
@@ -371,8 +371,8 @@ class _ControlPanelState extends State<ControlPanel> {
                         ),
                         // if (Util.version < 7)
                         //   NeuCard(
-                        //     width: (MediaQuery.of(context).size.width - 120) / 3,
-                        //     height: (MediaQuery.of(context).size.width - 120) / 3,
+                        //     width: (MediaQuery.sizeOf(context).width - 120) / 3,
+                        //     height: (MediaQuery.sizeOf(context).width - 120) / 3,
                         //     curveType: CurveType.convex,
                         //     decoration: NeumorphicDecoration(
                         //       color: Theme.of(context).scaffoldBackgroundColor,
@@ -400,8 +400,8 @@ class _ControlPanelState extends State<ControlPanel> {
                         //   ),
                         // if (Util.version < 7)
                         //   NeuCard(
-                        //     width: (MediaQuery.of(context).size.width - 120) / 3,
-                        //     height: (MediaQuery.of(context).size.width - 120) / 3,
+                        //     width: (MediaQuery.sizeOf(context).width - 120) / 3,
+                        //     height: (MediaQuery.sizeOf(context).width - 120) / 3,
                         //     curveType: CurveType.convex,
                         //     decoration: NeumorphicDecoration(
                         //       color: Theme.of(context).scaffoldBackgroundColor,
@@ -428,8 +428,8 @@ class _ControlPanelState extends State<ControlPanel> {
                         //     ),
                         //   ),
                         // NeuCard(
-                        //   width: (MediaQuery.of(context).size.width - 120) / 3,
-                        //   height: (MediaQuery.of(context).size.width - 120) / 3,
+                        //   width: (MediaQuery.sizeOf(context).width - 120) / 3,
+                        //   height: (MediaQuery.sizeOf(context).width - 120) / 3,
                         //   curveType: CurveType.convex,
                         //   decoration: NeumorphicDecoration(
                         //     color: Theme.of(context).scaffoldBackgroundColor,
@@ -565,8 +565,8 @@ class _ControlPanelState extends State<ControlPanel> {
                           ),
                         ),
                         // NeuCard(
-                        //   width: (MediaQuery.of(context).size.width - 120) / 3,
-                        //   height: (MediaQuery.of(context).size.width - 120) / 3,
+                        //   width: (MediaQuery.sizeOf(context).width - 120) / 3,
+                        //   height: (MediaQuery.sizeOf(context).width - 120) / 3,
                         //   curveType: CurveType.flat,
                         //   decoration: NeumorphicDecoration(
                         //     color: Theme.of(context).scaffoldBackgroundColor,
@@ -593,8 +593,8 @@ class _ControlPanelState extends State<ControlPanel> {
                         //   ),
                         // ),
                         // NeuCard(
-                        //   width: (MediaQuery.of(context).size.width - 120) / 3,
-                        //   height: (MediaQuery.of(context).size.width - 120) / 3,
+                        //   width: (MediaQuery.sizeOf(context).width - 120) / 3,
+                        //   height: (MediaQuery.sizeOf(context).width - 120) / 3,
                         //   curveType: CurveType.flat,
                         //   decoration: NeumorphicDecoration(
                         //     color: Theme.of(context).scaffoldBackgroundColor,
@@ -621,8 +621,8 @@ class _ControlPanelState extends State<ControlPanel> {
                         //   ),
                         // ),
                         // NeuCard(
-                        //   width: (MediaQuery.of(context).size.width - 120) / 3,
-                        //   height: (MediaQuery.of(context).size.width - 120) / 3,
+                        //   width: (MediaQuery.sizeOf(context).width - 120) / 3,
+                        //   height: (MediaQuery.sizeOf(context).width - 120) / 3,
                         //   curveType: CurveType.flat,
                         //   decoration: NeumorphicDecoration(
                         //     color: Theme.of(context).scaffoldBackgroundColor,
@@ -853,8 +853,8 @@ class _ControlPanelState extends State<ControlPanel> {
                       children: [
                         // if (Util.version >= 7)
                         //   NeuCard(
-                        //     width: (MediaQuery.of(context).size.width - 120) / 3,
-                        //     height: (MediaQuery.of(context).size.width - 120) / 3,
+                        //     width: (MediaQuery.sizeOf(context).width - 120) / 3,
+                        //     height: (MediaQuery.sizeOf(context).width - 120) / 3,
                         //     curveType: CurveType.flat,
                         //     decoration: NeumorphicDecoration(
                         //       color: Theme.of(context).scaffoldBackgroundColor,
@@ -883,8 +883,8 @@ class _ControlPanelState extends State<ControlPanel> {
                         //     ),
                         //   ),
                         // NeuCard(
-                        //   width: (MediaQuery.of(context).size.width - 120) / 3,
-                        //   height: (MediaQuery.of(context).size.width - 120) / 3,
+                        //   width: (MediaQuery.sizeOf(context).width - 120) / 3,
+                        //   height: (MediaQuery.sizeOf(context).width - 120) / 3,
                         //   curveType: CurveType.flat,
                         //   decoration: NeumorphicDecoration(
                         //     color: Theme.of(context).scaffoldBackgroundColor,
@@ -912,8 +912,8 @@ class _ControlPanelState extends State<ControlPanel> {
                         // ),
                         // if (Util.version < 7)
                         //   NeuCard(
-                        //     width: (MediaQuery.of(context).size.width - 120) / 3,
-                        //     height: (MediaQuery.of(context).size.width - 120) / 3,
+                        //     width: (MediaQuery.sizeOf(context).width - 120) / 3,
+                        //     height: (MediaQuery.sizeOf(context).width - 120) / 3,
                         //     curveType: CurveType.flat,
                         //     decoration: NeumorphicDecoration(
                         //       color: Theme.of(context).scaffoldBackgroundColor,
@@ -978,8 +978,8 @@ class _ControlPanelState extends State<ControlPanel> {
                         ),
                         // if (Util.version < 7)
                         //   NeuCard(
-                        //     width: (MediaQuery.of(context).size.width - 120) / 3,
-                        //     height: (MediaQuery.of(context).size.width - 120) / 3,
+                        //     width: (MediaQuery.sizeOf(context).width - 120) / 3,
+                        //     height: (MediaQuery.sizeOf(context).width - 120) / 3,
                         //     curveType: CurveType.flat,
                         //     decoration: NeumorphicDecoration(
                         //       color: Theme.of(context).scaffoldBackgroundColor,

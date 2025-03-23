@@ -29,7 +29,7 @@ class _PhotosState extends State<Photos> {
 
   @override
   Widget build(BuildContext context) {
-    final menuW = MediaQuery.of(context).size.width / 5;
+    final menuW = MediaQuery.sizeOf(context).width / 5;
     return Scaffold(
       appBar: AppBar(
         leading: AppBackButton(context),

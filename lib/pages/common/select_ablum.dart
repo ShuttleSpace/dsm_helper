@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:humphrey_garden/util/function.dart';
 import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 
 class SelectAlbum extends StatefulWidget {
@@ -30,6 +31,9 @@ class _SelectAlbumState extends State<SelectAlbum> {
     List<AssetPathEntity> list = await PhotoManager.getAssetPathList();
     setState(() {
       albums = list;
+      if (albums.isEmpty) {
+        Util.instance.toast('not found album!');
+      }
     });
   }
 
@@ -117,7 +121,7 @@ class _SelectAlbumState extends State<SelectAlbum> {
     return Material(
       color: Theme.of(context).scaffoldBackgroundColor,
       child: Container(
-        height: MediaQuery.of(context).size.height * 0.8,
+        height: MediaQuery.sizeOf(context).height * 0.8,
         child: SafeArea(
           top: false,
           child: Column(

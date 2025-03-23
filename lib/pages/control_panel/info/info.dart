@@ -211,89 +211,92 @@ class _SystemInfoState extends State<SystemInfo>
       shape: RoundedRectangleBorder(
           side: BorderSide(), borderRadius: BorderRadius.circular(18)),
       margin: EdgeInsets.only(top: 20, left: 20, right: 20),
-      child: Row(
-        children: [
-          CircularPercentIndicator(
-            radius: 40,
-            // progressColor: Colors.lightBlueAccent,
-            animation: true,
-            linearGradient: LinearGradient(
-              colors: percent <= 0.9
-                  ? [
-                      Colors.blue,
-                      Colors.blueAccent,
-                    ]
-                  : [
-                      Colors.red,
-                      Colors.orangeAccent,
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Row(
+          children: [
+            CircularPercentIndicator(
+              radius: 40,
+              // progressColor: Colors.lightBlueAccent,
+              animation: true,
+              linearGradient: LinearGradient(
+                colors: percent <= 0.9
+                    ? [
+                        Colors.blue,
+                        Colors.blueAccent,
+                      ]
+                    : [
+                        Colors.red,
+                        Colors.orangeAccent,
+                      ],
+              ),
+              animateFromLastPercent: true,
+              circularStrokeCap: CircularStrokeCap.round,
+              lineWidth: 12,
+              backgroundColor: Colors.black12,
+              percent: percent,
+              center: Text(
+                "${(percent * 100).toStringAsFixed(0)}%",
+                style: TextStyle(
+                    color: percent <= 0.9 ? Colors.blue : Colors.red,
+                    fontSize: 22),
+              ),
+            ),
+            SizedBox(
+              width: 10,
+            ),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Text(
+                        "存储空间 ${volume['num_id']}",
+                        style: TextStyle(fontWeight: FontWeight.w600),
+                      ),
+                      SizedBox(
+                        width: 5,
+                      ),
+                      volume['status'] == "normal"
+                          ? Label(
+                              "正常",
+                              Colors.green,
+                              fill: true,
+                            )
+                          : volume['status'] == "background"
+                              ? Label(
+                                  "正在检查硬盘",
+                                  Colors.lightBlueAccent,
+                                  fill: true,
+                                )
+                              : volume['status'] == "attention"
+                                  ? Label(
+                                      "注意",
+                                      Colors.orangeAccent,
+                                      fill: true,
+                                    )
+                                  : Label(
+                                      volume['status'],
+                                      Colors.red,
+                                      fill: true,
+                                    ),
                     ],
-            ),
-            animateFromLastPercent: true,
-            circularStrokeCap: CircularStrokeCap.round,
-            lineWidth: 12,
-            backgroundColor: Colors.black12,
-            percent: percent,
-            center: Text(
-              "${(percent * 100).toStringAsFixed(0)}%",
-              style: TextStyle(
-                  color: percent <= 0.9 ? Colors.blue : Colors.red,
-                  fontSize: 22),
-            ),
-          ),
-          SizedBox(
-            width: 10,
-          ),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Text(
-                      "存储空间 ${volume['num_id']}",
-                      style: TextStyle(fontWeight: FontWeight.w600),
-                    ),
-                    SizedBox(
-                      width: 5,
-                    ),
-                    volume['status'] == "normal"
-                        ? Label(
-                            "正常",
-                            Colors.green,
-                            fill: true,
-                          )
-                        : volume['status'] == "background"
-                            ? Label(
-                                "正在检查硬盘",
-                                Colors.lightBlueAccent,
-                                fill: true,
-                              )
-                            : volume['status'] == "attention"
-                                ? Label(
-                                    "注意",
-                                    Colors.orangeAccent,
-                                    fill: true,
-                                  )
-                                : Label(
-                                    volume['status'],
-                                    Colors.red,
-                                    fill: true,
-                                  ),
-                  ],
-                ),
-                SizedBox(
-                  height: 5,
-                ),
-                Text("${volume['desc'] ?? (volume['vol_desc'] ?? "-")}"),
-                SizedBox(
-                  height: 5,
-                ),
-                Text(
-                    "${Util.instance.formatSize(int.parse(volume['size']['used']))} / ${Util.instance.formatSize(int.parse(volume['size']['total']))}"),
-              ],
-            ),
-          )
-        ],
+                  ),
+                  SizedBox(
+                    height: 5,
+                  ),
+                  Text("${volume['desc'] ?? (volume['vol_desc'] ?? "-")}"),
+                  SizedBox(
+                    height: 5,
+                  ),
+                  Text(
+                      "${Util.instance.formatSize(int.parse(volume['size']['used']))} / ${Util.instance.formatSize(int.parse(volume['size']['total']))}"),
+                ],
+              ),
+            )
+          ],
+        ),
       ),
     );
   }
@@ -303,65 +306,70 @@ class _SystemInfoState extends State<SystemInfo>
       shape: RoundedRectangleBorder(
           side: BorderSide(), borderRadius: BorderRadius.circular(18)),
       margin: EdgeInsets.only(top: 20, left: 20, right: 20),
-      child: Row(
-        children: [
-          Card(
-            shape: RoundedRectangleBorder(
-                side: BorderSide(), borderRadius: BorderRadius.circular(18)),
-            margin: EdgeInsets.all(10),
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Image.asset(
-                disk['isSsd'] ? "assets/icons/ssd.png" : "assets/icons/hdd.png",
-                width: 40,
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Row(
+          children: [
+            Card(
+              shape: RoundedRectangleBorder(
+                  side: BorderSide(), borderRadius: BorderRadius.circular(18)),
+              margin: EdgeInsets.all(10),
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Image.asset(
+                  disk['isSsd']
+                      ? "assets/icons/ssd.png"
+                      : "assets/icons/hdd.png",
+                  width: 40,
+                ),
               ),
             ),
-          ),
-          SizedBox(
-            width: 10,
-          ),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Text(
-                      "${disk['longName']}",
-                      style: TextStyle(fontWeight: FontWeight.w600),
-                    ),
-                    SizedBox(
-                      width: 5,
-                    ),
-                    Label(
-                      disk['overview_status'] == "normal"
-                          ? "正常"
-                          : disk['overview_status'],
-                      disk['overview_status'] == "normal"
-                          ? Colors.green
-                          : Colors.red,
-                      fill: true,
-                    ),
-                  ],
-                ),
-                SizedBox(
-                  height: 5,
-                ),
-                Text("${disk['vendor'].trim()} ${disk['model'].trim()}"),
-                SizedBox(
-                  height: 5,
-                ),
-                Row(
-                  children: [
-                    Text(
-                        "${Util.instance.formatSize(int.parse(disk['size_total']))}"),
-                    Text("  ${disk['temp']}℃"),
-                  ],
-                ),
-              ],
+            SizedBox(
+              width: 10,
             ),
-          )
-        ],
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Text(
+                        "${disk['longName']}",
+                        style: TextStyle(fontWeight: FontWeight.w600),
+                      ),
+                      SizedBox(
+                        width: 5,
+                      ),
+                      Label(
+                        disk['overview_status'] == "normal"
+                            ? "正常"
+                            : disk['overview_status'],
+                        disk['overview_status'] == "normal"
+                            ? Colors.green
+                            : Colors.red,
+                        fill: true,
+                      ),
+                    ],
+                  ),
+                  SizedBox(
+                    height: 5,
+                  ),
+                  Text("${disk['vendor'].trim()} ${disk['model'].trim()}"),
+                  SizedBox(
+                    height: 5,
+                  ),
+                  Row(
+                    children: [
+                      Text(
+                          "${Util.instance.formatSize(int.parse(disk['size_total']))}"),
+                      Text("  ${disk['temp']}℃"),
+                    ],
+                  ),
+                ],
+              ),
+            )
+          ],
+        ),
       ),
     );
   }
@@ -818,138 +826,132 @@ class _SystemInfoState extends State<SystemInfo>
                       ),
                   ],
                 ),
-                network == null
-                    ? Center(
-                        child: Text("网络信息加载失败"),
-                      )
-                    : ListView(
-                        children: [
-                          Card(
-                            margin:
-                                EdgeInsets.only(top: 20, left: 20, right: 20),
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Padding(
-                                    padding: EdgeInsets.only(top: 20, left: 20),
-                                    child: Text(
-                                      "基本信息",
-                                      style: TextStyle(
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.w600),
-                                    ),
-                                  ),
-                                  Card(
-                                    margin: EdgeInsets.only(
-                                        top: 20, left: 20, right: 20),
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: Row(
-                                        children: [
-                                          Expanded(
-                                            child: Text(
-                                              "系统名称",
-                                              overflow: TextOverflow.ellipsis,
-                                            ),
-                                          ),
-                                          Expanded(
-                                            flex: 2,
-                                            child: Text(
-                                              "${network['hostname']}",
-                                              overflow: TextOverflow.ellipsis,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                  Card(
-                                    margin: EdgeInsets.only(
-                                        top: 20, left: 20, right: 20),
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: Row(
-                                        children: [
-                                          Expanded(
-                                            flex: 1,
-                                            child: Text(
-                                              "DNS",
-                                              overflow: TextOverflow.ellipsis,
-                                            ),
-                                          ),
-                                          Expanded(
-                                            flex: 2,
-                                            child: Text(
-                                              "${network['dns']}",
-                                              overflow: TextOverflow.ellipsis,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                  Card(
-                                    margin: EdgeInsets.only(
-                                        top: 20, left: 20, right: 20),
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: Row(
-                                        children: [
-                                          Expanded(
-                                            flex: 1,
-                                            child: Text(
-                                              "默认网关",
-                                              overflow: TextOverflow.ellipsis,
-                                            ),
-                                          ),
-                                          Expanded(
-                                            flex: 2,
-                                            child: Text(
-                                              "${network['gateway']}",
-                                              overflow: TextOverflow.ellipsis,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                  Card(
-                                    margin: EdgeInsets.only(
-                                        top: 20, left: 20, right: 20),
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: Row(
-                                        children: [
-                                          Expanded(
-                                            flex: 1,
-                                            child: Text(
-                                              "工作群组",
-                                              overflow: TextOverflow.ellipsis,
-                                            ),
-                                          ),
-                                          Expanded(
-                                            flex: 2,
-                                            child: Text(
-                                              "${network['workgroup']}",
-                                              overflow: TextOverflow.ellipsis,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                  SizedBox(
-                                    height: 20,
-                                  ),
-                                ],
+                ListView(
+                  children: [
+                    Card(
+                      margin: EdgeInsets.only(top: 20, left: 20, right: 20),
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Padding(
+                              padding: EdgeInsets.only(top: 20, left: 20),
+                              child: Text(
+                                "基本信息",
+                                style: TextStyle(
+                                    fontSize: 18, fontWeight: FontWeight.w600),
                               ),
                             ),
-                          ),
-                          ...nifs.map(_buildNifItem).toList(),
-                        ],
+                            Card(
+                              margin:
+                                  EdgeInsets.only(top: 20, left: 20, right: 20),
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Row(
+                                  children: [
+                                    Expanded(
+                                      child: Text(
+                                        "系统名称",
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                    Expanded(
+                                      flex: 2,
+                                      child: Text(
+                                        "${network['hostname']}",
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            Card(
+                              margin:
+                                  EdgeInsets.only(top: 20, left: 20, right: 20),
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Row(
+                                  children: [
+                                    Expanded(
+                                      flex: 1,
+                                      child: Text(
+                                        "DNS",
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                    Expanded(
+                                      flex: 2,
+                                      child: Text(
+                                        "${network['dns']}",
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            Card(
+                              margin:
+                                  EdgeInsets.only(top: 20, left: 20, right: 20),
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Row(
+                                  children: [
+                                    Expanded(
+                                      flex: 1,
+                                      child: Text(
+                                        "默认网关",
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                    Expanded(
+                                      flex: 2,
+                                      child: Text(
+                                        "${network['gateway']}",
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            Card(
+                              margin:
+                                  EdgeInsets.only(top: 20, left: 20, right: 20),
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Row(
+                                  children: [
+                                    Expanded(
+                                      flex: 1,
+                                      child: Text(
+                                        "工作群组",
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                    Expanded(
+                                      flex: 2,
+                                      child: Text(
+                                        "${network['workgroup']}",
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            SizedBox(
+                              height: 20,
+                            ),
+                          ],
+                        ),
                       ),
+                    ),
+                    ...nifs.map(_buildNifItem).toList(),
+                  ],
+                ),
                 loadingDisks
                     ? Center(
                         child: CupertinoActivityIndicator(

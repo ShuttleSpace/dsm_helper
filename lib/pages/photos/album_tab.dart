@@ -88,7 +88,7 @@ class AlbumTabState extends State<AlbumTab> {
 
   @override
   Widget build(BuildContext context) {
-    albumWidth = MediaQuery.of(context).size.width / 5;
+    albumWidth = MediaQuery.sizeOf(context).width / 5;
     return ListView(
       padding: EdgeInsets.all(20),
       children: [
@@ -253,7 +253,7 @@ class AlbumTabState extends State<AlbumTab> {
                       tag: e.additional?.thumbnail ?? '',
                       child: CupertinoExtendedImage(
                         e.additional?.thumbnail?.thumbUrl() ?? '',
-                        width: MediaQuery.of(context).size.width - 40,
+                        width: MediaQuery.sizeOf(context).width - 40,
                         height: 200,
                         fit: BoxFit.cover,
                         placeholder: Container(
@@ -265,7 +265,7 @@ class AlbumTabState extends State<AlbumTab> {
                       left: 0,
                       bottom: 0,
                       child: Container(
-                        width: MediaQuery.of(context).size.width - 40,
+                        width: MediaQuery.sizeOf(context).width - 40,
                         padding: EdgeInsets.fromLTRB(10, 20, 10, 10),
                         decoration: BoxDecoration(
                           gradient: LinearGradient(

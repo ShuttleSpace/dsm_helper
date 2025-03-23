@@ -27,7 +27,7 @@ class ApplicationList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: MediaQuery.of(context).size.width * 0.8,
+      width: MediaQuery.sizeOf(context).width * 0.8,
       color: Theme.of(context).scaffoldBackgroundColor,
       child: SafeArea(
         child: ListView(
@@ -616,7 +616,7 @@ class ApplicationList extends StatelessWidget {
     // if (applications.contains("SYNO.SDS.EzInternet.Instance")) {
     //   apps.add(
     //     NeuCard(
-    //       width: (MediaQuery.of(context).size.width * 0.8 - 60) / 2,
+    //       width: (MediaQuery.sizeOf(context).width * 0.8 - 60) / 2,
     //       height: 110,
     //       padding: EdgeInsets.symmetric(vertical: 20),
     //       curveType: CurveType.flat,
@@ -645,7 +645,7 @@ class ApplicationList extends StatelessWidget {
     // if (applications.contains("SYNO.SDS.SupportForm.Application")) {
     //   apps.add(
     //     NeuCard(
-    //       width: (MediaQuery.of(context).size.width * 0.8 - 60) / 2,
+    //       width: (MediaQuery.sizeOf(context).width * 0.8 - 60) / 2,
     //       curveType: CurveType.flat,
     //       decoration: NeumorphicDecoration(
     //         color: Theme.of(context).scaffoldBackgroundColor,
@@ -683,7 +683,7 @@ class ApplicationList extends StatelessWidget {
     //             settings: RouteSettings(name: "iSCSI_manager")));
     //       },
     //       child: NeuCard(
-    //         width: (MediaQuery.of(context).size.width * 0.8 - 60) / 2,
+    //         width: (MediaQuery.sizeOf(context).width * 0.8 - 60) / 2,
     //         curveType: CurveType.flat,
     //         decoration: NeumorphicDecoration(
     //           color: Theme.of(context).scaffoldBackgroundColor,
@@ -713,7 +713,7 @@ class ApplicationList extends StatelessWidget {
     // if (applications.contains("SYNO.SDS.App.FileStation3.Instance")) {
     //   apps.add(
     //     NeuCard(
-    //       width: (MediaQuery.of(context).size.width * 0.8 - 60) / 2,
+    //       width: (MediaQuery.sizeOf(context).width * 0.8 - 60) / 2,
     //       curveType: CurveType.flat,
     //       decoration: NeumorphicDecoration(
     //         color: Theme.of(context).scaffoldBackgroundColor,
@@ -751,7 +751,7 @@ class ApplicationList extends StatelessWidget {
     //             settings: RouteSettings(name: "universal_search")));
     //       },
     //       child: NeuCard(
-    //         width: (MediaQuery.of(context).size.width * 0.8 - 60) / 2,
+    //         width: (MediaQuery.sizeOf(context).width * 0.8 - 60) / 2,
     //         curveType: CurveType.flat,
     //         decoration: NeumorphicDecoration(
     //           color: Theme.of(context).scaffoldBackgroundColor,

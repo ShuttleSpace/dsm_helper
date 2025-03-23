@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:ui';
 
 import 'package:cool_ui/cool_ui.dart';
 import 'package:dio/dio.dart';
@@ -191,7 +192,7 @@ class _BackupState extends State<Backup> {
                 child: Stack(
                   children: [
                     Container(
-                      width: (MediaQuery.of(context).size.width - 40) *
+                      width: (MediaQuery.sizeOf(context).width - 40) *
                           (uploading?.uploadSize ??
                               1 /
                                   (uploading?.fileSize == 0
@@ -199,8 +200,8 @@ class _BackupState extends State<Backup> {
                                       : (uploading?.fileSize ?? 1))),
                       height: 70,
                       decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(20),
-                        color: Colors.blue,
+                        borderRadius: BorderRadius.circular(10),
+                        color: Colors.amber[100],
                       ),
                     ),
                     Padding(
@@ -214,7 +215,7 @@ class _BackupState extends State<Backup> {
                                   height: 40,
                                   width: 40,
                                 )
-                              : FileIcon(FileTypeEnum.movie),
+                              : FileIcon(FileTypeEnum.image),
                           SizedBox(
                             width: 20,
                           ),
@@ -224,7 +225,7 @@ class _BackupState extends State<Backup> {
                               children: [
                                 Text(
                                   uploading?.file?.path.split("/").last ??
-                                      '[Wrong State]',
+                                      '[Idle]',
                                   overflow: TextOverflow.ellipsis,
                                   maxLines: 2,
                                   style: TextStyle(fontSize: 13),
@@ -233,8 +234,7 @@ class _BackupState extends State<Backup> {
                                   height: 5,
                                 ),
                                 Text(
-                                  uploading?.file?.parent.path ??
-                                      '[Wrong State]',
+                                  uploading?.file?.parent.path ?? '[Idle]',
                                   overflow: TextOverflow.ellipsis,
                                   maxLines: 1,
                                   style: TextStyle(
@@ -255,23 +255,14 @@ class _BackupState extends State<Backup> {
             ),
           ],
           OutlinedButton(
-            onPressed: () {
-              showCupertinoModalPopup(
-                context: context,
-                builder: (context) {
-                  return SelectFolder(
-                    multi: false,
-                  );
-                },
-              ).then((res) {
-                if (res != null && res.length == 1) {
-                  setState(() {
-                    backupFolder = res[0];
-                    Util.instance.setStorage("backup_folder", backupFolder);
-                  });
-                }
-              });
-            },
+            onPressed: () => _onChooseBackupTargetDialog(context).then((res) {
+              if (res != null && res.length == 1) {
+                setState(() {
+                  backupFolder = res[0];
+                  Util.instance.setStorage("backup_folder", backupFolder);
+                });
+              }
+            }),
             child: Row(
               children: [
                 Column(
@@ -295,15 +286,7 @@ class _BackupState extends State<Backup> {
           ),
           OutlinedButton(
             onPressed: () {
-              showCupertinoModalPopup(
-                context: context,
-                builder: (context) {
-                  return SelectAlbum(
-                    multi: true,
-                    selected: albums,
-                  );
-                },
-              ).then((res) {
+              _onChooseBackupSourceDialog(context).then((res) {
                 print(res);
                 if (res != null) {
                   setState(() {
@@ -477,94 +460,7 @@ class _BackupState extends State<Backup> {
           ),
           uploading == null
               ? OutlinedButton(
-                  onPressed: () async {
-                    if (backupFolder.isBlank) {
-                      Util.instance.vibrate(FeedbackType.warning);
-                      Util.instance.toast("请选择备份目的地");
-                      return;
-                    }
-                    if (albums.length == 0) {
-                      Util.instance.vibrate(FeedbackType.warning);
-                      Util.instance.toast("请选择备份源");
-                      return;
-                    }
-                    List<AssetEntity> tasks;
-                    if (continueBackup) {
-                      tasks = uploads
-                          .where((element) =>
-                              element.modifiedDateTime.millisecondsSinceEpoch >
-                              (lastBackupTime?.millisecondsSinceEpoch ?? 0))
-                          .toList();
-                    } else {
-                      tasks = uploads;
-                    }
-                    //对待备份文件进行排序
-                    tasks.sort((a, b) {
-                      return a.modifiedDateTime
-                              .isAtSameMomentAs(b.modifiedDateTime)
-                          ? 0
-                          : a.modifiedDateTime.isBefore(b.modifiedDateTime)
-                              ? -1
-                              : 1;
-                    });
-                    for (int i = 0; i < tasks.length; i++) {
-                      if (cancel) {
-                        cancel = false;
-                        setState(() {
-                          uploading = null;
-                        });
-                        Util.instance.toast("备份任务已暂停");
-                        break;
-                      }
-                      uploading = UploadItem(await tasks[i].originFile,
-                          tasks[i].modifiedDateTime, tasks[i].type);
-
-                      if (uploading!.status != UploadStatus.wait) {
-                        continue;
-                      }
-                      //上传文件
-                      setState(() {
-                        uploading?.status = UploadStatus.running;
-                      });
-                      var res = await Api.upload(
-                          backupFolder,
-                          uploading!.file!.path,
-                          uploading!.cancelToken, (progress, total) {
-                        // print("$progress,$total");
-                        setState(() {
-                          uploading!.uploadSize = progress;
-                          uploading!.fileSize = total;
-                        });
-                      });
-                      if (res['success']) {
-                        if (Platform.isIOS) {
-                          // 仅在iOS删除源文件（iOS非真实源文件）
-                          uploading!.file!.deleteSync();
-                        }
-
-                        Util.instance.setStorage(
-                            "last_backup_time",
-                            uploading!.modifyTime!.millisecondsSinceEpoch
-                                .toString());
-                        setState(() {
-                          lastBackupTime = uploading!.modifyTime;
-                          uploading!.status = UploadStatus.complete;
-                        });
-                      } else {
-                        setState(() {
-                          uploading!.status = UploadStatus.failed;
-                        });
-                      }
-                      if (i == tasks.length - 1) {
-                        Util.instance.toast("备份已完成");
-                        Util.instance.vibrate(FeedbackType.light);
-                        setState(() {
-                          uploading = null;
-                          lastBackupTime = DateTime.now();
-                        });
-                      }
-                    }
-                  },
+                  onPressed: _onStartBackup,
                   child: Text("开始备份"),
                 )
               : OutlinedButton(
@@ -577,5 +473,126 @@ class _BackupState extends State<Backup> {
         ],
       ),
     );
+  }
+
+  Future<dynamic> _onChooseBackupTargetDialog(BuildContext context) {
+    return showCupertinoModalPopup(
+      filter: ImageFilter.blur(),
+      context: context,
+      builder: (context) {
+        return Material(
+          child: Card(
+            shape: RoundedRectangleBorder(
+                side: BorderSide(), borderRadius: BorderRadius.circular(18)),
+            child: SelectFolder(
+              multi: false,
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Future<dynamic> _onChooseBackupSourceDialog(BuildContext context) {
+    return showCupertinoModalPopup(
+      context: context,
+      builder: (context) {
+        return Material(
+          child: Card(
+            shape: RoundedRectangleBorder(
+                side: BorderSide(), borderRadius: BorderRadius.circular(18)),
+            child: SelectAlbum(
+              multi: true,
+              selected: albums,
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  void _onStartBackup() async {
+    if (backupFolder.isBlank) {
+      Util.instance.vibrate(FeedbackType.warning);
+      Util.instance.toast("请选择备份目的地");
+      return;
+    }
+    if (albums.length == 0) {
+      Util.instance.vibrate(FeedbackType.warning);
+      Util.instance.toast("请选择备份源");
+      return;
+    }
+    List<AssetEntity> tasks;
+    if (continueBackup) {
+      tasks = uploads
+          .where((element) =>
+              element.modifiedDateTime.millisecondsSinceEpoch >
+              (lastBackupTime?.millisecondsSinceEpoch ?? 0))
+          .toList();
+    } else {
+      tasks = uploads;
+    }
+    //对待备份文件进行排序
+    tasks.sort((a, b) {
+      return a.modifiedDateTime.isAtSameMomentAs(b.modifiedDateTime)
+          ? 0
+          : a.modifiedDateTime.isBefore(b.modifiedDateTime)
+              ? -1
+              : 1;
+    });
+    for (int i = 0; i < tasks.length; i++) {
+      if (cancel) {
+        cancel = false;
+        setState(() {
+          uploading = null;
+        });
+        Util.instance.toast("备份任务已暂停");
+        break;
+      }
+      uploading = UploadItem(
+          await tasks[i].originFile, tasks[i].modifiedDateTime, tasks[i].type);
+
+      if (uploading!.status != UploadStatus.wait) {
+        continue;
+      }
+      //上传文件
+      setState(() {
+        uploading?.status = UploadStatus.running;
+      });
+      var res = await Api.upload(
+          backupFolder, uploading!.file!.path, uploading!.cancelToken,
+          (progress, total) {
+        // print("$progress,$total");
+        setState(() {
+          uploading!.uploadSize = progress;
+          uploading!.fileSize = total;
+        });
+      });
+      if (res['success']) {
+        if (Platform.isIOS) {
+          // 仅在iOS删除源文件（iOS非真实源文件）
+          uploading!.file!.deleteSync();
+        }
+
+        Util.instance.setStorage("last_backup_time",
+            uploading!.modifyTime!.millisecondsSinceEpoch.toString());
+        setState(() {
+          lastBackupTime = uploading!.modifyTime;
+          uploading!.status = UploadStatus.complete;
+        });
+      } else {
+        setState(() {
+          uploading!.status = UploadStatus.failed;
+        });
+      }
+      if (i == tasks.length - 1) {
+        Util.instance.toast("备份已完成");
+        Util.instance.vibrate(FeedbackType.light);
+        setState(() {
+          uploading = null;
+          lastBackupTime = DateTime.now();
+        });
+      }
+    }
   }
 }

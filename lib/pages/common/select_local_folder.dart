@@ -204,7 +204,7 @@ class _SelectLocalFolderState extends State<SelectLocalFolder> {
       child: Material(
         color: Theme.of(context).scaffoldBackgroundColor,
         child: Container(
-          height: MediaQuery.of(context).size.height * 0.8,
+          height: MediaQuery.sizeOf(context).height * 0.8,
           child: SafeArea(
             top: false,
             child: Column(

@@ -196,7 +196,7 @@ class _ImagePreviewState extends State<ImagePreview>
 
   @override
   Widget build(BuildContext context) {
-    var size = MediaQuery.of(context).size;
+    var size = MediaQuery.sizeOf(context);
     Widget result = Material(
       color: Theme.of(context).brightness == Brightness.dark
           ? Colors.black

@@ -455,6 +455,22 @@ class DashboardState extends State<Dashboard> {
     }
   }
 
+  bool _isCardItemCollapsed(String itemName) =>
+      Util.instance.dashboardCardCollapseState[itemName] == true;
+
+  Widget _CardItemCollapse(String itemName) {
+    return IconButton(
+        onPressed: () {
+          setState(() {
+            Util.instance.dashboardCardCollapseState[itemName] =
+                !(_isCardItemCollapsed(itemName));
+          });
+        },
+        icon: Icon(_isCardItemCollapsed(itemName)
+            ? Icons.unfold_less
+            : Icons.unfold_more));
+  }
+
   Widget _buildWidgetItem(widget) {
     if (widget == "SYNO.SDS.SystemInfoApp.SystemHealthWidget") {
       return GestureDetector(
@@ -495,7 +511,7 @@ class DashboardState extends State<Dashboard> {
                             decoration: BoxDecoration(
                               color: Theme.of(context)
                                   .scaffoldBackgroundColor
-                                  .withOpacity(0.5),
+                                  .withValues(alpha: .1),
                               borderRadius: BorderRadius.circular(20),
                             ),
                           ),
@@ -632,10 +648,13 @@ class DashboardState extends State<Dashboard> {
                       style:
                           TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
                     ),
+                    Spacer(),
+                    _CardItemCollapse("ConnectionLog")
                   ],
                 ),
               ),
-              ...connectedUsers.map(_buildUserItem).toList(),
+              if (_isCardItemCollapsed('ConnectionLog'))
+                ...connectedUsers.map(_buildUserItem).toList(),
               SizedBox(
                 height: 20,
               ),
@@ -678,10 +697,13 @@ class DashboardState extends State<Dashboard> {
                         style: TextStyle(
                             fontSize: 18, fontWeight: FontWeight.w600),
                       ),
+                      Spacer(),
+                      _CardItemCollapse("TaskScheduler")
                     ],
                   ),
                 ),
-                ...tasks.map(_buildTaskItem).toList(),
+                if (_isCardItemCollapsed('TaskScheduler'))
+                  ...tasks.map(_buildTaskItem).toList(),
                 SizedBox(
                   height: 20,
                 ),
@@ -727,31 +749,34 @@ class DashboardState extends State<Dashboard> {
                         style: TextStyle(
                             fontSize: 18, fontWeight: FontWeight.w600),
                       ),
+                      Spacer(),
+                      _CardItemCollapse("RecentLog")
                     ],
                   ),
                 ),
                 SizedBox(
                   height: 10,
                 ),
-                SizedBox(
-                  height: 300,
-                  child: latestLog.length > 0
-                      ? CupertinoScrollbar(
-                          child: ListView.builder(
-                            itemBuilder: (context, i) {
-                              return _buildLogItem(latestLog[i]);
-                            },
-                            itemCount: latestLog.length,
+                if (_isCardItemCollapsed('RecentLog'))
+                  SizedBox(
+                    height: 300,
+                    child: latestLog.length > 0
+                        ? CupertinoScrollbar(
+                            child: ListView.builder(
+                              itemBuilder: (context, i) {
+                                return _buildLogItem(latestLog[i]);
+                              },
+                              itemCount: latestLog.length,
+                            ),
+                          )
+                        : Center(
+                            child: Text(
+                              "暂无日志",
+                              style: TextStyle(
+                                  color: AppTheme.of(context).placeholderColor),
+                            ),
                           ),
-                        )
-                      : Center(
-                          child: Text(
-                            "暂无日志",
-                            style: TextStyle(
-                                color: AppTheme.of(context).placeholderColor),
-                          ),
-                        ),
-                ),
+                  ),
                 SizedBox(
                   height: 10,
                 ),
@@ -795,10 +820,12 @@ class DashboardState extends State<Dashboard> {
                         style: TextStyle(
                             fontSize: 18, fontWeight: FontWeight.w600),
                       ),
+                      Spacer(),
+                      _CardItemCollapse("ResourceMonitor")
                     ],
                   ),
                 ),
-                ...[
+                if (_isCardItemCollapsed('ResourceMonitor')) ...[
                   SizedBox(
                     height: 10,
                   ),
@@ -1102,10 +1129,13 @@ class DashboardState extends State<Dashboard> {
                             style: TextStyle(
                                 fontSize: 18, fontWeight: FontWeight.w600),
                           ),
+                          Spacer(),
+                          _CardItemCollapse("StorageUsage")
                         ],
                       ),
                     ),
-                    ...volumes.map(_buildVolumeItem).toList(),
+                    if (_isCardItemCollapsed('StorageUsage'))
+                      ...volumes.map(_buildVolumeItem).toList(),
                     SizedBox(
                       height: 20,
                     ),
@@ -1143,10 +1173,13 @@ class DashboardState extends State<Dashboard> {
                             style: TextStyle(
                                 fontSize: 18, fontWeight: FontWeight.w600),
                           ),
+                          Spacer(),
+                          _CardItemCollapse("StorageUsage")
                         ],
                       ),
                     ),
-                    ...ssdCaches.map(_buildSSDCacheItem).toList(),
+                    if (_isCardItemCollapsed('StorageUsage'))
+                      ...ssdCaches.map(_buildSSDCacheItem).toList(),
                     SizedBox(
                       height: 20,
                     ),
@@ -1185,31 +1218,34 @@ class DashboardState extends State<Dashboard> {
                       style:
                           TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
                     ),
+                    Spacer(),
+                    _CardItemCollapse("FileChangeLog")
                   ],
                 ),
               ),
               SizedBox(
                 height: 10,
               ),
-              SizedBox(
-                height: 300,
-                child: fileLogs.length > 0
-                    ? CupertinoScrollbar(
-                        child: ListView.builder(
-                          itemBuilder: (context, i) {
-                            return _buildFileLogItem(fileLogs[i]);
-                          },
-                          itemCount: fileLogs.length,
+              if (_isCardItemCollapsed('FileChangeLog'))
+                SizedBox(
+                  height: 300,
+                  child: fileLogs.length > 0
+                      ? CupertinoScrollbar(
+                          child: ListView.builder(
+                            itemBuilder: (context, i) {
+                              return _buildFileLogItem(fileLogs[i]);
+                            },
+                            itemCount: fileLogs.length,
+                          ),
+                        )
+                      : Center(
+                          child: Text(
+                            "暂无日志",
+                            style: TextStyle(
+                                color: AppTheme.of(context).placeholderColor),
+                          ),
                         ),
-                      )
-                    : Center(
-                        child: Text(
-                          "暂无日志",
-                          style: TextStyle(
-                              color: AppTheme.of(context).placeholderColor),
-                        ),
-                      ),
-              ),
+                ),
               SizedBox(
                 height: 10,
               ),

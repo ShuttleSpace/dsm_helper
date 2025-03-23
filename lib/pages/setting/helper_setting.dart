@@ -282,13 +282,17 @@ class _HelperSettingState extends State<HelperSetting> {
                 showCupertinoModalPopup(
                   context: context,
                   builder: (context) {
-                    return NeuPicker(
-                      List.generate(20, (index) => "${index + 1}"),
-                      value: List.generate(20, (index) => index + 1)
-                          .indexOf(settingProvider.refreshDuration),
-                      onConfirm: (v) {
-                        settingProvider.setRefreshDuration(v + 1);
-                      },
+                    return Padding(
+                      padding: EdgeInsets.only(
+                          top: MediaQuery.viewPaddingOf(context).top),
+                      child: NeuPicker(
+                        List.generate(20, (index) => "${index + 1}"),
+                        value: List.generate(20, (index) => index + 1)
+                            .indexOf(settingProvider.refreshDuration),
+                        onConfirm: (v) {
+                          settingProvider.setRefreshDuration(v + 1);
+                        },
+                      ),
                     );
                   },
                 );
@@ -651,58 +655,31 @@ class _HelperSettingState extends State<HelperSetting> {
           ),
           OutlinedButton(
             onPressed: () {
-              Navigator.of(context).push(CupertinoPageRoute(
-                  builder: (context) {
-                    return About();
-                  },
-                  settings: RouteSettings(name: "about")));
+              setState(() {
+                Util.instance.dashboardCardCollapseSwitch =
+                    !Util.instance.dashboardCardCollapseSwitch;
+              });
             },
             // margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
             child: Row(
               children: [
-                Image.asset(
-                  "assets/icons/info_liner.png",
-                  width: 25,
-                ),
+                Icon(Icons.unfold_less_sharp),
                 SizedBox(
                   width: 8,
                 ),
                 Text(
-                  "关于${Util.instance.appName}",
+                  "仪表盘卡片默认折叠",
                   style: TextStyle(fontSize: 16),
                 ),
+                Spacer(),
+                if (Util.instance.dashboardCardCollapseSwitch)
+                  Icon(
+                    CupertinoIcons.checkmark_alt,
+                    color: Color(0xffff9813),
+                  ),
               ],
             ),
           ),
-          SizedBox(
-            height: 20,
-          ),
-          if (Util.instance.notReviewAccount)
-            OutlinedButton(
-              onPressed: () {
-                Navigator.of(context).push(CupertinoPageRoute(
-                    builder: (context) {
-                      return Vip();
-                    },
-                    settings: RouteSettings(name: "vip")));
-              },
-              // margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-              child: Row(
-                children: [
-                  Image.asset(
-                    "assets/icons/no_ad.png",
-                    width: 25,
-                  ),
-                  SizedBox(
-                    width: 8,
-                  ),
-                  Text(
-                    "关闭广告",
-                    style: TextStyle(fontSize: 16),
-                  ),
-                ],
-              ),
-            ),
         ],
       ),
     );

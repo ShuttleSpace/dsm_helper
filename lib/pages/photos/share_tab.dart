@@ -59,7 +59,7 @@ class _ShareTabState extends State<ShareTab> {
                           tag: e.additional?.thumbnail ?? '',
                           child: CupertinoExtendedImage(
                             e.additional?.thumbnail?.thumbUrl() ?? '',
-                            width: MediaQuery.of(context).size.width - 40,
+                            width: MediaQuery.sizeOf(context).width - 40,
                             height: 200,
                             fit: BoxFit.cover,
                             placeholder: Container(
@@ -71,7 +71,7 @@ class _ShareTabState extends State<ShareTab> {
                           left: 0,
                           bottom: 0,
                           child: Container(
-                            width: MediaQuery.of(context).size.width - 40,
+                            width: MediaQuery.sizeOf(context).width - 40,
                             padding: EdgeInsets.fromLTRB(10, 20, 10, 10),
                             decoration: BoxDecoration(
                               gradient: LinearGradient(
