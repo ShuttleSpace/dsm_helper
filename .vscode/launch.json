@@ -9,6 +9,7 @@
       "name": "humphrey_garden",
       "request": "launch",
       "type": "dart",
+      "program": "lib/main.dart",
       "args": [
         "--no-enable-impeller"
       ]
@@ -17,11 +18,13 @@
       "name": "humphrey_garden (profile mode)",
       "request": "launch",
       "type": "dart",
+      "program": "lib/main.dart",
       "flutterMode": "profile"
     },
     {
       "name": "humphrey_garden (release mode)",
       "request": "launch",
+      "program": "lib/main.dart",
       "type": "dart",
       "flutterMode": "release"
     },
