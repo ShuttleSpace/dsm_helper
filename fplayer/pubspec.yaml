@@ -6,7 +6,12 @@ homepage: https://github.com/FlutterPlayer/fplayer.git
 environment:
   sdk: '>=2.18.0 <3.0.0'
   flutter: ">=2.5.0"
-
+dependency_overrides:
+  battery_plus: 
+    git: 
+      url: https://gitee.com/dsm_bay/plus_plugins.git
+      ref: main
+      path: packages/battery_plus/battery_plus
 dependencies:
   flutter:
     sdk: flutter
