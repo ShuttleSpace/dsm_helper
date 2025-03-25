@@ -74,7 +74,7 @@ void main() async {
       Util.instance.removeStorage("no_ad_time");
     }
   }
-  await FlutterDownloader.initialize(debug: true, ignoreSsl: true);
+  // await FlutterDownloader.initialize(debug: true, ignoreSsl: true);
 
   Util.instance.downloadSavePath =
       await Util.instance.getStorage("download_save_path") ??
