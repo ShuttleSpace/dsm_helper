@@ -1,9 +1,9 @@
-import 'package:humphrey_garden/pages/photos/album_tab.dart';
-import 'package:humphrey_garden/pages/photos/folder.dart';
-import 'package:humphrey_garden/pages/photos/photo_tab.dart';
-import 'package:humphrey_garden/pages/photos/share_tab.dart';
-import 'package:humphrey_garden/pages/photos/timeline.dart';
-import 'package:humphrey_garden/widgets/neu_back_button.dart';
+import 'package:garden/pages/photos/album_tab.dart';
+import 'package:garden/pages/photos/folder.dart';
+import 'package:garden/pages/photos/photo_tab.dart';
+import 'package:garden/pages/photos/share_tab.dart';
+import 'package:garden/pages/photos/timeline.dart';
+import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 

@@ -2,12 +2,11 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
-import 'package:humphrey_garden/pages/common/browser.dart' as dsm;
-import 'package:humphrey_garden/pages/login/accounts.dart';
-import 'package:humphrey_garden/pages/setting/license.dart';
-import 'package:humphrey_garden/pages/update/update.dart';
-import 'package:humphrey_garden/providers/flux_provider.dart';
-import 'package:humphrey_garden/util/function.dart';
+import 'package:garden/pages/common/browser.dart' as dsm;
+import 'package:garden/pages/login/accounts.dart';
+import 'package:garden/pages/setting/license.dart';
+import 'package:garden/providers/flux_provider.dart';
+import 'package:garden/util/function.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';

@@ -1,5 +1,5 @@
-import 'package:humphrey_garden/models/photos/thumbnail_model.dart';
-import 'package:humphrey_garden/widgets/cupertino_image.dart';
+import 'package:garden/models/photos/thumbnail_model.dart';
+import 'package:garden/widgets/cupertino_image.dart';
 import 'package:flutter/material.dart';
 
 class ThumbnailCard extends StatelessWidget {

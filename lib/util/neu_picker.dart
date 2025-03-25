@@ -17,7 +17,7 @@ class _NeuPickerState extends State<NeuPicker> {
   int value = 0;
   @override
   void initState() {
-    value = widget.value ?? 0;
+    value = widget.value;
     _controller = FixedExtentScrollController(initialItem: value);
     super.initState();
   }

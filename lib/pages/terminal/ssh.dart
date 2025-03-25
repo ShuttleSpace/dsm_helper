@@ -1,10 +1,9 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:typed_data';
 
 import 'package:dartssh2/dartssh2.dart';
-import 'package:humphrey_garden/widgets/neu_back_button.dart';
-import 'package:humphrey_garden/widgets/virtual_keyboard.dart';
+import 'package:garden/widgets/neu_back_button.dart';
+import 'package:garden/widgets/virtual_keyboard.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:xterm/xterm.dart';
@@ -91,11 +90,11 @@ class _SshState extends State<Ssh> {
         leading: AppBackButton(
           context,
           color: Colors.black,
-          iconColor: Colors.white.withOpacity(0.5),
+          iconColor: Colors.white.withValues(alpha: .5),
         ),
         title: Text(
           title,
-          style: TextStyle(color: Colors.white.withOpacity(0.5)),
+          style: TextStyle(color: Colors.white.withValues(alpha: .5)),
         ),
         systemOverlayStyle: SystemUiOverlayStyle.light,
         backgroundColor: Colors.black,

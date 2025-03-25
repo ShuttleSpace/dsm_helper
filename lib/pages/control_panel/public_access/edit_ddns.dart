@@ -1,8 +1,10 @@
+// ignore_for_file: unused_import
+
 import 'package:cool_ui/cool_ui.dart';
-import 'package:humphrey_garden/util/function.dart';
-import 'package:humphrey_garden/util/neu_picker.dart';
-import 'package:humphrey_garden/widgets/label.dart';
-import 'package:humphrey_garden/widgets/neu_back_button.dart';
+import 'package:garden/util/function.dart';
+import 'package:garden/util/neu_picker.dart';
+import 'package:garden/widgets/label.dart';
+import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_vibrate/flutter_vibrate.dart';
@@ -215,25 +217,6 @@ class _EditDdnsState extends State<EditDdns> {
                   onTap: () {
                     FocusScope.of(context).unfocus();
                     return;
-                    showCupertinoModalPopup(
-                      context: context,
-                      builder: (context) {
-                        return NeuPicker(
-                          widget.providers
-                              .map((e) => e['provider'] as String)
-                              .toList(),
-                          value: widget.providers.indexWhere((element) =>
-                              element['provider'] == ddns['provider']),
-                          onConfirm: (v) {
-                            setState(() {
-                              ddns['provider'] =
-                                  widget.providers[v]['provider'];
-                              print(ddns['provider']);
-                            });
-                          },
-                        );
-                      },
-                    );
                   },
                   child: Card(
                     shape: RoundedRectangleBorder(

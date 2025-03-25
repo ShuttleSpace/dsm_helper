@@ -1,11 +1,11 @@
 import 'dart:async';
 import 'dart:math';
 
-import 'package:humphrey_garden/providers/setting.dart';
-import 'package:humphrey_garden/util/function.dart';
-import 'package:humphrey_garden/widgets/bubble_tab_indicator.dart';
-import 'package:humphrey_garden/widgets/label.dart';
-import 'package:humphrey_garden/widgets/neu_back_button.dart';
+import 'package:garden/providers/setting.dart';
+import 'package:garden/util/function.dart';
+import 'package:garden/widgets/bubble_tab_indicator.dart';
+import 'package:garden/widgets/label.dart';
+import 'package:garden/widgets/neu_back_button.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -241,7 +241,7 @@ class _PerformanceState extends State<Performance>
                                                     LineTouchTooltipData(
                                                         // tooltipBgColor: Colors
                                                         //     .white
-                                                        //     .withOpacity(0.6),
+                                                        //     .withValues(alpha: 0.6),
                                                         tooltipRoundedRadius:
                                                             20,
                                                         fitInsideHorizontally:
@@ -328,7 +328,7 @@ class _PerformanceState extends State<Performance>
                                                   belowBarData: BarAreaData(
                                                     show: true,
                                                     color: Colors.cyan
-                                                        .withOpacity(0.2),
+                                                        .withValues(alpha: .2),
                                                   ),
                                                 ),
                                               ],
@@ -409,7 +409,7 @@ class _PerformanceState extends State<Performance>
                                                     LineTouchTooltipData(
                                                         // tooltipBgColor: Colors
                                                         //     .white
-                                                        //     .withOpacity(0.6),
+                                                        //     .withValues(alpha: 0.6),
                                                         tooltipRoundedRadius:
                                                             20,
                                                         fitInsideHorizontally:
@@ -495,7 +495,7 @@ class _PerformanceState extends State<Performance>
                                                   belowBarData: BarAreaData(
                                                     show: true,
                                                     color: Colors.orangeAccent
-                                                        .withOpacity(0.2),
+                                                        .withValues(alpha: 0.2),
                                                   ),
                                                 ),
                                               ],
@@ -575,7 +575,7 @@ class _PerformanceState extends State<Performance>
                                                 touchTooltipData:
                                                     LineTouchTooltipData(
                                                   // tooltipBgColor: Colors.white
-                                                  //     .withOpacity(0.6),
+                                                  //     .withValues(alpha: 0.6),
                                                   tooltipRoundedRadius: 20,
                                                   fitInsideHorizontally: true,
                                                   fitInsideVertically: true,
@@ -693,7 +693,7 @@ class _PerformanceState extends State<Performance>
                                                   belowBarData: BarAreaData(
                                                     show: true,
                                                     color: Colors.blue
-                                                        .withOpacity(0.2),
+                                                        .withValues(alpha: 0.2),
                                                   ),
                                                 ),
                                                 LineChartBarData(
@@ -716,7 +716,7 @@ class _PerformanceState extends State<Performance>
                                                   belowBarData: BarAreaData(
                                                     show: true,
                                                     color: Colors.green
-                                                        .withOpacity(0.2),
+                                                        .withValues(alpha: 0.2),
                                                   ),
                                                 ),
                                               ],
@@ -813,7 +813,7 @@ class _PerformanceState extends State<Performance>
                                                     LineTouchTooltipData(
                                                         // tooltipBgColor: Colors
                                                         //     .white
-                                                        //     .withOpacity(0.6),
+                                                        //     .withValues(alpha: 0.6),
                                                         tooltipRoundedRadius:
                                                             20,
                                                         fitInsideHorizontally:
@@ -900,7 +900,7 @@ class _PerformanceState extends State<Performance>
                                                   belowBarData: BarAreaData(
                                                     show: true,
                                                     color: Colors.pink
-                                                        .withOpacity(0.2),
+                                                        .withValues(alpha: 0.2),
                                                   ),
                                                 ),
                                               ],
@@ -978,7 +978,7 @@ class _PerformanceState extends State<Performance>
                                                     LineTouchTooltipData(
                                                         // tooltipBgColor: Colors
                                                         //     .white
-                                                        //     .withOpacity(0.6),
+                                                        //     .withValues(alpha: 0.6),
                                                         tooltipRoundedRadius:
                                                             20,
                                                         fitInsideHorizontally:
@@ -1065,7 +1065,8 @@ class _PerformanceState extends State<Performance>
                                                   belowBarData: BarAreaData(
                                                       show: true,
                                                       color: Colors.purpleAccent
-                                                          .withOpacity(0.2)),
+                                                          .withValues(
+                                                              alpha: 0.2)),
                                                 ),
                                               ],
                                             ),
@@ -1116,7 +1117,7 @@ class _PerformanceState extends State<Performance>
                                       lineTouchData: LineTouchData(
                                         touchTooltipData: LineTouchTooltipData(
                                             // tooltipBgColor:
-                                            //     Colors.white.withOpacity(0.6),
+                                            //     Colors.white.withValues(alpha: 0.6),
                                             tooltipRoundedRadius: 20,
                                             fitInsideHorizontally: true,
                                             fitInsideVertically: true,
@@ -1544,7 +1545,7 @@ class _PerformanceState extends State<Performance>
                                       lineTouchData: LineTouchData(
                                         touchTooltipData: LineTouchTooltipData(
                                             // tooltipBgColor:
-                                            //     Colors.white.withOpacity(0.6),
+                                            //     Colors.white.withValues(alpha: 0.6),
                                             tooltipRoundedRadius: 20,
                                             fitInsideHorizontally: true,
                                             fitInsideVertically: true,
@@ -1622,7 +1623,8 @@ class _PerformanceState extends State<Performance>
                                           ),
                                           belowBarData: BarAreaData(
                                             show: true,
-                                            color: Colors.blue.withOpacity(0.2),
+                                            color: Colors.blue
+                                                .withValues(alpha: 0.2),
                                           ),
                                         ),
                                       ],
@@ -1929,7 +1931,7 @@ class _PerformanceState extends State<Performance>
                                                   touchTooltipData:
                                                       LineTouchTooltipData(
                                                     // tooltipBgColor: Colors.white
-                                                    //     .withOpacity(0.6),
+                                                    //     .withValues(alpha: 0.6),
                                                     tooltipRoundedRadius: 20,
                                                     fitInsideHorizontally: true,
                                                     fitInsideVertically: true,
@@ -2048,7 +2050,8 @@ class _PerformanceState extends State<Performance>
                                                     belowBarData: BarAreaData(
                                                       show: true,
                                                       color: Colors.blue
-                                                          .withOpacity(0.2),
+                                                          .withValues(
+                                                              alpha: 0.2),
                                                     ),
                                                   ),
                                                   LineChartBarData(
@@ -2071,7 +2074,8 @@ class _PerformanceState extends State<Performance>
                                                     belowBarData: BarAreaData(
                                                       show: true,
                                                       color: Colors.green
-                                                          .withOpacity(0.2),
+                                                          .withValues(
+                                                              alpha: 0.2),
                                                     ),
                                                   ),
                                                 ],
@@ -2194,7 +2198,7 @@ class _PerformanceState extends State<Performance>
                                                     LineTouchTooltipData(
                                                         // tooltipBgColor: Colors
                                                         //     .white
-                                                        //     .withOpacity(0.6),
+                                                        //     .withValues(alpha: 0.6),
                                                         tooltipRoundedRadius:
                                                             20,
                                                         fitInsideHorizontally:
@@ -2377,7 +2381,7 @@ class _PerformanceState extends State<Performance>
                                                     LineTouchTooltipData(
                                                         // tooltipBgColor: Colors
                                                         //     .white
-                                                        //     .withOpacity(0.6),
+                                                        //     .withValues(alpha: 0.6),
                                                         tooltipRoundedRadius:
                                                             20,
                                                         fitInsideHorizontally:
@@ -2584,7 +2588,7 @@ class _PerformanceState extends State<Performance>
                                                     LineTouchTooltipData(
                                                         // tooltipBgColor: Colors
                                                         //     .white
-                                                        //     .withOpacity(0.6),
+                                                        //     .withValues(alpha: 0.6),
                                                         tooltipRoundedRadius:
                                                             20,
                                                         fitInsideHorizontally:
@@ -2791,7 +2795,7 @@ class _PerformanceState extends State<Performance>
                                                     LineTouchTooltipData(
                                                         // tooltipBgColor: Colors
                                                         //     .white
-                                                        //     .withOpacity(0.6),
+                                                        //     .withValues(alpha: 0.6),
                                                         tooltipRoundedRadius:
                                                             20,
                                                         fitInsideHorizontally:
@@ -2973,7 +2977,7 @@ class _PerformanceState extends State<Performance>
                                                     LineTouchTooltipData(
                                                         // tooltipBgColor: Colors
                                                         //     .white
-                                                        //     .withOpacity(0.6),
+                                                        //     .withValues(alpha: 0.6),
                                                         tooltipRoundedRadius:
                                                             20,
                                                         fitInsideHorizontally:
@@ -3176,7 +3180,7 @@ class _PerformanceState extends State<Performance>
                                                     LineTouchTooltipData(
                                                         // tooltipBgColor: Colors
                                                         //     .white
-                                                        //     .withOpacity(0.6),
+                                                        //     .withValues(alpha: 0.6),
                                                         tooltipRoundedRadius:
                                                             20,
                                                         fitInsideHorizontally:
@@ -3353,7 +3357,7 @@ class _PerformanceState extends State<Performance>
                                                     LineTouchTooltipData(
                                                         // tooltipBgColor: Colors
                                                         //     .white
-                                                        //     .withOpacity(0.6),
+                                                        //     .withValues(alpha: 0.6),
                                                         tooltipRoundedRadius:
                                                             20,
                                                         fitInsideHorizontally:
@@ -3533,7 +3537,7 @@ class _PerformanceState extends State<Performance>
                                                     LineTouchTooltipData(
                                                         // tooltipBgColor: Colors
                                                         //     .white
-                                                        //     .withOpacity(0.6),
+                                                        //     .withValues(alpha: 0.6),
                                                         tooltipRoundedRadius:
                                                             20,
                                                         fitInsideHorizontally:
@@ -3719,7 +3723,7 @@ class _PerformanceState extends State<Performance>
                                                     LineTouchTooltipData(
                                                         // tooltipBgColor: Colors
                                                         //     .white
-                                                        //     .withOpacity(0.6),
+                                                        //     .withValues(alpha: 0.6),
                                                         tooltipRoundedRadius:
                                                             20,
                                                         fitInsideHorizontally:
@@ -3895,7 +3899,7 @@ class _PerformanceState extends State<Performance>
                                                     LineTouchTooltipData(
                                                         // tooltipBgColor: Colors
                                                         //     .white
-                                                        //     .withOpacity(0.6),
+                                                        //     .withValues(alpha: 0.6),
                                                         tooltipRoundedRadius:
                                                             20,
                                                         fitInsideHorizontally:

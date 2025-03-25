@@ -1,5 +1,5 @@
-import 'package:humphrey_garden/util/function.dart';
-import 'package:humphrey_garden/widgets/neu_back_button.dart';
+import 'package:garden/util/function.dart';
+import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/material.dart';
 import 'package:gesture_password_widget/gesture_password_widget.dart';
 import 'package:flutter_vibrate/flutter_vibrate.dart';

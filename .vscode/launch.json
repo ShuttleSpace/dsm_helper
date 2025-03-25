@@ -6,7 +6,7 @@
   "configurations": [
   
     {
-      "name": "humphrey_garden",
+      "name": "garden",
       "request": "launch",
       "type": "dart",
       "program": "lib/main.dart",
@@ -15,14 +15,14 @@
       ]
     },
     {
-      "name": "humphrey_garden (profile mode)",
+      "name": "garden (profile mode)",
       "request": "launch",
       "type": "dart",
       "program": "lib/main.dart",
       "flutterMode": "profile"
     },
     {
-      "name": "humphrey_garden (release mode)",
+      "name": "garden (release mode)",
       "request": "launch",
       "program": "lib/main.dart",
       "type": "dart",

@@ -1,20 +1,20 @@
-import 'package:humphrey_garden/pages/control_panel/external_device/external_device.dart';
-import 'package:humphrey_garden/pages/control_panel/file_service/file_service.dart';
-import 'package:humphrey_garden/pages/control_panel/media_index/media_index.dart';
-import 'package:humphrey_garden/pages/control_panel/network/network.dart';
-import 'package:humphrey_garden/pages/control_panel/power/power.dart';
-import 'package:humphrey_garden/pages/control_panel/public_access/public_access.dart';
-import 'package:humphrey_garden/pages/control_panel/ssh/ssh.dart';
-import 'package:humphrey_garden/pages/control_panel/task_scheduler/task_scheduler.dart';
-import 'package:humphrey_garden/pages/control_panel/update_reset/update_reset.dart';
-import 'package:humphrey_garden/pages/control_panel/user_groups/user_group.dart';
-import 'package:humphrey_garden/pages/control_panel/users/users.dart';
-import 'package:humphrey_garden/util/badge.dart';
-import 'package:humphrey_garden/util/function.dart';
-import 'package:humphrey_garden/widgets/neu_back_button.dart';
+import 'package:garden/pages/control_panel/external_device/external_device.dart';
+import 'package:garden/pages/control_panel/file_service/file_service.dart';
+import 'package:garden/pages/control_panel/media_index/media_index.dart';
+import 'package:garden/pages/control_panel/network/network.dart';
+import 'package:garden/pages/control_panel/power/power.dart';
+import 'package:garden/pages/control_panel/public_access/public_access.dart';
+import 'package:garden/pages/control_panel/ssh/ssh.dart';
+import 'package:garden/pages/control_panel/task_scheduler/task_scheduler.dart';
+import 'package:garden/pages/control_panel/update_reset/update_reset.dart';
+import 'package:garden/pages/control_panel/user_groups/user_group.dart';
+import 'package:garden/pages/control_panel/users/users.dart';
+import 'package:garden/util/badge.dart';
+import 'package:garden/util/function.dart';
+import 'package:garden/widgets/neu_back_button.dart';
 
 import 'shared_folders/shared_folders.dart';
-import 'package:humphrey_garden/pages/control_panel/info/info.dart';
+import 'package:garden/pages/control_panel/info/info.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart' hide Badge;
 

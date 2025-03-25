@@ -1,14 +1,12 @@
 import 'dart:io';
 
 import 'package:cool_ui/cool_ui.dart';
-import 'package:humphrey_garden/pages/common/gesture_password.dart';
-import 'package:humphrey_garden/pages/setting/about.dart';
-import 'package:humphrey_garden/pages/setting/vip.dart';
-import 'package:humphrey_garden/pages/setting/logout.dart';
-import 'package:humphrey_garden/providers/setting.dart';
-import 'package:humphrey_garden/util/function.dart';
-import 'package:humphrey_garden/util/neu_picker.dart';
-import 'package:humphrey_garden/widgets/neu_back_button.dart';
+import 'package:garden/pages/common/gesture_password.dart';
+import 'package:garden/pages/setting/logout.dart';
+import 'package:garden/providers/setting.dart';
+import 'package:garden/util/function.dart';
+import 'package:garden/util/neu_picker.dart';
+import 'package:garden/widgets/neu_back_button.dart';
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';

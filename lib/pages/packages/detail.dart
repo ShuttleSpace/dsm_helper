@@ -1,11 +1,11 @@
 import 'dart:async';
 
 import 'package:android_intent_plus/android_intent.dart';
-import 'package:humphrey_garden/pages/packages/uninstall.dart';
-import 'package:humphrey_garden/util/function.dart';
-import 'package:humphrey_garden/widgets/cupertino_image.dart';
-import 'package:humphrey_garden/widgets/label.dart';
-import 'package:humphrey_garden/widgets/neu_back_button.dart';
+import 'package:garden/pages/packages/uninstall.dart';
+import 'package:garden/util/function.dart';
+import 'package:garden/widgets/cupertino_image.dart';
+import 'package:garden/widgets/label.dart';
+import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';

@@ -1,7 +1,7 @@
 import 'dart:io';
 
-import 'package:humphrey_garden/util/function.dart';
-import 'package:humphrey_garden/widgets/file_icon.dart';
+import 'package:garden/util/function.dart';
+import 'package:garden/widgets/file_icon.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -177,7 +177,7 @@ class _SelectLocalFolderState extends State<SelectLocalFolder> {
     );
   }
 
-  Future<bool> onWillPop() {
+  Future<bool> onWillPop(i, result) {
     setState(() {
       selectedFiles = [];
     });
@@ -199,8 +199,8 @@ class _SelectLocalFolderState extends State<SelectLocalFolder> {
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: onWillPop,
+    return PopScope(
+      onPopInvokedWithResult: onWillPop,
       child: Material(
         color: Theme.of(context).scaffoldBackgroundColor,
         child: Container(

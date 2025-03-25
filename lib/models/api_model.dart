@@ -1,4 +1,4 @@
-import 'package:humphrey_garden/util/api.dart';
+import 'package:garden/util/api.dart';
 
 /// maxVersion : 6
 /// minVersion : 1

@@ -264,7 +264,9 @@ class _FViewState extends State<FView> {
     await SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky,
         overlays: []);
     bool changed = false;
-    var orientation = MediaQuery.of(context).orientation;
+    var orientation = context.mounted
+        ? MediaQuery.orientationOf(context)
+        : Orientation.portrait;
     FLog.d("start enter fullscreen. orientation:$orientation");
     if (_vWidth >= _vHeight) {
       if (orientation == Orientation.portrait) {
@@ -277,7 +279,7 @@ class _FViewState extends State<FView> {
     }
     FLog.d("screen orientation changed:$changed");
 
-    await Navigator.of(context).push(route);
+    context.mounted ? await Navigator.of(context).push(route) : '';
     _fullScreen = false;
     widget.player.exitFullScreen();
     await SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge,

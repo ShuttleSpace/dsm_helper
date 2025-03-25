@@ -2,13 +2,13 @@ import 'dart:io';
 
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:dio/dio.dart';
-import 'package:humphrey_garden/pages/common/select_local_folder.dart';
-import 'package:humphrey_garden/pages/file/select_folder.dart';
-import 'package:humphrey_garden/themes/app_theme.dart';
-import 'package:humphrey_garden/util/function.dart';
-import 'package:humphrey_garden/widgets/file_icon.dart';
-import 'package:humphrey_garden/widgets/label.dart';
-import 'package:humphrey_garden/widgets/neu_back_button.dart';
+import 'package:garden/pages/common/select_local_folder.dart';
+import 'package:garden/pages/file/select_folder.dart';
+import 'package:garden/themes/app_theme.dart';
+import 'package:garden/util/function.dart';
+import 'package:garden/widgets/file_icon.dart';
+import 'package:garden/widgets/label.dart';
+import 'package:garden/widgets/neu_back_button.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -48,7 +48,7 @@ class _UploadState extends State<Upload> {
   @override
   void initState() {
     setState(() {
-      savePath = widget.path ?? "";
+      savePath = widget.path;
     });
     uploads = widget.selectedFilesPath?.map((filePath) {
           File file = File(filePath);

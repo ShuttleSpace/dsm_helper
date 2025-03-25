@@ -22,7 +22,7 @@ class _VirtualKeyboardViewState extends State<VirtualKeyboardView> {
       padding: EdgeInsets.symmetric(horizontal: 10),
       child: SafeArea(
         child: DefaultTextStyle(
-          style: TextStyle(color: Colors.white.withOpacity(0.5)),
+          style: TextStyle(color: Colors.white.withValues(alpha: 0.5)),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -46,7 +46,7 @@ class _VirtualKeyboardViewState extends State<VirtualKeyboardView> {
                     },
                     child: Icon(
                       Icons.keyboard_arrow_up,
-                      color: Colors.white.withOpacity(0.5),
+                      color: Colors.white.withValues(alpha: 0.5),
                     ),
                   ),
                   SizedBox(
@@ -97,7 +97,7 @@ class _VirtualKeyboardViewState extends State<VirtualKeyboardView> {
                     },
                     child: Icon(
                       Icons.keyboard_arrow_left,
-                      color: Colors.white.withOpacity(0.5),
+                      color: Colors.white.withValues(alpha: 0.5),
                     ),
                   ),
                   // //下
@@ -107,7 +107,7 @@ class _VirtualKeyboardViewState extends State<VirtualKeyboardView> {
                     },
                     child: Icon(
                       Icons.keyboard_arrow_down,
-                      color: Colors.white.withOpacity(0.5),
+                      color: Colors.white.withValues(alpha: 0.5),
                     ),
                   ),
                   // // 右
@@ -117,7 +117,7 @@ class _VirtualKeyboardViewState extends State<VirtualKeyboardView> {
                     },
                     child: Icon(
                       Icons.keyboard_arrow_right,
-                      color: Colors.white.withOpacity(0.5),
+                      color: Colors.white.withValues(alpha: 0.5),
                     ),
                   ),
                   Spacer(),

@@ -1,5 +1,5 @@
-import 'package:humphrey_garden/pages/common/browser.dart';
-import 'package:humphrey_garden/widgets/neu_back_button.dart';
+import 'package:garden/pages/common/browser.dart';
+import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 

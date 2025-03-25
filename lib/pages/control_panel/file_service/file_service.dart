@@ -1,9 +1,9 @@
-import 'package:humphrey_garden/pages/control_panel/file_service/log_setting.dart';
-import 'package:humphrey_garden/pages/log_center/log_center.dart';
-import 'package:humphrey_garden/util/function.dart';
-import 'package:humphrey_garden/util/neu_picker.dart';
-import 'package:humphrey_garden/widgets/bubble_tab_indicator.dart';
-import 'package:humphrey_garden/widgets/neu_back_button.dart';
+import 'package:garden/pages/control_panel/file_service/log_setting.dart';
+import 'package:garden/pages/log_center/log_center.dart';
+import 'package:garden/util/function.dart';
+import 'package:garden/util/neu_picker.dart';
+import 'package:garden/widgets/bubble_tab_indicator.dart';
+import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';

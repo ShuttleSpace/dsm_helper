@@ -1,8 +1,8 @@
 import 'dart:math';
 
-import 'package:humphrey_garden/providers/audio_player_provider.dart';
-import 'package:humphrey_garden/themes/app_theme.dart';
-import 'package:humphrey_garden/widgets/neu_back_button.dart';
+import 'package:garden/providers/audio_player_provider.dart';
+import 'package:garden/themes/app_theme.dart';
+import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart' as ja;

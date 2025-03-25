@@ -1,6 +1,6 @@
-import 'package:humphrey_garden/util/function.dart';
-import 'package:humphrey_garden/widgets/file_icon.dart';
-import 'package:humphrey_garden/widgets/neu_back_button.dart';
+import 'package:garden/util/function.dart';
+import 'package:garden/widgets/file_icon.dart';
+import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 

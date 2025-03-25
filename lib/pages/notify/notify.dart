@@ -1,10 +1,10 @@
 import 'dart:convert';
 
-import 'package:humphrey_garden/themes/app_theme.dart';
-import 'package:humphrey_garden/util/function.dart';
-import 'package:humphrey_garden/util/strings.dart';
-import 'package:humphrey_garden/widgets/expansion_container.dart';
-import 'package:humphrey_garden/widgets/neu_back_button.dart';
+import 'package:garden/themes/app_theme.dart';
+import 'package:garden/util/function.dart';
+import 'package:garden/util/strings.dart';
+import 'package:garden/widgets/expansion_container.dart';
+import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/material.dart';
 import 'package:html/parser.dart';
 

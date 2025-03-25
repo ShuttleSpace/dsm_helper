@@ -1,8 +1,7 @@
-import 'package:humphrey_garden/models/photos/folder_model.dart';
-import 'package:humphrey_garden/pages/photos/widgets/photo_item_widget.dart';
-import 'package:humphrey_garden/pages/photos/widgets/thumbnail_card.dart';
+import 'package:garden/models/photos/folder_model.dart';
+import 'package:garden/pages/photos/widgets/photo_item_widget.dart';
+import 'package:garden/pages/photos/widgets/thumbnail_card.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 
 class Folder extends StatefulWidget {
   const Folder(this.isTeam);

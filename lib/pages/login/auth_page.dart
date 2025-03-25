@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:humphrey_garden/util/function.dart';
+import 'package:garden/util/function.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_vibrate/flutter_vibrate.dart';
@@ -46,7 +46,7 @@ class _AuthPageState extends State<AuthPage> {
 
   getData() async {
     String pass = await Util.instance.getStorage("gesture_password") ?? '';
-    password = pass ?? "";
+    password = pass;
     String launchAuthBiometricsStr =
         await Util.instance.getStorage("launch_auth_biometrics") ?? '';
     if (launchAuthBiometricsStr == "1") {
@@ -128,7 +128,7 @@ class _AuthPageState extends State<AuthPage> {
     }
   }
 
-  Future<bool> onWillPop() {
+  Future<bool> onWillPop(bool didPop, result) {
     Util.instance.vibrate(FeedbackType.light);
     if (DateTime.now().difference(lastPopTime) > Duration(seconds: 2)) {
       lastPopTime = DateTime.now();
@@ -148,8 +148,8 @@ class _AuthPageState extends State<AuthPage> {
         automaticallyImplyLeading: false,
         title: Text('安全验证'),
       ),
-      body: WillPopScope(
-        onWillPop: onWillPop,
+      body: PopScope(
+        onPopInvokedWithResult: onWillPop,
         child: Center(
           child: Column(
             mainAxisSize: MainAxisSize.min,

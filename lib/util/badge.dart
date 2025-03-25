@@ -21,7 +21,8 @@ class Badge extends StatelessWidget {
             borderRadius: BorderRadius.circular(size / 44 * 30),
             boxShadow: [
               BoxShadow(
-                  color: Colors.black.withOpacity(0.5), offset: Offset(1, 2)),
+                  color: Colors.black.withValues(alpha: 0.5),
+                  offset: Offset(1, 2)),
             ]),
         child: Text(
           "$badge",

@@ -1,21 +1,23 @@
+// ignore_for_file: unused_import
+
 import 'dart:async';
 import 'dart:io';
 
 import 'package:cool_ui/cool_ui.dart';
-import 'package:humphrey_garden/pages/home.dart';
-import 'package:humphrey_garden/pages/login/accounts.dart';
-import 'package:humphrey_garden/pages/login/auth_page.dart';
-import 'package:humphrey_garden/pages/login/login.dart';
-import 'package:humphrey_garden/providers/audio_player_provider.dart';
-import 'package:humphrey_garden/providers/flux_provider.dart';
-import 'package:humphrey_garden/providers/setting.dart';
-import 'package:humphrey_garden/providers/shortcut.dart';
-import 'package:humphrey_garden/providers/wallpaper.dart';
-import 'package:humphrey_garden/themes/light.dart';
-import 'package:humphrey_garden/themes/dark.dart';
-import 'package:humphrey_garden/util/function.dart';
-import 'package:humphrey_garden/util/log.dart';
-import 'package:humphrey_garden/widgets/keyboard_dismisser.dart';
+import 'package:garden/pages/home.dart';
+import 'package:garden/pages/login/accounts.dart';
+import 'package:garden/pages/login/auth_page.dart';
+import 'package:garden/pages/login/login.dart';
+import 'package:garden/providers/audio_player_provider.dart';
+import 'package:garden/providers/flux_provider.dart';
+import 'package:garden/providers/setting.dart';
+import 'package:garden/providers/shortcut.dart';
+import 'package:garden/providers/wallpaper.dart';
+import 'package:garden/themes/light.dart';
+import 'package:garden/themes/dark.dart';
+import 'package:garden/util/function.dart';
+import 'package:garden/util/log.dart';
+import 'package:garden/widgets/keyboard_dismisser.dart';
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -76,7 +78,7 @@ void main() async {
 
   Util.instance.downloadSavePath =
       await Util.instance.getStorage("download_save_path") ??
-          "/storage/emulated/0/humphrey_garden/Download";
+          "/storage/emulated/0/garden/Download";
   Util.instance.getStorage("download_wifi_only").then((value) {
     Util.instance.downloadWifiOnly = value == "1";
   });

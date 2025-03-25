@@ -1,5 +1,5 @@
-import 'package:humphrey_garden/util/function.dart';
-import 'package:humphrey_garden/widgets/neu_back_button.dart';
+import 'package:garden/util/function.dart';
+import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/material.dart';
 
 class License extends StatefulWidget {

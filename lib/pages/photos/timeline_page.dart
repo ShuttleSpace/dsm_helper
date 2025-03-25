@@ -1,5 +1,5 @@
-import 'package:humphrey_garden/pages/photos/timeline.dart';
-import 'package:humphrey_garden/widgets/neu_back_button.dart';
+import 'package:garden/pages/photos/timeline.dart';
+import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/material.dart';
 
 class TimelinePage extends StatefulWidget {

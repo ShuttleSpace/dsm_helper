@@ -1,7 +1,7 @@
-import 'package:humphrey_garden/themes/app_theme.dart';
-import 'package:humphrey_garden/util/function.dart';
-import 'package:humphrey_garden/widgets/animation_progress_bar.dart';
-import 'package:humphrey_garden/widgets/neu_back_button.dart';
+import 'package:garden/themes/app_theme.dart';
+import 'package:garden/util/function.dart';
+import 'package:garden/widgets/animation_progress_bar.dart';
+import 'package:garden/widgets/neu_back_button.dart';
 import 'package:easy_app_installer/easy_app_installer.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher_string.dart';
@@ -21,7 +21,7 @@ class _UpdateState extends State<Update> {
   String fileName = "";
   @override
   void initState() {
-    fileName = "humphrey_garden-${widget.data['buildVersionNo']}.apk";
+    fileName = "garden-${widget.data['buildVersionNo']}.apk";
     if (widget.direct) {
       download();
     }

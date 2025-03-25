@@ -1,3 +1,5 @@
+// ignore_for_file: constant_identifier_names
+
 part of fplayer;
 
 @immutable
@@ -182,10 +184,10 @@ class FVolumeWatcher extends StatefulWidget {
   });
 
   @override
-  _FVolumeWatcherState createState() => _FVolumeWatcherState();
+  FVolumeWatcherState createState() => FVolumeWatcherState();
 }
 
-class _FVolumeWatcherState extends State<FVolumeWatcher> {
+class FVolumeWatcherState extends State<FVolumeWatcher> {
   static OverlayEntry? _entry;
   static Timer? _timer;
   late StreamController<double> _volController;
@@ -216,7 +218,7 @@ class _FVolumeWatcherState extends State<FVolumeWatcher> {
       var entry = OverlayEntry(builder: (_) => widget);
       _entry = entry;
       var overlay = Overlay.of(context);
-      if (overlay != null) overlay.insert(entry);
+      overlay.insert(entry);
     }
     _timer = Timer(const Duration(milliseconds: 800), () {
       _entry?.remove();

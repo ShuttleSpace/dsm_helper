@@ -1,8 +1,8 @@
-import 'package:humphrey_garden/models/photos/album_model.dart';
-import 'package:humphrey_garden/models/photos/photo_model.dart';
-import 'package:humphrey_garden/pages/photos/widgets/photo_item_widget.dart';
-import 'package:humphrey_garden/widgets/cupertino_image.dart';
-import 'package:humphrey_garden/widgets/neu_back_button.dart';
+import 'package:garden/models/photos/album_model.dart';
+import 'package:garden/models/photos/photo_model.dart';
+import 'package:garden/pages/photos/widgets/photo_item_widget.dart';
+import 'package:garden/widgets/cupertino_image.dart';
+import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/material.dart';
 
 class AlbumPage extends StatefulWidget {

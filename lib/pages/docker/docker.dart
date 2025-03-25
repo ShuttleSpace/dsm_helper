@@ -1,10 +1,10 @@
-import 'package:humphrey_garden/pages/docker/detail.dart';
-import 'package:humphrey_garden/util/function.dart';
-import 'package:humphrey_garden/util/log.dart';
-import 'package:humphrey_garden/widgets/bubble_tab_indicator.dart';
-import 'package:humphrey_garden/widgets/animation_progress_bar.dart';
-import 'package:humphrey_garden/widgets/label.dart';
-import 'package:humphrey_garden/widgets/neu_back_button.dart';
+import 'package:garden/pages/docker/detail.dart';
+import 'package:garden/util/function.dart';
+import 'package:garden/util/log.dart';
+import 'package:garden/widgets/bubble_tab_indicator.dart';
+import 'package:garden/widgets/animation_progress_bar.dart';
+import 'package:garden/widgets/label.dart';
+import 'package:garden/widgets/neu_back_button.dart';
 import 'package:extended_text/extended_text.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';

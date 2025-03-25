@@ -1,21 +1,17 @@
 import 'dart:convert';
 
-import 'package:humphrey_garden/pages/backup/backup.dart';
-import 'package:humphrey_garden/pages/control_panel/ssh/ssh.dart';
-import 'package:humphrey_garden/pages/login/accounts.dart';
-import 'package:humphrey_garden/pages/login/confirm_logout.dart';
-import 'package:humphrey_garden/pages/setting/vip.dart';
-import 'package:humphrey_garden/providers/dark_mode.dart';
-import 'package:humphrey_garden/pages/setting/feedback.dart' as fd;
-import 'package:humphrey_garden/pages/setting/helper_setting.dart';
-import 'package:humphrey_garden/pages/terminal/select_server.dart';
-import 'package:humphrey_garden/pages/user/setting.dart';
-import 'package:humphrey_garden/providers/flux_provider.dart';
-import 'package:humphrey_garden/util/function.dart';
-import 'package:humphrey_garden/widgets/terminal_button.dart';
+import 'package:garden/pages/backup/backup.dart';
+import 'package:garden/pages/control_panel/ssh/ssh.dart';
+import 'package:garden/pages/login/accounts.dart';
+import 'package:garden/pages/login/confirm_logout.dart';
+import 'package:garden/providers/dark_mode.dart';
+import 'package:garden/pages/setting/helper_setting.dart';
+import 'package:garden/pages/terminal/select_server.dart';
+import 'package:garden/pages/user/setting.dart';
+import 'package:garden/util/function.dart';
+import 'package:garden/widgets/terminal_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:fluwx/fluwx.dart';
 import 'package:provider/provider.dart';
 
 class SettingButton extends StatelessWidget {
@@ -769,7 +765,7 @@ class _SettingState extends State<Setting> {
                             height: 2,
                           ),
                           Text(
-                            "SSH${ssh == null ? "开关" : ssh ? "已开启" : "已关闭"}",
+                            "SSH${ssh ? "已开启" : "已关闭"}",
                             style: TextStyle(fontSize: 12),
                           )
                         ],

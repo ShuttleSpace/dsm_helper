@@ -1,28 +1,28 @@
 import 'dart:async';
 import 'dart:math';
 
-import 'package:humphrey_garden/models/api_model.dart';
-import 'package:humphrey_garden/models/setting/group_model.dart';
-import 'package:humphrey_garden/models/shortcut_item_model.dart';
-import 'package:humphrey_garden/models/wallpaper_model.dart';
-import 'package:humphrey_garden/pages/control_panel/external_device/external_device.dart';
-import 'package:humphrey_garden/pages/control_panel/info/info.dart';
-import 'package:humphrey_garden/pages/control_panel/task_scheduler/task_scheduler.dart';
-import 'package:humphrey_garden/pages/dashborad/applications.dart';
-import 'package:humphrey_garden/pages/dashborad/media_converter.dart';
-import 'package:humphrey_garden/pages/dashborad/shortcut_list.dart';
-import 'package:humphrey_garden/pages/dashborad/widget_setting.dart';
-import 'package:humphrey_garden/pages/log_center/log_center.dart';
-import 'package:humphrey_garden/pages/notify/notify.dart';
-import 'package:humphrey_garden/pages/resource_monitor/performance.dart';
-import 'package:humphrey_garden/pages/resource_monitor/resource_monitor.dart';
-import 'package:humphrey_garden/providers/setting.dart';
-import 'package:humphrey_garden/providers/shortcut.dart';
-import 'package:humphrey_garden/providers/wallpaper.dart';
-import 'package:humphrey_garden/themes/app_theme.dart';
-import 'package:humphrey_garden/util/function.dart';
-import 'package:humphrey_garden/widgets/animation_progress_bar.dart';
-import 'package:humphrey_garden/widgets/label.dart';
+import 'package:garden/models/api_model.dart';
+import 'package:garden/models/setting/group_model.dart';
+import 'package:garden/models/shortcut_item_model.dart';
+import 'package:garden/models/wallpaper_model.dart';
+import 'package:garden/pages/control_panel/external_device/external_device.dart';
+import 'package:garden/pages/control_panel/info/info.dart';
+import 'package:garden/pages/control_panel/task_scheduler/task_scheduler.dart';
+import 'package:garden/pages/dashborad/applications.dart';
+import 'package:garden/pages/dashborad/media_converter.dart';
+import 'package:garden/pages/dashborad/shortcut_list.dart';
+import 'package:garden/pages/dashborad/widget_setting.dart';
+import 'package:garden/pages/log_center/log_center.dart';
+import 'package:garden/pages/notify/notify.dart';
+import 'package:garden/pages/resource_monitor/performance.dart';
+import 'package:garden/pages/resource_monitor/resource_monitor.dart';
+import 'package:garden/providers/setting.dart';
+import 'package:garden/providers/shortcut.dart';
+import 'package:garden/providers/wallpaper.dart';
+import 'package:garden/themes/app_theme.dart';
+import 'package:garden/util/function.dart';
+import 'package:garden/widgets/animation_progress_bar.dart';
+import 'package:garden/widgets/label.dart';
 import 'package:extended_image/extended_image.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/cupertino.dart';
@@ -1057,7 +1057,7 @@ class DashboardState extends State<Dashboard> {
                                     ),
                                     belowBarData: BarAreaData(
                                       show: true,
-                                      color: Colors.blue.withOpacity(0.2),
+                                      color: Colors.blue.withValues(alpha: .2),
                                     ),
                                   ),
                                   LineChartBarData(
@@ -1931,7 +1931,7 @@ class DashboardState extends State<Dashboard> {
                 Spacer(),
                 if (Util.instance.notReviewAccount)
                   Padding(
-                    padding: EdgeInsets.only(right: 10, top: 8, bottom: 8),
+                    padding: EdgeInsets.only(right: 8, top: 8, bottom: 8),
                     child: OutlinedButton(
                       onPressed: () {
                         Navigator.of(context)
@@ -1954,7 +1954,7 @@ class DashboardState extends State<Dashboard> {
                     ),
                   ),
                 Padding(
-                  padding: EdgeInsets.only(right: 10, top: 8, bottom: 8),
+                  padding: EdgeInsets.symmetric(vertical: 8),
                   child: OutlinedButton(
                     onPressed: () {
                       Navigator.of(context)

@@ -1,6 +1,6 @@
-import 'package:humphrey_garden/models/photos/geocoding_model.dart';
-import 'package:humphrey_garden/pages/photos/timeline_page.dart';
-import 'package:humphrey_garden/widgets/neu_back_button.dart';
+import 'package:garden/models/photos/geocoding_model.dart';
+import 'package:garden/pages/photos/timeline_page.dart';
+import 'package:garden/widgets/neu_back_button.dart';
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';

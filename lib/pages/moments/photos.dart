@@ -1,9 +1,9 @@
-import 'package:humphrey_garden/pages/common/image_preview.dart';
-import 'package:humphrey_garden/util/function.dart';
-import 'package:humphrey_garden/util/moments_api.dart';
-import 'package:humphrey_garden/widgets/cupertino_image.dart';
-import 'package:humphrey_garden/widgets/neu_back_button.dart';
-import 'package:humphrey_garden/widgets/transparent_router.dart';
+import 'package:garden/pages/common/image_preview.dart';
+import 'package:garden/util/function.dart';
+import 'package:garden/util/moments_api.dart';
+import 'package:garden/widgets/cupertino_image.dart';
+import 'package:garden/widgets/neu_back_button.dart';
+import 'package:garden/widgets/transparent_router.dart';
 import 'package:flutter/material.dart';
 
 class Photos extends StatefulWidget {

@@ -2,8 +2,8 @@ import 'dart:async';
 import 'dart:isolate';
 import 'dart:ui';
 
-import 'package:humphrey_garden/pages/download/download.dart';
-import 'package:humphrey_garden/util/function.dart';
+import 'package:garden/pages/download/download.dart';
+import 'package:garden/util/function.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 

@@ -1,13 +1,13 @@
 import 'dart:async';
 
 import 'package:cool_ui/cool_ui.dart';
-import 'package:humphrey_garden/pages/common/browser.dart' as dsm;
-import 'package:humphrey_garden/pages/setting/vip_login.dart';
-import 'package:humphrey_garden/pages/setting/vip_record.dart';
-import 'package:humphrey_garden/providers/flux_provider.dart';
-import 'package:humphrey_garden/themes/app_theme.dart';
-import 'package:humphrey_garden/util/function.dart';
-import 'package:humphrey_garden/widgets/neu_back_button.dart';
+import 'package:garden/pages/common/browser.dart' as dsm;
+import 'package:garden/pages/setting/vip_login.dart';
+import 'package:garden/pages/setting/vip_record.dart';
+import 'package:garden/providers/flux_provider.dart';
+import 'package:garden/themes/app_theme.dart';
+import 'package:garden/util/function.dart';
+import 'package:garden/widgets/neu_back_button.dart';
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -570,7 +570,7 @@ class _VipState extends State<Vip> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text("广告状态："),
-                  if (noAdTime == null && isForever == false)
+                  if (isForever == false)
                     Text("未关闭")
                   else if (isForever)
                     Text("永久关闭", style: TextStyle(color: Colors.red))

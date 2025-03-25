@@ -1,9 +1,9 @@
 import 'dart:async';
 
-import 'package:humphrey_garden/pages/control_panel/shared_folders/add_shared_folder.dart';
-import 'package:humphrey_garden/util/function.dart';
-import 'package:humphrey_garden/widgets/file_icon.dart';
-import 'package:humphrey_garden/widgets/neu_back_button.dart';
+import 'package:garden/pages/control_panel/shared_folders/add_shared_folder.dart';
+import 'package:garden/util/function.dart';
+import 'package:garden/widgets/file_icon.dart';
+import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -473,7 +473,7 @@ class _SharedFoldersState extends State<SharedFolders> {
                     height: MediaQuery.sizeOf(context).height,
                     color: Theme.of(context)
                         .scaffoldBackgroundColor
-                        .withOpacity(0.7),
+                        .withValues(alpha: .7),
                     child: Center(
                       child: CupertinoActivityIndicator(
                         radius: 14,

@@ -1,7 +1,7 @@
 import 'dart:io';
 
-import 'package:humphrey_garden/util/function.dart';
-import 'package:humphrey_garden/widgets/cupertino_image.dart';
+import 'package:garden/util/function.dart';
+import 'package:garden/widgets/cupertino_image.dart';
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
 
@@ -34,57 +34,45 @@ class FileIcon extends StatelessWidget {
       );
     } else if (fileType == FileTypeEnum.movie) {
       print(thumb);
-      return thumb == null
-          ? Image.asset(
-              "assets/icons/movie.png",
+      return network
+          ? CupertinoExtendedImage(
+              Util.instance.baseUrl +
+                  "/webapi/entry.cgi?path=${Uri.encodeComponent(thumb)}&size=medium&api=SYNO.FileStation.Thumb&method=get&version=2&_sid=${Util.instance.sid}&animate=true",
               width: width,
               height: height,
+              fit: fit,
+              placeholder: Container(
+                width: width,
+                height: height,
+                alignment: Alignment.center,
+                child: Image.asset(
+                  "assets/icons/movie.png",
+                  width: width,
+                  height: height,
+                ),
+              ),
             )
-          : network
-              ? CupertinoExtendedImage(
-                  Util.instance.baseUrl +
-                      "/webapi/entry.cgi?path=${Uri.encodeComponent(thumb ?? '')}&size=medium&api=SYNO.FileStation.Thumb&method=get&version=2&_sid=${Util.instance.sid}&animate=true",
-                  width: width,
-                  height: height,
-                  fit: fit,
-                  placeholder: Container(
-                    width: width,
-                    height: height,
-                    alignment: Alignment.center,
-                    child: Image.asset(
-                      "assets/icons/movie.png",
-                      width: width,
-                      height: height,
-                    ),
-                  ),
-                )
-              : ExtendedImage.file(
-                  File(thumb ?? ''),
-                  width: width,
-                  height: height,
-                  fit: fit,
-                );
+          : ExtendedImage.file(
+              File(thumb),
+              width: width,
+              height: height,
+              fit: fit,
+            );
     } else if (fileType == FileTypeEnum.image) {
-      return thumb == null
-          ? Image.asset(
-              "assets/icons/image.png",
+      return network
+          ? CupertinoExtendedImage(
+              Util.instance.baseUrl +
+                  "/webapi/entry.cgi?path=${Uri.encodeComponent(thumb)}&size=small&api=SYNO.FileStation.Thumb&method=get&version=2&_sid=${Util.instance.sid}&animate=true",
               width: width,
               height: height,
+              fit: fit,
             )
-          : network
-              ? CupertinoExtendedImage(
-                  Util.instance.baseUrl +
-                      "/webapi/entry.cgi?path=${Uri.encodeComponent(thumb)}&size=small&api=SYNO.FileStation.Thumb&method=get&version=2&_sid=${Util.instance.sid}&animate=true",
-                  width: width,
-                  height: height,
-                  fit: fit,
-                )
-              : ExtendedImage.file(
-                  File(thumb),
-                  width: width,
-                  height: height,
-                  fit: fit,
-                );
+          : ExtendedImage.file(
+              File(thumb),
+              width: width,
+              height: height,
+              fit: fit,
+            );
     } else if (fileType == FileTypeEnum.word) {
       return Image.asset(
         "assets/icons/word.png",

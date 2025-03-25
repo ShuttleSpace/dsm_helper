@@ -1,5 +1,5 @@
-import 'package:humphrey_garden/util/function.dart';
-import 'package:humphrey_garden/widgets/neu_back_button.dart';
+import 'package:garden/util/function.dart';
+import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -75,7 +75,9 @@ class _UserGroupsState extends State<UserGroups> {
           ? Container(
               width: MediaQuery.sizeOf(context).width,
               height: MediaQuery.sizeOf(context).height,
-              color: Theme.of(context).scaffoldBackgroundColor.withOpacity(0.7),
+              color: Theme.of(context)
+                  .scaffoldBackgroundColor
+                  .withValues(alpha: .7),
               child: Center(
                 child: CupertinoActivityIndicator(
                   radius: 14,

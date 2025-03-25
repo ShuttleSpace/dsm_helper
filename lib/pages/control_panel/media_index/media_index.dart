@@ -1,5 +1,5 @@
-import 'package:humphrey_garden/util/function.dart';
-import 'package:humphrey_garden/widgets/neu_back_button.dart';
+import 'package:garden/util/function.dart';
+import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
@@ -86,13 +86,9 @@ class _MediaIndexState extends State<MediaIndex> {
                       ),
                       Spacer(),
                       Text(
-                        "${mediaIndexing == null ? "加载中" : mediaIndexing ? "索引中" : "已完成"}",
+                        "${mediaIndexing ? "索引中" : "已完成"}",
                         style: TextStyle(
-                            color: mediaIndexing == null
-                                ? null
-                                : mediaIndexing
-                                    ? Colors.blue
-                                    : Colors.green),
+                            color: mediaIndexing ? Colors.blue : Colors.green),
                       ),
                     ],
                   ),

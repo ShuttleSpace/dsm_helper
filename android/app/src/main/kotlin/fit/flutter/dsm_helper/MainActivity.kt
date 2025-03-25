@@ -1,4 +1,4 @@
-package fit.flutter.humphrey_garden
+package fit.flutter.garden
 
 import io.flutter.embedding.android.FlutterActivity
 

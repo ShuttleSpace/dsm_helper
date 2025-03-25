@@ -1,8 +1,7 @@
 import 'dart:convert';
-import 'dart:typed_data';
 
-import 'package:humphrey_garden/util/function.dart';
-import 'package:humphrey_garden/widgets/neu_back_button.dart';
+import 'package:garden/util/function.dart';
+import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -27,7 +26,7 @@ class _OtpBindState extends State<OtpBind> {
   @override
   void initState() {
     setState(() {
-      email = widget.email ?? "";
+      email = widget.email;
     });
     _emailController.value = TextEditingValue(text: email);
     super.initState();

@@ -1,16 +1,16 @@
-import 'package:humphrey_garden/models/shortcut_item_model.dart';
-import 'package:humphrey_garden/pages/common/browser.dart';
-import 'package:humphrey_garden/pages/control_panel/control_panel.dart';
-import 'package:humphrey_garden/pages/docker/detail.dart';
-import 'package:humphrey_garden/pages/docker/docker.dart';
-import 'package:humphrey_garden/pages/download_station/download_station.dart';
-import 'package:humphrey_garden/pages/log_center/log_center.dart';
-import 'package:humphrey_garden/pages/moments/moments.dart';
-import 'package:humphrey_garden/pages/packages/packages.dart';
-import 'package:humphrey_garden/pages/resource_monitor/resource_monitor.dart';
-import 'package:humphrey_garden/pages/storage_manager/storage_manager.dart';
-import 'package:humphrey_garden/pages/virtual_machine/virtual_machine.dart';
-import 'package:humphrey_garden/util/function.dart';
+import 'package:garden/models/shortcut_item_model.dart';
+import 'package:garden/pages/common/browser.dart';
+import 'package:garden/pages/control_panel/control_panel.dart';
+import 'package:garden/pages/docker/detail.dart';
+import 'package:garden/pages/docker/docker.dart';
+import 'package:garden/pages/download_station/download_station.dart';
+import 'package:garden/pages/log_center/log_center.dart';
+import 'package:garden/pages/moments/moments.dart';
+import 'package:garden/pages/packages/packages.dart';
+import 'package:garden/pages/resource_monitor/resource_monitor.dart';
+import 'package:garden/pages/storage_manager/storage_manager.dart';
+import 'package:garden/pages/virtual_machine/virtual_machine.dart';
+import 'package:garden/util/function.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -75,9 +75,7 @@ class ShortcutList extends StatelessWidget {
         icon =
             "assets/applications/${Util.instance.version}/package_center.png";
         name = "套件中心";
-        page = Packages(system != null
-            ? system['firmware_ver']
-            : 'DSM ${Util.instance.version}.0-10049');
+        page = Packages('DSM ${Util.instance.version}.0-10049');
         routerName = "packages";
         if (appNotify['SYNO.SDS.PkgManApp.Instance'] != null) {
           unread = appNotify['SYNO.SDS.PkgManApp.Instance']['unread'];
@@ -250,7 +248,7 @@ class ShortcutList extends StatelessWidget {
                           shape: BoxShape.circle,
                           boxShadow: [
                             BoxShadow(
-                                color: Colors.black.withOpacity(0.5),
+                                color: Colors.black.withValues(alpha: .5),
                                 offset: Offset(1, 1)),
                           ],
                         ),

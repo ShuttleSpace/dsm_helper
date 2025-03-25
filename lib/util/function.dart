@@ -5,11 +5,11 @@ import 'dart:math';
 import 'package:cool_ui/cool_ui.dart';
 import 'package:dio/dio.dart';
 import 'package:dio/io.dart';
-import 'package:humphrey_garden/models/setting/group_model.dart';
-import 'package:humphrey_garden/pages/download/download.dart';
-import 'package:humphrey_garden/pages/update/update.dart';
-import 'package:humphrey_garden/util/api.dart';
-import 'package:humphrey_garden/util/log.dart';
+import 'package:garden/models/setting/group_model.dart';
+import 'package:garden/pages/download/download.dart';
+import 'package:garden/pages/update/update.dart';
+import 'package:garden/util/api.dart';
+import 'package:garden/util/log.dart';
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
@@ -22,10 +22,10 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_vibrate/flutter_vibrate.dart';
 
-export 'package:humphrey_garden/extensions/datetime.dart';
-export 'package:humphrey_garden/extensions/int.dart';
-export 'package:humphrey_garden/extensions/string.dart';
-export 'package:humphrey_garden/util/api.dart';
+export 'package:garden/extensions/datetime.dart';
+export 'package:garden/extensions/int.dart';
+export 'package:garden/extensions/string.dart';
+export 'package:garden/util/api.dart';
 
 enum FileTypeEnum {
   folder,
@@ -117,7 +117,7 @@ class Util {
 
   bool get notReviewAccount => account != "jinx";
   toast(String text) {
-    showToast(text ?? "",
+    showToast(text,
         dismissOtherToast: true,
         textPadding: EdgeInsets.symmetric(horizontal: 15, vertical: 8));
   }
@@ -188,9 +188,9 @@ class Util {
 
   Color getAdjustColor(Color baseColor, double amount) {
     Map<String, int> colors = {
-      'r': baseColor.red,
-      'g': baseColor.green,
-      'b': baseColor.blue
+      'r': baseColor.r.toInt(),
+      'g': baseColor.g.toInt(),
+      'b': baseColor.b.toInt()
     };
 
     colors = colors.map((key, value) {
@@ -650,8 +650,8 @@ class Util {
           onReceiveProgress: onReceiveProgress,
           cancelToken: cancelToken);
       return {
-        "code": 1,
-        "msg": "下载完成",
+        "code": response.statusCode,
+        "msg": response.statusMessage,
         "data": tempPath + Platform.pathSeparator + saveName
       };
     } on DioException catch (error) {
@@ -775,7 +775,7 @@ class Util {
 
   Future<bool> setStorage(String name, String value) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    return prefs.setString(name, value ?? "");
+    return prefs.setString(name, value);
   }
 
   Future<String?> getStorage(String name) async {

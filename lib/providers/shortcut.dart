@@ -1,4 +1,4 @@
-import 'package:humphrey_garden/util/function.dart';
+import 'package:garden/util/function.dart';
 import 'package:flutter/material.dart';
 
 class ShortcutProvider with ChangeNotifier {

@@ -1,7 +1,7 @@
 import 'dart:convert';
 
-import 'package:humphrey_garden/models/photos/thumbnail_model.dart';
-import 'package:humphrey_garden/util/function.dart';
+import 'package:garden/models/photos/thumbnail_model.dart';
+import 'package:garden/util/function.dart';
 
 import 'folder_model.dart';
 

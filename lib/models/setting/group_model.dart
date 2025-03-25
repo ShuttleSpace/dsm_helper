@@ -1,4 +1,4 @@
-import 'package:humphrey_garden/util/function.dart';
+import 'package:garden/util/function.dart';
 
 /// id : 1
 /// type : 1

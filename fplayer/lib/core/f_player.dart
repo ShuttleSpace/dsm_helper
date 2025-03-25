@@ -411,7 +411,8 @@ class FPlayer extends ChangeNotifier implements ValueListenable<FValue> {
       await _channel.invokeMethod("reset").then((_) {
         FLog.i("$this invoke reset #$cid -> done");
       });
-      _setValue(FValue.uninitialized().copyWith(fullScreen: value.fullScreen));
+      _setValue(
+          const FValue.uninitialized().copyWith(fullScreen: value.fullScreen));
     }
   }
 
@@ -498,10 +499,10 @@ class FPlayer extends ChangeNotifier implements ValueListenable<FValue> {
         break;
       case 'state_change':
         int newStateId = map['new'] ?? 0;
-        int _oldState = map['old'] ?? 0;
+        int oldState0 = map['old'] ?? 0;
         FState fpState = FState.values[newStateId];
-        FState oldState = (_oldState >= 0 && _oldState < FState.values.length)
-            ? FState.values[_oldState]
+        FState oldState = (oldState0 >= 0 && oldState0 < FState.values.length)
+            ? FState.values[oldState0]
             : state;
 
         if (fpState != oldState) {

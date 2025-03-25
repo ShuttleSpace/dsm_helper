@@ -1,12 +1,12 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:humphrey_garden/pages/download/download.dart';
-import 'package:humphrey_garden/pages/download/download_state.dart';
-import 'package:humphrey_garden/pages/file/file.dart';
-import 'package:humphrey_garden/pages/setting/setting.dart';
-import 'package:humphrey_garden/util/function.dart';
-import 'package:humphrey_garden/widgets/update_dialog.dart';
+import 'package:garden/pages/download/download.dart';
+import 'package:garden/pages/download/download_state.dart';
+import 'package:garden/pages/file/file.dart';
+import 'package:garden/pages/setting/setting.dart';
+import 'package:garden/util/function.dart';
+import 'package:garden/widgets/update_dialog.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -191,7 +191,7 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
     }
   }
 
-  Future<bool> onWillPop() {
+  Future<bool> onWillPop(i, r) {
     Util.instance.vibrate(FeedbackType.light);
     Future<bool> value = Future.value(true);
     if (_currentIndex == 0) {
@@ -226,8 +226,8 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: onWillPop,
+    return PopScope(
+      onPopInvokedWithResult: onWillPop,
       child: Scaffold(
         appBar: null,
         body: DownloadStateInherited(

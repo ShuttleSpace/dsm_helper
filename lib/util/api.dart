@@ -5,7 +5,7 @@ import 'dart:math';
 
 // import 'package:device_info_plus/device_info_plus.dart';
 import 'package:dio/dio.dart';
-import 'package:humphrey_garden/models/api_model.dart';
+import 'package:garden/models/api_model.dart';
 import 'package:http_parser/http_parser.dart';
 
 import 'function.dart';
@@ -549,7 +549,7 @@ class Api {
       "protect_type_enable": '"false"',
       "date_expired":
           dateExpired == null ? "" : '"${dateExpired.format("Y-m-d H:i:s")}"',
-      "expire_times": expireTimes ?? "",
+      "expire_times": expireTimes,
       "protect_type": "none",
       "redirect_uri": null,
       "id": jsonEncode(id),

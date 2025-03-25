@@ -73,7 +73,7 @@ class _FSliderState extends State<FSlider> {
 
     return GestureDetector(
       child: Container(
-        margin: EdgeInsets.only(left: margin, right: margin),
+        margin: const EdgeInsets.only(left: margin, right: margin),
         height: double.infinity,
         width: double.infinity,
         color: Colors.transparent,
@@ -195,7 +195,7 @@ class _SliderPainter extends CustomPainter {
 
     // draw circle cursor
     pt.color = colors.cursorColor;
-    pt.color = pt.color.withAlpha(max(0, pt.color.alpha - 50));
+    pt.color = pt.color.withAlpha(max(0, pt.color.a.toInt() - 50));
     radius = min(size.height / 2, dragging ? 10 : 5);
     canvas.drawCircle(Offset(value, size.height / 2), radius, pt);
     pt.color = colors.cursorColor;

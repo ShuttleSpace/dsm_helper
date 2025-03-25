@@ -1,4 +1,4 @@
 extension StringExt on String {
-  bool get isBlank => this == null || this.trim().isEmpty;
-  bool get isNotBlank => this != null && this.trim().isNotEmpty;
+  bool get isBlank => this.trim().isEmpty;
+  bool get isNotBlank => this.trim().isNotEmpty;
 }

@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 part of fplayer;
 
 FPanelWidgetBuilder fPanelBuilder({
@@ -1062,6 +1064,8 @@ class __FPanel2State extends State<_FPanel2> {
   void takeSnapshot() {
     player.takeSnapShot().then((v) {
       var provider = MemoryImage(v);
+      if (!context.mounted) return;
+      // ignore: use_build_context_synchronously
       precacheImage(provider, context).then((_) {
         setState(() {
           screenshot = true;

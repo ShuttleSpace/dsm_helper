@@ -1,7 +1,7 @@
-import 'package:humphrey_garden/pages/resource_monitor/performance.dart';
-import 'package:humphrey_garden/pages/resource_monitor/task_manager.dart';
-import 'package:humphrey_garden/pages/resource_monitor/users.dart';
-import 'package:humphrey_garden/widgets/neu_back_button.dart';
+import 'package:garden/pages/resource_monitor/performance.dart';
+import 'package:garden/pages/resource_monitor/task_manager.dart';
+import 'package:garden/pages/resource_monitor/users.dart';
+import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 

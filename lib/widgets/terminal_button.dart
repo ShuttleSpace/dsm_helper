@@ -1,4 +1,4 @@
-import 'package:humphrey_garden/util/function.dart';
+import 'package:garden/util/function.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_vibrate/flutter_vibrate.dart';
 
@@ -19,7 +19,7 @@ class TerminalButton extends StatelessWidget {
         onPressed?.call();
       },
       child: Container(
-        color: active ? Colors.blue.withOpacity(0.4) : null,
+        color: active ? Colors.blue.withValues(alpha: 0.4) : null,
         width: 40,
         height: 30,
         alignment: Alignment.center,

@@ -1,9 +1,9 @@
 import 'dart:io';
-import 'package:humphrey_garden/pages/common/browser.dart';
-import 'package:humphrey_garden/pages/setting/license.dart';
-import 'package:humphrey_garden/pages/setting/open_source.dart';
-import 'package:humphrey_garden/util/function.dart';
-import 'package:humphrey_garden/widgets/neu_back_button.dart';
+import 'package:garden/pages/common/browser.dart';
+import 'package:garden/pages/setting/license.dart';
+import 'package:garden/pages/setting/open_source.dart';
+import 'package:garden/util/function.dart';
+import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -321,8 +321,7 @@ class _AboutState extends State<About> {
                             Navigator.of(context)
                                 .push(CupertinoPageRoute(builder: (context) {
                               return Browser(
-                                url:
-                                    "https://gitee.com/apaipai/humphrey_garden",
+                                url: "https://gitee.com/apaipai/garden",
                               );
                             }));
                           },
