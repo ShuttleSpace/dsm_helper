@@ -70,7 +70,7 @@ class _PhotosState extends State<Photos> {
                           child: SafeArea(
                             top: false,
                             child: Padding(
-                              padding: EdgeInsets.all(22),
+                              padding: EdgeInsets.all(8),
                               child: Column(
                                 mainAxisSize: MainAxisSize.min,
                                 children: <Widget>[

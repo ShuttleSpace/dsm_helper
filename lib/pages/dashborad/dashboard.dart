@@ -329,7 +329,8 @@ class DashboardState extends State<Dashboard> {
                     ['modulelist'] ??
                 [];
             restoreSizePos = init['data']['UserSettings']
-                ['SYNO.SDS._Widget.Instance']['restoreSizePos'];
+                    ['SYNO.SDS._Widget.Instance']['restoreSizePos'] ??
+                {};
           }
           if (init['data']['UserSettings']['Desktop'] != null) {
             applications = init['data']['UserSettings']['Desktop']

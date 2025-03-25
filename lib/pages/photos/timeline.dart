@@ -117,7 +117,25 @@ class TimelineState extends State<Timeline> {
                 child: ListView.builder(
                   controller: _scrollController,
                   itemBuilder: (context, i) {
-                    return _buildTimelineItem(days[i]);
+                    if (days[i].photos != null) {
+                      return _buildTimelineItem(days[i]);
+                    }
+                    return FutureBuilder(
+                        future: days[i].fetchPhotos(
+                          isTeam: isTeam,
+                          type: widget.type,
+                          itemTypes: itemTypes,
+                          geocodingId: widget.geocodingId,
+                          generalTagId: widget.generalTagId,
+                          recentlyAdd: widget.recentlyAdd,
+                        ),
+                        builder: (context, snapshot) {
+                          if (snapshot.hasError) {
+                            return Text('Error: ${snapshot.error}');
+                          } else {
+                            return _buildTimelineItem(days[i]);
+                          }
+                        });
                   },
                   itemCount: days.length,
                 ),
@@ -128,26 +146,6 @@ class TimelineState extends State<Timeline> {
   }
 
   Widget _buildTimelineItem(Day day) {
-    if (day.photos == null) {
-      day
-          .fetchPhotos(
-        isTeam: isTeam,
-        type: widget.type,
-        itemTypes: itemTypes,
-        geocodingId: widget.geocodingId,
-        generalTagId: widget.generalTagId,
-        recentlyAdd: widget.recentlyAdd,
-      )
-          .then((_) {
-        setState(() {
-          print('_buildTimelineItem: ${day.photos?.length}');
-          final i = days.indexWhere((d) => d.day == day.day);
-          days.insert(i, days.removeAt(i));
-          days = [...days]; // 强制重建
-        });
-      });
-    }
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [

@@ -243,11 +243,7 @@ class _TaskManagerState extends State<TaskManager>
                         ? Colors.white
                         : Colors.black,
                     unselectedLabelColor: Colors.grey,
-                    indicator: BubbleTabIndicator(
-                      indicatorColor: Theme.of(context).scaffoldBackgroundColor,
-                      shadowColor: Util.instance.getAdjustColor(
-                          Theme.of(context).scaffoldBackgroundColor, -20),
-                    ),
+                    indicator: BubbleTabIndicator(),
                     tabs: [
                       Padding(
                         padding:
