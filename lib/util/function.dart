@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 
+import 'package:background_downloader/background_downloader.dart';
 import 'package:cool_ui/cool_ui.dart';
 import 'package:dio/dio.dart';
 import 'package:dio/io.dart';
@@ -13,7 +14,6 @@ import 'package:garden/util/log.dart';
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:oktoast/oktoast.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -129,6 +129,7 @@ class Util {
   }
 
   vibrate(FeedbackType type) async {
+    if (!Platform.isAndroid && !Platform.isIOS) return;
     if (vibrateOn) {
       bool canVibrate = await Vibrate.canVibrate;
       if (canVibrate) {
@@ -712,13 +713,16 @@ class Util {
     debugPrint(saveName);
     // CancelToken cancelToken = CancelToken();
     // DioDownload().downloadFile(url: url, savePath: saveName, cancelToken: cancelToken);
-    String? taskId = await FlutterDownloader.enqueue(
-        url: url,
-        fileName: saveName,
-        savedDir: savePath,
-        showNotification: true,
-        openFileFromNotification: true);
-    return taskId;
+    var task = DownloadTask(
+      url: url,
+      filename: saveName,
+      directory: savePath,
+    );
+    var enqueState = await FileDownloader().enqueue(task);
+    if (!enqueState) {
+      return Future.error("队列下载任务失败!");
+    }
+    return task.taskId;
   }
 
   String formatSize(num size,
