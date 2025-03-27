@@ -108,6 +108,8 @@ dependencies:
     git: https://gitee.com/dsm_bay/easy_app_installer.git
   background_downloader: ^8.6.0
   path: ^1.9.0
+  signals: ^6.0.2
+  signals_flutter: ^6.0.2
 #  flutter_filereader: ^3.0.0
 #  x5_webview: ^0.2.4
 dev_dependencies:

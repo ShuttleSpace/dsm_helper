@@ -2,13 +2,11 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:math';
 
-import 'package:garden/providers/flux_provider.dart';
 import 'package:garden/util/function.dart';
 import 'package:garden/widgets/hero_widget.dart';
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:fluwx/fluwx.dart';
 import 'package:flutter_vibrate/flutter_vibrate.dart';
 import 'package:provider/provider.dart';
 
@@ -440,26 +438,14 @@ class _ImagePreviewState extends State<ImagePreview>
                             ),
                             GestureDetector(
                               onTap: () {
-                                WeChatImageToShare wechatImage;
                                 if (widget.images[currentIndex]
                                     .startsWith("http")) {
-                                  wechatImage = WeChatImageToShare(
-                                      localImagePath:
-                                          widget.images[currentIndex]);
                                 } else if (widget.images[currentIndex]
                                     .startsWith("/")) {
-                                  wechatImage = WeChatImageToShare(
-                                      uint8List:
-                                          File(widget.images[currentIndex])
-                                              .readAsBytesSync());
                                 } else {
                                   Util.instance.toast("暂不支持分享此图片");
                                   return;
                                 }
-                                c.read<FluwxProvider>().wx.share(
-                                      WeChatShareImageModel(wechatImage,
-                                          scene: WeChatScene.session),
-                                    );
                               },
                               child: Image.asset(
                                 "assets/icons/wechat.png",

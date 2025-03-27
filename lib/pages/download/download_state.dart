@@ -59,8 +59,8 @@ class DownloadStateNotifier extends ChangeNotifier {
     _receiverPort.listen((dynamic data) {
       debugPrint('UI Isolate Callback: $data');
       String id = data[0];
-      TaskStatus status = data[1];
-      int progress = data[2];
+      TaskStatus status = data[1] ?? TaskStatus.notFound;
+      int progress = data[2] ?? 0;
 
       if (tasks.value.isNotEmpty) {
         tasks.value.forEach((task) {
@@ -79,9 +79,11 @@ class DownloadStateNotifier extends ChangeNotifier {
   }
 
   runLoop() async {
-    List<DownloadTask> downloadTasks =
-        await FileDownloader().allTasks() as List<DownloadTask>;
-    tasks.value = downloadTasks.map((e) => DownloadInfo.formTask(e)).toList();
+    List<Task> downloadTasks = await FileDownloader().allTasks();
+    tasks.value = downloadTasks
+        .takeWhile((t) => t is DownloadTask)
+        .map((e) => DownloadInfo.formTask(e as DownloadTask))
+        .toList();
     loading.value = false;
     debugPrint('runLoop: loading= ${loading.value}');
     // 如果存在下载中任务，每秒刷新一次

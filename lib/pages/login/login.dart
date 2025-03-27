@@ -5,7 +5,6 @@ import 'package:dio/dio.dart';
 import 'package:garden/pages/common/browser.dart' as dsm;
 import 'package:garden/pages/login/accounts.dart';
 import 'package:garden/pages/setting/license.dart';
-import 'package:garden/providers/flux_provider.dart';
 import 'package:garden/util/function.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
@@ -14,7 +13,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_vibrate/flutter_vibrate.dart';
 import 'package:package_info_plus/package_info_plus.dart';
-import 'package:provider/provider.dart';
 
 class Login extends StatefulWidget {
   final Map? server;
@@ -45,6 +43,7 @@ class _LoginState extends State<Login> {
   bool checkSsl = true;
   bool rememberDevice = true;
   bool read = true;
+  bool passwordVisible = false;
   TextEditingController _hostController = TextEditingController();
   TextEditingController _accountController = TextEditingController();
   TextEditingController _noteController = TextEditingController();
@@ -246,10 +245,6 @@ class _LoginState extends State<Login> {
                                   Util.instance.setStorage("read", "1");
                                   Util.instance.setStorage(
                                       "agreement", read ? "1" : "0");
-                                  context.read<FluwxProvider>().wx.registerApi(
-                                      appId: "wxabdf23571f34b49b",
-                                      universalLink:
-                                          "https://dsm.apaipai.top/app/");
                                 },
                                 child: Text(
                                   "同意并继续",
@@ -837,15 +832,23 @@ class _LoginState extends State<Login> {
                 child: TextField(
                   controller: _passwordController,
                   onChanged: (v) => password = v,
-                  obscureText: true,
+                  obscureText: !passwordVisible,
                   textInputAction: TextInputAction.done,
                   onEditingComplete: () {
                     FocusScope.of(context).unfocus();
                   },
                   decoration: InputDecoration(
-                    border: InputBorder.none,
-                    labelText: '密码',
-                  ),
+                      border: InputBorder.none,
+                      labelText: '密码',
+                      suffixIcon: IconButton(
+                          onPressed: () {
+                            setState(() {
+                              passwordVisible = !passwordVisible;
+                            });
+                          },
+                          icon: Icon(passwordVisible
+                              ? Icons.visibility
+                              : Icons.visibility_off_outlined))),
                 ),
               ),
             ),

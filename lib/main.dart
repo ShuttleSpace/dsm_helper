@@ -9,7 +9,6 @@ import 'package:garden/pages/login/accounts.dart';
 import 'package:garden/pages/login/auth_page.dart';
 import 'package:garden/pages/login/login.dart';
 import 'package:garden/providers/audio_player_provider.dart';
-import 'package:garden/providers/flux_provider.dart';
 import 'package:garden/providers/setting.dart';
 import 'package:garden/providers/shortcut.dart';
 import 'package:garden/providers/wallpaper.dart';
@@ -23,7 +22,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:fluwx/fluwx.dart';
 import 'package:oktoast/oktoast.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
@@ -37,42 +35,7 @@ void main() async {
   };
 
   WidgetsFlutterBinding.ensureInitialized();
-  String agreement = await Util.instance.getStorage("agreement") ?? '';
-  Fluwx fluwx = Fluwx();
   Log.init();
-  if (agreement == "1") {
-    fluwx
-        .registerApi(
-            appId: "wxabdf23571f34b49b",
-            universalLink: "https://dsm.apaipai.top/app/")
-        .then((value) {
-      // stopLog();
-    });
-    Util.instance.appUrl = '';
-    Util.instance.baseUrl = '';
-    // 是否关闭广告
-    // 判断是否登录
-    bool isForever = true;
-    DateTime noAdTime = DateTime.now();
-    Util.instance.isWechatInstalled = await fluwx.isWeChatInstalled;
-    String userToken = await Util.instance.getStorage("user_token") ?? '';
-    String noAdTimeStr = await Util.instance.getStorage("no_ad_time") ?? '';
-    if (noAdTimeStr.isNotBlank) {
-      noAdTime = DateTime.parse(noAdTimeStr);
-    }
-    if (userToken.isNotBlank) {
-      isForever = Util.instance.vipForever = true;
-    }
-
-    if (isForever || (noAdTime.isAfter(DateTime.now()))) {
-      // 处于关闭广告有效期内
-      if (kDebugMode) {
-        debugPrint("免广告有效期内");
-      }
-    } else {
-      Util.instance.removeStorage("no_ad_time");
-    }
-  }
 
   Util.instance.downloadSavePath =
       await Util.instance.getStorage("download_save_path") ??
@@ -161,7 +124,6 @@ void main() async {
         ChangeNotifierProvider.value(value: WallpaperProvider(showWallpaper)),
         ChangeNotifierProvider.value(value: SettingProvider(refreshDuration)),
         ChangeNotifierProvider.value(value: AudioPlayerProvider()),
-        ChangeNotifierProvider.value(value: FluwxProvider(fluwx))
       ],
       child: MyApp(authPage, launchAccountPage),
     ),

@@ -43,20 +43,23 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
     WidgetsBinding.instance.addObserver(this);
     getData();
     Util.instance.setStorage("agreement", "1");
-    FlutterSharingIntent.instance
-        .getInitialSharing()
-        .then((List<SharedFile> value) {
-      print("Shared: getInitialMedia ${value.map((f) => f.value).join(",")}");
-      handleFiles(value);
-    });
-    // For sharing images coming from outside the app while the app is in the memory
-    FlutterSharingIntent.instance.getMediaStream().listen(
-        (List<SharedFile> value) {
-      handleFiles(value);
-      print("Shared: getMediaStream ${value.map((f) => f.value).join(",")}");
-    }, onError: (err) {
-      print("getIntentDataStream error: $err");
-    });
+    if (Platform.isAndroid || Platform.isIOS) {
+      FlutterSharingIntent.instance
+          .getInitialSharing()
+          .then((List<SharedFile> value) {
+        print("Shared: getInitialMedia ${value.map((f) => f.value).join(",")}");
+        handleFiles(value);
+      });
+      // For sharing images coming from outside the app while the app is in the memory
+      FlutterSharingIntent.instance.getMediaStream().listen(
+          (List<SharedFile> value) {
+        handleFiles(value);
+        print("Shared: getMediaStream ${value.map((f) => f.value).join(",")}");
+      }, onError: (err) {
+        print("getIntentDataStream error: $err");
+      });
+    }
+
     // For sharing images coming from outside the app while the app is in the memory
     // ReceiveSharingIntent.getMediaStream().listen((List<SharedMediaFile> value) {
     //   handleFiles(value);

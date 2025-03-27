@@ -452,7 +452,7 @@ class Util {
       } else {
         code = error.message ?? '';
       }
-      print("请求出错:${headers['origin']} $url");
+      print("请求出错:${headers['origin']} $url ${error.toString()}");
       return {
         "success": false,
         "error": {"code": code},
@@ -531,7 +531,6 @@ class Util {
     Response response;
     try {
       response = await dio.post(url, data: data, cancelToken: cancelToken);
-
       return response.data;
     } on DioException catch (error) {
       debugPrint("请求出错:${headers['origin']} $url 请求内容:$data");

@@ -15,6 +15,7 @@ class GroupsModel {
   List<GroupModel>? channel;
   static Future<GroupsModel> fetch() async {
     var res = await Util.instance.post("${Util.instance.appUrl}/app/groups");
+    print("[GroupsModel] $res");
     if (res['code'] == 1) {
       List<GroupModel> qq = [];
       List<GroupModel> wechat = [];

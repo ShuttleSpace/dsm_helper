@@ -4,15 +4,12 @@ import 'package:cool_ui/cool_ui.dart';
 import 'package:garden/pages/common/browser.dart' as dsm;
 import 'package:garden/pages/setting/vip_login.dart';
 import 'package:garden/pages/setting/vip_record.dart';
-import 'package:garden/providers/flux_provider.dart';
 import 'package:garden/themes/app_theme.dart';
 import 'package:garden/util/function.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:fluwx/fluwx.dart';
-import 'package:provider/provider.dart';
 
 class Vip extends StatefulWidget {
   const Vip();
@@ -33,37 +30,10 @@ class _VipState extends State<Vip> {
   Timer? timer;
   @override
   void initState() {
-    if (this.mounted) {
-      context.read<FluwxProvider>().wx.addSubscriber(wechatListener);
-    }
-    // weChatResponseEventHandler
-    //     .distinct((a, b) => a == b)
-    //     .listen(wechatListener);
     initData();
     getActivity();
 
     super.initState();
-  }
-
-  void wechatListener(res) {
-    if (res is WeChatAuthResponse) {
-      setState(() {
-        login(res.code ?? '');
-      });
-    } else if (res is WeChatPaymentResponse) {
-      setState(() {
-        if (res.isSuccessful) {
-          checkPayment();
-        } else {
-          if (res.errCode == -2) {
-            Util.instance.toast("已取消支付");
-          } else {
-            Util.instance.toast(
-                res.errStr?.isNotBlank == true ? res.errStr ?? '' : '支付失败');
-          }
-        }
-      });
-    }
   }
 
   checkPayment() async {
@@ -358,12 +328,7 @@ class _VipState extends State<Vip> {
     }
   }
 
-  wxLogin() {
-    context
-        .read<FluwxProvider>()
-        .wx
-        .authBy(which: NormalAuth(scope: "snsapi_userinfo"));
-  }
+  wxLogin() {}
 
   loginDialog({bool alert = true}) {
     showCupertinoDialog(
@@ -495,16 +460,6 @@ class _VipState extends State<Vip> {
     if (res['code'] == 1) {
       var data = res['data'];
       outTradeNo = data['out_trade_no'];
-      context.read<FluwxProvider>().wx.pay(
-            which: Payment(
-                appId: data['appid'],
-                partnerId: data['partnerid'],
-                prepayId: data['prepayid'],
-                packageValue: data['package'],
-                nonceStr: data['noncestr'],
-                timestamp: int.parse(data['timestamp']),
-                sign: data['sign']),
-          );
     } else {
       Util.instance.toast(res['msg']);
     }

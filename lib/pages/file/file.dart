@@ -2215,7 +2215,7 @@ class FilesState extends State<Files> {
                                 color: file['additional']['mount_point_type'] ==
                                         "remotefail"
                                     ? AppTheme.of(context).titleColor
-                                    : Colors.black),
+                                    : Colors.white),
                             overflowWidget: TextOverflowWidget(
                               position: TextOverflowPosition.middle,
                               align: TextOverflowAlign.right,
