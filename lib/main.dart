@@ -22,7 +22,6 @@ import 'package:extended_image/extended_image.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:fluwx/fluwx.dart';
 import 'package:oktoast/oktoast.dart';
@@ -74,7 +73,6 @@ void main() async {
       Util.instance.removeStorage("no_ad_time");
     }
   }
-  // await FlutterDownloader.initialize(debug: true, ignoreSsl: true);
 
   Util.instance.downloadSavePath =
       await Util.instance.getStorage("download_save_path") ??

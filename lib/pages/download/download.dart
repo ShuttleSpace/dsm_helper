@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:android_intent_plus/android_intent.dart';
+import 'package:background_downloader/background_downloader.dart';
 import 'package:garden/pages/common/video_player.dart';
 import 'package:garden/pages/download/download_setting.dart';
 import 'package:garden/pages/download/download_state.dart';
@@ -10,39 +11,23 @@ import 'package:garden/util/function.dart';
 import 'package:garden/widgets/file_icon.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:flutter_vibrate/flutter_vibrate.dart';
+import 'package:path/path.dart' as Path;
 
 class DownloadInfo {
-  String taskId;
-  DownloadTaskStatus status;
-  int progress;
-  String url;
-  String filename;
-  String savedDir;
-  int timeCreated;
+  DownloadTask task;
+  TaskStatus? status;
+  int? progress;
 
-  DownloadInfo(
-      {required this.taskId,
-      required this.status,
-      required this.progress,
-      required this.url,
-      required this.filename,
-      required this.savedDir,
-      required this.timeCreated});
+  DownloadInfo({
+    required this.task,
+  });
   factory DownloadInfo.formTask(DownloadTask task) {
-    return DownloadInfo(
-        taskId: task.taskId,
-        status: task.status,
-        progress: task.progress,
-        url: task.url,
-        filename: task.filename ?? '',
-        savedDir: task.savedDir,
-        timeCreated: task.timeCreated);
+    return DownloadInfo(task: task);
   }
   @override
   String toString() =>
-      "DownloadInfo(taskId: $taskId, status: $status, progress: $progress, url: $url, filename: $filename, savedDir: $savedDir, timeCreated: $timeCreated)";
+      "DownloadInfo(taskId: ${task.taskId}, status: $status, progress: $progress, url: ${task.taskId}, filename: ${task.filename}, savedDir: ${task.directory}, timeCreated: ${task.creationTime.toIso8601String()})";
 }
 
 class Download extends StatefulWidget {
@@ -53,6 +38,7 @@ class Download extends StatefulWidget {
 
 class DownloadState extends State<Download> {
   DownloadStateNotifier? _downloadStateNotifier;
+  var downloader = FileDownloader();
 
   @override
   void didChangeDependencies() {
@@ -74,8 +60,8 @@ class DownloadState extends State<Download> {
     super.dispose();
   }
 
-  Widget _buildDownloadStatus(DownloadTaskStatus status, int progress) {
-    if (status == DownloadTaskStatus.complete) {
+  Widget _buildDownloadStatus(TaskStatus status, int progress) {
+    if (status == TaskStatus.complete) {
       return Card(
         shape: RoundedRectangleBorder(
             side: BorderSide(), borderRadius: BorderRadius.circular(18)),
@@ -88,7 +74,7 @@ class DownloadState extends State<Download> {
           ),
         ),
       );
-    } else if (status == DownloadTaskStatus.failed) {
+    } else if (status == TaskStatus.failed) {
       return Card(
         shape: RoundedRectangleBorder(
             side: BorderSide(), borderRadius: BorderRadius.circular(18)),
@@ -101,7 +87,7 @@ class DownloadState extends State<Download> {
           ),
         ),
       );
-    } else if (status == DownloadTaskStatus.canceled) {
+    } else if (status == TaskStatus.canceled) {
       return Card(
         shape: RoundedRectangleBorder(
             side: BorderSide(), borderRadius: BorderRadius.circular(18)),
@@ -114,7 +100,7 @@ class DownloadState extends State<Download> {
           ),
         ),
       );
-    } else if (status == DownloadTaskStatus.paused) {
+    } else if (status == TaskStatus.paused) {
       return Card(
         shape: RoundedRectangleBorder(
             side: BorderSide(), borderRadius: BorderRadius.circular(18)),
@@ -127,7 +113,7 @@ class DownloadState extends State<Download> {
           ),
         ),
       );
-    } else if (status == DownloadTaskStatus.running) {
+    } else if (status == TaskStatus.running) {
       return Card(
         shape: RoundedRectangleBorder(
             side: BorderSide(), borderRadius: BorderRadius.circular(18)),
@@ -140,7 +126,7 @@ class DownloadState extends State<Download> {
           ),
         ),
       );
-    } else if (status == DownloadTaskStatus.enqueued) {
+    } else if (status == TaskStatus.enqueued) {
       return Card(
         shape: RoundedRectangleBorder(
             side: BorderSide(), borderRadius: BorderRadius.circular(18)),
@@ -158,8 +144,8 @@ class DownloadState extends State<Download> {
     }
   }
 
-  Widget _buildTaskItem(DownloadInfo task) {
-    FileTypeEnum fileType = Util.instance.fileType(task.filename);
+  Widget _buildTaskItem(DownloadInfo info) {
+    FileTypeEnum fileType = Util.instance.fileType(info.task.filename);
     // String path = file['path'];
     return Padding(
       padding:
@@ -171,16 +157,16 @@ class DownloadState extends State<Download> {
             Util.instance.vibrate(FeedbackType.light);
             _downloadStateNotifier!
               ..multiSelect.value = true
-              ..addSelectedTask(task);
+              ..addSelectedTask(info);
           },
           onPressed: () async {
             // print(task.savedDir + "/" + task.filename);
             // return;
             if (value) {
-              if (_downloadStateNotifier!.selectedTasks.value.contains(task)) {
-                _downloadStateNotifier!.removeSelectedTask(task);
+              if (_downloadStateNotifier!.selectedTasks.value.contains(info)) {
+                _downloadStateNotifier!.removeSelectedTask(info);
               } else {
-                _downloadStateNotifier!.addSelectedTask(task);
+                _downloadStateNotifier!.addSelectedTask(info);
               }
             } else {
               if (fileType == FileTypeEnum.image) {
@@ -190,13 +176,13 @@ class DownloadState extends State<Download> {
                 for (int i = 0;
                     i < _downloadStateNotifier!.tasks.value.length;
                     i++) {
-                  if (task.status == DownloadTaskStatus.complete &&
-                      Util.instance.fileType(task.filename) ==
+                  if (info.status == TaskStatus.complete &&
+                      Util.instance.fileType(info.task.filename) ==
                           FileTypeEnum.image) {
-                    images.add(_downloadStateNotifier!.tasks.value[i].savedDir +
-                        "/" +
-                        _downloadStateNotifier!.tasks.value[i].filename);
-                    if (_downloadStateNotifier!.tasks.value[i] == task) {
+                    images.add(Path.join(
+                        _downloadStateNotifier!.tasks.value[i].task.directory,
+                        _downloadStateNotifier!.tasks.value[i].task.filename));
+                    if (_downloadStateNotifier!.tasks.value[i] == info) {
                       index = images.length - 1;
                     }
                   }
@@ -217,7 +203,7 @@ class DownloadState extends State<Download> {
                 if (videoPlayer == '1') {
                   AndroidIntent intent = AndroidIntent(
                     action: 'action_view',
-                    data: task.savedDir + "/" + task.filename,
+                    data: await info.task.filePath(),
                     arguments: {},
                     type: "video/*",
                   );
@@ -226,16 +212,33 @@ class DownloadState extends State<Download> {
                   Navigator.of(context).push(
                     CupertinoPageRoute(
                         builder: (context) {
-                          return VideoPlayer(
-                            url: task.savedDir + "/" + task.filename,
-                            name: task.filename,
-                          );
+                          return FutureBuilder(
+                              future: info.task.filePath(),
+                              builder: (context, snapshot) {
+                                if (snapshot.hasError) {
+                                  return Text(snapshot.error.toString());
+                                }
+                                if (snapshot.connectionState ==
+                                    ConnectionState.waiting) {
+                                  return CircularProgressIndicator.adaptive();
+                                }
+                                if (snapshot.hasData) {
+                                  return VideoPlayer(
+                                    url: snapshot.data!,
+                                    name: info.task.filename,
+                                  );
+                                } else {
+                                  return Text('未知错误');
+                                }
+                              });
                         },
                         settings: RouteSettings(name: "preview_image")),
                   );
                 }
               } else {
-                var result = await FlutterDownloader.open(taskId: task.taskId);
+                var result = await downloader.openFile(
+                    filePath:
+                        Path.join(info.task.directory, info.task.filename));
                 if (!result) {
                   Util.instance.toast("不支持打开此文件");
                 }
@@ -249,12 +252,12 @@ class DownloadState extends State<Download> {
                 width: 20,
               ),
               Hero(
-                tag: task.savedDir + "/" + task.filename,
+                tag: Path.join(info.task.directory, info.task.filename),
                 child: FileIcon(
                   fileType,
                   thumb: fileType == FileTypeEnum.image &&
-                          task.status == DownloadTaskStatus.complete
-                      ? task.savedDir + "/" + task.filename
+                          info.status == TaskStatus.complete
+                      ? Path.join(info.task.directory, info.task.filename)
                       : '',
                   network: false,
                 ),
@@ -267,7 +270,7 @@ class DownloadState extends State<Download> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      task.filename,
+                      info.task.filename,
                       style: TextStyle(
                         fontSize: 16,
                       ),
@@ -276,7 +279,8 @@ class DownloadState extends State<Download> {
                       height: 5,
                     ),
                     Text(
-                      DateTime.fromMillisecondsSinceEpoch(task.timeCreated)
+                      DateTime.fromMillisecondsSinceEpoch(
+                              info.task.creationTime.secondsSinceEpoch)
                           .format("Y/m/d H:i:s"),
                       style: TextStyle(
                           fontSize: 12,
@@ -286,7 +290,8 @@ class DownloadState extends State<Download> {
                     SizedBox(
                       height: 5,
                     ),
-                    _buildDownloadStatus(task.status, task.progress),
+                    _buildDownloadStatus(
+                        info.status ?? TaskStatus.notFound, info.progress ?? 0),
                   ],
                 ),
               ),
@@ -307,7 +312,7 @@ class DownloadState extends State<Download> {
                                 valueListenable:
                                     _downloadStateNotifier!.selectedTasks,
                                 builder: (context, selectedTasks, chidl) =>
-                                    selectedTasks.contains(task)
+                                    selectedTasks.contains(info)
                                         ? Icon(
                                             CupertinoIcons.checkmark_alt,
                                             color: Color(0xffff9813),
@@ -343,13 +348,14 @@ class DownloadState extends State<Download> {
                                             SizedBox(
                                               height: 22,
                                             ),
-                                            if (task.status ==
-                                                DownloadTaskStatus.failed)
+                                            if (info.status ==
+                                                TaskStatus.failed)
                                               OutlinedButton(
                                                 onPressed: () async {
                                                   Navigator.of(context).pop();
-                                                  await FlutterDownloader.retry(
-                                                      taskId: task.taskId);
+                                                  // TODO: retry
+                                                  // await downloader.retry(
+                                                  //     taskId: info.taskId);
                                                   await _downloadStateNotifier!
                                                       .runLoop();
                                                 },
@@ -359,13 +365,13 @@ class DownloadState extends State<Download> {
                                                       TextStyle(fontSize: 18),
                                                 ),
                                               ),
-                                            if (task.status ==
-                                                DownloadTaskStatus.running)
+                                            if (info.status ==
+                                                TaskStatus.running)
                                               OutlinedButton(
                                                 onPressed: () async {
                                                   Navigator.of(context).pop();
-                                                  await FlutterDownloader.pause(
-                                                      taskId: task.taskId);
+                                                  await downloader
+                                                      .pause(info.task);
                                                   await _downloadStateNotifier!
                                                       .runLoop();
                                                 },
@@ -375,18 +381,15 @@ class DownloadState extends State<Download> {
                                                       TextStyle(fontSize: 18),
                                                 ),
                                               ),
-                                            if (task.status ==
-                                                DownloadTaskStatus.paused)
+                                            if (info.status ==
+                                                TaskStatus.paused)
                                               OutlinedButton(
                                                 onPressed: () async {
                                                   Navigator.of(context).pop();
-                                                  debugPrint(task.taskId);
-                                                  var res =
-                                                      await FlutterDownloader
-                                                          .resume(
-                                                              taskId:
-                                                                  task.taskId);
-                                                  debugPrint(res);
+                                                  debugPrint(info.task.taskId);
+                                                  var res = await downloader
+                                                      .resume(info.task);
+                                                  debugPrint("resume: $res");
                                                   await _downloadStateNotifier!
                                                       .runLoop();
                                                 },
@@ -397,10 +400,10 @@ class DownloadState extends State<Download> {
                                                 ),
                                               ),
                                             if ([
-                                              DownloadTaskStatus.paused,
-                                              DownloadTaskStatus.running,
-                                              DownloadTaskStatus.failed
-                                            ].contains(task.status))
+                                              TaskStatus.paused,
+                                              TaskStatus.running,
+                                              TaskStatus.failed
+                                            ].contains(info.status))
                                               SizedBox(
                                                 height: 16,
                                               ),
@@ -462,11 +465,11 @@ class DownloadState extends State<Download> {
                                                                     Navigator.of(
                                                                             context)
                                                                         .pop();
-                                                                    await FlutterDownloader.remove(
-                                                                        taskId: task
-                                                                            .taskId,
-                                                                        shouldDeleteContent:
-                                                                            true);
+                                                                    await downloader
+                                                                        .cancelTaskWithId(
+                                                                      info.task
+                                                                          .taskId,
+                                                                    );
                                                                     await _downloadStateNotifier!
                                                                         .runLoop();
                                                                   },
@@ -491,9 +494,9 @@ class DownloadState extends State<Download> {
                                                                             () async {
                                                                           Navigator.of(context)
                                                                               .pop();
-                                                                          await FlutterDownloader.remove(
-                                                                              taskId: task.taskId,
-                                                                              shouldDeleteContent: false);
+                                                                          await downloader.cancelTaskWithId(info
+                                                                              .task
+                                                                              .taskId);
                                                                           await _downloadStateNotifier!
                                                                               .runLoop();
                                                                         },
@@ -796,10 +799,9 @@ class DownloadState extends State<Download> {
                           child: OutlinedButton(
                             onPressed: () async {
                               Navigator.of(context).pop();
-                              for (DownloadInfo task in value) {
-                                await FlutterDownloader.remove(
-                                    taskId: task.taskId,
-                                    shouldDeleteContent: true);
+                              for (DownloadInfo info in value) {
+                                await downloader
+                                    .cancelTaskWithId(info.task.taskId);
                               }
                               _downloadStateNotifier!.runLoop();
                               _downloadStateNotifier!.resetSelectedTasks();

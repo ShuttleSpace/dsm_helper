@@ -2,10 +2,10 @@ import 'dart:async';
 import 'dart:isolate';
 import 'dart:ui';
 
+import 'package:background_downloader/background_downloader.dart';
 import 'package:garden/pages/download/download.dart';
 import 'package:garden/util/function.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_downloader/flutter_downloader.dart';
 
 class DownloadStateNotifier extends ChangeNotifier {
   ValueNotifier<List<DownloadInfo>> tasks = ValueNotifier([]);
@@ -39,7 +39,12 @@ class DownloadStateNotifier extends ChangeNotifier {
       downloadPath.value = value;
     });
     bindBackgroundIsolate();
-    FlutterDownloader.registerCallback(downloadCallback, step: 1);
+    FileDownloader().registerCallbacks(
+      taskStatusCallback: (update) =>
+          downloadCallback(update.task.taskId, status: update.status),
+      taskProgressCallback: (update) =>
+          downloadCallback(update.task.taskId, progress: update.progress),
+    );
     runLoop();
   }
 
@@ -54,12 +59,12 @@ class DownloadStateNotifier extends ChangeNotifier {
     _receiverPort.listen((dynamic data) {
       debugPrint('UI Isolate Callback: $data');
       String id = data[0];
-      DownloadTaskStatus status = DownloadTaskStatus.fromInt(data[1]);
+      TaskStatus status = data[1];
       int progress = data[2];
 
       if (tasks.value.isNotEmpty) {
         tasks.value.forEach((task) {
-          if (task.taskId == id) {
+          if (task.task.taskId == id) {
             task.status = status;
             task.progress = progress;
           }
@@ -75,16 +80,16 @@ class DownloadStateNotifier extends ChangeNotifier {
 
   runLoop() async {
     List<DownloadTask> downloadTasks =
-        await FlutterDownloader.loadTasks() ?? [];
+        await FileDownloader().allTasks() as List<DownloadTask>;
     tasks.value = downloadTasks.map((e) => DownloadInfo.formTask(e)).toList();
     loading.value = false;
     debugPrint('runLoop: loading= ${loading.value}');
     // 如果存在下载中任务，每秒刷新一次
     if (tasks.value
             .where((task) =>
-                task.status == DownloadTaskStatus.running ||
-                task.status == DownloadTaskStatus.enqueued ||
-                task.status == DownloadTaskStatus.undefined)
+                task.status == TaskStatus.running ||
+                task.status == TaskStatus.enqueued ||
+                task.status == TaskStatus.notFound)
             .length >
         0) {
     } else {}
@@ -102,7 +107,8 @@ class DownloadStateNotifier extends ChangeNotifier {
     return Future.value(false);
   }
 
-  static void downloadCallback(String id, int status, int progress) {
+  static void downloadCallback(String id,
+      {TaskStatus? status, double? progress}) {
     debugPrint(
         'Background Isolate Callback: task ($id) is in status ($status) and process ($progress)');
     IsolateNameServer.lookupPortByName('downloader_send_port')

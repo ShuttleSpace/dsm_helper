@@ -51,7 +51,6 @@ dependencies:
 #  android_intent: ^2.0.2 方法已过时，无法编译通过
   android_intent_plus: 5.3.0   
   path_provider: 2.1.5
-  flutter_downloader: 1.12.0  # 1.10.6起不再支持flutter 3.7
   percent_indicator: ^4.2.3
   fl_chart: 0.70.2 # 0.63.0起不再支持flutter 3.7
   file_picker_pro: ^1.8.0
@@ -107,6 +106,8 @@ dependencies:
     path: fplayer
   easy_app_installer: 
     git: https://gitee.com/dsm_bay/easy_app_installer.git
+  background_downloader: ^8.6.0
+  path: ^1.9.0
 #  flutter_filereader: ^3.0.0
 #  x5_webview: ^0.2.4
 dev_dependencies:
