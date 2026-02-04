@@ -1461,7 +1461,7 @@ class FilesState extends State<Files> {
                 debugPrint("无NFO文件");
               }
               Navigator.of(context).push(CupertinoPageRoute(builder: (context) {
-                return VideoPlayer(
+                return VideoPlayerPage(
                   url: url,
                   name: file['name'],
                   cover: cover,

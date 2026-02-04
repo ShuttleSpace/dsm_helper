@@ -3,14 +3,12 @@
 #
 
 list(APPEND FLUTTER_PLUGIN_LIST
-  battery_plus
   connectivity_plus
   file_picker_pro
   file_selector_windows
   local_auth_windows
   open_share_plus
   permission_handler_windows
-  screen_brightness_windows
   syncfusion_pdfviewer_windows
   url_launcher_windows
 )

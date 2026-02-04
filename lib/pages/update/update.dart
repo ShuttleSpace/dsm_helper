@@ -2,7 +2,7 @@ import 'package:garden/themes/app_theme.dart';
 import 'package:garden/util/function.dart';
 import 'package:garden/widgets/animation_progress_bar.dart';
 import 'package:garden/widgets/neu_back_button.dart';
-import 'package:easy_app_installer/easy_app_installer.dart';
+// import 'package:easy_app_installer/easy_app_installer.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
@@ -37,25 +37,28 @@ class _UpdateState extends State<Update> {
       downloading = true;
     });
     try {
-      /// 仅支持将APK下载到沙盒目录下
-      /// 当前这个示例最终生成的文件路径就是 '/data/user/0/$applicationPackageName/files/updateApk/new.apk'
-      /// 如果连续调用此方法，并且参数传递的完全一致，那么Native端将拒绝执行后续任务，直到下载中的任务执行完毕。
-      await EasyAppInstaller.instance.downloadAndInstallApk(
-        fileUrl: widget.data['downloadURL'],
-        fileDirectory: "apk",
-        fileName: fileName,
-        onDownloadingListener: (progress) {
-          setState(() {
-            this.progress = progress / 100;
-          });
-        },
-      );
+      // TODO: 使用替代方案下载和安装 APK
+      // 暂时使用浏览器下载
+      await launchUrlString(widget.data['downloadURL']);
+      setState(() {
+        downloading = false;
+      });
+      // /// 仅支持将APK下载到沙盒目录下
+      // /// 当前这个示例最终生成的文件路径就是 '/data/user/0/$applicationPackageName/files/updateApk/new.apk'
+      // /// 如果连续调用此方法，并且参数传递的完全一致，那么Native端将拒绝执行后续任务，直到下载中的任务执行完毕。
+      // await EasyAppInstaller.instance.downloadAndInstallApk(
+      //   fileUrl: widget.data['downloadURL'],
+      //   fileDirectory: "apk",
+      //   fileName: fileName,
+      //   onDownloadingListener: (progress) {
+      //     setState(() {
+      //       this.progress = progress / 100;
+      //     });
+      //   },
+      // );
     } catch (e) {
-      Util.instance.toast("下载失败");
+      Util.instance.toast("下载失败:$e");
     }
-    setState(() {
-      downloading = false;
-    });
   }
 
   @override

@@ -14,7 +14,7 @@ import 'package:garden/util/log.dart';
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
-import 'package:image_gallery_saver/image_gallery_saver.dart';
+import 'package:image_gallery_saver_plus/image_gallery_saver_plus.dart';
 import 'package:oktoast/oktoast.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
@@ -822,20 +822,32 @@ class Util {
       }
       bool result = false;
       if (save != null) {
-        result = await ImageGallerySaver.saveImage(save.readAsBytesSync(),
-            name: Util.instance.appName);
+        final result = await ImageGallerySaverPlus.saveImage(
+          save.readAsBytesSync(),
+          name: Util.instance.appName,
+        );
+        // ImageGallerySaverPlus 返回的是一个 Map 或 List
+        if (result is Map && result['isSuccess'] == true) {
+          return {
+            "code": 1,
+            "msg": "success",
+          };
+        } else if (result is List && result.isNotEmpty) {
+          return {
+            "code": 1,
+            "msg": "success",
+          };
+        } else {
+          return {
+            "code": 0,
+            "msg": "error",
+          };
+        }
       } else {
         toast('获取缓存文件失败!');
-      }
-      if (showLoading) {
-        hide();
-      }
-      if (result) {
-        return {
-          "code": 1,
-          "msg": "success",
-        };
-      } else {
+        if (hide != null) {
+          hide();
+        }
         return {
           "code": 0,
           "msg": "error",

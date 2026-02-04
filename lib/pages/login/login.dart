@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:garden/pages/common/browser.dart' as dsm;
+import 'package:garden/pages/common/device_finder.dart';
 import 'package:garden/pages/login/accounts.dart';
 import 'package:garden/pages/setting/license.dart';
 import 'package:garden/util/function.dart';
@@ -627,6 +628,37 @@ class _LoginState extends State<Login> {
   //   await wol.wake().then((v) => print('sent'));
   // }
 
+  _openDeviceFinder() async {
+    FocusScope.of(context).unfocus();
+    final result = await Navigator.of(context).push(
+      CupertinoPageRoute(
+        builder: (context) {
+          return DeviceFinder(
+            url: "https://finds.synology.com",
+            title: "设备发现",
+          );
+        },
+      ),
+    );
+
+    if (result != null && result is String) {
+      try {
+        final data = jsonDecode(result) as Map<String, dynamic>;
+        // 用户选择的设备信息
+        setState(() {
+          host = data['host'] ?? '';
+          port = data['port'] ?? (https ? '5001' : '5000');
+          _hostController.value = TextEditingValue(text: host);
+          _portController.value = TextEditingValue(text: port);
+        });
+        Util.instance.toast("已选择设备: ${data['name'] ?? host}");
+      } catch (e) {
+        debugPrint("Error parsing device info: $e");
+        Util.instance.toast("解析设备信息失败");
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -635,23 +667,6 @@ class _LoginState extends State<Login> {
           widget.type == "login" ? "账号登录" : "添加账号",
         ),
         actions: [
-          // Padding(
-          //   padding: EdgeInsets.only(right: 10, top: 8, bottom: 8),
-          //   child: NeuButton(
-          //     decoration: NeumorphicDecoration(
-          //       color: Theme.of(context).scaffoldBackgroundColor,
-          //       borderRadius: BorderRadius.circular(10),
-          //     ),
-          //     padding: EdgeInsets.all(10),
-          //     bevel: 5,
-          //     onPressed: wakeup,
-          //     child: Image.asset(
-          //       "assets/icons/history.png",
-          //       width: 20,
-          //       height: 20,
-          //     ),
-          //   ),
-          // ),
           if (servers.length > 0)
             Padding(
               padding: EdgeInsets.only(right: 10, top: 8, bottom: 8),
@@ -668,7 +683,21 @@ class _LoginState extends State<Login> {
                   height: 20,
                 ),
               ),
-            )
+            ),
+          Padding(
+            padding: EdgeInsetsGeometry.only(right: 10, top: 8, bottom: 8),
+            child: OutlinedButton(
+              onPressed: _openDeviceFinder,
+              style: OutlinedButton.styleFrom(
+                minimumSize: Size(36, 36),
+                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              ),
+              child: Icon(
+                Icons.open_in_browser,
+                size: 20,
+              ),
+            ),
+          ),
         ],
       ),
       body: GestureDetector(

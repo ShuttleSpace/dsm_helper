@@ -7,17 +7,17 @@ import 'package:garden/util/function.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
-import 'package:fplayer/fplayer.dart';
+import 'package:video_player/video_player.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import 'package:xml2json/xml2json.dart';
 
-class VideoPlayer extends StatefulWidget {
+class VideoPlayerPage extends StatefulWidget {
   final String? name;
   final String url;
   final String? cover;
   final String? nfo;
   final bool network;
-  VideoPlayer(
+  VideoPlayerPage(
       {required this.url,
       this.name,
       this.cover,
@@ -25,63 +25,19 @@ class VideoPlayer extends StatefulWidget {
       this.network = true});
 
   @override
-  _VideoPlayerState createState() => _VideoPlayerState();
+  _VideoPlayerPageState createState() => _VideoPlayerPageState();
 }
 
-class _VideoPlayerState extends State<VideoPlayer> {
-  final FPlayer player = FPlayer();
-  bool fullScreen = false;
-  _VideoPlayerState();
+class _VideoPlayerPageState extends State<VideoPlayerPage> {
+  late VideoPlayerController _controller;
+  bool _isInitialized = false;
+  bool _isPlaying = false;
+
   String description = "";
   String date = "";
   String year = '';
   List actors = [];
   Map<String, dynamic> nfoDetail = {};
-
-  int seekTime = 100000;
-  // @override
-  // void initState() {
-  //   super.initState();
-  //
-  //   player.setDataSource(widget.url, autoPlay: true);
-  //   player.addListener(() {
-  //     FijkValue value = player.value;
-  //     print(value.size);
-  //     if (mounted) {
-  //       setState(() {
-  //         fullScreen = value.fullScreen;
-  //       });
-  //     }
-  //   });
-  //
-  // }
-  void startPlay() async {
-    // 视频播放相关配置
-    await player.setOption(FOption.hostCategory, "enable-snapshot", 1);
-    await player.setOption(FOption.hostCategory, "request-screen-on", 1);
-    await player.setOption(FOption.hostCategory, "request-audio-focus", 1);
-    await player.setOption(FOption.playerCategory, "reconnect", 20);
-    await player.setOption(FOption.playerCategory, "framedrop", 20);
-    await player.setOption(FOption.playerCategory, "enable-accurate-seek", 1);
-    await player.setOption(FOption.playerCategory, "mediacodec", 1);
-    await player.setOption(FOption.playerCategory, "packet-buffering", 0);
-    await player.setOption(FOption.playerCategory, "soundtouch", 1);
-
-    // 播放传入的视频
-    setVideoUrl(widget.url);
-
-    // 播放视频列表的第一个视频
-    // setVideoUrl(videoList[videoIndex].url);
-  }
-
-  Future<void> setVideoUrl(String url) async {
-    try {
-      await player.setDataSource(url, autoPlay: true, showCover: true);
-    } catch (error) {
-      print("播放-异常: $error");
-      return;
-    }
-  }
 
   // 倍速列表
   Map<String, double> speedList = {
@@ -90,68 +46,50 @@ class _VideoPlayerState extends State<VideoPlayer> {
     "1.0": 1.0,
     "0.5": 0.5,
   };
+
+  double _currentSpeed = 1.0;
+
   @override
-  initState() {
-    // BetterPlayerConfiguration betterPlayerConfiguration = BetterPlayerConfiguration(
-    //   fit: BoxFit.contain,
-    //   autoPlay: true,
-    //   autoDispose: true,
-    //   looping: false,
-    //   placeholder: _buildVideoPlaceholder(),
-    //   showPlaceholderUntilPlay: true,
-    //   allowedScreenSleep: false,
-    //   translations: [
-    //     BetterPlayerTranslations(
-    //       languageCode: 'zh',
-    //       overflowMenuPlaybackSpeed: "播放速度",
-    //       overflowMenuSubtitles: "字幕",
-    //       overflowMenuAudioTracks: "音频",
-    //       overflowMenuQuality: "质量",
-    //     )
-    //   ],
-    // );
-    // BetterPlayerDataSource dataSource = BetterPlayerDataSource(
-    //   widget.network ? BetterPlayerDataSourceType.network : BetterPlayerDataSourceType.file,
-    //   widget.url,
-    // );
-    // _betterPlayerController = BetterPlayerController(betterPlayerConfiguration);
-    // _betterPlayerController.setupDataSource(dataSource);
-    // _betterPlayerController.setBetterPlayerControlsConfiguration(BetterPlayerControlsConfiguration(
-    //   controlBarColor: Colors.black26,
-    // ));
-    // _betterPlayerController.addEventsListener((event) {
-    //   if (event.betterPlayerEventType == BetterPlayerEventType.play) {
-    //     _setPlaceholderVisibleState(false);
-    //   }
-    // });
-    parseNfo();
-    startPlay();
+  void initState() {
     super.initState();
+    parseNfo();
+    _initializeVideo();
   }
 
-  // void _setPlaceholderVisibleState(bool hidden) {
-  //   _placeholderStreamController.add(hidden);
-  //   _showPlaceholder = hidden;
-  // }
+  Future<void> _initializeVideo() async {
+    try {
+      _controller = VideoPlayerController.networkUrl(
+        Uri.parse(widget.url),
+      );
 
-  ///_placeholderStreamController is used only to refresh video placeholder
-  ///widget.
-  // Widget _buildVideoPlaceholder() {
-  //   return StreamBuilder<bool>(
-  //     stream: _placeholderStreamController.stream,
-  //     builder: (context, snapshot) {
-  //       if (_showPlaceholder && widget.cover.isNotBlank) {
-  //         if (widget.cover.startsWith("http")) {
-  //           return ExtendedImage.network(widget.cover);
-  //         } else {
-  //           return ExtendedImage.network(Util.baseUrl + "/webapi/entry.cgi?path=${Uri.encodeComponent(widget.cover)}&size=original&api=SYNO.FileStation.Thumb&method=get&version=2&_sid=${Util.sid}&animate=true");
-  //         }
-  //       } else {
-  //         return SizedBox();
-  //       }
-  //     },
-  //   );
-  // }
+      await _controller.initialize();
+
+      _controller.addListener(() {
+        if (mounted) {
+          setState(() {
+            _isPlaying = _controller.value.isPlaying;
+          });
+        }
+      });
+
+      // 自动播放
+      await _controller.play();
+
+      setState(() {
+        _isInitialized = true;
+      });
+    } catch (error) {
+      print("播放初始化异常: $error");
+      Util.instance.toast("视频加载失败，请尝试使用第三方播放器");
+    }
+  }
+
+  Future<void> _changeSpeed(double speed) async {
+    setState(() {
+      _currentSpeed = speed;
+    });
+    await _controller.setPlaybackSpeed(speed);
+  }
 
   parseNfo() async {
     if (widget.nfo != null) {
@@ -173,6 +111,13 @@ class _VideoPlayerState extends State<VideoPlayer> {
     }
   }
 
+  String _formatDuration(Duration duration) {
+    String twoDigits(int n) => n.toString().padLeft(2, '0');
+    final minutes = twoDigits(duration.inMinutes.remainder(60));
+    final seconds = twoDigits(duration.inSeconds.remainder(60));
+    return '$minutes:$seconds';
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -184,7 +129,7 @@ class _VideoPlayerState extends State<VideoPlayer> {
             padding: EdgeInsets.only(left: 0, top: 8, bottom: 8, right: 8),
             child: OutlinedButton(
               onPressed: () async {
-                // player.pause();
+                _controller.pause();
                 if (Platform.isAndroid) {
                   AndroidIntent intent = AndroidIntent(
                     action: 'action_view',
@@ -207,140 +152,138 @@ class _VideoPlayerState extends State<VideoPlayer> {
       ),
       body: Column(
         children: [
-          // Container(
-          //   width: MediaQuery.sizeOf(context).width,
-          //   height: MediaQuery.sizeOf(context).width * 9 / 16,
-          //   alignment: Alignment.center,
-          //   child: FijkView(
-          //     width: MediaQuery.sizeOf(context).width,
-          //     height: MediaQuery.sizeOf(context).width * 9 / 16,
-          //     fit: FijkFit.contain,
-          //     player: player,
-          //     color: Colors.black,
-          //     cover: widget.cover != null ? ExtendedNetworkImageProvider(Util.baseUrl + "/webapi/entry.cgi?path=${Uri.encodeComponent(widget.cover)}&size=original&api=SYNO.FileStation.Thumb&method=get&version=2&_sid=${Util.sid}&animate=true") : null,
-          //   ),
-          // ),
-          FView(
-            player: player,
-            width: double.infinity,
-            height: MediaQuery.sizeOf(context).width * 9 / 16,
+          // 视频播放区域
+          Container(
             color: Colors.black,
-            fsFit: FFit.contain, // 全屏模式下的填充
-            fit: FFit.contain, // 正常模式下的填充
-            cover: widget.cover != null
-                ? ExtendedNetworkImageProvider(Util.instance.baseUrl +
-                    "/webapi/entry.cgi?path=${Uri.encodeComponent(widget.cover ?? '')}&size=original&api=SYNO.FileStation.Thumb&method=get&version=2&_sid=${Util.instance.sid}&animate=true")
-                : null,
-
-            panelBuilder: fPanelBuilder(
-              // 单视频配置
-              title: widget.name ?? '',
-              // subTitle: '视频副标题',
-              // 右下方截屏按钮
-              isSnapShot: false,
-              // 右上方按钮组开关
-              isRightButton: false,
-              // 右上方按钮组
-              // rightButtonList: [
-              //   InkWell(
-              //     onTap: () {},
-              //     child: Container(
-              //       padding: const EdgeInsets.all(10),
-              //       decoration: BoxDecoration(
-              //         color: Theme.of(context).primaryColorLight,
-              //         borderRadius: const BorderRadius.vertical(
-              //           top: Radius.circular(5),
-              //         ),
-              //       ),
-              //       child: Icon(
-              //         Icons.favorite,
-              //         color: Theme.of(context).primaryColor,
-              //       ),
-              //     ),
-              //   ),
-              //   InkWell(
-              //     onTap: () {},
-              //     child: Container(
-              //       padding: const EdgeInsets.all(10),
-              //       decoration: BoxDecoration(
-              //         color: Theme.of(context).primaryColorLight,
-              //         borderRadius: const BorderRadius.vertical(
-              //           bottom: Radius.circular(5),
-              //         ),
-              //       ),
-              //       child: Icon(
-              //         Icons.thumb_up,
-              //         color: Theme.of(context).primaryColor,
-              //       ),
-              //     ),
-              //   )
-              // ],
-              // 字幕功能：待内核提供api
-              // caption: true,
-              // 视频列表开关
-              isVideos: false,
-              // 视频列表列表
-              // videoList: videoList,
-              // 当前视频索引
-              // videoIndex: videoIndex,
-              // 全屏模式下点击播放下一集视频按钮
-              // playNextVideoFun: () {
-              //   setState(() {
-              //     videoIndex += 1;
-              //   });
-              // },
-              settingFun: () {
-                print('设置按钮点击事件');
-              },
-              // 自定义倍速列表
-              speedList: speedList,
-              // 清晰度开关
-              // isResolution: true,
-              // 自定义清晰度列表
-              // resolutionList: resolutionList,
-              // 视频播放错误点击刷新回调
-              // onError: () async {
-              //   await player.reset();
-              //   setVideoUrl(videoList[videoIndex].url);
-              // },
-              // 视频播放完成回调
-              // onVideoEnd: () async {
-              //   var index = videoIndex + 1;
-              //   if (index < videoList.length) {
-              //     await player.reset();
-              //     setState(() {
-              //       videoIndex = index;
-              //     });
-              //     setVideoUrl(videoList[index].url);
-              //   }
-              // },
-              onVideoTimeChange: () {
-                // 视频时间变动则触发一次，可以保存视频播放历史
-              },
-              // onVideoPrepared: () async {
-              //   // 视频初始化完毕，如有历史记录时间段则可以触发快进
-              //   try {
-              //     if (seekTime >= 1) {
-              //       /// seekTo必须在FState.prepared
-              //       print('seekTo');
-              //       await player.seekTo(seekTime);
-              //       // print("视频快进-$seekTime");
-              //       seekTime = 0;
-              //     }
-              //   } catch (error) {
-              //     print("视频初始化完快进-异常: $error");
-              //   }
-              // },
-            ),
+            child: _isInitialized
+                ? Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      AspectRatio(
+                        aspectRatio: _controller.value.aspectRatio,
+                        child: VideoPlayer(_controller),
+                      ),
+                      // 控制面板
+                      Positioned(
+                        bottom: 0,
+                        left: 0,
+                        right: 0,
+                        child: Container(
+                          color: Colors.black54,
+                          padding: EdgeInsets.symmetric(
+                            vertical: 10,
+                            horizontal: 20,
+                          ),
+                          child: Column(
+                            children: [
+                              // 进度条
+                              VideoProgressIndicator(
+                                _controller,
+                                allowScrubbing: true,
+                                colors: VideoProgressColors(
+                                  playedColor: Theme.of(context).primaryColor,
+                                  bufferedColor: Colors.grey,
+                                  backgroundColor: Colors.white24,
+                                ),
+                              ),
+                              SizedBox(height: 10),
+                              // 控制按钮
+                              Row(
+                                children: [
+                                  // 播放/暂停按钮
+                                  IconButton(
+                                    onPressed: () {
+                                      setState(() {
+                                        if (_controller.value.isPlaying) {
+                                          _controller.pause();
+                                        } else {
+                                          _controller.play();
+                                        }
+                                      });
+                                    },
+                                    icon: Icon(
+                                      _controller.value.isPlaying
+                                          ? Icons.pause
+                                          : Icons.play_arrow,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                  // 时间显示
+                                  Text(
+                                    "${_formatDuration(_controller.value.position)} / ${_formatDuration(_controller.value.duration)}",
+                                    style: TextStyle(color: Colors.white),
+                                  ),
+                                  Spacer(),
+                                  // 倍速按钮
+                                  PopupMenuButton<double>(
+                                    icon: Row(
+                                      children: [
+                                        Text(
+                                          "${_currentSpeed}x",
+                                          style: TextStyle(color: Colors.white),
+                                        ),
+                                        Icon(
+                                          Icons.speed,
+                                          color: Colors.white,
+                                          size: 16,
+                                        ),
+                                      ],
+                                    ),
+                                    onSelected: (double speed) {
+                                      _changeSpeed(speed);
+                                    },
+                                    itemBuilder: (BuildContext context) {
+                                      return speedList.entries.map((entry) {
+                                        return PopupMenuItem<double>(
+                                          value: entry.value,
+                                          child: Text(entry.key),
+                                        );
+                                      }).toList();
+                                    },
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      // 点击播放/暂停
+                      GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            if (_controller.value.isPlaying) {
+                              _controller.pause();
+                            } else {
+                              _controller.play();
+                            }
+                          });
+                        },
+                      ),
+                    ],
+                  )
+                : Container(
+                    width: double.infinity,
+                    height: MediaQuery.sizeOf(context).width * 9 / 16,
+                    color: Colors.black,
+                    child: Center(
+                      child: widget.cover != null && widget.cover!.isNotBlank
+                          ? ExtendedImage.network(
+                              widget.cover!.startsWith("http")
+                                  ? widget.cover!
+                                  : Util.instance.baseUrl +
+                                      "/webapi/entry.cgi?path=${Uri.encodeComponent(widget.cover!)}&size=original&api=SYNO.FileStation.Thumb&method=get&version=2&_sid=${Util.instance.sid}&animate=true",
+                            )
+                          : CircularProgressIndicator(),
+                    ),
+                  ),
           ),
           Expanded(
             child: ListView(
               children: [
-                // Text("${widget.url}"),
                 Padding(
                   padding: EdgeInsets.all(20),
                   child: Text(
-                    "注意：视频播放器目前并不稳定，如遇到黑屏、无声、卡顿等任何问题，请点击右上角按钮使用第三方播放器播放！${Platform.isIOS ? '(仅支持vlc player，请确保已安装)' : ''}",
+                    "注意：视频播放器目前使用官方库，如遇到黑屏、无声、卡顿等任何问题，请点击右上角按钮使用第三方播放器播放！${Platform.isIOS ? '(仅支持vlc player，请确保已安装)' : ''}",
                     style: TextStyle(color: Colors.grey, fontSize: 12),
                   ),
                 ),
@@ -413,13 +356,6 @@ class _VideoPlayerState extends State<VideoPlayer> {
   @override
   void dispose() async {
     super.dispose();
-    // try {
-    //   await ScreenBrightness().resetScreenBrightness();
-    // } catch (e) {
-    //   print(e);
-    //   throw 'Failed to reset brightness';
-    // }
-    player.release();
-    // _placeholderStreamController.close();
+    _controller.dispose();
   }
 }

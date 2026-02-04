@@ -195,7 +195,7 @@ class TimelineState extends State<Timeline> {
       onTap: () {
         if (photo.type == 'video') {
           Navigator.of(context).push(CupertinoPageRoute(builder: (context) {
-            return VideoPlayer(
+            return VideoPlayerPage(
               url: photo.videoUrl(isTeam: isTeam),
               cover: photo.thumbUrl(isTeam: isTeam),
             );

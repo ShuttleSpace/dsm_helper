@@ -223,7 +223,7 @@ class DownloadState extends State<Download> {
                                   return CircularProgressIndicator.adaptive();
                                 }
                                 if (snapshot.hasData) {
-                                  return VideoPlayer(
+                                  return VideoPlayerPage(
                                     url: snapshot.data!,
                                     name: info.task.filename,
                                   );

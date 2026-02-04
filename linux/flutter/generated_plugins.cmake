@@ -6,6 +6,7 @@ list(APPEND FLUTTER_PLUGIN_LIST
   file_picker_pro
   file_selector_linux
   open_share_plus
+  syncfusion_pdfviewer_linux
   url_launcher_linux
 )
 

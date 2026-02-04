@@ -21,7 +21,7 @@ class PhotoItemWidget extends StatelessWidget {
       onTap: () {
         if (photo.type == 'video') {
           Navigator.of(context).push(CupertinoPageRoute(builder: (context) {
-            return VideoPlayer(
+            return VideoPlayerPage(
               url: photo.videoUrl(isTeam: isTeam ?? false),
               cover: photo.thumbUrl(isTeam: isTeam ?? false),
             );
