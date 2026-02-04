@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:flutter/cupertino.dart';
+import 'package:garden/pages/common/device_finder.dart';
 import 'package:garden/util/function.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/material.dart';
@@ -71,6 +73,51 @@ class _AddServerState extends State<AddServer> {
       appBar: AppBar(
         leading: AppBackButton(context),
         title: Text("添加服务器"),
+        actions: [
+          Padding(
+            padding: EdgeInsetsGeometry.only(right: 10, top: 8, bottom: 8),
+            child: OutlinedButton(
+              style: OutlinedButton.styleFrom(
+                minimumSize: Size(36, 36),
+                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              ),
+              onPressed: () async {
+                FocusScope.of(context).unfocus();
+                final result = await Navigator.of(context).push(
+                  CupertinoPageRoute(
+                    builder: (context) {
+                      return DeviceFinder(
+                        url: "https://finds.synology.com",
+                        title: "设备发现",
+                      );
+                    },
+                  ),
+                );
+
+                if (result != null && result is String) {
+                  try {
+                    final data = jsonDecode(result) as Map<String, dynamic>;
+                    // 用户选择的设备信息
+                    setState(() {
+                      host = data['host'] ?? '';
+                      // port = data['port'] ?? (https ? '5001' : '5000');
+                      _hostController.value = TextEditingValue(text: host);
+                      _portController.value = TextEditingValue(text: port);
+                    });
+                    Util.instance.toast("已选择设备: ${data['name'] ?? host}");
+                  } catch (e) {
+                    debugPrint("Error parsing device info: $e");
+                    Util.instance.toast("解析设备信息失败");
+                  }
+                }
+              },
+              child: Icon(
+                Icons.open_in_browser,
+                size: 20,
+              ),
+            ),
+          )
+        ],
       ),
       body: GestureDetector(
         onTap: () {
