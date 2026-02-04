@@ -76,7 +76,7 @@ class _UpdateResetState extends State<UpdateReset>
               isScrollable: true,
               controller: _tabController,
               indicatorSize: TabBarIndicatorSize.label,
-              labelColor: Theme.of(context).brightness == Brightness.dark
+              labelColor: Theme.brightnessOf(context) == Brightness.dark
                   ? Colors.white
                   : Colors.black,
               unselectedLabelColor: Colors.grey,

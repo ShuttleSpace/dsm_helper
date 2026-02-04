@@ -21,13 +21,14 @@ class BubbleTabIndicator extends Decoration {
 
   const BubbleTabIndicator({
     this.indicatorHeight = 20.0,
-    this.indicatorColor = Colors.greenAccent,
-    this.shadowColor = Colors.greenAccent,
+    Color? indicatorColor,
+    Color? shadowColor,
     this.indicatorRadius = 100.0,
     this.tabBarIndicatorSize = TabBarIndicatorSize.label,
     this.padding = const EdgeInsets.symmetric(vertical: 2.0, horizontal: 8.0),
     this.insets = const EdgeInsets.symmetric(horizontal: 5.0),
-  });
+  })  : indicatorColor = indicatorColor ?? Colors.greenAccent,
+        shadowColor = shadowColor ?? Colors.greenAccent;
 
   @override
   Decoration? lerpFrom(Decoration? a, double t) {

@@ -1,3 +1,4 @@
+import 'package:garden/themes/app_theme.dart';
 import 'package:garden/util/function.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_vibrate/flutter_vibrate.dart';
@@ -13,13 +14,18 @@ class TerminalButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final appTheme = theme.extension<AppTheme>();
+    
     return GestureDetector(
       onTap: () {
         Util.instance.vibrate(FeedbackType.light);
         onPressed?.call();
       },
       child: Container(
-        color: active ? Colors.blue.withValues(alpha: 0.4) : null,
+        color: active 
+            ? (appTheme?.infoColor ?? Colors.blue).withValues(alpha: 0.4) 
+            : null,
         width: 40,
         height: 30,
         alignment: Alignment.center,

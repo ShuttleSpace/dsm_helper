@@ -8,7 +8,6 @@ import 'package:extended_image/extended_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_vibrate/flutter_vibrate.dart';
-import 'package:provider/provider.dart';
 
 class ImagePreview extends StatefulWidget {
   final List<String> images;
@@ -196,10 +195,10 @@ class _ImagePreviewState extends State<ImagePreview>
   Widget build(BuildContext context) {
     var size = MediaQuery.sizeOf(context);
     Widget result = Material(
-      color: Theme.of(context).brightness == Brightness.dark
+      color: Theme.brightnessOf(context) == Brightness.dark
           ? Colors.black
           : Colors.transparent,
-      shadowColor: Theme.of(context).brightness == Brightness.dark
+      shadowColor: Theme.brightnessOf(context) == Brightness.dark
           ? Colors.black
           : Colors.transparent,
       child: Stack(

@@ -10,6 +10,8 @@
 #include <file_picker_pro/file_picker_pro_plugin_c_api.h>
 #include <file_selector_windows/file_selector_windows.h>
 #include <local_auth_windows/local_auth_plugin.h>
+#include <media_kit_libs_windows_video/media_kit_libs_windows_video_plugin_c_api.h>
+#include <media_kit_video/media_kit_video_plugin_c_api.h>
 #include <open_share_plus/open_share_plus_plugin_c_api.h>
 #include <permission_handler_windows/permission_handler_windows_plugin.h>
 #include <syncfusion_pdfviewer_windows/syncfusion_pdfviewer_windows_plugin.h>
@@ -24,6 +26,10 @@ void RegisterPlugins(flutter::PluginRegistry* registry) {
       registry->GetRegistrarForPlugin("FileSelectorWindows"));
   LocalAuthPluginRegisterWithRegistrar(
       registry->GetRegistrarForPlugin("LocalAuthPlugin"));
+  MediaKitLibsWindowsVideoPluginCApiRegisterWithRegistrar(
+      registry->GetRegistrarForPlugin("MediaKitLibsWindowsVideoPluginCApi"));
+  MediaKitVideoPluginCApiRegisterWithRegistrar(
+      registry->GetRegistrarForPlugin("MediaKitVideoPluginCApi"));
   OpenSharePlusPluginCApiRegisterWithRegistrar(
       registry->GetRegistrarForPlugin("OpenSharePlusPluginCApi"));
   PermissionHandlerWindowsPluginRegisterWithRegistrar(

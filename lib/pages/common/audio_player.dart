@@ -1,11 +1,13 @@
+import 'dart:async';
 import 'dart:math';
 
+import 'package:garden/models/player.dart';
 import 'package:garden/providers/audio_player_provider.dart';
 import 'package:garden/themes/app_theme.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:just_audio/just_audio.dart' as ja;
+import 'package:media_kit/media_kit.dart';
 import 'package:provider/provider.dart';
 
 class AudioPlayer extends StatefulWidget {
@@ -15,34 +17,70 @@ class AudioPlayer extends StatefulWidget {
   });
   final String name;
   final String url;
+
   @override
   State<AudioPlayer> createState() => _AudioPlayerState();
 }
 
 class _AudioPlayerState extends State<AudioPlayer> {
-  ja.AudioPlayer player = ja.AudioPlayer();
+  late Player _player;
   String title = "";
+  late StreamController<PlayerStateX> _stateController;
+  late StreamSubscription<bool> _playingSubscription;
+  late StreamSubscription<bool> _completedSubscription;
+  late StreamSubscription<bool> _bufferSubscription;
+
   @override
   void initState() {
     var audioPlayerProvider = context.read<AudioPlayerProvider>();
-    player = audioPlayerProvider.player;
+    _player = audioPlayerProvider.player;
     title = widget.name;
+
+    // 初始化状态控制器
+    _stateController = StreamController<PlayerStateX>.broadcast();
+
+    // 监听播放状态
+    _playingSubscription = _player.stream.playing.listen((isPlaying) {
+      if (isPlaying) {
+        _stateController.add(PlayerStateX.playing);
+      } else {
+        _stateController.add(PlayerStateX.paused);
+      }
+    });
+
+    // 监听播放完成
+    _completedSubscription = _player.stream.completed.listen((isCompleted) {
+      if (isCompleted) {
+        _stateController.add(PlayerStateX.completed);
+      }
+    });
+
+    _bufferSubscription = _player.stream.buffering.listen((isBuffering) {
+      if (isBuffering) {
+        _stateController.add(PlayerStateX.buffering);
+      }
+    });
+
+    // 设置音频源
     if (audioPlayerProvider.url != widget.url) {
       audioPlayerProvider.setUrl(widget.url, title);
-      setSource();
+      _setSource();
     }
-    setState(() {});
+
     super.initState();
   }
 
   @override
   void dispose() {
+    _playingSubscription.cancel();
+    _completedSubscription.cancel();
+    _stateController.close();
+    _bufferSubscription.cancel();
     super.dispose();
   }
 
-  setSource() async {
-    await player.setUrl(widget.url);
-    await player.play();
+  Future<void> _setSource() async {
+    await _player.open(Media(widget.url));
   }
 
   @override
@@ -69,20 +107,19 @@ class _AudioPlayerState extends State<AudioPlayer> {
                     ),
                   ),
                 ),
-                SizedBox(
-                  height: 20,
-                ),
+                SizedBox(height: 20),
                 Text(title),
               ],
             ),
-            SizedBox(
-              height: 20,
+            SizedBox(height: 20),
+            ControlButtons(
+              player: _player,
+              stateController: _stateController,
             ),
-            ControlButtons(player),
             SeekBar(
-              player: player,
+              player: _player,
               onChangeEnd: (newPosition) {
-                player.seek(newPosition);
+                _player.seek(newPosition);
               },
             ),
           ],
@@ -92,20 +129,15 @@ class _AudioPlayerState extends State<AudioPlayer> {
   }
 }
 
-class PositionData {
-  final Duration position;
-  final Duration bufferedPosition;
-  final Duration duration;
-
-  PositionData(this.position, this.bufferedPosition, this.duration);
-}
-
 class ControlButtons extends StatelessWidget {
-  final ja.AudioPlayer player;
+  final Player player;
+  final StreamController<PlayerStateX> stateController;
 
-  const ControlButtons(
-    this.player,
-  );
+  const ControlButtons({
+    required this.player,
+    required this.stateController,
+  });
+
   void showSliderDialog({
     required BuildContext context,
     required String title,
@@ -113,7 +145,6 @@ class ControlButtons extends StatelessWidget {
     required double min,
     required double max,
     String valueSuffix = '',
-    // TODO: Replace these two by ValueStream.
     required double value,
     required Stream<double> stream,
     required ValueChanged<double> onChanged,
@@ -128,11 +159,14 @@ class ControlButtons extends StatelessWidget {
             height: 100.0,
             child: Column(
               children: [
-                Text('${snapshot.data?.toStringAsFixed(1)}$valueSuffix',
-                    style: const TextStyle(
-                        fontFamily: 'Fixed',
-                        fontWeight: FontWeight.bold,
-                        fontSize: 24.0)),
+                Text(
+                  '${snapshot.data?.toStringAsFixed(1)}$valueSuffix',
+                  style: const TextStyle(
+                    fontFamily: 'Fixed',
+                    fontWeight: FontWeight.bold,
+                    fontSize: 24.0,
+                  ),
+                ),
                 Slider(
                   divisions: divisions,
                   min: min,
@@ -153,6 +187,7 @@ class ControlButtons extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
+        // 音量按钮
         OutlinedButton(
           child: const Icon(Icons.volume_up),
           onPressed: () {
@@ -162,79 +197,55 @@ class ControlButtons extends StatelessWidget {
               divisions: 10,
               min: 0.0,
               max: 1.0,
-              value: player.volume,
-              stream: player.volumeStream,
+              value: player.state.volume / 100,
+              stream: player.stream.volume,
               onChanged: player.setVolume,
             );
           },
         ),
-        // StreamBuilder<ja.SequenceState>(
-        //   stream: player.sequenceStateStream,
-        //   builder: (context, snapshot) => IconButton(
-        //     icon: const Icon(Icons.skip_previous),
-        //     onPressed: player.hasPrevious ? player.seekToPrevious : null,
-        //   ),
-        // ),
-        SizedBox(
-          width: 30,
-        ),
-        StreamBuilder<ja.PlayerState>(
-          stream: player.playerStateStream,
+
+        SizedBox(width: 30),
+
+        // 播放/暂停按钮
+        StreamBuilder<PlayerStateX>(
+          stream: stateController.stream,
           builder: (context, snapshot) {
-            final playerState = snapshot.data;
-            final processingState = playerState?.processingState;
-            final playing = playerState?.playing;
-            if (processingState == ja.ProcessingState.loading ||
-                processingState == ja.ProcessingState.buffering) {
+            if (snapshot.data == PlayerStateX.buffering) {
               return OutlinedButton(
-                child: const CupertinoActivityIndicator(
-                  radius: 24,
-                ),
+                child: const CupertinoActivityIndicator(radius: 24),
                 onPressed: player.play,
               );
-            } else if (playing != true) {
+            } else if (snapshot.data == PlayerStateX.stopped ||
+                snapshot.data == PlayerStateX.paused) {
               return OutlinedButton(
-                child: const Icon(
-                  Icons.play_arrow,
-                  size: 64,
-                ),
+                child: const Icon(Icons.play_arrow, size: 64),
                 onPressed: player.play,
               );
-            } else if (processingState != ja.ProcessingState.completed) {
+            } else if (snapshot.data == PlayerStateX.playing) {
               return OutlinedButton(
-                child: const Icon(
-                  Icons.pause,
-                  size: 64,
-                ),
+                child: const Icon(Icons.pause, size: 64),
                 onPressed: player.pause,
               );
             } else {
+              // 播放完成，重新播放
               return OutlinedButton(
-                child: const Icon(
-                  Icons.play_arrow,
-                  size: 64,
-                ),
-                onPressed: () => player.seek(Duration.zero,
-                    index: player.effectiveIndices?.first),
+                child: const Icon(Icons.play_arrow, size: 64),
+                onPressed: () => player.seek(Duration.zero),
               );
             }
           },
         ),
-        // StreamBuilder<ja.SequenceState>(
-        //   stream: player.sequenceStateStream,
-        //   builder: (context, snapshot) => IconButton(
-        //     icon: const Icon(Icons.skip_next),
-        //     onPressed: player.hasNext ? player.seekToNext : null,
-        //   ),
-        // ),
-        SizedBox(
-          width: 30,
-        ),
+
+        SizedBox(width: 30),
+
+        // 速度按钮
         StreamBuilder<double>(
-          stream: player.speedStream,
+          stream: player.stream.rate,
           builder: (context, snapshot) => OutlinedButton(
-            child: Text("${snapshot.data?.toStringAsFixed(1)}x",
-                style: const TextStyle(fontWeight: FontWeight.bold)),
+            child: Text(
+              "${snapshot.data?.toStringAsFixed(1)}x",
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
             onPressed: () {
               showSliderDialog(
                 context: context,
@@ -242,9 +253,11 @@ class ControlButtons extends StatelessWidget {
                 divisions: 10,
                 min: 0.5,
                 max: 1.5,
-                value: player.speed,
-                stream: player.speedStream,
-                onChanged: player.setSpeed,
+                value: player.state.rate,
+                stream: player.stream.rate,
+                onChanged: (value) {
+                  player.setRate(value);
+                },
               );
             },
           ),
@@ -255,7 +268,7 @@ class ControlButtons extends StatelessWidget {
 }
 
 class SeekBar extends StatefulWidget {
-  final ja.AudioPlayer player;
+  final Player player;
   final ValueChanged<Duration>? onChanged;
   final ValueChanged<Duration>? onChangeEnd;
 
@@ -307,6 +320,7 @@ class SeekBarState extends State<SeekBar> {
   Widget build(BuildContext context) {
     return Stack(
       children: [
+        // 缓冲进度条（背景）
         SliderTheme(
           data: _sliderThemeData?.copyWith(
                 thumbShape: HiddenThumbComponentShape(),
@@ -315,47 +329,40 @@ class SeekBarState extends State<SeekBar> {
               ) ??
               SliderThemeData(),
           child: ExcludeSemantics(
-            child: StreamBuilder(
-              stream: widget.player.bufferedPositionStream,
-              builder:
-                  (BuildContext context, AsyncSnapshot<Duration> snapshot) {
-                Duration _duration = widget.player.duration ?? Duration.zero;
-                Duration _position = snapshot.data ?? Duration.zero;
+            child: StreamBuilder<Duration>(
+              stream: widget.player.stream.buffer,
+              builder: (context, snapshot) {
+                final Duration duration = widget.player.state.duration;
+                final Duration bufferedPosition =
+                    snapshot.data ?? Duration.zero;
                 return Slider(
                   min: 0.0,
-                  max: _duration.inMilliseconds.toDouble(),
-                  value: min(_position.inMilliseconds.toDouble(),
-                      _duration.inMilliseconds.toDouble()),
-                  onChanged: (value) {
-                    setState(() {
-                      _dragValue = value;
-                    });
-                    widget.onChanged
-                        ?.call(Duration(milliseconds: value.round()));
-                  },
-                  onChangeEnd: (value) {
-                    widget.onChangeEnd
-                        ?.call(Duration(milliseconds: value.round()));
-                    _dragValue = null;
-                  },
+                  max: duration.inMilliseconds.toDouble(),
+                  value: bufferedPosition.inMilliseconds.toDouble(),
+                  onChanged: null, // 缓冲进度不可交互
                 );
               },
             ),
           ),
         ),
-        StreamBuilder(
-          stream: widget.player.positionStream,
-          builder: (BuildContext context, AsyncSnapshot<Duration> snapshot) {
-            Duration _duration = widget.player.duration ?? Duration.zero;
-            Duration _position = snapshot.data ?? Duration.zero;
-            Duration _remaining = _duration - _position;
+
+        // 播放进度条（可交互）
+        StreamBuilder<Duration>(
+          stream: widget.player.stream.position,
+          builder: (context, snapshot) {
+            final Duration duration = widget.player.state.duration;
+            final Duration position = snapshot.data ?? Duration.zero;
+            final Duration remaining = duration - position;
+
             return Column(
               children: [
                 Slider(
                   min: 0.0,
-                  max: _duration.inMilliseconds.toDouble(),
-                  value: min(_dragValue ?? _position.inMilliseconds.toDouble(),
-                      _duration.inMilliseconds.toDouble()),
+                  max: duration.inMilliseconds.toDouble(),
+                  value: min(
+                    _dragValue ?? position.inMilliseconds.toDouble(),
+                    duration.inMilliseconds.toDouble(),
+                  ),
                   onChanged: (value) {
                     setState(() {
                       _dragValue = value;
@@ -375,29 +382,40 @@ class SeekBarState extends State<SeekBar> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                          RegExp(r'((^0*[1-9]\d*:)?\d{2}:\d{2})\.\d+$')
-                                  .firstMatch("$_position")
-                                  ?.group(1) ??
-                              '$_position',
-                          style: TextStyle(
-                              color: AppTheme.of(context).placeholderColor,
-                              fontSize: 12)),
+                        _formatDuration(position),
+                        style: TextStyle(
+                          color: AppTheme.of(context).placeholderColor,
+                          fontSize: 12,
+                        ),
+                      ),
                       Text(
-                          RegExp(r'((^0*[1-9]\d*:)?\d{2}:\d{2})\.\d+$')
-                                  .firstMatch("$_remaining")
-                                  ?.group(1) ??
-                              '$_remaining',
-                          style: TextStyle(
-                              color: AppTheme.of(context).placeholderColor,
-                              fontSize: 12))
+                        _formatDuration(remaining),
+                        style: TextStyle(
+                          color: AppTheme.of(context).placeholderColor,
+                          fontSize: 12,
+                        ),
+                      ),
                     ],
                   ),
-                )
+                ),
               ],
             );
           },
         ),
       ],
     );
+  }
+
+  String _formatDuration(Duration duration) {
+    String twoDigits(int n) => n.toString().padLeft(2, '0');
+    final hours = duration.inHours;
+    final minutes = duration.inMinutes.remainder(60);
+    final seconds = duration.inSeconds.remainder(60);
+
+    if (hours > 0) {
+      return '$hours:${twoDigits(minutes)}:${twoDigits(seconds)}';
+    } else {
+      return '${twoDigits(minutes)}:${twoDigits(seconds)}';
+    }
   }
 }

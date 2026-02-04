@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:garden/themes/app_theme.dart';
 import 'package:garden/util/function.dart';
 import 'package:garden/widgets/animation_progress_bar.dart';
 import 'package:garden/widgets/label.dart';
@@ -24,6 +25,13 @@ class _VirtualMachineState extends State<VirtualMachine> {
   List guests = [];
   List repos = [];
   int _currentIndex = 0;
+  
+  // 主题颜色
+  Color get _errorColor => Theme.of(context).extension<AppTheme>()?.errorColor ?? Colors.redAccent;
+  Color get _successColor => Theme.of(context).extension<AppTheme>()?.successColor ?? Colors.green;
+  Color get _warningColor => Theme.of(context).extension<AppTheme>()?.warningColor ?? Colors.orange;
+  Color get _infoColor => Theme.of(context).extension<AppTheme>()?.infoColor ?? Colors.blue;
+  
   @override
   void initState() {
     getData();

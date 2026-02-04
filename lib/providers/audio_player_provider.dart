@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:just_audio/just_audio.dart';
+import 'package:media_kit/media_kit.dart';
 
 class AudioPlayerProvider with ChangeNotifier {
-  late AudioPlayer _player;
+  late Player _player;
   String _url = '';
   String _name = '';
-  AudioPlayer get player => _player;
+  Player get player => _player;
   String get url => _url;
   String get name => _name;
   AudioPlayerProvider() {
-    _player = AudioPlayer();
+    _player = Player();
   }
-  void setPlayer(AudioPlayer player) async {
+  void setPlayer(Player player) async {
     _player = player;
     notifyListeners();
   }

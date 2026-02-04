@@ -13,6 +13,9 @@ class UpdateDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final cupertinoTheme = CupertinoTheme.of(context);
+    
     return Center(
       child: Material(
         color: Colors.transparent,
@@ -38,7 +41,7 @@ class UpdateDialog extends StatelessWidget {
                       heightPercentages: [0.26, 0.28, 0.31],
 //                  blur: MaskFilter.blur(BlurStyle.solid, 16.0),
                     ),
-                    backgroundColor: CupertinoTheme.of(context).primaryColor,
+                    backgroundColor: cupertinoTheme.primaryColor,
                     size: Size(double.infinity, double.infinity),
                     waveAmplitude: 0,
                   ),
@@ -83,7 +86,7 @@ class UpdateDialog extends StatelessWidget {
                           minHeight: 120,
                         ),
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: theme.colorScheme.surface,
                           borderRadius: BorderRadius.vertical(
                               bottom: Radius.circular(20)),
                         ),
@@ -95,7 +98,7 @@ class UpdateDialog extends StatelessWidget {
                             Text(
                               "更新日志：",
                               style: TextStyle(
-                                  color: Colors.black,
+                                  color: theme.colorScheme.onSurface,
                                   fontWeight: FontWeight.w500,
                                   fontSize: 14,
                                   height: 1.5),
@@ -103,7 +106,9 @@ class UpdateDialog extends StatelessWidget {
                             Text(
                               "${updateInfo['buildUpdateDescription']}",
                               style: TextStyle(
-                                  color: Colors.black, fontSize: 14, height: 2),
+                                  color: theme.colorScheme.onSurface, 
+                                  fontSize: 14, 
+                                  height: 2),
                             ),
                             SizedBox(
                               height: 40,
@@ -145,15 +150,17 @@ class UpdateDialog extends StatelessWidget {
                           Util.instance.setStorage(
                               "ignoredVersions", ignoredVersions.join(","));
                         },
-                        color:
-                            CupertinoTheme.of(context).scaffoldBackgroundColor,
+                        color: cupertinoTheme.scaffoldBackgroundColor,
                         borderRadius: BorderRadius.circular(50),
                         minSize: 0,
                         padding:
                             EdgeInsets.symmetric(horizontal: 29, vertical: 5),
                         child: Text(
                           "忽略此版本",
-                          style: TextStyle(fontSize: 17.5, color: Colors.grey),
+                          style: TextStyle(
+                            fontSize: 17.5, 
+                            color: theme.colorScheme.onSurface.withOpacity(0.6)
+                          ),
                         ),
                       ),
                       SizedBox(
@@ -168,14 +175,17 @@ class UpdateDialog extends StatelessWidget {
                               },
                               settings: RouteSettings(name: "update")));
                         },
-                        color: CupertinoTheme.of(context).primaryColor,
+                        color: cupertinoTheme.primaryColor,
                         borderRadius: BorderRadius.circular(50),
                         minSize: 0,
                         padding:
                             EdgeInsets.symmetric(horizontal: 29, vertical: 5),
                         child: Text(
                           "立即更新",
-                          style: TextStyle(fontSize: 17.5, color: Colors.white),
+                          style: TextStyle(
+                            fontSize: 17.5, 
+                            color: theme.colorScheme.surface
+                          ),
                         ),
                       ),
                     ],
@@ -197,7 +207,7 @@ class UpdateDialog extends StatelessWidget {
                     child: ImageIcon(
                       AssetImage("assets/icons/close.png"),
                       size: 48.5,
-                      color: Colors.white,
+                      color: theme.colorScheme.surface,
                     ),
                   ),
                 ),

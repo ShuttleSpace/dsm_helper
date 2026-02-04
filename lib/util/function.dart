@@ -187,7 +187,7 @@ class Util {
     return encoded;
   }
 
-  Color getAdjustColor(Color baseColor, double amount) {
+  static Color getAdjustColor(Color baseColor, double amount) {
     Map<String, int> colors = {
       'r': baseColor.r.toInt(),
       'g': baseColor.g.toInt(),
@@ -820,7 +820,6 @@ class Util {
       } else {
         save = File(url);
       }
-      bool result = false;
       if (save != null) {
         final result = await ImageGallerySaverPlus.saveImage(
           save.readAsBytesSync(),

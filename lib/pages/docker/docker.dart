@@ -1,4 +1,5 @@
 import 'package:garden/pages/docker/detail.dart';
+import 'package:garden/themes/app_theme.dart';
 import 'package:garden/util/function.dart';
 import 'package:garden/util/log.dart';
 import 'package:garden/widgets/bubble_tab_indicator.dart';
@@ -25,6 +26,17 @@ class _DockerState extends State<Docker> with SingleTickerProviderStateMixin {
   Map utilization = {};
   bool containerLoading = true;
   bool imageLoading = true;
+
+  // 主题颜色
+  Color get _errorColor =>
+      Theme.of(context).extension<AppTheme>()?.errorColor ?? Colors.redAccent;
+  Color get _successColor =>
+      Theme.of(context).extension<AppTheme>()?.successColor ?? Colors.green;
+  Color get _warningColor =>
+      Theme.of(context).extension<AppTheme>()?.warningColor ?? Colors.orange;
+  Color get _infoColor =>
+      Theme.of(context).extension<AppTheme>()?.infoColor ?? Colors.blue;
+
   @override
   void initState() {
     _tabController = TabController(length: 3, vsync: this);
@@ -582,7 +594,7 @@ class _DockerState extends State<Docker> with SingleTickerProviderStateMixin {
               isScrollable: false,
               controller: _tabController,
               indicatorSize: TabBarIndicatorSize.label,
-              labelColor: Theme.of(context).brightness == Brightness.dark
+              labelColor: Theme.brightnessOf(context) == Brightness.dark
                   ? Colors.white
                   : Colors.black,
               unselectedLabelColor: Colors.grey,

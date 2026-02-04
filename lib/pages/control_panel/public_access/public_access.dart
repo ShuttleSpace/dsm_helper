@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:garden/pages/control_panel/public_access/edit_ddns.dart';
 import 'package:garden/util/function.dart';
+import 'package:garden/widgets/bubble_tab_indicator.dart';
 import 'package:garden/widgets/label.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
@@ -190,41 +191,42 @@ class _PublicAccessState extends State<PublicAccess>
       ),
       body: Column(
         children: [
-          // NeuCard(
-          //   width: double.infinity,
-          //   decoration: NeumorphicDecoration(
-          //     color: Theme.of(context).scaffoldBackgroundColor,
-          //     borderRadius: BorderRadius.circular(20),
-          //   ),
-          //   margin: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-          //   curveType: CurveType.flat,
-          //   bevel: 10,
-          //   child: TabBar(
-          //     isScrollable: false,
-          //     controller: _tabController,
-          //     indicatorSize: TabBarIndicatorSize.label,
-          //     labelColor: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black,
-          //     unselectedLabelColor: Colors.grey,
-          //     indicator: BubbleTabIndicator(
-          //       indicatorColor: Theme.of(context).scaffoldBackgroundColor,
-          //       shadowColor: Util.getAdjustColor(Theme.of(context).scaffoldBackgroundColor, -20),
-          //     ),
-          //     tabs: [
-          //       Padding(
-          //         padding: EdgeInsets.symmetric(vertical: 10, horizontal: 5),
-          //         child: Text("DDNS"),
-          //       ),
-          //       // Padding(
-          //       //   padding: EdgeInsets.symmetric(vertical: 10, horizontal: 5),
-          //       //   child: Text("路由器配置"),
-          //       // ),
-          //       // Padding(
-          //       //   padding: EdgeInsets.symmetric(vertical: 10, horizontal: 5),
-          //       //   child: Text("高级设置"),
-          //       // ),
-          //     ],
-          //   ),
-          // ),
+          Container(
+            width: double.infinity,
+            decoration: BoxDecoration(
+              color: Theme.of(context).scaffoldBackgroundColor,
+              borderRadius: BorderRadius.circular(20),
+            ),
+            margin: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+            child: TabBar(
+              isScrollable: false,
+              controller: _tabController,
+              indicatorSize: TabBarIndicatorSize.label,
+              labelColor: Theme.brightnessOf(context) == Brightness.dark
+                  ? Colors.white
+                  : Colors.black,
+              unselectedLabelColor: Colors.grey,
+              indicator: BubbleTabIndicator(
+                indicatorColor: Theme.of(context).scaffoldBackgroundColor,
+                shadowColor: Util.getAdjustColor(
+                    Theme.of(context).scaffoldBackgroundColor, -20),
+              ),
+              tabs: [
+                Padding(
+                  padding: EdgeInsets.symmetric(vertical: 10, horizontal: 5),
+                  child: Text("DDNS"),
+                ),
+                // Padding(
+                //   padding: EdgeInsets.symmetric(vertical: 10, horizontal: 5),
+                //   child: Text("路由器配置"),
+                // ),
+                // Padding(
+                //   padding: EdgeInsets.symmetric(vertical: 10, horizontal: 5),
+                //   child: Text("高级设置"),
+                // ),
+              ],
+            ),
+          ),
           Expanded(
             child: TabBarView(
               controller: _tabController,

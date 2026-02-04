@@ -1,3 +1,4 @@
+import 'package:garden/themes/app_theme.dart';
 import 'package:garden/util/function.dart';
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/cupertino.dart';
@@ -75,18 +76,19 @@ class CupertinoExtendedImage extends StatelessWidget {
 class CupertinoCircleAvatar extends StatelessWidget {
   final String url;
   final String text;
-  final Color backgroundColor;
+  final Color? backgroundColor;
   final double fontSize;
   final double size;
-  final Color foregroundColor;
+  final Color? foregroundColor;
   CupertinoCircleAvatar({
     required this.url,
-    this.backgroundColor = Colors.blue,
+    Color? backgroundColor,
     this.size = 30,
     this.text = "",
     this.fontSize = 18,
-    this.foregroundColor = CupertinoColors.white,
-  });
+    Color? foregroundColor,
+  })  : backgroundColor = backgroundColor ?? Colors.blue,
+        foregroundColor = foregroundColor ?? CupertinoColors.white;
   @override
   Widget build(BuildContext context) {
     return url.isBlank
@@ -100,7 +102,10 @@ class CupertinoCircleAvatar extends StatelessWidget {
             height: size,
             child: Text(
               text,
-              style: TextStyle(fontSize: fontSize, color: foregroundColor),
+              style: TextStyle(
+                fontSize: fontSize, 
+                color: foregroundColor ?? Theme.of(context).colorScheme.surface
+              ),
             ),
           )
         : CupertinoExtendedImage(

@@ -13,6 +13,8 @@ class GroupsModel {
   List<GroupModel>? qq;
   List<GroupModel>? wechat;
   List<GroupModel>? channel;
+
+  /// @deprecated
   static Future<GroupsModel> fetch() async {
     var res = await Util.instance.post("${Util.instance.appUrl}/app/groups");
     print("[GroupsModel] $res");

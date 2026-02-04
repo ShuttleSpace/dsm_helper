@@ -416,7 +416,7 @@ class _BoxDecorationPainter extends BoxPainter {
       return;
     }
     Paint dashedPaint = Paint()
-      ..color = _decoration.dashedColor ?? Colors.black
+      ..color = _decoration.dashedColor ?? Colors.black54
       ..strokeWidth = _decoration.strokeHeight ?? 3
       ..style = PaintingStyle.stroke;
 

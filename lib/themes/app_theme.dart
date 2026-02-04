@@ -9,11 +9,23 @@ class AppTheme extends ThemeExtension<AppTheme> {
   final Color? placeholderColor;
   final Color? titleColor;
   final Color? progressColor;
+  final Color? successColor;
+  final Color? warningColor;
+  final Color? errorColor;
+  final Color? infoColor;
+  final Color? primaryActionColor;
+  final Color? placeholderBackgroundColor;
   AppTheme({
     this.primaryColor,
     this.placeholderColor,
     this.titleColor,
     this.progressColor,
+    this.successColor,
+    this.warningColor,
+    this.errorColor,
+    this.infoColor,
+    this.primaryActionColor,
+    this.placeholderBackgroundColor,
   });
 
   @override
@@ -21,11 +33,25 @@ class AppTheme extends ThemeExtension<AppTheme> {
     Color? primaryColor,
     Color? placeholderColor,
     Color? titleColor,
+    Color? progressColor,
+    Color? successColor,
+    Color? warningColor,
+    Color? errorColor,
+    Color? infoColor,
+    Color? primaryActionColor,
+    Color? placeholderBackgroundColor,
   }) {
     return AppTheme(
       primaryColor: primaryColor ?? this.primaryColor,
-      placeholderColor: primaryColor ?? this.placeholderColor,
-      titleColor: primaryColor ?? this.titleColor,
+      placeholderColor: placeholderColor ?? this.placeholderColor,
+      titleColor: titleColor ?? this.titleColor,
+      progressColor: progressColor ?? this.progressColor,
+      successColor: successColor ?? this.successColor,
+      warningColor: warningColor ?? this.warningColor,
+      errorColor: errorColor ?? this.errorColor,
+      infoColor: infoColor ?? this.infoColor,
+      primaryActionColor: primaryActionColor ?? this.primaryActionColor,
+      placeholderBackgroundColor: placeholderBackgroundColor ?? this.placeholderBackgroundColor,
     );
   }
 

@@ -1,6 +1,6 @@
 import 'dart:math';
 
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
 
 class FAProgressBar extends StatefulWidget {
   FAProgressBar({
@@ -12,14 +12,18 @@ class FAProgressBar extends StatefulWidget {
     this.verticalDirection = VerticalDirection.down,
     BorderRadiusGeometry? borderRadius,
     this.border,
-    this.backgroundColor = const Color(0x00FFFFFF),
-    this.progressColor = const Color(0xFFFA7268),
+    Color? backgroundColor,
+    Color? progressColor,
     this.changeColorValue,
-    this.changeProgressColor = const Color(0xFF5F4B8B),
+    Color? changeProgressColor,
     this.displayText = '',
-    this.displayTextStyle =
-        const TextStyle(color: const Color(0xFFFFFFFF), fontSize: 12),
-  }) : _borderRadius = borderRadius ?? BorderRadius.circular(8);
+    TextStyle? displayTextStyle,
+  })  : _borderRadius = borderRadius ?? BorderRadius.circular(8),
+        backgroundColor = backgroundColor ?? const Color(0x00FFFFFF),
+        progressColor = progressColor ?? const Color(0xFFFA7268),
+        changeProgressColor = changeProgressColor ?? const Color(0xFF5F4B8B),
+        displayTextStyle = displayTextStyle ??
+            const TextStyle(color: Color(0xFFFFFFFF), fontSize: 12);
   final int currentValue;
   final int maxValue;
   final double size;

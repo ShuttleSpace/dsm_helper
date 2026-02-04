@@ -360,7 +360,7 @@ Page resource error:
                         ),
                         constraints: BoxConstraints(
                           maxWidth: 500,
-                          maxHeight: MediaQuery.of(context).size.height * 0.7,
+                          maxHeight: MediaQuery.sizeOf(context).height * 0.7,
                         ),
                         child: Column(
                           mainAxisSize: MainAxisSize.min,

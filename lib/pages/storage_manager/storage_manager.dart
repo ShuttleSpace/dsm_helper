@@ -1,4 +1,5 @@
 import 'package:garden/pages/storage_manager/smart.dart';
+import 'package:garden/themes/app_theme.dart';
 import 'package:garden/util/function.dart';
 import 'package:garden/widgets/bubble_tab_indicator.dart';
 import 'package:garden/widgets/dashed_decoration.dart';
@@ -23,6 +24,20 @@ class _StorageManagerState extends State<StorageManager>
   List storagePools = [];
   List hotSpares = [];
   Map env = {};
+
+  // 主题颜色
+  Color get _errorColor =>
+      Theme.of(context).extension<AppTheme>()?.errorColor ?? Colors.red;
+  Color get _successColor =>
+      Theme.of(context).extension<AppTheme>()?.successColor ?? Colors.green;
+  Color get _warningColor =>
+      Theme.of(context).extension<AppTheme>()?.warningColor ??
+      Colors.orangeAccent;
+  Color get _infoColor =>
+      Theme.of(context).extension<AppTheme>()?.infoColor ?? Colors.blue;
+  Color get _uploadColor => _infoColor;
+  Color get _downloadColor => _successColor;
+
   @override
   void initState() {
     _tabController = TabController(length: 6, vsync: this);
@@ -850,7 +865,7 @@ class _StorageManagerState extends State<StorageManager>
                     isScrollable: true,
                     controller: _tabController,
                     indicatorSize: TabBarIndicatorSize.label,
-                    labelColor: Theme.of(context).brightness == Brightness.dark
+                    labelColor: Theme.brightnessOf(context) == Brightness.dark
                         ? Colors.white
                         : Colors.black,
                     unselectedLabelColor: Colors.grey,

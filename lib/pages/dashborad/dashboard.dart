@@ -79,9 +79,25 @@ class DashboardState extends State<Dashboard> {
 
   Map volWarnings = {};
   String msg = "";
+
+  // 主题颜色 - 根据 AppTheme 获取
+  Color get _errorColor =>
+      Theme.of(context).extension<AppTheme>()?.errorColor ?? _errorColor;
+  Color get _successColor =>
+      Theme.of(context).extension<AppTheme>()?.successColor ?? _successColor;
+  Color get _warningColor =>
+      Theme.of(context).extension<AppTheme>()?.warningColor ?? _warningColor;
+  Color get _infoColor =>
+      Theme.of(context).extension<AppTheme>()?.infoColor ?? _infoColor;
+  Color get _uploadColor => Colors.blueAccent;
+  Color get _downloadColor => _successColor;
+  Color get _chartGridColor => Theme.of(context).colorScheme.outlineVariant;
+  Color get _chartTextColor =>
+      Theme.of(context).colorScheme.onSurface.withOpacity(0.6);
+
   @override
   void initState() {
-    getGroups();
+    // getGroups();
     networks = List.generate(20, (i) => {"tx": 0, "rx": 0});
     getNotifyStrings();
     ApiModel.fetch().then((apis) {
@@ -97,6 +113,7 @@ class DashboardState extends State<Dashboard> {
     return _scaffoldKey.currentState?.isDrawerOpen ?? false;
   }
 
+  /// @deprecated
   getGroups() async {
     Util.instance.groups = await GroupsModel.fetch();
     if (Util.instance.notReviewAccount) {
@@ -506,7 +523,7 @@ class DashboardState extends State<Dashboard> {
                             shape: BoxShape.rectangle,
                             borderRadius: BorderRadius.circular(20),
                           ),
-                        if (Theme.of(context).brightness == Brightness.dark)
+                        if (Theme.brightnessOf(context) == Brightness.dark)
                           Container(
                             height: 170,
                             decoration: BoxDecoration(
@@ -582,12 +599,12 @@ class DashboardState extends State<Dashboard> {
                                                             'temperature_warning'] ==
                                                         null
                                                     ? (system['sys_temp'] > 80
-                                                        ? Colors.red
-                                                        : Colors.green)
+                                                        ? _errorColor
+                                                        : _successColor)
                                                     : (system[
                                                             'temperature_warning']
-                                                        ? Colors.red
-                                                        : Colors.green)),
+                                                        ? _errorColor
+                                                        : _successColor)),
                                             overflow: TextOverflow.ellipsis,
                                           ),
                                         ],
@@ -852,8 +869,8 @@ class DashboardState extends State<Dashboard> {
                             child: FAProgressBar(
                               backgroundColor: Colors.transparent,
                               changeColorValue: 90,
-                              changeProgressColor: Colors.red,
-                              progressColor: Colors.blue,
+                              changeProgressColor: _errorColor,
+                              progressColor: _infoColor,
                               displayTextStyle: TextStyle(
                                   color: AppTheme.of(context).progressColor,
                                   fontSize: 12),
@@ -889,12 +906,13 @@ class DashboardState extends State<Dashboard> {
                             child: FAProgressBar(
                               backgroundColor: Colors.transparent,
                               changeColorValue: 90,
-                              changeProgressColor: Colors.red,
-                              progressColor: Colors.blue,
+                              changeProgressColor: _errorColor,
+                              progressColor: _infoColor,
                               displayTextStyle: TextStyle(
                                   color: AppTheme.of(context).progressColor,
                                   fontSize: 12),
-                              currentValue: utilization['memory']['real_usage'],
+                              currentValue:
+                                  (utilization['memory']?['real_usage'] ?? 0),
                               displayText: '%',
                             ),
                           ),
@@ -922,26 +940,26 @@ class DashboardState extends State<Dashboard> {
                           SizedBox(width: 60, child: Text("网络：")),
                           Icon(
                             Icons.upload_sharp,
-                            color: Colors.blue,
+                            color: _uploadColor,
                           ),
                           Text(
                             Util.instance.formatSize(
                                     utilization['network']?[0]?['tx'] ?? 0) +
                                 "/S",
-                            style: TextStyle(color: Colors.blue),
+                            style: TextStyle(color: _uploadColor),
                           ),
                           SizedBox(
                             width: 30,
                           ),
                           Icon(
                             Icons.download_sharp,
-                            color: Colors.green,
+                            color: _downloadColor,
                           ),
                           Text(
                             Util.instance.formatSize(
                                     utilization['network'][0]['rx'] ?? 0) +
                                 "/S",
-                            style: TextStyle(color: Colors.green),
+                            style: TextStyle(color: _downloadColor),
                           ),
                         ],
                       ),
@@ -990,7 +1008,7 @@ class DashboardState extends State<Dashboard> {
                                           fontSize: 14,
                                         );
                                         return LineTooltipItem(
-                                            '${touchedSpot.bar.color == Colors.blue ? "上传" : "下载"}:${Util.instance.formatSize(touchedSpot.y.floor())}',
+                                            '${touchedSpot.bar.color == _uploadColor ? "上传" : "下载"}:${Util.instance.formatSize(touchedSpot.y.floor())}',
                                             textStyle);
                                       }).toList();
                                     },
@@ -1026,7 +1044,7 @@ class DashboardState extends State<Dashboard> {
                                             Util.instance
                                                 .formatSize(value, fixed: 0),
                                             style: TextStyle(
-                                              color: Color(0xff67727d),
+                                              color: _chartTextColor,
                                               fontSize: 12,
                                             ));
                                       },
@@ -1058,7 +1076,7 @@ class DashboardState extends State<Dashboard> {
                                     ),
                                     belowBarData: BarAreaData(
                                       show: true,
-                                      color: Colors.blue.withValues(alpha: .2),
+                                      color: _uploadColor.withValues(alpha: .2),
                                     ),
                                   ),
                                   LineChartBarData(
@@ -1076,7 +1094,8 @@ class DashboardState extends State<Dashboard> {
                                     ),
                                     belowBarData: BarAreaData(
                                       show: true,
-                                      color: Colors.green.withValues(alpha: .2),
+                                      color:
+                                          _downloadColor.withValues(alpha: .2),
                                     ),
                                   ),
                                 ],
@@ -1361,8 +1380,7 @@ class DashboardState extends State<Dashboard> {
                                         child: Text(
                                           "终止连接",
                                           style: TextStyle(
-                                              fontSize: 18,
-                                              color: Colors.redAccent),
+                                              fontSize: 18, color: _errorColor),
                                         ),
                                       ),
                                     ),

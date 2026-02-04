@@ -22,6 +22,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:media_kit/media_kit.dart';
 import 'package:oktoast/oktoast.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
@@ -35,6 +36,7 @@ void main() async {
   };
 
   WidgetsFlutterBinding.ensureInitialized();
+  MediaKit.ensureInitialized();
   Log.init();
 
   Util.instance.downloadSavePath =

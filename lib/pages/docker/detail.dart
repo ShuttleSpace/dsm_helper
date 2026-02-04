@@ -343,7 +343,7 @@ class _ContainerDetailState extends State<ContainerDetail>
                     isScrollable: false,
                     controller: _tabController,
                     indicatorSize: TabBarIndicatorSize.label,
-                    labelColor: Theme.of(context).brightness == Brightness.dark
+                    labelColor: Theme.brightnessOf(context) == Brightness.dark
                         ? Colors.white
                         : Colors.black,
                     unselectedLabelColor: Colors.grey,

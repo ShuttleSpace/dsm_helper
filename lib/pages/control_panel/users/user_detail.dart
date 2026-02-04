@@ -329,7 +329,7 @@ class _UserDetailState extends State<UserDetail>
               isScrollable: true,
               controller: _tabController,
               indicatorSize: TabBarIndicatorSize.label,
-              labelColor: Theme.of(context).brightness == Brightness.dark
+              labelColor: Theme.brightnessOf(context) == Brightness.dark
                   ? Colors.white
                   : Colors.black,
               unselectedLabelColor: Colors.grey,

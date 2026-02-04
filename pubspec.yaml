@@ -96,16 +96,19 @@ dependencies:
   webview_flutter: 4.10.0
   simple_logger: ^1.9.0+2
   extended_text: ^15.0.2  #15.0.0 起支持 Flutter 3.22+
-  just_audio: 0.9.46
+  # just_audio: 0.9.46
   rxdart: ^0.28.0
   flutter_floating: ^1.0.8
-  video_player: ^2.9.5
+  # video_player: ^2.9.5
 #  easy_app_installer:
 #    git: https://gitee.com/dsm_bay/easy_app_installer.git
   background_downloader: ^8.6.0
   path: ^1.9.0
   signals: ^6.0.2
   signals_flutter: ^6.0.2
+  media_kit: ^1.2.6
+  media_kit_video: ^2.0.1
+  media_kit_libs_video: ^1.0.7
 #  flutter_filereader: ^3.0.0
 #  x5_webview: ^0.2.4
 dev_dependencies:

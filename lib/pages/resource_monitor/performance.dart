@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:garden/providers/setting.dart';
+import 'package:garden/themes/app_theme.dart';
 import 'package:garden/util/function.dart';
 import 'package:garden/widgets/bubble_tab_indicator.dart';
 import 'package:garden/widgets/label.dart';
@@ -28,21 +29,6 @@ class _PerformanceState extends State<Performance>
   List disks = [];
   List spaces = [];
   List luns = [];
-  List colors = [
-    Colors.red,
-    Colors.purpleAccent,
-    Colors.redAccent,
-    Colors.green,
-    Colors.amber,
-    Colors.orange,
-    Colors.teal,
-    Colors.indigoAccent,
-    Colors.cyanAccent,
-    Colors.yellow,
-    Colors.black,
-    Colors.lightGreenAccent,
-    Colors.pinkAccent
-  ];
   late Timer timer;
   int maxNetworkSpeed = 0;
   int maxDiskReadSpeed = 0;
@@ -51,6 +37,32 @@ class _PerformanceState extends State<Performance>
   int maxVolumeWriteSpeed = 0;
 
   int networkCount = 0;
+  
+  // 图表颜色配置 - 根据主题自适应
+  Color get _chartGridColor => Theme.of(context).colorScheme.outlineVariant;
+  Color get _chartTextColor => Theme.of(context).colorScheme.onSurface.withOpacity(0.6);
+  
+  // 获取图表颜色列表 - 使用主题语义颜色
+  List<Color> get _chartColors {
+    final theme = Theme.of(context);
+    final appTheme = theme.extension<AppTheme>();
+    return [
+      appTheme?.errorColor ?? Colors.red,
+      Colors.purpleAccent,
+      Colors.redAccent,
+      appTheme?.successColor ?? Colors.green,
+      appTheme?.warningColor ?? Colors.amber,
+      Colors.orange,
+      Colors.teal,
+      Colors.indigoAccent,
+      Colors.cyanAccent,
+      Colors.yellow,
+      theme.colorScheme.onSurface,
+      Colors.lightGreenAccent,
+      Colors.pinkAccent
+    ];
+  }
+  
   @override
   void initState() {
     final settingProvider =
@@ -143,11 +155,12 @@ class _PerformanceState extends State<Performance>
                     isScrollable: true,
                     controller: _tabController,
                     indicatorSize: TabBarIndicatorSize.label,
-                    labelColor: Theme.of(context).brightness == Brightness.dark
-                        ? Colors.white
-                        : Colors.black,
-                    unselectedLabelColor: Colors.grey,
-                    indicator: BubbleTabIndicator(),
+                    labelColor: Theme.of(context).colorScheme.onSurface,
+                    unselectedLabelColor: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+                    indicator: BubbleTabIndicator(
+                      indicatorColor: Theme.of(context).colorScheme.primary,
+                      shadowColor: Theme.of(context).colorScheme.primary,
+                    ),
                     tabs: [
                       Padding(
                         padding:
@@ -229,7 +242,7 @@ class _PerformanceState extends State<Performance>
                                                 BorderRadius.circular(5)),
                                         // padding: EdgeInsets.symmetric(horizontal: 10),
                                         child: Padding(
-                                          padding: EdgeInsets.all(10),
+                                          padding: EdgeInsets.all(5),
                                           child: LineChart(
                                             LineChartData(
                                               lineTouchData: LineTouchData(
@@ -2138,7 +2151,7 @@ class _PerformanceState extends State<Performance>
                                     i++)
                                   Label(
                                     "${disks.last['disk'][i]['display_name']}",
-                                    colors[i],
+                                    _chartColors[i],
                                     height: 22,
                                   ),
                               ],
@@ -2215,7 +2228,7 @@ class _PerformanceState extends State<Performance>
                                                                 "${disks.last['disk'][i]['display_name']}：${disks[items[0].spotIndex]['disk'][i]['utilization'].floor()}%",
                                                                 TextStyle(
                                                                     color:
-                                                                        colors[
+                                                                        _chartColors[
                                                                             i]),
                                                               ),
                                                             LineTooltipItem(
@@ -2309,7 +2322,7 @@ class _PerformanceState extends State<Performance>
                                                               .toDouble());
                                                     }).toList(),
                                                     isCurved: true,
-                                                    color: colors[i],
+                                                    color: _chartColors[i],
                                                     barWidth: 2,
                                                     isStrokeCapRound: true,
                                                     dotData: FlDotData(
@@ -2398,7 +2411,7 @@ class _PerformanceState extends State<Performance>
                                                                 "${disks.last['disk'][i]['display_name']}：${Util.instance.formatSize(disks[items[0].spotIndex]['disk'][i]['read_byte'].floor())}",
                                                                 TextStyle(
                                                                     color:
-                                                                        colors[
+                                                                        _chartColors[
                                                                             i]),
                                                               ),
                                                             LineTooltipItem(
@@ -2516,7 +2529,7 @@ class _PerformanceState extends State<Performance>
                                                               .toDouble());
                                                     }).toList(),
                                                     isCurved: true,
-                                                    color: colors[i],
+                                                    color: _chartColors[i],
                                                     barWidth: 2,
                                                     isStrokeCapRound: true,
                                                     dotData: FlDotData(
@@ -2605,7 +2618,7 @@ class _PerformanceState extends State<Performance>
                                                                 "${disks.last['disk'][i]['display_name']}：${Util.instance.formatSize(disks[items[0].spotIndex]['disk'][i]['write_byte'].floor())}",
                                                                 TextStyle(
                                                                     color:
-                                                                        colors[
+                                                                        _chartColors[
                                                                             i]),
                                                               ),
                                                             LineTooltipItem(
@@ -2723,7 +2736,7 @@ class _PerformanceState extends State<Performance>
                                                               .toDouble());
                                                     }).toList(),
                                                     isCurved: true,
-                                                    color: colors[i],
+                                                    color: _chartColors[i],
                                                     barWidth: 2,
                                                     isStrokeCapRound: true,
                                                     dotData: FlDotData(
@@ -2812,7 +2825,7 @@ class _PerformanceState extends State<Performance>
                                                                 "${disks.last['disk'][i]['display_name']}：${disks[items[0].spotIndex]['disk'][i]['read_access'].floor()}",
                                                                 TextStyle(
                                                                     color:
-                                                                        colors[
+                                                                        _chartColors[
                                                                             i]),
                                                               ),
                                                             LineTooltipItem(
@@ -2905,7 +2918,7 @@ class _PerformanceState extends State<Performance>
                                                               .toDouble());
                                                     }).toList(),
                                                     isCurved: true,
-                                                    color: colors[i],
+                                                    color: _chartColors[i],
                                                     barWidth: 2,
                                                     isStrokeCapRound: true,
                                                     dotData: FlDotData(
@@ -2994,7 +3007,7 @@ class _PerformanceState extends State<Performance>
                                                                 "${disks.last['disk'][i]['display_name']}：${Util.instance.formatSize(disks[items[0].spotIndex]['disk'][i]['write_access'].floor())}",
                                                                 TextStyle(
                                                                     color:
-                                                                        colors[
+                                                                        _chartColors[
                                                                             i]),
                                                               ),
                                                             LineTooltipItem(
@@ -3080,7 +3093,7 @@ class _PerformanceState extends State<Performance>
                                                               .toDouble());
                                                     }).toList(),
                                                     isCurved: true,
-                                                    color: colors[i],
+                                                    color: _chartColors[i],
                                                     barWidth: 2,
                                                     isStrokeCapRound: true,
                                                     dotData: FlDotData(
@@ -3120,7 +3133,7 @@ class _PerformanceState extends State<Performance>
                                     i++)
                                   Label(
                                     "${spaces.last['volume'][i]['display_name']}",
-                                    colors[i],
+                                    _chartColors[i],
                                     height: 22,
                                   ),
                               ],
@@ -3197,7 +3210,7 @@ class _PerformanceState extends State<Performance>
                                                                 "${spaces.last['volume'][i]['display_name']}：${spaces[items[0].spotIndex]['volume'][i]['utilization'].floor()}%",
                                                                 TextStyle(
                                                                     color:
-                                                                        colors[
+                                                                        _chartColors[
                                                                             i]),
                                                               ),
                                                             LineTooltipItem(
@@ -3285,7 +3298,7 @@ class _PerformanceState extends State<Performance>
                                                               .toDouble());
                                                     }).toList(),
                                                     isCurved: true,
-                                                    color: colors[i],
+                                                    color: _chartColors[i],
                                                     barWidth: 2,
                                                     isStrokeCapRound: true,
                                                     dotData: FlDotData(
@@ -3374,7 +3387,7 @@ class _PerformanceState extends State<Performance>
                                                                 "${spaces.last['volume'][i]['display_name']}：${Util.instance.formatSize(spaces[items[0].spotIndex]['volume'][i]['read_byte'].floor())}",
                                                                 TextStyle(
                                                                     color:
-                                                                        colors[
+                                                                        _chartColors[
                                                                             i]),
                                                               ),
                                                             LineTooltipItem(
@@ -3465,7 +3478,7 @@ class _PerformanceState extends State<Performance>
                                                               .toDouble());
                                                     }).toList(),
                                                     isCurved: true,
-                                                    color: colors[i],
+                                                    color: _chartColors[i],
                                                     barWidth: 2,
                                                     isStrokeCapRound: true,
                                                     dotData: FlDotData(
@@ -3554,7 +3567,7 @@ class _PerformanceState extends State<Performance>
                                                                 "${spaces.last['volume'][i]['display_name']}：${Util.instance.formatSize(spaces[items[0].spotIndex]['volume'][i]['write_byte'].floor())}",
                                                                 TextStyle(
                                                                     color:
-                                                                        colors[
+                                                                        _chartColors[
                                                                             i]),
                                                               ),
                                                             LineTooltipItem(
@@ -3651,7 +3664,7 @@ class _PerformanceState extends State<Performance>
                                                               .toDouble());
                                                     }).toList(),
                                                     isCurved: true,
-                                                    color: colors[i],
+                                                    color: _chartColors[i],
                                                     barWidth: 2,
                                                     isStrokeCapRound: true,
                                                     dotData: FlDotData(
@@ -3740,7 +3753,7 @@ class _PerformanceState extends State<Performance>
                                                                 "${spaces.last['volume'][i]['display_name']}：${spaces[items[0].spotIndex]['volume'][i]['read_access'].floor()}",
                                                                 TextStyle(
                                                                     color:
-                                                                        colors[
+                                                                        _chartColors[
                                                                             i]),
                                                               ),
                                                             LineTooltipItem(
@@ -3827,7 +3840,7 @@ class _PerformanceState extends State<Performance>
                                                               .toDouble());
                                                     }).toList(),
                                                     isCurved: true,
-                                                    color: colors[i],
+                                                    color: _chartColors[i],
                                                     barWidth: 2,
                                                     isStrokeCapRound: true,
                                                     dotData: FlDotData(
@@ -3916,7 +3929,7 @@ class _PerformanceState extends State<Performance>
                                                                 "${spaces.last['volume'][i]['display_name']}：${Util.instance.formatSize(spaces[items[0].spotIndex]['volume'][i]['write_access'].floor())}",
                                                                 TextStyle(
                                                                     color:
-                                                                        colors[
+                                                                        _chartColors[
                                                                             i]),
                                                               ),
                                                             LineTooltipItem(
@@ -4008,7 +4021,7 @@ class _PerformanceState extends State<Performance>
                                                               .toDouble());
                                                     }).toList(),
                                                     isCurved: true,
-                                                    color: colors[i],
+                                                    color: _chartColors[i],
                                                     barWidth: 2,
                                                     isStrokeCapRound: true,
                                                     dotData: FlDotData(

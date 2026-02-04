@@ -42,13 +42,13 @@ class _RemoteFolderState extends State<RemoteFolder>
               dividerHeight: 0,
               controller: _tabController,
               indicatorSize: TabBarIndicatorSize.label,
-              labelColor: Theme.of(context).brightness == Brightness.dark
+              labelColor: Theme.brightnessOf(context) == Brightness.dark
                   ? Colors.white
                   : Colors.black,
               unselectedLabelColor: Colors.grey,
               indicator: BubbleTabIndicator(
                 indicatorColor: Theme.of(context).scaffoldBackgroundColor,
-                shadowColor: Util.instance.getAdjustColor(
+                shadowColor: Util.getAdjustColor(
                     Theme.of(context).scaffoldBackgroundColor, -20),
               ),
               tabs: [

@@ -268,7 +268,7 @@ class _ExternalDeviceState extends State<ExternalDevice>
                 isScrollable: false,
                 controller: _tabController,
                 indicatorSize: TabBarIndicatorSize.label,
-                labelColor: Theme.of(context).brightness == Brightness.dark
+                labelColor: Theme.brightnessOf(context) == Brightness.dark
                     ? Colors.white
                     : Colors.black,
                 unselectedLabelColor: Colors.grey,

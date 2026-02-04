@@ -163,10 +163,9 @@ class _FileServiceState extends State<FileService>
                       isScrollable: true,
                       controller: _tabController,
                       indicatorSize: TabBarIndicatorSize.label,
-                      labelColor:
-                          Theme.of(context).brightness == Brightness.dark
-                              ? Colors.white
-                              : Colors.black,
+                      labelColor: Theme.brightnessOf(context) == Brightness.dark
+                          ? Colors.white
+                          : Colors.black,
                       unselectedLabelColor: Colors.grey,
                       indicator: BubbleTabIndicator(),
                       tabs: [

@@ -7,7 +7,6 @@ import 'package:draggable_scrollbar/draggable_scrollbar.dart';
 import 'package:garden/pages/download/download_state.dart';
 import 'package:garden/util/log.dart';
 import 'package:flutter_vibrate/flutter_vibrate.dart';
-import 'package:just_audio/just_audio.dart' as ja;
 import 'package:garden/pages/common/audio_player.dart';
 import 'package:garden/pages/common/image_preview.dart';
 import 'package:garden/pages/common/pdf_viewer.dart';
@@ -1486,9 +1485,8 @@ class FilesState extends State<Files> {
             })).then((_) {
               AudioPlayerProvider audioPlayerProvider =
                   context.read<AudioPlayerProvider>();
-              if (audioPlayerProvider.player.playing &&
-                  audioPlayerProvider.player.playerState.processingState !=
-                      ja.ProcessingState.completed) {
+              if (audioPlayerProvider.player.state.playing &&
+                  !audioPlayerProvider.player.state.completed) {
                 audioPlayerFloating?.open(context);
               }
             });
@@ -2172,15 +2170,6 @@ class FilesState extends State<Files> {
         onLongPress: () {
           Util.instance.vibrate(FeedbackType.light);
           fileAction(file, remote: remote);
-          // if (paths.length > 1) {
-          //   Util.vibrate(FeedbackType.light);
-          //   setState(() {
-          //     multiSelect = true;
-          //     selectedFiles.add(file);
-          //   });
-          // } else {
-          //   Util.vibrate(FeedbackType.warning);
-          // }
         },
         onPressed: () {
           openFile(file, fileType: fileType, remote: remote);
@@ -2215,7 +2204,10 @@ class FilesState extends State<Files> {
                                 color: file['additional']['mount_point_type'] ==
                                         "remotefail"
                                     ? AppTheme.of(context).titleColor
-                                    : Colors.white),
+                                    : Theme.brightnessOf(context) ==
+                                            Brightness.dark
+                                        ? Colors.white
+                                        : Colors.black),
                             overflowWidget: TextOverflowWidget(
                               position: TextOverflowPosition.middle,
                               align: TextOverflowAlign.right,
@@ -3200,6 +3192,10 @@ class FilesState extends State<Files> {
       ),
       body: Column(
         children: [
+          Divider(
+            indent: 12,
+            endIndent: 12,
+          ),
           if (searchResult)
             Container(
               height: 45,
@@ -3364,12 +3360,19 @@ class FilesState extends State<Files> {
                             ),
                       // if (selectedFiles.length > 0)
                       AnimatedPositioned(
+                        width: MediaQuery.sizeOf(context).width,
                         bottom: selectedFiles.length > 0 ? 0 : -100,
                         duration: Duration(milliseconds: 200),
                         child: Card(
+                          color: Colors.transparent.withAlpha(120),
                           shape: RoundedRectangleBorder(
-                              side: BorderSide(),
-                              borderRadius: BorderRadius.circular(18)),
+                              side: BorderSide(
+                                color: Theme.brightnessOf(context) ==
+                                        Brightness.dark
+                                    ? Colors.white
+                                    : Colors.black,
+                              ),
+                              borderRadius: BorderRadius.circular(3)),
                           margin: EdgeInsets.all(20),
                           child: Padding(
                             padding: const EdgeInsets.all(8.0),
