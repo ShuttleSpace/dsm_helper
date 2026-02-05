@@ -1,3 +1,4 @@
+import 'package:garden/util/log.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher_string.dart';
@@ -6,12 +7,12 @@ import 'package:webview_flutter/webview_flutter.dart';
 class Browser extends StatefulWidget {
   final String url;
   final String? title;
-  Browser({required this.url, this.title});
+  const Browser({super.key, required this.url, this.title});
   @override
-  _BrowserState createState() => _BrowserState();
+  BrowserState createState() => BrowserState();
 }
 
-class _BrowserState extends State<Browser> {
+class BrowserState extends State<Browser> {
   final WebViewController _webviewController = WebViewController();
   @override
   void initState() {
@@ -22,14 +23,14 @@ class _BrowserState extends State<Browser> {
         NavigationDelegate(
           onPageStarted: (url) {
             //TODO 检查是否需要授权
-            debugPrint("onPageStarted");
+            Log.info("onPageStarted");
           },
           onPageFinished: (_) {
-            debugPrint("onPageFinished");
+            Log.info("onPageFinished");
             setState(() {});
           },
           onWebResourceError: (WebResourceError error) {
-            debugPrint('''
+            Log.info('''
 Page resource error:
   code: ${error.errorCode}
   description: ${error.description}
@@ -53,13 +54,13 @@ Page resource error:
             if (snapshot.hasData) {
               return Text(snapshot.data ?? widget.title ?? "加载中……");
             } else {
-              return SizedBox();
+              return const SizedBox();
             }
           },
         ),
         actions: [
           Padding(
-            padding: EdgeInsets.only(right: 10, top: 8, bottom: 8),
+            padding: const EdgeInsets.only(right: 10, top: 8, bottom: 8),
             child: OutlinedButton(
               onPressed: () {
                 launchUrlString(widget.url,
@@ -83,7 +84,7 @@ Page resource error:
           ),
           SafeArea(
             child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+              padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
               child: Row(
                 children: <Widget>[
                   FutureBuilder<bool>(
@@ -105,7 +106,7 @@ Page resource error:
                       );
                     },
                   ),
-                  SizedBox(
+                  const SizedBox(
                     width: 10,
                   ),
                   FutureBuilder<bool>(
@@ -127,24 +128,24 @@ Page resource error:
                       );
                     },
                   ),
-                  Spacer(),
+                  const Spacer(),
                   OutlinedButton(
                     onPressed: () {
                       Navigator.of(context).pop();
                     },
-                    child: Icon(
+                    child: const Icon(
                       Icons.close,
                       size: 22,
                     ),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     width: 10,
                   ),
                   OutlinedButton(
                     onPressed: () {
                       _webviewController.reload();
                     },
-                    child: Icon(
+                    child: const Icon(
                       Icons.replay,
                       size: 22,
                     ),

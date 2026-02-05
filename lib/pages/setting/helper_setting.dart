@@ -1,29 +1,36 @@
 import 'dart:io';
 
 import 'package:cool_ui/cool_ui.dart';
-import 'package:garden/pages/common/gesture_password.dart';
-import 'package:garden/pages/setting/logout.dart';
-import 'package:garden/providers/setting.dart';
-import 'package:garden/util/function.dart';
-import 'package:garden/util/neu_picker.dart';
-import 'package:garden/widgets/neu_back_button.dart';
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_vibrate/flutter_vibrate.dart';
+import 'package:garden/constants/app_constants.dart';
+import 'package:garden/pages/common/gesture_password.dart';
+import 'package:garden/pages/setting/player_setting.dart';
+import 'package:garden/stores/app_store.dart';
+import 'package:garden/stores/settings_store.dart';
+import 'package:garden/theme/app_colors.dart';
+import 'package:garden/util/http_util.dart';
+import 'package:garden/util/storage_util.dart';
+import 'package:garden/util/ui_util.dart';
+import 'package:garden/widgets/neu_back_button.dart';
+import 'package:garden/widgets/neu_picker.dart';
 import 'package:local_auth/error_codes.dart' as auth_error;
 import 'package:local_auth/local_auth.dart';
 import 'package:local_auth_android/local_auth_android.dart';
+import 'package:signals_flutter/signals_flutter.dart';
 import 'package:local_auth_darwin/local_auth_darwin.dart';
-import 'package:provider/provider.dart';
 
 class HelperSetting extends StatefulWidget {
+  const HelperSetting({super.key});
+
   @override
-  _HelperSettingState createState() => _HelperSettingState();
+  HelperSettingState createState() => HelperSettingState();
 }
 
-class _HelperSettingState extends State<HelperSetting> {
+class HelperSettingState extends State<HelperSetting> {
   final LocalAuthentication auth = LocalAuthentication();
   bool launchAuth = false;
   bool password = false;
@@ -45,15 +52,14 @@ class _HelperSettingState extends State<HelperSetting> {
   }
 
   initAuth() async {
-    String launchAuthStr = await Util.instance.getStorage("launch_auth") ?? '';
+    String launchAuthStr = await StorageUtil.getString("launch_auth") ?? '';
     String launchAuthPasswordStr =
-        await Util.instance.getStorage("launch_auth_password") ?? '';
+        await StorageUtil.getString("launch_auth_password") ?? '';
     String launchAuthBiometricsStr =
-        await Util.instance.getStorage("launch_auth_biometrics") ?? '';
-    String videoPlayerStr =
-        await Util.instance.getStorage("video_player") ?? '';
+        await StorageUtil.getString("launch_auth_biometrics") ?? '';
+    String videoPlayerStr = await StorageUtil.getString("video_player") ?? '';
     String launchAccountPageStr =
-        await Util.instance.getStorage('launch_account_page') ?? '';
+        await StorageUtil.getString('launch_account_page') ?? '';
     videoPlayer = videoPlayerStr == '1';
     launchAuth = launchAuthStr == "1";
     password = launchAuthPasswordStr == "1";
@@ -83,27 +89,28 @@ class _HelperSettingState extends State<HelperSetting> {
     return Scaffold(
       appBar: AppBar(
         leading: AppBackButton(context),
-        title: Text("助手设置"),
+        title: const Text("Garden设置"),
       ),
       body: ListView(
-        padding: EdgeInsets.all(20),
+        padding: const EdgeInsets.all(20),
         children: [
           GestureDetector(
             onTap: () {
               setState(() {
-                Util.instance.vibrateOn = !Util.instance.vibrateOn;
-                Util.instance.setStorage(
-                    "vibrate_on", Util.instance.vibrateOn ? "1" : "0");
-                if (Util.instance.vibrateOn) {
-                  Util.instance.vibrate(FeedbackType.light);
+                settingsStore.setVibrateOn(!settingsStore.vibrateOn);
+                StorageUtil.setString(
+                    "vibrate_on", settingsStore.vibrateOn ? "1" : "0");
+                if (settingsStore.vibrateOn) {
+                  UiUtil.vibrate(FeedbackType.light);
                 }
               });
             },
             child: Card(
               shape: RoundedRectangleBorder(
-                  side: BorderSide(), borderRadius: BorderRadius.circular(18)),
+                  side: const BorderSide(),
+                  borderRadius: BorderRadius.circular(18)),
               child: Padding(
-                padding: EdgeInsets.all(20),
+                padding: const EdgeInsets.all(20),
                 child: Column(
                   children: [
                     Row(
@@ -112,109 +119,111 @@ class _HelperSettingState extends State<HelperSetting> {
                           "assets/icons/vibrate.png",
                           width: 30,
                         ),
-                        SizedBox(
+                        const SizedBox(
                           width: 8,
                         ),
-                        Text(
+                        const Text(
                           "震动",
                           style: TextStyle(fontSize: 16),
                         ),
-                        Spacer(),
-                        if (Util.instance.vibrateOn)
-                          Icon(
+                        const Spacer(),
+                        if (settingsStore.vibrateOn)
+                          const Icon(
                             CupertinoIcons.checkmark_alt,
-                            color: Color(0xffff9813),
+                            color: AppColors.primaryAction,
                           ),
                       ],
                     ),
-                    if (Util.instance.vibrateOn)
+                    if (settingsStore.vibrateOn)
                       Card(
                         shape: RoundedRectangleBorder(
-                            side: BorderSide(),
+                            side: const BorderSide(),
                             borderRadius: BorderRadius.circular(18)),
-                        margin: EdgeInsets.only(top: 20),
+                        margin: const EdgeInsets.only(top: 20),
                         child: Padding(
-                          padding: EdgeInsets.all(20),
+                          padding: const EdgeInsets.all(20),
                           child: Column(
                             children: [
                               GestureDetector(
                                 onTap: () {
                                   setState(() {
-                                    Util.instance.vibrateNormal =
-                                        !Util.instance.vibrateNormal;
-                                    Util.instance.setStorage(
+                                    settingsStore.setVibrateNormal(
+                                        !settingsStore.vibrateNormal);
+                                    StorageUtil.setString(
                                         "vibrate_warning",
-                                        Util.instance.vibrateNormal
+                                        settingsStore.vibrateNormal
                                             ? "1"
                                             : "0");
-                                    if (Util.instance.vibrateNormal) {
-                                      Util.instance.vibrate(FeedbackType.light);
+                                    if (settingsStore.vibrateNormal) {
+                                      UiUtil.vibrate(FeedbackType.light);
                                     }
                                   });
                                 },
                                 child: Card(
                                   shape: RoundedRectangleBorder(
-                                      side: BorderSide(),
+                                      side: const BorderSide(),
                                       borderRadius: BorderRadius.circular(18)),
                                   // margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                                   child: Padding(
-                                    padding: const EdgeInsets.all(8.0),
+                                    padding: const EdgeInsets.all(
+                                        AppConstants.paddingSmall),
                                     child: Row(
                                       children: [
-                                        Text(
+                                        const Text(
                                           "基础操作震动",
                                           style: TextStyle(
                                               fontSize: 16, height: 1.6),
                                         ),
-                                        Spacer(),
-                                        if (Util.instance.vibrateNormal)
-                                          Icon(
+                                        const Spacer(),
+                                        if (settingsStore.vibrateNormal)
+                                          const Icon(
                                             CupertinoIcons.checkmark_alt,
-                                            color: Color(0xffff9813),
+                                            color: AppColors.primaryAction,
                                           ),
                                       ],
                                     ),
                                   ),
                                 ),
                               ),
-                              SizedBox(
+                              const SizedBox(
                                 height: 20,
                               ),
                               GestureDetector(
                                 onTap: () {
                                   setState(() {
-                                    Util.instance.vibrateWarning =
-                                        !Util.instance.vibrateWarning;
-                                    Util.instance.setStorage(
+                                    settingsStore.setVibrateWarning(
+                                        !settingsStore.vibrateWarning);
+                                    StorageUtil.setString(
                                         "vibrate_warning",
-                                        Util.instance.vibrateWarning
+                                        settingsStore.vibrateWarning
                                             ? "1"
                                             : "0");
-                                    if (Util.instance.vibrateWarning) {
-                                      Util.instance
+                                    if (settingsStore.vibrateWarning) {
+                                      HttpUtil.instance
                                           .vibrate(FeedbackType.warning);
                                     }
                                   });
                                 },
                                 child: Card(
                                   shape: RoundedRectangleBorder(
-                                      side: BorderSide(),
+                                      side: const BorderSide(),
                                       borderRadius: BorderRadius.circular(18)),
                                   // margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                                   child: Padding(
-                                    padding: const EdgeInsets.all(8.0),
+                                    padding: const EdgeInsets.all(
+                                        AppConstants.paddingSmall),
                                     child: Row(
                                       children: [
-                                        Text(
+                                        const Text(
                                           "敏感操作震动",
                                           style: TextStyle(
                                               fontSize: 16, height: 1.6),
                                         ),
-                                        Spacer(),
-                                        if (Util.instance.vibrateWarning)
-                                          Icon(
+                                        const Spacer(),
+                                        if (settingsStore.vibrateWarning)
+                                          const Icon(
                                             CupertinoIcons.checkmark_alt,
-                                            color: Color(0xffff9813),
+                                            color: AppColors.primaryAction,
                                           ),
                                       ],
                                     ),
@@ -230,51 +239,60 @@ class _HelperSettingState extends State<HelperSetting> {
               ),
             ),
           ),
-          SizedBox(
+          const SizedBox(
             height: 20,
           ),
           GestureDetector(
             onTap: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) {
+                    return const PlayerSettingPage();
+                  },
+                  settings: const RouteSettings(name: "player_setting"),
+                ),
+              );
               setState(() {
                 videoPlayer = !videoPlayer;
-                Util.instance
+                HttpUtil.instance
                     .setStorage("video_player", videoPlayer ? "1" : "0");
               });
             },
             child: Card(
               shape: RoundedRectangleBorder(
-                  side: BorderSide(), borderRadius: BorderRadius.circular(18)),
+                  side: const BorderSide(),
+                  borderRadius: BorderRadius.circular(18)),
               // margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
               child: Padding(
-                padding: const EdgeInsets.all(8.0),
+                padding: const EdgeInsets.all(AppConstants.paddingSmall),
                 child: Row(
                   children: [
                     Image.asset(
                       "assets/icons/player.png",
                       width: 25,
                     ),
-                    SizedBox(
+                    const SizedBox(
                       width: 8,
                     ),
-                    Text(
-                      "始终使用第三方播放器",
+                    const Text(
+                      "播放器设置",
                       style: TextStyle(fontSize: 16, height: 1.6),
                     ),
-                    Spacer(),
+                    const Spacer(),
                     if (videoPlayer)
-                      Icon(
+                      const Icon(
                         CupertinoIcons.checkmark_alt,
-                        color: Color(0xffff9813),
+                        color: AppColors.primaryAction,
                       ),
                   ],
                 ),
               ),
             ),
           ),
-          SizedBox(
+          const SizedBox(
             height: 20,
           ),
-          Consumer<SettingProvider>(builder: (context, settingProvider, _) {
+          Watch((context) {
             return GestureDetector(
               onTap: () {
                 showCupertinoModalPopup(
@@ -286,9 +304,9 @@ class _HelperSettingState extends State<HelperSetting> {
                       child: NeuPicker(
                         List.generate(20, (index) => "${index + 1}"),
                         value: List.generate(20, (index) => index + 1)
-                            .indexOf(settingProvider.refreshDuration),
+                            .indexOf(appStore.refreshDuration),
                         onConfirm: (v) {
-                          settingProvider.setRefreshDuration(v + 1);
+                          appStore.setRefreshDuration(v + 1);
                         },
                       ),
                     );
@@ -297,88 +315,90 @@ class _HelperSettingState extends State<HelperSetting> {
               },
               child: Card(
                 shape: RoundedRectangleBorder(
-                    side: BorderSide(),
+                    side: const BorderSide(),
                     borderRadius: BorderRadius.circular(18)),
                 // margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                 child: Padding(
-                  padding: const EdgeInsets.all(8.0),
+                  padding: const EdgeInsets.all(AppConstants.paddingSmall),
                   child: Row(
                     children: [
                       Image.asset(
                         "assets/icons/player.png",
                         width: 25,
                       ),
-                      SizedBox(
+                      const SizedBox(
                         width: 8,
                       ),
-                      Text(
+                      const Text(
                         "控制台/资源监控更新频率",
                         style: TextStyle(fontSize: 16, height: 1.6),
                       ),
-                      Spacer(),
-                      Text("${settingProvider.refreshDuration}秒")
+                      const Spacer(),
+                      Text("${appStore.refreshDuration}秒")
                     ],
                   ),
                 ),
               ),
             );
           }),
-          SizedBox(
+          const SizedBox(
             height: 20,
           ),
           GestureDetector(
             onTap: () {
               setState(() {
                 launchAccountPage = !launchAccountPage;
-                Util.instance.setStorage(
+                StorageUtil.setString(
                     "launch_account_page", launchAccountPage ? "1" : "0");
               });
             },
             child: Card(
               shape: RoundedRectangleBorder(
-                  side: BorderSide(), borderRadius: BorderRadius.circular(18)),
+                  side: const BorderSide(),
+                  borderRadius: BorderRadius.circular(18)),
               // margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
               child: Padding(
-                padding: const EdgeInsets.all(8.0),
+                padding: const EdgeInsets.all(AppConstants.paddingSmall),
                 child: Row(
                   children: [
                     Image.asset(
                       "assets/icons/change.png",
                       width: 25,
                     ),
-                    SizedBox(
+                    const SizedBox(
                       width: 8,
                     ),
-                    Text(
+                    const Text(
                       "启动时默认进入选择账号页面",
                       style: TextStyle(fontSize: 16, height: 1.6),
                     ),
-                    Spacer(),
+                    const Spacer(),
                     if (launchAccountPage)
-                      Icon(
+                      const Icon(
                         CupertinoIcons.checkmark_alt,
-                        color: Color(0xffff9813),
+                        color: AppColors.primaryAction,
                       ),
                   ],
                 ),
               ),
             ),
           ),
-          SizedBox(
+          const SizedBox(
             height: 20,
           ),
           GestureDetector(
             onTap: () {
               setState(() {
                 launchAuth = !launchAuth;
-                Util.instance.setStorage("launch_auth", launchAuth ? "1" : "0");
+                StorageUtil.setString("launch_auth", launchAuth ? "1" : "0");
               });
             },
             child: Card(
               shape: RoundedRectangleBorder(
-                  side: BorderSide(), borderRadius: BorderRadius.circular(18)),
+                  side: const BorderSide(),
+                  borderRadius: BorderRadius.circular(18)),
               child: Padding(
-                padding: EdgeInsets.all(20),
+                padding: const EdgeInsets.all(20),
                 child: Column(
                   children: [
                     Row(
@@ -387,29 +407,29 @@ class _HelperSettingState extends State<HelperSetting> {
                           "assets/icons/safe.png",
                           width: 30,
                         ),
-                        SizedBox(
+                        const SizedBox(
                           width: 8,
                         ),
-                        Text(
+                        const Text(
                           "启动密码",
                           style: TextStyle(fontSize: 16),
                         ),
-                        Spacer(),
+                        const Spacer(),
                         if (launchAuth)
-                          Icon(
+                          const Icon(
                             CupertinoIcons.checkmark_alt,
-                            color: Color(0xffff9813),
+                            color: AppColors.primaryAction,
                           ),
                       ],
                     ),
                     if (launchAuth)
                       Card(
                         shape: RoundedRectangleBorder(
-                            side: BorderSide(),
+                            side: const BorderSide(),
                             borderRadius: BorderRadius.circular(18)),
-                        margin: EdgeInsets.only(top: 20),
+                        margin: const EdgeInsets.only(top: 20),
                         child: Padding(
-                          padding: EdgeInsets.all(20),
+                          padding: const EdgeInsets.all(20),
                           child: Column(
                             children: [
                               GestureDetector(
@@ -418,22 +438,22 @@ class _HelperSettingState extends State<HelperSetting> {
                                     if (password) {
                                       setState(() {
                                         password = false;
-                                        Util.instance.setStorage(
+                                        StorageUtil.setString(
                                             "launch_auth_password", "0");
                                         biometrics = false;
-                                        Util.instance.setStorage(
+                                        StorageUtil.setString(
                                             "launch_auth_biometrics", "0");
                                       });
                                     } else {
                                       Navigator.of(context).push(
                                           CupertinoPageRoute(
                                               builder: (context) {
-                                        return GesturePasswordPage();
+                                        return const GesturePasswordPage();
                                       })).then((res) {
                                         if (res != null && res) {
                                           setState(() {
                                             password = true;
-                                            Util.instance.setStorage(
+                                            StorageUtil.setString(
                                                 "launch_auth_password",
                                                 password ? "1" : "0");
                                           });
@@ -441,30 +461,31 @@ class _HelperSettingState extends State<HelperSetting> {
                                       });
                                     }
                                     // password = !password;
-                                    // Util.setStorage("launch_password", password ? "1" : "0");
+                                    // HttpUtil.setStorage("launch_password", password ? "1" : "0");
                                   });
                                 },
                                 child: Card(
                                   shape: RoundedRectangleBorder(
-                                      side: BorderSide(),
+                                      side: const BorderSide(),
                                       borderRadius: BorderRadius.circular(18)),
                                   // margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                                   child: Padding(
-                                    padding: const EdgeInsets.all(8.0),
+                                    padding: const EdgeInsets.all(
+                                        AppConstants.paddingSmall),
                                     child: Column(
                                       children: [
                                         Row(
                                           children: [
-                                            Text(
+                                            const Text(
                                               "图形密码",
                                               style: TextStyle(
                                                   fontSize: 16, height: 1.6),
                                             ),
-                                            Spacer(),
+                                            const Spacer(),
                                             if (password)
-                                              Icon(
+                                              const Icon(
                                                 CupertinoIcons.checkmark_alt,
-                                                color: Color(0xffff9813),
+                                                color: AppColors.primaryAction,
                                               ),
                                           ],
                                         ),
@@ -474,22 +495,22 @@ class _HelperSettingState extends State<HelperSetting> {
                                 ),
                               ),
                               if (canCheckBiometrics) ...[
-                                SizedBox(
+                                const SizedBox(
                                   height: 20,
                                 ),
                                 GestureDetector(
                                   onTap: () async {
                                     if (biometrics == false) {
                                       if (password == false) {
-                                        Util.instance
+                                        HttpUtil.instance
                                             .vibrate(FeedbackType.warning);
-                                        Util.instance.toast("请先开启图形密码后再开启指纹");
+                                        UiUtil.toast("请先开启图形密码后再开启指纹");
                                         return;
                                       }
                                       try {
                                         bool didAuthenticate =
                                             await auth.authenticate(
-                                          options: AuthenticationOptions(
+                                          options: const AuthenticationOptions(
                                             biometricOnly: true,
                                             sensitiveTransaction: false,
                                           ),
@@ -501,7 +522,7 @@ class _HelperSettingState extends State<HelperSetting> {
                                                   "系统未设置${biometricTypeName[biometricsType]}，点击设置按钮前往系统设置页面",
                                               cancelButton: "取消",
                                             ),
-                                            AndroidAuthMessages(
+                                            const AndroidAuthMessages(
                                               biometricNotRecognized: "系统未设置指纹",
                                               biometricRequiredTitle:
                                                   "请触摸指纹传感器",
@@ -520,27 +541,27 @@ class _HelperSettingState extends State<HelperSetting> {
                                         auth.stopAuthentication();
                                         setState(() {
                                           biometrics = didAuthenticate;
-                                          Util.instance.setStorage(
+                                          StorageUtil.setString(
                                               "launch_auth_biometrics",
                                               biometrics ? "1" : "0");
                                         });
                                       } on PlatformException catch (e) {
                                         if (e.code == auth_error.notAvailable) {
-                                          Util.instance.toast("生物验证不可用");
+                                          UiUtil.toast("生物验证不可用");
                                         } else if (e.code ==
                                             auth_error.passcodeNotSet) {
-                                          Util.instance.toast("系统未设置密码");
+                                          UiUtil.toast("系统未设置密码");
                                         } else if (e.code ==
                                             auth_error.lockedOut) {
-                                          Util.instance.toast("认证失败次数过多，请稍后再试");
+                                          UiUtil.toast("认证失败次数过多，请稍后再试");
                                         } else {
-                                          Util.instance.toast(e.message ?? '');
+                                          UiUtil.toast(e.message ?? '');
                                         }
                                       }
                                     } else {
                                       setState(() {
                                         biometrics = false;
-                                        Util.instance.setStorage(
+                                        StorageUtil.setString(
                                             "launch_auth_biometrics",
                                             biometrics ? "1" : "0");
                                       });
@@ -548,31 +569,33 @@ class _HelperSettingState extends State<HelperSetting> {
 
                                     // setState(() {
                                     //   biometrics = !biometrics;
-                                    //   Util.setStorage("launch_biometrics", biometrics ? "1" : "0");
+                                    //   HttpUtil.setStorage("launch_biometrics", biometrics ? "1" : "0");
                                     // });
                                   },
                                   child: Card(
                                     shape: RoundedRectangleBorder(
-                                        side: BorderSide(),
+                                        side: const BorderSide(),
                                         borderRadius:
                                             BorderRadius.circular(18)),
                                     // margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                                     child: Padding(
-                                      padding: const EdgeInsets.all(8.0),
+                                      padding: const EdgeInsets.all(
+                                          AppConstants.paddingSmall),
                                       child: Column(
                                         children: [
                                           Row(
                                             children: [
                                               Text(
                                                 "${biometricTypeName[biometricsType]}验证",
-                                                style: TextStyle(
+                                                style: const TextStyle(
                                                     fontSize: 16, height: 1.6),
                                               ),
-                                              Spacer(),
+                                              const Spacer(),
                                               if (biometrics)
-                                                Icon(
+                                                const Icon(
                                                   CupertinoIcons.checkmark_alt,
-                                                  color: Color(0xffff9813),
+                                                  color:
+                                                      AppColors.primaryAction,
                                                 ),
                                             ],
                                           ),
@@ -591,37 +614,7 @@ class _HelperSettingState extends State<HelperSetting> {
               ),
             ),
           ),
-          if (!Util.instance.notReviewAccount) ...[
-            SizedBox(
-              height: 20,
-            ),
-            OutlinedButton(
-              onPressed: () {
-                Navigator.of(context).push(CupertinoPageRoute(
-                    builder: (context) {
-                      return Logout();
-                    },
-                    settings: RouteSettings(name: "logout")));
-              },
-              // margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-              child: Row(
-                children: [
-                  Image.asset(
-                    "assets/icons/logout.png",
-                    width: 25,
-                  ),
-                  SizedBox(
-                    width: 8,
-                  ),
-                  Text(
-                    "注销账号",
-                    style: TextStyle(fontSize: 16),
-                  ),
-                ],
-              ),
-            ),
-          ],
-          SizedBox(
+          const SizedBox(
             height: 20,
           ),
           OutlinedButton(
@@ -629,7 +622,7 @@ class _HelperSettingState extends State<HelperSetting> {
               var hide = showWeuiLoadingToast(context: context);
               clearDiskCachedImages();
               hide();
-              Util.instance.toast("图片缓存清理完成");
+              UiUtil.toast("图片缓存清理完成");
             },
             // margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
             child: Row(
@@ -638,42 +631,42 @@ class _HelperSettingState extends State<HelperSetting> {
                   "assets/icons/clear_cache.png",
                   width: 25,
                 ),
-                SizedBox(
+                const SizedBox(
                   width: 8,
                 ),
-                Text(
+                const Text(
                   "清理图片缓存",
                   style: TextStyle(fontSize: 16),
                 ),
               ],
             ),
           ),
-          SizedBox(
+          const SizedBox(
             height: 20,
           ),
           OutlinedButton(
             onPressed: () {
               setState(() {
-                Util.instance.dashboardCardCollapseSwitch =
-                    !Util.instance.dashboardCardCollapseSwitch;
+                settingsStore.setDashboardCardCollapseSwitch(
+                    !settingsStore.dashboardCardCollapseSwitch);
               });
             },
             // margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
             child: Row(
               children: [
-                Icon(Icons.unfold_less_sharp),
-                SizedBox(
+                const Icon(Icons.unfold_less_sharp),
+                const SizedBox(
                   width: 8,
                 ),
-                Text(
+                const Text(
                   "仪表盘卡片默认折叠",
                   style: TextStyle(fontSize: 16),
                 ),
-                Spacer(),
-                if (Util.instance.dashboardCardCollapseSwitch)
-                  Icon(
+                const Spacer(),
+                if (settingsStore.dashboardCardCollapseSwitch)
+                  const Icon(
                     CupertinoIcons.checkmark_alt,
-                    color: Color(0xffff9813),
+                    color: AppColors.primaryAction,
                   ),
               ],
             ),

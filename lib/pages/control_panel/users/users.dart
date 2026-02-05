@@ -1,17 +1,22 @@
 import 'package:garden/pages/control_panel/users/user_detail.dart';
-import 'package:garden/util/function.dart';
+import 'package:garden/util/ui_util.dart';
+import 'package:garden/stores/connection_store.dart';
+import 'package:garden/util/http_util.dart';
 import 'package:garden/widgets/bubble_tab_indicator.dart';
 import 'package:garden/widgets/label.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:garden/constants/app_constants.dart';
 
 class Users extends StatefulWidget {
+  const Users({super.key});
+
   @override
-  _UsersState createState() => _UsersState();
+  UsersState createState() => UsersState();
 }
 
-class _UsersState extends State<Users> with SingleTickerProviderStateMixin {
+class UsersState extends State<Users> with SingleTickerProviderStateMixin {
   late TabController _tabController;
   List users = [];
   List groups = [];
@@ -30,8 +35,11 @@ class _UsersState extends State<Users> with SingleTickerProviderStateMixin {
         users = res['data']['users'];
       });
     } else {
-      Util.instance.toast("加载失败");
-      Navigator.of(context).pop();
+      UiUtil.toast("加载失败");
+      if (context.mounted) {
+        // ignore: use_build_context_synchronously
+        Navigator.of(context).pop();
+      }
     }
     var group = await Api.userGroups();
     if (group['success']) {
@@ -40,18 +48,22 @@ class _UsersState extends State<Users> with SingleTickerProviderStateMixin {
         groups = group['data']['groups'];
       });
     } else {
-      Util.instance.toast("加载失败");
-      Navigator.of(context).pop();
+      UiUtil.toast("加载失败");
+      if (context.mounted) {
+        // ignore: use_build_context_synchronously
+        Navigator.of(context).pop();
+      }
     }
   }
 
   Widget _buildGroupItem(group) {
     return Card(
       shape: RoundedRectangleBorder(
-          side: BorderSide(), borderRadius: BorderRadius.circular(18)),
-      margin: EdgeInsets.symmetric(vertical: 10),
+          side: const BorderSide(), borderRadius: BorderRadius.circular(18)),
+      margin:
+          const EdgeInsets.symmetric(vertical: AppConstants.paddingSmall + 2),
       child: Padding(
-        padding: EdgeInsets.all(20),
+        padding: const EdgeInsets.all(20),
         child: Row(
           children: [
             Expanded(
@@ -60,14 +72,14 @@ class _UsersState extends State<Users> with SingleTickerProviderStateMixin {
                 children: [
                   Text(
                     "${group['name']}",
-                    style: TextStyle(fontSize: 16),
+                    style: const TextStyle(fontSize: 16),
                   ),
                   if (group['description'] != "")
                     Padding(
-                      padding: EdgeInsets.only(top: 5),
+                      padding: const EdgeInsets.only(top: 5),
                       child: Text(
                         "${group['description']}",
-                        style: TextStyle(color: Colors.grey),
+                        style: const TextStyle(color: Colors.grey),
                       ),
                     ),
                 ],
@@ -87,17 +99,18 @@ class _UsersState extends State<Users> with SingleTickerProviderStateMixin {
                 builder: (context) {
                   return UserDetail(user);
                 },
-                settings: RouteSettings(name: "user_detail")))
+                settings: const RouteSettings(name: "user_detail")))
             .then((value) {
           setState(() {});
         });
       },
       child: Card(
         shape: RoundedRectangleBorder(
-            side: BorderSide(), borderRadius: BorderRadius.circular(18)),
-        margin: EdgeInsets.symmetric(vertical: 10),
+            side: const BorderSide(), borderRadius: BorderRadius.circular(18)),
+        margin:
+            const EdgeInsets.symmetric(vertical: AppConstants.paddingSmall + 2),
         child: Padding(
-          padding: EdgeInsets.all(20),
+          padding: const EdgeInsets.all(20),
           child: Row(
             children: [
               Expanded(
@@ -107,31 +120,31 @@ class _UsersState extends State<Users> with SingleTickerProviderStateMixin {
                     Row(
                       children: [
                         if (user['expired'] == 'normal')
-                          Label("正常", Colors.green)
+                          const Label("正常", Colors.green)
                         else
-                          Label("停用", Colors.red),
-                        SizedBox(
+                          const Label("停用", Colors.red),
+                        const SizedBox(
                           width: 5,
                         ),
                         Text(
                           "${user['name']}",
-                          style: TextStyle(fontSize: 16),
+                          style: const TextStyle(fontSize: 16),
                         )
                       ],
                     ),
                     if (user['email'] != "")
                       Padding(
-                        padding: EdgeInsets.only(top: 5),
+                        padding: const EdgeInsets.only(top: 5),
                         child: Text(
                           "${user['email']}",
                         ),
                       ),
                     if (user['description'] != "")
                       Padding(
-                        padding: EdgeInsets.only(top: 5),
+                        padding: const EdgeInsets.only(top: 5),
                         child: Text(
                           "${user['description']}",
-                          style: TextStyle(color: Colors.grey),
+                          style: const TextStyle(color: Colors.grey),
                         ),
                       ),
                   ],
@@ -149,7 +162,7 @@ class _UsersState extends State<Users> with SingleTickerProviderStateMixin {
     return Scaffold(
       appBar: AppBar(
         leading: AppBackButton(context),
-        title: Text(Util.instance.version < 7 ? "用户账户" : "用户与群组"),
+        title: Text(connectionStore.version < 7 ? "用户账户" : "用户与群组"),
       ),
       body: loading
           ? Container(
@@ -158,7 +171,7 @@ class _UsersState extends State<Users> with SingleTickerProviderStateMixin {
               color: Theme.of(context)
                   .scaffoldBackgroundColor
                   .withValues(alpha: .7),
-              child: Center(
+              child: const Center(
                 child: CupertinoActivityIndicator(
                   radius: 14,
                 ),
@@ -166,12 +179,13 @@ class _UsersState extends State<Users> with SingleTickerProviderStateMixin {
             )
           : Column(
               children: [
-                if (Util.instance.version >= 7)
+                if (connectionStore.version >= 7)
                   Card(
                     shape: RoundedRectangleBorder(
-                        side: BorderSide(),
+                        side: const BorderSide(),
                         borderRadius: BorderRadius.circular(18)),
-                    margin: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                    margin: const EdgeInsets.symmetric(
+                        vertical: 10, horizontal: 20),
                     child: TabBar(
                       dividerHeight: 0,
                       isScrollable: false,
@@ -181,8 +195,8 @@ class _UsersState extends State<Users> with SingleTickerProviderStateMixin {
                           ? Colors.white
                           : Colors.black,
                       unselectedLabelColor: Colors.grey,
-                      indicator: BubbleTabIndicator(),
-                      tabs: [
+                      indicator: const BubbleTabIndicator(),
+                      tabs: const [
                         Padding(
                           padding:
                               EdgeInsets.symmetric(vertical: 10, horizontal: 5),
@@ -197,9 +211,9 @@ class _UsersState extends State<Users> with SingleTickerProviderStateMixin {
                     ),
                   ),
                 Expanded(
-                  child: Util.instance.version < 7
+                  child: connectionStore.version < 7
                       ? ListView.builder(
-                          padding: EdgeInsets.all(20),
+                          padding: const EdgeInsets.all(20),
                           itemBuilder: (context, i) {
                             return _buildUserItem(users[i]);
                           },
@@ -209,14 +223,14 @@ class _UsersState extends State<Users> with SingleTickerProviderStateMixin {
                           controller: _tabController,
                           children: [
                             ListView.builder(
-                              padding: EdgeInsets.all(20),
+                              padding: const EdgeInsets.all(20),
                               itemBuilder: (context, i) {
                                 return _buildUserItem(users[i]);
                               },
                               itemCount: users.length,
                             ),
                             ListView.builder(
-                              padding: EdgeInsets.all(20),
+                              padding: const EdgeInsets.all(20),
                               itemBuilder: (context, i) {
                                 return _buildGroupItem(groups[i]);
                               },

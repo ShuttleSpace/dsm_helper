@@ -1,7 +1,8 @@
 import 'dart:convert';
+import 'package:garden/stores/connection_store.dart';
 
 import 'package:garden/models/photos/photo_model.dart';
-import 'package:garden/util/function.dart';
+import 'package:garden/util/http_util.dart';
 
 class GeneralTagModel {
   GeneralTagModel({
@@ -12,12 +13,12 @@ class GeneralTagModel {
   });
   static Future<List<GeneralTagModel>> fetch(
       {List<String>? additional, int limit = 5000, bool isTeam = false}) async {
-    var res = await Util.instance.post("entry.cgi", data: {
+    var res = await HttpUtil.instance.post("entry.cgi", data: {
       // "folder_id": id,
       "api": 'SYNO.Foto${isTeam ? 'Team' : ''}.Browse.GeneralTag',
       "method": 'list',
       "version": 1,
-      "_sid": Util.instance.sid,
+      "_sid": connectionStore.sid,
       "additional": jsonEncode(additional),
       "offset": 0,
       "limit": limit,
@@ -25,9 +26,9 @@ class GeneralTagModel {
     if (res['success']) {
       List list = res['data']['list'];
       List<GeneralTagModel> generalTags = [];
-      list.forEach((element) {
+      for (var element in list) {
         generalTags.add(GeneralTagModel.fromJson(element));
-      });
+      }
       return generalTags;
     } else {
       throw Exception();

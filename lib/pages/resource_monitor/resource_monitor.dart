@@ -6,20 +6,20 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class ResourceMonitor extends StatefulWidget {
-  ResourceMonitor({this.tabIndex = 0});
+  const ResourceMonitor({super.key, this.tabIndex = 0});
   final int tabIndex;
   @override
-  _ResourceMonitorState createState() => _ResourceMonitorState();
+  ResourceMonitorState createState() => ResourceMonitorState();
 }
 
-class _ResourceMonitorState extends State<ResourceMonitor>
+class ResourceMonitorState extends State<ResourceMonitor>
     with SingleTickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         leading: AppBackButton(context),
-        title: Text("资源监控"),
+        title: const Text("资源监控"),
       ),
       body: ListView(
         children: [
@@ -30,34 +30,34 @@ class _ResourceMonitorState extends State<ResourceMonitor>
                 Navigator.of(context).push(
                   CupertinoPageRoute(
                     builder: (context) {
-                      return Performance();
+                      return const Performance();
                     },
-                    settings: RouteSettings(name: "performance"),
+                    settings: const RouteSettings(name: "performance"),
                   ),
                 );
               },
               child: Padding(
-                padding: EdgeInsets.symmetric(vertical: 20),
+                padding: const EdgeInsets.symmetric(vertical: 20),
                 child: Row(
                   children: [
-                    SizedBox(
+                    const SizedBox(
                       width: 20,
                     ),
                     Image.asset(
                       "assets/control_panel/performance.png",
                       width: 40,
                     ),
-                    SizedBox(
+                    const SizedBox(
                       width: 10,
                     ),
-                    Expanded(
+                    const Expanded(
                       child: Text(
                         "性能",
                         style: TextStyle(
                             fontSize: 18, fontWeight: FontWeight.w600),
                       ),
                     ),
-                    SizedBox(
+                    const SizedBox(
                       width: 20,
                     ),
                   ],
@@ -72,34 +72,34 @@ class _ResourceMonitorState extends State<ResourceMonitor>
                 Navigator.of(context).push(
                   CupertinoPageRoute(
                     builder: (context) {
-                      return TaskManager();
+                      return const TaskManager();
                     },
-                    settings: RouteSettings(name: "task_manager"),
+                    settings: const RouteSettings(name: "task_manager"),
                   ),
                 );
               },
               child: Padding(
-                padding: EdgeInsets.symmetric(vertical: 20),
+                padding: const EdgeInsets.symmetric(vertical: 20),
                 child: Row(
                   children: [
-                    SizedBox(
+                    const SizedBox(
                       width: 20,
                     ),
                     Image.asset(
                       "assets/control_panel/task_manager.png",
                       width: 40,
                     ),
-                    SizedBox(
+                    const SizedBox(
                       width: 10,
                     ),
-                    Expanded(
+                    const Expanded(
                       child: Text(
                         "任务管理器",
                         style: TextStyle(
                             fontSize: 18, fontWeight: FontWeight.w600),
                       ),
                     ),
-                    SizedBox(
+                    const SizedBox(
                       width: 20,
                     ),
                   ],
@@ -114,34 +114,34 @@ class _ResourceMonitorState extends State<ResourceMonitor>
                 Navigator.of(context).push(
                   CupertinoPageRoute(
                     builder: (context) {
-                      return Users();
+                      return const Users();
                     },
-                    settings: RouteSettings(name: "monitor_users"),
+                    settings: const RouteSettings(name: "monitor_users"),
                   ),
                 );
               },
               child: Padding(
-                padding: EdgeInsets.symmetric(vertical: 20),
+                padding: const EdgeInsets.symmetric(vertical: 20),
                 child: Row(
                   children: [
-                    SizedBox(
+                    const SizedBox(
                       width: 20,
                     ),
                     Image.asset(
                       "assets/control_panel/plugin.png",
                       width: 40,
                     ),
-                    SizedBox(
+                    const SizedBox(
                       width: 10,
                     ),
-                    Expanded(
+                    const Expanded(
                       child: Text(
                         "目前连接用户",
                         style: TextStyle(
                             fontSize: 18, fontWeight: FontWeight.w600),
                       ),
                     ),
-                    SizedBox(
+                    const SizedBox(
                       width: 20,
                     ),
                   ],

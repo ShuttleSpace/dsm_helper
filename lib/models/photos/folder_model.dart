@@ -1,9 +1,10 @@
 import 'dart:convert';
+import 'package:garden/stores/connection_store.dart';
 
 import 'package:garden/models/photos/access_permission_model.dart';
 import 'package:garden/models/photos/photo_model.dart';
 import 'package:garden/models/photos/thumbnail_model.dart';
-import 'package:garden/util/function.dart';
+import 'package:garden/util/http_util.dart';
 
 /// additional : {"thumbnail":[{"cache_key":"611690_1665630858","m":"ready","preview":"broken","sm":"ready","unit_id":611690,"xl":"ready"},{"cache_key":"611689_1665630860","m":"ready","preview":"broken","sm":"ready","unit_id":611689,"xl":"ready"},{"cache_key":"611688_1665630855","m":"ready","preview":"broken","sm":"ready","unit_id":611688,"xl":"ready"},{"cache_key":"611687_1665630852","m":"ready","preview":"broken","sm":"ready","unit_id":611687,"xl":"ready"}]}
 /// id : 14770
@@ -29,11 +30,11 @@ class FolderModel {
   });
   static Future<FolderModel> fetch(
       {List<String> additional = const [], bool isTeam = false}) async {
-    var res = await Util.instance.post("entry.cgi", data: {
+    var res = await HttpUtil.instance.post("entry.cgi", data: {
       "api": 'SYNO.Foto${isTeam ? 'Team' : ''}.Browse.Folder',
       "method": 'get',
       "version": 2,
-      "_sid": Util.instance.sid,
+      "_sid": connectionStore.sid,
       "additional": jsonEncode(additional),
     });
     if (res['success']) {
@@ -50,20 +51,20 @@ class FolderModel {
       "api": 'SYNO.Foto${isTeam ? 'Team' : ''}.Browse.Folder',
       "method": 'list',
       "version": 2,
-      "_sid": Util.instance.sid,
+      "_sid": connectionStore.sid,
       "additional": jsonEncode(additional),
       "sort_by": "filename",
       "sort_direction": "asc",
       "offset": 0,
       "limit": 5000,
     };
-    var res = await Util.instance.post("entry.cgi", data: data);
+    var res = await HttpUtil.instance.post("entry.cgi", data: data);
     if (res['success']) {
       List list = res['data']['list'];
       folders = [];
-      list.forEach((element) {
+      for (var element in list) {
         folders.add(FolderModel.fromJson(element));
-      });
+      }
       return folders;
     } else {
       throw Exception();
@@ -72,12 +73,12 @@ class FolderModel {
 
   Future<List<PhotoModel>> fetchPhotos(
       {List<String> additional = const [], bool isTeam = false}) async {
-    var res = await Util.instance.post("entry.cgi", data: {
+    var res = await HttpUtil.instance.post("entry.cgi", data: {
       "folder_id": id,
       "api": 'SYNO.Foto${isTeam ? 'Team' : ''}.Browse.Item',
       "method": 'list',
       "version": 1,
-      "_sid": Util.instance.sid,
+      "_sid": connectionStore.sid,
       "additional": jsonEncode(additional),
       "sort_by": "takentime",
       "sort_direction": "asc",
@@ -87,9 +88,9 @@ class FolderModel {
     if (res['success']) {
       List list = res['data']['list'];
       photos = [];
-      list.forEach((element) {
+      for (var element in list) {
         photos.add(PhotoModel.fromJson(element));
-      });
+      }
       return photos;
     } else {
       throw Exception();

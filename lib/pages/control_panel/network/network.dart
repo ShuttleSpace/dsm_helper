@@ -1,24 +1,29 @@
-import 'package:garden/util/function.dart';
+import 'package:garden/util/http_util.dart';
+import 'package:garden/util/log.dart';
 import 'package:garden/widgets/bubble_tab_indicator.dart';
 import 'package:garden/widgets/expansion_container.dart';
 import 'package:garden/widgets/label.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:garden/constants/app_constants.dart';
+import 'package:garden/theme/app_colors.dart';
 
 class Network extends StatefulWidget {
-  const Network();
+  const Network({super.key});
 
   @override
-  _NetworkState createState() => _NetworkState();
+  NetworkState createState() => NetworkState();
 }
 
-class _NetworkState extends State<Network> with SingleTickerProviderStateMixin {
-  TextEditingController _serverNameController = TextEditingController();
-  TextEditingController _dnsPrimaryController = TextEditingController();
-  TextEditingController _dnsSecondaryController = TextEditingController();
-  TextEditingController _proxyHttpHostController = TextEditingController();
-  TextEditingController _proxyHttpPortController = TextEditingController();
+class NetworkState extends State<Network> with SingleTickerProviderStateMixin {
+  final TextEditingController _serverNameController = TextEditingController();
+  final TextEditingController _dnsPrimaryController = TextEditingController();
+  final TextEditingController _dnsSecondaryController = TextEditingController();
+  final TextEditingController _proxyHttpHostController =
+      TextEditingController();
+  final TextEditingController _proxyHttpPortController =
+      TextEditingController();
   late TabController _tabController;
   Map network = {};
   Map proxy = {};
@@ -41,7 +46,7 @@ class _NetworkState extends State<Network> with SingleTickerProviderStateMixin {
         loading = false;
       });
       List result = res['data']['result'];
-      result.forEach((item) {
+      for (var item in result) {
         if (item['success'] == true) {
           switch (item['api']) {
             case "SYNO.Core.Network":
@@ -84,12 +89,12 @@ class _NetworkState extends State<Network> with SingleTickerProviderStateMixin {
             case "SYNO.Core.Web.DSM":
               setState(() {
                 dsm = item['data'];
-                print(dsm);
+                Log.info("Web.DSM: $dsm");
               });
               break;
           }
         }
-      });
+      }
     }
   }
 
@@ -98,10 +103,10 @@ class _NetworkState extends State<Network> with SingleTickerProviderStateMixin {
     return Scaffold(
       appBar: AppBar(
         leading: AppBackButton(context),
-        title: Text("网络"),
+        title: const Text("网络"),
       ),
       body: loading
-          ? Center(
+          ? const Center(
               child: CupertinoActivityIndicator(
                 radius: 14,
               ),
@@ -110,9 +115,10 @@ class _NetworkState extends State<Network> with SingleTickerProviderStateMixin {
               children: [
                 Card(
                   shape: RoundedRectangleBorder(
-                      side: BorderSide(),
+                      side: const BorderSide(),
                       borderRadius: BorderRadius.circular(18)),
-                  margin: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                  margin:
+                      const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
                   child: TabBar(
                     dividerHeight: 0,
                     isScrollable: true,
@@ -122,8 +128,8 @@ class _NetworkState extends State<Network> with SingleTickerProviderStateMixin {
                         ? Colors.white
                         : Colors.black,
                     unselectedLabelColor: Colors.grey,
-                    indicator: BubbleTabIndicator(),
-                    tabs: [
+                    indicator: const BubbleTabIndicator(),
+                    tabs: const [
                       Padding(
                         padding:
                             EdgeInsets.symmetric(vertical: 10, horizontal: 5),
@@ -160,56 +166,58 @@ class _NetworkState extends State<Network> with SingleTickerProviderStateMixin {
                         children: [
                           Card(
                             shape: RoundedRectangleBorder(
-                                side: BorderSide(),
+                                side: const BorderSide(),
                                 borderRadius: BorderRadius.circular(18)),
-                            margin:
-                                EdgeInsets.only(top: 20, left: 20, right: 20),
+                            margin: const EdgeInsets.only(
+                                top: 20, left: 20, right: 20),
                             child: Padding(
-                              padding: const EdgeInsets.all(20.0),
+                              padding: const EdgeInsets.all(
+                                  AppConstants.paddingLarge),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(
+                                  const Text(
                                     "常规",
                                     style: TextStyle(
                                         fontSize: 18,
                                         fontWeight: FontWeight.w600),
                                   ),
-                                  SizedBox(
+                                  const SizedBox(
                                     height: 20,
                                   ),
-                                  Text("请输入系统名称、域名服务器 (DNS) 及默认网关。"),
-                                  SizedBox(
+                                  const Text("请输入系统名称、域名服务器 (DNS) 及默认网关。"),
+                                  const SizedBox(
                                     height: 20,
                                   ),
                                   Card(
                                     shape: RoundedRectangleBorder(
-                                        side: BorderSide(),
+                                        side: const BorderSide(),
                                         borderRadius:
                                             BorderRadius.circular(18)),
                                     child: Padding(
-                                      padding: const EdgeInsets.all(8.0),
+                                      padding: const EdgeInsets.all(
+                                          AppConstants.paddingSmall),
                                       child: TextField(
                                         controller: _serverNameController,
                                         onChanged: (v) =>
                                             network['server_name'] = v,
-                                        decoration: InputDecoration(
+                                        decoration: const InputDecoration(
                                           border: InputBorder.none,
                                           labelText: '系统名称',
                                         ),
                                       ),
                                     ),
                                   ),
-                                  SizedBox(
+                                  const SizedBox(
                                     height: 20,
                                   ),
                                   Text("默认网关(gateway): ${network['gateway']}"),
-                                  SizedBox(
+                                  const SizedBox(
                                     height: 5,
                                   ),
                                   Text(
                                       "IPv6默认网关: ${network['v6gateway'] == "" ? "-" : network['v6gateway']}"),
-                                  SizedBox(
+                                  const SizedBox(
                                     height: 20,
                                   ),
                                   GestureDetector(
@@ -222,19 +230,20 @@ class _NetworkState extends State<Network> with SingleTickerProviderStateMixin {
                                     },
                                     child: Card(
                                       shape: RoundedRectangleBorder(
-                                          side: BorderSide(),
+                                          side: const BorderSide(),
                                           borderRadius:
                                               BorderRadius.circular(5)),
                                       child: Padding(
-                                        padding: const EdgeInsets.all(8.0),
+                                        padding: const EdgeInsets.all(
+                                            AppConstants.paddingSmall),
                                         child: Row(
                                           children: [
-                                            Text("手动配置DNS服务器"),
-                                            Spacer(),
+                                            const Text("手动配置DNS服务器"),
+                                            const Spacer(),
                                             if (network['dns_manual'])
-                                              Icon(
+                                              const Icon(
                                                 CupertinoIcons.checkmark_alt,
-                                                color: Color(0xffff9813),
+                                                color: AppColors.primaryAction,
                                                 size: 22,
                                               ),
                                           ],
@@ -242,44 +251,46 @@ class _NetworkState extends State<Network> with SingleTickerProviderStateMixin {
                                       ),
                                     ),
                                   ),
-                                  SizedBox(
+                                  const SizedBox(
                                     height: 20,
                                   ),
                                   Card(
                                     shape: RoundedRectangleBorder(
-                                        side: BorderSide(),
+                                        side: const BorderSide(),
                                         borderRadius:
                                             BorderRadius.circular(18)),
                                     child: Padding(
-                                      padding: const EdgeInsets.all(8.0),
+                                      padding: const EdgeInsets.all(
+                                          AppConstants.paddingSmall),
                                       child: TextField(
                                         controller: _dnsPrimaryController,
                                         enabled: network['dns_manual'],
                                         onChanged: (v) =>
                                             network['dns_primary'] = v,
-                                        decoration: InputDecoration(
+                                        decoration: const InputDecoration(
                                           border: InputBorder.none,
                                           labelText: '首选DNS服务器',
                                         ),
                                       ),
                                     ),
                                   ),
-                                  SizedBox(
+                                  const SizedBox(
                                     height: 20,
                                   ),
                                   Card(
                                     shape: RoundedRectangleBorder(
-                                        side: BorderSide(),
+                                        side: const BorderSide(),
                                         borderRadius:
                                             BorderRadius.circular(18)),
                                     child: Padding(
-                                      padding: const EdgeInsets.all(8.0),
+                                      padding: const EdgeInsets.all(
+                                          AppConstants.paddingSmall),
                                       child: TextField(
                                         controller: _dnsSecondaryController,
                                         enabled: network['dns_manual'],
                                         onChanged: (v) =>
                                             network['dns_secondary'] = v,
-                                        decoration: InputDecoration(
+                                        decoration: const InputDecoration(
                                           border: InputBorder.none,
                                           labelText: '备用DNS服务器',
                                         ),
@@ -290,27 +301,28 @@ class _NetworkState extends State<Network> with SingleTickerProviderStateMixin {
                               ),
                             ),
                           ),
-                          SizedBox(
+                          const SizedBox(
                             height: 20,
                           ),
                           Card(
                             shape: RoundedRectangleBorder(
-                                side: BorderSide(),
+                                side: const BorderSide(),
                                 borderRadius: BorderRadius.circular(18)),
-                            margin:
-                                EdgeInsets.only(top: 20, left: 20, right: 20),
+                            margin: const EdgeInsets.only(
+                                top: 20, left: 20, right: 20),
                             child: Padding(
-                              padding: const EdgeInsets.all(20.0),
+                              padding: const EdgeInsets.all(
+                                  AppConstants.paddingLarge),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(
+                                  const Text(
                                     "代理服务器",
                                     style: TextStyle(
                                         fontSize: 18,
                                         fontWeight: FontWeight.w600),
                                   ),
-                                  SizedBox(
+                                  const SizedBox(
                                     height: 20,
                                   ),
                                   GestureDetector(
@@ -322,19 +334,20 @@ class _NetworkState extends State<Network> with SingleTickerProviderStateMixin {
                                     },
                                     child: Card(
                                       shape: RoundedRectangleBorder(
-                                          side: BorderSide(),
+                                          side: const BorderSide(),
                                           borderRadius:
                                               BorderRadius.circular(5)),
                                       child: Padding(
-                                        padding: const EdgeInsets.all(8.0),
+                                        padding: const EdgeInsets.all(
+                                            AppConstants.paddingSmall),
                                         child: Row(
                                           children: [
-                                            Text("手动配置DNS服务器"),
-                                            Spacer(),
+                                            const Text("手动配置DNS服务器"),
+                                            const Spacer(),
                                             if (proxy['enable'])
-                                              Icon(
+                                              const Icon(
                                                 CupertinoIcons.checkmark_alt,
-                                                color: Color(0xffff9813),
+                                                color: AppColors.primaryAction,
                                                 size: 22,
                                               ),
                                           ],
@@ -342,44 +355,46 @@ class _NetworkState extends State<Network> with SingleTickerProviderStateMixin {
                                       ),
                                     ),
                                   ),
-                                  SizedBox(
+                                  const SizedBox(
                                     height: 20,
                                   ),
                                   Card(
                                     shape: RoundedRectangleBorder(
-                                        side: BorderSide(),
+                                        side: const BorderSide(),
                                         borderRadius:
                                             BorderRadius.circular(18)),
                                     child: Padding(
-                                      padding: const EdgeInsets.all(8.0),
+                                      padding: const EdgeInsets.all(
+                                          AppConstants.paddingSmall),
                                       child: TextField(
                                         controller: _proxyHttpHostController,
                                         enabled: proxy['enable'],
                                         onChanged: (v) =>
                                             proxy['http_host'] = v,
-                                        decoration: InputDecoration(
+                                        decoration: const InputDecoration(
                                           border: InputBorder.none,
                                           labelText: '地址',
                                         ),
                                       ),
                                     ),
                                   ),
-                                  SizedBox(
+                                  const SizedBox(
                                     height: 20,
                                   ),
                                   Card(
                                     shape: RoundedRectangleBorder(
-                                        side: BorderSide(),
+                                        side: const BorderSide(),
                                         borderRadius:
                                             BorderRadius.circular(18)),
                                     child: Padding(
-                                      padding: const EdgeInsets.all(8.0),
+                                      padding: const EdgeInsets.all(
+                                          AppConstants.paddingSmall),
                                       child: TextField(
                                         controller: _proxyHttpPortController,
                                         enabled: proxy['enable'],
                                         onChanged: (v) =>
                                             proxy['http_port'] = v,
-                                        decoration: InputDecoration(
+                                        decoration: const InputDecoration(
                                           border: InputBorder.none,
                                           labelText: '端口',
                                         ),
@@ -390,7 +405,7 @@ class _NetworkState extends State<Network> with SingleTickerProviderStateMixin {
                               ),
                             ),
                           ),
-                          SizedBox(
+                          const SizedBox(
                             height: 20,
                           ),
                         ],
@@ -400,11 +415,11 @@ class _NetworkState extends State<Network> with SingleTickerProviderStateMixin {
                           ...ethernets.map((ethernet) {
                             return Card(
                               shape: RoundedRectangleBorder(
-                                  side: BorderSide(),
+                                  side: const BorderSide(),
                                   borderRadius: BorderRadius.circular(18)),
-                              margin:
-                                  EdgeInsets.only(left: 20, right: 20, top: 20),
-                              // padding: EdgeInsets.symmetric(horizontal: 20),
+                              margin: const EdgeInsets.only(
+                                  left: 20, right: 20, top: 20),
+                              // padding: EdgeInsets.symmetric(horizontal: AppConstants.paddingLarge),
                               child: ExpansionContainer(
                                 title: Column(
                                   children: [
@@ -412,19 +427,19 @@ class _NetworkState extends State<Network> with SingleTickerProviderStateMixin {
                                       children: [
                                         Text(
                                           "局域网${ethernets.indexOf(ethernet) + 1}",
-                                          style: TextStyle(
+                                          style: const TextStyle(
                                               fontSize: 18,
                                               fontWeight: FontWeight.w600),
                                           overflow: TextOverflow.ellipsis,
                                         ),
-                                        SizedBox(
+                                        const SizedBox(
                                           width: 10,
                                         ),
                                         if (ethernet['status'] == 'connected')
-                                          Label("已联机", Colors.blue)
+                                          const Label("已联机", Colors.blue)
                                         else if (ethernet['status'] ==
                                             'disconnected')
-                                          Label("尚未联机", Colors.grey)
+                                          const Label("尚未联机", Colors.grey)
                                         else
                                           Label(ethernet['status'],
                                               Colors.orangeAccent),
@@ -436,7 +451,7 @@ class _NetworkState extends State<Network> with SingleTickerProviderStateMixin {
                                           Text(ethernet['use_dhcp']
                                               ? 'DHCP'
                                               : '静态IP'),
-                                          SizedBox(
+                                          const SizedBox(
                                             width: 20,
                                           ),
                                           Text(ethernet['ip']),
@@ -447,13 +462,13 @@ class _NetworkState extends State<Network> with SingleTickerProviderStateMixin {
                                 showFirst: false,
                                 children: [
                                   Padding(
-                                    padding: EdgeInsets.symmetric(
+                                    padding: const EdgeInsets.symmetric(
                                         horizontal: 20, vertical: 10),
                                     child: Column(
                                       children: [
                                         Row(
                                           children: [
-                                            Text("子网掩码(mask)："),
+                                            const Text("子网掩码(mask)："),
                                             Expanded(
                                               child: Text(
                                                 ethernet['mask'] == ''
@@ -465,12 +480,13 @@ class _NetworkState extends State<Network> with SingleTickerProviderStateMixin {
                                           ],
                                         ),
                                         Padding(
-                                          padding: EdgeInsets.only(top: 10),
+                                          padding:
+                                              const EdgeInsets.only(top: 10),
                                           child: Row(
                                             crossAxisAlignment:
                                                 CrossAxisAlignment.start,
                                             children: [
-                                              Text("IPv6地址："),
+                                              const Text("IPv6地址："),
                                               Expanded(
                                                 child: ethernet['ipv6'] !=
                                                             null &&
@@ -488,7 +504,7 @@ class _NetworkState extends State<Network> with SingleTickerProviderStateMixin {
                                                           return Text(ipv6);
                                                         }).toList(),
                                                       )
-                                                    : Text(
+                                                    : const Text(
                                                         "--",
                                                         textAlign:
                                                             TextAlign.right,
@@ -497,12 +513,12 @@ class _NetworkState extends State<Network> with SingleTickerProviderStateMixin {
                                             ],
                                           ),
                                         ),
-                                        SizedBox(
+                                        const SizedBox(
                                           height: 10,
                                         ),
                                         Row(
                                           children: [
-                                            Text("网络状态："),
+                                            const Text("网络状态："),
                                             Expanded(
                                               child: Text(
                                                 "${ethernet['max_supported_speed']} Mb/s,${ethernet['duplex'] ? '全双工' : '半双工'}, MTU ${ethernet['mtu']}",
@@ -517,35 +533,35 @@ class _NetworkState extends State<Network> with SingleTickerProviderStateMixin {
                                 ],
                               ),
                             );
-                          }).toList(),
+                          }),
                           ...pppoes.map((pppoe) {
                             return Card(
                               shape: RoundedRectangleBorder(
-                                  side: BorderSide(),
+                                  side: const BorderSide(),
                                   borderRadius: BorderRadius.circular(18)),
-                              margin:
-                                  EdgeInsets.only(left: 20, right: 20, top: 20),
-                              // padding: EdgeInsets.symmetric(horizontal: 20),
+                              margin: const EdgeInsets.only(
+                                  left: 20, right: 20, top: 20),
+                              // padding: EdgeInsets.symmetric(horizontal: AppConstants.paddingLarge),
                               child: ExpansionContainer(
                                 title: Column(
                                   children: [
                                     Row(
                                       children: [
-                                        Text(
+                                        const Text(
                                           "PPPoE",
                                           style: TextStyle(
                                               fontSize: 18,
                                               fontWeight: FontWeight.w600),
                                           overflow: TextOverflow.ellipsis,
                                         ),
-                                        SizedBox(
+                                        const SizedBox(
                                           width: 10,
                                         ),
                                         if (pppoe['status'] == 'connected')
-                                          Label("已联机", Colors.blue)
+                                          const Label("已联机", Colors.blue)
                                         else if (pppoe['status'] ==
                                             'disconnected')
-                                          Label("尚未联机", Colors.grey)
+                                          const Label("尚未联机", Colors.grey)
                                         else
                                           Label(pppoe['status'],
                                               Colors.orangeAccent),
@@ -557,7 +573,7 @@ class _NetworkState extends State<Network> with SingleTickerProviderStateMixin {
                                           Text(pppoe['use_dhcp']
                                               ? 'DHCP'
                                               : '静态IP'),
-                                          SizedBox(
+                                          const SizedBox(
                                             width: 20,
                                           ),
                                           Text(pppoe['ip']),
@@ -568,13 +584,13 @@ class _NetworkState extends State<Network> with SingleTickerProviderStateMixin {
                                 showFirst: false,
                                 children: [
                                   Padding(
-                                    padding: EdgeInsets.symmetric(
+                                    padding: const EdgeInsets.symmetric(
                                         horizontal: 20, vertical: 10),
                                     child: Column(
                                       children: [
                                         Row(
                                           children: [
-                                            Text("子网掩码(mask)："),
+                                            const Text("子网掩码(mask)："),
                                             Expanded(
                                               child: Text(
                                                 pppoe['mask'] == ''
@@ -586,12 +602,13 @@ class _NetworkState extends State<Network> with SingleTickerProviderStateMixin {
                                           ],
                                         ),
                                         Padding(
-                                          padding: EdgeInsets.only(top: 10),
+                                          padding:
+                                              const EdgeInsets.only(top: 10),
                                           child: Row(
                                             crossAxisAlignment:
                                                 CrossAxisAlignment.start,
                                             children: [
-                                              Text("IPv6地址："),
+                                              const Text("IPv6地址："),
                                               Expanded(
                                                 child: pppoe['ipv6'] != null &&
                                                         pppoe['ipv6'].length > 0
@@ -605,7 +622,7 @@ class _NetworkState extends State<Network> with SingleTickerProviderStateMixin {
                                                           return Text(ipv6);
                                                         }).toList(),
                                                       )
-                                                    : Text(
+                                                    : const Text(
                                                         "--",
                                                         textAlign:
                                                             TextAlign.right,
@@ -616,10 +633,11 @@ class _NetworkState extends State<Network> with SingleTickerProviderStateMixin {
                                         ),
                                         if (pppoe['status'] == 'connected')
                                           Padding(
-                                            padding: EdgeInsets.only(top: 10),
+                                            padding:
+                                                const EdgeInsets.only(top: 10),
                                             child: Row(
                                               children: [
-                                                Text("网络状态："),
+                                                const Text("网络状态："),
                                                 Expanded(
                                                   child: Text(
                                                     "${pppoe['max_supported_speed']} Mb/s,${pppoe['duplex'] ? '全双工' : '半双工'}, MTU ${pppoe['mtu']}",
@@ -635,16 +653,16 @@ class _NetworkState extends State<Network> with SingleTickerProviderStateMixin {
                                 ],
                               ),
                             );
-                          }).toList(),
+                          }),
                         ],
                       ),
-                      Center(
+                      const Center(
                         child: Text("开发中"),
                       ),
-                      Center(
+                      const Center(
                         child: Text("开发中"),
                       ),
-                      Center(
+                      const Center(
                         child: Text("开发中"),
                       ),
                     ],

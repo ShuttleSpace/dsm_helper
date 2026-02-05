@@ -7,6 +7,7 @@
 /// title : "firefox"
 /// type : "url"
 /// url : "http://pan.fmtol.com:5083/vnc.html"
+library;
 
 class ShortcutItemModel {
   ShortcutItemModel({

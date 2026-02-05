@@ -4,30 +4,34 @@ import 'dart:ui';
 
 import 'package:background_downloader/background_downloader.dart';
 import 'package:garden/pages/download/download.dart';
-import 'package:garden/util/function.dart';
+import 'package:garden/util/http_util.dart';
 import 'package:flutter/widgets.dart';
+import 'package:signals_flutter/signals_flutter.dart';
 
-class DownloadStateNotifier extends ChangeNotifier {
-  ValueNotifier<List<DownloadInfo>> tasks = ValueNotifier([]);
-  ValueNotifier<bool> loading = ValueNotifier(true);
-  ValueNotifier<List<DownloadInfo>> selectedTasks = ValueNotifier([]);
-  ValueNotifier<bool> multiSelect = ValueNotifier(false);
-  ValueNotifier<String> downloadPath = ValueNotifier('');
-  ReceivePort _receiverPort = ReceivePort();
+class DownloadStateNotifier {
+  final tasks = signal<List<DownloadInfo>>([]);
+  final loading = signal<bool>(true);
+  final selectedTasks = signal<List<DownloadInfo>>([]);
+  final multiSelect = signal<bool>(false);
+  final downloadPath = signal<String>('');
+  final ReceivePort _receiverPort = ReceivePort();
 
   void addSelectedTask(DownloadInfo task) {
-    selectedTasks.value.add(task);
-    selectedTasks.notifyListeners();
+    final currentTasks = [...selectedTasks.value];
+    currentTasks.add(task);
+    selectedTasks.value = currentTasks;
   }
 
   void addSelectedTasks(List<DownloadInfo> tasks) {
-    selectedTasks.value.addAll(tasks);
-    selectedTasks.notifyListeners();
+    final currentTasks = [...selectedTasks.value];
+    currentTasks.addAll(tasks);
+    selectedTasks.value = currentTasks;
   }
 
   void removeSelectedTask(DownloadInfo task) {
-    selectedTasks.value.remove(task);
-    selectedTasks.notifyListeners();
+    final currentTasks = [...selectedTasks.value];
+    currentTasks.remove(task);
+    selectedTasks.value = currentTasks;
   }
 
   void resetSelectedTasks() {
@@ -35,7 +39,7 @@ class DownloadStateNotifier extends ChangeNotifier {
   }
 
   void init() {
-    Util.instance.getDownloadPath().then((value) {
+    HttpUtil.instance.getDownloadPath().then((value) {
       downloadPath.value = value;
     });
     bindBackgroundIsolate();
@@ -63,13 +67,14 @@ class DownloadStateNotifier extends ChangeNotifier {
       int progress = data[2] ?? 0;
 
       if (tasks.value.isNotEmpty) {
-        tasks.value.forEach((task) {
+        final updatedTasks = tasks.value.map((task) {
           if (task.task.taskId == id) {
             task.status = status;
             task.progress = progress;
           }
-        });
-        tasks.notifyListeners();
+          return task;
+        }).toList();
+        tasks.value = updatedTasks;
       }
     });
   }
@@ -88,12 +93,11 @@ class DownloadStateNotifier extends ChangeNotifier {
     debugPrint('runLoop: loading= ${loading.value}');
     // 如果存在下载中任务，每秒刷新一次
     if (tasks.value
-            .where((task) =>
-                task.status == TaskStatus.running ||
-                task.status == TaskStatus.enqueued ||
-                task.status == TaskStatus.notFound)
-            .length >
-        0) {
+        .where((task) =>
+            task.status == TaskStatus.running ||
+            task.status == TaskStatus.enqueued ||
+            task.status == TaskStatus.notFound)
+        .isNotEmpty) {
     } else {}
   }
 
@@ -121,7 +125,8 @@ class DownloadStateNotifier extends ChangeNotifier {
 @immutable
 class DownloadStateInherited extends InheritedWidget {
   final DownloadStateNotifier notifier;
-  DownloadStateInherited({required this.notifier, required super.child});
+  const DownloadStateInherited(
+      {super.key, required this.notifier, required super.child});
 
   static DownloadStateInherited? of(BuildContext context) {
     return context
@@ -130,7 +135,7 @@ class DownloadStateInherited extends InheritedWidget {
 
   @override
   bool updateShouldNotify(covariant InheritedWidget oldWidget) {
-    return !(oldWidget is DownloadStateInherited) ||
-        (oldWidget).notifier != this.notifier;
+    return oldWidget is! DownloadStateInherited ||
+        (oldWidget).notifier != notifier;
   }
 }

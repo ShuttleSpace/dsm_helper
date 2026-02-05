@@ -1,18 +1,24 @@
-import 'package:garden/themes/app_theme.dart';
-import 'package:garden/util/function.dart';
+import 'package:garden/theme/app_theme.dart';
+import 'package:garden/util/format_util.dart';
+import 'package:garden/util/ui_util.dart';
+import 'package:garden/util/http_util.dart';
 import 'package:garden/widgets/bubble_tab_indicator.dart';
 import 'package:garden/widgets/label.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:garden/constants/app_constants.dart';
+import 'package:garden/theme/app_colors.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 
 class ExternalDevice extends StatefulWidget {
+  const ExternalDevice({super.key});
+
   @override
-  _ExternalDeviceState createState() => _ExternalDeviceState();
+  ExternalDeviceState createState() => ExternalDeviceState();
 }
 
-class _ExternalDeviceState extends State<ExternalDevice>
+class ExternalDeviceState extends State<ExternalDevice>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
   List esatas = [];
@@ -32,7 +38,7 @@ class _ExternalDeviceState extends State<ExternalDevice>
         loading = false;
       });
       List result = res['data']['result'];
-      result.forEach((item) {
+      for (var item in result) {
         if (item['success'] == true) {
           switch (item['api']) {
             case "SYNO.Core.ExternalDevice.Storage.eSATA":
@@ -47,36 +53,36 @@ class _ExternalDeviceState extends State<ExternalDevice>
               break;
           }
         }
-      });
+      }
     } else {
-      Util.instance.toast("获取外接设备失败，code${res['error']['code']}");
+      UiUtil.toast("获取外接设备失败，code${res['error']['code']}");
     }
   }
 
   Widget _buildPartitionItem(partition) {
     return Card(
       shape: RoundedRectangleBorder(
-          side: BorderSide(), borderRadius: BorderRadius.circular(18)),
-      margin: EdgeInsets.only(top: 20),
+          side: const BorderSide(), borderRadius: BorderRadius.circular(18)),
+      margin: const EdgeInsets.only(top: 20),
       child: Padding(
-        padding: const EdgeInsets.all(8.0),
+        padding: const EdgeInsets.all(AppConstants.paddingSmall),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
               children: [
                 Text("${partition['partition_title']}"),
-                SizedBox(
+                const SizedBox(
                   width: 10,
                 ),
                 partition['status'] == "normal"
-                    ? Label(
+                    ? const Label(
                         "正常",
                         Colors.green,
                         fill: true,
                       )
                     : partition['status'] == "background"
-                        ? Label(
+                        ? const Label(
                             "正在检查硬盘",
                             Colors.lightBlueAccent,
                             fill: true,
@@ -88,18 +94,18 @@ class _ExternalDeviceState extends State<ExternalDevice>
                           ),
               ],
             ),
-            SizedBox(
+            const SizedBox(
               height: 10,
             ),
             Row(
               children: [
                 Card(
                   shape: RoundedRectangleBorder(
-                      side: BorderSide(),
+                      side: const BorderSide(),
                       borderRadius: BorderRadius.circular(18)),
-                  margin: EdgeInsets.all(10),
+                  margin: const EdgeInsets.all(10),
                   child: Padding(
-                    padding: const EdgeInsets.all(8.0),
+                    padding: const EdgeInsets.all(AppConstants.paddingSmall),
                     child: CircularPercentIndicator(
                       radius: 40,
                       // progressColor: Colors.lightBlueAccent,
@@ -136,7 +142,7 @@ class _ExternalDeviceState extends State<ExternalDevice>
                     ),
                   ),
                 ),
-                SizedBox(
+                const SizedBox(
                   width: 10,
                 ),
                 Expanded(
@@ -147,9 +153,9 @@ class _ExternalDeviceState extends State<ExternalDevice>
                         children: [
                           Text(
                             "${partition['share_name']}",
-                            style: TextStyle(fontWeight: FontWeight.w600),
+                            style: const TextStyle(fontWeight: FontWeight.w600),
                           ),
-                          SizedBox(
+                          const SizedBox(
                             width: 10,
                           ),
                           Label(
@@ -159,21 +165,21 @@ class _ExternalDeviceState extends State<ExternalDevice>
                           )
                         ],
                       ),
-                      SizedBox(
+                      const SizedBox(
                         height: 5,
                       ),
                       Text(
-                          "已用：${Util.instance.formatSize(partition['used_size_mb'] * 1024 * 1024)}"),
-                      SizedBox(
+                          "已用：${FormatUtil.formatSize(partition['used_size_mb'] * 1024 * 1024)}"),
+                      const SizedBox(
                         height: 5,
                       ),
                       Text(
-                          "可用：${Util.instance.formatSize(partition['total_size_mb'] * 1024 * 1024 - partition['used_size_mb'] * 1024 * 1024)}"),
-                      SizedBox(
+                          "可用：${FormatUtil.formatSize(partition['total_size_mb'] * 1024 * 1024 - partition['used_size_mb'] * 1024 * 1024)}"),
+                      const SizedBox(
                         height: 5,
                       ),
                       Text(
-                          "容量：${Util.instance.formatSize(partition['total_size_mb'] * 1024 * 1024)}"),
+                          "容量：${FormatUtil.formatSize(partition['total_size_mb'] * 1024 * 1024)}"),
                     ],
                   ),
                 )
@@ -189,9 +195,9 @@ class _ExternalDeviceState extends State<ExternalDevice>
     List partitions = esata['partitions'];
     return Card(
       shape: RoundedRectangleBorder(
-          side: BorderSide(), borderRadius: BorderRadius.circular(18)),
+          side: const BorderSide(), borderRadius: BorderRadius.circular(18)),
       child: Padding(
-        padding: EdgeInsets.all(20),
+        padding: const EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -199,13 +205,14 @@ class _ExternalDeviceState extends State<ExternalDevice>
               children: [
                 Text(
                   "${esata['dev_title']}",
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+                  style: const TextStyle(
+                      fontSize: 18, fontWeight: FontWeight.w600),
                 ),
-                SizedBox(
+                const SizedBox(
                   width: 10,
                 ),
                 esata['status'] == "normal"
-                    ? Label(
+                    ? const Label(
                         "正常",
                         Colors.green,
                         fill: true,
@@ -215,33 +222,33 @@ class _ExternalDeviceState extends State<ExternalDevice>
                         Colors.red,
                         fill: true,
                       ),
-                SizedBox(
+                const SizedBox(
                   width: 10,
                 ),
-                Spacer(),
+                const Spacer(),
                 OutlinedButton(
                   onPressed: () async {
                     var res = await Api.ejectEsata(esata['dev_id']);
                     if (res['success']) {
-                      Util.instance.toast("设备已退出");
+                      UiUtil.toast("设备已退出");
                       getData();
                     } else {
-                      Util.instance.toast("设备退出失败，代码${res['error']['code']}");
+                      UiUtil.toast("设备退出失败，代码${res['error']['code']}");
                     }
                   },
-                  child: SizedBox(
+                  child: const SizedBox(
                     width: 20,
                     height: 20,
                     child: Icon(
                       CupertinoIcons.eject,
-                      color: Color(0xffff9813),
+                      color: AppColors.primaryAction,
                       size: 16,
                     ),
                   ),
                 ),
               ],
             ),
-            ...partitions.map(_buildPartitionItem).toList(),
+            ...partitions.map(_buildPartitionItem),
           ],
         ),
       ),
@@ -253,16 +260,17 @@ class _ExternalDeviceState extends State<ExternalDevice>
     return Scaffold(
       appBar: AppBar(
         leading: AppBackButton(context),
-        title: Text("外接设备"),
+        title: const Text("外接设备"),
       ),
       body: Column(
         children: [
           Card(
             shape: RoundedRectangleBorder(
-                side: BorderSide(), borderRadius: BorderRadius.circular(18)),
-            margin: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                side: const BorderSide(),
+                borderRadius: BorderRadius.circular(18)),
+            margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
             child: Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding: const EdgeInsets.all(AppConstants.paddingSmall),
               child: TabBar(
                 dividerHeight: 0,
                 isScrollable: false,
@@ -272,8 +280,8 @@ class _ExternalDeviceState extends State<ExternalDevice>
                     ? Colors.white
                     : Colors.black,
                 unselectedLabelColor: Colors.grey,
-                indicator: BubbleTabIndicator(),
-                tabs: [
+                indicator: const BubbleTabIndicator(),
+                tabs: const [
                   Padding(
                     padding: EdgeInsets.symmetric(vertical: 10, horizontal: 5),
                     child: Text("外接设备"),
@@ -291,19 +299,19 @@ class _ExternalDeviceState extends State<ExternalDevice>
               controller: _tabController,
               children: [
                 loading
-                    ? Center(
+                    ? const Center(
                         child: CupertinoActivityIndicator(
                           radius: 14,
                         ),
                       )
-                    : (esatas + usbs).length > 0
+                    : (esatas + usbs).isNotEmpty
                         ? ListView.separated(
-                            padding: EdgeInsets.all(20),
+                            padding: const EdgeInsets.all(20),
                             itemBuilder: (context, i) {
                               return _buildESataItem((esatas + usbs)[i]);
                             },
                             separatorBuilder: (context, i) {
-                              return SizedBox(
+                              return const SizedBox(
                                 height: 20,
                               );
                             },
@@ -315,7 +323,7 @@ class _ExternalDeviceState extends State<ExternalDevice>
                                   color: AppTheme.of(context).placeholderColor),
                             ),
                           ),
-                Center(
+                const Center(
                   child: Text("未开发"),
                 ),
               ],

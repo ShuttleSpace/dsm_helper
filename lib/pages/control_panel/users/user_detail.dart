@@ -1,24 +1,31 @@
-import 'package:garden/util/function.dart';
+import 'package:garden/util/http_util.dart';
+import 'package:garden/util/log.dart';
+import 'package:garden/util/ui_util.dart';
 import 'package:garden/widgets/bubble_tab_indicator.dart';
+import 'package:garden/widgets/control_panel/permission_item.dart';
+import 'package:garden/widgets/control_panel/quota_item.dart';
+import 'package:garden/widgets/control_panel/user_group_item.dart';
 import 'package:garden/widgets/label.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:garden/constants/app_constants.dart';
+import 'package:garden/theme/app_colors.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 
 class UserDetail extends StatefulWidget {
   final Map user;
-  UserDetail(this.user);
+  const UserDetail(this.user, {super.key});
   @override
-  _UserDetailState createState() => _UserDetailState();
+  UserDetailState createState() => UserDetailState();
 }
 
-class _UserDetailState extends State<UserDetail>
+class UserDetailState extends State<UserDetail>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
-  TextEditingController _nameController = TextEditingController();
-  TextEditingController _descriptionController = TextEditingController();
-  TextEditingController _emailController = TextEditingController();
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _descriptionController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
   Map? user;
   List groups = [];
   List originGroups = [];
@@ -44,50 +51,6 @@ class _UserDetailState extends State<UserDetail>
     super.initState();
   }
 
-  Widget _buildGroupItem(group) {
-    return GestureDetector(
-      onTap: () {
-        setState(() {
-          group['is_member'] = !group['is_member'];
-        });
-      },
-      child: Card(
-        shape: RoundedRectangleBorder(
-            side: BorderSide(), borderRadius: BorderRadius.circular(18)),
-        child: Padding(
-          padding: EdgeInsets.all(20),
-          child: Row(
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "${group['name']}",
-                      style: TextStyle(fontSize: 16),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.only(top: 5),
-                      child: Text(
-                        "${group['description']}",
-                        style: TextStyle(color: Colors.grey),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              if (group['is_member'])
-                Icon(
-                  CupertinoIcons.checkmark_alt,
-                  color: Color(0xffff9813),
-                ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
   Widget _buildVolumeItem(volume) {
     List shares = quotas
         .where((element) => element['volume'] == volume['volume_path'])
@@ -100,146 +63,27 @@ class _UserDetailState extends State<UserDetail>
       },
       child: Card(
         shape: RoundedRectangleBorder(
-            side: BorderSide(), borderRadius: BorderRadius.circular(18)),
+            side: const BorderSide(), borderRadius: BorderRadius.circular(18)),
         child: Padding(
-          padding: EdgeInsets.all(20),
+          padding: const EdgeInsets.all(20),
           child: Column(
             children: [
               Row(
                 children: [
                   Text(
                     "${volume['display_name']}",
-                    style: TextStyle(fontSize: 16),
+                    style: const TextStyle(fontSize: 16),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     width: 5,
                   ),
                   Label("${volume['description']}", Colors.lightBlueAccent),
                 ],
               ),
-              SizedBox(
+              const SizedBox(
                 height: 10,
               ),
-              ...shares.map(_buildQuotaItem).toList(),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildQuotaItem(quota) {
-    return GestureDetector(
-      onTap: () {
-        setState(() {
-          // group['is_member'] = !group['is_member'];
-        });
-      },
-      child: Card(
-        shape: RoundedRectangleBorder(
-            side: BorderSide(), borderRadius: BorderRadius.circular(18)),
-        margin: EdgeInsets.symmetric(vertical: 10),
-        child: Padding(
-          padding: EdgeInsets.all(20),
-          child: Row(
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "${quota['name']}",
-                      style: TextStyle(fontSize: 16),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.only(top: 5),
-                      child: Text(
-                        "${quota['description'] == "" ? "-" : quota['description']}",
-                        style: TextStyle(color: Colors.grey),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Text(
-                "${Util.instance.formatSize(quota['used'] * 1024 * 1024)}",
-                style: TextStyle(fontSize: 16),
-              ),
-              Text(
-                " / ",
-                style: TextStyle(fontSize: 16),
-              ),
-              Text(
-                "${quota['quota'] == 0 ? "无限制" : Util.instance.formatSize(quota['quota'] * 1024 * 1024)}",
-                style: TextStyle(fontSize: 16),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildPermissionStatue(permission) {
-    if (permission['is_custom'] ||
-        permission['is_deny'] ||
-        permission['is_readonly'] ||
-        permission['is_writable']) {
-      return permission['is_readonly']
-          ? Label("只读", Colors.lightBlueAccent)
-          : permission['is_writable']
-              ? Label("可读写", Colors.green)
-              : permission['is_custom']
-                  ? Label("自定义", Colors.orangeAccent)
-                  : permission['is_deny']
-                      ? Label("禁止访问", Colors.red)
-                      : Label(permission['inherit'], Colors.orangeAccent);
-    } else {
-      return permission['inherit'] == "ro"
-          ? Label("只读", Colors.lightBlueAccent)
-          : permission['inherit'] == "rw"
-              ? Label("可读写", Colors.green)
-              : permission['inherit'] == "cu"
-                  ? Label("自定义", Colors.orangeAccent)
-                  : permission['inherit'] == "-"
-                      ? Label("禁止访问", Colors.red)
-                      : Label(permission['inherit'], Colors.orangeAccent);
-    }
-  }
-
-  Widget _buildPermissionItem(permission) {
-    return GestureDetector(
-      onTap: () {
-        setState(() {
-          // group['is_member'] = !group['is_member'];
-        });
-      },
-      child: Card(
-        shape: RoundedRectangleBorder(
-            side: BorderSide(), borderRadius: BorderRadius.circular(18)),
-        child: Padding(
-          padding: EdgeInsets.all(20),
-          child: Row(
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Text(
-                          "${permission['name']}",
-                          style: TextStyle(fontSize: 16),
-                        ),
-                        SizedBox(
-                          width: 5,
-                        ),
-                        _buildPermissionStatue(permission),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
+              ...shares.map((quota) => QuotaItem(quota: quota)),
             ],
           ),
         ),
@@ -265,7 +109,7 @@ class _UserDetailState extends State<UserDetail>
     var res = await Api.userDetail(user?['name']);
     if (res['success']) {
       List result = res['data']['result'];
-      result.forEach((item) {
+      for (var item in result) {
         if (item['success'] == true) {
           switch (item['api']) {
             case "SYNO.Core.User":
@@ -307,7 +151,7 @@ class _UserDetailState extends State<UserDetail>
               break;
           }
         }
-      });
+      }
     }
   }
 
@@ -322,8 +166,9 @@ class _UserDetailState extends State<UserDetail>
         children: [
           Card(
             shape: RoundedRectangleBorder(
-                side: BorderSide(), borderRadius: BorderRadius.circular(18)),
-            margin: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                side: const BorderSide(),
+                borderRadius: BorderRadius.circular(18)),
+            margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
             child: TabBar(
               dividerHeight: 0,
               isScrollable: true,
@@ -333,8 +178,8 @@ class _UserDetailState extends State<UserDetail>
                   ? Colors.white
                   : Colors.black,
               unselectedLabelColor: Colors.grey,
-              indicator: BubbleTabIndicator(),
-              tabs: [
+              indicator: const BubbleTabIndicator(),
+              tabs: const [
                 Padding(
                   padding: EdgeInsets.symmetric(vertical: 10, horizontal: 5),
                   child: Text("信息"),
@@ -367,101 +212,106 @@ class _UserDetailState extends State<UserDetail>
               controller: _tabController,
               children: [
                 ListView(
-                  padding: EdgeInsets.all(20),
+                  padding: const EdgeInsets.all(20),
                   children: [
                     Card(
                       shape: RoundedRectangleBorder(
-                          side: BorderSide(),
+                          side: const BorderSide(),
                           borderRadius: BorderRadius.circular(18)),
                       child: Padding(
-                        padding: const EdgeInsets.all(8.0),
+                        padding:
+                            const EdgeInsets.all(AppConstants.paddingSmall),
                         child: TextField(
                           controller: _nameController,
                           onChanged: (v) => user?['new_name'] = v,
-                          decoration: InputDecoration(
+                          decoration: const InputDecoration(
                             border: InputBorder.none,
                             labelText: '名称',
                           ),
                         ),
                       ),
                     ),
-                    SizedBox(
+                    const SizedBox(
                       height: 20,
                     ),
                     Card(
                       shape: RoundedRectangleBorder(
-                          side: BorderSide(),
+                          side: const BorderSide(),
                           borderRadius: BorderRadius.circular(18)),
                       child: Padding(
-                        padding: const EdgeInsets.all(8.0),
+                        padding:
+                            const EdgeInsets.all(AppConstants.paddingSmall),
                         child: TextField(
                           controller: _descriptionController,
                           onChanged: (v) => user?['description'] = v,
-                          decoration: InputDecoration(
+                          decoration: const InputDecoration(
                             border: InputBorder.none,
                             labelText: '描述',
                           ),
                         ),
                       ),
                     ),
-                    SizedBox(
+                    const SizedBox(
                       height: 20,
                     ),
                     Card(
                       shape: RoundedRectangleBorder(
-                          side: BorderSide(),
+                          side: const BorderSide(),
                           borderRadius: BorderRadius.circular(18)),
                       child: Padding(
-                        padding: const EdgeInsets.all(8.0),
+                        padding:
+                            const EdgeInsets.all(AppConstants.paddingSmall),
                         child: TextField(
                           controller: _emailController,
                           onChanged: (v) => user?['email'] = v,
-                          decoration: InputDecoration(
+                          decoration: const InputDecoration(
                             border: InputBorder.none,
                             labelText: '电子邮件',
                           ),
                         ),
                       ),
                     ),
-                    SizedBox(
+                    const SizedBox(
                       height: 20,
                     ),
                     Card(
                       shape: RoundedRectangleBorder(
-                          side: BorderSide(),
+                          side: const BorderSide(),
                           borderRadius: BorderRadius.circular(18)),
                       child: Padding(
-                        padding: const EdgeInsets.all(8.0),
+                        padding:
+                            const EdgeInsets.all(AppConstants.paddingSmall),
                         child: TextField(
                           onChanged: (v) => password = v,
                           obscureText: true,
-                          decoration: InputDecoration(
+                          decoration: const InputDecoration(
                             border: InputBorder.none,
                             labelText: '修改密码',
                           ),
                         ),
                       ),
                     ),
-                    SizedBox(
+                    const SizedBox(
                       height: 20,
                     ),
                     Card(
                       shape: RoundedRectangleBorder(
-                          side: BorderSide(),
+                          side: const BorderSide(),
                           borderRadius: BorderRadius.circular(18)),
                       child: Padding(
-                        padding: const EdgeInsets.all(8.0),
+                        padding:
+                            const EdgeInsets.all(AppConstants.paddingSmall),
                         child: TextField(
                           obscureText: true,
                           onChanged: (v) => confirmPassword = v,
-                          decoration: InputDecoration(
+                          decoration: const InputDecoration(
                             border: InputBorder.none,
                             labelText: '确认密码',
                           ),
                         ),
                       ),
                     ),
-                    SizedBox(
+                    const SizedBox(
                       height: 20,
                     ),
                     GestureDetector(
@@ -473,25 +323,26 @@ class _UserDetailState extends State<UserDetail>
                       },
                       child: Card(
                         shape: RoundedRectangleBorder(
-                            side: BorderSide(),
+                            side: const BorderSide(),
                             borderRadius: BorderRadius.circular(18)),
                         child: Padding(
-                          padding: const EdgeInsets.all(8.0),
+                          padding:
+                              const EdgeInsets.all(AppConstants.paddingSmall),
                           child: Row(
                             children: [
-                              Text("不允许此用户修改密码"),
-                              Spacer(),
+                              const Text("不允许此用户修改密码"),
+                              const Spacer(),
                               if (user?['cannot_chg_passwd'] ?? false)
-                                Icon(
+                                const Icon(
                                   CupertinoIcons.checkmark_alt,
-                                  color: Color(0xffff9813),
+                                  color: AppColors.primaryAction,
                                 ),
                             ],
                           ),
                         ),
                       ),
                     ),
-                    SizedBox(
+                    const SizedBox(
                       height: 20,
                     ),
                     GestureDetector(
@@ -502,25 +353,26 @@ class _UserDetailState extends State<UserDetail>
                       },
                       child: Card(
                         shape: RoundedRectangleBorder(
-                            side: BorderSide(),
+                            side: const BorderSide(),
                             borderRadius: BorderRadius.circular(18)),
                         child: Padding(
-                          padding: const EdgeInsets.all(8.0),
+                          padding:
+                              const EdgeInsets.all(AppConstants.paddingSmall),
                           child: Row(
                             children: [
-                              Text("密码始终有效"),
-                              Spacer(),
+                              const Text("密码始终有效"),
+                              const Spacer(),
                               if (user?['passwd_never_expire'] ?? false)
-                                Icon(
+                                const Icon(
                                   CupertinoIcons.checkmark_alt,
-                                  color: Color(0xffff9813),
+                                  color: AppColors.primaryAction,
                                 ),
                             ],
                           ),
                         ),
                       ),
                     ),
-                    SizedBox(
+                    const SizedBox(
                       height: 20,
                     ),
                     GestureDetector(
@@ -535,34 +387,34 @@ class _UserDetailState extends State<UserDetail>
                       },
                       child: Card(
                         shape: RoundedRectangleBorder(
-                            side: BorderSide(),
+                            side: const BorderSide(),
                             borderRadius: BorderRadius.circular(18)),
                         child: Padding(
-                          padding: EdgeInsets.all(20),
+                          padding: const EdgeInsets.all(20),
                           child: Column(
                             children: [
                               Row(
                                 children: [
-                                  Text(
+                                  const Text(
                                     "停用此用户账户",
                                     style: TextStyle(fontSize: 16),
                                   ),
-                                  Spacer(),
+                                  const Spacer(),
                                   if (user?['expired'] != "normal")
-                                    Icon(
+                                    const Icon(
                                       CupertinoIcons.checkmark_alt,
-                                      color: Color(0xffff9813),
+                                      color: AppColors.primaryAction,
                                     ),
                                 ],
                               ),
                               if (user?['expired'] != "normal")
                                 Card(
                                   shape: RoundedRectangleBorder(
-                                      side: BorderSide(),
+                                      side: const BorderSide(),
                                       borderRadius: BorderRadius.circular(18)),
-                                  margin: EdgeInsets.only(top: 20),
+                                  margin: const EdgeInsets.only(top: 20),
                                   child: Padding(
-                                    padding: EdgeInsets.all(20),
+                                    padding: const EdgeInsets.all(20),
                                     child: Row(
                                       children: [
                                         Expanded(
@@ -575,27 +427,27 @@ class _UserDetailState extends State<UserDetail>
                                             },
                                             child: Card(
                                               shape: RoundedRectangleBorder(
-                                                  side: BorderSide(),
+                                                  side: const BorderSide(),
                                                   borderRadius:
                                                       BorderRadius.circular(5)),
                                               // margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                                               child: Padding(
-                                                padding:
-                                                    const EdgeInsets.all(8.0),
+                                                padding: const EdgeInsets.all(
+                                                    AppConstants.paddingSmall),
                                                 child: Column(
                                                   children: [
                                                     Row(
                                                       children: [
-                                                        Text(
+                                                        const Text(
                                                           "立即",
                                                           style: TextStyle(
                                                               fontSize: 16,
                                                               height: 1.6),
                                                         ),
-                                                        Spacer(),
+                                                        const Spacer(),
                                                         if (user?['expired'] ==
                                                             "now")
-                                                          Icon(
+                                                          const Icon(
                                                             CupertinoIcons
                                                                 .checkmark_alt,
                                                             color: Color(
@@ -609,7 +461,7 @@ class _UserDetailState extends State<UserDetail>
                                             ),
                                           ),
                                         ),
-                                        SizedBox(
+                                        const SizedBox(
                                           width: 20,
                                         ),
                                         Expanded(
@@ -623,33 +475,34 @@ class _UserDetailState extends State<UserDetail>
                                                 setState(() {
                                                   user?['expired'] =
                                                       v.format("Y-m-d");
-                                                  print(user?['expired']);
+                                                  Log.info(user?['expired']);
                                                 });
                                               });
                                             },
                                             child: Card(
                                               shape: RoundedRectangleBorder(
-                                                  side: BorderSide(),
+                                                  side: const BorderSide(),
                                                   borderRadius:
                                                       BorderRadius.circular(5)),
                                               // margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                                               child: Padding(
-                                                padding:
-                                                    const EdgeInsets.all(8.0),
+                                                padding: const EdgeInsets.all(
+                                                    AppConstants.paddingSmall),
                                                 child: Column(
                                                   children: [
                                                     Row(
                                                       children: [
                                                         Text(
                                                           "${user?['expired'] == "now" ? "到期于：" : user?['expired']}",
-                                                          style: TextStyle(
-                                                              fontSize: 16,
-                                                              height: 1.6),
+                                                          style:
+                                                              const TextStyle(
+                                                                  fontSize: 16,
+                                                                  height: 1.6),
                                                         ),
-                                                        Spacer(),
+                                                        const Spacer(),
                                                         if (user?['expired'] !=
                                                             "now")
-                                                          Icon(
+                                                          const Icon(
                                                             CupertinoIcons
                                                                 .checkmark_alt,
                                                             color: Color(
@@ -672,43 +525,50 @@ class _UserDetailState extends State<UserDetail>
                         ),
                       ),
                     ),
-                    SizedBox(
+                    const SizedBox(
                       height: 20,
                     ),
                   ],
                 ),
                 ListView.separated(
-                  padding: EdgeInsets.all(20),
+                  padding: const EdgeInsets.all(20),
                   itemBuilder: (context, i) {
-                    return _buildGroupItem(groups[i]);
+                    return UserGroupItem(
+                      group: groups[i],
+                      onTap: () {
+                        setState(() {
+                          groups[i]['is_member'] = !groups[i]['is_member'];
+                        });
+                      },
+                    );
                   },
                   itemCount: groups.length,
                   separatorBuilder: (context, i) {
-                    return SizedBox(
+                    return const SizedBox(
                       height: 20,
                     );
                   },
                 ),
                 ListView.separated(
-                  padding: EdgeInsets.all(20),
+                  padding: const EdgeInsets.all(20),
                   itemBuilder: (context, i) {
-                    return _buildPermissionItem(permissions[i]);
+                    return PermissionItem(permission: permissions[i]);
                   },
                   itemCount: permissions.length,
                   separatorBuilder: (context, i) {
-                    return SizedBox(
+                    return const SizedBox(
                       height: 20,
                     );
                   },
                 ),
                 ListView.separated(
-                  padding: EdgeInsets.all(20),
+                  padding: const EdgeInsets.all(20),
                   itemBuilder: (context, i) {
                     return _buildVolumeItem(volumes[i]);
                   },
                   itemCount: volumes.length,
                   separatorBuilder: (context, i) {
-                    return SizedBox(
+                    return const SizedBox(
                       height: 20,
                     );
                   },
@@ -720,16 +580,16 @@ class _UserDetailState extends State<UserDetail>
           ),
           SafeArea(
             child: Padding(
-              padding: EdgeInsets.all(20),
+              padding: const EdgeInsets.all(20),
               child: OutlinedButton(
                 onPressed: () async {
                   if (password.isNotBlank || confirmPassword.isNotBlank) {
                     if (password != confirmPassword) {
-                      Util.instance.toast("密码输入不一致");
+                      UiUtil.toast("密码输入不一致");
                       return;
                     }
                     if (password != '' && password.length < 6) {
-                      Util.instance.toast("密码最低6位");
+                      UiUtil.toast("密码最低6位");
                       return;
                     }
                     user?['password'] = password;
@@ -759,16 +619,16 @@ class _UserDetailState extends State<UserDetail>
                   if (res['success']) {
                     widget.user['name'] = user?['new_name'];
                     widget.user['email'] = user?['email'];
-                    Util.instance.toast("保存成功");
+                    UiUtil.toast("保存成功");
                   } else {
-                    Util.instance.toast("保存失败,代码${res['error']['code']}");
+                    UiUtil.toast("保存失败,代码${res['error']['code']}");
                   }
                 },
                 child: saving
-                    ? CupertinoActivityIndicator(
+                    ? const CupertinoActivityIndicator(
                         radius: 13,
                       )
-                    : Text(
+                    : const Text(
                         ' 保存 ',
                         style: TextStyle(fontSize: 18),
                       ),

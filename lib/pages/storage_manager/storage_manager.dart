@@ -1,42 +1,35 @@
 import 'package:garden/pages/storage_manager/smart.dart';
-import 'package:garden/themes/app_theme.dart';
-import 'package:garden/util/function.dart';
+import 'package:garden/util/ui_util.dart';
+import 'package:garden/util/http_util.dart';
 import 'package:garden/widgets/bubble_tab_indicator.dart';
 import 'package:garden/widgets/dashed_decoration.dart';
-import 'package:garden/widgets/label.dart';
 import 'package:garden/widgets/neu_back_button.dart';
+import 'package:garden/widgets/storage/ssd_cache_item.dart';
+import 'package:garden/widgets/storage/volume_item.dart';
+import 'package:garden/widgets/storage/disk_item.dart';
+import 'package:garden/widgets/storage/pool_item.dart';
+import 'package:garden/widgets/storage/pool_detail.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:percent_indicator/circular_percent_indicator.dart';
+import 'package:garden/constants/app_constants.dart';
 
 class StorageManager extends StatefulWidget {
+  const StorageManager({super.key});
+
   @override
-  _StorageManagerState createState() => _StorageManagerState();
+  StorageManagerState createState() => StorageManagerState();
 }
 
-class _StorageManagerState extends State<StorageManager>
+class StorageManagerState extends State<StorageManager>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
   bool loading = true;
-  List ssdCaches = [];
-  List volumes = [];
-  List disks = [];
-  List storagePools = [];
-  List hotSpares = [];
-  Map env = {};
-
-  // 主题颜色
-  Color get _errorColor =>
-      Theme.of(context).extension<AppTheme>()?.errorColor ?? Colors.red;
-  Color get _successColor =>
-      Theme.of(context).extension<AppTheme>()?.successColor ?? Colors.green;
-  Color get _warningColor =>
-      Theme.of(context).extension<AppTheme>()?.warningColor ??
-      Colors.orangeAccent;
-  Color get _infoColor =>
-      Theme.of(context).extension<AppTheme>()?.infoColor ?? Colors.blue;
-  Color get _uploadColor => _infoColor;
-  Color get _downloadColor => _successColor;
+  List<Map<String, dynamic>> ssdCaches = [];
+  List<Map<String, dynamic>> volumes = [];
+  List<Map<String, dynamic>> disks = [];
+  List<Map<String, dynamic>> storagePools = [];
+  List<Map<String, dynamic>> hotSpares = [];
+  Map<String, dynamic> env = {};
 
   @override
   void initState() {
@@ -66,778 +59,12 @@ class _StorageManagerState extends State<StorageManager>
         hotSpares = res['data']['hotSpares'];
       });
     } else {
-      Util.instance.toast("获取存储空间信息失败，代码${res['error']['code']}");
-      Navigator.of(context).pop();
+      UiUtil.toast("获取存储空间信息失败，代码${res['error']['code']}");
+      if (context.mounted) {
+        // ignore: use_build_context_synchronously
+        Navigator.of(context).pop();
+      }
     }
-  }
-
-  Widget _buildSSDCacheItem(volume) {
-    double percent =
-        int.parse(volume['size']['used'] ?? volume['size']['reusable']) /
-            int.parse(volume['size']['total']);
-    return Card(
-      shape: RoundedRectangleBorder(
-          side: BorderSide(), borderRadius: BorderRadius.circular(18)),
-      margin: EdgeInsets.only(top: 20, left: 20, right: 20),
-      child: Row(
-        children: [
-          Card(
-            shape: RoundedRectangleBorder(
-                side: BorderSide(), borderRadius: BorderRadius.circular(18)),
-            margin: EdgeInsets.all(10),
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: CircularPercentIndicator(
-                radius: 40,
-                // progressColor: Colors.lightBlueAccent,
-                animation: true,
-                linearGradient: LinearGradient(
-                  colors: percent <= 0.9
-                      ? [
-                          Colors.blue,
-                          Colors.blueAccent,
-                        ]
-                      : [
-                          Colors.red,
-                          Colors.orangeAccent,
-                        ],
-                ),
-                animateFromLastPercent: true,
-                circularStrokeCap: CircularStrokeCap.round,
-                lineWidth: 12,
-                backgroundColor: Colors.black12,
-                percent: percent,
-                center: Text(
-                  "${(percent * 100).toStringAsFixed(0)}%",
-                  style: TextStyle(
-                      color: percent <= 0.9 ? Colors.blue : Colors.red,
-                      fontSize: 22),
-                ),
-              ),
-            ),
-          ),
-          SizedBox(
-            width: 10,
-          ),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Text(
-                      "${volume['id'].toString().replaceFirst("ssd_", "SSD 缓存 ")}",
-                      style: TextStyle(fontWeight: FontWeight.w600),
-                    ),
-                    SizedBox(
-                      width: 5,
-                    ),
-                    Label(
-                      volume['status'] == "normal" ? "正常" : volume['status'],
-                      volume['status'] == "normal" ? Colors.green : Colors.red,
-                      fill: true,
-                    ),
-                  ],
-                ),
-                SizedBox(
-                  height: 5,
-                ),
-                Text(
-                    "已用：${Util.instance.formatSize(int.parse(volume['size']['used'] ?? volume['size']['reusable']))}"),
-                SizedBox(
-                  height: 5,
-                ),
-                Text(
-                    "可用：${Util.instance.formatSize(int.parse(volume['size']['total']) - int.parse(volume['size']['used'] ?? volume['size']['reusable']))}"),
-                SizedBox(
-                  height: 5,
-                ),
-                Text(
-                    "容量：${Util.instance.formatSize(int.parse(volume['size']['total']))}"),
-              ],
-            ),
-          )
-        ],
-      ),
-    );
-  }
-
-  Widget _buildVolumeItem(volume) {
-    return Card(
-      shape: RoundedRectangleBorder(
-          side: BorderSide(), borderRadius: BorderRadius.circular(18)),
-      margin: EdgeInsets.only(top: 20, left: 20, right: 20),
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Row(
-          children: [
-            Card(
-              shape: RoundedRectangleBorder(
-                  side: BorderSide(), borderRadius: BorderRadius.circular(18)),
-              margin: EdgeInsets.all(10),
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: CircularPercentIndicator(
-                  radius: 40,
-                  // progressColor: Colors.lightBlueAccent,
-                  animation: true,
-                  linearGradient: LinearGradient(
-                    colors: int.parse(volume['size']['used']) /
-                                int.parse(volume['size']['total']) <=
-                            0.9
-                        ? [
-                            Colors.blue,
-                            Colors.blueAccent,
-                          ]
-                        : [
-                            Colors.red,
-                            Colors.orangeAccent,
-                          ],
-                  ),
-                  animateFromLastPercent: true,
-                  circularStrokeCap: CircularStrokeCap.round,
-                  lineWidth: 12,
-                  backgroundColor: Colors.black12,
-                  percent: int.parse(volume['size']['used']) /
-                      int.parse(volume['size']['total']),
-                  center: Text(
-                    "${(int.parse(volume['size']['used']) / int.parse(volume['size']['total']) * 100).toStringAsFixed(0)}%",
-                    style: TextStyle(
-                        color: int.parse(volume['size']['used']) /
-                                    int.parse(volume['size']['total']) <=
-                                0.9
-                            ? Colors.blue
-                            : Colors.red,
-                        fontSize: 22),
-                  ),
-                ),
-              ),
-            ),
-            SizedBox(
-              width: 10,
-            ),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "存储空间 ${volume['num_id']}",
-                    style: TextStyle(fontWeight: FontWeight.w600),
-                  ),
-                  SizedBox(
-                    height: 5,
-                  ),
-                  Row(
-                    children: [
-                      Label(
-                        "${volume['fs_type']}",
-                        Colors.lightBlueAccent,
-                        height: 23,
-                      ),
-                      SizedBox(
-                        width: 5,
-                      ),
-                      volume['status'] == "normal"
-                          ? Label(
-                              "正常",
-                              Colors.green,
-                              fill: true,
-                            )
-                          : volume['status'] == "background"
-                              ? Label(
-                                  "正在检查硬盘",
-                                  Colors.lightBlueAccent,
-                                  fill: true,
-                                )
-                              : volume['status'] == "attention"
-                                  ? Label(
-                                      "注意",
-                                      Colors.orangeAccent,
-                                      fill: true,
-                                    )
-                                  : Label(
-                                      volume['status'],
-                                      Colors.red,
-                                      fill: true,
-                                    ),
-                    ],
-                  ),
-                  SizedBox(
-                    height: 5,
-                  ),
-                  Text(
-                      "已用：${Util.instance.formatSize(int.parse(volume['size']['used']))}"),
-                  SizedBox(
-                    height: 5,
-                  ),
-                  Text(
-                      "可用：${Util.instance.formatSize(int.parse(volume['size']['total']) - int.parse(volume['size']['used']))}"),
-                  SizedBox(
-                    height: 5,
-                  ),
-                  Text(
-                      "全部：${Util.instance.formatSize(int.parse(volume['size']['total']))}"),
-                ],
-              ),
-            )
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildDiskItem(disk, {bool full = false}) {
-    return GestureDetector(
-      onTap: () {
-        Navigator.of(context).push(CupertinoPageRoute(
-            builder: (context) {
-              return Smart(disk);
-            },
-            settings: RouteSettings(name: "disk_smart")));
-      },
-      child: Card(
-        shape: RoundedRectangleBorder(
-            side: BorderSide(), borderRadius: BorderRadius.circular(18)),
-        margin: EdgeInsets.only(top: 10),
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Column(
-            children: [
-              Row(
-                children: [
-                  Card(
-                    shape: RoundedRectangleBorder(
-                        side: BorderSide(),
-                        borderRadius: BorderRadius.circular(18)),
-                    margin: EdgeInsets.all(10),
-                    child: Image.asset(
-                      disk['isSsd']
-                          ? "assets/icons/ssd.png"
-                          : "assets/icons/hdd.png",
-                      width: 40,
-                    ),
-                  ),
-                  SizedBox(
-                    width: 10,
-                  ),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            Text(
-                              "${disk['longName'].replaceAll("Cache device", "缓存设备")}",
-                              style: TextStyle(fontWeight: FontWeight.w600),
-                            ),
-                            SizedBox(
-                              width: 5,
-                            ),
-                            Label(
-                              disk['overview_status'] == "normal"
-                                  ? "正常"
-                                  : disk['overview_status'],
-                              disk['overview_status'] == "normal"
-                                  ? Colors.green
-                                  : Colors.red,
-                              fill: true,
-                            ),
-                            SizedBox(
-                              width: 5,
-                            ),
-                            if (disk['temp'] != null && disk['temp'] > -1)
-                              Label(
-                                "${disk['temp']}℃",
-                                Colors.lightBlueAccent,
-                                height: 23,
-                              ),
-                          ],
-                        ),
-                        SizedBox(
-                          height: 5,
-                        ),
-                        Text(
-                            "${disk['vendor'].trim()} ${disk['model'].trim()}"),
-                        SizedBox(
-                          height: 5,
-                        ),
-                        Text(
-                            "${Util.instance.formatSize(int.parse(disk['size_total']))}"),
-                      ],
-                    ),
-                  )
-                ],
-              ),
-              if (full) ...[
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 10),
-                  child: Column(
-                    children: [
-                      Row(
-                        children: [
-                          SizedBox(
-                            width: 150,
-                            child: Text(
-                              "位置",
-                              style: TextStyle(fontWeight: FontWeight.w600),
-                            ),
-                          ),
-                          Text("${disk['container']['str']}"),
-                        ],
-                      ),
-                      SizedBox(
-                        height: 5,
-                      ),
-                      Row(
-                        children: [
-                          SizedBox(
-                            width: 150,
-                            child: Text(
-                              "硬盘类型",
-                              style: TextStyle(fontWeight: FontWeight.w600),
-                            ),
-                          ),
-                          Text("${disk['diskType']}"),
-                        ],
-                      ),
-                      SizedBox(
-                        height: 5,
-                      ),
-                      Row(
-                        children: [
-                          SizedBox(
-                            width: 150,
-                            child: Text(
-                              "存储池",
-                              style: TextStyle(fontWeight: FontWeight.w600),
-                            ),
-                          ),
-                          if (storagePools
-                                  .where(
-                                      (pool) => pool['id'] == disk['used_by'])
-                                  .toList()
-                                  .length >
-                              0)
-                            Text(
-                                "存储池 ${storagePools.where((pool) => pool['id'] == disk['used_by']).toList()[0]['num_id']}")
-                          else if (ssdCaches
-                                  .where((ssd) => ssd['id'] == disk['used_by'])
-                                  .toList()
-                                  .length >
-                              0)
-                            Text(
-                                "${ssdCaches.where((ssd) => ssd['id'] == disk['used_by']).toList()[0]['id'].toString().replaceFirst("ssd_", "SSD 缓存 ")}")
-                          else
-                            Text("-"),
-                        ],
-                      ),
-                      SizedBox(
-                        height: 5,
-                      ),
-                      Row(
-                        children: [
-                          SizedBox(
-                            width: 150,
-                            child: Text(
-                              "硬盘分配状态",
-                              style: TextStyle(fontWeight: FontWeight.w600),
-                            ),
-                          ),
-                          Text(
-                            "${disk['status'] == "normal" ? "正常" : disk['status'] == "not_use" ? "未初始化" : disk['status'] == "sys_partition_normal" ? "已初始化" : "${disk['status']}"}",
-                            style: TextStyle(
-                                color: disk['status'] == "normal"
-                                    ? Colors.green
-                                    : Colors.red),
-                          ),
-                        ],
-                      ),
-                      SizedBox(
-                        height: 5,
-                      ),
-                      Row(
-                        children: [
-                          SizedBox(
-                            width: 150,
-                            child: Text(
-                              "健康状态",
-                              style: TextStyle(fontWeight: FontWeight.w600),
-                            ),
-                          ),
-                          Text(
-                            "${disk['smart_status'] == "normal" ? "正常" : disk['smart_status']}",
-                            style: TextStyle(
-                                color: disk['smart_status'] == "normal"
-                                    ? Colors.green
-                                    : Colors.red),
-                          ),
-                        ],
-                      ),
-                      SizedBox(
-                        height: 5,
-                      ),
-                      if (disk['remain_life'] != null) ...[
-                        Row(
-                          children: [
-                            SizedBox(
-                              width: 150,
-                              child: Text(
-                                "预计寿命",
-                                style: TextStyle(fontWeight: FontWeight.w600),
-                              ),
-                            ),
-                            Text(
-                                "${disk['remain_life'] == -1 ? "-" : disk['remain_life']}"),
-                          ],
-                        ),
-                        SizedBox(
-                          height: 5,
-                        ),
-                      ],
-                      if (disk['unc'] != null && disk['unc'] > -1) ...[
-                        Row(
-                          children: [
-                            SizedBox(
-                              width: 150,
-                              child: Text(
-                                "坏扇区数量",
-                                style: TextStyle(fontWeight: FontWeight.w600),
-                              ),
-                            ),
-                            Text("${disk['unc']}"),
-                          ],
-                        ),
-                        SizedBox(
-                          height: 5,
-                        ),
-                      ],
-                      if (disk['temp'] != null) ...[
-                        Row(
-                          children: [
-                            SizedBox(
-                              width: 150,
-                              child: Text(
-                                "温度",
-                                style: TextStyle(fontWeight: FontWeight.w600),
-                              ),
-                            ),
-                            Text(
-                                "${disk['temp'] > -1 ? "${disk['temp']} ℃" : "-"}"),
-                          ],
-                        ),
-                        SizedBox(
-                          height: 5,
-                        ),
-                      ],
-                      if (disk['serial'] != null) ...[
-                        Row(
-                          children: [
-                            SizedBox(
-                              width: 150,
-                              child: Text(
-                                "序列号",
-                                style: TextStyle(fontWeight: FontWeight.w600),
-                              ),
-                            ),
-                            Text("${disk['serial']}"),
-                          ],
-                        ),
-                        SizedBox(
-                          height: 5,
-                        ),
-                      ],
-                      if (disk['firm'] != null) ...[
-                        Row(
-                          children: [
-                            SizedBox(
-                              width: 150,
-                              child: Text(
-                                "固件版本",
-                                style: TextStyle(fontWeight: FontWeight.w600),
-                              ),
-                            ),
-                            Text("${disk['firm']}"),
-                          ],
-                        ),
-                        SizedBox(
-                          height: 5,
-                        ),
-                      ],
-                      if (disk['is4Kn'] != null)
-                        Row(
-                          children: [
-                            SizedBox(
-                              width: 150,
-                              child: Text(
-                                "4K原生硬盘",
-                                style: TextStyle(fontWeight: FontWeight.w600),
-                              ),
-                            ),
-                            Text("${disk['is4Kn'] ? "是" : "否"}"),
-                          ],
-                        ),
-                    ],
-                  ),
-                ),
-              ],
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildPoolDetail(pool) {
-    return Card(
-      shape: RoundedRectangleBorder(
-          side: BorderSide(), borderRadius: BorderRadius.circular(18)),
-      child: Padding(
-        padding: EdgeInsets.all(20),
-        child: Column(
-          children: [
-            Row(
-              children: [
-                Text(
-                  "存储池 ${pool['num_id']}",
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
-                ),
-                SizedBox(
-                  width: 5,
-                ),
-                pool['status'] == "normal"
-                    ? Label(
-                        "正常",
-                        Colors.green,
-                        fill: true,
-                      )
-                    : pool['status'] == "background"
-                        ? Label(
-                            "正在检查硬盘",
-                            Colors.lightBlueAccent,
-                            fill: true,
-                          )
-                        : pool['status'] == "attention"
-                            ? Label(
-                                "注意",
-                                Colors.orangeAccent,
-                                fill: true,
-                              )
-                            : Label(
-                                pool['status'],
-                                Colors.red,
-                                fill: true,
-                              ),
-                Spacer(),
-                Text(
-                    "${Util.instance.formatSize(int.parse(pool['size']['used']))} / ${Util.instance.formatSize(int.parse(pool['size']['total']))}"),
-              ],
-            ),
-            Row(
-              children: [
-                Text(
-                  pool['device_type'] == "basic"
-                      ? "Basic"
-                      : pool['device_type'] == "shr_without_disk_protect" ||
-                              pool['device_type'] == "shr"
-                          ? "Synology Hybrid RAID (SHR) "
-                          : pool['device_type'],
-                  style: TextStyle(fontSize: 12, color: Colors.grey),
-                ),
-                if (pool['device_type'] == "basic" ||
-                    pool['device_type'] == "shr_without_disk_protect")
-                  Text(
-                    "（无数据保护）",
-                    style: TextStyle(fontSize: 12, color: Colors.red),
-                  ),
-              ],
-            ),
-            SizedBox(
-              height: 5,
-            ),
-            Row(
-              children: [
-                SizedBox(
-                  width: 150,
-                  child: Text(
-                    "支持多个存储空间",
-                    style: TextStyle(fontWeight: FontWeight.w600),
-                  ),
-                ),
-                Text("${pool['raidType'] == "single" ? "否" : "是"}")
-              ],
-            ),
-            SizedBox(
-              height: 5,
-            ),
-            Row(
-              children: [
-                SizedBox(
-                  width: 150,
-                  child: Text(
-                    "可用容量",
-                    style: TextStyle(fontWeight: FontWeight.w600),
-                  ),
-                ),
-                Text(
-                    "${Util.instance.formatSize(int.parse(pool['size']['total']) - int.parse(pool['size']['used']))}"),
-              ],
-            ),
-            SizedBox(
-              height: 20,
-            ),
-            Card(
-              shape: RoundedRectangleBorder(
-                  side: BorderSide(), borderRadius: BorderRadius.circular(18)),
-              child: Padding(
-                padding: EdgeInsets.all(20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "硬盘信息",
-                      style: TextStyle(fontWeight: FontWeight.w600),
-                    ),
-                    ...disks
-                        .where((e) => pool['disks'].contains(e['id']))
-                        .map(_buildDiskItem)
-                        .toList(),
-                  ],
-                ),
-              ),
-            ),
-            SizedBox(
-              height: 20,
-            ),
-            Card(
-              shape: RoundedRectangleBorder(
-                  side: BorderSide(), borderRadius: BorderRadius.circular(18)),
-              child: Padding(
-                padding: EdgeInsets.all(20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "可用Hot Spare硬盘",
-                      style: TextStyle(fontWeight: FontWeight.w600),
-                    ),
-                    SizedBox(
-                      height: 10,
-                    ),
-                    Row(
-                      children: [
-                        Text(
-                            "${pool['spares'] == null || pool['spares'].length == 0 ? "系统中无备援配置" : "暂不支持显示，共${pool['spares'].length}块"}"),
-                      ],
-                    )
-                  ],
-                ),
-              ),
-            ),
-            SizedBox(
-              height: 20,
-            ),
-            Card(
-              shape: RoundedRectangleBorder(
-                  side: BorderSide(), borderRadius: BorderRadius.circular(18)),
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Padding(
-                      padding: EdgeInsets.only(left: 20, top: 20),
-                      child: Text(
-                        "存储分配",
-                        style: TextStyle(fontWeight: FontWeight.w600),
-                      ),
-                    ),
-                    ...volumes
-                        .where((e) => e['pool_path'] == pool['id'])
-                        .map(_buildVolumeItem)
-                        .toList(),
-                    SizedBox(
-                      height: 20,
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildPoolItem(pool) {
-    return Card(
-      shape: RoundedRectangleBorder(
-          side: BorderSide(), borderRadius: BorderRadius.circular(18)),
-      margin: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-      child: Padding(
-        padding: EdgeInsets.all(10),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Text("存储池 ${pool['num_id']}"),
-                SizedBox(
-                  width: 10,
-                ),
-                pool['status'] == "normal"
-                    ? Label(
-                        "正常",
-                        Colors.green,
-                        fill: true,
-                      )
-                    : pool['status'] == "background"
-                        ? Label(
-                            "正在检查硬盘",
-                            Colors.lightBlueAccent,
-                            fill: true,
-                          )
-                        : pool['status'] == "attention"
-                            ? Label(
-                                "注意",
-                                Colors.orangeAccent,
-                                fill: true,
-                              )
-                            : Label(
-                                pool['status'],
-                                Colors.red,
-                                fill: true,
-                              ),
-                Spacer(),
-                Text(
-                    Util.instance.formatSize(int.parse(pool['size']['total']))),
-              ],
-            ),
-            SizedBox(
-              height: 10,
-            ),
-            Row(
-              children: [
-                Text(
-                  pool['device_type'] == "basic"
-                      ? "Basic"
-                      : pool['device_type'] == "shr_without_disk_protect" ||
-                              pool['device_type'] == "shr"
-                          ? "Synology Hybrid RAID (SHR) "
-                          : pool['device_type'],
-                  style: TextStyle(fontSize: 12, color: Colors.grey),
-                ),
-                if (pool['device_type'] == "basic" ||
-                    pool['device_type'] == "shr_without_disk_protect")
-                  Text(
-                    "（无数据保护）",
-                    style: TextStyle(fontSize: 12, color: Colors.red),
-                  ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
   }
 
   @override
@@ -845,10 +72,10 @@ class _StorageManagerState extends State<StorageManager>
     return Scaffold(
       appBar: AppBar(
         leading: AppBackButton(context),
-        title: Text("存储空间管理员"),
+        title: const Text("存储空间管理员"),
       ),
       body: loading
-          ? Center(
+          ? const Center(
               child: CupertinoActivityIndicator(
                 radius: 14,
               ),
@@ -857,9 +84,10 @@ class _StorageManagerState extends State<StorageManager>
               children: [
                 Card(
                   shape: RoundedRectangleBorder(
-                      side: BorderSide(),
+                      side: const BorderSide(),
                       borderRadius: BorderRadius.circular(18)),
-                  margin: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                  margin:
+                      const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
                   child: TabBar(
                     dividerHeight: 0,
                     isScrollable: true,
@@ -869,8 +97,8 @@ class _StorageManagerState extends State<StorageManager>
                         ? Colors.white
                         : Colors.black,
                     unselectedLabelColor: Colors.grey,
-                    indicator: BubbleTabIndicator(),
-                    tabs: [
+                    indicator: const BubbleTabIndicator(),
+                    tabs: const [
                       Padding(
                         padding:
                             EdgeInsets.symmetric(vertical: 10, horizontal: 5),
@@ -912,21 +140,22 @@ class _StorageManagerState extends State<StorageManager>
                         children: [
                           Card(
                             shape: RoundedRectangleBorder(
-                                side: BorderSide(),
+                                side: const BorderSide(),
                                 borderRadius: BorderRadius.circular(18)),
-                            margin: EdgeInsets.symmetric(
+                            margin: const EdgeInsets.symmetric(
                                 horizontal: 20, vertical: 15),
                             child: Padding(
-                              padding: const EdgeInsets.all(8.0),
+                              padding: const EdgeInsets.all(
+                                  AppConstants.paddingSmall),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  SizedBox(
+                                  const SizedBox(
                                     height: 20,
                                   ),
-                                  Padding(
-                                    padding:
-                                        EdgeInsets.symmetric(horizontal: 20),
+                                  const Padding(
+                                    padding: EdgeInsets.symmetric(
+                                        horizontal: AppConstants.paddingLarge),
                                     child: Text(
                                       "存储空间状态",
                                       style: TextStyle(
@@ -934,8 +163,9 @@ class _StorageManagerState extends State<StorageManager>
                                           fontWeight: FontWeight.w600),
                                     ),
                                   ),
-                                  ...volumes.map(_buildVolumeItem).toList(),
-                                  SizedBox(
+                                  ...volumes.map(
+                                      (volume) => VolumeItem(volume: volume)),
+                                  const SizedBox(
                                     height: 20,
                                   ),
                                 ],
@@ -944,21 +174,22 @@ class _StorageManagerState extends State<StorageManager>
                           ),
                           Card(
                             shape: RoundedRectangleBorder(
-                                side: BorderSide(),
+                                side: const BorderSide(),
                                 borderRadius: BorderRadius.circular(18)),
-                            margin: EdgeInsets.symmetric(
+                            margin: const EdgeInsets.symmetric(
                                 horizontal: 20, vertical: 15),
                             child: Padding(
-                              padding: const EdgeInsets.all(8.0),
+                              padding: const EdgeInsets.all(
+                                  AppConstants.paddingSmall),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  SizedBox(
+                                  const SizedBox(
                                     height: 20,
                                   ),
-                                  Padding(
-                                    padding:
-                                        EdgeInsets.symmetric(horizontal: 20),
+                                  const Padding(
+                                    padding: EdgeInsets.symmetric(
+                                        horizontal: AppConstants.paddingLarge),
                                     child: Text(
                                       "存储池",
                                       style: TextStyle(
@@ -967,9 +198,8 @@ class _StorageManagerState extends State<StorageManager>
                                     ),
                                   ),
                                   ...storagePools.reversed
-                                      .map(_buildPoolItem)
-                                      .toList(),
-                                  SizedBox(
+                                      .map((pool) => PoolItem(pool: pool)),
+                                  const SizedBox(
                                     height: 20,
                                   ),
                                 ],
@@ -978,22 +208,22 @@ class _StorageManagerState extends State<StorageManager>
                           ),
                           Card(
                             shape: RoundedRectangleBorder(
-                                side: BorderSide(),
+                                side: const BorderSide(),
                                 borderRadius: BorderRadius.circular(18)),
-                            margin: EdgeInsets.symmetric(
+                            margin: const EdgeInsets.symmetric(
                                 horizontal: 20, vertical: 15),
                             child: Padding(
-                              padding: EdgeInsets.all(20),
+                              padding: const EdgeInsets.all(20),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(
+                                  const Text(
                                     "硬盘信息",
                                     style: TextStyle(
                                         fontSize: 18,
                                         fontWeight: FontWeight.w600),
                                   ),
-                                  SizedBox(
+                                  const SizedBox(
                                     height: 20,
                                   ),
                                   Wrap(
@@ -1008,27 +238,21 @@ class _StorageManagerState extends State<StorageManager>
                                           width: 40,
                                           decoration: DashedDecoration(
                                             color: disks
-                                                        .where((disk) =>
-                                                            disk['num_id'] ==
-                                                            i + 1)
-                                                        .length >
-                                                    0
+                                                    .where((disk) =>
+                                                        disk['num_id'] == i + 1)
+                                                    .isNotEmpty
                                                 ? Colors.blue
                                                 : Colors.transparent,
                                             dashedColor: disks
-                                                        .where((disk) =>
-                                                            disk['num_id'] ==
-                                                            i + 1)
-                                                        .length >
-                                                    0
+                                                    .where((disk) =>
+                                                        disk['num_id'] == i + 1)
+                                                    .isNotEmpty
                                                 ? Colors.blue
                                                 : Colors.grey,
                                             gap: disks
-                                                        .where((disk) =>
-                                                            disk['num_id'] ==
-                                                            i + 1)
-                                                        .length >
-                                                    0
+                                                    .where((disk) =>
+                                                        disk['num_id'] == i + 1)
+                                                    .isNotEmpty
                                                 ? 0.1
                                                 : 2,
                                           ),
@@ -1041,71 +265,92 @@ class _StorageManagerState extends State<StorageManager>
                           ),
                         ],
                       ),
-                      volumes.length > 0
+                      volumes.isNotEmpty
                           ? ListView.separated(
                               itemBuilder: (context, i) {
-                                return _buildVolumeItem(
-                                    volumes.reversed.toList()[i]);
+                                return VolumeItem(
+                                    volume: volumes.reversed.toList()[i]);
                               },
                               itemCount: volumes.length,
                               separatorBuilder: (context, i) {
-                                return SizedBox(
+                                return const SizedBox(
                                   height: 20,
                                 );
                               },
                             )
-                          : Center(
+                          : const Center(
                               child: Text("无存储空间"),
                             ),
-                      storagePools.length > 0
+                      storagePools.isNotEmpty
                           ? ListView.separated(
-                              padding: EdgeInsets.all(20),
+                              padding: const EdgeInsets.all(20),
                               itemBuilder: (context, i) {
-                                return _buildPoolDetail(
-                                    storagePools.reversed.toList()[i]);
+                                return PoolDetail(
+                                  pool: storagePools.reversed.toList()[i],
+                                  disks: disks,
+                                  volumes: volumes,
+                                  ssdCaches: ssdCaches,
+                                );
                               },
                               itemCount: storagePools.length,
                               separatorBuilder: (context, i) {
-                                return SizedBox(
+                                return const SizedBox(
                                   height: 20,
                                 );
                               },
                             )
-                          : Center(
+                          : const Center(
                               child: Text("无存储池"),
                             ),
-                      disks.length > 0
+                      disks.isNotEmpty
                           ? ListView.separated(
-                              padding: EdgeInsets.all(20),
+                              padding: const EdgeInsets.all(20),
                               itemBuilder: (context, i) {
-                                return _buildDiskItem(disks[i], full: true);
+                                return GestureDetector(
+                                  onTap: () {
+                                    Navigator.of(context).push(
+                                        CupertinoPageRoute(
+                                            builder: (context) {
+                                              return Smart(disks[i]);
+                                            },
+                                            settings: const RouteSettings(
+                                                name: "disk_smart")));
+                                  },
+                                  child: DiskItem(
+                                    disk: disks[i],
+                                    storagePools: storagePools,
+                                    ssdCaches: ssdCaches,
+                                    full: true,
+                                  ),
+                                );
                               },
                               itemCount: disks.length,
                               separatorBuilder: (context, i) {
-                                return SizedBox(
+                                return const SizedBox(
                                   height: 20,
                                 );
                               },
                             )
-                          : Center(
+                          : const Center(
                               child: Text("无HDD/SSD"),
                             ),
                       Center(
-                        child: Text(
-                            "${hotSpares.length > 0 ? "暂不支持显示，共${hotSpares.length}个" : "无备援装置"}"),
+                        child: Text(hotSpares.isNotEmpty
+                            ? "暂不支持显示，共${hotSpares.length}个"
+                            : "无备援装置"),
                       ),
-                      ssdCaches.length > 0
+                      ssdCaches.isNotEmpty
                           ? ListView.separated(
                               itemBuilder: (context, i) {
-                                return _buildSSDCacheItem(ssdCaches[i]);
+                                return SsdCacheItem(volume: ssdCaches[i]);
                               },
                               separatorBuilder: (context, i) {
-                                return SizedBox(
+                                return const SizedBox(
                                   height: 20,
                                 );
                               },
                               itemCount: ssdCaches.length)
-                          : Center(
+                          : const Center(
                               child: Text("无SSD缓存"),
                             ),
                     ],

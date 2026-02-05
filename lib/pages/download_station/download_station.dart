@@ -1,9 +1,12 @@
 import 'dart:async';
+import 'package:garden/util/file_type_util.dart';
+import 'package:garden/util/format_util.dart';
 
 import 'package:garden/pages/download_station/add_task.dart';
 import 'package:garden/pages/download_station/detail.dart';
-import 'package:garden/themes/app_theme.dart';
-import 'package:garden/util/function.dart';
+import 'package:garden/theme/app_colors.dart';
+import 'package:garden/theme/app_theme.dart';
+import 'package:garden/util/http_util.dart';
 import 'package:garden/widgets/file_icon.dart';
 import 'package:garden/widgets/animation_progress_bar.dart';
 import 'package:garden/widgets/neu_back_button.dart';
@@ -11,11 +14,13 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class DownloadStation extends StatefulWidget {
+  const DownloadStation({super.key});
+
   @override
-  _DownloadStationState createState() => _DownloadStationState();
+  DownloadStationState createState() => DownloadStationState();
 }
 
-class _DownloadStationState extends State<DownloadStation> {
+class DownloadStationState extends State<DownloadStation> {
   bool loading = true;
   late Timer timer;
   List tasks = [];
@@ -24,7 +29,7 @@ class _DownloadStationState extends State<DownloadStation> {
   Map<String, bool> pauseLoading = {};
   @override
   void initState() {
-    timer = Timer.periodic(Duration(seconds: 10), (timer) {
+    timer = Timer.periodic(const Duration(seconds: 10), (timer) {
       getData();
     });
     getData();
@@ -47,7 +52,7 @@ class _DownloadStationState extends State<DownloadStation> {
     });
     if (res['success']) {
       List result = res['data']['result'];
-      result.forEach((item) {
+      for (var item in result) {
         if (item['success'] == true) {
           switch (item['api']) {
             case "SYNO.DownloadStation2.Task":
@@ -63,13 +68,14 @@ class _DownloadStationState extends State<DownloadStation> {
               break;
           }
         }
-      });
+      }
     }
   }
 
   Widget _buildDownloadItem(download) {
     pauseLoading[download['id']] = pauseLoading[download['id']] ?? false;
-    FileTypeEnum fileType = Util.instance.fileType(download['title']);
+    FileTypeEnum fileType = FileTypeUtil.toFileTypeEnum(
+        FileTypeUtil.getFileType(download['title']));
     return GestureDetector(
       onTap: () {
         Navigator.of(context)
@@ -78,7 +84,7 @@ class _DownloadStationState extends State<DownloadStation> {
             builder: (context) {
               return DownloadDetail(download['id']);
             },
-            settings: RouteSettings(name: "download_detail"),
+            settings: const RouteSettings(name: "download_detail"),
           ),
         )
             .then((res) {
@@ -89,25 +95,25 @@ class _DownloadStationState extends State<DownloadStation> {
       },
       child: Card(
         shape: RoundedRectangleBorder(
-            side: BorderSide(), borderRadius: BorderRadius.circular(18)),
+            side: const BorderSide(), borderRadius: BorderRadius.circular(18)),
         child: Padding(
-          padding: EdgeInsets.all(20),
+          padding: const EdgeInsets.all(20),
           child: Column(
             children: [
               Row(
                 children: [
                   FileIcon(fileType),
-                  SizedBox(
+                  const SizedBox(
                     width: 10,
                   ),
                   Expanded(
                     child: Text(
                       "${download['title']}",
-                      style: TextStyle(fontSize: 16),
+                      style: const TextStyle(fontSize: 16),
                       maxLines: 3,
                     ),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     width: 10,
                   ),
                   SizedBox(
@@ -131,7 +137,7 @@ class _DownloadStationState extends State<DownloadStation> {
                               }
                             },
                             child: pauseLoading[download['id']] == true
-                                ? CupertinoActivityIndicator()
+                                ? const CupertinoActivityIndicator()
                                 : Icon(
                                     download['status'] == 2
                                         ? Icons.pause_circle_outline_sharp
@@ -147,7 +153,7 @@ class _DownloadStationState extends State<DownloadStation> {
                   ),
                 ],
               ),
-              SizedBox(
+              const SizedBox(
                 height: 5,
               ),
               Row(
@@ -160,14 +166,14 @@ class _DownloadStationState extends State<DownloadStation> {
                           if (download['status'] != 5)
                             TextSpan(
                               text:
-                                  "${Util.instance.formatSize(download['additional']['transfer']['size_downloaded'])} / ",
-                              style: TextStyle(
+                                  "${FormatUtil.formatSize(download['additional']['transfer']['size_downloaded'])} / ",
+                              style: const TextStyle(
                                   fontSize: 12, color: Colors.lightBlueAccent),
                             ),
                           TextSpan(
-                            text:
-                                "${Util.instance.formatSize(download['size'])}",
-                            style: TextStyle(fontSize: 12, color: Colors.grey),
+                            text: FormatUtil.formatSize(download['size']),
+                            style: const TextStyle(
+                                fontSize: 12, color: Colors.grey),
                           ),
                         ],
                       ),
@@ -176,42 +182,51 @@ class _DownloadStationState extends State<DownloadStation> {
                   if (download['status'] == 2)
                     Expanded(
                       child: Text(
-                        "${download['additional']['transfer']['speed_download'] > 0 ? Util.instance.timeRemaining(((download['size'] - download['additional']['transfer']['size_downloaded']) / download['additional']['transfer']['speed_download']).ceil()) : "--:--:--"}",
-                        style: TextStyle(fontSize: 12, color: Colors.grey),
+                        download['additional']['transfer']['speed_download'] > 0
+                            ? HttpUtil.instance.timeRemaining(
+                                ((download['size'] -
+                                            download['additional']['transfer']
+                                                ['size_downloaded']) /
+                                        download['additional']['transfer']
+                                            ['speed_download'])
+                                    .ceil())
+                            : "--:--:--",
+                        style:
+                            const TextStyle(fontSize: 12, color: Colors.grey),
                         textAlign: TextAlign.start,
                       ),
                     ),
                   Expanded(
                     child: download['status'] == 1
-                        ? Text(
+                        ? const Text(
                             "等待中",
                             style: TextStyle(fontSize: 12, color: Colors.grey),
                             textAlign: TextAlign.right,
                           )
                         : download['status'] == 2
                             ? Text(
-                                "${Util.instance.formatSize(download['additional']['transfer']['speed_download'])}/s",
-                                style: TextStyle(
+                                "${FormatUtil.formatSize(download['additional']['transfer']['speed_download'])}/s",
+                                style: const TextStyle(
                                     fontSize: 12,
                                     color: Colors.lightBlueAccent),
                                 textAlign: TextAlign.right,
                               )
                             : download['status'] == 3
-                                ? Text(
+                                ? const Text(
                                     "已暂停",
                                     style: TextStyle(
                                         fontSize: 12, color: Colors.grey),
                                     textAlign: TextAlign.right,
                                   )
                                 : download['status'] == 5
-                                    ? Text(
+                                    ? const Text(
                                         "已完成",
                                         style: TextStyle(
                                             fontSize: 12, color: Colors.green),
                                         textAlign: TextAlign.right,
                                       )
                                     : download['status'] == 6
-                                        ? Text(
+                                        ? const Text(
                                             "检查中",
                                             style: TextStyle(
                                                 fontSize: 12,
@@ -219,7 +234,7 @@ class _DownloadStationState extends State<DownloadStation> {
                                             textAlign: TextAlign.right,
                                           )
                                         : download['status'] == 8
-                                            ? Text(
+                                            ? const Text(
                                                 "做种中",
                                                 style: TextStyle(
                                                     fontSize: 12,
@@ -227,7 +242,7 @@ class _DownloadStationState extends State<DownloadStation> {
                                                 textAlign: TextAlign.right,
                                               )
                                             : download['status'] == 11
-                                                ? Text(
+                                                ? const Text(
                                                     "等待中",
                                                     style: TextStyle(
                                                         fontSize: 12,
@@ -235,7 +250,7 @@ class _DownloadStationState extends State<DownloadStation> {
                                                     textAlign: TextAlign.right,
                                                   )
                                                 : download['status'] == 12
-                                                    ? Text(
+                                                    ? const Text(
                                                         "下载中",
                                                         style: TextStyle(
                                                             fontSize: 12,
@@ -244,7 +259,7 @@ class _DownloadStationState extends State<DownloadStation> {
                                                             TextAlign.right,
                                                       )
                                                     : download['status'] == 101
-                                                        ? Text(
+                                                        ? const Text(
                                                             "错误",
                                                             style: TextStyle(
                                                                 fontSize: 12,
@@ -255,7 +270,7 @@ class _DownloadStationState extends State<DownloadStation> {
                                                           )
                                                         : download['status'] ==
                                                                 105
-                                                            ? Text(
+                                                            ? const Text(
                                                                 "空间不足",
                                                                 style: TextStyle(
                                                                     fontSize:
@@ -268,7 +283,7 @@ class _DownloadStationState extends State<DownloadStation> {
                                                               )
                                                             : download['status'] ==
                                                                     113
-                                                                ? Text(
+                                                                ? const Text(
                                                                     "重复的任务",
                                                                     style: TextStyle(
                                                                         fontSize:
@@ -281,7 +296,7 @@ class _DownloadStationState extends State<DownloadStation> {
                                                                   )
                                                                 : Text(
                                                                     "代码：${download['status']}",
-                                                                    style: TextStyle(
+                                                                    style: const TextStyle(
                                                                         fontSize:
                                                                             12,
                                                                         color: Colors
@@ -293,11 +308,11 @@ class _DownloadStationState extends State<DownloadStation> {
                   ),
                 ],
               ),
-              SizedBox(
+              const SizedBox(
                 height: 2,
               ),
               FAProgressBar(
-                backgroundColor: Color(0xffE0E0E0),
+                backgroundColor: AppColors.greyLight,
                 progressColor: Colors.blue,
                 size: 6,
                 currentValue: download['size'] == 0
@@ -331,75 +346,75 @@ class _DownloadStationState extends State<DownloadStation> {
                 // mainAxisAlignment: MainAxisAlignment.center,
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(
+                  const Icon(
                     Icons.download_sharp,
                     size: 20,
                     color: Colors.lightBlueAccent,
                   ),
                   Text(
-                    Util.instance.formatSize(downloadRate),
-                    style: TextStyle(
+                    FormatUtil.formatSize(downloadRate),
+                    style: const TextStyle(
                       color: Colors.lightBlueAccent,
                     ),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     width: 10,
                   ),
-                  Icon(
+                  const Icon(
                     Icons.upload_sharp,
                     size: 20,
                     color: Colors.orange,
                   ),
                   Text(
-                    Util.instance.formatSize(uploadRate),
-                    style: TextStyle(
+                    FormatUtil.formatSize(uploadRate),
+                    style: const TextStyle(
                       color: Colors.orange,
                     ),
                   ),
                 ],
               )
-            : Text("Download Station"),
+            : const Text("Download Station"),
         actions: [
           Padding(
-            padding: EdgeInsets.only(right: 10, top: 8, bottom: 8),
+            padding: const EdgeInsets.only(right: 10, top: 8, bottom: 8),
             child: OutlinedButton(
               onPressed: () {
                 Navigator.of(context)
                     .push(
                   CupertinoPageRoute(
                     builder: (context) {
-                      return AddDownloadTask();
+                      return const AddDownloadTask();
                     },
-                    settings: RouteSettings(name: "add_download_task"),
+                    settings: const RouteSettings(name: "add_download_task"),
                   ),
                 )
                     .then((value) {
                   getData();
                 });
               },
-              child: Icon(Icons.add),
+              child: const Icon(Icons.add),
             ),
           ),
         ],
       ),
       body: loading
-          ? Center(
+          ? const Center(
               child: CupertinoActivityIndicator(
                 radius: 14,
               ),
             )
-          : tasks.length > 0
+          : tasks.isNotEmpty
               ? Column(
                   children: [
                     Expanded(
                       child: ListView.separated(
-                        padding: EdgeInsets.all(20),
+                        padding: const EdgeInsets.all(20),
                         itemBuilder: (context, i) {
                           return _buildDownloadItem(tasks[i]);
                         },
                         itemCount: tasks.length,
                         separatorBuilder: (context, i) {
-                          return SizedBox(
+                          return const SizedBox(
                             height: 20,
                           );
                         },

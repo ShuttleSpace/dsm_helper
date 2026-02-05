@@ -1,23 +1,19 @@
-import 'package:draggable_scrollbar/draggable_scrollbar.dart';
-import 'package:garden/pages/common/image_preview.dart';
-import 'package:garden/pages/moments/photos.dart';
-import 'package:garden/pages/moments/timeline.dart';
-import 'package:garden/util/function.dart';
+import 'package:garden/stores/connection_store.dart';
 import 'package:garden/util/moments_api.dart';
-import 'package:garden/widgets/cupertino_image.dart';
+import 'package:garden/widgets/moments/moments_content_tab.dart';
 import 'package:garden/widgets/neu_back_button.dart';
-import 'package:garden/widgets/transparent_router.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class Moments extends StatefulWidget {
+  const Moments({super.key});
+
   @override
-  _MomentsState createState() => _MomentsState();
+  MomentsState createState() => MomentsState();
 }
 
-class _MomentsState extends State<Moments> {
+class MomentsState extends State<Moments> {
   int currentIndex = 0;
-  ScrollController _scrollController = ScrollController();
+  final ScrollController _scrollController = ScrollController();
   List timeline = [];
   List category = [];
   List album = [];
@@ -31,6 +27,7 @@ class _MomentsState extends State<Moments> {
   bool loadingTimeline = true;
   bool loadingAlbum = true;
   bool loadingShares = true;
+  
   @override
   void initState() {
     getData();
@@ -39,7 +36,7 @@ class _MomentsState extends State<Moments> {
     getRecently();
     getVideos();
     getShares();
-    if (Util.instance.version == 7) {
+    if (connectionStore.version == 7) {
       debugPrint("DSM 版本为7");
       getGeocoding();
       getGeneral();
@@ -53,7 +50,7 @@ class _MomentsState extends State<Moments> {
     if (res['success'] && mounted) {
       setState(() {
         timeline = [];
-        if (Util.instance.version == 7) {
+        if (connectionStore.version == 7) {
           for (var section in res['data']['section']) {
             timeline.addAll(section['list']);
           }
@@ -147,237 +144,10 @@ class _MomentsState extends State<Moments> {
     }
   }
 
-  getLineInfo(line) async {
-    if (line['items'] == null) {
-      line['items'] = [];
-      MomentsApi.photos(
-              year: line['year'], month: line['month'], day: line['day'])
-          .then((res) {
-        if (res['success'] && mounted) {
-          setState(() {
-            line['items'] = res['data']['list'];
-          });
-        }
-      });
-    }
-    if (line['location'] == null) {
-      line['location'] = {};
-      MomentsApi.location(line['year'], line['month'], line['day']).then((res) {
-        if (res['success'] && mounted) {
-          setState(() {
-            line['location'] = res['data'];
-          });
-        }
-      });
-    }
-  }
-
-  Widget _buildPhotoItem(photo, List photos) {
-    int duration = 0;
-    Map timeLong = {};
-    if (photo['type'] == "video") {
-      if (photo['additional']['video_convert'].length > 0) {
-        duration = photo['additional']['video_convert'][0]['metadata']
-                ['duration'] ~/
-            1000;
-        timeLong = Util.instance.timeLong(duration);
-      } else {
-        timeLong = {
-          "hours": 0,
-          "minutes": 0,
-          "seconds": 0,
-        };
-      }
-    }
-    String thumbUrl =
-        '${Util.instance.baseUrl}/webapi/entry.cgi?id=${photo['additional']['thumbnail']['unit_id']}&cache_key="${photo['additional']['thumbnail']['cache_key']}"&type="unit"&size="sm"&api="SYNO.${Util.instance.version == 7 ? "Foto" : "Photo"}.Thumbnail"&method="get"&version=1&_sid=${Util.instance.sid}';
-    return GestureDetector(
-      onTap: () {
-        Navigator.of(context).push(TransparentPageRoute(
-          pageBuilder: (context, _, __) {
-            return ImagePreview(
-              photos
-                  .map((photo) =>
-                      '${Util.instance.baseUrl}/webapi/entry.cgi?id=${photo['additional']['thumbnail']['unit_id']}&cache_key="${photo['additional']['thumbnail']['cache_key']}"&type="unit"&size="xl"&api="SYNO.${Util.instance.version == 7 ? "Foto" : "Photo"}.Thumbnail"&method="get"&version=1&_sid=${Util.instance.sid}')
-                  .toList(),
-              photos.indexOf(photo),
-              tag: "photo-${photo['additional']['thumbnail']['unit_id']}",
-            );
-          },
-        ));
-      },
-      child: Container(
-        width: photoWidth,
-        height: photoWidth,
-        child: Stack(
-          children: [
-            Hero(
-              tag: "photo-${photo['additional']['thumbnail']['unit_id']}",
-              child: CupertinoExtendedImage(
-                thumbUrl,
-                width: photoWidth,
-                height: photoWidth,
-                fit: BoxFit.cover,
-                placeholder: Container(
-                  width: photoWidth,
-                  height: photoWidth,
-                  color: Color(0xffE9E9E9),
-                ),
-              ),
-            ),
-            if (photo['type'] == "video")
-              Align(
-                alignment: Alignment.center,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      Icons.play_circle_fill,
-                      color: Colors.white,
-                      size: 40,
-                    ),
-                    SizedBox(height: 5),
-                    Text(
-                      "${timeLong['hours'].toString().padLeft(2, "0")}:${timeLong['minutes'].toString().padLeft(2, "0")}:${timeLong['seconds'].toString().padLeft(2, "0")}",
-                      style: TextStyle(color: Colors.white, fontSize: 12),
-                    ),
-                  ],
-                ),
-              )
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildTimelineItem(line) {
-    getLineInfo(line);
-    List items = line['items'];
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Container(
-          alignment: Alignment.centerLeft,
-          height: 40,
-          padding: const EdgeInsets.symmetric(horizontal: 20),
-          child: Row(
-            children: [
-              Text(
-                "${line['year']}-${line['month'].toString().padLeft(2, "0")}-${line['day'].toString().padLeft(2, "0")}",
-              ),
-              if (line['location'] != null &&
-                  ((line['location']['first_level'] != null &&
-                      line['location']['first_level'] != "")))
-                Text("   ${line['location']['first_level']}"),
-              if (line['location'] != null &&
-                  ((line['location']['second_level'] != null &&
-                      line['location']['second_level'].length > 0)))
-                Text("${line['location']['second_level'].join(",")}"),
-            ],
-          ),
-        ),
-        Wrap(
-          spacing: 2,
-          runSpacing: 2,
-          children: items.length == 0
-              ? List.generate(line['item_count'], (index) {
-                  return Container(
-                    color: Colors.grey,
-                    width: photoWidth,
-                    height: photoWidth,
-                  );
-                })
-              : items.map((item) {
-                  return _buildPhotoItem(item, items);
-                }).toList(),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildAlbumItem(album) {
-    String thumbUrl =
-        '${Util.instance.baseUrl}/webapi/entry.cgi?id=${album['additional']['thumbnail']['unit_id']}&cache_key="${album['additional']['thumbnail']['cache_key']}"&type="unit"&size="sm"&api="SYNO.${Util.instance.version == 7 ? "Foto" : "Photo"}.Thumbnail"&method="get"&version=1&_sid=${Util.instance.sid}';
-    String tag = "album-${album['additional']['thumbnail']['unit_id']}";
-    return GestureDetector(
-      onTap: () {
-        Navigator.of(context).push(CupertinoPageRoute(
-          builder: (context) {
-            return Photos(album, tag: tag);
-          },
-        ));
-      },
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            width: albumWidth,
-            height: albumWidth,
-            child: Hero(
-              tag: "album-${album['additional']['thumbnail']['unit_id']}",
-              child: CupertinoExtendedImage(
-                thumbUrl,
-                width: albumWidth,
-                height: albumWidth,
-                fit: BoxFit.cover,
-                boxShape: BoxShape.rectangle,
-                borderRadius: BorderRadius.circular(10),
-                placeholder: Container(
-                  width: albumWidth,
-                  height: albumWidth,
-                  color: Color(0xffE9E9E9),
-                ),
-              ),
-            ),
-          ),
-          SizedBox(
-            height: 5,
-          ),
-          Text(
-            "${album['name']}",
-            style: TextStyle(fontSize: 14),
-            maxLines: 1,
-          ),
-          Text(
-            "${album['item_count']}",
-            style: TextStyle(fontSize: 12, color: Colors.grey),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildCategoryItem(List photos, int index) {
-    double itemWidth = (albumWidth - 2) / 2;
-    if (index < photos.length) {
-      Map photo = photos[index];
-      String thumbUrl =
-          '${Util.instance.baseUrl}/webapi/entry.cgi?id=${photo['additional']['thumbnail']['unit_id']}&cache_key="${photo['additional']['thumbnail']['cache_key']}"&type="unit"&size="sm"&api="SYNO.${Util.instance.version == 7 ? "Foto" : "Photo"}.Thumbnail"&method="get"&version=1&_sid=${Util.instance.sid}';
-      return Container(
-        width: itemWidth,
-        height: itemWidth,
-        child: CupertinoExtendedImage(
-          thumbUrl,
-          width: itemWidth,
-          height: itemWidth,
-          fit: BoxFit.cover,
-          boxShape: BoxShape.rectangle,
-          placeholder: Container(
-            width: itemWidth,
-            height: itemWidth,
-            color: Color(0xffE9E9E9),
-          ),
-        ),
-      );
-    } else {
-      return Container(
-        width: itemWidth,
-        height: itemWidth,
-        decoration: BoxDecoration(
-          color: Colors.grey,
-        ),
-      );
-    }
+  void _onTabChanged(int index) {
+    setState(() {
+      currentIndex = index;
+    });
   }
 
   @override
@@ -390,372 +160,32 @@ class _MomentsState extends State<Moments> {
           enableSearch: false,
           enabled: false,
           initialSelection: currentIndex,
-          dropdownMenuEntries: [
+          dropdownMenuEntries: const [
             DropdownMenuEntry(value: 0, label: '图片'),
             DropdownMenuEntry(value: 1, label: '相册'),
             DropdownMenuEntry(value: 2, label: '共享'),
           ],
           onSelected: (value) {
-            setState(() {
-              currentIndex = value ?? 0;
-            });
+            _onTabChanged(value ?? 0);
           },
         ),
       ),
-      body: IndexedStack(
-        index: currentIndex,
-        children: [
-          loadingTimeline
-              ? Center(
-                  child: CupertinoActivityIndicator(
-                    radius: 14,
-                  ),
-                )
-              : timeline.length > 0
-                  ? DraggableScrollbar.semicircle(
-                      labelTextBuilder: (position) {
-                        var line = timeline
-                            .where((element) =>
-                                element['position']['start'] <= position &&
-                                element['position']['end'] >= position)
-                            .toList();
-                        if (line.length > 0) {
-                          return Container(
-                            padding: EdgeInsets.symmetric(horizontal: 20),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: [
-                                Text(
-                                  "${line[0]['month']}月",
-                                  style: TextStyle(fontSize: 30),
-                                ),
-                                Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Text(
-                                        "${line[0]['day'].toString().padLeft(2, "0")}日"),
-                                    Text("${line[0]['year']}"),
-                                  ],
-                                )
-                              ],
-                            ),
-                          );
-                        } else {
-                          return Placeholder(
-                            child: Center(
-                              child: Text('[x]'),
-                            ),
-                          );
-                        }
-                      },
-                      labelConstraints: BoxConstraints(
-                          minHeight: 60,
-                          maxHeight: 60,
-                          minWidth: 140,
-                          maxWidth: 140),
-                      controller: _scrollController,
-                      child: ListView.builder(
-                        controller: _scrollController,
-                        itemBuilder: (context, i) {
-                          return _buildTimelineItem(timeline[i]);
-                        },
-                        itemCount: timeline.length,
-                      ),
-                    )
-                  : Center(
-                      child: Text("无项目"),
-                    ),
-          loadingAlbum
-              ? Center(
-                  child: CupertinoActivityIndicator(
-                    radius: 14,
-                  ),
-                )
-              : Container(
-                  child: ListView(
-                    padding: EdgeInsets.all(20),
-                    children: [
-                      Wrap(
-                        runSpacing: 20,
-                        spacing: 20,
-                        children: [
-                          if (geocoding.length > 0)
-                            GestureDetector(
-                              onTap: () {
-                                // Navigator.of(context).push(CupertinoPageRoute(
-                                //   builder: (context) {
-                                //     return Timeline(
-                                //       "视频",
-                                //       category: "Timeline",
-                                //       type: "video",
-                                //     );
-                                //   },
-                                // ));
-                              },
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  ClipRRect(
-                                    borderRadius: BorderRadius.circular(10),
-                                    child: Container(
-                                      width: albumWidth,
-                                      height: albumWidth,
-                                      decoration: BoxDecoration(
-                                        color: Colors.white,
-                                        borderRadius: BorderRadius.circular(18),
-                                      ),
-                                      child: Wrap(
-                                        runSpacing: 2,
-                                        spacing: 2,
-                                        children: [
-                                          ...List.generate(4, (index) {
-                                            return _buildCategoryItem(
-                                                geocoding, index);
-                                          })
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                  SizedBox(
-                                    height: 5,
-                                  ),
-                                  Text(
-                                    "位置",
-                                    style: TextStyle(fontSize: 14),
-                                    maxLines: 1,
-                                  ),
-                                ],
-                              ),
-                            ),
-                          if (general.length > 0)
-                            GestureDetector(
-                              // onTap: () {
-                              //   Navigator.of(context).push(CupertinoPageRoute(
-                              //     builder: (context) {
-                              //       return Timeline(
-                              //         "视频",
-                              //         category: "Timeline",
-                              //         type: "video",
-                              //       );
-                              //     },
-                              //   ));
-                              // },
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  ClipRRect(
-                                    borderRadius: BorderRadius.circular(10),
-                                    child: Container(
-                                      width: albumWidth,
-                                      height: albumWidth,
-                                      decoration: BoxDecoration(
-                                        color: Colors.white,
-                                        borderRadius: BorderRadius.circular(18),
-                                      ),
-                                      child: Wrap(
-                                        runSpacing: 2,
-                                        spacing: 2,
-                                        children: [
-                                          ...List.generate(4, (index) {
-                                            return _buildCategoryItem(
-                                                general, index);
-                                          })
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                  SizedBox(
-                                    height: 5,
-                                  ),
-                                  Text(
-                                    "标签",
-                                    style: TextStyle(fontSize: 14),
-                                    maxLines: 1,
-                                  ),
-                                ],
-                              ),
-                            ),
-                          // GestureDetector(
-                          //   onTap: () {
-                          //     Navigator.of(context).push(CupertinoPageRoute(
-                          //       builder: (context) {
-                          //         return Album(
-                          //           "与他人共享",
-                          //           shared: true,
-                          //         );
-                          //       },
-                          //     ));
-                          //   },
-                          //   child: Column(
-                          //     crossAxisAlignment: CrossAxisAlignment.start,
-                          //     children: [
-                          //       ClipRRect(
-                          //         borderRadius: BorderRadius.circular(10),
-                          //         child: Container(
-                          //           width: albumWidth,
-                          //           height: albumWidth,
-                          //           decoration: BoxDecoration(
-                          //             color: Colors.white,
-                          //             borderRadius: BorderRadius.circular(18),
-                          //           ),
-                          //           child: Wrap(
-                          //             runSpacing: 2,
-                          //             spacing: 2,
-                          //             children: [
-                          //               ...List.generate(4, (index) {
-                          //                 return _buildCategoryItem(shares, index);
-                          //               })
-                          //             ],
-                          //           ),
-                          //         ),
-                          //       ),
-                          //       SizedBox(
-                          //         height: 5,
-                          //       ),
-                          //       Text(
-                          //         "共享",
-                          //         style: TextStyle(fontSize: 14),
-                          //         maxLines: 1,
-                          //       ),
-                          //     ],
-                          //   ),
-                          // ),
-                          GestureDetector(
-                            onTap: () {
-                              Navigator.of(context).push(CupertinoPageRoute(
-                                builder: (context) {
-                                  return Timeline(
-                                    "视频",
-                                    category: "Timeline",
-                                    type: "video",
-                                  );
-                                },
-                              ));
-                            },
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                ClipRRect(
-                                  borderRadius: BorderRadius.circular(10),
-                                  child: Container(
-                                    width: albumWidth,
-                                    height: albumWidth,
-                                    decoration: BoxDecoration(
-                                      color: Colors.white,
-                                      borderRadius: BorderRadius.circular(18),
-                                    ),
-                                    child: Wrap(
-                                      runSpacing: 2,
-                                      spacing: 2,
-                                      children: [
-                                        ...List.generate(4, (index) {
-                                          return _buildCategoryItem(
-                                              videos, index);
-                                        })
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                                SizedBox(
-                                  height: 5,
-                                ),
-                                Text(
-                                  "视频",
-                                  style: TextStyle(fontSize: 14),
-                                  maxLines: 1,
-                                ),
-                              ],
-                            ),
-                          ),
-                          GestureDetector(
-                            onTap: () {
-                              Navigator.of(context).push(CupertinoPageRoute(
-                                builder: (context) {
-                                  return Timeline(
-                                    "最近添加的",
-                                    category: "RecentlyAdded",
-                                  );
-                                },
-                              ));
-                            },
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                ClipRRect(
-                                  borderRadius: BorderRadius.circular(10),
-                                  child: Container(
-                                    width: albumWidth,
-                                    height: albumWidth,
-                                    decoration: BoxDecoration(
-                                      color: Colors.white,
-                                      borderRadius: BorderRadius.circular(18),
-                                    ),
-                                    child: Wrap(
-                                      runSpacing: 2,
-                                      spacing: 2,
-                                      children: [
-                                        ...List.generate(4, (index) {
-                                          return _buildCategoryItem(
-                                              recentlyAdd, index);
-                                        })
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                                SizedBox(
-                                  height: 5,
-                                ),
-                                Text(
-                                  "最近添加的",
-                                  style: TextStyle(fontSize: 14),
-                                  maxLines: 1,
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                      album.length > 0
-                          ? Wrap(
-                              runSpacing: 20,
-                              spacing: 20,
-                              children: [
-                                ...album.map(_buildAlbumItem).toList(),
-                              ],
-                            )
-                          : Container(
-                              height: 500,
-                              child: Center(
-                                child: Text("无手动创建的相册"),
-                              ),
-                            ),
-                    ],
-                  ),
-                ),
-          loadingShares
-              ? Center(
-                  child: CupertinoActivityIndicator(
-                    radius: 14,
-                  ),
-                )
-              : shares.length > 0
-                  ? Padding(
-                      padding: EdgeInsets.all(20),
-                      child: Wrap(
-                        runSpacing: 20,
-                        spacing: 20,
-                        children: [
-                          ...shares.map(_buildAlbumItem).toList(),
-                        ],
-                      ),
-                    )
-                  : Container(
-                      height: 500,
-                      child: Center(
-                        child: Text("无手动创建的相册"),
-                      ),
-                    ),
-        ],
+      body: MomentsContentTab(
+        currentIndex: currentIndex,
+        loadingTimeline: loadingTimeline,
+        loadingAlbum: loadingAlbum,
+        loadingShares: loadingShares,
+        timeline: timeline,
+        album: album,
+        shares: shares,
+        geocoding: geocoding,
+        general: general,
+        videos: videos,
+        recentlyAdd: recentlyAdd,
+        scrollController: _scrollController,
+        photoWidth: photoWidth,
+        albumWidth: albumWidth,
+        onTabChanged: _onTabChanged,
       ),
     );
   }

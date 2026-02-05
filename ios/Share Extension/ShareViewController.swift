@@ -17,7 +17,7 @@ import ImageIO
 @objc(ShareViewController)
 class ShareViewController: UIViewController {
         // TODO: IMPORTANT: This should be your host app bundle identifier
-        var hostAppBundleIdentifier = "fit.flutter.dsm-helper"
+        var hostAppBundleIdentifier = "fit.flutter.garden"
         let sharedKey = "SharingKey"
         var appGroupId = ""
         var sharedMedia: [SharingFile] = []

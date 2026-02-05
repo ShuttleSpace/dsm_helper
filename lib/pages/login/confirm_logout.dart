@@ -1,15 +1,18 @@
-import 'package:garden/util/function.dart';
+import 'package:garden/util/http_util.dart';
+import 'package:garden/util/storage_util.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:garden/constants/app_constants.dart';
+import 'package:garden/theme/app_colors.dart';
 
 class ConfirmLogout extends StatefulWidget {
   final bool otpEnable;
-  ConfirmLogout(this.otpEnable);
+  const ConfirmLogout(this.otpEnable, {super.key});
   @override
-  _ConfirmLogoutState createState() => _ConfirmLogoutState();
+  ConfirmLogoutState createState() => ConfirmLogoutState();
 }
 
-class _ConfirmLogoutState extends State<ConfirmLogout> {
+class ConfirmLogoutState extends State<ConfirmLogout> {
   bool forget = false;
   @override
   Widget build(BuildContext context) {
@@ -17,26 +20,26 @@ class _ConfirmLogoutState extends State<ConfirmLogout> {
       color: Colors.transparent,
       child: Card(
         shape: RoundedRectangleBorder(
-            side: BorderSide(), borderRadius: BorderRadius.circular(18)),
+            side: const BorderSide(), borderRadius: BorderRadius.circular(18)),
         child: SafeArea(
           top: false,
           child: Padding(
-            padding: EdgeInsets.all(20),
+            padding: const EdgeInsets.all(20),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
-                Text(
+                const Text(
                   "退出登录",
                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
                 ),
-                SizedBox(
+                const SizedBox(
                   height: 12,
                 ),
-                Text(
+                const Text(
                   "确认要退出登录当前账号吗？",
                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.w400),
                 ),
-                SizedBox(
+                const SizedBox(
                   height: 22,
                 ),
                 if (widget.otpEnable) ...[
@@ -48,25 +51,26 @@ class _ConfirmLogoutState extends State<ConfirmLogout> {
                     },
                     child: Card(
                       shape: RoundedRectangleBorder(
-                          side: BorderSide(),
+                          side: const BorderSide(),
                           borderRadius: BorderRadius.circular(18)),
                       child: Padding(
-                        padding: const EdgeInsets.all(8.0),
+                        padding:
+                            const EdgeInsets.all(AppConstants.paddingSmall),
                         child: Row(
                           children: [
-                            Text("取消记住本设备"),
-                            Spacer(),
+                            const Text("取消记住本设备"),
+                            const Spacer(),
                             if (forget)
-                              Icon(
+                              const Icon(
                                 CupertinoIcons.checkmark_alt,
-                                color: Color(0xffff9813),
+                                color: AppColors.primaryAction,
                               ),
                           ],
                         ),
                       ),
                     ),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 22,
                   ),
                 ],
@@ -78,19 +82,19 @@ class _ConfirmLogoutState extends State<ConfirmLogout> {
                           if (forget) {
                             Api.trustDevice("delete");
                           }
-                          Util.instance.removeStorage("sid");
-                          // Util.removeStorage("smid");
+                          StorageUtil.remove("sid");
+                          // HttpUtil.removeStorage("smid");
                           Navigator.of(context).pushNamedAndRemoveUntil(
                               "/login", (route) => false);
                         },
-                        child: Text(
+                        child: const Text(
                           "退出登录",
                           style:
                               TextStyle(fontSize: 18, color: Colors.redAccent),
                         ),
                       ),
                     ),
-                    SizedBox(
+                    const SizedBox(
                       width: 16,
                     ),
                     Expanded(
@@ -98,7 +102,7 @@ class _ConfirmLogoutState extends State<ConfirmLogout> {
                         onPressed: () async {
                           Navigator.of(context).pop();
                         },
-                        child: Text(
+                        child: const Text(
                           "取消",
                           style: TextStyle(fontSize: 18),
                         ),
@@ -106,7 +110,7 @@ class _ConfirmLogoutState extends State<ConfirmLogout> {
                     ),
                   ],
                 ),
-                SizedBox(
+                const SizedBox(
                   height: 8,
                 ),
               ],

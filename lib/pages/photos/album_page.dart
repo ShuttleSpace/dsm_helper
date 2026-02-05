@@ -4,9 +4,10 @@ import 'package:garden/pages/photos/widgets/photo_item_widget.dart';
 import 'package:garden/widgets/cupertino_image.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/material.dart';
+import 'package:garden/theme/app_colors.dart';
 
 class AlbumPage extends StatefulWidget {
-  const AlbumPage(this.album, {this.isTeam = false});
+  const AlbumPage(this.album, {super.key, this.isTeam = false});
   final AlbumModel album;
   final bool isTeam;
   @override
@@ -56,7 +57,7 @@ class _AlbumPageState extends State<AlbumPage> {
                   style: TextStyle(
                       color:
                           Theme.of(context).appBarTheme.titleTextStyle?.color,
-                      shadows: [
+                      shadows: const [
                         BoxShadow(
                             color: Colors.white,
                             offset: Offset(1, 1),
@@ -86,11 +87,11 @@ class _AlbumPageState extends State<AlbumPage> {
           ];
         },
         body: GridView.builder(
-          padding: EdgeInsets.symmetric(horizontal: 5, vertical: 10),
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 10),
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 4, mainAxisSpacing: 2, crossAxisSpacing: 2),
           itemBuilder: (context, i) {
-            if (photos.length > 0) {
+            if (photos.isNotEmpty) {
               return PhotoItemWidget(
                 photos[i],
                 photos,
@@ -100,13 +101,13 @@ class _AlbumPageState extends State<AlbumPage> {
               );
             } else {
               return Container(
-                color: Color(0xffE9E9E9),
+                color: AppColors.placeholderBackgroundLight,
                 width: photoWidth,
                 height: photoWidth,
               );
             }
           },
-          itemCount: photos.length > 0
+          itemCount: photos.isNotEmpty
               ? photos.length.toInt()
               : widget.album.itemCount?.toInt(),
         ),
@@ -119,7 +120,7 @@ class _AlbumPageState extends State<AlbumPage> {
         //       children: photos.length == 0
         //           ? List.generate(widget.album.itemCount, (index) {
         //               return Container(
-        //                 color: Color(0xffE9E9E9),
+        //                 color: AppColors.placeholderBackgroundLight,
         //                 width: photoWidth,
         //                 height: photoWidth,
         //               );

@@ -1,19 +1,22 @@
 import 'dart:async';
 import 'dart:math';
 
-import 'package:garden/util/function.dart';
+import 'package:garden/util/http_util.dart';
+import 'package:garden/util/log.dart';
 import 'package:garden/widgets/animation_progress_bar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:garden/constants/app_constants.dart';
+import 'package:garden/theme/app_colors.dart';
 
 class MediaConverter extends StatefulWidget {
   final Map converter;
-  MediaConverter(this.converter);
+  const MediaConverter(this.converter, {super.key});
   @override
-  _MediaConverterState createState() => _MediaConverterState();
+  MediaConverterState createState() => MediaConverterState();
 }
 
-class _MediaConverterState extends State<MediaConverter> {
+class MediaConverterState extends State<MediaConverter> {
   late Timer timer;
   Map converter = {};
   @override
@@ -21,7 +24,7 @@ class _MediaConverterState extends State<MediaConverter> {
     setState(() {
       converter = widget.converter;
     });
-    timer = Timer.periodic(Duration(seconds: 5), (timer) {
+    timer = Timer.periodic(const Duration(seconds: 5), (timer) {
       getMediaConverter();
     });
     getMediaConverter();
@@ -33,7 +36,7 @@ class _MediaConverterState extends State<MediaConverter> {
     if (res['success'] && mounted) {
       setState(() {
         converter = res['data'];
-        print(converter);
+        Log.info("get media converter status $res}");
       });
     }
   }
@@ -41,7 +44,7 @@ class _MediaConverterState extends State<MediaConverter> {
   @override
   void dispose() {
     timer.cancel();
-    print("取消计时器");
+    Log.info("取消计时器");
     super.dispose();
   }
 
@@ -51,37 +54,37 @@ class _MediaConverterState extends State<MediaConverter> {
       color: Colors.transparent,
       child: Card(
         shape: RoundedRectangleBorder(
-            side: BorderSide(), borderRadius: BorderRadius.circular(18)),
+            side: const BorderSide(), borderRadius: BorderRadius.circular(18)),
         child: SafeArea(
           top: false,
           child: Padding(
-            padding: const EdgeInsets.all(20.0),
+            padding: const EdgeInsets.all(AppConstants.paddingLarge),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
-                Text(
+                const Text(
                   "转换进程",
                   style: TextStyle(
                       fontSize: 20,
                       color: Colors.black,
                       fontWeight: FontWeight.w500),
                 ),
-                SizedBox(
+                const SizedBox(
                   height: 12,
                 ),
                 Card(
                   shape: RoundedRectangleBorder(
-                      side: BorderSide(),
+                      side: const BorderSide(),
                       borderRadius: BorderRadius.circular(18)),
                   child: Padding(
-                    padding: const EdgeInsets.all(20.0),
+                    padding: const EdgeInsets.all(AppConstants.paddingLarge),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text.rich(
                           TextSpan(
                             children: [
-                              TextSpan(
+                              const TextSpan(
                                   text: "图像：",
                                   style: TextStyle(
                                       color: Colors.blue, fontSize: 18)),
@@ -90,7 +93,7 @@ class _MediaConverterState extends State<MediaConverter> {
                             ],
                           ),
                         ),
-                        SizedBox(
+                        const SizedBox(
                           height: 10,
                         ),
                         FAProgressBar(
@@ -117,22 +120,22 @@ class _MediaConverterState extends State<MediaConverter> {
                     ),
                   ),
                 ),
-                SizedBox(
+                const SizedBox(
                   height: 20,
                 ),
                 Card(
                   shape: RoundedRectangleBorder(
-                      side: BorderSide(),
+                      side: const BorderSide(),
                       borderRadius: BorderRadius.circular(18)),
                   child: Padding(
-                    padding: const EdgeInsets.all(20.0),
+                    padding: const EdgeInsets.all(AppConstants.paddingLarge),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text.rich(
                           TextSpan(
                             children: [
-                              TextSpan(
+                              const TextSpan(
                                   text: "视频：",
                                   style: TextStyle(
                                       color: Colors.blue, fontSize: 18)),
@@ -140,7 +143,7 @@ class _MediaConverterState extends State<MediaConverter> {
                             ],
                           ),
                         ),
-                        SizedBox(
+                        const SizedBox(
                           height: 10,
                         ),
                         FAProgressBar(
@@ -158,22 +161,22 @@ class _MediaConverterState extends State<MediaConverter> {
                     ),
                   ),
                 ),
-                SizedBox(
+                const SizedBox(
                   height: 20,
                 ),
                 Card(
                   shape: RoundedRectangleBorder(
-                      side: BorderSide(),
+                      side: const BorderSide(),
                       borderRadius: BorderRadius.circular(18)),
                   child: Padding(
-                    padding: const EdgeInsets.all(20.0),
+                    padding: const EdgeInsets.all(AppConstants.paddingLarge),
                     child: Row(
                       children: [
                         Expanded(
                           child: Text.rich(
                             TextSpan(
                               children: [
-                                TextSpan(
+                                const TextSpan(
                                     text: "状态：",
                                     style: TextStyle(
                                         color: Colors.blue, fontSize: 18)),
@@ -185,9 +188,10 @@ class _MediaConverterState extends State<MediaConverter> {
                                   TextSpan(
                                       text:
                                           " (${DateTime.fromMillisecondsSinceEpoch(converter['resume_time'] * 1000).format("H:i")}恢复)",
-                                      style: TextStyle(color: Colors.grey)),
+                                      style:
+                                          const TextStyle(color: Colors.grey)),
                                 if (converter['resume_time'] < 0)
-                                  TextSpan(
+                                  const TextSpan(
                                       text: " (无限期延迟)",
                                       style: TextStyle(color: Colors.grey)),
                               ],
@@ -207,18 +211,19 @@ class _MediaConverterState extends State<MediaConverter> {
                                   builder: (context) {
                                     return Material(
                                       child: Padding(
-                                        padding: const EdgeInsets.all(20.0),
+                                        padding: const EdgeInsets.all(
+                                            AppConstants.paddingLarge),
                                         child: Column(
                                           mainAxisSize: MainAxisSize.min,
                                           children: [
-                                            Text(
+                                            const Text(
                                               "延迟转换",
                                               style: TextStyle(
                                                   fontSize: 20,
                                                   color: Colors.black,
                                                   fontWeight: FontWeight.w500),
                                             ),
-                                            SizedBox(
+                                            const SizedBox(
                                               height: 12,
                                             ),
                                             GestureDetector(
@@ -227,13 +232,13 @@ class _MediaConverterState extends State<MediaConverter> {
                                               },
                                               child: Card(
                                                 shape: RoundedRectangleBorder(
-                                                    side: BorderSide(),
+                                                    side: const BorderSide(),
                                                     borderRadius:
                                                         BorderRadius.circular(
                                                             5)),
-                                                margin:
-                                                    EdgeInsets.only(bottom: 20),
-                                                child: Padding(
+                                                margin: const EdgeInsets.only(
+                                                    bottom: 20),
+                                                child: const Padding(
                                                   padding: EdgeInsets.all(20),
                                                   child: Text(
                                                     "延迟1小时",
@@ -247,13 +252,13 @@ class _MediaConverterState extends State<MediaConverter> {
                                               },
                                               child: Card(
                                                 shape: RoundedRectangleBorder(
-                                                    side: BorderSide(),
+                                                    side: const BorderSide(),
                                                     borderRadius:
                                                         BorderRadius.circular(
                                                             5)),
-                                                margin:
-                                                    EdgeInsets.only(bottom: 20),
-                                                child: Padding(
+                                                margin: const EdgeInsets.only(
+                                                    bottom: 20),
+                                                child: const Padding(
                                                   padding: EdgeInsets.all(20),
                                                   child: Text(
                                                     "延迟3小时",
@@ -267,13 +272,13 @@ class _MediaConverterState extends State<MediaConverter> {
                                               },
                                               child: Card(
                                                 shape: RoundedRectangleBorder(
-                                                    side: BorderSide(),
+                                                    side: const BorderSide(),
                                                     borderRadius:
                                                         BorderRadius.circular(
                                                             5)),
-                                                margin:
-                                                    EdgeInsets.only(bottom: 20),
-                                                child: Padding(
+                                                margin: const EdgeInsets.only(
+                                                    bottom: 20),
+                                                child: const Padding(
                                                   padding: EdgeInsets.all(20),
                                                   child: Text(
                                                     "延迟6小时",
@@ -287,13 +292,13 @@ class _MediaConverterState extends State<MediaConverter> {
                                               },
                                               child: Card(
                                                 shape: RoundedRectangleBorder(
-                                                    side: BorderSide(),
+                                                    side: const BorderSide(),
                                                     borderRadius:
                                                         BorderRadius.circular(
                                                             5)),
-                                                margin:
-                                                    EdgeInsets.only(bottom: 20),
-                                                child: Padding(
+                                                margin: const EdgeInsets.only(
+                                                    bottom: 20),
+                                                child: const Padding(
                                                   padding: EdgeInsets.all(20),
                                                   child: Text(
                                                     "无限期延迟",
@@ -305,7 +310,7 @@ class _MediaConverterState extends State<MediaConverter> {
                                               onPressed: () async {
                                                 Navigator.of(context).pop();
                                               },
-                                              child: Text(
+                                              child: const Text(
                                                 "取消",
                                                 style: TextStyle(fontSize: 18),
                                               ),
@@ -327,13 +332,13 @@ class _MediaConverterState extends State<MediaConverter> {
                           },
                           child: Card(
                             shape: RoundedRectangleBorder(
-                                side: BorderSide(),
+                                side: const BorderSide(),
                                 borderRadius: BorderRadius.circular(18)),
                             child: Icon(
                               converter['status'] == "paused"
                                   ? CupertinoIcons.play_arrow_solid
                                   : CupertinoIcons.pause_fill,
-                              color: Color(0xffff9813),
+                              color: AppColors.primaryAction,
                               size: 16,
                             ),
                           ),
@@ -342,19 +347,19 @@ class _MediaConverterState extends State<MediaConverter> {
                     ),
                   ),
                 ),
-                SizedBox(
+                const SizedBox(
                   height: 20,
                 ),
                 OutlinedButton(
                   onPressed: () async {
                     Navigator.of(context).pop();
                   },
-                  child: Text(
+                  child: const Text(
                     "确定",
                     style: TextStyle(fontSize: 18),
                   ),
                 ),
-                SizedBox(
+                const SizedBox(
                   height: 8,
                 ),
               ],

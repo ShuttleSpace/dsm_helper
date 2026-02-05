@@ -82,6 +82,7 @@ class ExpansionContainer extends StatefulWidget {
   /// the tile to reveal or hide the [children]. The [initiallyExpanded] property must
   /// be non-null.
   const ExpansionContainer({
+    super.key,
     this.leading,
     required this.title,
     this.showFirst = false,
@@ -328,7 +329,9 @@ class _ExpansionContainerState extends State<ExpansionContainer>
 
   Widget? _buildTrailingIcon(BuildContext context) {
     if (_effectiveAffinity(widget.controlAffinity) !=
-        ListTileControlAffinity.trailing) return null;
+        ListTileControlAffinity.trailing) {
+      return null;
+    }
     return _buildIcon(context);
   }
 
@@ -355,11 +358,11 @@ class _ExpansionContainerState extends State<ExpansionContainer>
                 onTap: _handleTap,
                 child: Container(
                   padding: widget.tilePadding ??
-                      EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+                      const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
                   child: Row(
                     children: [
                       Expanded(child: widget.title),
-                      SizedBox(
+                      const SizedBox(
                         width: 5,
                       ),
                       widget.trailing ??

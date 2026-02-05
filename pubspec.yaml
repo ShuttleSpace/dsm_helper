@@ -1,5 +1,5 @@
 name: garden
-description: 适用于群辉6.x的手机助手。采用新拟态设计风格
+description: dsm all in one app.
 
 # The following line prevents the package from being accidentally published to
 # pub.dev using `pub publish`. This is preferred for private packages.
@@ -61,7 +61,6 @@ dependencies:
   html: 0.15.5 
   flutter_html: 
     git: https://gitee.com/SecondaryMarquis/flutter_html.git
-  provider: ^6.0.5
   wave: ^0.2.2
   modal_bottom_sheet: ^3.0.0-pre
   photo_manager: 3.6.4
@@ -109,12 +108,18 @@ dependencies:
   media_kit: ^1.2.6
   media_kit_video: ^2.0.1
   media_kit_libs_video: ^1.0.7
+  flutter_animation_progress_bar: ^2.3.1
+  file_picker: ^10.3.10
+  shared_preferences: ^2.5.4
+  local_auth_darwin: ^1.6.1
+  http_parser: ^4.1.2
+  local_auth_android: ^1.0.56
 #  flutter_filereader: ^3.0.0
 #  x5_webview: ^0.2.4
 dev_dependencies:
   flutter_test:
     sdk: flutter
-
+  flutter_lints: ^3.0.0
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 

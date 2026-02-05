@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 class FAProgressBar extends StatefulWidget {
   FAProgressBar({
+    super.key,
     this.currentValue = 0,
     this.maxValue = 95,
     this.size = 30,
@@ -40,10 +41,10 @@ class FAProgressBar extends StatefulWidget {
   final TextStyle displayTextStyle;
 
   @override
-  _FAProgressBarState createState() => _FAProgressBarState();
+  FAProgressBarState createState() => FAProgressBarState();
 }
 
-class _FAProgressBarState extends State<FAProgressBar>
+class FAProgressBarState extends State<FAProgressBar>
     with SingleTickerProviderStateMixin {
   late Animation<double> _animation;
   late AnimationController _controller;
@@ -61,9 +62,9 @@ class _FAProgressBarState extends State<FAProgressBar>
   }
 
   @override
-  void didUpdateWidget(FAProgressBar old) {
+  void didUpdateWidget(FAProgressBar oldWidget) {
     triggerAnimation();
-    super.didUpdateWidget(old);
+    super.didUpdateWidget(oldWidget);
   }
 
   void triggerAnimation() {
@@ -97,7 +98,8 @@ class _FAProgressBarState extends State<FAProgressBar>
 }
 
 class AnimatedProgressBar extends AnimatedWidget {
-  AnimatedProgressBar({
+  const AnimatedProgressBar({
+    super.key,
     required Animation<double> animation,
     required this.widget,
   }) : super(listenable: animation);
@@ -109,16 +111,17 @@ class AnimatedProgressBar extends AnimatedWidget {
     return y < 0 ? 0 : ((y > 1) ? 1 : y);
   }
 
+  @override
   Widget build(BuildContext context) {
     final animation = listenable as Animation<double>;
     Color? progressColor = widget.progressColor;
 
-    final _colorTween = ColorTween(
+    final colorTween = ColorTween(
       begin: widget.progressColor,
       end: widget.changeProgressColor,
     );
 
-    progressColor = _colorTween.transform(transformValue(
+    progressColor = colorTween.transform(transformValue(
       animation.value,
       widget.changeColorValue,
       widget.maxValue,
@@ -140,8 +143,8 @@ class AnimatedProgressBar extends AnimatedWidget {
       alignment: widget.direction == Axis.horizontal
           ? Alignment(position, 0)
           : (widget.verticalDirection == VerticalDirection.up
-              ? FractionalOffset(0.5, 0.05)
-              : FractionalOffset(0.5, 0.95)),
+              ? const FractionalOffset(0.5, 0.05)
+              : const FractionalOffset(0.5, 0.95)),
       child: Text(
         (widget.currentValue).toInt().toString() + widget.displayText,
         softWrap: false,

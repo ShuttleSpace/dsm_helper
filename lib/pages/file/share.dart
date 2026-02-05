@@ -1,9 +1,13 @@
 import 'dart:convert';
+import 'package:garden/util/ui_util.dart';
+import 'package:garden/util/storage_util.dart';
 
-import 'package:garden/util/function.dart';
+import 'package:garden/util/http_util.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:garden/constants/app_constants.dart';
+import 'package:garden/theme/app_colors.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 
@@ -11,12 +15,12 @@ class Share extends StatefulWidget {
   final List<String>? paths;
   final Map? link;
   final bool? fileRequest;
-  Share({this.paths, this.link, this.fileRequest = false});
+  const Share({super.key, this.paths, this.link, this.fileRequest = false});
   @override
-  _ShareState createState() => _ShareState();
+  ShareState createState() => ShareState();
 }
 
-class _ShareState extends State<Share> {
+class ShareState extends State<Share> {
   bool loading = true;
   Map link = {};
   DateTime? startTime;
@@ -72,14 +76,17 @@ class _ShareState extends State<Share> {
   deleteShare() async {
     var res = await Api.deleteShare([link['id']]);
     if (res['success']) {
-      Util.instance.toast("取消共享成功");
-      Navigator.of(context).pop();
+      UiUtil.toast("取消共享成功");
+      if (context.mounted) {
+        // ignore: use_build_context_synchronously
+        Navigator.of(context).pop();
+      }
     }
   }
 
   getData() async {
     if (widget.fileRequest == true) {
-      requestName = await Util.instance.getStorage("account") ?? '';
+      requestName = await StorageUtil.getString("account") ?? '';
       requestInfo = "嗨，我的朋友！请将文件上传到此处。";
     }
     if (widget.paths == null || widget.paths!.isEmpty) {
@@ -124,41 +131,43 @@ class _ShareState extends State<Share> {
 
   Widget _buildLinkItem(link) {
     return Container(
-      padding: EdgeInsets.all(20),
+      padding: const EdgeInsets.all(20),
       child: Column(
         children: [
-          SizedBox(
+          const SizedBox(
             height: 20,
           ),
           Card(
             shape: RoundedRectangleBorder(
-                side: BorderSide(), borderRadius: BorderRadius.circular(18)),
+                side: const BorderSide(),
+                borderRadius: BorderRadius.circular(18)),
             child: Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding: const EdgeInsets.all(AppConstants.paddingSmall),
               child: Image.memory(
-                Base64Decoder().convert(link['qrcode'].split(",")[1]),
+                const Base64Decoder().convert(link['qrcode'].split(",")[1]),
                 height: 150,
               ),
             ),
           ),
-          SizedBox(
+          const SizedBox(
             height: 20,
           ),
           Text(
             link['name'],
-            style: TextStyle(fontSize: 26),
+            style: const TextStyle(fontSize: 26),
           ),
           Text(
             link['path'],
           ),
-          SizedBox(
+          const SizedBox(
             height: 20,
           ),
           Card(
             shape: RoundedRectangleBorder(
-                side: BorderSide(), borderRadius: BorderRadius.circular(18)),
+                side: const BorderSide(),
+                borderRadius: BorderRadius.circular(18)),
             child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
               child: Row(
                 children: [
                   Expanded(
@@ -166,21 +175,21 @@ class _ShareState extends State<Share> {
                       "${link['url']}",
                     ),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     width: 10,
                   ),
                   OutlinedButton(
                     onPressed: () async {
-                      ClipboardData data = new ClipboardData(text: link['url']);
+                      ClipboardData data = ClipboardData(text: link['url']);
                       Clipboard.setData(data);
-                      Util.instance.toast("已复制到剪贴板");
+                      UiUtil.toast("已复制到剪贴板");
                     },
-                    child: SizedBox(
+                    child: const SizedBox(
                       width: 20,
                       height: 20,
                       child: Icon(
                         Icons.copy,
-                        color: Color(0xffff9813),
+                        color: AppColors.primaryAction,
                         size: 16,
                       ),
                     ),
@@ -189,7 +198,7 @@ class _ShareState extends State<Share> {
               ),
             ),
           ),
-          SizedBox(
+          const SizedBox(
             height: 20,
           ),
           GestureDetector(
@@ -210,12 +219,13 @@ class _ShareState extends State<Share> {
             },
             child: Card(
               shape: RoundedRectangleBorder(
-                  side: BorderSide(), borderRadius: BorderRadius.circular(18)),
+                  side: const BorderSide(),
+                  borderRadius: BorderRadius.circular(18)),
               child: Padding(
-                padding: const EdgeInsets.all(8.0),
+                padding: const EdgeInsets.all(AppConstants.paddingSmall),
                 child: TextField(
                   controller: endTimeController,
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     enabled: false,
                     border: InputBorder.none,
                     labelText: "设置停止时间",
@@ -224,7 +234,7 @@ class _ShareState extends State<Share> {
               ),
             ),
           ),
-          SizedBox(
+          const SizedBox(
             height: 20,
           ),
           GestureDetector(
@@ -246,12 +256,13 @@ class _ShareState extends State<Share> {
             },
             child: Card(
               shape: RoundedRectangleBorder(
-                  side: BorderSide(), borderRadius: BorderRadius.circular(18)),
+                  side: const BorderSide(),
+                  borderRadius: BorderRadius.circular(18)),
               child: Padding(
-                padding: const EdgeInsets.all(8.0),
+                padding: const EdgeInsets.all(AppConstants.paddingSmall),
                 child: TextField(
                   controller: startTimeController,
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     enabled: false,
                     border: InputBorder.none,
                     labelText: "设置开始时间",
@@ -260,19 +271,20 @@ class _ShareState extends State<Share> {
               ),
             ),
           ),
-          SizedBox(
+          const SizedBox(
             height: 20,
           ),
           Card(
             shape: RoundedRectangleBorder(
-                side: BorderSide(), borderRadius: BorderRadius.circular(18)),
+                side: const BorderSide(),
+                borderRadius: BorderRadius.circular(18)),
             child: Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding: const EdgeInsets.all(AppConstants.paddingSmall),
               child: TextField(
                 controller: timesController,
                 keyboardType: TextInputType.number,
                 onChanged: (v) => times = v,
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   border: InputBorder.none,
                   labelText: '允许访问的数量',
                 ),
@@ -280,36 +292,38 @@ class _ShareState extends State<Share> {
             ),
           ),
           if (link['enable_upload']) ...[
-            SizedBox(
+            const SizedBox(
               height: 20,
             ),
             Card(
               shape: RoundedRectangleBorder(
-                  side: BorderSide(), borderRadius: BorderRadius.circular(18)),
+                  side: const BorderSide(),
+                  borderRadius: BorderRadius.circular(18)),
               child: Padding(
-                padding: const EdgeInsets.all(8.0),
+                padding: const EdgeInsets.all(AppConstants.paddingSmall),
                 child: TextField(
                   controller: requestNameController,
                   onChanged: (v) => requestName = v,
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     border: InputBorder.none,
                     labelText: '您的姓名',
                   ),
                 ),
               ),
             ),
-            SizedBox(
+            const SizedBox(
               height: 20,
             ),
             Card(
               shape: RoundedRectangleBorder(
-                  side: BorderSide(), borderRadius: BorderRadius.circular(18)),
+                  side: const BorderSide(),
+                  borderRadius: BorderRadius.circular(18)),
               child: Padding(
-                padding: const EdgeInsets.all(8.0),
+                padding: const EdgeInsets.all(AppConstants.paddingSmall),
                 child: TextField(
                   controller: requestInfoController,
                   onChanged: (v) => requestInfo = v,
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     border: InputBorder.none,
                     labelText: '信息',
                   ),
@@ -327,7 +341,7 @@ class _ShareState extends State<Share> {
     return Scaffold(
       appBar: AppBar(
         leading: AppBackButton(context),
-        title: Text(
+        title: const Text(
           "共享文件",
         ),
       ),
@@ -336,7 +350,7 @@ class _ShareState extends State<Share> {
           FocusScope.of(context).unfocus();
         },
         child: loading
-            ? Center(
+            ? const Center(
                 child: CupertinoActivityIndicator(
                   radius: 14,
                 ),
@@ -351,7 +365,7 @@ class _ShareState extends State<Share> {
                     ),
                   ),
                   Padding(
-                    padding: EdgeInsets.all(20),
+                    padding: const EdgeInsets.all(20),
                     child: Row(
                       children: [
                         Expanded(
@@ -367,13 +381,13 @@ class _ShareState extends State<Share> {
                                   requestName: requestName,
                                   requestInfo: requestInfo);
                               if (res['success']) {
-                                Util.instance.toast("保存成功");
+                                UiUtil.toast("保存成功");
                               }
                             },
-                            child: Text("保存修改"),
+                            child: const Text("保存修改"),
                           ),
                         ),
-                        SizedBox(
+                        const SizedBox(
                           width: 20,
                         ),
                         Expanded(
@@ -386,34 +400,35 @@ class _ShareState extends State<Share> {
                                     color: Colors.transparent,
                                     child: Card(
                                       shape: RoundedRectangleBorder(
-                                          side: BorderSide(),
+                                          side: const BorderSide(),
                                           borderRadius:
                                               BorderRadius.circular(5)),
                                       child: SafeArea(
                                         top: false,
                                         child: Padding(
-                                          padding: const EdgeInsets.all(8.0),
+                                          padding: const EdgeInsets.all(
+                                              AppConstants.paddingSmall),
                                           child: Column(
                                             mainAxisSize: MainAxisSize.min,
                                             children: <Widget>[
-                                              Text(
+                                              const Text(
                                                 "确认取消",
                                                 style: TextStyle(
                                                     fontSize: 20,
                                                     fontWeight:
                                                         FontWeight.w500),
                                               ),
-                                              SizedBox(
+                                              const SizedBox(
                                                 height: 12,
                                               ),
-                                              Text(
+                                              const Text(
                                                 "确认要取消此共享链接？",
                                                 style: TextStyle(
                                                     fontSize: 20,
                                                     fontWeight:
                                                         FontWeight.w400),
                                               ),
-                                              SizedBox(
+                                              const SizedBox(
                                                 height: 22,
                                               ),
                                               Row(
@@ -425,7 +440,7 @@ class _ShareState extends State<Share> {
                                                             .pop();
                                                         deleteShare();
                                                       },
-                                                      child: Text(
+                                                      child: const Text(
                                                         "取消共享",
                                                         style: TextStyle(
                                                             fontSize: 18,
@@ -434,7 +449,7 @@ class _ShareState extends State<Share> {
                                                       ),
                                                     ),
                                                   ),
-                                                  SizedBox(
+                                                  const SizedBox(
                                                     width: 16,
                                                   ),
                                                   Expanded(
@@ -443,7 +458,7 @@ class _ShareState extends State<Share> {
                                                         Navigator.of(context)
                                                             .pop();
                                                       },
-                                                      child: Text(
+                                                      child: const Text(
                                                         "取消",
                                                         style: TextStyle(
                                                             fontSize: 18),
@@ -452,7 +467,7 @@ class _ShareState extends State<Share> {
                                                   ),
                                                 ],
                                               ),
-                                              SizedBox(
+                                              const SizedBox(
                                                 height: 8,
                                               ),
                                             ],
@@ -464,7 +479,7 @@ class _ShareState extends State<Share> {
                                 },
                               );
                             },
-                            child: Text("取消共享"),
+                            child: const Text("取消共享"),
                           ),
                         ),
                       ],

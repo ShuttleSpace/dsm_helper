@@ -1,16 +1,8 @@
 import 'dart:convert';
+import 'package:garden/stores/connection_store.dart';
 
 import 'package:garden/models/photos/photo_model.dart';
-import 'package:garden/util/function.dart';
-
-/// additional : {"thumbnail":{"cache_key":"611178_1665630275","m":"ready","preview":"broken","sm":"ready","unit_id":611178,"xl":"ready"}}
-/// country : "中国大陆"
-/// country_id : 1
-/// first_level : "青岛市"
-/// id : 70
-/// item_count : 172
-/// name : "青岛市"
-/// second_level : ""
+import 'package:garden/util/http_util.dart';
 
 class GeocodingModel {
   GeocodingModel({
@@ -25,12 +17,12 @@ class GeocodingModel {
   });
   static Future<List<GeocodingModel>> fetch(
       {List<String>? additional, int limit = 5000, bool isTeam = false}) async {
-    var res = await Util.instance.post("entry.cgi", data: {
+    var res = await HttpUtil.instance.post("entry.cgi", data: {
       // "folder_id": id,
       "api": 'SYNO.Foto${isTeam ? 'Team' : ''}.Browse.Geocoding',
       "method": 'list',
       "version": 1,
-      "_sid": Util.instance.sid,
+      "_sid": connectionStore.sid,
       "additional": jsonEncode(additional),
       "offset": 0,
       "limit": limit,
@@ -38,9 +30,9 @@ class GeocodingModel {
     if (res['success']) {
       List list = res['data']['list'];
       List<GeocodingModel> geocodings = [];
-      list.forEach((element) {
+      for (var element in list) {
         geocodings.add(GeocodingModel.fromJson(element));
-      });
+      }
       return geocodings;
     } else {
       throw Exception();

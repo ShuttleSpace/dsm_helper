@@ -7,10 +7,13 @@ import 'package:garden/widgets/cupertino_image.dart';
 import 'package:garden/widgets/transparent_router.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:garden/constants/app_constants.dart';
+import 'package:garden/theme/app_colors.dart';
 
 class Timeline extends StatefulWidget {
   const Timeline(this.isTeam,
-      {this.type,
+      {super.key,
+      this.type,
       this.geocodingId = 0,
       this.generalTagId = 0,
       this.recentlyAdd = false});
@@ -24,7 +27,7 @@ class Timeline extends StatefulWidget {
 }
 
 class TimelineState extends State<Timeline> {
-  ScrollController _scrollController = ScrollController();
+  final ScrollController _scrollController = ScrollController();
   bool loading = true;
   double photoWidth = 0;
   List<TimelineModel> timelines = [];
@@ -69,12 +72,12 @@ class TimelineState extends State<Timeline> {
   @override
   Widget build(BuildContext context) {
     return loading
-        ? Center(
+        ? const Center(
             child: CupertinoActivityIndicator(
               radius: 14,
             ),
           )
-        : days.length > 0
+        : days.isNotEmpty
             ? DraggableScrollbar.semicircle(
                 labelTextBuilder: (position) {
                   var line = days
@@ -82,15 +85,16 @@ class TimelineState extends State<Timeline> {
                           (day.startPosition ?? 0) <= position &&
                           (day.endPosition ?? 0) >= position)
                       .toList();
-                  if (line.length > 0) {
+                  if (line.isNotEmpty) {
                     return Container(
-                      padding: EdgeInsets.symmetric(horizontal: 20),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: AppConstants.paddingLarge),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
                           Text(
                             "${line[0].month}月",
-                            style: TextStyle(fontSize: 30),
+                            style: const TextStyle(fontSize: 30),
                           ),
                           Column(
                             mainAxisAlignment: MainAxisAlignment.center,
@@ -104,14 +108,14 @@ class TimelineState extends State<Timeline> {
                       ),
                     );
                   } else {
-                    return Placeholder(
+                    return const Placeholder(
                       child: Center(
                         child: Text('[x]'),
                       ),
                     );
                   }
                 },
-                labelConstraints: BoxConstraints(
+                labelConstraints: const BoxConstraints(
                     minHeight: 60, maxHeight: 60, minWidth: 140, maxWidth: 140),
                 controller: _scrollController,
                 child: ListView.builder(
@@ -140,7 +144,7 @@ class TimelineState extends State<Timeline> {
                   itemCount: days.length,
                 ),
               )
-            : Center(
+            : const Center(
                 child: Text("无项目"),
               );
   }
@@ -152,7 +156,8 @@ class TimelineState extends State<Timeline> {
         Container(
           alignment: Alignment.centerLeft,
           height: 40,
-          padding: const EdgeInsets.symmetric(horizontal: 20),
+          padding:
+              const EdgeInsets.symmetric(horizontal: AppConstants.paddingLarge),
           child: Row(
             children: [
               Text(
@@ -169,7 +174,7 @@ class TimelineState extends State<Timeline> {
           children: day.photos == null
               ? List.generate(day.itemCount?.toInt() ?? 0, (index) {
                   return Container(
-                    // color: Color(0xffE9E9E9),
+                    // color: AppColors.placeholderBackgroundLight,
                     color: Colors.amber,
                     width: photoWidth,
                     height: photoWidth,
@@ -214,7 +219,7 @@ class TimelineState extends State<Timeline> {
           ));
         }
       },
-      child: Container(
+      child: SizedBox(
         width: photoWidth,
         height: photoWidth,
         child: Stack(
@@ -229,7 +234,7 @@ class TimelineState extends State<Timeline> {
                 placeholder: Container(
                   width: photoWidth,
                   height: photoWidth,
-                  color: Color(0xffE9E9E9),
+                  color: AppColors.placeholderBackgroundLight,
                 ),
               ),
             ),
@@ -239,15 +244,15 @@ class TimelineState extends State<Timeline> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(
+                    const Icon(
                       Icons.play_circle_fill,
                       color: Colors.white,
                       size: 40,
                     ),
-                    SizedBox(height: 5),
+                    const SizedBox(height: 5),
                     Text(
                       "${photo.additional?.videoMeta?.hours.toString().padLeft(2, "0")}:${photo.additional?.videoMeta?.minutes.toString().padLeft(2, "0")}:${photo.additional?.videoMeta?.seconds.toString().padLeft(2, "0")}",
-                      style: TextStyle(color: Colors.white, fontSize: 12),
+                      style: const TextStyle(color: Colors.white, fontSize: 12),
                     ),
                   ],
                 ),

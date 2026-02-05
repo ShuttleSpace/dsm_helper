@@ -1,25 +1,32 @@
 import 'package:garden/pages/control_panel/file_service/log_setting.dart';
+import 'package:garden/util/log.dart';
+import 'package:garden/util/ui_util.dart';
 import 'package:garden/pages/log_center/log_center.dart';
-import 'package:garden/util/function.dart';
-import 'package:garden/util/neu_picker.dart';
+import 'package:garden/util/http_util.dart';
+import 'package:garden/widgets/neu_picker.dart';
 import 'package:garden/widgets/bubble_tab_indicator.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:garden/constants/app_constants.dart';
+import 'package:garden/theme/app_colors.dart';
 import 'package:flutter/services.dart';
+import 'package:simple_logger/simple_logger.dart';
 
 class FileService extends StatefulWidget {
+  const FileService({super.key});
+
   @override
-  _FileServiceState createState() => _FileServiceState();
+  FileServiceState createState() => FileServiceState();
 }
 
-class _FileServiceState extends State<FileService>
+class FileServiceState extends State<FileService>
     with SingleTickerProviderStateMixin {
-  TextEditingController _workgroupController = TextEditingController();
-  TextEditingController _nfsv4Controller = TextEditingController();
-  TextEditingController _timeoutController = TextEditingController();
-  TextEditingController _ftpPortController = TextEditingController();
-  TextEditingController _sftpPortController = TextEditingController();
+  final TextEditingController _workgroupController = TextEditingController();
+  final TextEditingController _nfsv4Controller = TextEditingController();
+  final TextEditingController _timeoutController = TextEditingController();
+  final TextEditingController _ftpPortController = TextEditingController();
+  final TextEditingController _sftpPortController = TextEditingController();
   List<String> utf8Modes = ['禁用', '自动', '强制'];
   bool loading = true;
   late TabController _tabController;
@@ -39,24 +46,27 @@ class _FileServiceState extends State<FileService>
   @override
   void initState() {
     _tabController = TabController(length: 2, vsync: this);
-    getData();
+    getData(() {
+      Navigator.of(context).pop();
+    });
     super.initState();
   }
 
-  getData() async {
+  getData(Function onFailure) async {
     var res = await Api.fileService();
-    print(res);
+    Log.logger.log(Level.INFO, "FileService: $res");
     if (res['success']) {
       setState(() {
         loading = false;
       });
       if (res['data']['has_fail']) {
-        Util.instance.toast("加载失败");
-        Navigator.of(context).pop();
+        UiUtil.toast("加载失败");
+
+        onFailure();
         return;
       }
       List result = res['data']['result'];
-      result.forEach((item) {
+      for (var item in result) {
         if (item['success'] == true) {
           switch (item['api']) {
             case "SYNO.Core.FileServ.SMB":
@@ -90,7 +100,7 @@ class _FileServiceState extends State<FileService>
             case "SYNO.Core.FileServ.FTP.SFTP":
               setState(() {
                 sftp = item['data'];
-                print(sftp);
+                Log.logger.log(Level.INFO, "SFTP: $sftp");
                 _sftpPortController.value =
                     TextEditingValue(text: "${sftp['portnum']}");
               });
@@ -132,7 +142,7 @@ class _FileServiceState extends State<FileService>
               break;
           }
         }
-      });
+      }
     }
   }
 
@@ -141,10 +151,10 @@ class _FileServiceState extends State<FileService>
     return Scaffold(
       appBar: AppBar(
         leading: AppBackButton(context),
-        title: Text("文件服务"),
+        title: const Text("文件服务"),
       ),
       body: loading
-          ? Center(
+          ? const Center(
               child: CupertinoActivityIndicator(
                 radius: 14,
               ),
@@ -153,11 +163,12 @@ class _FileServiceState extends State<FileService>
               children: [
                 Card(
                   shape: RoundedRectangleBorder(
-                      side: BorderSide(),
+                      side: const BorderSide(),
                       borderRadius: BorderRadius.circular(18)),
-                  margin: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                  margin:
+                      const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
                   child: Padding(
-                    padding: const EdgeInsets.all(8.0),
+                    padding: const EdgeInsets.all(AppConstants.paddingSmall),
                     child: TabBar(
                       dividerHeight: 0,
                       isScrollable: true,
@@ -167,8 +178,8 @@ class _FileServiceState extends State<FileService>
                           ? Colors.white
                           : Colors.black,
                       unselectedLabelColor: Colors.grey,
-                      indicator: BubbleTabIndicator(),
-                      tabs: [
+                      indicator: const BubbleTabIndicator(),
+                      tabs: const [
                         Padding(
                           padding:
                               EdgeInsets.symmetric(vertical: 10, horizontal: 5),
@@ -200,25 +211,25 @@ class _FileServiceState extends State<FileService>
                     controller: _tabController,
                     children: [
                       ListView(
-                        padding: EdgeInsets.symmetric(vertical: 20),
+                        padding: const EdgeInsets.symmetric(vertical: 20),
                         children: [
                           Card(
                             shape: RoundedRectangleBorder(
-                                side: BorderSide(),
+                                side: const BorderSide(),
                                 borderRadius: BorderRadius.circular(18)),
-                            margin: EdgeInsets.only(left: 20, right: 20),
+                            margin: const EdgeInsets.only(left: 20, right: 20),
                             child: Padding(
-                              padding: EdgeInsets.all(20),
+                              padding: const EdgeInsets.all(20),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(
+                                  const Text(
                                     "SMB",
                                     style: TextStyle(
                                         fontSize: 18,
                                         fontWeight: FontWeight.w600),
                                   ),
-                                  SizedBox(
+                                  const SizedBox(
                                     height: 20,
                                   ),
                                   GestureDetector(
@@ -230,22 +241,23 @@ class _FileServiceState extends State<FileService>
                                     },
                                     child: Card(
                                       shape: RoundedRectangleBorder(
-                                          side: BorderSide(),
+                                          side: const BorderSide(),
                                           borderRadius:
                                               BorderRadius.circular(5)),
                                       child: Padding(
-                                        padding: const EdgeInsets.all(8.0),
+                                        padding: const EdgeInsets.all(
+                                            AppConstants.paddingSmall),
                                         child: Row(
                                           children: [
-                                            Expanded(
+                                            const Expanded(
                                               child: Text(
                                                 "启用SMB服务",
                                               ),
                                             ),
                                             if (smb['enable_samba'])
-                                              Icon(
+                                              const Icon(
                                                 CupertinoIcons.checkmark_alt,
-                                                color: Color(0xffff9813),
+                                                color: AppColors.primaryAction,
                                               ),
                                           ],
                                         ),
@@ -253,28 +265,29 @@ class _FileServiceState extends State<FileService>
                                     ),
                                   ),
                                   if (smb['enable_samba']) ...[
-                                    SizedBox(
+                                    const SizedBox(
                                       height: 20,
                                     ),
                                     Card(
                                       shape: RoundedRectangleBorder(
-                                          side: BorderSide(),
+                                          side: const BorderSide(),
                                           borderRadius:
                                               BorderRadius.circular(5)),
                                       child: Padding(
-                                        padding: const EdgeInsets.all(8.0),
+                                        padding: const EdgeInsets.all(
+                                            AppConstants.paddingSmall),
                                         child: TextField(
                                           controller: _workgroupController,
                                           onChanged: (v) =>
                                               smb['workgroup'] = v,
-                                          decoration: InputDecoration(
+                                          decoration: const InputDecoration(
                                             border: InputBorder.none,
                                             labelText: '工作群组',
                                           ),
                                         ),
                                       ),
                                     ),
-                                    SizedBox(
+                                    const SizedBox(
                                       height: 20,
                                     ),
                                     GestureDetector(
@@ -286,29 +299,31 @@ class _FileServiceState extends State<FileService>
                                       },
                                       child: Card(
                                         shape: RoundedRectangleBorder(
-                                            side: BorderSide(),
+                                            side: const BorderSide(),
                                             borderRadius:
                                                 BorderRadius.circular(5)),
                                         child: Padding(
-                                          padding: const EdgeInsets.all(8.0),
+                                          padding: const EdgeInsets.all(
+                                              AppConstants.paddingSmall),
                                           child: Row(
                                             children: [
-                                              Expanded(
+                                              const Expanded(
                                                 child: Text(
                                                   "不可访问以前版本",
                                                 ),
                                               ),
                                               if (smb['disable_shadow_copy'])
-                                                Icon(
+                                                const Icon(
                                                   CupertinoIcons.checkmark_alt,
-                                                  color: Color(0xffff9813),
+                                                  color:
+                                                      AppColors.primaryAction,
                                                 ),
                                             ],
                                           ),
                                         ),
                                       ),
                                     ),
-                                    SizedBox(
+                                    const SizedBox(
                                       height: 20,
                                     ),
                                     GestureDetector(
@@ -321,28 +336,30 @@ class _FileServiceState extends State<FileService>
                                           Navigator.of(context).push(
                                               CupertinoPageRoute(
                                                   builder: (context) {
-                                            return LogSetting("cifs");
+                                            return const LogSetting("cifs");
                                           }));
                                         }
                                       },
                                       child: Card(
                                         shape: RoundedRectangleBorder(
-                                            side: BorderSide(),
+                                            side: const BorderSide(),
                                             borderRadius:
                                                 BorderRadius.circular(5)),
                                         child: Padding(
-                                          padding: const EdgeInsets.all(8.0),
+                                          padding: const EdgeInsets.all(
+                                              AppConstants.paddingSmall),
                                           child: Row(
                                             children: [
-                                              Expanded(
+                                              const Expanded(
                                                 child: Text(
                                                   "启动传输日志",
                                                 ),
                                               ),
                                               if (syslogClient['cifs'])
-                                                Icon(
+                                                const Icon(
                                                   CupertinoIcons.checkmark_alt,
-                                                  color: Color(0xffff9813),
+                                                  color:
+                                                      AppColors.primaryAction,
                                                 ),
                                             ],
                                           ),
@@ -350,7 +367,7 @@ class _FileServiceState extends State<FileService>
                                       ),
                                     ),
                                     if (syslogClient['cifs']) ...[
-                                      SizedBox(
+                                      const SizedBox(
                                         height: 20,
                                       ),
                                       Row(
@@ -362,14 +379,15 @@ class _FileServiceState extends State<FileService>
                                                   Navigator.of(context).push(
                                                       CupertinoPageRoute(
                                                           builder: (context) {
-                                                    return LogSetting("cifs");
+                                                    return const LogSetting(
+                                                        "cifs");
                                                   }));
                                                 }
                                               },
-                                              child: Text("日志设置"),
+                                              child: const Text("日志设置"),
                                             ),
                                           ),
-                                          SizedBox(
+                                          const SizedBox(
                                             width: 20,
                                           ),
                                           Expanded(
@@ -378,10 +396,10 @@ class _FileServiceState extends State<FileService>
                                                 Navigator.of(context).push(
                                                     CupertinoPageRoute(
                                                         builder: (context) {
-                                                  return LogCenter();
+                                                  return const LogCenter();
                                                 }));
                                               },
-                                              child: Text(
+                                              child: const Text(
                                                 "查看日志",
                                               ),
                                             ),
@@ -394,26 +412,26 @@ class _FileServiceState extends State<FileService>
                               ),
                             ),
                           ),
-                          SizedBox(
+                          const SizedBox(
                             height: 20,
                           ),
                           Card(
                             shape: RoundedRectangleBorder(
-                                side: BorderSide(),
+                                side: const BorderSide(),
                                 borderRadius: BorderRadius.circular(18)),
-                            margin: EdgeInsets.only(left: 20, right: 20),
+                            margin: const EdgeInsets.only(left: 20, right: 20),
                             child: Padding(
-                              padding: EdgeInsets.all(20),
+                              padding: const EdgeInsets.all(20),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(
+                                  const Text(
                                     "AFP",
                                     style: TextStyle(
                                         fontSize: 18,
                                         fontWeight: FontWeight.w600),
                                   ),
-                                  SizedBox(
+                                  const SizedBox(
                                     height: 20,
                                   ),
                                   GestureDetector(
@@ -424,22 +442,23 @@ class _FileServiceState extends State<FileService>
                                     },
                                     child: Card(
                                       shape: RoundedRectangleBorder(
-                                          side: BorderSide(),
+                                          side: const BorderSide(),
                                           borderRadius:
                                               BorderRadius.circular(5)),
                                       child: Padding(
-                                        padding: const EdgeInsets.all(8.0),
+                                        padding: const EdgeInsets.all(
+                                            AppConstants.paddingSmall),
                                         child: Row(
                                           children: [
-                                            Expanded(
+                                            const Expanded(
                                               child: Text(
                                                 "启用AFP服务",
                                               ),
                                             ),
                                             if (afp['enable_afp'])
-                                              Icon(
+                                              const Icon(
                                                 CupertinoIcons.checkmark_alt,
-                                                color: Color(0xffff9813),
+                                                color: AppColors.primaryAction,
                                               ),
                                           ],
                                         ),
@@ -447,7 +466,7 @@ class _FileServiceState extends State<FileService>
                                     ),
                                   ),
                                   if (afp['enable_afp']) ...[
-                                    SizedBox(
+                                    const SizedBox(
                                       height: 20,
                                     ),
                                     GestureDetector(
@@ -459,22 +478,24 @@ class _FileServiceState extends State<FileService>
                                       },
                                       child: Card(
                                         shape: RoundedRectangleBorder(
-                                            side: BorderSide(),
+                                            side: const BorderSide(),
                                             borderRadius:
                                                 BorderRadius.circular(5)),
                                         child: Padding(
-                                          padding: const EdgeInsets.all(8.0),
+                                          padding: const EdgeInsets.all(
+                                              AppConstants.paddingSmall),
                                           child: Row(
                                             children: [
-                                              Expanded(
+                                              const Expanded(
                                                 child: Text(
                                                   "启动传输日志",
                                                 ),
                                               ),
                                               if (syslogClient['afp'])
-                                                Icon(
+                                                const Icon(
                                                   CupertinoIcons.checkmark_alt,
-                                                  color: Color(0xffff9813),
+                                                  color:
+                                                      AppColors.primaryAction,
                                                 ),
                                             ],
                                           ),
@@ -486,26 +507,26 @@ class _FileServiceState extends State<FileService>
                               ),
                             ),
                           ),
-                          SizedBox(
+                          const SizedBox(
                             height: 20,
                           ),
                           Card(
                             shape: RoundedRectangleBorder(
-                                side: BorderSide(),
+                                side: const BorderSide(),
                                 borderRadius: BorderRadius.circular(18)),
-                            margin: EdgeInsets.only(left: 20, right: 20),
+                            margin: const EdgeInsets.only(left: 20, right: 20),
                             child: Padding(
-                              padding: EdgeInsets.all(20),
+                              padding: const EdgeInsets.all(20),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(
+                                  const Text(
                                     "NFS",
                                     style: TextStyle(
                                         fontSize: 18,
                                         fontWeight: FontWeight.w600),
                                   ),
-                                  SizedBox(
+                                  const SizedBox(
                                     height: 20,
                                   ),
                                   GestureDetector(
@@ -516,22 +537,23 @@ class _FileServiceState extends State<FileService>
                                     },
                                     child: Card(
                                       shape: RoundedRectangleBorder(
-                                          side: BorderSide(),
+                                          side: const BorderSide(),
                                           borderRadius:
                                               BorderRadius.circular(5)),
                                       child: Padding(
-                                        padding: const EdgeInsets.all(8.0),
+                                        padding: const EdgeInsets.all(
+                                            AppConstants.paddingSmall),
                                         child: Row(
                                           children: [
-                                            Expanded(
+                                            const Expanded(
                                               child: Text(
                                                 "启用NFS服务",
                                               ),
                                             ),
                                             if (nfs['enable_nfs'])
-                                              Icon(
+                                              const Icon(
                                                 CupertinoIcons.checkmark_alt,
-                                                color: Color(0xffff9813),
+                                                color: AppColors.primaryAction,
                                               ),
                                           ],
                                         ),
@@ -539,7 +561,7 @@ class _FileServiceState extends State<FileService>
                                     ),
                                   ),
                                   if (nfs['enable_nfs']) ...[
-                                    SizedBox(
+                                    const SizedBox(
                                       height: 20,
                                     ),
                                     GestureDetector(
@@ -551,22 +573,24 @@ class _FileServiceState extends State<FileService>
                                       },
                                       child: Card(
                                         shape: RoundedRectangleBorder(
-                                            side: BorderSide(),
+                                            side: const BorderSide(),
                                             borderRadius:
                                                 BorderRadius.circular(5)),
                                         child: Padding(
-                                          padding: const EdgeInsets.all(8.0),
+                                          padding: const EdgeInsets.all(
+                                              AppConstants.paddingSmall),
                                           child: Row(
                                             children: [
-                                              Expanded(
+                                              const Expanded(
                                                 child: Text(
                                                   "启用 NFSv4.1 支持",
                                                 ),
                                               ),
                                               if (nfs['enable_nfs_v4'])
-                                                Icon(
+                                                const Icon(
                                                   CupertinoIcons.checkmark_alt,
-                                                  color: Color(0xffff9813),
+                                                  color:
+                                                      AppColors.primaryAction,
                                                 ),
                                             ],
                                           ),
@@ -576,21 +600,22 @@ class _FileServiceState extends State<FileService>
                                   ],
                                   if (nfs['enable_nfs'] &&
                                       nfs['enable_nfs_v4']) ...[
-                                    SizedBox(
+                                    const SizedBox(
                                       height: 20,
                                     ),
                                     Card(
                                       shape: RoundedRectangleBorder(
-                                          side: BorderSide(),
+                                          side: const BorderSide(),
                                           borderRadius:
                                               BorderRadius.circular(5)),
                                       child: Padding(
-                                        padding: const EdgeInsets.all(8.0),
+                                        padding: const EdgeInsets.all(
+                                            AppConstants.paddingSmall),
                                         child: TextField(
                                           controller: _nfsv4Controller,
                                           onChanged: (v) =>
                                               nfs['nfs_v4_domain'] = v,
-                                          decoration: InputDecoration(
+                                          decoration: const InputDecoration(
                                             border: InputBorder.none,
                                             labelText: 'NFSv4 域',
                                           ),
@@ -602,31 +627,31 @@ class _FileServiceState extends State<FileService>
                               ),
                             ),
                           ),
-                          SizedBox(
+                          const SizedBox(
                             height: 20,
                           ),
                         ],
                       ),
                       ListView(
-                        padding: EdgeInsets.symmetric(vertical: 20),
+                        padding: const EdgeInsets.symmetric(vertical: 20),
                         children: [
                           Card(
                             shape: RoundedRectangleBorder(
-                                side: BorderSide(),
+                                side: const BorderSide(),
                                 borderRadius: BorderRadius.circular(18)),
-                            margin: EdgeInsets.only(left: 20, right: 20),
+                            margin: const EdgeInsets.only(left: 20, right: 20),
                             child: Padding(
-                              padding: EdgeInsets.all(20),
+                              padding: const EdgeInsets.all(20),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(
+                                  const Text(
                                     "FTP/FTPS",
                                     style: TextStyle(
                                         fontSize: 18,
                                         fontWeight: FontWeight.w600),
                                   ),
-                                  SizedBox(
+                                  const SizedBox(
                                     height: 20,
                                   ),
                                   GestureDetector(
@@ -637,29 +662,30 @@ class _FileServiceState extends State<FileService>
                                     },
                                     child: Card(
                                       shape: RoundedRectangleBorder(
-                                          side: BorderSide(),
+                                          side: const BorderSide(),
                                           borderRadius:
                                               BorderRadius.circular(5)),
                                       child: Padding(
-                                        padding: const EdgeInsets.all(8.0),
+                                        padding: const EdgeInsets.all(
+                                            AppConstants.paddingSmall),
                                         child: Row(
                                           children: [
-                                            Expanded(
+                                            const Expanded(
                                               child: Text(
                                                 "启用FTP服务",
                                               ),
                                             ),
                                             if (ftp['enable_ftp'])
-                                              Icon(
+                                              const Icon(
                                                 CupertinoIcons.checkmark_alt,
-                                                color: Color(0xffff9813),
+                                                color: AppColors.primaryAction,
                                               ),
                                           ],
                                         ),
                                       ),
                                     ),
                                   ),
-                                  SizedBox(
+                                  const SizedBox(
                                     height: 20,
                                   ),
                                   GestureDetector(
@@ -671,22 +697,23 @@ class _FileServiceState extends State<FileService>
                                     },
                                     child: Card(
                                       shape: RoundedRectangleBorder(
-                                          side: BorderSide(),
+                                          side: const BorderSide(),
                                           borderRadius:
                                               BorderRadius.circular(5)),
                                       child: Padding(
-                                        padding: const EdgeInsets.all(8.0),
+                                        padding: const EdgeInsets.all(
+                                            AppConstants.paddingSmall),
                                         child: Row(
                                           children: [
-                                            Expanded(
+                                            const Expanded(
                                               child: Text(
                                                 "启用 FTP SSL/TLS 加密服务（FTPS）",
                                               ),
                                             ),
                                             if (ftp['enable_ftps'])
-                                              Icon(
+                                              const Icon(
                                                 CupertinoIcons.checkmark_alt,
-                                                color: Color(0xffff9813),
+                                                color: AppColors.primaryAction,
                                               ),
                                           ],
                                         ),
@@ -694,23 +721,25 @@ class _FileServiceState extends State<FileService>
                                     ),
                                   ),
                                   if (ftp['enable_ftps']) ...[
-                                    SizedBox(
+                                    const SizedBox(
                                       height: 20,
                                     ),
                                     Card(
                                       shape: RoundedRectangleBorder(
-                                          side: BorderSide(),
+                                          side: const BorderSide(),
                                           borderRadius:
                                               BorderRadius.circular(5)),
                                       child: Padding(
-                                        padding: const EdgeInsets.all(8.0),
+                                        padding: const EdgeInsets.all(
+                                            AppConstants.paddingSmall),
                                         child: TextField(
                                           controller: _timeoutController,
                                           onChanged: (v) {
                                             try {
                                               ftp['timeout'] = int.parse(v);
                                             } catch (e) {
-                                              print("error");
+                                              Log.logger.log(Level.SEVERE,
+                                                  "parse ftp timeout error $e");
                                             }
                                           },
                                           keyboardType: TextInputType.number,
@@ -718,30 +747,32 @@ class _FileServiceState extends State<FileService>
                                             FilteringTextInputFormatter
                                                 .digitsOnly,
                                           ],
-                                          decoration: InputDecoration(
+                                          decoration: const InputDecoration(
                                             border: InputBorder.none,
                                             labelText: '超时(1-7200秒)',
                                           ),
                                         ),
                                       ),
                                     ),
-                                    SizedBox(
+                                    const SizedBox(
                                       height: 20,
                                     ),
                                     Card(
                                       shape: RoundedRectangleBorder(
-                                          side: BorderSide(),
+                                          side: const BorderSide(),
                                           borderRadius:
                                               BorderRadius.circular(5)),
                                       child: Padding(
-                                        padding: const EdgeInsets.all(8.0),
+                                        padding: const EdgeInsets.all(
+                                            AppConstants.paddingSmall),
                                         child: TextField(
                                           controller: _ftpPortController,
                                           onChanged: (v) {
                                             try {
                                               ftp['portnum'] = int.parse(v);
                                             } catch (e) {
-                                              print("error");
+                                              Log.logger.log(Level.SEVERE,
+                                                  "parse ftp portnum error: $e");
                                             }
                                           },
                                           keyboardType: TextInputType.number,
@@ -749,14 +780,14 @@ class _FileServiceState extends State<FileService>
                                             FilteringTextInputFormatter
                                                 .digitsOnly,
                                           ],
-                                          decoration: InputDecoration(
+                                          decoration: const InputDecoration(
                                             border: InputBorder.none,
                                             labelText: 'FTP 服务所使用的端口号',
                                           ),
                                         ),
                                       ),
                                     ),
-                                    SizedBox(
+                                    const SizedBox(
                                       height: 20,
                                     ),
                                     GestureDetector(
@@ -768,29 +799,31 @@ class _FileServiceState extends State<FileService>
                                       },
                                       child: Card(
                                         shape: RoundedRectangleBorder(
-                                            side: BorderSide(),
+                                            side: const BorderSide(),
                                             borderRadius:
                                                 BorderRadius.circular(5)),
                                         child: Padding(
-                                          padding: const EdgeInsets.all(8.0),
+                                          padding: const EdgeInsets.all(
+                                              AppConstants.paddingSmall),
                                           child: Row(
                                             children: [
-                                              Expanded(
+                                              const Expanded(
                                                 child: Text(
                                                   "启用 FXP",
                                                 ),
                                               ),
                                               if (ftp['enable_fxp'])
-                                                Icon(
+                                                const Icon(
                                                   CupertinoIcons.checkmark_alt,
-                                                  color: Color(0xffff9813),
+                                                  color:
+                                                      AppColors.primaryAction,
                                                 ),
                                             ],
                                           ),
                                         ),
                                       ),
                                     ),
-                                    SizedBox(
+                                    const SizedBox(
                                       height: 20,
                                     ),
                                     GestureDetector(
@@ -802,29 +835,31 @@ class _FileServiceState extends State<FileService>
                                       },
                                       child: Card(
                                         shape: RoundedRectangleBorder(
-                                            side: BorderSide(),
+                                            side: const BorderSide(),
                                             borderRadius:
                                                 BorderRadius.circular(5)),
                                         child: Padding(
-                                          padding: const EdgeInsets.all(8.0),
+                                          padding: const EdgeInsets.all(
+                                              AppConstants.paddingSmall),
                                           child: Row(
                                             children: [
-                                              Expanded(
+                                              const Expanded(
                                                 child: Text(
                                                   "启用 FIPS 加密模块",
                                                 ),
                                               ),
                                               if (ftp['enable_fips'])
-                                                Icon(
+                                                const Icon(
                                                   CupertinoIcons.checkmark_alt,
-                                                  color: Color(0xffff9813),
+                                                  color:
+                                                      AppColors.primaryAction,
                                                 ),
                                             ],
                                           ),
                                         ),
                                       ),
                                     ),
-                                    SizedBox(
+                                    const SizedBox(
                                       height: 20,
                                     ),
                                     GestureDetector(
@@ -836,29 +871,31 @@ class _FileServiceState extends State<FileService>
                                       },
                                       child: Card(
                                         shape: RoundedRectangleBorder(
-                                            side: BorderSide(),
+                                            side: const BorderSide(),
                                             borderRadius:
                                                 BorderRadius.circular(5)),
                                         child: Padding(
-                                          padding: const EdgeInsets.all(8.0),
+                                          padding: const EdgeInsets.all(
+                                              AppConstants.paddingSmall),
                                           child: Row(
                                             children: [
-                                              Expanded(
+                                              const Expanded(
                                                 child: Text(
                                                   "支持 ASCII 传送模式",
                                                 ),
                                               ),
                                               if (ftp['enable_ascii'])
-                                                Icon(
+                                                const Icon(
                                                   CupertinoIcons.checkmark_alt,
-                                                  color: Color(0xffff9813),
+                                                  color:
+                                                      AppColors.primaryAction,
                                                 ),
                                             ],
                                           ),
                                         ),
                                       ),
                                     ),
-                                    SizedBox(
+                                    const SizedBox(
                                       height: 20,
                                     ),
                                     GestureDetector(
@@ -881,17 +918,17 @@ class _FileServiceState extends State<FileService>
                                       },
                                       child: Card(
                                         shape: RoundedRectangleBorder(
-                                            side: BorderSide(),
+                                            side: const BorderSide(),
                                             borderRadius:
                                                 BorderRadius.circular(5)),
                                         child: Padding(
-                                          padding: const EdgeInsets.all(8.0),
+                                          padding: const EdgeInsets.all(
+                                              AppConstants.paddingSmall),
                                           child: Row(
                                             children: [
-                                              Text("UTF-8 编码:"),
-                                              Spacer(),
-                                              Text(
-                                                  "${utf8Modes[ftp['utf8_mode']]}"),
+                                              const Text("UTF-8 编码:"),
+                                              const Spacer(),
+                                              Text(utf8Modes[ftp['utf8_mode']]),
                                             ],
                                           ),
                                         ),
@@ -902,26 +939,26 @@ class _FileServiceState extends State<FileService>
                               ),
                             ),
                           ),
-                          SizedBox(
+                          const SizedBox(
                             height: 20,
                           ),
                           Card(
                             shape: RoundedRectangleBorder(
-                                side: BorderSide(),
+                                side: const BorderSide(),
                                 borderRadius: BorderRadius.circular(18)),
-                            margin: EdgeInsets.only(left: 20, right: 20),
+                            margin: const EdgeInsets.only(left: 20, right: 20),
                             child: Padding(
-                              padding: EdgeInsets.all(20),
+                              padding: const EdgeInsets.all(20),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(
+                                  const Text(
                                     "SFTP",
                                     style: TextStyle(
                                         fontSize: 18,
                                         fontWeight: FontWeight.w600),
                                   ),
-                                  SizedBox(
+                                  const SizedBox(
                                     height: 20,
                                   ),
                                   GestureDetector(
@@ -932,45 +969,48 @@ class _FileServiceState extends State<FileService>
                                     },
                                     child: Card(
                                       shape: RoundedRectangleBorder(
-                                          side: BorderSide(),
+                                          side: const BorderSide(),
                                           borderRadius:
                                               BorderRadius.circular(5)),
                                       child: Padding(
-                                        padding: const EdgeInsets.all(8.0),
+                                        padding: const EdgeInsets.all(
+                                            AppConstants.paddingSmall),
                                         child: Row(
                                           children: [
-                                            Expanded(
+                                            const Expanded(
                                               child: Text(
                                                 "启用SFTP服务",
                                               ),
                                             ),
                                             if (sftp['enable'])
-                                              Icon(
+                                              const Icon(
                                                 CupertinoIcons.checkmark_alt,
-                                                color: Color(0xffff9813),
+                                                color: AppColors.primaryAction,
                                               ),
                                           ],
                                         ),
                                       ),
                                     ),
                                   ),
-                                  SizedBox(
+                                  const SizedBox(
                                     height: 20,
                                   ),
                                   Card(
                                     shape: RoundedRectangleBorder(
-                                        side: BorderSide(),
+                                        side: const BorderSide(),
                                         borderRadius:
                                             BorderRadius.circular(18)),
                                     child: Padding(
-                                      padding: const EdgeInsets.all(8.0),
+                                      padding: const EdgeInsets.all(
+                                          AppConstants.paddingSmall),
                                       child: TextField(
                                         controller: _sftpPortController,
                                         onChanged: (v) {
                                           try {
                                             sftp['portnum'] = int.parse(v);
                                           } catch (e) {
-                                            print("error");
+                                            Log.logger.log(Level.SEVERE,
+                                                "parse ftp portnum error: $e");
                                           }
                                         },
                                         keyboardType: TextInputType.number,
@@ -978,7 +1018,7 @@ class _FileServiceState extends State<FileService>
                                           FilteringTextInputFormatter
                                               .digitsOnly,
                                         ],
-                                        decoration: InputDecoration(
+                                        decoration: const InputDecoration(
                                           border: InputBorder.none,
                                           labelText: '端口号',
                                         ),
@@ -999,7 +1039,7 @@ class _FileServiceState extends State<FileService>
                 ),
                 SafeArea(
                   child: Padding(
-                    padding: EdgeInsets.all(20),
+                    padding: const EdgeInsets.all(20),
                     child: OutlinedButton(
                       onPressed: () async {
                         if (saving) {
@@ -1015,12 +1055,14 @@ class _FileServiceState extends State<FileService>
                           setState(() {
                             saving = false;
                           });
-                          Util.instance.toast("保存成功");
-                          getData();
+                          UiUtil.toast("保存成功");
+                          getData(() {
+                            Navigator.of(context).pop();
+                          });
                         }
                       },
                       child: saving
-                          ? Row(
+                          ? const Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 CupertinoActivityIndicator(),
@@ -1033,7 +1075,7 @@ class _FileServiceState extends State<FileService>
                                 )
                               ],
                             )
-                          : Text(
+                          : const Text(
                               ' 保存 ',
                               style: TextStyle(fontSize: 18),
                             ),

@@ -121,6 +121,7 @@ class KeyboardDismisser extends StatelessWidget {
   /// [KeyboardDismisser] will dismiss the keyboard when performing a tapping
   /// gesture.
   const KeyboardDismisser({
+    super.key,
     required this.child,
     this.behavior = HitTestBehavior.deferToChild,
     this.gestures = const [GestureType.onTap],

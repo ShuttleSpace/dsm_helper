@@ -1,20 +1,23 @@
-import 'package:garden/providers/shortcut.dart';
-import 'package:garden/providers/wallpaper.dart';
-import 'package:garden/util/function.dart';
+import 'package:garden/stores/app_store.dart';
+import 'package:garden/util/log.dart';
+import 'package:garden/util/ui_util.dart';
+import 'package:garden/util/storage_util.dart';
+import 'package:garden/util/http_util.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:garden/constants/app_constants.dart';
+import 'package:garden/theme/app_colors.dart';
 
 class WidgetSetting extends StatefulWidget {
   final List widgets;
   final Map restoreSizePos;
-  WidgetSetting(this.widgets, this.restoreSizePos);
+  const WidgetSetting(this.widgets, this.restoreSizePos, {super.key});
   @override
-  _WidgetSettingState createState() => _WidgetSettingState();
+  WidgetSettingState createState() => WidgetSettingState();
 }
 
-class _WidgetSettingState extends State<WidgetSetting> {
+class WidgetSettingState extends State<WidgetSetting> {
   bool showShortcut = true;
   bool showWallpaper = true;
   List<String> allWidgets = [
@@ -40,7 +43,7 @@ class _WidgetSettingState extends State<WidgetSetting> {
   List selectedWidgets = [];
   @override
   void initState() {
-    Util.instance.getStorage("show_shortcut").then((showShortcutStr) {
+    StorageUtil.getString("show_shortcut").then((showShortcutStr) {
       setState(() {
         if (showShortcutStr != null) {
           showShortcut = showShortcutStr == "1";
@@ -49,7 +52,7 @@ class _WidgetSettingState extends State<WidgetSetting> {
         }
       });
     });
-    Util.instance.getStorage("show_wallpaper").then((showWallpaperStr) {
+    StorageUtil.getString("show_wallpaper").then((showWallpaperStr) {
       setState(() {
         if (showWallpaperStr != null) {
           showWallpaper = showWallpaperStr == "1";
@@ -62,13 +65,13 @@ class _WidgetSettingState extends State<WidgetSetting> {
       selectedWidgets.addAll(widget.widgets);
       showWidgets.addAll(widget.widgets);
     });
-    allWidgets.forEach((widget) {
+    for (var widget in allWidgets) {
       if (!showWidgets.contains(widget)) {
         setState(() {
           showWidgets.add(widget);
         });
       }
-    });
+    }
     super.initState();
   }
 
@@ -77,28 +80,31 @@ class _WidgetSettingState extends State<WidgetSetting> {
     return Scaffold(
       appBar: AppBar(
         leading: AppBackButton(context),
-        title: Text("小组件设置"),
+        title: const Text("小组件设置"),
         actions: [
           Padding(
-            padding: EdgeInsets.only(right: 10, top: 8, bottom: 8),
+            padding: const EdgeInsets.only(right: 10, top: 8, bottom: 8),
             child: OutlinedButton(
               onPressed: () async {
                 List saveWidgets = [];
-                showWidgets.forEach((widget) {
+                for (var widget in showWidgets) {
                   if (selectedWidgets.contains(widget)) {
                     saveWidgets.add(widget);
                   }
-                });
+                }
                 Map data = {
                   "SYNO.SDS._Widget.Instance": {"modulelist": saveWidgets},
                   // "restoreSizePos": widget.restoreSizePos
                 };
                 var res = await Api.userSetting(data);
                 if (res['success']) {
-                  Util.instance.toast("保存小组件成功");
-                  Navigator.of(context).pop(saveWidgets);
+                  UiUtil.toast("保存小组件成功");
+                  if (context.mounted) {
+                    // ignore: use_build_context_synchronously
+                    Navigator.of(context).pop();
+                  }
                 } else {
-                  Util.instance.toast("保存小组件失败，代码${res['error']['code']}");
+                  UiUtil.toast("保存小组件失败，代码${res['error']['code']}");
                 }
               },
               child: Image.asset(
@@ -113,23 +119,22 @@ class _WidgetSettingState extends State<WidgetSetting> {
       body: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.all(20.0),
+            padding: const EdgeInsets.all(AppConstants.paddingLarge),
             child: GestureDetector(
               onTap: () {
                 setState(() {
                   setState(() {
                     showShortcut = !showShortcut;
-                    Provider.of<ShortcutProvider>(context, listen: false)
-                        .changeMode(showShortcut);
+                    appStore.changeShortcut(showShortcut);
                   });
                 });
               },
               child: Card(
                 shape: RoundedRectangleBorder(
-                    side: BorderSide(),
+                    side: const BorderSide(),
                     borderRadius: BorderRadius.circular(18)),
                 child: Padding(
-                  padding: EdgeInsets.all(20),
+                  padding: const EdgeInsets.all(20),
                   child: Column(
                     children: [
                       Row(
@@ -138,18 +143,18 @@ class _WidgetSettingState extends State<WidgetSetting> {
                             "assets/icons/shortcut.png",
                             width: 30,
                           ),
-                          SizedBox(
+                          const SizedBox(
                             width: 8,
                           ),
-                          Text(
+                          const Text(
                             "控制台快捷方式",
                             style: TextStyle(fontSize: 16),
                           ),
-                          Spacer(),
+                          const Spacer(),
                           if (showShortcut)
-                            Icon(
+                            const Icon(
                               CupertinoIcons.checkmark_alt,
-                              color: Color(0xffff9813),
+                              color: AppColors.primaryAction,
                             ),
                         ],
                       ),
@@ -166,17 +171,16 @@ class _WidgetSettingState extends State<WidgetSetting> {
                 setState(() {
                   setState(() {
                     showWallpaper = !showWallpaper;
-                    Provider.of<WallpaperProvider>(context, listen: false)
-                        .changeMode(showWallpaper);
+                    appStore.changeWallpaper(showWallpaper);
                   });
                 });
               },
               child: Card(
                 shape: RoundedRectangleBorder(
-                    side: BorderSide(),
+                    side: const BorderSide(),
                     borderRadius: BorderRadius.circular(18)),
                 child: Padding(
-                  padding: EdgeInsets.all(20),
+                  padding: const EdgeInsets.all(20),
                   child: Column(
                     children: [
                       Row(
@@ -185,18 +189,18 @@ class _WidgetSettingState extends State<WidgetSetting> {
                             "assets/icons/wallpaper.png",
                             width: 30,
                           ),
-                          SizedBox(
+                          const SizedBox(
                             width: 8,
                           ),
-                          Text(
+                          const Text(
                             "系统状态显示壁纸",
                             style: TextStyle(fontSize: 16),
                           ),
-                          Spacer(),
+                          const Spacer(),
                           if (showWallpaper)
-                            Icon(
+                            const Icon(
                               CupertinoIcons.checkmark_alt,
-                              color: Color(0xffff9813),
+                              color: AppColors.primaryAction,
                             ),
                         ],
                       ),
@@ -206,7 +210,7 @@ class _WidgetSettingState extends State<WidgetSetting> {
               ),
             ),
           ),
-          SizedBox(
+          const SizedBox(
             height: 20,
           ),
           Expanded(
@@ -221,35 +225,36 @@ class _WidgetSettingState extends State<WidgetSetting> {
                       } else {
                         selectedWidgets.add(widget);
                       }
-                      print(showWidgets);
+                      Log.info(showWidgets);
                     });
                   },
                   child: Card(
                     shape: RoundedRectangleBorder(
-                        side: BorderSide(),
+                        side: const BorderSide(),
                         borderRadius: BorderRadius.circular(18)),
-                    margin: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                    margin: const EdgeInsets.symmetric(
+                        vertical: 10, horizontal: 20),
                     child: Padding(
-                      padding: EdgeInsets.all(20),
+                      padding: const EdgeInsets.all(20),
                       child: Row(
                         children: [
                           Expanded(
                             child: Text(
                               name[widget],
-                              style: TextStyle(fontSize: 16),
+                              style: const TextStyle(fontSize: 16),
                             ),
                           ),
                           Card(
                             shape: RoundedRectangleBorder(
-                                side: BorderSide(),
+                                side: const BorderSide(),
                                 borderRadius: BorderRadius.circular(18)),
                             child: SizedBox(
                               width: 20,
                               height: 20,
                               child: selectedWidgets.contains(widget)
-                                  ? Icon(
+                                  ? const Icon(
                                       CupertinoIcons.checkmark_alt,
-                                      color: Color(0xffff9813),
+                                      color: AppColors.primaryAction,
                                     )
                                   : null,
                             ),

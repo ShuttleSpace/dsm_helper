@@ -4,18 +4,18 @@ import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 class PdfViewer extends StatefulWidget {
   final String url;
   final String name;
-  PdfViewer(this.url, this.name);
+  const PdfViewer(this.url, this.name, {super.key});
   @override
-  _PdfViewerState createState() => _PdfViewerState();
+  PdfViewerState createState() => PdfViewerState();
 }
 
-class _PdfViewerState extends State<PdfViewer> {
+class PdfViewerState extends State<PdfViewer> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
           title: Text(widget.name),
         ),
-        body: Container(child: SfPdfViewer.network(widget.url)));
+        body: SfPdfViewer.network(widget.url));
   }
 }

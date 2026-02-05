@@ -1,17 +1,19 @@
-import 'package:garden/util/function.dart';
+import 'package:garden/util/http_util.dart';
+import 'package:garden/util/ui_util.dart';
 import 'package:garden/widgets/label.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:garden/constants/app_constants.dart';
 
 class TaskRecord extends StatefulWidget {
   final int id;
-  TaskRecord(this.id);
+  const TaskRecord(this.id, {super.key});
   @override
-  _TaskRecordState createState() => _TaskRecordState();
+  TaskRecordState createState() => TaskRecordState();
 }
 
-class _TaskRecordState extends State<TaskRecord> {
+class TaskRecordState extends State<TaskRecord> {
   List records = [];
   bool loading = true;
   @override
@@ -28,18 +30,22 @@ class _TaskRecordState extends State<TaskRecord> {
         records = res['data'];
       });
     } else {
-      Util.instance.toast("加载失败");
-      Navigator.of(context).pop();
+      UiUtil.toast("加载失败");
+      if (context.mounted) {
+        // ignore: use_build_context_synchronously
+        Navigator.of(context).pop();
+      }
     }
   }
 
   Widget _buildRecordItem(record) {
     return Card(
       shape: RoundedRectangleBorder(
-          side: BorderSide(), borderRadius: BorderRadius.circular(18)),
-      margin: EdgeInsets.symmetric(vertical: 10),
+          side: const BorderSide(), borderRadius: BorderRadius.circular(18)),
+      margin:
+          const EdgeInsets.symmetric(vertical: AppConstants.paddingSmall + 2),
       child: Padding(
-        padding: EdgeInsets.all(20),
+        padding: const EdgeInsets.all(20),
         child: Row(
           children: [
             Expanded(
@@ -49,44 +55,44 @@ class _TaskRecordState extends State<TaskRecord> {
                   Text(
                     "${record['start_time']} 至 ${record['stop_time']}",
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 10,
                   ),
-                  Text(
+                  const Text(
                     "脚本：",
                     style: TextStyle(fontSize: 16),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 5,
                   ),
                   Text(
                     "${record['script_in'].trim()}",
-                    style: TextStyle(fontSize: 13),
+                    style: const TextStyle(fontSize: 13),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 10,
                   ),
                   Row(
                     children: [
                       if (record['exit_type'] == 'normal')
-                        Label("正常", Colors.green)
+                        const Label("正常", Colors.green)
                       else
                         Label("中断(${record['exit_code']})", Colors.red),
-                      SizedBox(
+                      const SizedBox(
                         width: 5,
                       ),
-                      Text(
+                      const Text(
                         "标准输出/结果：",
                         style: TextStyle(fontSize: 16),
                       )
                     ],
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 5,
                   ),
                   Text(
                     "${record['script_out'].trim()}",
-                    style: TextStyle(fontSize: 13),
+                    style: const TextStyle(fontSize: 13),
                   ),
                 ],
               ),
@@ -102,7 +108,7 @@ class _TaskRecordState extends State<TaskRecord> {
     return Scaffold(
       appBar: AppBar(
         leading: AppBackButton(context),
-        title: Text("查看结果"),
+        title: const Text("查看结果"),
       ),
       body: loading
           ? Container(
@@ -111,14 +117,14 @@ class _TaskRecordState extends State<TaskRecord> {
               color: Theme.of(context)
                   .scaffoldBackgroundColor
                   .withValues(alpha: .7),
-              child: Center(
+              child: const Center(
                 child: CupertinoActivityIndicator(
                   radius: 14,
                 ),
               ),
             )
           : ListView.builder(
-              padding: EdgeInsets.all(20),
+              padding: const EdgeInsets.all(20),
               itemBuilder: (context, i) {
                 return _buildRecordItem(records[i]);
               },

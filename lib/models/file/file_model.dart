@@ -2,6 +2,7 @@
 /// isdir : true
 /// name : "#recycle"
 /// path : "/Downloads/#recycle"
+library;
 
 class FileModel {
   FileModel({

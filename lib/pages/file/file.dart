@@ -1,10 +1,16 @@
 import 'dart:async';
+import 'package:garden/util/file_type_util.dart';
+import 'package:garden/util/format_util.dart';
+import 'package:garden/util/ui_util.dart';
+import 'package:garden/util/storage_util.dart';
+import 'package:garden/stores/connection_store.dart';
 import 'dart:io';
 import 'package:android_intent_plus/android_intent.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:draggable_scrollbar/draggable_scrollbar.dart';
 import 'package:garden/pages/download/download_state.dart';
+import 'package:garden/stores/app_store.dart';
 import 'package:garden/util/log.dart';
 import 'package:flutter_vibrate/flutter_vibrate.dart';
 import 'package:garden/pages/common/audio_player.dart';
@@ -21,29 +27,29 @@ import 'package:garden/pages/file/select_folder.dart';
 import 'package:garden/pages/file/share.dart';
 import 'package:garden/pages/file/share_manager.dart';
 import 'package:garden/pages/file/upload.dart';
-import 'package:garden/providers/audio_player_provider.dart';
-import 'package:garden/themes/app_theme.dart';
-import 'package:garden/util/function.dart';
+import 'package:garden/theme/app_theme.dart';
+import 'package:garden/util/http_util.dart';
 import 'package:garden/widgets/animation_progress_bar.dart';
 import 'package:garden/widgets/file_icon.dart';
 import 'package:garden/widgets/transparent_router.dart';
 import 'package:extended_text/extended_text.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:garden/constants/app_constants.dart';
+import 'package:garden/theme/app_colors.dart';
 import 'package:flutter_floating/floating/floating.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:provider/provider.dart';
 
 enum ListType { list, icon }
 
 class Files extends StatefulWidget {
-  Files({key}) : super(key: key);
+  const Files({super.key});
   @override
   FilesState createState({key}) => FilesState();
 }
 
 class FilesState extends State<Files> {
-  GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   List paths = [];
   List files = [];
   List smbFolders = [];
@@ -57,8 +63,8 @@ class FilesState extends State<Files> {
   String msg = "";
   bool multiSelect = false;
   List selectedFiles = [];
-  ScrollController _pathScrollController = ScrollController();
-  ScrollController _fileScrollController = ScrollController();
+  final ScrollController _pathScrollController = ScrollController();
+  final ScrollController _fileScrollController = ScrollController();
   Map backgroundProcess = {};
   bool showProcessList = false;
   String sortBy = "name";
@@ -84,14 +90,14 @@ class FilesState extends State<Files> {
     getFtpFolder();
     getSftpFolder();
     getDavFolder();
-    processingTimer = Timer.periodic(Duration(seconds: 10), (timer) {
+    processingTimer = Timer.periodic(const Duration(seconds: 10), (timer) {
       getBackgroundTask();
     });
 
     _fileScrollController.addListener(() {
       String path = "";
-      if (paths.length > 0) {
-        path = "/" + paths.join("/");
+      if (paths.isNotEmpty) {
+        path = "/${paths.join("/")}";
       } else {
         path = "/";
       }
@@ -150,7 +156,7 @@ class FilesState extends State<Files> {
       });
       if (result['data']['finished']) {
         if (showProcessList = true) {
-          Util.instance.toast(
+          UiUtil.toast(
               "${result['data']['path']} ${backgroundProcess[taskId]['type'] == 'copy' ? '复制' : '移动'}到 ${result['data']['dest_folder_path']} 完成");
         }
 
@@ -169,7 +175,7 @@ class FilesState extends State<Files> {
       if (result['success'] != null && result['success']) {
         if (result['data']['finished']) {
           if (showProcessList = true) {
-            Util.instance.toast("文件删除完成");
+            UiUtil.toast("文件删除完成");
           }
           backgroundProcess[taskId]['timer']?.cancel();
           backgroundProcess[taskId]['timer'] = null;
@@ -178,7 +184,7 @@ class FilesState extends State<Files> {
         }
       }
     } catch (e) {
-      Util.instance.toast("文件删除出错");
+      UiUtil.toast("文件删除出错");
       backgroundProcess[taskId]['timer']?.cancel();
       backgroundProcess[taskId]['timer'] = null;
       backgroundProcess.remove(taskId);
@@ -193,98 +199,103 @@ class FilesState extends State<Files> {
             result['data']['errors'].length > 0) {
           if (result['data']['errors'][0]['code'] == 1403) {
             String password = "";
-            showCupertinoDialog(
-                context: context,
-                builder: (context) {
-                  return Material(
-                    color: Colors.transparent,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Card(
-                          shape: RoundedRectangleBorder(
-                              side: BorderSide(),
-                              borderRadius: BorderRadius.circular(18)),
-                          margin: EdgeInsets.symmetric(horizontal: 50),
-                          child: Padding(
-                            padding: EdgeInsets.all(20),
-                            child: Column(
-                              children: [
-                                Text(
-                                  "解压密码",
-                                  style: TextStyle(
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.w500),
-                                ),
-                                SizedBox(
-                                  height: 16,
-                                ),
-                                Card(
-                                  shape: RoundedRectangleBorder(
-                                      side: BorderSide(),
-                                      borderRadius: BorderRadius.circular(18)),
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: TextField(
-                                      onChanged: (v) => password = v,
-                                      decoration: InputDecoration(
-                                        border: InputBorder.none,
-                                        hintText: "请输入解压密码",
-                                        labelText: "解压密码",
+            if (context.mounted) {
+              showCupertinoDialog(
+                  // ignore: use_build_context_synchronously
+                  context: context,
+                  builder: (context) {
+                    return Material(
+                      color: Colors.transparent,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Card(
+                            shape: RoundedRectangleBorder(
+                                side: const BorderSide(),
+                                borderRadius: BorderRadius.circular(18)),
+                            margin: const EdgeInsets.symmetric(horizontal: 50),
+                            child: Padding(
+                              padding: const EdgeInsets.all(20),
+                              child: Column(
+                                children: [
+                                  const Text(
+                                    "解压密码",
+                                    style: TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.w500),
+                                  ),
+                                  const SizedBox(
+                                    height: 16,
+                                  ),
+                                  Card(
+                                    shape: RoundedRectangleBorder(
+                                        side: const BorderSide(),
+                                        borderRadius:
+                                            BorderRadius.circular(18)),
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(
+                                          AppConstants.paddingSmall),
+                                      child: TextField(
+                                        onChanged: (v) => password = v,
+                                        decoration: const InputDecoration(
+                                          border: InputBorder.none,
+                                          hintText: "请输入解压密码",
+                                          labelText: "解压密码",
+                                        ),
                                       ),
                                     ),
                                   ),
-                                ),
-                                SizedBox(
-                                  height: 20,
-                                ),
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      child: OutlinedButton(
-                                        onPressed: () async {
-                                          if (password == "") {
-                                            Util.instance.toast("请输入解压密码");
-                                            return;
-                                          }
-                                          Navigator.of(context).pop();
-                                          extractFile(result['data']['path'],
-                                              password: password);
-                                        },
-                                        child: Text(
-                                          "确定",
-                                          style: TextStyle(fontSize: 18),
+                                  const SizedBox(
+                                    height: 20,
+                                  ),
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        child: OutlinedButton(
+                                          onPressed: () async {
+                                            if (password == "") {
+                                              UiUtil.toast("请输入解压密码");
+                                              return;
+                                            }
+                                            Navigator.of(context).pop();
+                                            extractFile(result['data']['path'],
+                                                password: password);
+                                          },
+                                          child: const Text(
+                                            "确定",
+                                            style: TextStyle(fontSize: 18),
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                    SizedBox(
-                                      width: 16,
-                                    ),
-                                    Expanded(
-                                      child: OutlinedButton(
-                                        onPressed: () async {
-                                          Navigator.of(context).pop();
-                                        },
-                                        child: Text(
-                                          "取消",
-                                          style: TextStyle(fontSize: 18),
+                                      const SizedBox(
+                                        width: 16,
+                                      ),
+                                      Expanded(
+                                        child: OutlinedButton(
+                                          onPressed: () async {
+                                            Navigator.of(context).pop();
+                                          },
+                                          child: const Text(
+                                            "取消",
+                                            style: TextStyle(fontSize: 18),
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                  ],
-                                )
-                              ],
+                                    ],
+                                  )
+                                ],
+                              ),
                             ),
                           ),
-                        ),
-                      ],
-                    ),
-                  );
-                });
+                        ],
+                      ),
+                    );
+                  });
+            }
           }
         } else {
           if (showProcessList = true) {
-            Util.instance.toast("文件解压完成");
+            UiUtil.toast("文件解压完成");
           }
         }
         backgroundProcess[taskId]['timer']?.cancel();
@@ -306,7 +317,7 @@ class FilesState extends State<Files> {
       if (result['success'] != null && result['success']) {
         if (result['data']['finished']) {
           if (showProcessList = true) {
-            Util.instance.toast("文件压缩完成");
+            UiUtil.toast("文件压缩完成");
           }
 
           backgroundProcess[taskId]['timer']?.cancel();
@@ -316,7 +327,7 @@ class FilesState extends State<Files> {
         }
       }
     } catch (e) {
-      Util.instance.toast("文件压缩出错");
+      UiUtil.toast("文件压缩出错");
       backgroundProcess[taskId]['timer']?.cancel();
       backgroundProcess[taskId]['timer'] = null;
       backgroundProcess.remove(taskId);
@@ -328,7 +339,7 @@ class FilesState extends State<Files> {
       return;
     }
     backgroundProcess[taskId]['timer'] =
-        Timer.periodic(Duration(seconds: 1), (_) async {
+        Timer.periodic(const Duration(seconds: 1), (_) async {
       switch (backgroundProcess[taskId]['type']) {
         case 'copy':
         case 'move':
@@ -360,12 +371,12 @@ class FilesState extends State<Files> {
 
   refresh() {
     String path = "";
-    if (paths.length > 0 && paths[0].contains("//")) {
-      debugPrint("远程");
+    if (paths.isNotEmpty && paths[0].contains("//")) {
+      Log.info("远程");
       path = paths.join("/");
     } else {
-      debugPrint("本地");
-      path = (paths.length > 0 ? "/" : '') + paths.join("/");
+      Log.info("本地");
+      path = (paths.isNotEmpty ? "/" : '') + paths.join("/");
     }
     goPath(path);
   }
@@ -420,103 +431,106 @@ class FilesState extends State<Files> {
     if (res['success']) {
       bool? r = await result(res['data']['taskid']);
       if (r == null) {
-        Util.instance.toast('Wrong State!');
+        UiUtil.toast('Wrong State!');
         return;
       }
       if (r == false) {
         //搜索未结束
-        searchTimer = Timer.periodic(Duration(seconds: 2), (timer) {
+        searchTimer = Timer.periodic(const Duration(seconds: 2), (timer) {
           result(res['data']['taskid']);
         });
       }
     } else {
-      debugPrint("搜索出错");
-      Util.instance.toast('搜索出错!');
+      Log.info("搜索出错");
+      UiUtil.toast('搜索出错!');
     }
   }
 
   downloadFiles(List files) async {
     Connectivity().onConnectivityChanged.listen((result) {
       if (result.contains(ConnectivityResult.mobile)) {
-        Util.instance.vibrate(FeedbackType.warning);
-        showCupertinoModalPopup(
-          context: context,
-          builder: (context) {
-            return Material(
-              color: Colors.transparent,
-              child: Card(
-                shape: RoundedRectangleBorder(
-                    side: BorderSide(),
-                    borderRadius: BorderRadius.circular(18)),
-                child: SafeArea(
-                  top: false,
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: <Widget>[
-                        Text(
-                          "下载确认",
-                          style: TextStyle(
-                              fontSize: 20, fontWeight: FontWeight.w500),
-                        ),
-                        SizedBox(
-                          height: 12,
-                        ),
-                        Text(
-                          "您当前正在使用数据网络，下载文件可能会产生流量费用，是否继续下载？",
-                          style: TextStyle(
-                              fontSize: 20, fontWeight: FontWeight.w400),
-                        ),
-                        SizedBox(
-                          height: 22,
-                        ),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: OutlinedButton(
-                                onPressed: () async {
-                                  Navigator.of(context).pop(true);
-                                  download(files);
-                                },
-                                child: Text(
-                                  "下载",
-                                  style: TextStyle(
-                                      fontSize: 18, color: Colors.redAccent),
+        UiUtil.vibrate(FeedbackType.warning);
+        if (context.mounted) {
+          showCupertinoModalPopup(
+            // ignore: use_build_context_synchronously
+            context: context,
+            builder: (context) {
+              return Material(
+                color: Colors.transparent,
+                child: Card(
+                  shape: RoundedRectangleBorder(
+                      side: const BorderSide(),
+                      borderRadius: BorderRadius.circular(18)),
+                  child: SafeArea(
+                    top: false,
+                    child: Padding(
+                      padding: const EdgeInsets.all(AppConstants.paddingSmall),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: <Widget>[
+                          const Text(
+                            "下载确认",
+                            style: TextStyle(
+                                fontSize: 20, fontWeight: FontWeight.w500),
+                          ),
+                          const SizedBox(
+                            height: 12,
+                          ),
+                          const Text(
+                            "您当前正在使用数据网络，下载文件可能会产生流量费用，是否继续下载？",
+                            style: TextStyle(
+                                fontSize: 20, fontWeight: FontWeight.w400),
+                          ),
+                          const SizedBox(
+                            height: 22,
+                          ),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: OutlinedButton(
+                                  onPressed: () async {
+                                    Navigator.of(context).pop(true);
+                                    download(files);
+                                  },
+                                  child: const Text(
+                                    "下载",
+                                    style: TextStyle(
+                                        fontSize: 18, color: Colors.redAccent),
+                                  ),
                                 ),
                               ),
-                            ),
-                            SizedBox(
-                              width: 20,
-                            ),
-                            Expanded(
-                              child: OutlinedButton(
-                                onPressed: () async {
-                                  Navigator.of(context).pop(false);
-                                },
-                                child: Text(
-                                  "取消",
-                                  style: TextStyle(fontSize: 18),
+                              const SizedBox(
+                                width: 20,
+                              ),
+                              Expanded(
+                                child: OutlinedButton(
+                                  onPressed: () async {
+                                    Navigator.of(context).pop(false);
+                                  },
+                                  child: const Text(
+                                    "取消",
+                                    style: TextStyle(fontSize: 18),
+                                  ),
                                 ),
                               ),
-                            ),
-                          ],
-                        ),
-                        SizedBox(
-                          height: 8,
-                        ),
-                      ],
+                            ],
+                          ),
+                          const SizedBox(
+                            height: 8,
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
-              ),
-            );
-          },
-        ).then((value) {
-          if (value == null || value == false) {
-            return;
-          }
-        });
+              );
+            },
+          ).then((value) {
+            if (value == null || value == false) {
+              return;
+            }
+          });
+        }
       } else {
         download(files);
       }
@@ -532,33 +546,36 @@ class FilesState extends State<Files> {
         bool permission = false;
         permission = await Permission.manageExternalStorage.request().isGranted;
         if (!permission) {
-          Util.instance.toast("安卓11以上需授权文件管理权限");
+          UiUtil.toast("安卓11以上需授权文件管理权限");
           return;
         }
       } else {
         bool permission = false;
         permission = await Permission.storage.request().isGranted;
         if (!permission) {
-          Util.instance.toast("请先授权APP访问存储权限");
+          UiUtil.toast("请先授权APP访问存储权限");
           return;
         }
       }
     }
 
     for (var file in files) {
-      String url = Util.instance.baseUrl +
-          "/webapi/entry.cgi?api=SYNO.FileStation.Download&version=2&method=download&path=${Uri.encodeComponent(file['path'])}&mode=download&_sid=${Util.instance.sid}";
+      String url =
+          "${connectionStore.baseUrl}/webapi/entry.cgi?api=SYNO.FileStation.Download&version=2&method=download&path=${Uri.encodeComponent(file['path'])}&mode=download&_sid=${connectionStore.sid}";
       String filename = "";
       if (file['isdir']) {
         filename = file['name'] + ".zip";
       } else {
         filename = file['name'];
       }
-      await Util.instance.download(filename, url);
+      await HttpUtil.instance.download(filename, url);
     }
-    Util.instance
+    HttpUtil.instance
         .toast("已添加${files.length > 1 ? "${files.length}个" : ""}下载任务，请至下载页面查看");
-    DownloadStateInherited.of(context)?.notifier.runLoop();
+    if (context.mounted) {
+      // ignore: use_build_context_synchronously
+      DownloadStateInherited.of(context)?.notifier.runLoop();
+    }
   }
 
   Future<bool?> result(String taskId) async {
@@ -621,7 +638,7 @@ class FilesState extends State<Files> {
   }
 
   getShareList() async {
-    String listTypeStr = await Util.instance.getStorage("file_list_type") ?? '';
+    String listTypeStr = await StorageUtil.getString("file_list_type") ?? '';
 
     setState(() {
       if (listTypeStr.isNotBlank) {
@@ -666,11 +683,11 @@ class FilesState extends State<Files> {
     if (res['success']) {
       setState(() {
         files = res['data']['files'];
-        print(files);
+        Log.info(files);
       });
     } else {
       setState(() {
-        msg = res['msg'] ?? Util.instance.notReviewAccount
+        msg = res['msg'] ?? connectionStore.notReviewAccount
             ? '暂无文件'
             : "加载失败，code:${res['error']['code']}";
       });
@@ -678,8 +695,8 @@ class FilesState extends State<Files> {
   }
 
   goPath(String path) async {
-    debugPrint("path:$path");
-    Util.instance.vibrate(FeedbackType.light);
+    Log.info("path:$path");
+    UiUtil.vibrate(FeedbackType.light);
     setState(() {
       success = true;
     });
@@ -691,7 +708,7 @@ class FilesState extends State<Files> {
     }
     double offset = _pathScrollController.position.maxScrollExtent;
     _pathScrollController.animateTo(offset,
-        duration: Duration(milliseconds: 200), curve: Curves.ease);
+        duration: const Duration(milliseconds: 200), curve: Curves.ease);
     _fileScrollController.jumpTo(scrollPosition[path] ?? 0);
   }
 
@@ -699,19 +716,21 @@ class FilesState extends State<Files> {
     setState(() {
       loading = true;
     });
-    var res = await Util.instance.get(
-        Util.instance.baseUrl +
-            "/webapi/entry.cgi?api=SYNO.FileStation.Download&version=1&method=download&path=${Uri.encodeComponent(file['path'])}&mode=open&_sid=${Util.instance.sid}",
+    var res = await HttpUtil.instance.get(
+        "${connectionStore.baseUrl}/webapi/entry.cgi?api=SYNO.FileStation.Download&version=1&method=download&path=${Uri.encodeComponent(file['path'])}&mode=open&_sid=${connectionStore.sid}",
         decode: false);
     setState(() {
       loading = false;
     });
-    Navigator.of(context).push(CupertinoPageRoute(builder: (context) {
-      return TextEditor(
-        fileName: file['name'],
-        content: res,
-      );
-    }));
+    if (context.mounted) {
+      // ignore: use_build_context_synchronously
+      Navigator.of(context).push(CupertinoPageRoute(builder: (context) {
+        return TextEditor(
+          fileName: file['name'],
+          content: res,
+        );
+      }));
+    }
   }
 
   Widget _buildSortMenu(BuildContext context, StateSetter setState) {
@@ -719,20 +738,21 @@ class FilesState extends State<Files> {
       color: Colors.transparent,
       child: Card(
         shape: RoundedRectangleBorder(
-            side: BorderSide(), borderRadius: BorderRadius.circular(18)),
+            side: const BorderSide(), borderRadius: BorderRadius.circular(18)),
         child: Padding(
-          padding: EdgeInsets.all(20),
+          padding: const EdgeInsets.all(20),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
               Card(
                 shape: RoundedRectangleBorder(
-                    side: BorderSide(),
+                    side: const BorderSide(),
                     borderRadius: BorderRadius.circular(18)),
                 child: SafeArea(
                   top: false,
                   child: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 20, vertical: 10),
                     child: Column(
                       children: [
                         GestureDetector(
@@ -743,22 +763,23 @@ class FilesState extends State<Files> {
                           },
                           child: Row(
                             children: [
-                              Expanded(
+                              const Expanded(
                                 child: Text("名称"),
                               ),
                               Card(
                                 shape: RoundedRectangleBorder(
-                                    side: BorderSide(),
+                                    side: const BorderSide(),
                                     borderRadius: BorderRadius.circular(18)),
                                 child: Padding(
-                                  padding: const EdgeInsets.all(8.0),
+                                  padding: const EdgeInsets.all(
+                                      AppConstants.paddingSmall),
                                   child: SizedBox(
                                     width: 20,
                                     height: 20,
                                     child: sortBy == "name"
-                                        ? Icon(
+                                        ? const Icon(
                                             CupertinoIcons.checkmark_alt,
-                                            color: Color(0xffff9813),
+                                            color: AppColors.primaryAction,
                                           )
                                         : null,
                                   ),
@@ -767,7 +788,7 @@ class FilesState extends State<Files> {
                             ],
                           ),
                         ),
-                        SizedBox(height: 5),
+                        const SizedBox(height: 5),
                         GestureDetector(
                           onTap: () {
                             setState(() {
@@ -776,22 +797,23 @@ class FilesState extends State<Files> {
                           },
                           child: Row(
                             children: [
-                              Expanded(
+                              const Expanded(
                                 child: Text("大小"),
                               ),
                               Card(
                                 shape: RoundedRectangleBorder(
-                                    side: BorderSide(),
+                                    side: const BorderSide(),
                                     borderRadius: BorderRadius.circular(18)),
                                 child: Padding(
-                                  padding: const EdgeInsets.all(8.0),
+                                  padding: const EdgeInsets.all(
+                                      AppConstants.paddingSmall),
                                   child: SizedBox(
                                     width: 20,
                                     height: 20,
                                     child: sortBy == "size"
-                                        ? Icon(
+                                        ? const Icon(
                                             CupertinoIcons.checkmark_alt,
-                                            color: Color(0xffff9813),
+                                            color: AppColors.primaryAction,
                                           )
                                         : null,
                                   ),
@@ -800,7 +822,7 @@ class FilesState extends State<Files> {
                             ],
                           ),
                         ),
-                        SizedBox(height: 5),
+                        const SizedBox(height: 5),
                         GestureDetector(
                           onTap: () {
                             setState(() {
@@ -809,22 +831,23 @@ class FilesState extends State<Files> {
                           },
                           child: Row(
                             children: [
-                              Expanded(
+                              const Expanded(
                                 child: Text("文件类型"),
                               ),
                               Card(
                                 shape: RoundedRectangleBorder(
-                                    side: BorderSide(),
+                                    side: const BorderSide(),
                                     borderRadius: BorderRadius.circular(18)),
                                 child: Padding(
-                                  padding: const EdgeInsets.all(8.0),
+                                  padding: const EdgeInsets.all(
+                                      AppConstants.paddingSmall),
                                   child: SizedBox(
                                     width: 20,
                                     height: 20,
                                     child: sortBy == "type"
-                                        ? Icon(
+                                        ? const Icon(
                                             CupertinoIcons.checkmark_alt,
-                                            color: Color(0xffff9813),
+                                            color: AppColors.primaryAction,
                                           )
                                         : null,
                                   ),
@@ -833,7 +856,7 @@ class FilesState extends State<Files> {
                             ],
                           ),
                         ),
-                        SizedBox(height: 5),
+                        const SizedBox(height: 5),
                         GestureDetector(
                           onTap: () {
                             setState(() {
@@ -842,22 +865,23 @@ class FilesState extends State<Files> {
                           },
                           child: Row(
                             children: [
-                              Expanded(
+                              const Expanded(
                                 child: Text("修改日期"),
                               ),
                               Card(
                                 shape: RoundedRectangleBorder(
-                                    side: BorderSide(),
+                                    side: const BorderSide(),
                                     borderRadius: BorderRadius.circular(18)),
                                 child: Padding(
-                                  padding: const EdgeInsets.all(8.0),
+                                  padding: const EdgeInsets.all(
+                                      AppConstants.paddingSmall),
                                   child: SizedBox(
                                     width: 20,
                                     height: 20,
                                     child: sortBy == "mtime"
-                                        ? Icon(
+                                        ? const Icon(
                                             CupertinoIcons.checkmark_alt,
-                                            color: Color(0xffff9813),
+                                            color: AppColors.primaryAction,
                                           )
                                         : null,
                                   ),
@@ -866,7 +890,7 @@ class FilesState extends State<Files> {
                             ],
                           ),
                         ),
-                        SizedBox(height: 5),
+                        const SizedBox(height: 5),
                         GestureDetector(
                           onTap: () {
                             setState(() {
@@ -875,22 +899,23 @@ class FilesState extends State<Files> {
                           },
                           child: Row(
                             children: [
-                              Expanded(
+                              const Expanded(
                                 child: Text("创建日期"),
                               ),
                               Card(
                                 shape: RoundedRectangleBorder(
-                                    side: BorderSide(),
+                                    side: const BorderSide(),
                                     borderRadius: BorderRadius.circular(18)),
                                 child: Padding(
-                                  padding: const EdgeInsets.all(8.0),
+                                  padding: const EdgeInsets.all(
+                                      AppConstants.paddingSmall),
                                   child: SizedBox(
                                     width: 20,
                                     height: 20,
                                     child: sortBy == "crtime"
-                                        ? Icon(
+                                        ? const Icon(
                                             CupertinoIcons.checkmark_alt,
-                                            color: Color(0xffff9813),
+                                            color: AppColors.primaryAction,
                                           )
                                         : null,
                                   ),
@@ -899,7 +924,7 @@ class FilesState extends State<Files> {
                             ],
                           ),
                         ),
-                        SizedBox(height: 5),
+                        const SizedBox(height: 5),
                         GestureDetector(
                           onTap: () {
                             setState(() {
@@ -908,22 +933,23 @@ class FilesState extends State<Files> {
                           },
                           child: Row(
                             children: [
-                              Expanded(
+                              const Expanded(
                                 child: Text("最近访问时间"),
                               ),
                               Card(
                                 shape: RoundedRectangleBorder(
-                                    side: BorderSide(),
+                                    side: const BorderSide(),
                                     borderRadius: BorderRadius.circular(18)),
                                 child: Padding(
-                                  padding: const EdgeInsets.all(8.0),
+                                  padding: const EdgeInsets.all(
+                                      AppConstants.paddingSmall),
                                   child: SizedBox(
                                     width: 20,
                                     height: 20,
                                     child: sortBy == "atime"
-                                        ? Icon(
+                                        ? const Icon(
                                             CupertinoIcons.checkmark_alt,
-                                            color: Color(0xffff9813),
+                                            color: AppColors.primaryAction,
                                           )
                                         : null,
                                   ),
@@ -932,7 +958,7 @@ class FilesState extends State<Files> {
                             ],
                           ),
                         ),
-                        SizedBox(height: 5),
+                        const SizedBox(height: 5),
                         GestureDetector(
                           onTap: () {
                             setState(() {
@@ -941,22 +967,23 @@ class FilesState extends State<Files> {
                           },
                           child: Row(
                             children: [
-                              Expanded(
+                              const Expanded(
                                 child: Text("权限"),
                               ),
                               Card(
                                 shape: RoundedRectangleBorder(
-                                    side: BorderSide(),
+                                    side: const BorderSide(),
                                     borderRadius: BorderRadius.circular(18)),
                                 child: Padding(
-                                  padding: const EdgeInsets.all(8.0),
+                                  padding: const EdgeInsets.all(
+                                      AppConstants.paddingSmall),
                                   child: SizedBox(
                                     width: 20,
                                     height: 20,
                                     child: sortBy == "posix"
-                                        ? Icon(
+                                        ? const Icon(
                                             CupertinoIcons.checkmark_alt,
-                                            color: Color(0xffff9813),
+                                            color: AppColors.primaryAction,
                                           )
                                         : null,
                                   ),
@@ -965,7 +992,7 @@ class FilesState extends State<Files> {
                             ],
                           ),
                         ),
-                        SizedBox(height: 5),
+                        const SizedBox(height: 5),
                         GestureDetector(
                           onTap: () {
                             setState(() {
@@ -974,22 +1001,23 @@ class FilesState extends State<Files> {
                           },
                           child: Row(
                             children: [
-                              Expanded(
+                              const Expanded(
                                 child: Text("拥有者"),
                               ),
                               Card(
                                 shape: RoundedRectangleBorder(
-                                    side: BorderSide(),
+                                    side: const BorderSide(),
                                     borderRadius: BorderRadius.circular(18)),
                                 child: Padding(
-                                  padding: const EdgeInsets.all(8.0),
+                                  padding: const EdgeInsets.all(
+                                      AppConstants.paddingSmall),
                                   child: SizedBox(
                                     width: 20,
                                     height: 20,
                                     child: sortBy == "user"
-                                        ? Icon(
+                                        ? const Icon(
                                             CupertinoIcons.checkmark_alt,
-                                            color: Color(0xffff9813),
+                                            color: AppColors.primaryAction,
                                           )
                                         : null,
                                   ),
@@ -998,7 +1026,7 @@ class FilesState extends State<Files> {
                             ],
                           ),
                         ),
-                        SizedBox(height: 5),
+                        const SizedBox(height: 5),
                         GestureDetector(
                           onTap: () {
                             setState(() {
@@ -1007,22 +1035,23 @@ class FilesState extends State<Files> {
                           },
                           child: Row(
                             children: [
-                              Expanded(
+                              const Expanded(
                                 child: Text("群组"),
                               ),
                               Card(
                                 shape: RoundedRectangleBorder(
-                                    side: BorderSide(),
+                                    side: const BorderSide(),
                                     borderRadius: BorderRadius.circular(18)),
                                 child: Padding(
-                                  padding: const EdgeInsets.all(8.0),
+                                  padding: const EdgeInsets.all(
+                                      AppConstants.paddingSmall),
                                   child: SizedBox(
                                     width: 20,
                                     height: 20,
                                     child: sortBy == "group"
-                                        ? Icon(
+                                        ? const Icon(
                                             CupertinoIcons.checkmark_alt,
-                                            color: Color(0xffff9813),
+                                            color: AppColors.primaryAction,
                                           )
                                         : null,
                                   ),
@@ -1036,15 +1065,16 @@ class FilesState extends State<Files> {
                   ),
                 ),
               ),
-              SizedBox(
+              const SizedBox(
                 height: 20,
               ),
               Card(
                 shape: RoundedRectangleBorder(
-                    side: BorderSide(),
+                    side: const BorderSide(),
                     borderRadius: BorderRadius.circular(18)),
                 child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                   child: Column(
                     children: [
                       GestureDetector(
@@ -1055,22 +1085,23 @@ class FilesState extends State<Files> {
                         },
                         child: Row(
                           children: [
-                            Expanded(
+                            const Expanded(
                               child: Text("由小至大"),
                             ),
                             Card(
                               shape: RoundedRectangleBorder(
-                                  side: BorderSide(),
+                                  side: const BorderSide(),
                                   borderRadius: BorderRadius.circular(18)),
                               child: Padding(
-                                padding: const EdgeInsets.all(8.0),
+                                padding: const EdgeInsets.all(
+                                    AppConstants.paddingSmall),
                                 child: SizedBox(
                                   width: 20,
                                   height: 20,
                                   child: sortDirection == "ASC"
-                                      ? Icon(
+                                      ? const Icon(
                                           CupertinoIcons.checkmark_alt,
-                                          color: Color(0xffff9813),
+                                          color: AppColors.primaryAction,
                                         )
                                       : null,
                                 ),
@@ -1079,7 +1110,7 @@ class FilesState extends State<Files> {
                           ],
                         ),
                       ),
-                      SizedBox(height: 5),
+                      const SizedBox(height: 5),
                       GestureDetector(
                         onTap: () {
                           setState(() {
@@ -1088,22 +1119,23 @@ class FilesState extends State<Files> {
                         },
                         child: Row(
                           children: [
-                            Expanded(
+                            const Expanded(
                               child: Text("由大至小"),
                             ),
                             Card(
                               shape: RoundedRectangleBorder(
-                                  side: BorderSide(),
+                                  side: const BorderSide(),
                                   borderRadius: BorderRadius.circular(18)),
                               child: Padding(
-                                padding: const EdgeInsets.all(8.0),
+                                padding: const EdgeInsets.all(
+                                    AppConstants.paddingSmall),
                                 child: SizedBox(
                                   width: 20,
                                   height: 20,
                                   child: sortDirection == "DESC"
-                                      ? Icon(
+                                      ? const Icon(
                                           CupertinoIcons.checkmark_alt,
-                                          color: Color(0xffff9813),
+                                          color: AppColors.primaryAction,
                                         )
                                       : null,
                                 ),
@@ -1116,19 +1148,19 @@ class FilesState extends State<Files> {
                   ),
                 ),
               ),
-              SizedBox(
+              const SizedBox(
                 height: 22,
               ),
               OutlinedButton(
                 onPressed: () async {
                   Navigator.of(context).pop();
                 },
-                child: Text(
+                child: const Text(
                   "确定",
                   style: TextStyle(fontSize: 18),
                 ),
               ),
-              SizedBox(
+              const SizedBox(
                 height: 8,
               ),
             ],
@@ -1139,7 +1171,7 @@ class FilesState extends State<Files> {
   }
 
   deleteFile(List<String> files) {
-    Util.instance.vibrate(FeedbackType.warning);
+    UiUtil.vibrate(FeedbackType.warning);
     showCupertinoModalPopup(
       context: context,
       builder: (context) {
@@ -1147,28 +1179,29 @@ class FilesState extends State<Files> {
           color: Colors.transparent,
           child: Card(
             shape: RoundedRectangleBorder(
-                side: BorderSide(), borderRadius: BorderRadius.circular(18)),
+                side: const BorderSide(),
+                borderRadius: BorderRadius.circular(18)),
             child: SafeArea(
               top: false,
               child: Padding(
-                padding: const EdgeInsets.all(8.0),
+                padding: const EdgeInsets.all(AppConstants.paddingSmall),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: <Widget>[
-                    Text(
+                    const Text(
                       "确认删除",
                       style:
                           TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
                     ),
-                    SizedBox(
+                    const SizedBox(
                       height: 12,
                     ),
-                    Text(
+                    const Text(
                       "确认要删除文件？",
                       style:
                           TextStyle(fontSize: 20, fontWeight: FontWeight.w400),
                     ),
-                    SizedBox(
+                    const SizedBox(
                       height: 22,
                     ),
                     Row(
@@ -1194,14 +1227,14 @@ class FilesState extends State<Files> {
                                 getProcessingTaskResult(res['data']['taskid']);
                               }
                             },
-                            child: Text(
+                            child: const Text(
                               "确认删除",
                               style: TextStyle(
                                   fontSize: 18, color: Colors.redAccent),
                             ),
                           ),
                         ),
-                        SizedBox(
+                        const SizedBox(
                           width: 20,
                         ),
                         Expanded(
@@ -1209,7 +1242,7 @@ class FilesState extends State<Files> {
                             onPressed: () async {
                               Navigator.of(context).pop();
                             },
-                            child: Text(
+                            child: const Text(
                               "取消",
                               style: TextStyle(fontSize: 18),
                             ),
@@ -1217,7 +1250,7 @@ class FilesState extends State<Files> {
                         ),
                       ],
                     ),
-                    SizedBox(
+                    const SizedBox(
                       height: 8,
                     ),
                   ],
@@ -1231,7 +1264,7 @@ class FilesState extends State<Files> {
   }
 
   extractFile(file, {String password = ''}) async {
-    var res = await Api.extractTask(file['path'], "/" + paths.join("/"),
+    var res = await Api.extractTask(file['path'], "/${paths.join("/")}",
         password: password);
     if (res['success']) {
       backgroundProcess[res['data']['taskid']] = {
@@ -1248,11 +1281,11 @@ class FilesState extends State<Files> {
     String zipName = "";
     String destPath = "";
     if (file.length == 1) {
-      zipName = file[0].split("/").last + ".zip";
+      zipName = "${file[0].split("/").last}.zip";
     } else {
       zipName = paths.last + ".zip";
     }
-    destPath = "/" + paths.join("/") + "/" + zipName;
+    destPath = "/${paths.join("/")}/$zipName";
     showCupertinoModalPopup(
       context: context,
       builder: (context) {
@@ -1260,28 +1293,29 @@ class FilesState extends State<Files> {
           color: Colors.transparent,
           child: Card(
             shape: RoundedRectangleBorder(
-                side: BorderSide(), borderRadius: BorderRadius.circular(18)),
+                side: const BorderSide(),
+                borderRadius: BorderRadius.circular(18)),
             child: SafeArea(
               top: false,
               child: Padding(
-                padding: const EdgeInsets.all(8.0),
+                padding: const EdgeInsets.all(AppConstants.paddingSmall),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: <Widget>[
-                    Text(
+                    const Text(
                       "压缩文件",
                       style:
                           TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
                     ),
-                    SizedBox(
+                    const SizedBox(
                       height: 12,
                     ),
                     Text(
                       "确认要压缩到$zipName？",
-                      style:
-                          TextStyle(fontSize: 20, fontWeight: FontWeight.w400),
+                      style: const TextStyle(
+                          fontSize: 20, fontWeight: FontWeight.w400),
                     ),
-                    SizedBox(
+                    const SizedBox(
                       height: 22,
                     ),
                     OutlinedButton(
@@ -1305,37 +1339,37 @@ class FilesState extends State<Files> {
                           getProcessingTaskResult(res['data']['taskid']);
                         }
                       },
-                      child: Text(
+                      child: const Text(
                         "开始压缩",
                         style: TextStyle(fontSize: 18),
                       ),
                     ),
-                    SizedBox(
+                    const SizedBox(
                       height: 16,
                     ),
                     OutlinedButton(
                       onPressed: () async {
                         // Navigator.of(context).pop();
-                        Util.instance.toast("敬请期待");
+                        UiUtil.toast("敬请期待");
                       },
-                      child: Text(
+                      child: const Text(
                         "更多选项",
                         style: TextStyle(fontSize: 18),
                       ),
                     ),
-                    SizedBox(
+                    const SizedBox(
                       height: 16,
                     ),
                     OutlinedButton(
                       onPressed: () async {
                         Navigator.of(context).pop();
                       },
-                      child: Text(
+                      child: const Text(
                         "取消",
                         style: TextStyle(fontSize: 18),
                       ),
                     ),
-                    SizedBox(
+                    const SizedBox(
                       height: 8,
                     ),
                   ],
@@ -1374,12 +1408,13 @@ class FilesState extends State<Files> {
             List<String> paths = [];
             int index = 0;
             for (int i = 0; i < files.length; i++) {
-              if (Util.instance.fileType(files[i]['name']) ==
+              if (FileTypeUtil.toFileTypeEnum(
+                      FileTypeUtil.getFileType(files[i]['name'])) ==
                   FileTypeEnum.image) {
-                images.add(Util.instance.baseUrl +
-                    "/webapi/entry.cgi?path=${Uri.encodeComponent(files[i]['path'])}&size=original&api=SYNO.FileStation.Thumb&method=get&version=2&_sid=${Util.instance.sid}&animate=true");
-                thumbs.add(Util.instance.baseUrl +
-                    "/webapi/entry.cgi?path=${Uri.encodeComponent(files[i]['path'])}&size=small&api=SYNO.FileStation.Thumb&method=get&version=2&_sid=${Util.instance.sid}&animate=true");
+                images.add(
+                    "${connectionStore.baseUrl}/webapi/entry.cgi?path=${Uri.encodeComponent(files[i]['path'])}&size=original&api=SYNO.FileStation.Thumb&method=get&version=2&_sid=${connectionStore.sid}&animate=true");
+                thumbs.add(
+                    "${connectionStore.baseUrl}/webapi/entry.cgi?path=${Uri.encodeComponent(files[i]['path'])}&size=small&api=SYNO.FileStation.Thumb&method=get&version=2&_sid=${connectionStore.sid}&animate=true");
                 names.add(files[i]['name']);
                 paths.add(files[i]['path']);
                 if (files[i]['name'] == file['name']) {
@@ -1404,11 +1439,11 @@ class FilesState extends State<Files> {
             break;
           case FileTypeEnum.movie:
             String videoPlayer =
-                await Util.instance.getStorage("video_player") ?? '';
-            String url = Util.instance.baseUrl +
-                "/fbdownload/${Uri.encodeComponent(file['name'])}?dlink=%22${Util.instance.utf8Encode(file['path'])}%22&_sid=%22${Util.instance.sid}%22&mode=open";
-            // String url = Util.baseUrl + "/fbdownload/${file['name']}?dlink=%22${Util.utf8Encode(file['path'])}%22&_sid=%22${Util.sid}%22&mode=open";
-            // print(url);
+                await StorageUtil.getString("video_player") ?? '';
+            String url =
+                "${connectionStore.baseUrl}/fbdownload/${Uri.encodeComponent(file['name'])}?dlink=%22${FormatUtil.utf8Encode(file['path'])}%22&_sid=%22${connectionStore.sid}%22&mode=open";
+            // String url = HttpUtil.baseUrl + "/fbdownload/${file['name']}?dlink=%22${HttpUtil.utf8Encode(file['path'])}%22&_sid=%22${HttpUtil.sid}%22&mode=open";
+            // Log.info(url);
             // 调用nplayer
             // launchUrlString("nplayer-http://${Uri.encodeComponent(url)}");
             // 调用vlc player
@@ -1448,7 +1483,7 @@ class FilesState extends State<Files> {
                           element['name'].startsWith("$name-cover") ||
                           element['name'].startsWith("cover"))['path'];
                     } catch (e) {
-                      debugPrint("无封面图");
+                      Log.info("无封面图");
                     }
                   }
                 }
@@ -1457,16 +1492,20 @@ class FilesState extends State<Files> {
                 nfo = files.firstWhere(
                     (element) => element['name'] == "$name.nfo")['path'];
               } catch (e) {
-                debugPrint("无NFO文件");
+                Log.info("无NFO文件");
               }
-              Navigator.of(context).push(CupertinoPageRoute(builder: (context) {
-                return VideoPlayerPage(
-                  url: url,
-                  name: file['name'],
-                  cover: cover,
-                  nfo: nfo,
-                );
-              }));
+              if (context.mounted) {
+                // ignore: use_build_context_synchronously
+                Navigator.of(context)
+                    .push(CupertinoPageRoute(builder: (context) {
+                  return VideoPlayerPage(
+                    url: url,
+                    name: file['name'],
+                    cover: cover,
+                    nfo: nfo,
+                  );
+                }));
+              }
             }
 
             break;
@@ -1475,26 +1514,28 @@ class FilesState extends State<Files> {
             if (audioPlayerFloating?.isShowing == true) {
               audioPlayerFloating?.close();
             }
-            String url = Util.instance.baseUrl +
-                "/fbdownload/${file['name']}?dlink=%22${Util.instance.utf8Encode(file['path'])}%22&_sid=%22${Util.instance.sid}%22&mode=open";
+            String url =
+                "${connectionStore.baseUrl}/fbdownload/${file['name']}?dlink=%22${FormatUtil.utf8Encode(file['path'])}%22&_sid=%22${connectionStore.sid}%22&mode=open";
             Navigator.of(context).push(CupertinoPageRoute(builder: (context) {
               return AudioPlayer(
                 url: url,
                 name: file['name'],
               );
             })).then((_) {
-              AudioPlayerProvider audioPlayerProvider =
-                  context.read<AudioPlayerProvider>();
-              if (audioPlayerProvider.player.state.playing &&
-                  !audioPlayerProvider.player.state.completed) {
-                audioPlayerFloating?.open(context);
+              if (appStore.player != null &&
+                  appStore.player!.state.playing &&
+                  !appStore.player!.state.completed) {
+                if (context.mounted) {
+                  // ignore: use_build_context_synchronously
+                  audioPlayerFloating?.open(context);
+                }
               }
             });
             break;
           // case FileType.music:
           //   AndroidIntent intent = AndroidIntent(
           //     action: 'action_view',
-          //     data: Util.baseUrl + "/webapi/entry.cgi?api=SYNO.FileStation.Download&version=1&method=download&path=${Uri.encodeComponent(file['path'])}&mode=open&_sid=${Util.sid}",
+          //     data: HttpUtil.baseUrl + "/webapi/entry.cgi?api=SYNO.FileStation.Download&version=1&method=download&path=${Uri.encodeComponent(file['path'])}&mode=open&_sid=${HttpUtil.sid}",
           //     arguments: {},
           //     type: "audio/*",
           //   );
@@ -1503,7 +1544,7 @@ class FilesState extends State<Files> {
           // case FileType.word:
           //   AndroidIntent intent = AndroidIntent(
           //     action: 'action_view',
-          //     data: Util.baseUrl + "/webapi/entry.cgi?api=SYNO.FileStation.Download&version=1&method=download&path=${Uri.encodeComponent(file['path'])}&mode=open&_sid=${Util.sid}",
+          //     data: HttpUtil.baseUrl + "/webapi/entry.cgi?api=SYNO.FileStation.Download&version=1&method=download&path=${Uri.encodeComponent(file['path'])}&mode=open&_sid=${HttpUtil.sid}",
           //     arguments: {},
           //     type: "application/msword|application/vnd.openxmlformats-officedocument.wordprocessingml.document",
           //   );
@@ -1512,7 +1553,7 @@ class FilesState extends State<Files> {
           // case FileType.excel:
           //   AndroidIntent intent = AndroidIntent(
           //     action: 'action_view',
-          //     data: Util.baseUrl + "/webapi/entry.cgi?api=SYNO.FileStation.Download&version=1&method=download&path=${Uri.encodeComponent(file['path'])}&mode=open&_sid=${Util.sid}",
+          //     data: HttpUtil.baseUrl + "/webapi/entry.cgi?api=SYNO.FileStation.Download&version=1&method=download&path=${Uri.encodeComponent(file['path'])}&mode=open&_sid=${HttpUtil.sid}",
           //     arguments: {},
           //     type: "application/vnd.ms-excel|application/x-excel|application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
           //   );
@@ -1521,7 +1562,7 @@ class FilesState extends State<Files> {
           // case FileType.ppt:
           //   AndroidIntent intent = AndroidIntent(
           //     action: 'action_view',
-          //     data: Util.baseUrl + "/webapi/entry.cgi?api=SYNO.FileStation.Download&version=1&method=download&path=${Uri.encodeComponent(file['path'])}&mode=open&_sid=${Util.sid}",
+          //     data: HttpUtil.baseUrl + "/webapi/entry.cgi?api=SYNO.FileStation.Download&version=1&method=download&path=${Uri.encodeComponent(file['path'])}&mode=open&_sid=${HttpUtil.sid}",
           //     arguments: {},
           //     type: "application/vnd.ms-powerpoint|application/vnd.openxmlformats-officedocument.presentationml.presentation",
           //   );
@@ -1536,28 +1577,27 @@ class FilesState extends State<Files> {
           case FileTypeEnum.pdf:
             Navigator.of(context).push(CupertinoPageRoute(builder: (context) {
               return PdfViewer(
-                  Util.instance.baseUrl +
-                      "/fbdownload/${file['name']}?dlink=%22${Util.instance.utf8Encode(file['path'])}%22&_sid=%22${Util.instance.sid}%22&mode=open",
+                  "${connectionStore.baseUrl}/fbdownload/${file['name']}?dlink=%22${FormatUtil.utf8Encode(file['path'])}%22&_sid=%22${connectionStore.sid}%22&mode=open",
                   file['name']);
             }));
             break;
           default:
             AndroidIntent intent = AndroidIntent(
               action: 'action_view',
-              data: Util.instance.baseUrl +
-                  "/fbdownload/${file['name']}?dlink=%22${Util.instance.utf8Encode(file['path'])}%22&_sid=%22${Util.instance.sid}%22&mode=open",
+              data:
+                  "${connectionStore.baseUrl}/fbdownload/${file['name']}?dlink=%22${FormatUtil.utf8Encode(file['path'])}%22&_sid=%22${connectionStore.sid}%22&mode=open",
               arguments: {},
               // type: "application/vnd.ms-powerpoint|application/vnd.openxmlformats-officedocument.presentationml.presentation",
             );
             await intent.launch();
-          // Util.toast("暂不支持打开此类型文件");
+          // HttpUtil.toast("暂不支持打开此类型文件");
         }
       }
     }
   }
 
   fileAction(file, {bool remote = false}) async {
-    Util.instance.vibrate(FeedbackType.light);
+    UiUtil.vibrate(FeedbackType.light);
     showCupertinoModalPopup(
       context: context,
       builder: (context) {
@@ -1565,17 +1605,18 @@ class FilesState extends State<Files> {
           color: Colors.transparent,
           child: Card(
             shape: RoundedRectangleBorder(
-                side: BorderSide(), borderRadius: BorderRadius.circular(18)),
+                side: const BorderSide(),
+                borderRadius: BorderRadius.circular(18)),
             child: SafeArea(
               top: false,
               child: Padding(
-                padding: EdgeInsets.all(20),
+                padding: const EdgeInsets.all(20),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: <Widget>[
                     Stack(
                       children: [
-                        Row(
+                        const Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Text(
@@ -1603,10 +1644,10 @@ class FilesState extends State<Files> {
                                       width: 20,
                                       height: 20,
                                     ),
-                                    SizedBox(
+                                    const SizedBox(
                                       width: 5,
                                     ),
-                                    Text("多选"),
+                                    const Text("多选"),
                                   ],
                                 ),
                               ),
@@ -1614,17 +1655,17 @@ class FilesState extends State<Files> {
                           ),
                       ],
                     ),
-                    SizedBox(
+                    const SizedBox(
                       height: 20,
                     ),
-                    Container(
+                    SizedBox(
                       width: double.infinity,
                       child: Wrap(
                         runSpacing: 20,
                         spacing: 20,
                         children: [
                           Container(
-                            constraints: BoxConstraints(maxWidth: 112),
+                            constraints: const BoxConstraints(maxWidth: 112),
                             width: (MediaQuery.sizeOf(context).width - 100) / 3,
                             child: OutlinedButton(
                               onPressed: () async {
@@ -1633,8 +1674,8 @@ class FilesState extends State<Files> {
                                     builder: (context) {
                                       return FileDetail(file);
                                     },
-                                    settings:
-                                        RouteSettings(name: "file_detail")));
+                                    settings: const RouteSettings(
+                                        name: "file_detail")));
                               },
                               child: Column(
                                 children: [
@@ -1642,7 +1683,7 @@ class FilesState extends State<Files> {
                                     "assets/icons/info_liner.png",
                                     width: 30,
                                   ),
-                                  Text(
+                                  const Text(
                                     "详情",
                                     style: TextStyle(fontSize: 12),
                                   ),
@@ -1651,7 +1692,7 @@ class FilesState extends State<Files> {
                             ),
                           ),
                           Container(
-                            constraints: BoxConstraints(maxWidth: 112),
+                            constraints: const BoxConstraints(maxWidth: 112),
                             width: (MediaQuery.sizeOf(context).width - 100) / 3,
                             child: OutlinedButton(
                               onPressed: () async {
@@ -1664,7 +1705,7 @@ class FilesState extends State<Files> {
                                     "assets/icons/download.png",
                                     width: 30,
                                   ),
-                                  Text(
+                                  const Text(
                                     "下载",
                                     style: TextStyle(fontSize: 12),
                                   ),
@@ -1672,12 +1713,13 @@ class FilesState extends State<Files> {
                               ),
                             ),
                           ),
-                          if (Util.instance.fileType(file['name']) ==
+                          if (FileTypeUtil.toFileTypeEnum(
+                                      FileTypeUtil.getFileType(file['name'])) ==
                                   FileTypeEnum.zip &&
                               !remote &&
                               file['path'].startsWith("/"))
                             Container(
-                              constraints: BoxConstraints(maxWidth: 112),
+                              constraints: const BoxConstraints(maxWidth: 112),
                               width:
                                   (MediaQuery.sizeOf(context).width - 100) / 3,
                               child: OutlinedButton(
@@ -1691,7 +1733,7 @@ class FilesState extends State<Files> {
                                       "assets/icons/unzip.png",
                                       width: 30,
                                     ),
-                                    Text(
+                                    const Text(
                                       "解压",
                                       style: TextStyle(fontSize: 12),
                                     ),
@@ -1704,7 +1746,7 @@ class FilesState extends State<Files> {
                               !remote &&
                               file['path'].startsWith("/"))
                             Container(
-                              constraints: BoxConstraints(maxWidth: 112),
+                              constraints: const BoxConstraints(maxWidth: 112),
                               width:
                                   (MediaQuery.sizeOf(context).width - 100) / 3,
                               child: OutlinedButton(
@@ -1718,7 +1760,7 @@ class FilesState extends State<Files> {
                                       "assets/icons/archive.png",
                                       width: 30,
                                     ),
-                                    Text(
+                                    const Text(
                                       "压缩",
                                       style: TextStyle(fontSize: 12),
                                     ),
@@ -1730,7 +1772,7 @@ class FilesState extends State<Files> {
                               !remote &&
                               file['path'].startsWith("/"))
                             Container(
-                              constraints: BoxConstraints(maxWidth: 112),
+                              constraints: const BoxConstraints(maxWidth: 112),
                               width:
                                   (MediaQuery.sizeOf(context).width - 100) / 3,
                               child: OutlinedButton(
@@ -1740,7 +1782,8 @@ class FilesState extends State<Files> {
                                       builder: (context) {
                                         return Share(paths: [file['path']]);
                                       },
-                                      settings: RouteSettings(name: "share")));
+                                      settings:
+                                          const RouteSettings(name: "share")));
                                 },
                                 child: Column(
                                   children: [
@@ -1748,7 +1791,7 @@ class FilesState extends State<Files> {
                                       "assets/icons/share.png",
                                       width: 30,
                                     ),
-                                    Text(
+                                    const Text(
                                       "共享",
                                       style: TextStyle(fontSize: 12),
                                     ),
@@ -1761,7 +1804,7 @@ class FilesState extends State<Files> {
                               !remote &&
                               file['path'].startsWith("/")) ...[
                             Container(
-                              constraints: BoxConstraints(maxWidth: 112),
+                              constraints: const BoxConstraints(maxWidth: 112),
                               width:
                                   (MediaQuery.sizeOf(context).width - 100) / 3,
                               child: OutlinedButton(
@@ -1774,7 +1817,8 @@ class FilesState extends State<Files> {
                                           fileRequest: true,
                                         );
                                       },
-                                      settings: RouteSettings(name: "share")));
+                                      settings:
+                                          const RouteSettings(name: "share")));
                                 },
                                 child: Column(
                                   children: [
@@ -1782,7 +1826,7 @@ class FilesState extends State<Files> {
                                       "assets/icons/upload.png",
                                       width: 30,
                                     ),
-                                    Text(
+                                    const Text(
                                       "文件请求",
                                       style: TextStyle(fontSize: 12),
                                     ),
@@ -1791,9 +1835,9 @@ class FilesState extends State<Files> {
                               ),
                             ),
                           ],
-                          if (paths.length > 0)
+                          if (paths.isNotEmpty)
                             Container(
-                              constraints: BoxConstraints(maxWidth: 112),
+                              constraints: const BoxConstraints(maxWidth: 112),
                               width:
                                   (MediaQuery.sizeOf(context).width - 100) / 3,
                               child: OutlinedButton(
@@ -1814,34 +1858,34 @@ class FilesState extends State<Files> {
                                           children: [
                                             Card(
                                               shape: RoundedRectangleBorder(
-                                                  side: BorderSide(),
+                                                  side: const BorderSide(),
                                                   borderRadius:
                                                       BorderRadius.circular(5)),
-                                              margin: EdgeInsets.symmetric(
-                                                  horizontal: 50),
+                                              margin:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 50),
                                               child: Padding(
-                                                padding: EdgeInsets.all(20),
+                                                padding:
+                                                    const EdgeInsets.all(20),
                                                 child: Column(
                                                   children: [
-                                                    Text(
+                                                    const Text(
                                                       "重命名",
                                                       style: TextStyle(
                                                           fontSize: 20,
                                                           fontWeight:
                                                               FontWeight.w500),
                                                     ),
-                                                    SizedBox(
+                                                    const SizedBox(
                                                       height: 16,
                                                     ),
                                                     Card(
-                                                      shape:
-                                                          RoundedRectangleBorder(
-                                                              side:
-                                                                  BorderSide(),
-                                                              borderRadius:
-                                                                  BorderRadius
-                                                                      .circular(
-                                                                          5)),
+                                                      shape: RoundedRectangleBorder(
+                                                          side:
+                                                              const BorderSide(),
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(5)),
                                                       child: Padding(
                                                         padding:
                                                             const EdgeInsets
@@ -1852,7 +1896,7 @@ class FilesState extends State<Files> {
                                                           controller:
                                                               nameController,
                                                           decoration:
-                                                              InputDecoration(
+                                                              const InputDecoration(
                                                             border: InputBorder
                                                                 .none,
                                                             hintText: "请输入新的名称",
@@ -1861,7 +1905,7 @@ class FilesState extends State<Files> {
                                                         ),
                                                       ),
                                                     ),
-                                                    SizedBox(
+                                                    const SizedBox(
                                                       height: 16,
                                                     ),
                                                     Row(
@@ -1872,7 +1916,8 @@ class FilesState extends State<Files> {
                                                                 () async {
                                                               if (name.trim() ==
                                                                   "") {
-                                                                Util.instance
+                                                                HttpUtil
+                                                                    .instance
                                                                     .toast(
                                                                         "请输入新文件名");
                                                                 return;
@@ -1887,7 +1932,8 @@ class FilesState extends State<Files> {
                                                                       name);
                                                               if (res[
                                                                   'success']) {
-                                                                Util.instance
+                                                                HttpUtil
+                                                                    .instance
                                                                     .toast(
                                                                         "重命名成功");
                                                                 refresh();
@@ -1903,24 +1949,26 @@ class FilesState extends State<Files> {
                                                                             [
                                                                             'code'] ==
                                                                         414) {
-                                                                  Util.instance
+                                                                  HttpUtil
+                                                                      .instance
                                                                       .toast(
                                                                           "重命名失败：指定的名称已存在");
                                                                 } else {
-                                                                  Util.instance
+                                                                  HttpUtil
+                                                                      .instance
                                                                       .toast(
                                                                           "重命名失败");
                                                                 }
                                                               }
                                                             },
-                                                            child: Text(
+                                                            child: const Text(
                                                               "确定",
                                                               style: TextStyle(
                                                                   fontSize: 18),
                                                             ),
                                                           ),
                                                         ),
-                                                        SizedBox(
+                                                        const SizedBox(
                                                           width: 16,
                                                         ),
                                                         Expanded(
@@ -1931,7 +1979,7 @@ class FilesState extends State<Files> {
                                                                       context)
                                                                   .pop();
                                                             },
-                                                            child: Text(
+                                                            child: const Text(
                                                               "取消",
                                                               style: TextStyle(
                                                                   fontSize: 18),
@@ -1956,7 +2004,7 @@ class FilesState extends State<Files> {
                                       "assets/icons/edit.png",
                                       width: 30,
                                     ),
-                                    Text(
+                                    const Text(
                                       "重命名",
                                       style: TextStyle(fontSize: 12),
                                     ),
@@ -1969,7 +2017,7 @@ class FilesState extends State<Files> {
                               !remote &&
                               file['path'].startsWith("/"))
                             Container(
-                              constraints: BoxConstraints(maxWidth: 112),
+                              constraints: const BoxConstraints(maxWidth: 112),
                               width:
                                   (MediaQuery.sizeOf(context).width - 100) / 3,
                               child: OutlinedButton(
@@ -1979,9 +2027,9 @@ class FilesState extends State<Files> {
                                       "${file['name']} - ${paths[1]}",
                                       file['path']);
                                   if (res['success']) {
-                                    Util.instance.toast("收藏成功");
+                                    UiUtil.toast("收藏成功");
                                   } else {
-                                    Util.instance.toast(
+                                    UiUtil.toast(
                                         "收藏失败，代码${res['error']['code']}");
                                   }
                                 },
@@ -1991,7 +2039,7 @@ class FilesState extends State<Files> {
                                       "assets/icons/collect.png",
                                       width: 30,
                                     ),
-                                    Text(
+                                    const Text(
                                       "添加收藏",
                                       style: TextStyle(fontSize: 12),
                                     ),
@@ -2003,7 +2051,7 @@ class FilesState extends State<Files> {
                                   "remote" &&
                               file['path'].startsWith("/"))
                             Container(
-                              constraints: BoxConstraints(maxWidth: 112),
+                              constraints: const BoxConstraints(maxWidth: 112),
                               width:
                                   (MediaQuery.sizeOf(context).width - 100) / 3,
                               child: OutlinedButton(
@@ -2012,11 +2060,11 @@ class FilesState extends State<Files> {
                                   var res =
                                       await Api.unMountFolder(file['path']);
                                   if (res['success']) {
-                                    Util.instance.toast("卸载成功");
+                                    UiUtil.toast("卸载成功");
                                     refresh();
                                     getSmbFolder();
                                   } else {
-                                    Util.instance.toast(
+                                    UiUtil.toast(
                                         "卸载失败，代码${res['error']['code']}");
                                   }
                                 },
@@ -2026,7 +2074,7 @@ class FilesState extends State<Files> {
                                       "assets/icons/eject.png",
                                       width: 30,
                                     ),
-                                    Text(
+                                    const Text(
                                       "卸载",
                                       style: TextStyle(fontSize: 12),
                                     ),
@@ -2036,7 +2084,7 @@ class FilesState extends State<Files> {
                             ),
                           if (remote && !file['path'].startsWith("/"))
                             Container(
-                              constraints: BoxConstraints(maxWidth: 112),
+                              constraints: const BoxConstraints(maxWidth: 112),
                               width:
                                   (MediaQuery.sizeOf(context).width - 100) / 3,
                               child: OutlinedButton(
@@ -2045,11 +2093,11 @@ class FilesState extends State<Files> {
                                   var res =
                                       await Api.remoteUnConnect(file['path']);
                                   if (res['success']) {
-                                    Util.instance.toast("远程连接已断开");
+                                    UiUtil.toast("远程连接已断开");
                                     refresh();
                                     getSmbFolder();
                                   } else {
-                                    Util.instance.toast(
+                                    UiUtil.toast(
                                         "断开连接失败，代码${res['error']['code']}");
                                   }
                                 },
@@ -2059,7 +2107,7 @@ class FilesState extends State<Files> {
                                       "assets/icons/eject.png",
                                       width: 30,
                                     ),
-                                    Text(
+                                    const Text(
                                       "断开连接",
                                       style: TextStyle(fontSize: 12),
                                     ),
@@ -2069,7 +2117,7 @@ class FilesState extends State<Files> {
                             ),
                           if (paths.length > 1)
                             Container(
-                              constraints: BoxConstraints(maxWidth: 112),
+                              constraints: const BoxConstraints(maxWidth: 112),
                               width:
                                   (MediaQuery.sizeOf(context).width - 100) / 3,
                               child: OutlinedButton(
@@ -2083,7 +2131,7 @@ class FilesState extends State<Files> {
                                       "assets/icons/delete.png",
                                       width: 30,
                                     ),
-                                    Text(
+                                    const Text(
                                       "删除",
                                       style: TextStyle(
                                           fontSize: 12,
@@ -2096,19 +2144,19 @@ class FilesState extends State<Files> {
                         ],
                       ),
                     ),
-                    SizedBox(
+                    const SizedBox(
                       height: 16,
                     ),
                     OutlinedButton(
                       onPressed: () async {
                         Navigator.of(context).pop();
                       },
-                      child: Text(
+                      child: const Text(
                         "取消",
                         style: TextStyle(fontSize: 18),
                       ),
                     ),
-                    SizedBox(
+                    const SizedBox(
                       height: 8,
                     ),
                   ],
@@ -2122,19 +2170,21 @@ class FilesState extends State<Files> {
   }
 
   Widget _buildFileItem(file, {bool remote = false}) {
-    FileTypeEnum fileType = Util.instance.fileType(file['name']);
+    FileTypeEnum fileType =
+        FileTypeUtil.toFileTypeEnum(FileTypeUtil.getFileType(file['name']));
     String path = file['path'];
     Widget actionButton = multiSelect
         ? Card(
             shape: RoundedRectangleBorder(
-                side: BorderSide(), borderRadius: BorderRadius.circular(18)),
+                side: const BorderSide(),
+                borderRadius: BorderRadius.circular(18)),
             child: SizedBox(
               width: 20,
               height: 20,
               child: selectedFiles.contains(file)
-                  ? Icon(
+                  ? const Icon(
                       CupertinoIcons.checkmark_alt,
-                      color: Color(0xffff9813),
+                      color: AppColors.primaryAction,
                     )
                   : null,
             ),
@@ -2145,10 +2195,11 @@ class FilesState extends State<Files> {
             },
             child: Card(
               shape: RoundedRectangleBorder(
-                  side: BorderSide(), borderRadius: BorderRadius.circular(18)),
+                  side: const BorderSide(),
+                  borderRadius: BorderRadius.circular(18)),
               // padding: EdgeInsets.zero,
-              child: Padding(
-                padding: const EdgeInsets.all(2.0),
+              child: const Padding(
+                padding: EdgeInsets.all(2.0),
                 child: Icon(
                   CupertinoIcons.right_chevron,
                   size: 14,
@@ -2158,17 +2209,17 @@ class FilesState extends State<Files> {
           );
     return Container(
       constraints: listType == ListType.icon && !remote
-          ? BoxConstraints(maxWidth: 112)
+          ? const BoxConstraints(maxWidth: 112)
           : null,
       width: listType == ListType.icon && !remote
           ? (MediaQuery.sizeOf(context).width - 80) / 3
           : double.infinity,
       padding: listType == ListType.icon && !remote
           ? EdgeInsets.zero
-          : EdgeInsets.only(bottom: 20.0),
+          : const EdgeInsets.only(bottom: 20.0),
       child: OutlinedButton(
         onLongPress: () {
-          Util.instance.vibrate(FeedbackType.light);
+          UiUtil.vibrate(FeedbackType.light);
           fileAction(file, remote: remote);
         },
         onPressed: () {
@@ -2176,21 +2227,21 @@ class FilesState extends State<Files> {
         },
         child: listType == ListType.list || remote
             ? Padding(
-                padding: EdgeInsets.symmetric(vertical: 5),
+                padding: const EdgeInsets.symmetric(vertical: 5),
                 child: Row(
                   children: [
-                    SizedBox(
+                    const SizedBox(
                       width: 10,
                     ),
                     Hero(
-                      tag: Util.instance.baseUrl +
-                          "/webapi/entry.cgi?path=${Uri.encodeComponent(path)}&size=original&api=SYNO.FileStation.Thumb&method=get&version=2&_sid=${Util.instance.sid}&animate=true",
+                      tag:
+                          "${connectionStore.baseUrl}/webapi/entry.cgi?path=${Uri.encodeComponent(path)}&size=original&api=SYNO.FileStation.Thumb&method=get&version=2&_sid=${connectionStore.sid}&animate=true",
                       child: FileIcon(
                         file['isdir'] ? FileTypeEnum.folder : fileType,
                         thumb: file['path'],
                       ),
                     ),
-                    SizedBox(
+                    const SizedBox(
                       width: 10,
                     ),
                     Expanded(
@@ -2208,7 +2259,7 @@ class FilesState extends State<Files> {
                                             Brightness.dark
                                         ? Colors.white
                                         : Colors.black),
-                            overflowWidget: TextOverflowWidget(
+                            overflowWidget: const TextOverflowWidget(
                               position: TextOverflowPosition.middle,
                               align: TextOverflowAlign.right,
                               child: Text(
@@ -2218,7 +2269,7 @@ class FilesState extends State<Files> {
                             ),
                             maxLines: 2,
                           ),
-                          SizedBox(
+                          const SizedBox(
                             height: 5,
                           ),
                           if (!file['isdir'] && file['additional'] != null ||
@@ -2229,8 +2280,8 @@ class FilesState extends State<Files> {
                                 children: [
                                   if (!file['isdir'])
                                     TextSpan(
-                                        text:
-                                            "${Util.instance.formatSize(file['additional']['size'])}"),
+                                        text: FormatUtil.formatSize(
+                                            file['additional']['size'])),
                                   if (file['additional'] != null &&
                                       file['additional']['time'] != null &&
                                       file['additional']['time']['mtime'] !=
@@ -2260,11 +2311,11 @@ class FilesState extends State<Files> {
                         ],
                       ),
                     ),
-                    SizedBox(
+                    const SizedBox(
                       width: 10,
                     ),
                     actionButton,
-                    SizedBox(
+                    const SizedBox(
                       width: 10,
                     ),
                   ],
@@ -2275,14 +2326,14 @@ class FilesState extends State<Files> {
                   Align(
                     alignment: Alignment.center,
                     child: Container(
-                      padding: EdgeInsets.symmetric(
+                      padding: const EdgeInsets.symmetric(
                         vertical: 5,
                       ),
                       child: Column(
                         children: [
                           Hero(
-                            tag: Util.instance.baseUrl +
-                                "/webapi/entry.cgi?path=${Uri.encodeComponent(path)}&size=original&api=SYNO.FileStation.Thumb&method=get&version=2&_sid=${Util.instance.sid}&animate=true",
+                            tag:
+                                "${connectionStore.baseUrl}/webapi/entry.cgi?path=${Uri.encodeComponent(path)}&size=original&api=SYNO.FileStation.Thumb&method=get&version=2&_sid=${connectionStore.sid}&animate=true",
                             child: FileIcon(
                               file['isdir'] ? FileTypeEnum.folder : fileType,
                               thumb: file['path'],
@@ -2291,14 +2342,14 @@ class FilesState extends State<Files> {
                               height: 30,
                             ),
                           ),
-                          SizedBox(
+                          const SizedBox(
                             height: 10,
                           ),
                           Text(
                             file['name'],
                             maxLines: 1,
                             textAlign: TextAlign.center,
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontSize: 12,
                             ),
                           ),
@@ -2322,20 +2373,21 @@ class FilesState extends State<Files> {
 
   Widget _buildPathItem(BuildContext context, int index) {
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 10),
+      padding:
+          const EdgeInsets.symmetric(vertical: AppConstants.paddingSmall + 2),
       child: OutlinedButton(
         onPressed: () {
           String path = "";
           List<String> items = [];
           if (paths.length > 1 && paths[0].contains("//")) {
-            debugPrint("远程");
+            Log.info("远程");
             items = paths.getRange(0, index + 1).toList().cast();
             path = items.join("/");
             goPath(path);
           } else {
-            debugPrint("本地");
+            Log.info("本地");
             items = paths.getRange(0, index + 1).toList().cast();
-            path = "/" + items.join("/");
+            path = "/${items.join("/")}";
           }
           goPath(path);
         },
@@ -2360,16 +2412,16 @@ class FilesState extends State<Files> {
         refresh();
       });
     } else {
-      if (paths.length > 0) {
+      if (paths.isNotEmpty) {
         paths.removeLast();
         String path = "";
-        print(paths);
-        if (paths.length > 0 && paths[0].contains("//")) {
-          debugPrint("远程");
+        Log.info(paths);
+        if (paths.isNotEmpty && paths[0].contains("//")) {
+          Log.info("远程");
           path = paths.join("/");
         } else {
-          debugPrint("本地");
-          path = (paths.length > 0 ? "/" : '') + paths.join("/");
+          Log.info("本地");
+          path = (paths.isNotEmpty ? "/" : '') + paths.join("/");
         }
         goPath(path);
       } else {
@@ -2394,10 +2446,11 @@ class FilesState extends State<Files> {
       children.add(
         Card(
           shape: RoundedRectangleBorder(
-              side: BorderSide(), borderRadius: BorderRadius.circular(18)),
-          margin: EdgeInsets.only(left: 20, right: 20, bottom: 20),
+              side: const BorderSide(),
+              borderRadius: BorderRadius.circular(18)),
+          margin: const EdgeInsets.only(left: 20, right: 20, bottom: 20),
           child: Padding(
-            padding: EdgeInsets.all(20),
+            padding: const EdgeInsets.all(20),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -2417,7 +2470,7 @@ class FilesState extends State<Files> {
                       if (['copy', 'move', 'achieve', 'compress']
                               .contains(task['type']) &&
                           value != null) ...[
-                        TextSpan(
+                        const TextSpan(
                           text: " 至 ",
                         ),
                         TextSpan(
@@ -2428,9 +2481,9 @@ class FilesState extends State<Files> {
                       ],
                     ],
                   ),
-                  style: TextStyle(fontSize: 14, color: Colors.grey),
+                  style: const TextStyle(fontSize: 14, color: Colors.grey),
                 ),
-                SizedBox(
+                const SizedBox(
                   height: 10,
                 ),
                 if (value != null)
@@ -2465,7 +2518,7 @@ class FilesState extends State<Files> {
         shrinkWrap: true,
         children: [
           Padding(
-            padding: EdgeInsets.only(left: 10, top: 8, bottom: 8),
+            padding: const EdgeInsets.only(left: 10, top: 8, bottom: 8),
             child: OutlinedButton(
               onPressed: () async {
                 if (multiSelect) {
@@ -2490,7 +2543,7 @@ class FilesState extends State<Files> {
                 }
               },
               child: multiSelect
-                  ? Icon(Icons.close)
+                  ? const Icon(Icons.close)
                   : Image.asset(
                       "assets/icons/collect.png",
                       width: 20,
@@ -2498,7 +2551,7 @@ class FilesState extends State<Files> {
             ),
           ),
           Padding(
-            padding: EdgeInsets.only(left: 10, top: 8, bottom: 8),
+            padding: const EdgeInsets.only(left: 10, top: 8, bottom: 8),
             child: OutlinedButton(
               onPressed: () async {
                 showCupertinoModalPopup(
@@ -2508,18 +2561,18 @@ class FilesState extends State<Files> {
                       color: Colors.transparent,
                       child: Card(
                         shape: RoundedRectangleBorder(
-                            side: BorderSide(),
+                            side: const BorderSide(),
                             borderRadius: BorderRadius.circular(18)),
                         child: SafeArea(
                           top: false,
                           child: Padding(
-                            padding: EdgeInsets.all(20),
+                            padding: const EdgeInsets.all(20),
                             child: Column(
                               mainAxisSize: MainAxisSize.min,
                               children: <Widget>[
                                 Stack(
                                   children: [
-                                    Align(
+                                    const Align(
                                       alignment: Alignment.center,
                                       child: Text(
                                         "远程文件夹",
@@ -2530,19 +2583,19 @@ class FilesState extends State<Files> {
                                     ),
                                     Align(
                                       alignment: Alignment.centerRight,
-                                      child: Container(
+                                      child: SizedBox(
                                         width: 30,
                                         height: 30,
                                         child: OutlinedButton(
                                           onPressed: () async {
-                                            Util.instance.toast("重新加载远程连接中");
+                                            UiUtil.toast("重新加载远程连接中");
                                             Navigator.of(context).pop();
                                             getFtpFolder();
                                             getSftpFolder();
                                             getSmbFolder();
                                             getDavFolder();
                                           },
-                                          child: Icon(
+                                          child: const Icon(
                                             Icons.refresh,
                                             size: 20,
                                           ),
@@ -2551,7 +2604,7 @@ class FilesState extends State<Files> {
                                     )
                                   ],
                                 ),
-                                SizedBox(
+                                const SizedBox(
                                   height: 20,
                                 ),
                                 Container(
@@ -2564,11 +2617,10 @@ class FilesState extends State<Files> {
                                     child: Column(
                                       children: [
                                         if ((smbFolders +
-                                                    ftpFolders +
-                                                    sftpFolders +
-                                                    davFolders)
-                                                .length >
-                                            0) ...[
+                                                ftpFolders +
+                                                sftpFolders +
+                                                davFolders)
+                                            .isNotEmpty) ...[
                                           ...(smbFolders +
                                                   ftpFolders +
                                                   sftpFolders +
@@ -2576,7 +2628,7 @@ class FilesState extends State<Files> {
                                               .map((folder) {
                                             return _buildFileItem(folder,
                                                 remote: true);
-                                          }).toList(),
+                                          }),
                                         ] else
                                           Center(
                                             child: Text(
@@ -2590,19 +2642,19 @@ class FilesState extends State<Files> {
                                     ),
                                   ),
                                 ),
-                                SizedBox(
+                                const SizedBox(
                                   height: 16,
                                 ),
                                 OutlinedButton(
                                   onPressed: () async {
                                     Navigator.of(context).pop();
                                   },
-                                  child: Text(
+                                  child: const Text(
                                     "取消",
                                     style: TextStyle(fontSize: 18),
                                   ),
                                 ),
-                                SizedBox(
+                                const SizedBox(
                                   height: 8,
                                 ),
                               ],
@@ -2620,19 +2672,19 @@ class FilesState extends State<Files> {
               ),
             ),
           ),
-          if (Util.instance.notReviewAccount &&
-              paths.length > 0 &&
+          if (connectionStore.notReviewAccount &&
+              paths.isNotEmpty &&
               !multiSelect)
             Padding(
-              padding: EdgeInsets.only(left: 10, top: 8, bottom: 8),
+              padding: const EdgeInsets.only(left: 10, top: 8, bottom: 8),
               child: OutlinedButton(
                 onPressed: () async {
                   Navigator.of(context)
                       .push(CupertinoPageRoute(
                           builder: (context) {
-                            return Upload("/" + paths.join("/"));
+                            return Upload("/${paths.join("/")}");
                           },
-                          settings: RouteSettings(name: "upload")))
+                          settings: const RouteSettings(name: "upload")))
                       .then((value) {
                     refresh();
                   });
@@ -2645,7 +2697,7 @@ class FilesState extends State<Files> {
             ),
           if (backgroundProcess.isNotEmpty)
             Padding(
-              padding: EdgeInsets.only(left: 10, top: 8, bottom: 8),
+              padding: const EdgeInsets.only(left: 10, top: 8, bottom: 8),
               child: OutlinedButton(
                 onPressed: () async {
                   setState(() {
@@ -2658,20 +2710,20 @@ class FilesState extends State<Files> {
                 ),
               ),
             ),
-          SizedBox(
+          const SizedBox(
             width: 24,
           ),
-          if (paths.length > 0)
+          if (paths.isNotEmpty)
             Padding(
-              padding: EdgeInsets.only(right: 10, top: 8, bottom: 8),
+              padding: const EdgeInsets.only(right: 10, top: 8, bottom: 8),
               child: OutlinedButton(
                 onPressed: () async {
                   Navigator.of(context)
                       .push(CupertinoPageRoute(
                           builder: (content) {
-                            return Search("/" + paths.join("/"));
+                            return Search("/${paths.join("/")}");
                           },
-                          settings: RouteSettings(name: "search")))
+                          settings: const RouteSettings(name: "search")))
                       .then((res) {
                     if (res != null) {
                       search(res['folders'], res['pattern'],
@@ -2686,14 +2738,14 @@ class FilesState extends State<Files> {
               ),
             ),
           Padding(
-            padding: EdgeInsets.only(right: 10, top: 8, bottom: 8),
+            padding: const EdgeInsets.only(right: 10, top: 8, bottom: 8),
             child: OutlinedButton(
               onPressed: () {
                 setState(() {
                   listType =
                       listType == ListType.list ? ListType.icon : ListType.list;
                 });
-                Util.instance.setStorage("file_list_type",
+                StorageUtil.setString("file_list_type",
                     listType == ListType.list ? "list" : "icon");
               },
               child: Image.asset(
@@ -2707,16 +2759,16 @@ class FilesState extends State<Files> {
           ),
           if (multiSelect)
             Padding(
-              padding: EdgeInsets.only(right: 10, top: 8, bottom: 8),
+              padding: const EdgeInsets.only(right: 10, top: 8, bottom: 8),
               child: OutlinedButton(
                 onPressed: () {
                   if (selectedFiles.length == files.length) {
                     selectedFiles = [];
                   } else {
                     selectedFiles = [];
-                    files.forEach((file) {
+                    for (var file in files) {
                       selectedFiles.add(file);
-                    });
+                    }
                   }
 
                   setState(() {});
@@ -2730,7 +2782,7 @@ class FilesState extends State<Files> {
             )
           else if (paths.length > 1)
             Padding(
-              padding: EdgeInsets.only(right: 10, top: 8, bottom: 8),
+              padding: const EdgeInsets.only(right: 10, top: 8, bottom: 8),
               child: OutlinedButton(
                 onPressed: () {
                   showCupertinoModalPopup(
@@ -2752,7 +2804,7 @@ class FilesState extends State<Files> {
               ),
             ),
           Padding(
-            padding: EdgeInsets.only(right: 10, top: 8, bottom: 8),
+            padding: const EdgeInsets.only(right: 10, top: 8, bottom: 8),
             child: OutlinedButton(
               onPressed: () {
                 showCupertinoModalPopup(
@@ -2762,34 +2814,34 @@ class FilesState extends State<Files> {
                       color: Colors.transparent,
                       child: Card(
                         shape: RoundedRectangleBorder(
-                            side: BorderSide(),
+                            side: const BorderSide(),
                             borderRadius: BorderRadius.circular(18)),
                         child: SafeArea(
                           top: false,
                           child: Padding(
-                            padding: EdgeInsets.all(20),
+                            padding: const EdgeInsets.all(20),
                             child: Column(
                               mainAxisSize: MainAxisSize.min,
                               children: <Widget>[
-                                Text(
+                                const Text(
                                   "选择操作",
                                   style: TextStyle(
                                       fontSize: 20,
                                       fontWeight: FontWeight.w500),
                                 ),
-                                SizedBox(
+                                const SizedBox(
                                   height: 12,
                                 ),
-                                Container(
+                                SizedBox(
                                   width: double.infinity,
                                   child: Wrap(
                                     runSpacing: 20,
                                     spacing: 20,
                                     children: [
-                                      if (paths.length == 0) ...[
+                                      if (paths.isEmpty) ...[
                                         Container(
-                                          constraints:
-                                              BoxConstraints(maxWidth: 112),
+                                          constraints: const BoxConstraints(
+                                              maxWidth: 112),
                                           width: (MediaQuery.of(context)
                                                       .size
                                                       .width -
@@ -2799,23 +2851,26 @@ class FilesState extends State<Files> {
                                             onPressed: () async {
                                               Navigator.of(context).pop();
                                               List volumes = await getVolumes();
-                                              if (volumes.length > 0) {
-                                                Navigator.of(context)
-                                                    .push(CupertinoPageRoute(
-                                                        builder: (context) {
-                                                          return AddSharedFolders(
-                                                              volumes);
-                                                        },
-                                                        settings: RouteSettings(
-                                                            name:
-                                                                "add_shared_folders")))
-                                                    .then((res) {
-                                                  if (res != null && res) {
-                                                    refresh();
-                                                  }
-                                                });
+                                              if (volumes.isNotEmpty) {
+                                                if (context.mounted) {
+                                                  Navigator.of(context)
+                                                      .push(CupertinoPageRoute(
+                                                          builder: (context) {
+                                                            return AddSharedFolders(
+                                                                volumes);
+                                                          },
+                                                          settings:
+                                                              const RouteSettings(
+                                                                  name:
+                                                                      "add_shared_folders")))
+                                                      .then((res) {
+                                                    if (res != null && res) {
+                                                      refresh();
+                                                    }
+                                                  });
+                                                }
                                               } else {
-                                                Util.instance.toast("未获取到存储空间");
+                                                UiUtil.toast("未获取到存储空间");
                                               }
                                             },
                                             child: Column(
@@ -2824,7 +2879,7 @@ class FilesState extends State<Files> {
                                                   "assets/icons/new_folder.png",
                                                   width: 30,
                                                 ),
-                                                Text(
+                                                const Text(
                                                   "共享文件夹",
                                                   style:
                                                       TextStyle(fontSize: 12),
@@ -2834,10 +2889,10 @@ class FilesState extends State<Files> {
                                           ),
                                         ),
                                       ],
-                                      if (paths.length > 0) ...[
+                                      if (paths.isNotEmpty) ...[
                                         Container(
-                                          constraints:
-                                              BoxConstraints(maxWidth: 112),
+                                          constraints: const BoxConstraints(
+                                              maxWidth: 112),
                                           width: (MediaQuery.of(context)
                                                       .size
                                                       .width -
@@ -2860,18 +2915,18 @@ class FilesState extends State<Files> {
                                                           Card(
                                                             shape: RoundedRectangleBorder(
                                                                 side:
-                                                                    BorderSide(),
+                                                                    const BorderSide(),
                                                                 borderRadius:
                                                                     BorderRadius
                                                                         .circular(
                                                                             5)),
                                                             child: Padding(
                                                               padding:
-                                                                  EdgeInsets
+                                                                  const EdgeInsets
                                                                       .all(20),
                                                               child: Column(
                                                                 children: [
-                                                                  Text(
+                                                                  const Text(
                                                                     "新建文件夹",
                                                                     style: TextStyle(
                                                                         fontSize:
@@ -2879,13 +2934,13 @@ class FilesState extends State<Files> {
                                                                         fontWeight:
                                                                             FontWeight.w500),
                                                                   ),
-                                                                  SizedBox(
+                                                                  const SizedBox(
                                                                     height: 16,
                                                                   ),
                                                                   Card(
                                                                     shape: RoundedRectangleBorder(
                                                                         side:
-                                                                            BorderSide(),
+                                                                            const BorderSide(),
                                                                         borderRadius:
                                                                             BorderRadius.circular(5)),
                                                                     child:
@@ -2899,7 +2954,7 @@ class FilesState extends State<Files> {
                                                                             (v) =>
                                                                                 name = v,
                                                                         decoration:
-                                                                            InputDecoration(
+                                                                            const InputDecoration(
                                                                           border:
                                                                               InputBorder.none,
                                                                           hintText:
@@ -2910,7 +2965,7 @@ class FilesState extends State<Files> {
                                                                       ),
                                                                     ),
                                                                   ),
-                                                                  SizedBox(
+                                                                  const SizedBox(
                                                                     height: 20,
                                                                   ),
                                                                   Row(
@@ -2922,35 +2977,35 @@ class FilesState extends State<Files> {
                                                                               () async {
                                                                             if (name.trim() ==
                                                                                 "") {
-                                                                              Util.instance.toast("请输入文件夹名");
+                                                                              UiUtil.toast("请输入文件夹名");
                                                                               return;
                                                                             }
                                                                             Navigator.of(context).pop();
                                                                             String
                                                                                 path =
-                                                                                "/" + paths.join("/");
+                                                                                "/${paths.join("/")}";
                                                                             var res =
                                                                                 await Api.createFolder(path, name);
                                                                             if (res['success']) {
-                                                                              Util.instance.toast("文件夹创建成功");
+                                                                              UiUtil.toast("文件夹创建成功");
                                                                               refresh();
                                                                             } else {
                                                                               if (res['error']['errors'] != null && res['error']['errors'].length > 0 && res['error']['errors'][0]['code'] == 414) {
-                                                                                Util.instance.toast("文件夹创建失败：指定的名称已存在");
+                                                                                UiUtil.toast("文件夹创建失败：指定的名称已存在");
                                                                               } else {
-                                                                                Util.instance.toast("文件夹创建失败");
+                                                                                UiUtil.toast("文件夹创建失败");
                                                                               }
                                                                             }
                                                                           },
                                                                           child:
-                                                                              Text(
+                                                                              const Text(
                                                                             "确定",
                                                                             style:
                                                                                 TextStyle(fontSize: 18),
                                                                           ),
                                                                         ),
                                                                       ),
-                                                                      SizedBox(
+                                                                      const SizedBox(
                                                                         width:
                                                                             16,
                                                                       ),
@@ -2962,7 +3017,7 @@ class FilesState extends State<Files> {
                                                                             Navigator.of(context).pop();
                                                                           },
                                                                           child:
-                                                                              Text(
+                                                                              const Text(
                                                                             "取消",
                                                                             style:
                                                                                 TextStyle(fontSize: 18),
@@ -2986,7 +3041,7 @@ class FilesState extends State<Files> {
                                                   "assets/icons/new_folder.png",
                                                   width: 30,
                                                 ),
-                                                Text(
+                                                const Text(
                                                   "新建文件夹",
                                                   style:
                                                       TextStyle(fontSize: 12),
@@ -3009,14 +3064,14 @@ class FilesState extends State<Files> {
                                                       builder: (context) {
                                                         return Share(
                                                           paths: [
-                                                            "/" +
-                                                                paths.join("/")
+                                                            "/${paths.join("/")}"
                                                           ],
                                                           fileRequest: true,
                                                         );
                                                       },
-                                                      settings: RouteSettings(
-                                                          name: "share")));
+                                                      settings:
+                                                          const RouteSettings(
+                                                              name: "share")));
                                             },
                                             child: Column(
                                               children: [
@@ -3024,7 +3079,7 @@ class FilesState extends State<Files> {
                                                   "assets/icons/upload.png",
                                                   width: 30,
                                                 ),
-                                                Text(
+                                                const Text(
                                                   "创建文件请求",
                                                   style:
                                                       TextStyle(fontSize: 12),
@@ -3036,7 +3091,7 @@ class FilesState extends State<Files> {
                                       ],
                                       Container(
                                         constraints:
-                                            BoxConstraints(maxWidth: 112),
+                                            const BoxConstraints(maxWidth: 112),
                                         width:
                                             (MediaQuery.sizeOf(context).width -
                                                     100) /
@@ -3047,9 +3102,9 @@ class FilesState extends State<Files> {
                                             Navigator.of(context).push(
                                                 CupertinoPageRoute(
                                                     builder: (content) {
-                                                      return ShareManager();
+                                                      return const ShareManager();
                                                     },
-                                                    settings: RouteSettings(
+                                                    settings: const RouteSettings(
                                                         name:
                                                             "share_manager")));
                                           },
@@ -3059,7 +3114,7 @@ class FilesState extends State<Files> {
                                                 "assets/icons/link.png",
                                                 width: 30,
                                               ),
-                                              Text(
+                                              const Text(
                                                 "共享链接管理",
                                                 style: TextStyle(fontSize: 12),
                                               ),
@@ -3069,7 +3124,7 @@ class FilesState extends State<Files> {
                                       ),
                                       Container(
                                         constraints:
-                                            BoxConstraints(maxWidth: 112),
+                                            const BoxConstraints(maxWidth: 112),
                                         width:
                                             (MediaQuery.sizeOf(context).width -
                                                     100) /
@@ -3080,9 +3135,9 @@ class FilesState extends State<Files> {
                                             Navigator.of(context)
                                                 .push(CupertinoPageRoute(
                                                     builder: (content) {
-                                                      return RemoteFolder();
+                                                      return const RemoteFolder();
                                                     },
-                                                    settings: RouteSettings(
+                                                    settings: const RouteSettings(
                                                         name: "remote_folder")))
                                                 .then((res) {
                                               refresh();
@@ -3095,7 +3150,7 @@ class FilesState extends State<Files> {
                                                 "assets/icons/remote.png",
                                                 width: 30,
                                               ),
-                                              Text(
+                                              const Text(
                                                 "装载远程",
                                                 style: TextStyle(fontSize: 12),
                                               ),
@@ -3127,7 +3182,7 @@ class FilesState extends State<Files> {
                                       //         borderRadius: BorderRadius.circular(10),
                                       //       ),
                                       //       bevel: 20,
-                                      //       padding: EdgeInsets.symmetric(vertical: 10),
+                                      //       padding: EdgeInsets.symmetric(vertical: AppConstants.paddingSmall + 2),
                                       //       child: Column(
                                       //         children: [
                                       //           Image.asset(
@@ -3145,19 +3200,19 @@ class FilesState extends State<Files> {
                                     ],
                                   ),
                                 ),
-                                SizedBox(
+                                const SizedBox(
                                   height: 20,
                                 ),
                                 OutlinedButton(
                                   onPressed: () async {
                                     Navigator.of(context).pop();
                                   },
-                                  child: Text(
+                                  child: const Text(
                                     "取消",
                                     style: TextStyle(fontSize: 18),
                                   ),
                                 ),
-                                SizedBox(
+                                const SizedBox(
                                   height: 8,
                                 ),
                               ],
@@ -3192,7 +3247,7 @@ class FilesState extends State<Files> {
       ),
       body: Column(
         children: [
-          Divider(
+          const Divider(
             indent: 12,
             endIndent: 12,
           ),
@@ -3204,12 +3259,12 @@ class FilesState extends State<Files> {
               child: Row(
                 children: [
                   Container(
-                    margin: EdgeInsets.only(left: 20),
+                    margin: const EdgeInsets.only(left: 20),
                     child: Card(
                       shape: RoundedRectangleBorder(
-                          side: BorderSide(),
+                          side: const BorderSide(),
                           borderRadius: BorderRadius.circular(18)),
-                      child: Padding(
+                      child: const Padding(
                         padding:
                             EdgeInsets.symmetric(vertical: 3, horizontal: 5),
                         child: Text(
@@ -3219,7 +3274,7 @@ class FilesState extends State<Files> {
                       ),
                     ),
                   ),
-                  Spacer(),
+                  const Spacer(),
                   GestureDetector(
                     onTap: () {
                       searchTimer?.cancel();
@@ -3230,16 +3285,16 @@ class FilesState extends State<Files> {
                       });
                     },
                     child: Container(
-                      margin: EdgeInsets.only(right: 20),
+                      margin: const EdgeInsets.only(right: 20),
                       child: Card(
                         shape: RoundedRectangleBorder(
-                            side: BorderSide(),
+                            side: const BorderSide(),
                             borderRadius: BorderRadius.circular(18)),
                         child: Padding(
-                          padding:
-                              EdgeInsets.symmetric(vertical: 3, horizontal: 5),
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 3, horizontal: 5),
                           child: searching
-                              ? Row(
+                              ? const Row(
                                   children: [
                                     Text(
                                       "搜索中",
@@ -3253,7 +3308,7 @@ class FilesState extends State<Files> {
                                     ),
                                   ],
                                 )
-                              : Text(
+                              : const Text(
                                   "退出搜索",
                                   style: TextStyle(fontSize: 12),
                                 ),
@@ -3272,21 +3327,22 @@ class FilesState extends State<Files> {
               child: Row(
                 children: [
                   Container(
-                    padding: EdgeInsets.only(left: 20, top: 10, bottom: 10),
+                    padding:
+                        const EdgeInsets.only(left: 20, top: 10, bottom: 10),
                     child: OutlinedButton(
                       onPressed: () {
                         goPath("");
                       },
-                      child: Icon(
+                      child: const Icon(
                         CupertinoIcons.home,
                         size: 16,
                       ),
                     ),
                   ),
-                  if (paths.length > 0)
+                  if (paths.isNotEmpty)
                     Container(
-                      padding: EdgeInsets.symmetric(vertical: 14),
-                      child: Icon(
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      child: const Icon(
                         CupertinoIcons.right_chevron,
                         size: 14,
                       ),
@@ -3299,8 +3355,8 @@ class FilesState extends State<Files> {
                       scrollDirection: Axis.horizontal,
                       separatorBuilder: (context, i) {
                         return Container(
-                          padding: EdgeInsets.symmetric(vertical: 14),
-                          child: Icon(
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          child: const Icon(
                             CupertinoIcons.right_chevron,
                             size: 14,
                           ),
@@ -3321,7 +3377,7 @@ class FilesState extends State<Files> {
                           ? DraggableScrollbar.semicircle(
                               backgroundColor:
                                   Theme.of(context).scaffoldBackgroundColor,
-                              scrollbarTimeToFade: Duration(seconds: 1),
+                              scrollbarTimeToFade: const Duration(seconds: 1),
                               controller: _fileScrollController,
                               child: ListView.builder(
                                 controller: _fileScrollController,
@@ -3330,23 +3386,23 @@ class FilesState extends State<Files> {
                                     right: 20,
                                     top: 20,
                                     bottom:
-                                        selectedFiles.length > 0 ? 140 : 20),
+                                        selectedFiles.isNotEmpty ? 140 : 20),
                                 itemBuilder: (context, i) {
                                   return _buildFileItem(files[i]);
                                 },
                                 itemCount: files.length,
                               ),
                             )
-                          : Container(
+                          : SizedBox(
                               width: double.infinity,
                               child: DraggableScrollbar.semicircle(
                                 backgroundColor:
                                     Theme.of(context).scaffoldBackgroundColor,
-                                scrollbarTimeToFade: Duration(seconds: 1),
+                                scrollbarTimeToFade: const Duration(seconds: 1),
                                 controller: _fileScrollController,
                                 child: ListView(
                                   controller: _fileScrollController,
-                                  padding: EdgeInsets.all(20),
+                                  padding: const EdgeInsets.all(20),
                                   children: [
                                     Wrap(
                                       runSpacing: 20,
@@ -3361,8 +3417,8 @@ class FilesState extends State<Files> {
                       // if (selectedFiles.length > 0)
                       AnimatedPositioned(
                         width: MediaQuery.sizeOf(context).width,
-                        bottom: selectedFiles.length > 0 ? 0 : -100,
-                        duration: Duration(milliseconds: 200),
+                        bottom: selectedFiles.isNotEmpty ? 0 : -100,
+                        duration: const Duration(milliseconds: 200),
                         child: Card(
                           color: Colors.transparent.withAlpha(120),
                           shape: RoundedRectangleBorder(
@@ -3373,9 +3429,10 @@ class FilesState extends State<Files> {
                                     : Colors.black,
                               ),
                               borderRadius: BorderRadius.circular(3)),
-                          margin: EdgeInsets.all(20),
+                          margin: const EdgeInsets.all(20),
                           child: Padding(
-                            padding: const EdgeInsets.all(8.0),
+                            padding:
+                                const EdgeInsets.all(AppConstants.paddingSmall),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceAround,
                               children: [
@@ -3384,7 +3441,7 @@ class FilesState extends State<Files> {
                                     showCupertinoModalPopup(
                                       context: context,
                                       builder: (context) {
-                                        return SelectFolder(
+                                        return const SelectFolder(
                                           multi: false,
                                         );
                                       },
@@ -3424,7 +3481,7 @@ class FilesState extends State<Files> {
                                         "assets/icons/move.png",
                                         width: 25,
                                       ),
-                                      Text(
+                                      const Text(
                                         "移动到",
                                         style: TextStyle(fontSize: 12),
                                       ),
@@ -3436,7 +3493,7 @@ class FilesState extends State<Files> {
                                     showCupertinoModalPopup(
                                       context: context,
                                       builder: (context) {
-                                        return SelectFolder(
+                                        return const SelectFolder(
                                           multi: false,
                                         );
                                       },
@@ -3475,7 +3532,7 @@ class FilesState extends State<Files> {
                                         "assets/icons/copy.png",
                                         width: 25,
                                       ),
-                                      Text(
+                                      const Text(
                                         "复制到",
                                         style: TextStyle(fontSize: 12),
                                       ),
@@ -3494,7 +3551,7 @@ class FilesState extends State<Files> {
                                         "assets/icons/archive.png",
                                         width: 25,
                                       ),
-                                      Text(
+                                      const Text(
                                         "压缩",
                                         style: TextStyle(fontSize: 12),
                                       ),
@@ -3511,7 +3568,7 @@ class FilesState extends State<Files> {
                                         "assets/icons/download.png",
                                         width: 25,
                                       ),
-                                      Text(
+                                      const Text(
                                         "下载",
                                         style: TextStyle(fontSize: 12),
                                       ),
@@ -3530,7 +3587,7 @@ class FilesState extends State<Files> {
                                         "assets/icons/delete.png",
                                         width: 25,
                                       ),
-                                      Text(
+                                      const Text(
                                         "删除",
                                         style: TextStyle(fontSize: 12),
                                       ),
@@ -3549,7 +3606,7 @@ class FilesState extends State<Files> {
                           color: Theme.of(context)
                               .scaffoldBackgroundColor
                               .withValues(alpha: .7),
-                          child: Center(
+                          child: const Center(
                             child: CupertinoActivityIndicator(
                               radius: 14,
                             ),
@@ -3562,11 +3619,11 @@ class FilesState extends State<Files> {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Text(
-                          "$msg",
+                          msg,
                           style: TextStyle(
                               color: AppTheme.of(context).placeholderColor),
                         ),
-                        SizedBox(
+                        const SizedBox(
                           height: 20,
                         ),
                         SizedBox(
@@ -3575,7 +3632,7 @@ class FilesState extends State<Files> {
                             onPressed: () {
                               refresh();
                             },
-                            child: Text(
+                            child: const Text(
                               ' 刷新 ',
                               style: TextStyle(fontSize: 18),
                             ),

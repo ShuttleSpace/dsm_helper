@@ -1,7 +1,10 @@
 import 'dart:convert';
+import 'package:garden/stores/connection_store.dart';
 
 import 'package:garden/models/photos/photo_model.dart';
-import 'package:garden/util/function.dart';
+import 'package:garden/util/http_util.dart';
+import 'package:garden/util/log.dart';
+import 'package:simple_logger/simple_logger.dart';
 
 /// additional : {"sharing_info":{"enable_password":false,"expiration":0,"is_expired":false,"mtime":1666874109,"owner":{"id":1,"name":"yaoshuwei"},"passphrase":"5kpICmfPs","permission":[],"privacy_type":"public-view","sharing_link":"http://pan.apaipai.top:5000/mo/sharing/5kpICmfPs","type":"album"},"thumbnail":{"cache_key":"684382_1666619064","m":"ready","preview":"broken","sm":"ready","unit_id":684382,"xl":"ready"}}
 /// cant_migrate_condition : {}
@@ -63,14 +66,14 @@ class AlbumModel {
       "api": "SYNO.Foto${isTeam ? 'Team' : ''}.Browse.Album",
       "method": "list",
       "version": shared ? 2 : 1,
-      "_sid": Util.instance.sid,
+      "_sid": connectionStore.sid,
     };
     if (shared) {
       data['category'] = '"shared"';
     }
-    print(data);
-    var res = await Util.instance.post("entry.cgi", data: data);
-    print(res);
+    Log.logger.log(Level.INFO, "fetching albums with data: $data");
+    var res = await HttpUtil.instance.post("entry.cgi", data: data);
+    Log.logger.log(Level.INFO, "response from server: $res");
     if (res['success']) {
       List<AlbumModel> albums = [];
       res['data']['list'].forEach((e) {

@@ -1,19 +1,23 @@
 import 'package:garden/pages/common/browser.dart';
-import 'package:garden/util/function.dart';
+import 'package:garden/util/http_util.dart';
+import 'package:garden/util/log.dart';
 import 'package:garden/widgets/bubble_tab_indicator.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:garden/constants/app_constants.dart';
 
 class UpdateReset extends StatefulWidget {
+  const UpdateReset({super.key});
+
   @override
-  _UpdateResetState createState() => _UpdateResetState();
+  UpdateResetState createState() => UpdateResetState();
 }
 
-class _UpdateResetState extends State<UpdateReset>
+class UpdateResetState extends State<UpdateReset>
     with SingleTickerProviderStateMixin {
-  TapGestureRecognizer _updateNoteRecognizer = TapGestureRecognizer();
+  final TapGestureRecognizer _updateNoteRecognizer = TapGestureRecognizer();
   late TabController _tabController;
   String firmwareDate = "";
   String firmwareVer = "";
@@ -50,7 +54,7 @@ class _UpdateResetState extends State<UpdateReset>
     setState(() {
       checking = false;
     });
-    print(res);
+    Log.info("check update: $res");
     if (res['success']) {
       setState(() {
         update = res['data']['update'];
@@ -63,14 +67,15 @@ class _UpdateResetState extends State<UpdateReset>
     return Scaffold(
       appBar: AppBar(
         leading: AppBackButton(context),
-        title: Text("更新和还原"),
+        title: const Text("更新和还原"),
       ),
       body: Column(
         children: [
           Card(
             shape: RoundedRectangleBorder(
-                side: BorderSide(), borderRadius: BorderRadius.circular(18)),
-            margin: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                side: const BorderSide(),
+                borderRadius: BorderRadius.circular(18)),
+            margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
             child: TabBar(
               dividerHeight: 0,
               isScrollable: true,
@@ -80,8 +85,8 @@ class _UpdateResetState extends State<UpdateReset>
                   ? Colors.white
                   : Colors.black,
               unselectedLabelColor: Colors.grey,
-              indicator: BubbleTabIndicator(),
-              tabs: [
+              indicator: const BubbleTabIndicator(),
+              tabs: const [
                 Padding(
                   padding: EdgeInsets.symmetric(vertical: 10, horizontal: 5),
                   child: Text("系统更新"),
@@ -102,52 +107,55 @@ class _UpdateResetState extends State<UpdateReset>
               controller: _tabController,
               children: [
                 ListView(
-                  padding: EdgeInsets.all(20),
+                  padding: const EdgeInsets.all(20),
                   children: [
-                    Text(
+                    const Text(
                       "Synology 会不时发布 DSM 更新。安装更新版本的 DSM 以获得新功能、安全补丁以及改进的系统稳定性。",
                       style: TextStyle(color: Colors.grey),
                     ),
-                    SizedBox(
+                    const SizedBox(
                       height: 20,
                     ),
                     Card(
                       shape: RoundedRectangleBorder(
-                          side: BorderSide(),
+                          side: const BorderSide(),
                           borderRadius: BorderRadius.circular(18)),
                       child: Padding(
-                        padding: const EdgeInsets.all(8.0),
+                        padding:
+                            const EdgeInsets.all(AppConstants.paddingSmall),
                         child: Text("产品型号: $model"),
                       ),
                     ),
-                    SizedBox(
+                    const SizedBox(
                       height: 20,
                     ),
                     Card(
                       shape: RoundedRectangleBorder(
-                          side: BorderSide(),
+                          side: const BorderSide(),
                           borderRadius: BorderRadius.circular(18)),
                       child: Padding(
-                        padding: const EdgeInsets.all(8.0),
+                        padding:
+                            const EdgeInsets.all(AppConstants.paddingSmall),
                         child: Text("DSM 版本: $firmwareVer"),
                       ),
                     ),
-                    SizedBox(
+                    const SizedBox(
                       height: 20,
                     ),
                     Card(
                       shape: RoundedRectangleBorder(
-                          side: BorderSide(),
+                          side: const BorderSide(),
                           borderRadius: BorderRadius.circular(18)),
                       child: Padding(
-                        padding: const EdgeInsets.all(8.0),
+                        padding:
+                            const EdgeInsets.all(AppConstants.paddingSmall),
                         child: Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text("状态: "),
+                            const Text("状态: "),
                             Expanded(
                               child: checking
-                                  ? CupertinoActivityIndicator()
+                                  ? const CupertinoActivityIndicator()
                                   : update != null &&
                                           (update?['available'] ?? true)
                                       ? Text.rich(TextSpan(
@@ -155,12 +163,12 @@ class _UpdateResetState extends State<UpdateReset>
                                             TextSpan(
                                               text:
                                                   "${update?['version']}版本可下载",
-                                              style: TextStyle(
+                                              style: const TextStyle(
                                                   color: Colors.green),
                                             ),
                                             TextSpan(
                                                 text: " (说明)",
-                                                style: TextStyle(
+                                                style: const TextStyle(
                                                     color: Colors.blue),
                                                 recognizer:
                                                     _updateNoteRecognizer
@@ -177,14 +185,14 @@ class _UpdateResetState extends State<UpdateReset>
                                                             );
                                                           },
                                                           settings:
-                                                              RouteSettings(
+                                                              const RouteSettings(
                                                                   name:
                                                                       "browser"),
                                                         ));
                                                       }),
                                           ],
                                         ))
-                                      : Text(
+                                      : const Text(
                                           "无更新",
                                         ),
                             ),
@@ -192,19 +200,19 @@ class _UpdateResetState extends State<UpdateReset>
                         ),
                       ),
                     ),
-                    SizedBox(
+                    const SizedBox(
                       height: 20,
                     ),
-                    Text(
+                    const Text(
                       "为保证系统稳定性，此处仅作展示，请至WEB控制端进行更新",
                       style: TextStyle(color: Colors.red),
                     ),
                   ],
                 ),
-                Center(
+                const Center(
                   child: Text("待开发"),
                 ),
-                Center(
+                const Center(
                   child: Text("待开发"),
                 ),
               ],

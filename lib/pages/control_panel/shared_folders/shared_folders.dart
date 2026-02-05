@@ -1,18 +1,23 @@
 import 'dart:async';
+import 'package:garden/util/format_util.dart';
+import 'package:garden/util/log.dart';
+import 'package:garden/util/ui_util.dart';
 
 import 'package:garden/pages/control_panel/shared_folders/add_shared_folder.dart';
-import 'package:garden/util/function.dart';
+import 'package:garden/util/http_util.dart';
 import 'package:garden/widgets/file_icon.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class SharedFolders extends StatefulWidget {
+  const SharedFolders({super.key});
+
   @override
-  _SharedFoldersState createState() => _SharedFoldersState();
+  SharedFoldersState createState() => SharedFoldersState();
 }
 
-class _SharedFoldersState extends State<SharedFolders> {
+class SharedFoldersState extends State<SharedFolders> {
   bool loading = true;
   bool success = true;
   String msg = "";
@@ -63,14 +68,14 @@ class _SharedFoldersState extends State<SharedFolders> {
     });
     if (res['success']) {
       folders = res['data']['shares'];
-      folders.forEach((folder) {
-        volumes.forEach((volume) {
+      for (var folder in folders) {
+        for (var volume in volumes) {
           if (volume['volume_path'] == folder['vol_path']) {
             folder['volume_name'] = volume['display_name'];
             folder['volume_desc'] = volume['description'];
           }
-        });
-      });
+        }
+      }
       setState(() {});
     } else {
       if (loading) {
@@ -89,27 +94,28 @@ class _SharedFoldersState extends State<SharedFolders> {
           color: Colors.transparent,
           child: Card(
             shape: RoundedRectangleBorder(
-                side: BorderSide(), borderRadius: BorderRadius.circular(18)),
+                side: const BorderSide(),
+                borderRadius: BorderRadius.circular(18)),
             child: SafeArea(
               top: false,
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
-                  Text(
+                  const Text(
                     "删除共享文件夹",
                     style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 12,
                   ),
-                  Text(
+                  const Text(
                     "我已了解所选共享文件夹及其快照将被永久删除并无法恢复",
                     style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.w400,
                         color: Colors.red),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 22,
                   ),
                   Row(
@@ -119,22 +125,22 @@ class _SharedFoldersState extends State<SharedFolders> {
                           onPressed: () async {
                             Navigator.of(context).pop();
                             var res = await Api.deleteSharedFolder([folder]);
-                            print(res);
+                            Log.info(res);
                             if (res['success']) {
-                              Util.instance.toast("共享文件夹删除成功");
+                              UiUtil.toast("共享文件夹删除成功");
                               getData();
                             } else {
-                              Util.instance.toast("共享文件夹删除出错");
+                              UiUtil.toast("共享文件夹删除出错");
                             }
                           },
-                          child: Text(
+                          child: const Text(
                             "确认删除",
                             style: TextStyle(
                                 fontSize: 18, color: Colors.redAccent),
                           ),
                         ),
                       ),
-                      SizedBox(
+                      const SizedBox(
                         width: 16,
                       ),
                       Expanded(
@@ -142,7 +148,7 @@ class _SharedFoldersState extends State<SharedFolders> {
                           onPressed: () async {
                             Navigator.of(context).pop();
                           },
-                          child: Text(
+                          child: const Text(
                             "取消",
                             style: TextStyle(fontSize: 18),
                           ),
@@ -150,7 +156,7 @@ class _SharedFoldersState extends State<SharedFolders> {
                       ),
                     ],
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 8,
                   ),
                 ],
@@ -172,11 +178,11 @@ class _SharedFoldersState extends State<SharedFolders> {
           // margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
           child: Row(
             children: [
-              SizedBox(
+              const SizedBox(
                 width: 20,
               ),
               folder['encryption'] == null || folder['encryption'] == 0
-                  ? FileIcon(
+                  ? const FileIcon(
                       FileTypeEnum.folder,
                     )
                   : Image.asset(
@@ -184,7 +190,7 @@ class _SharedFoldersState extends State<SharedFolders> {
                       width: 40,
                       height: 40,
                     ),
-              SizedBox(
+              const SizedBox(
                 width: 10,
               ),
               Expanded(
@@ -193,11 +199,11 @@ class _SharedFoldersState extends State<SharedFolders> {
                   children: [
                     Text(
                       folder['name'],
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 16,
                       ),
                     ),
-                    SizedBox(
+                    const SizedBox(
                       height: 5,
                     ),
                     Text(
@@ -208,7 +214,7 @@ class _SharedFoldersState extends State<SharedFolders> {
                               Theme.of(context).textTheme.headlineSmall?.color),
                     ),
                     if (folder['unite_permission'] != null) ...[
-                      SizedBox(
+                      const SizedBox(
                         height: 5,
                       ),
                       Text(
@@ -222,7 +228,7 @@ class _SharedFoldersState extends State<SharedFolders> {
                       ),
                     ],
                     if (folder['enable_recycle_bin'] != null) ...[
-                      SizedBox(
+                      const SizedBox(
                         height: 5,
                       ),
                       Text(
@@ -236,11 +242,11 @@ class _SharedFoldersState extends State<SharedFolders> {
                       ),
                     ],
                     if (folder['quota_value'] != null) ...[
-                      SizedBox(
+                      const SizedBox(
                         height: 5,
                       ),
                       Text(
-                        "共享文件夹配额：${folder['quota_value'] > 0 ? Util.instance.formatSize(folder['quota_value'] * 1024 * 1024) : "已停用"}",
+                        "共享文件夹配额：${folder['quota_value'] > 0 ? FormatUtil.formatSize(folder['quota_value'] * 1024 * 1024) : "已停用"}",
                         style: TextStyle(
                             fontSize: 12,
                             color: Theme.of(context)
@@ -250,11 +256,11 @@ class _SharedFoldersState extends State<SharedFolders> {
                       ),
                     ],
                     if (folder['share_quota_used'] != null) ...[
-                      SizedBox(
+                      const SizedBox(
                         height: 5,
                       ),
                       Text(
-                        "共享文件夹大小：${Util.instance.formatSize(folder['share_quota_used'] * 1024 * 1024)}",
+                        "共享文件夹大小：${FormatUtil.formatSize(folder['share_quota_used'] * 1024 * 1024)}",
                         style: TextStyle(
                             fontSize: 12,
                             color: Theme.of(context)
@@ -264,7 +270,7 @@ class _SharedFoldersState extends State<SharedFolders> {
                       ),
                     ],
                     if (folder['enable_share_compress'] != null) ...[
-                      SizedBox(
+                      const SizedBox(
                         height: 5,
                       ),
                       Text(
@@ -278,7 +284,7 @@ class _SharedFoldersState extends State<SharedFolders> {
                       ),
                     ],
                     if (folder['enable_share_cow'] != null) ...[
-                      SizedBox(
+                      const SizedBox(
                         height: 5,
                       ),
                       Text(
@@ -294,11 +300,11 @@ class _SharedFoldersState extends State<SharedFolders> {
                   ],
                 ),
               ),
-              SizedBox(
+              const SizedBox(
                 width: 10,
               ),
               folder['is_share_moving']
-                  ? Text("移动中")
+                  ? const Text("移动中")
                   : OutlinedButton(
                       onPressed: () {
                         showCupertinoModalPopup(
@@ -308,20 +314,20 @@ class _SharedFoldersState extends State<SharedFolders> {
                               color: Colors.transparent,
                               child: Card(
                                 shape: RoundedRectangleBorder(
-                                    side: BorderSide(),
+                                    side: const BorderSide(),
                                     borderRadius: BorderRadius.circular(18)),
                                 child: SafeArea(
                                   top: false,
                                   child: Column(
                                     mainAxisSize: MainAxisSize.min,
                                     children: <Widget>[
-                                      Text(
+                                      const Text(
                                         "选择操作",
                                         style: TextStyle(
                                             fontSize: 20,
                                             fontWeight: FontWeight.w500),
                                       ),
-                                      SizedBox(
+                                      const SizedBox(
                                         height: 12,
                                       ),
                                       if (folder['support_snapshot']) ...[
@@ -329,12 +335,12 @@ class _SharedFoldersState extends State<SharedFolders> {
                                           onPressed: () async {
                                             Navigator.of(context).pop();
                                           },
-                                          child: Text(
+                                          child: const Text(
                                             "克隆",
                                             style: TextStyle(fontSize: 18),
                                           ),
                                         ),
-                                        SizedBox(
+                                        const SizedBox(
                                           height: 16,
                                         ),
                                       ],
@@ -348,7 +354,7 @@ class _SharedFoldersState extends State<SharedFolders> {
                                                         volumes,
                                                         folder: folder);
                                                   },
-                                                  settings: RouteSettings(
+                                                  settings: const RouteSettings(
                                                       name:
                                                           "add_shared_folders")))
                                               .then((res) {
@@ -357,12 +363,12 @@ class _SharedFoldersState extends State<SharedFolders> {
                                             }
                                           });
                                         },
-                                        child: Text(
+                                        child: const Text(
                                           "编辑",
                                           style: TextStyle(fontSize: 18),
                                         ),
                                       ),
-                                      SizedBox(
+                                      const SizedBox(
                                         height: 16,
                                       ),
                                       if (folder['enable_recycle_bin']) ...[
@@ -372,16 +378,16 @@ class _SharedFoldersState extends State<SharedFolders> {
                                             Api.cleanRecycleBin(folder['name'])
                                                 .then((res) {
                                               if (res['success']) {
-                                                Util.instance.toast("请求已发送");
+                                                UiUtil.toast("请求已发送");
                                               }
                                             });
                                           },
-                                          child: Text(
+                                          child: const Text(
                                             "清空回收站",
                                             style: TextStyle(fontSize: 18),
                                           ),
                                         ),
-                                        SizedBox(
+                                        const SizedBox(
                                           height: 16,
                                         ),
                                       ],
@@ -390,14 +396,14 @@ class _SharedFoldersState extends State<SharedFolders> {
                                           Navigator.of(context).pop();
                                           deleteFolder(folder['name']);
                                         },
-                                        child: Text(
+                                        child: const Text(
                                           "删除",
                                           style: TextStyle(
                                               fontSize: 18,
                                               color: Colors.redAccent),
                                         ),
                                       ),
-                                      SizedBox(
+                                      const SizedBox(
                                         height: 8,
                                       ),
                                     ],
@@ -408,12 +414,12 @@ class _SharedFoldersState extends State<SharedFolders> {
                           },
                         );
                       },
-                      child: Icon(
+                      child: const Icon(
                         CupertinoIcons.right_chevron,
                         size: 18,
                       ),
                     ),
-              SizedBox(
+              const SizedBox(
                 width: 20,
               ),
             ],
@@ -428,13 +434,13 @@ class _SharedFoldersState extends State<SharedFolders> {
     return Scaffold(
       appBar: AppBar(
         leading: AppBackButton(context),
-        title: Text(
+        title: const Text(
           "共享文件夹",
         ),
-        actions: volumes.length > 0
+        actions: volumes.isNotEmpty
             ? [
                 Padding(
-                  padding: EdgeInsets.only(right: 10, top: 8, bottom: 8),
+                  padding: const EdgeInsets.only(right: 10, top: 8, bottom: 8),
                   child: OutlinedButton(
                     onPressed: () async {
                       Navigator.of(context)
@@ -442,15 +448,15 @@ class _SharedFoldersState extends State<SharedFolders> {
                               builder: (context) {
                                 return AddSharedFolders(volumes);
                               },
-                              settings:
-                                  RouteSettings(name: "add_shared_folders")))
+                              settings: const RouteSettings(
+                                  name: "add_shared_folders")))
                           .then((res) {
                         if (res != null && res) {
                           getData();
                         }
                       });
                     },
-                    child: Icon(Icons.add),
+                    child: const Icon(Icons.add),
                   ),
                 )
               ]
@@ -460,7 +466,7 @@ class _SharedFoldersState extends State<SharedFolders> {
           ? Stack(
               children: [
                 ListView.builder(
-                  padding: EdgeInsets.only(bottom: 20),
+                  padding: const EdgeInsets.only(bottom: 20),
                   itemBuilder: (context, i) {
                     return _buildFolderItem(folders[i]);
                   },
@@ -474,7 +480,7 @@ class _SharedFoldersState extends State<SharedFolders> {
                     color: Theme.of(context)
                         .scaffoldBackgroundColor
                         .withValues(alpha: .7),
-                    child: Center(
+                    child: const Center(
                       child: CupertinoActivityIndicator(
                         radius: 14,
                       ),
@@ -486,8 +492,8 @@ class _SharedFoldersState extends State<SharedFolders> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text("$msg"),
-                  SizedBox(
+                  Text(msg),
+                  const SizedBox(
                     height: 20,
                   ),
                   SizedBox(
@@ -496,7 +502,7 @@ class _SharedFoldersState extends State<SharedFolders> {
                       onPressed: () {
                         getData();
                       },
-                      child: Text(
+                      child: const Text(
                         ' 刷新 ',
                         style: TextStyle(fontSize: 18),
                       ),

@@ -1,11 +1,15 @@
 import 'dart:async';
+import 'package:garden/util/log.dart';
+import 'package:garden/util/ui_util.dart';
+import 'package:garden/util/storage_util.dart';
+import 'package:garden/stores/connection_store.dart';
 import 'dart:io';
 
 import 'package:garden/pages/download/download.dart';
 import 'package:garden/pages/download/download_state.dart';
 import 'package:garden/pages/file/file.dart';
 import 'package:garden/pages/setting/setting.dart';
-import 'package:garden/util/function.dart';
+import 'package:garden/util/http_util.dart';
 import 'package:garden/widgets/update_dialog.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
@@ -22,16 +26,19 @@ import 'file/upload.dart';
 import 'login/auth_page.dart';
 
 class Home extends StatefulWidget {
+  const Home({super.key});
+
   @override
-  _HomeState createState() => _HomeState();
+  HomeState createState() => HomeState();
 }
 
-class _HomeState extends State<Home> with WidgetsBindingObserver {
+class HomeState extends State<Home> with WidgetsBindingObserver {
   int _currentIndex = 0;
   DateTime lastPopTime = DateTime.now();
   PackageInfo? packageInfo;
-  GlobalKey<FilesState> _filesStateKey = GlobalKey<FilesState>();
-  GlobalKey<DashboardState> _dashboardStateKey = GlobalKey<DashboardState>();
+  final GlobalKey<FilesState> _filesStateKey = GlobalKey<FilesState>();
+  final GlobalKey<DashboardState> _dashboardStateKey =
+      GlobalKey<DashboardState>();
   //判断是否需要启动密码
   bool launchAuth = false;
   bool password = false;
@@ -42,21 +49,23 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
   void initState() {
     WidgetsBinding.instance.addObserver(this);
     getData();
-    Util.instance.setStorage("agreement", "1");
+    StorageUtil.setString("agreement", "1");
     if (Platform.isAndroid || Platform.isIOS) {
       FlutterSharingIntent.instance
           .getInitialSharing()
           .then((List<SharedFile> value) {
-        print("Shared: getInitialMedia ${value.map((f) => f.value).join(",")}");
+        Log.info(
+            "Shared: getInitialMedia ${value.map((f) => f.value).join(",")}");
         handleFiles(value);
       });
       // For sharing images coming from outside the app while the app is in the memory
       FlutterSharingIntent.instance.getMediaStream().listen(
           (List<SharedFile> value) {
         handleFiles(value);
-        print("Shared: getMediaStream ${value.map((f) => f.value).join(",")}");
+        Log.info(
+            "Shared: getMediaStream ${value.map((f) => f.value).join(",")}");
       }, onError: (err) {
-        print("getIntentDataStream error: $err");
+        Log.info("getIntentDataStream error: $err");
       });
     }
 
@@ -73,7 +82,7 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
     // });
     // // For sharing or opening urls/text coming from outside the app while the app is in the memory
     // ReceiveSharingIntent.getTextStream().listen((String value) {
-    //   // Util.toast("getTextStream:$value");
+    //   // HttpUtil.toast("getTextStream:$value");
     //   if (value != null) {
     //     handleTorrent(value);
     //   }
@@ -92,7 +101,7 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
 
   handleFiles(List<SharedFile> files) async {
     _sharedFiles = files;
-    if (_sharedFiles.length > 0) {
+    if (_sharedFiles.isNotEmpty) {
       if (_sharedFiles.length == 1 &&
           _sharedFiles.first.value!.endsWith(".torrent")) {
         String filePath = '';
@@ -104,11 +113,14 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
         } else {
           filePath = _sharedFiles.first.value ?? '';
         }
-        Navigator.of(context).push(CupertinoPageRoute(builder: (context) {
-          return AddDownloadTask(
-            torrentPath: filePath,
-          );
-        }));
+        if (context.mounted) {
+          // ignore: use_build_context_synchronously
+          Navigator.of(context).push(CupertinoPageRoute(builder: (context) {
+            return AddDownloadTask(
+              torrentPath: filePath,
+            );
+          }));
+        }
         //   if (content.startsWith("content://") && content.endsWith(".torrent")) {
         //     // final filePath = await FlutterSharingIntent.getAbsolutePath(content);
         //
@@ -155,20 +167,21 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
   }
 
   checkAuth() async {
-    // print("是否需要启动密码")
-    String launchAuthStr = await Util.instance.getStorage("launch_auth") ?? '';
+    // Log.info("是否需要启动密码")
+    String launchAuthStr = await StorageUtil.getString("launch_auth") ?? '';
     String launchAuthPasswordStr =
-        await Util.instance.getStorage("launch_auth_password") ?? '';
+        await StorageUtil.getString("launch_auth_password") ?? '';
     String launchAuthBiometricsStr =
-        await Util.instance.getStorage("launch_auth_biometrics") ?? '';
+        await StorageUtil.getString("launch_auth_biometrics") ?? '';
     launchAuth = launchAuthStr == "1";
     password = launchAuthPasswordStr == "1";
     biometrics = launchAuthBiometricsStr == "1";
 
     authPage = launchAuth && (password || biometrics);
-    if (Util.instance.isAuthPage == false && authPage) {
+    if (connectionStore.isAuthPage == false && authPage && context.mounted) {
+      // ignore: use_build_context_synchronously
       Navigator.of(context).push(CupertinoPageRoute(builder: (context) {
-        return AuthPage(
+        return const AuthPage(
           launch: false,
         );
       }));
@@ -183,8 +196,9 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
         buildNumber = '1';
       }
       var res = await Api.update(buildNumber); //packageInfo.buildNumber
-      if (res['code'] == 1) {
+      if (res['code'] == 1 && context.mounted) {
         showCupertinoDialog(
+          // ignore: use_build_context_synchronously
           context: context,
           builder: (context) {
             return UpdateDialog(res['data'], packageInfo);
@@ -194,18 +208,20 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
     }
   }
 
-  Future<bool> onWillPop(i, r) {
-    Util.instance.vibrate(FeedbackType.light);
+  void onWillPop(bool didPop, dynamic result) {
+    if (didPop) return;
+
+    UiUtil.vibrate(FeedbackType.light);
     Future<bool> value = Future.value(true);
     if (_currentIndex == 0) {
       if (_dashboardStateKey.currentState?.isDrawerOpen == true) {
         _dashboardStateKey.currentState?.closeDrawer();
-        return Future.value(false);
+        return;
       }
     } else if (_currentIndex == 1) {
       if (_filesStateKey.currentState?.isDrawerOpen == true) {
         _filesStateKey.currentState?.closeDrawer();
-        return Future.value(false);
+        return;
       }
       value = _filesStateKey.currentState?.onWillPop() ?? Future.value(false);
     } else if (_currentIndex == 2) {
@@ -214,9 +230,10 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
     }
     value.then((v) {
       if (v) {
-        if (DateTime.now().difference(lastPopTime) > Duration(seconds: 2)) {
+        if (DateTime.now().difference(lastPopTime) >
+            const Duration(seconds: 2)) {
           lastPopTime = DateTime.now();
-          Util.instance.toast('再按一次退出${Util.instance.appName}');
+          UiUtil.toast('再按一次退出${connectionStore.appName}');
         } else {
           lastPopTime = DateTime.now();
           // 退出app
@@ -224,7 +241,6 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
         }
       }
     });
-    return Future.value(false);
   }
 
   @override
@@ -236,13 +252,13 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
         body: DownloadStateInherited(
           notifier: DownloadStateNotifier(),
           child: IndexedStack(
+            index: _currentIndex,
             children: [
               Dashboard(key: _dashboardStateKey),
               Files(key: _filesStateKey),
               Download(key: UniqueKey()),
-              Setting(),
+              const Setting(),
             ],
-            index: _currentIndex,
           ),
         ),
         bottomNavigationBar: BottomNavigationBar(
@@ -250,7 +266,7 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
           type: BottomNavigationBarType.fixed,
           selectedItemColor: Colors.blue,
           onTap: (v) {
-            print('[selected] $v');
+            Log.info('[selected] $v');
             setState(() {
               _currentIndex = v;
             });

@@ -1,15 +1,17 @@
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:garden/constants/app_constants.dart';
+import 'package:garden/theme/app_colors.dart';
 
 class Search extends StatefulWidget {
   final String folder;
-  Search(this.folder);
+  const Search(this.folder, {super.key});
   @override
-  _SearchState createState() => _SearchState();
+  SearchState createState() => SearchState();
 }
 
-class _SearchState extends State<Search> {
+class SearchState extends State<Search> {
   TextEditingController folderController = TextEditingController();
   List<String> folders = [];
   String pattern = "";
@@ -30,34 +32,35 @@ class _SearchState extends State<Search> {
     return Scaffold(
       appBar: AppBar(
         leading: AppBackButton(context),
-        title: Text("搜索文件"),
+        title: const Text("搜索文件"),
       ),
       body: GestureDetector(
         onTap: () {
           FocusScope.of(context).unfocus();
         },
         child: ListView(
-          padding: EdgeInsets.all(20),
+          padding: const EdgeInsets.all(20),
           children: [
             Card(
               shape: RoundedRectangleBorder(
-                  side: BorderSide(), borderRadius: BorderRadius.circular(18)),
+                  side: const BorderSide(),
+                  borderRadius: BorderRadius.circular(18)),
               child: Padding(
-                padding: const EdgeInsets.all(8.0),
+                padding: const EdgeInsets.all(AppConstants.paddingSmall),
                 child: TextField(
                   onChanged: (v) => pattern = v,
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     border: InputBorder.none,
                     labelText: '关键字',
                   ),
                 ),
               ),
             ),
-            SizedBox(
+            const SizedBox(
               height: 20,
             ),
             Padding(
-              padding: EdgeInsets.only(bottom: 20),
+              padding: const EdgeInsets.only(bottom: 20),
               child: GestureDetector(
                 onTap: () {
                   setState(() {
@@ -66,18 +69,18 @@ class _SearchState extends State<Search> {
                 },
                 child: Card(
                   shape: RoundedRectangleBorder(
-                      side: BorderSide(),
+                      side: const BorderSide(),
                       borderRadius: BorderRadius.circular(18)),
                   child: Padding(
-                    padding: const EdgeInsets.all(8.0),
+                    padding: const EdgeInsets.all(AppConstants.paddingSmall),
                     child: Row(
                       children: [
-                        Text("启用文件内容搜索"),
-                        Spacer(),
+                        const Text("启用文件内容搜索"),
+                        const Spacer(),
                         if (searchContent)
-                          Icon(
+                          const Icon(
                             CupertinoIcons.checkmark_alt,
-                            color: Color(0xffff9813),
+                            color: AppColors.primaryAction,
                           ),
                       ],
                     ),
@@ -87,20 +90,21 @@ class _SearchState extends State<Search> {
             ),
             Card(
               shape: RoundedRectangleBorder(
-                  side: BorderSide(), borderRadius: BorderRadius.circular(18)),
+                  side: const BorderSide(),
+                  borderRadius: BorderRadius.circular(18)),
               child: Padding(
-                padding: const EdgeInsets.all(8.0),
+                padding: const EdgeInsets.all(AppConstants.paddingSmall),
                 child: TextField(
                   controller: folderController,
                   enabled: false,
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     border: InputBorder.none,
                     labelText: '所在位置',
                   ),
                 ),
               ),
             ),
-            SizedBox(
+            const SizedBox(
               height: 20,
             ),
             OutlinedButton(
@@ -120,7 +124,7 @@ class _SearchState extends State<Search> {
                 //     },
                 //     settings: RouteSettings(name: "search_result")));
               },
-              child: Text(
+              child: const Text(
                 ' 搜索 ',
                 style: TextStyle(fontSize: 18),
               ),

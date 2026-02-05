@@ -1,14 +1,18 @@
-import 'package:garden/util/function.dart';
+import 'package:garden/util/http_util.dart';
+import 'package:garden/util/ui_util.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:garden/constants/app_constants.dart';
 
 class UserGroups extends StatefulWidget {
+  const UserGroups({super.key});
+
   @override
-  _UserGroupsState createState() => _UserGroupsState();
+  UserGroupsState createState() => UserGroupsState();
 }
 
-class _UserGroupsState extends State<UserGroups> {
+class UserGroupsState extends State<UserGroups> {
   List groups = [];
   bool loading = true;
   @override
@@ -25,18 +29,22 @@ class _UserGroupsState extends State<UserGroups> {
         groups = res['data']['groups'];
       });
     } else {
-      Util.instance.toast("加载失败");
-      Navigator.of(context).pop();
+      UiUtil.toast("加载失败");
+      if (context.mounted) {
+        // ignore: use_build_context_synchronously
+        Navigator.of(context).pop();
+      }
     }
   }
 
   Widget _buildGroupItem(group) {
     return Card(
       shape: RoundedRectangleBorder(
-          side: BorderSide(), borderRadius: BorderRadius.circular(18)),
-      margin: EdgeInsets.symmetric(vertical: 10),
+          side: const BorderSide(), borderRadius: BorderRadius.circular(18)),
+      margin:
+          const EdgeInsets.symmetric(vertical: AppConstants.paddingSmall + 2),
       child: Padding(
-        padding: EdgeInsets.all(20),
+        padding: const EdgeInsets.all(20),
         child: Row(
           children: [
             Expanded(
@@ -45,14 +53,14 @@ class _UserGroupsState extends State<UserGroups> {
                 children: [
                   Text(
                     "${group['name']}",
-                    style: TextStyle(fontSize: 16),
+                    style: const TextStyle(fontSize: 16),
                   ),
                   if (group['description'] != "")
                     Padding(
-                      padding: EdgeInsets.only(top: 5),
+                      padding: const EdgeInsets.only(top: 5),
                       child: Text(
                         "${group['description']}",
-                        style: TextStyle(color: Colors.grey),
+                        style: const TextStyle(color: Colors.grey),
                       ),
                     ),
                 ],
@@ -69,7 +77,7 @@ class _UserGroupsState extends State<UserGroups> {
     return Scaffold(
       appBar: AppBar(
         leading: AppBackButton(context),
-        title: Text("用户群组"),
+        title: const Text("用户群组"),
       ),
       body: loading
           ? Container(
@@ -78,14 +86,14 @@ class _UserGroupsState extends State<UserGroups> {
               color: Theme.of(context)
                   .scaffoldBackgroundColor
                   .withValues(alpha: .7),
-              child: Center(
+              child: const Center(
                 child: CupertinoActivityIndicator(
                   radius: 14,
                 ),
               ),
             )
           : ListView.builder(
-              padding: EdgeInsets.all(20),
+              padding: const EdgeInsets.all(20),
               itemBuilder: (context, i) {
                 return _buildGroupItem(groups[i]);
               },

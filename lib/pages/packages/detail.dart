@@ -1,13 +1,18 @@
 import 'dart:async';
+import 'package:garden/util/format_util.dart';
+import 'package:garden/util/log.dart';
+import 'package:garden/util/ui_util.dart';
+import 'package:garden/stores/connection_store.dart';
 
 import 'package:android_intent_plus/android_intent.dart';
 import 'package:garden/pages/packages/uninstall.dart';
-import 'package:garden/util/function.dart';
+import 'package:garden/util/http_util.dart';
 import 'package:garden/widgets/cupertino_image.dart';
 import 'package:garden/widgets/label.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:garden/constants/app_constants.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_swiper_null_safety/flutter_swiper_null_safety.dart';
 
@@ -15,12 +20,13 @@ class PackageDetail extends StatefulWidget {
   final Map package;
   final bool beta;
   final String? method;
-  PackageDetail(this.package, {this.beta = false, this.method});
+  const PackageDetail(this.package,
+      {super.key, this.beta = false, this.method});
   @override
-  _PackageDetailState createState() => _PackageDetailState();
+  PackageDetailState createState() => PackageDetailState();
 }
 
-class _PackageDetailState extends State<PackageDetail> {
+class PackageDetailState extends State<PackageDetail> {
   String thumbnailUrl = "";
   String installVolume = "";
   String installPath = "";
@@ -53,7 +59,7 @@ class _PackageDetailState extends State<PackageDetail> {
     }
     thumbnailUrl = widget.package['thumbnail'].last;
     if (!thumbnailUrl.startsWith("http")) {
-      thumbnailUrl = Util.instance.baseUrl + thumbnailUrl;
+      thumbnailUrl = connectionStore.baseUrl + thumbnailUrl;
     }
     getVolumes();
     super.initState();
@@ -75,7 +81,7 @@ class _PackageDetailState extends State<PackageDetail> {
 
   Widget _buildSwiperItem(String url) {
     if (!url.startsWith("http")) {
-      url = Util.instance.baseUrl + url;
+      url = connectionStore.baseUrl + url;
     }
     return CupertinoExtendedImage(
       url,
@@ -92,61 +98,62 @@ class _PackageDetailState extends State<PackageDetail> {
           color: Colors.transparent,
           child: Card(
             shape: RoundedRectangleBorder(
-                side: BorderSide(), borderRadius: BorderRadius.circular(18)),
+                side: const BorderSide(),
+                borderRadius: BorderRadius.circular(18)),
             child: SafeArea(
               top: false,
               child: Padding(
-                padding: EdgeInsets.all(20),
+                padding: const EdgeInsets.all(20),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: <Widget>[
-                    Text(
+                    const Text(
                       "选择套件安装位置",
                       style:
                           TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
                     ),
-                    SizedBox(
+                    const SizedBox(
                       height: 12,
                     ),
                     ...volumes.map((volume) {
                       return Padding(
-                        padding: EdgeInsets.only(bottom: 20),
+                        padding: const EdgeInsets.only(bottom: 20),
                         child: OutlinedButton(
                           onPressed: () async {
                             install(volume['volume_path']);
                             Navigator.of(context).pop();
                           },
                           child: Container(
-                            padding: EdgeInsets.only(left: 20),
+                            padding: const EdgeInsets.only(left: 20),
                             width: double.infinity,
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                    "${volume['display_name']}(可用容量：${Util.instance.formatSize(int.parse(volume['size_free_byte']))}) - ${volume['fs_type']}"),
-                                SizedBox(
+                                    "${volume['display_name']}(可用容量：${FormatUtil.formatSize(int.parse(volume['size_free_byte']))}) - ${volume['fs_type']}"),
+                                const SizedBox(
                                   height: 5,
                                 ),
                                 Text(
                                   "${volume['description']}",
-                                  style: TextStyle(color: Colors.grey),
+                                  style: const TextStyle(color: Colors.grey),
                                 ),
                               ],
                             ),
                           ),
                         ),
                       );
-                    }).toList(),
+                    }),
                     OutlinedButton(
                       onPressed: () async {
                         Navigator.of(context).pop();
                       },
-                      child: Text(
+                      child: const Text(
                         "取消",
                         style: TextStyle(fontSize: 18),
                       ),
                     ),
-                    SizedBox(
+                    const SizedBox(
                       height: 8,
                     ),
                   ],
@@ -172,37 +179,38 @@ class _PackageDetailState extends State<PackageDetail> {
         widget.package['id'], widget.package['version'],
         beta: widget.beta);
     if (res['success']) {
-      if (res['data']['paused_pkgs'].length > 0) {
+      if (res['data']['paused_pkgs'].length > 0 && context.mounted) {
         showCupertinoModalPopup(
+          // ignore: use_build_context_synchronously
           context: context,
           builder: (context) {
             return Material(
               color: Colors.transparent,
               child: Card(
                 shape: RoundedRectangleBorder(
-                    side: BorderSide(),
+                    side: const BorderSide(),
                     borderRadius: BorderRadius.circular(18)),
                 child: SafeArea(
                   top: false,
                   child: Padding(
-                    padding: EdgeInsets.all(20),
+                    padding: const EdgeInsets.all(20),
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: <Widget>[
-                        Text(
+                        const Text(
                           "确认更新",
                           style: TextStyle(
                               fontSize: 20, fontWeight: FontWeight.w500),
                         ),
-                        SizedBox(
+                        const SizedBox(
                           height: 12,
                         ),
                         Text(
                           '更新${res['data']['cause_pausing_pkgs'].join(",")}时，${res['data']['paused_pkgs'].join("，")}将被停用。',
-                          style: TextStyle(
+                          style: const TextStyle(
                               fontSize: 20, fontWeight: FontWeight.w400),
                         ),
-                        SizedBox(
+                        const SizedBox(
                           height: 22,
                         ),
                         Row(
@@ -213,14 +221,14 @@ class _PackageDetailState extends State<PackageDetail> {
                                   install(installPath);
                                   Navigator.of(context).pop();
                                 },
-                                child: Text(
+                                child: const Text(
                                   "继续更新",
                                   style: TextStyle(
                                       fontSize: 18, color: Colors.redAccent),
                                 ),
                               ),
                             ),
-                            SizedBox(
+                            const SizedBox(
                               width: 16,
                             ),
                             Expanded(
@@ -228,7 +236,7 @@ class _PackageDetailState extends State<PackageDetail> {
                                 onPressed: () async {
                                   Navigator.of(context).pop();
                                 },
-                                child: Text(
+                                child: const Text(
                                   "取消",
                                   style: TextStyle(fontSize: 18),
                                 ),
@@ -236,7 +244,7 @@ class _PackageDetailState extends State<PackageDetail> {
                             ),
                           ],
                         ),
-                        SizedBox(
+                        const SizedBox(
                           height: 8,
                         ),
                       ],
@@ -260,27 +268,30 @@ class _PackageDetailState extends State<PackageDetail> {
   uninstallPackage() async {
     var res = await Api.uninstallPackageTask(widget.package['id']);
     if (res['success']) {
-      Util.instance.toast("卸载成功");
-      Navigator.of(context).pop();
+      UiUtil.toast("卸载成功");
+      if (context.mounted) {
+        // ignore: use_build_context_synchronously
+        Navigator.of(context).pop();
+      }
     } else {
-      Util.instance.toast("套件卸载失败，错误代码：${res['error']['code']}");
+      UiUtil.toast("套件卸载失败，错误代码：${res['error']['code']}");
     }
   }
 
   install(path) async {
     var res = await Api.installPackageTask(widget.package['id'], path);
-    print(res);
+    Log.info(res);
     if (res['success']) {
-      Util.instance.toast("已开始安装");
+      UiUtil.toast("已开始安装");
       setState(() {
         installing = true;
         installButtonText = "准备安装…";
         installProgress = double.parse(res['data']['progress']);
       });
       //进度
-      timer = Timer.periodic(Duration(seconds: 5), (timer) {
+      timer = Timer.periodic(const Duration(seconds: 5), (timer) {
         Api.installPackageStatus(res['data']['taskid']).then((value) {
-          print(value);
+          Log.info(value);
           setState(() {
             installing = !value['data']['finished'];
             if (value['data']['finished']) {
@@ -303,9 +314,9 @@ class _PackageDetailState extends State<PackageDetail> {
         });
       });
     } else if (res['error']['code'] == 4501) {
-      Util.instance.toast("此套件需配置信息，当前暂不支持，请在WEB端安装");
+      UiUtil.toast("此套件需配置信息，当前暂不支持，请在WEB端安装");
     } else {
-      Util.instance.toast("安装套件失败，代码${res['error']['code']}");
+      UiUtil.toast("安装套件失败，代码${res['error']['code']}");
     }
   }
 
@@ -328,21 +339,21 @@ class _PackageDetailState extends State<PackageDetail> {
         children: [
           Expanded(
             child: ListView(
-              padding: EdgeInsets.all(20),
+              padding: const EdgeInsets.all(20),
               children: [
                 Card(
                   shape: RoundedRectangleBorder(
-                      side: BorderSide(),
+                      side: const BorderSide(),
                       borderRadius: BorderRadius.circular(18)),
                   child: Padding(
-                    padding: EdgeInsets.all(20),
+                    padding: const EdgeInsets.all(20),
                     child: Row(
                       children: [
                         CupertinoExtendedImage(
                           thumbnailUrl,
                           width: 60,
                         ),
-                        SizedBox(
+                        const SizedBox(
                           width: 20,
                         ),
                         Expanded(
@@ -352,10 +363,10 @@ class _PackageDetailState extends State<PackageDetail> {
                               Text("${widget.package['dname']}"),
                               if (widget.package['installed'])
                                 Padding(
-                                  padding: EdgeInsets.only(top: 10),
+                                  padding: const EdgeInsets.only(top: 10),
                                   child: widget.package['launched']
-                                      ? Label("已启动", Colors.green)
-                                      : Label("已停用", Colors.red),
+                                      ? const Label("已启动", Colors.green)
+                                      : const Label("已停用", Colors.red),
                                 ),
                             ],
                           ),
@@ -368,20 +379,20 @@ class _PackageDetailState extends State<PackageDetail> {
                     widget.package['snapshot'].length > 0)
                   Card(
                     shape: RoundedRectangleBorder(
-                        side: BorderSide(),
+                        side: const BorderSide(),
                         borderRadius: BorderRadius.circular(18)),
-                    margin: EdgeInsets.only(top: 20),
+                    margin: const EdgeInsets.only(top: 20),
                     child: Padding(
-                      padding: EdgeInsets.all(10),
+                      padding: const EdgeInsets.all(10),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Container(
+                          SizedBox(
                             height: 210,
                             child: Swiper(
                               autoplay: true,
                               autoplayDelay: 5000,
-                              pagination: SwiperPagination(
+                              pagination: const SwiperPagination(
                                   alignment: Alignment.bottomCenter,
                                   builder: DotSwiperPaginationBuilder(
                                       activeColor: Colors.lightBlueAccent,
@@ -400,20 +411,20 @@ class _PackageDetailState extends State<PackageDetail> {
                   ),
                 Card(
                   shape: RoundedRectangleBorder(
-                      side: BorderSide(),
+                      side: const BorderSide(),
                       borderRadius: BorderRadius.circular(18)),
-                  margin: EdgeInsets.only(top: 20),
+                  margin: const EdgeInsets.only(top: 20),
                   child: Padding(
-                    padding: EdgeInsets.all(20),
+                    padding: const EdgeInsets.all(20),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
+                        const Text(
                           "描述",
                           style: TextStyle(
                               fontSize: 18, fontWeight: FontWeight.w600),
                         ),
-                        SizedBox(
+                        const SizedBox(
                           height: 20,
                         ),
                         Text("${widget.package['desc']}"),
@@ -424,17 +435,17 @@ class _PackageDetailState extends State<PackageDetail> {
                 if (widget.package['changelog'] != "")
                   Card(
                     shape: RoundedRectangleBorder(
-                        side: BorderSide(),
+                        side: const BorderSide(),
                         borderRadius: BorderRadius.circular(18)),
-                    margin: EdgeInsets.only(top: 20),
+                    margin: const EdgeInsets.only(top: 20),
                     child: Padding(
-                      padding: EdgeInsets.all(20),
+                      padding: const EdgeInsets.all(20),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
                             "${widget.package['version']}新增功能",
-                            style: TextStyle(
+                            style: const TextStyle(
                                 fontSize: 18, fontWeight: FontWeight.w600),
                           ),
                           // SizedBox(
@@ -464,20 +475,20 @@ class _PackageDetailState extends State<PackageDetail> {
                   ),
                 Card(
                   shape: RoundedRectangleBorder(
-                      side: BorderSide(),
+                      side: const BorderSide(),
                       borderRadius: BorderRadius.circular(18)),
-                  margin: EdgeInsets.only(top: 20),
+                  margin: const EdgeInsets.only(top: 20),
                   child: Padding(
-                    padding: EdgeInsets.all(20),
+                    padding: const EdgeInsets.all(20),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
+                        const Text(
                           "其他信息",
                           style: TextStyle(
                               fontSize: 18, fontWeight: FontWeight.w600),
                         ),
-                        SizedBox(
+                        const SizedBox(
                           height: 20,
                         ),
                         Wrap(
@@ -486,15 +497,16 @@ class _PackageDetailState extends State<PackageDetail> {
                           children: [
                             Card(
                               shape: RoundedRectangleBorder(
-                                  side: BorderSide(),
+                                  side: const BorderSide(),
                                   borderRadius: BorderRadius.circular(18)),
                               child: Padding(
-                                padding: const EdgeInsets.all(8.0),
+                                padding: const EdgeInsets.all(
+                                    AppConstants.paddingSmall),
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Text("开发者"),
-                                    SizedBox(
+                                    const Text("开发者"),
+                                    const SizedBox(
                                       height: 5,
                                     ),
                                     if (widget.package['maintainer_url'] !=
@@ -503,7 +515,8 @@ class _PackageDetailState extends State<PackageDetail> {
                                       GestureDetector(
                                         child: Text(
                                           "${widget.package['maintainer']}",
-                                          style: TextStyle(color: Colors.blue),
+                                          style: const TextStyle(
+                                              color: Colors.blue),
                                         ),
                                         onTap: () {
                                           AndroidIntent intent = AndroidIntent(
@@ -527,16 +540,17 @@ class _PackageDetailState extends State<PackageDetail> {
                                 widget.package['distributor'] != "")
                               Card(
                                 shape: RoundedRectangleBorder(
-                                    side: BorderSide(),
+                                    side: const BorderSide(),
                                     borderRadius: BorderRadius.circular(18)),
                                 child: Padding(
-                                  padding: const EdgeInsets.all(8.0),
+                                  padding: const EdgeInsets.all(
+                                      AppConstants.paddingSmall),
                                   child: Column(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
-                                      Text("发布人员"),
-                                      SizedBox(
+                                      const Text("发布人员"),
+                                      const SizedBox(
                                         height: 5,
                                       ),
                                       if (widget.package['distributor_url'] !=
@@ -546,8 +560,8 @@ class _PackageDetailState extends State<PackageDetail> {
                                         GestureDetector(
                                           child: Text(
                                             "${widget.package['distributor']}",
-                                            style:
-                                                TextStyle(color: Colors.blue),
+                                            style: const TextStyle(
+                                                color: Colors.blue),
                                           ),
                                           onTap: () {
                                             AndroidIntent intent =
@@ -570,15 +584,16 @@ class _PackageDetailState extends State<PackageDetail> {
                               ),
                             Card(
                               shape: RoundedRectangleBorder(
-                                  side: BorderSide(),
+                                  side: const BorderSide(),
                                   borderRadius: BorderRadius.circular(18)),
                               child: Padding(
-                                padding: const EdgeInsets.all(8.0),
+                                padding: const EdgeInsets.all(
+                                    AppConstants.paddingSmall),
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Text("下载次数"),
-                                    SizedBox(
+                                    const Text("下载次数"),
+                                    const SizedBox(
                                       height: 5,
                                     ),
                                     Text("${widget.package['download_count']}"),
@@ -589,16 +604,17 @@ class _PackageDetailState extends State<PackageDetail> {
                             if (widget.package['installed'])
                               Card(
                                 shape: RoundedRectangleBorder(
-                                    side: BorderSide(),
+                                    side: const BorderSide(),
                                     borderRadius: BorderRadius.circular(18)),
                                 child: Padding(
-                                  padding: const EdgeInsets.all(8.0),
+                                  padding: const EdgeInsets.all(
+                                      AppConstants.paddingSmall),
                                   child: Column(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
-                                      Text("已安装版本"),
-                                      SizedBox(
+                                      const Text("已安装版本"),
+                                      const SizedBox(
                                         height: 5,
                                       ),
                                       Text(
@@ -610,35 +626,37 @@ class _PackageDetailState extends State<PackageDetail> {
                             if (widget.package['installed'])
                               Card(
                                 shape: RoundedRectangleBorder(
-                                    side: BorderSide(),
+                                    side: const BorderSide(),
                                     borderRadius: BorderRadius.circular(18)),
                                 child: Padding(
-                                  padding: const EdgeInsets.all(8.0),
+                                  padding: const EdgeInsets.all(
+                                      AppConstants.paddingSmall),
                                   child: Column(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
-                                      Text("安装位置"),
-                                      SizedBox(
+                                      const Text("安装位置"),
+                                      const SizedBox(
                                         height: 5,
                                       ),
-                                      Text(
-                                          "${installVolume.replaceAll("volume", "存储空间 ")}"),
+                                      Text(installVolume.replaceAll(
+                                          "volume", "存储空间 ")),
                                     ],
                                   ),
                                 ),
                               ),
                             Card(
                               shape: RoundedRectangleBorder(
-                                  side: BorderSide(),
+                                  side: const BorderSide(),
                                   borderRadius: BorderRadius.circular(18)),
                               child: Padding(
-                                padding: const EdgeInsets.all(8.0),
+                                padding: const EdgeInsets.all(
+                                    AppConstants.paddingSmall),
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Text("最新版本"),
-                                    SizedBox(
+                                    const Text("最新版本"),
+                                    const SizedBox(
                                       height: 5,
                                     ),
                                     Text("${widget.package['version']}"),
@@ -656,13 +674,13 @@ class _PackageDetailState extends State<PackageDetail> {
             ),
           ),
           Padding(
-            padding: EdgeInsets.symmetric(vertical: 20, horizontal: 10),
+            padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 10),
             child: Row(
               children: [
                 if (widget.package['installed']) ...[
                   Expanded(
                     child: Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 10),
+                      padding: const EdgeInsets.symmetric(horizontal: 10),
                       child: OutlinedButton(
                         onPressed: () async {
                           if (widget.package['additional']
@@ -671,8 +689,8 @@ class _PackageDetailState extends State<PackageDetail> {
                                 builder: (context) {
                                   return UninstallPackage(widget.package);
                                 },
-                                settings:
-                                    RouteSettings(name: "uninstall_package")));
+                                settings: const RouteSettings(
+                                    name: "uninstall_package")));
                           } else {
                             showCupertinoModalPopup(
                               context: context,
@@ -681,32 +699,33 @@ class _PackageDetailState extends State<PackageDetail> {
                                   color: Colors.transparent,
                                   child: Card(
                                     shape: RoundedRectangleBorder(
-                                        side: BorderSide(),
+                                        side: const BorderSide(),
                                         borderRadius:
                                             BorderRadius.circular(18)),
                                     child: SafeArea(
                                       top: false,
                                       child: Padding(
-                                        padding: const EdgeInsets.all(8.0),
+                                        padding: const EdgeInsets.all(
+                                            AppConstants.paddingSmall),
                                         child: Column(
                                           mainAxisSize: MainAxisSize.min,
                                           children: <Widget>[
-                                            Text(
+                                            const Text(
                                               "卸载套件",
                                               style: TextStyle(
                                                   fontSize: 20,
                                                   fontWeight: FontWeight.w500),
                                             ),
-                                            SizedBox(
+                                            const SizedBox(
                                               height: 12,
                                             ),
-                                            Text(
+                                            const Text(
                                               "确认要卸载此套件？",
                                               style: TextStyle(
                                                   fontSize: 20,
                                                   fontWeight: FontWeight.w400),
                                             ),
-                                            SizedBox(
+                                            const SizedBox(
                                               height: 22,
                                             ),
                                             Row(
@@ -718,7 +737,7 @@ class _PackageDetailState extends State<PackageDetail> {
                                                           .pop();
                                                       uninstallPackage();
                                                     },
-                                                    child: Text(
+                                                    child: const Text(
                                                       "卸载",
                                                       style: TextStyle(
                                                           fontSize: 18,
@@ -727,7 +746,7 @@ class _PackageDetailState extends State<PackageDetail> {
                                                     ),
                                                   ),
                                                 ),
-                                                SizedBox(
+                                                const SizedBox(
                                                   width: 20,
                                                 ),
                                                 Expanded(
@@ -736,7 +755,7 @@ class _PackageDetailState extends State<PackageDetail> {
                                                       Navigator.of(context)
                                                           .pop();
                                                     },
-                                                    child: Text(
+                                                    child: const Text(
                                                       "取消",
                                                       style: TextStyle(
                                                           fontSize: 18),
@@ -745,7 +764,7 @@ class _PackageDetailState extends State<PackageDetail> {
                                                 ),
                                               ],
                                             ),
-                                            SizedBox(
+                                            const SizedBox(
                                               height: 8,
                                             ),
                                           ],
@@ -758,7 +777,7 @@ class _PackageDetailState extends State<PackageDetail> {
                             );
                           }
                         },
-                        child: Text(
+                        child: const Text(
                           "卸载",
                           style: TextStyle(color: Colors.red),
                         ),
@@ -770,7 +789,7 @@ class _PackageDetailState extends State<PackageDetail> {
                       widget.package['additional']['startable'])
                     Expanded(
                       child: Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 10),
+                        padding: const EdgeInsets.symmetric(horizontal: 10),
                         child: widget.package['launched']
                             ? OutlinedButton(
                                 onPressed: () {
@@ -781,35 +800,35 @@ class _PackageDetailState extends State<PackageDetail> {
                                         color: Colors.transparent,
                                         child: Card(
                                           shape: RoundedRectangleBorder(
-                                              side: BorderSide(),
+                                              side: const BorderSide(),
                                               borderRadius:
                                                   BorderRadius.circular(5)),
                                           child: SafeArea(
                                             top: false,
                                             child: Padding(
-                                              padding:
-                                                  const EdgeInsets.all(8.0),
+                                              padding: const EdgeInsets.all(
+                                                  AppConstants.paddingSmall),
                                               child: Column(
                                                 mainAxisSize: MainAxisSize.min,
                                                 children: <Widget>[
-                                                  Text(
+                                                  const Text(
                                                     "停用套件",
                                                     style: TextStyle(
                                                         fontSize: 20,
                                                         fontWeight:
                                                             FontWeight.w500),
                                                   ),
-                                                  SizedBox(
+                                                  const SizedBox(
                                                     height: 12,
                                                   ),
-                                                  Text(
+                                                  const Text(
                                                     "确认要停用此套件？",
                                                     style: TextStyle(
                                                         fontSize: 20,
                                                         fontWeight:
                                                             FontWeight.w400),
                                                   ),
-                                                  SizedBox(
+                                                  const SizedBox(
                                                     height: 22,
                                                   ),
                                                   Row(
@@ -829,7 +848,7 @@ class _PackageDetailState extends State<PackageDetail> {
                                                                     "stop");
                                                             if (res[
                                                                 'success']) {
-                                                              Util.instance
+                                                              HttpUtil.instance
                                                                   .toast("已停用");
                                                               setState(() {
                                                                 widget.package[
@@ -838,7 +857,7 @@ class _PackageDetailState extends State<PackageDetail> {
                                                               });
                                                             }
                                                           },
-                                                          child: Text(
+                                                          child: const Text(
                                                             "停用",
                                                             style: TextStyle(
                                                                 fontSize: 18,
@@ -847,7 +866,7 @@ class _PackageDetailState extends State<PackageDetail> {
                                                           ),
                                                         ),
                                                       ),
-                                                      SizedBox(
+                                                      const SizedBox(
                                                         width: 20,
                                                       ),
                                                       Expanded(
@@ -857,7 +876,7 @@ class _PackageDetailState extends State<PackageDetail> {
                                                                     context)
                                                                 .pop();
                                                           },
-                                                          child: Text(
+                                                          child: const Text(
                                                             "取消",
                                                             style: TextStyle(
                                                                 fontSize: 18),
@@ -866,7 +885,7 @@ class _PackageDetailState extends State<PackageDetail> {
                                                       ),
                                                     ],
                                                   ),
-                                                  SizedBox(
+                                                  const SizedBox(
                                                     height: 8,
                                                   ),
                                                 ],
@@ -878,7 +897,7 @@ class _PackageDetailState extends State<PackageDetail> {
                                     },
                                   );
                                 },
-                                child: Text("停用"),
+                                child: const Text("停用"),
                               )
                             : OutlinedButton(
                                 onPressed: () async {
@@ -886,40 +905,40 @@ class _PackageDetailState extends State<PackageDetail> {
                                       widget.package['id'],
                                       widget.package['dsm_apps'],
                                       "start");
-                                  print(res);
+                                  Log.info(res);
                                   if (res['success']) {
-                                    Util.instance.toast("已启动");
+                                    UiUtil.toast("已启动");
                                     setState(() {
                                       widget.package['launched'] = true;
                                     });
                                   }
                                 },
-                                child: Text("启动"),
+                                child: const Text("启动"),
                               ),
                       ),
                     ),
                 ] else
                   Expanded(
                     child: Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 10),
+                      padding: const EdgeInsets.symmetric(horizontal: 10),
                       child: OutlinedButton(
                         onPressed: () {
                           selectVolume();
                         },
-                        child: Text("$installButtonText"),
+                        child: Text(installButtonText),
                       ),
                     ),
                   ),
                 if (widget.package['can_update'])
                   Expanded(
                     child: Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 10),
+                      padding: const EdgeInsets.symmetric(horizontal: 10),
                       child: OutlinedButton(
                         onPressed: () async {
                           update();
                           // install(volume['volume_path']);
                         },
-                        child: Text("$installButtonText"),
+                        child: Text(installButtonText),
                       ),
                     ),
                   ),

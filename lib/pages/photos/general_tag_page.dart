@@ -6,7 +6,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class GeneralTagPage extends StatefulWidget {
-  const GeneralTagPage(this.isTeam);
+  const GeneralTagPage(this.isTeam, {super.key});
   final bool isTeam;
   @override
   State<GeneralTagPage> createState() => _GeneralTagPageState();
@@ -36,16 +36,16 @@ class _GeneralTagPageState extends State<GeneralTagPage> {
     return Scaffold(
       appBar: AppBar(
         leading: AppBackButton(context),
-        title: Text("标签"),
+        title: const Text("标签"),
       ),
       body: loading
-          ? Center(
+          ? const Center(
               child: CupertinoActivityIndicator(
                 radius: 14,
               ),
             )
           : SingleChildScrollView(
-              padding: EdgeInsets.all(20),
+              padding: const EdgeInsets.all(20),
               child: Wrap(
                 runSpacing: 20,
                 spacing: 20,
@@ -82,7 +82,7 @@ class _GeneralTagPageState extends State<GeneralTagPage> {
                           ),
                           Text(
                             "${tag.itemCount}个项目",
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontSize: 12,
                             ),
                           ),

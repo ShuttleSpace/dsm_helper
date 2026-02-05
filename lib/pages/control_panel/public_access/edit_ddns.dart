@@ -1,27 +1,32 @@
 // ignore_for_file: unused_import
 
 import 'package:cool_ui/cool_ui.dart';
-import 'package:garden/util/function.dart';
-import 'package:garden/util/neu_picker.dart';
+import 'package:garden/util/log.dart';
+import 'package:garden/util/ui_util.dart';
+import 'package:garden/util/http_util.dart';
+import 'package:garden/widgets/neu_picker.dart';
 import 'package:garden/widgets/label.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:garden/constants/app_constants.dart';
+import 'package:garden/theme/app_colors.dart';
 import 'package:flutter_vibrate/flutter_vibrate.dart';
+import 'package:simple_logger/simple_logger.dart';
 
 class EditDdns extends StatefulWidget {
   final Map? ddns;
   final List extIp;
   final List providers;
-  EditDdns(this.providers, {this.extIp = const [], this.ddns});
+  const EditDdns(this.providers, {super.key, this.extIp = const [], this.ddns});
 
   @override
-  _EditDdnsState createState() => _EditDdnsState();
+  EditDdnsState createState() => EditDdnsState();
 }
 
-class _EditDdnsState extends State<EditDdns> {
-  TextEditingController _hostnameController = TextEditingController();
-  TextEditingController _usernameController = TextEditingController();
+class EditDdnsState extends State<EditDdns> {
+  final TextEditingController _hostnameController = TextEditingController();
+  final TextEditingController _usernameController = TextEditingController();
   Map ddns = {};
   Map statusStr = {
     "service_ddns_normal": "正常",
@@ -48,7 +53,7 @@ class _EditDdnsState extends State<EditDdns> {
   }
 
   deleteDdns() async {
-    Util.instance.vibrate(FeedbackType.warning);
+    UiUtil.vibrate(FeedbackType.warning);
     showCupertinoModalPopup(
       context: context,
       builder: (context) {
@@ -56,28 +61,29 @@ class _EditDdnsState extends State<EditDdns> {
           color: Colors.transparent,
           child: Card(
             shape: RoundedRectangleBorder(
-                side: BorderSide(), borderRadius: BorderRadius.circular(18)),
+                side: const BorderSide(),
+                borderRadius: BorderRadius.circular(18)),
             child: SafeArea(
               top: false,
               child: Padding(
-                padding: const EdgeInsets.all(8.0),
+                padding: const EdgeInsets.all(AppConstants.paddingSmall),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: <Widget>[
-                    Text(
+                    const Text(
                       "确认删除",
                       style:
                           TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
                     ),
-                    SizedBox(
+                    const SizedBox(
                       height: 12,
                     ),
-                    Text(
+                    const Text(
                       "确认要删除以下DDNS？",
                       style:
                           TextStyle(fontSize: 20, fontWeight: FontWeight.w400),
                     ),
-                    SizedBox(
+                    const SizedBox(
                       height: 22,
                     ),
                     Row(
@@ -86,29 +92,31 @@ class _EditDdnsState extends State<EditDdns> {
                           child: OutlinedButton(
                             onPressed: () async {
                               if (widget.ddns == null) {
-                                Util.instance.toast('ddns 为空!');
+                                UiUtil.toast('ddns 为空!');
                                 return;
                               }
                               Navigator.of(context).pop();
                               var res =
                                   await Api.ddnsDelete(widget.ddns!['id']);
-                              print(res);
+                              Log.logger.log(Level.INFO, "delete ddns: $res");
                               if (res['success']) {
-                                Util.instance.toast("DDNS删除成功");
-                                Navigator.of(context).pop(true);
+                                UiUtil.toast("DDNS删除成功");
+                                if (context.mounted) {
+                                  Navigator.of(context).pop(true);
+                                }
                               } else {
-                                Util.instance
+                                HttpUtil.instance
                                     .toast("删除失败，代码:${res['error']['code']}");
                               }
                             },
-                            child: Text(
+                            child: const Text(
                               "确认删除",
                               style: TextStyle(
                                   fontSize: 18, color: Colors.redAccent),
                             ),
                           ),
                         ),
-                        SizedBox(
+                        const SizedBox(
                           width: 20,
                         ),
                         Expanded(
@@ -116,7 +124,7 @@ class _EditDdnsState extends State<EditDdns> {
                             onPressed: () async {
                               Navigator.of(context).pop();
                             },
-                            child: Text(
+                            child: const Text(
                               "取消",
                               style: TextStyle(fontSize: 18),
                             ),
@@ -124,7 +132,7 @@ class _EditDdnsState extends State<EditDdns> {
                         ),
                       ],
                     ),
-                    SizedBox(
+                    const SizedBox(
                       height: 8,
                     ),
                   ],
@@ -139,17 +147,17 @@ class _EditDdnsState extends State<EditDdns> {
 
   bool checkForm() {
     if (ddns['provider'] == null || ddns['provider'] == "") {
-      Util.instance.toast("请选择服务供应商");
+      UiUtil.toast("请选择服务供应商");
       return false;
     } else if (ddns['hostname'] == null || ddns['hostname'] == "") {
-      Util.instance.toast("请输入主机名称");
+      UiUtil.toast("请输入主机名称");
       return false;
     } else if (ddns['username'] == null || ddns['username'] == "") {
-      Util.instance.toast("请输入用户名/电子邮件");
+      UiUtil.toast("请输入用户名/电子邮件");
       return false;
     } else if (widget.ddns == null &&
         (ddns['passwd'] == null || ddns['passwd'] == "")) {
-      Util.instance.toast("请输入密码/密钥");
+      UiUtil.toast("请输入密码/密钥");
       return false;
     }
 
@@ -161,10 +169,10 @@ class _EditDdnsState extends State<EditDdns> {
     return Scaffold(
       appBar: AppBar(
         leading: AppBackButton(context),
-        title: Text("DDNS"),
+        title: const Text("DDNS"),
         actions: [
           Padding(
-            padding: EdgeInsets.only(right: 10, top: 8, bottom: 8),
+            padding: const EdgeInsets.only(right: 10, top: 8, bottom: 8),
             child: OutlinedButton(
               onPressed: deleteDdns,
               child: Image.asset(
@@ -179,7 +187,7 @@ class _EditDdnsState extends State<EditDdns> {
         children: [
           Expanded(
             child: ListView(
-              padding: EdgeInsets.all(20),
+              padding: const EdgeInsets.all(20),
               children: [
                 ...[
                   GestureDetector(
@@ -190,18 +198,19 @@ class _EditDdnsState extends State<EditDdns> {
                     },
                     child: Card(
                       shape: RoundedRectangleBorder(
-                          side: BorderSide(),
+                          side: const BorderSide(),
                           borderRadius: BorderRadius.circular(18)),
                       child: Padding(
-                        padding: const EdgeInsets.all(8.0),
+                        padding:
+                            const EdgeInsets.all(AppConstants.paddingSmall),
                         child: Row(
                           children: [
-                            Text("启用支持DDNS"),
-                            Spacer(),
+                            const Text("启用支持DDNS"),
+                            const Spacer(),
                             if (ddns['enable'])
-                              Icon(
+                              const Icon(
                                 CupertinoIcons.checkmark_alt,
-                                color: Color(0xffff9813),
+                                color: AppColors.primaryAction,
                                 size: 22,
                               ),
                           ],
@@ -209,7 +218,7 @@ class _EditDdnsState extends State<EditDdns> {
                       ),
                     ),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 20,
                   ),
                 ],
@@ -220,14 +229,14 @@ class _EditDdnsState extends State<EditDdns> {
                   },
                   child: Card(
                     shape: RoundedRectangleBorder(
-                        side: BorderSide(),
+                        side: const BorderSide(),
                         borderRadius: BorderRadius.circular(18)),
                     child: Padding(
-                      padding: const EdgeInsets.all(8.0),
+                      padding: const EdgeInsets.all(AppConstants.paddingSmall),
                       child: Row(
                         children: [
-                          Text("服务供应商"),
-                          Spacer(),
+                          const Text("服务供应商"),
+                          const Spacer(),
                           Text(
                               "${ddns['provider'] != null && ddns['provider'] != "" ? widget.providers.where((element) => element['provider'] == ddns['provider']).first['provider'] : "请选择"}"),
                         ],
@@ -235,100 +244,100 @@ class _EditDdnsState extends State<EditDdns> {
                     ),
                   ),
                 ),
-                SizedBox(
+                const SizedBox(
                   height: 20,
                 ),
                 Card(
                   shape: RoundedRectangleBorder(
-                      side: BorderSide(),
+                      side: const BorderSide(),
                       borderRadius: BorderRadius.circular(18)),
                   child: Padding(
-                    padding: const EdgeInsets.all(8.0),
+                    padding: const EdgeInsets.all(AppConstants.paddingSmall),
                     child: TextField(
                       controller: _hostnameController,
                       onChanged: (v) => ddns['hostname'] = v,
-                      decoration: InputDecoration(
+                      decoration: const InputDecoration(
                         border: InputBorder.none,
                         labelText: '主机名称',
                       ),
                     ),
                   ),
                 ),
-                SizedBox(
+                const SizedBox(
                   height: 20,
                 ),
                 Card(
                   shape: RoundedRectangleBorder(
-                      side: BorderSide(),
+                      side: const BorderSide(),
                       borderRadius: BorderRadius.circular(18)),
                   child: Padding(
-                    padding: const EdgeInsets.all(8.0),
+                    padding: const EdgeInsets.all(AppConstants.paddingSmall),
                     child: TextField(
                       controller: _usernameController,
                       onChanged: (v) => ddns['username'] = v,
-                      decoration: InputDecoration(
+                      decoration: const InputDecoration(
                         border: InputBorder.none,
                         labelText: '用户名/电子邮件',
                       ),
                     ),
                   ),
                 ),
-                SizedBox(
+                const SizedBox(
                   height: 20,
                 ),
                 Card(
                   shape: RoundedRectangleBorder(
-                      side: BorderSide(),
+                      side: const BorderSide(),
                       borderRadius: BorderRadius.circular(18)),
                   child: Padding(
-                    padding: const EdgeInsets.all(8.0),
+                    padding: const EdgeInsets.all(AppConstants.paddingSmall),
                     child: TextField(
                       onChanged: (v) => ddns['passwd'] = v,
-                      decoration: InputDecoration(
+                      decoration: const InputDecoration(
                         border: InputBorder.none,
                         labelText: '密码/密钥',
                       ),
                     ),
                   ),
                 ),
-                SizedBox(
+                const SizedBox(
                   height: 20,
                 ),
                 Card(
                   shape: RoundedRectangleBorder(
-                      side: BorderSide(),
+                      side: const BorderSide(),
                       borderRadius: BorderRadius.circular(18)),
                   child: Padding(
-                    padding: const EdgeInsets.all(8.0),
+                    padding: const EdgeInsets.all(AppConstants.paddingSmall),
                     child: Row(
                       children: [
-                        Text("外部地址(ipv4):"),
-                        Spacer(),
+                        const Text("外部地址(ipv4):"),
+                        const Spacer(),
                         Text("${ddns['ip']}"),
                       ],
                     ),
                   ),
                 ),
-                SizedBox(
+                const SizedBox(
                   height: 20,
                 ),
                 Card(
                   shape: RoundedRectangleBorder(
-                      side: BorderSide(),
+                      side: const BorderSide(),
                       borderRadius: BorderRadius.circular(18)),
                   child: Padding(
-                    padding: const EdgeInsets.all(8.0),
+                    padding: const EdgeInsets.all(AppConstants.paddingSmall),
                     child: Row(
                       children: [
-                        Text("外部地址(ipv6):"),
-                        Spacer(),
+                        const Text("外部地址(ipv6):"),
+                        const Spacer(),
                         Text("${ddns['ipv6']}"),
                       ],
                     ),
                   ),
                 ),
                 //statusStr[ddns['status']] ?? ddns['status']
-                SizedBox(
+                const SizedBox(
                   height: 20,
                 ),
                 Row(
@@ -336,14 +345,15 @@ class _EditDdnsState extends State<EditDdns> {
                     Expanded(
                       child: Card(
                         shape: RoundedRectangleBorder(
-                            side: BorderSide(),
+                            side: const BorderSide(),
                             borderRadius: BorderRadius.circular(18)),
                         child: Padding(
-                          padding: const EdgeInsets.all(8.0),
+                          padding:
+                              const EdgeInsets.all(AppConstants.paddingSmall),
                           child: Row(
                             children: [
-                              Text("状态:"),
-                              SizedBox(
+                              const Text("状态:"),
+                              const SizedBox(
                                 width: 10,
                               ),
                               if (ddns['status'] != null)
@@ -359,7 +369,7 @@ class _EditDdnsState extends State<EditDdns> {
                         ),
                       ),
                     ),
-                    SizedBox(
+                    const SizedBox(
                       width: 20,
                     ),
                     OutlinedButton(
@@ -367,23 +377,23 @@ class _EditDdnsState extends State<EditDdns> {
                         if (checkForm()) {
                           var hide = showWeuiLoadingToast(
                               context: context,
-                              message: Text("测试中，请稍后"),
+                              message: const Text("测试中，请稍后"),
                               backButtonClose: true,
                               alignment: Alignment.center);
                           var res = await Api.ddnsTest(ddns);
                           hide();
-                          print(res);
+                          Log.info("ddnsTest:$res");
                           if (res['success']) {
                             setState(() {
                               ddns['status'] = res['data']['status'];
                             });
                           } else {
-                            Util.instance.toast(
+                            UiUtil.toast(
                                 "测试失败，${res['error']['errors']},code:${res['error']['code']}");
                           }
                         }
                       },
-                      child: Text("测试联机"),
+                      child: const Text("测试联机"),
                     ),
                   ],
                 ),
@@ -392,20 +402,22 @@ class _EditDdnsState extends State<EditDdns> {
           ),
           SafeArea(
             child: Padding(
-              padding: EdgeInsets.all(20),
+              padding: const EdgeInsets.all(20),
               child: OutlinedButton(
                 onPressed: () async {
                   if (checkForm()) {
                     var res = await Api.ddnsSave(ddns);
                     if (res['success']) {
-                      Util.instance.toast("保存成功");
-                      Navigator.of(context).pop(true);
+                      UiUtil.toast("保存成功");
+                      if (context.mounted) {
+                        Navigator.of(context).pop(true);
+                      }
                     } else {
-                      Util.instance.toast("保存失败,代码${res['error']['code']}");
+                      UiUtil.toast("保存失败,代码${res['error']['code']}");
                     }
                   }
                 },
-                child: Text(
+                child: const Text(
                   ' 保存 ',
                   style: TextStyle(fontSize: 18),
                 ),

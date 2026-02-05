@@ -1,6 +1,8 @@
 import 'package:garden/models/photos/photo_model.dart';
 import 'package:garden/pages/common/image_preview.dart';
 import 'package:garden/pages/common/video_player.dart';
+import 'package:garden/theme/app_colors.dart';
+import 'package:garden/util/log.dart';
 import 'package:garden/widgets/cupertino_image.dart';
 import 'package:garden/widgets/transparent_router.dart';
 import 'package:flutter/cupertino.dart';
@@ -8,7 +10,7 @@ import 'package:flutter/material.dart';
 
 class PhotoItemWidget extends StatelessWidget {
   const PhotoItemWidget(this.photo, this.photos,
-      {this.isTeam, this.showName = true, required this.width});
+      {super.key, this.isTeam, this.showName = true, required this.width});
   final PhotoModel photo;
   final List<PhotoModel> photos;
   final bool? isTeam;
@@ -16,7 +18,7 @@ class PhotoItemWidget extends StatelessWidget {
   final bool? showName;
   @override
   Widget build(BuildContext context) {
-    print('PhtoItemWidget: ${width}');
+    Log.info('PhtoItemWidget: $width');
     return GestureDetector(
       onTap: () {
         if (photo.type == 'video') {
@@ -41,7 +43,7 @@ class PhotoItemWidget extends StatelessWidget {
           ));
         }
       },
-      child: Container(
+      child: SizedBox(
         width: width,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -58,7 +60,7 @@ class PhotoItemWidget extends StatelessWidget {
                     boxShape: BoxShape.rectangle,
                     borderRadius: BorderRadius.circular(10),
                     placeholder: Container(
-                      color: Color(0xffE9E9E9),
+                      color: AppColors.placeholderBackgroundLight,
                     ),
                   ),
                 ),
@@ -68,15 +70,16 @@ class PhotoItemWidget extends StatelessWidget {
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Icon(
+                        const Icon(
                           Icons.play_circle_fill,
                           color: Colors.white,
                           size: 40,
                         ),
-                        SizedBox(height: 5),
+                        const SizedBox(height: 5),
                         Text(
                           "${photo.additional?.videoMeta?.hours.toString().padLeft(2, "0")}:${photo.additional?.videoMeta?.minutes.toString().padLeft(2, "0")}:${photo.additional?.videoMeta?.seconds.toString().padLeft(2, "0")}",
-                          style: TextStyle(color: Colors.white, fontSize: 12),
+                          style: const TextStyle(
+                              color: Colors.white, fontSize: 12),
                         ),
                       ],
                     ),

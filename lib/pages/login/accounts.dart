@@ -1,20 +1,28 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:garden/pages/login/login.dart';
-import 'package:garden/util/function.dart';
-import 'package:garden/widgets/label.dart';
-import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:garden/constants/app_constants.dart';
+import 'package:garden/pages/login/login.dart';
+import 'package:garden/stores/connection_store.dart';
+import 'package:garden/util/format_util.dart';
+import 'package:garden/util/http_util.dart';
+import 'package:garden/util/log.dart';
+import 'package:garden/util/storage_util.dart';
+import 'package:garden/util/ui_util.dart';
+import 'package:garden/widgets/label.dart';
+import 'package:garden/widgets/neu_back_button.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 
 class Accounts extends StatefulWidget {
+  const Accounts({super.key});
+
   @override
-  _AccountsState createState() => _AccountsState();
+  AccountsState createState() => AccountsState();
 }
 
-class _AccountsState extends State<Accounts> {
+class AccountsState extends State<Accounts> {
   List servers = [];
   Timer? timer;
   bool visible = true;
@@ -31,7 +39,7 @@ class _AccountsState extends State<Accounts> {
   }
 
   getData() async {
-    String serverString = await Util.instance.getStorage("servers") ?? '';
+    String serverString = await StorageUtil.getString("servers") ?? '';
     if (serverString.isNotBlank) {
       setState(() {
         servers = json.decode(serverString);
@@ -41,12 +49,10 @@ class _AccountsState extends State<Accounts> {
   }
 
   getInfo() async {
-    if (timer == null) {
-      timer = Timer.periodic(Duration(seconds: 5), (timer) {
-        getInfo();
-      });
-    }
-    servers.forEach((server) {
+    timer ??= Timer.periodic(const Duration(seconds: 5), (timer) {
+      getInfo();
+    });
+    for (var server in servers) {
       server['loading'] = server['loading'] ?? true;
       server['is_login'] = server['is_login'] ?? false;
       server['base_url'] = server['base_url'] ??
@@ -93,12 +99,12 @@ class _AccountsState extends State<Accounts> {
           });
         }
       }
-    });
+    }
   }
 
   saveAccounts() async {
     List accounts = [];
-    servers.forEach((server) {
+    for (var server in servers) {
       accounts.add({
         "https": server['https'],
         "host": server['host'],
@@ -113,8 +119,8 @@ class _AccountsState extends State<Accounts> {
         "cookie": server['cookie'],
         "sid": server['sid'],
       });
-    });
-    Util.instance.setStorage("servers", json.encode(accounts));
+    }
+    StorageUtil.setString("servers", json.encode(accounts));
   }
 
   serverInfo(server) async {
@@ -164,32 +170,32 @@ class _AccountsState extends State<Accounts> {
     server['write'] = server['write'] ?? 0.0;
     return GestureDetector(
       onTap: () {
-        print(server);
+        Log.info(server);
         if (server['is_login']) {
-          Util.instance.account = "${server['account']}";
-          Util.instance.baseUrl = "${server['base_url']}";
-          Util.instance.checkSsl = server['check_ssl'];
-          Util.instance.setStorage("base_url", Util.instance.baseUrl);
+          connectionStore.setAccount("${server['account']}");
+          connectionStore.setBaseUrl("${server['base_url']}");
+          connectionStore.setCheckSsl(server['check_ssl']);
+          StorageUtil.setString("base_url", connectionStore.baseUrl);
 
-          Util.instance.setStorage("https", server['https'] ? "1" : "0");
-          Util.instance.setStorage("host", server['host']);
-          Util.instance.setStorage("port", server['port']);
-          Util.instance.setStorage("account", server['account']);
-          Util.instance.setStorage("note", server['note'] ?? '');
-          Util.instance.setStorage(
+          StorageUtil.setString("https", server['https'] ? "1" : "0");
+          StorageUtil.setString("host", server['host']);
+          StorageUtil.setString("port", server['port']);
+          StorageUtil.setString("account", server['account']);
+          StorageUtil.setString("note", server['note'] ?? '');
+          StorageUtil.setString(
               "remember_password", server['remember_password'] ? "1" : "0");
           if (server['remember_password']) {
-            Util.instance.setStorage("password", server['password']);
+            StorageUtil.setString("password", server['password']);
           } else {
-            Util.instance.setStorage("password", "");
+            StorageUtil.setString("password", "");
           }
-          Util.instance
+          HttpUtil.instance
               .setStorage("auto_login", server['auto_login'] ? "1" : "0");
-          Util.instance
+          HttpUtil.instance
               .setStorage("check_ssl", server['check_ssl'] ? "1" : "0");
-          Util.instance.setStorage("sid", server['sid']);
-          Util.instance.sid = server['sid'];
-          Util.instance.cookie = server['cookie'];
+          StorageUtil.setString("sid", server['sid']);
+          connectionStore.setSid(server['sid']);
+          connectionStore.setCookie(server['cookie']);
           Navigator.of(context)
               .pushNamedAndRemoveUntil("/home", (route) => false);
         } else {
@@ -201,9 +207,9 @@ class _AccountsState extends State<Accounts> {
       },
       child: Card(
         shape: RoundedRectangleBorder(
-            side: BorderSide(), borderRadius: BorderRadius.circular(18)),
+            side: const BorderSide(), borderRadius: BorderRadius.circular(18)),
         child: Padding(
-          padding: EdgeInsets.all(20),
+          padding: const EdgeInsets.all(20),
           child: Row(
             children: [
               Expanded(
@@ -221,30 +227,30 @@ class _AccountsState extends State<Accounts> {
                                   if (server['note'] != null &&
                                       server['note'] != "") ...[
                                     Label("${server['note']}", Colors.blue),
-                                    SizedBox(
+                                    const SizedBox(
                                       width: 5,
                                     ),
                                   ],
                                   Text(
                                     "${visible ? server['account'] : "*****"}",
-                                    style: TextStyle(fontSize: 18),
+                                    style: const TextStyle(fontSize: 18),
                                   ),
                                 ],
                               ),
-                              SizedBox(
+                              const SizedBox(
                                 height: 5,
                               ),
                               Row(
                                 children: [
                                   if (server['https'])
-                                    Icon(
+                                    const Icon(
                                       Icons.lock,
                                       color: Colors.green,
                                       size: 12,
                                     ),
                                   Text(
                                     "${visible ? server['host'] : "*****"}",
-                                    style: TextStyle(color: Colors.grey),
+                                    style: const TextStyle(color: Colors.grey),
                                   ),
                                 ],
                               )
@@ -252,15 +258,15 @@ class _AccountsState extends State<Accounts> {
                           ),
                         ),
                         if (server['loading'])
-                          CupertinoActivityIndicator()
+                          const CupertinoActivityIndicator()
                         else if (!server['is_login'])
-                          Label("失效", Colors.red),
-                        SizedBox(
+                          const Label("失效", Colors.red),
+                        const SizedBox(
                           width: 10,
                         ),
                         OutlinedButton(
                           onPressed: () {
-                            print(server);
+                            Log.info(server);
                             server['action'] = "edit";
                             Navigator.of(context)
                                 .push(CupertinoPageRoute(builder: (context) {
@@ -272,7 +278,7 @@ class _AccountsState extends State<Accounts> {
                             width: 20,
                           ),
                         ),
-                        SizedBox(
+                        const SizedBox(
                           width: 10,
                         ),
                         OutlinedButton(
@@ -282,7 +288,7 @@ class _AccountsState extends State<Accounts> {
                             });
 
                             saveAccounts();
-                            Util.instance.toast("删除成功");
+                            UiUtil.toast("删除成功");
                           },
                           child: Image.asset(
                             "assets/icons/delete.png",
@@ -298,11 +304,13 @@ class _AccountsState extends State<Accounts> {
                             children: [
                               Card(
                                 shape: RoundedRectangleBorder(
-                                    side: BorderSide(),
+                                    side: const BorderSide(),
                                     borderRadius: BorderRadius.circular(18)),
-                                margin: EdgeInsets.only(top: 10, right: 10),
+                                margin:
+                                    const EdgeInsets.only(top: 10, right: 10),
                                 child: Padding(
-                                  padding: const EdgeInsets.all(8.0),
+                                  padding: const EdgeInsets.all(
+                                      AppConstants.paddingSmall),
                                   child: CircularPercentIndicator(
                                     radius: 30,
                                     // progressColor: Colors.lightBlueAccent,
@@ -324,7 +332,7 @@ class _AccountsState extends State<Accounts> {
                                     backgroundColor: Colors.black12,
                                     percent: server['cpu'] / 100,
                                     center: server['loading']
-                                        ? CupertinoActivityIndicator()
+                                        ? const CupertinoActivityIndicator()
                                         : Text(
                                             "${server['cpu']}%",
                                             style: TextStyle(
@@ -336,21 +344,23 @@ class _AccountsState extends State<Accounts> {
                                   ),
                                 ),
                               ),
-                              SizedBox(
+                              const SizedBox(
                                 height: 10,
                               ),
-                              Text("CPU"),
+                              const Text("CPU"),
                             ],
                           ),
                           Column(
                             children: [
                               Card(
                                 shape: RoundedRectangleBorder(
-                                    side: BorderSide(),
+                                    side: const BorderSide(),
                                     borderRadius: BorderRadius.circular(18)),
-                                margin: EdgeInsets.only(top: 10, right: 10),
+                                margin:
+                                    const EdgeInsets.only(top: 10, right: 10),
                                 child: Padding(
-                                  padding: const EdgeInsets.all(8.0),
+                                  padding: const EdgeInsets.all(
+                                      AppConstants.paddingSmall),
                                   child: CircularPercentIndicator(
                                     radius: 30,
                                     // progressColor: Colors.lightBlueAccent,
@@ -372,7 +382,7 @@ class _AccountsState extends State<Accounts> {
                                     backgroundColor: Colors.black12,
                                     percent: server['ram'] / 100,
                                     center: server['loading']
-                                        ? CupertinoActivityIndicator()
+                                        ? const CupertinoActivityIndicator()
                                         : Text(
                                             "${server['ram']}%",
                                             style: TextStyle(
@@ -384,10 +394,10 @@ class _AccountsState extends State<Accounts> {
                                   ),
                                 ),
                               ),
-                              SizedBox(
+                              const SizedBox(
                                 height: 10,
                               ),
-                              Text("RAM"),
+                              const Text("RAM"),
                             ],
                           ),
                           Expanded(
@@ -402,34 +412,38 @@ class _AccountsState extends State<Accounts> {
                                         mainAxisAlignment:
                                             MainAxisAlignment.center,
                                         children: [
-                                          Icon(
+                                          const Icon(
                                             Icons.upload_sharp,
                                             color: Colors.blue,
                                             size: 16,
                                           ),
                                           Text(
-                                            "${server['loading'] ? "-" : "${Util.instance.formatSize(server['tx'], fixed: 0)}/S"}",
-                                            style: TextStyle(
+                                            server['loading']
+                                                ? "-"
+                                                : "${FormatUtil.formatSize(server['tx'], fixed: 0)}/S",
+                                            style: const TextStyle(
                                                 color: Colors.blue,
                                                 fontSize: 12),
                                           ),
                                         ],
                                       ),
-                                      SizedBox(
+                                      const SizedBox(
                                         height: 10,
                                       ),
                                       Row(
                                         mainAxisAlignment:
                                             MainAxisAlignment.center,
                                         children: [
-                                          Icon(
+                                          const Icon(
                                             Icons.download_sharp,
                                             color: Colors.green,
                                             size: 16,
                                           ),
                                           Text(
-                                            "${server['loading'] ? "-" : "${Util.instance.formatSize(server['rx'], fixed: 0)}/S"}",
-                                            style: TextStyle(
+                                            server['loading']
+                                                ? "-"
+                                                : "${FormatUtil.formatSize(server['rx'], fixed: 0)}/S",
+                                            style: const TextStyle(
                                                 color: Colors.green,
                                                 fontSize: 12),
                                           ),
@@ -438,7 +452,7 @@ class _AccountsState extends State<Accounts> {
                                     ],
                                   ),
                                 ),
-                                Text("网络"),
+                                const Text("网络"),
                               ],
                             ),
                           ),
@@ -451,29 +465,29 @@ class _AccountsState extends State<Accounts> {
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
                                       Text(
-                                        "R:${server['loading'] ? "-" : "${Util.instance.formatSize(server['read'], fixed: 0)}/S"}",
-                                        style: TextStyle(
+                                        "R:${server['loading'] ? "-" : "${FormatUtil.formatSize(server['read'], fixed: 0)}/S"}",
+                                        style: const TextStyle(
                                             color: Colors.blue, fontSize: 12),
                                       ),
-                                      SizedBox(
+                                      const SizedBox(
                                         height: 10,
                                       ),
                                       Text(
-                                        "W:${server['loading'] ? "-" : "${Util.instance.formatSize(server['write'], fixed: 0)}/S"}",
-                                        style: TextStyle(
+                                        "W:${server['loading'] ? "-" : "${FormatUtil.formatSize(server['write'], fixed: 0)}/S"}",
+                                        style: const TextStyle(
                                             color: Colors.green, fontSize: 12),
                                       )
                                     ],
                                   ),
                                 ),
-                                Text("磁盘"),
+                                const Text("磁盘"),
                               ],
                             ),
                           ),
                         ],
                       )
                     else
-                      Container(
+                      SizedBox(
                         height: 108,
                         child: Center(child: Text(server['error'])),
                       ),
@@ -492,10 +506,10 @@ class _AccountsState extends State<Accounts> {
     return Scaffold(
       appBar: AppBar(
         leading: AppBackButton(context),
-        title: Text("选择账号"),
+        title: const Text("选择账号"),
         actions: [
           Padding(
-            padding: EdgeInsets.only(right: 10, top: 8, bottom: 8),
+            padding: const EdgeInsets.only(right: 10, top: 8, bottom: 8),
             child: GestureDetector(
               onTap: () {
                 setState(() {
@@ -504,10 +518,10 @@ class _AccountsState extends State<Accounts> {
               },
               child: Card(
                 shape: RoundedRectangleBorder(
-                    side: BorderSide(),
+                    side: const BorderSide(),
                     borderRadius: BorderRadius.circular(18)),
                 child: Padding(
-                  padding: const EdgeInsets.all(8.0),
+                  padding: const EdgeInsets.all(AppConstants.paddingSmall),
                   child: Icon(visible
                       ? CupertinoIcons.eye_slash_fill
                       : CupertinoIcons.eye_fill),
@@ -516,12 +530,12 @@ class _AccountsState extends State<Accounts> {
             ),
           ),
           Padding(
-            padding: EdgeInsets.only(right: 10, top: 8, bottom: 8),
+            padding: const EdgeInsets.only(right: 10, top: 8, bottom: 8),
             child: OutlinedButton(
               onPressed: () {
                 Navigator.of(context)
                     .push(CupertinoPageRoute(builder: (context) {
-                  return Login(
+                  return const Login(
                     type: "add",
                   );
                 })).then((_) {
@@ -529,19 +543,19 @@ class _AccountsState extends State<Accounts> {
                 });
                 return;
               },
-              child: Icon(Icons.add),
+              child: const Icon(Icons.add),
             ),
           )
         ],
       ),
       body: ListView.separated(
-        padding: EdgeInsets.all(20),
+        padding: const EdgeInsets.all(20),
         itemBuilder: (context, i) {
           return _buildServerItem(servers[i]);
         },
         itemCount: servers.length,
         separatorBuilder: (context, i) {
-          return SizedBox(
+          return const SizedBox(
             height: 20,
           );
         },

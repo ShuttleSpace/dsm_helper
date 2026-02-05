@@ -15,6 +15,7 @@ class BubbleTabIndicator extends Decoration {
   final Color indicatorColor;
   final Color shadowColor;
   final double indicatorRadius;
+  @override
   final EdgeInsetsGeometry padding;
   final EdgeInsetsGeometry insets;
   final TabBarIndicatorSize tabBarIndicatorSize;
@@ -33,7 +34,7 @@ class BubbleTabIndicator extends Decoration {
   @override
   Decoration? lerpFrom(Decoration? a, double t) {
     if (a is BubbleTabIndicator) {
-      return new BubbleTabIndicator(
+      return BubbleTabIndicator(
         padding:
             EdgeInsetsGeometry.lerp(a.padding, padding, t) ?? EdgeInsets.zero,
         insets: EdgeInsetsGeometry.lerp(a.insets, insets, t) ?? EdgeInsets.zero,
@@ -45,7 +46,7 @@ class BubbleTabIndicator extends Decoration {
   @override
   Decoration? lerpTo(Decoration? b, double t) {
     if (b is BubbleTabIndicator) {
-      return new BubbleTabIndicator(
+      return BubbleTabIndicator(
         padding:
             EdgeInsetsGeometry.lerp(padding, b.padding, t) ?? EdgeInsets.zero,
         insets: EdgeInsetsGeometry.lerp(insets, b.insets, t) ?? EdgeInsets.zero,
@@ -55,13 +56,13 @@ class BubbleTabIndicator extends Decoration {
   }
 
   @override
-  _BubblePainter createBoxPainter([VoidCallback? onChanged]) {
-    return new _BubblePainter(this, onChanged);
+  BubblePainter createBoxPainter([VoidCallback? onChanged]) {
+    return BubblePainter(this, onChanged);
   }
 }
 
-class _BubblePainter extends BoxPainter {
-  _BubblePainter(this.decoration, VoidCallback? onChanged) : super(onChanged);
+class BubblePainter extends BoxPainter {
+  BubblePainter(this.decoration, VoidCallback? onChanged) : super(onChanged);
 
   final BubbleTabIndicator decoration;
 
@@ -80,7 +81,7 @@ class _BubblePainter extends BoxPainter {
       indicator = insets.resolve(textDirection).deflateRect(rect);
     }
 
-    return new Rect.fromLTWH(
+    return Rect.fromLTWH(
       indicator.left,
       indicator.top,
       indicator.width,
@@ -102,7 +103,7 @@ class _BubblePainter extends BoxPainter {
     paint.style = PaintingStyle.fill;
     final Paint result = Paint()
       ..color = shadowColor
-      ..maskFilter = MaskFilter.blur(BlurStyle.normal, 10.0);
+      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 10.0);
     canvas.drawRRect(
         RRect.fromRectAndRadius(indicator, Radius.circular(indicatorRadius)),
         result);

@@ -2,19 +2,21 @@ import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/material.dart';
 
 class SpeedLimit extends StatefulWidget {
+  const SpeedLimit({super.key});
+
   @override
-  _SpeedLimitState createState() => _SpeedLimitState();
+  SpeedLimitState createState() => SpeedLimitState();
 }
 
-class _SpeedLimitState extends State<SpeedLimit> {
+class SpeedLimitState extends State<SpeedLimit> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         leading: AppBackButton(context),
-        title: Text("速度限制"),
+        title: const Text("速度限制"),
       ),
-      body: Center(
+      body: const Center(
         child: Text("开发中……"),
       ),
     );

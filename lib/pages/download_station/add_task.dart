@@ -1,20 +1,23 @@
+import 'package:garden/extensions/map.dart';
 import 'package:garden/pages/download_station/select_file.dart';
+import 'package:garden/util/ui_util.dart';
 import 'package:garden/pages/file/select_folder.dart';
-import 'package:garden/util/function.dart';
+import 'package:garden/util/http_util.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:garden/constants/app_constants.dart';
 import 'package:flutter_vibrate/flutter_vibrate.dart';
 
 class AddDownloadTask extends StatefulWidget {
   final String? torrentPath;
-  AddDownloadTask({this.torrentPath});
+  const AddDownloadTask({super.key, this.torrentPath});
   @override
-  _AddDownloadTaskState createState() => _AddDownloadTaskState();
+  AddDownloadTaskState createState() => AddDownloadTaskState();
 }
 
-class _AddDownloadTaskState extends State<AddDownloadTask> {
+class AddDownloadTaskState extends State<AddDownloadTask> {
   String saveFolder = "";
   String torrentPath = "";
   String url = "";
@@ -34,8 +37,8 @@ class _AddDownloadTaskState extends State<AddDownloadTask> {
         saveFolder = res['data']['default_destination'];
       });
     } else {
-      Util.instance.vibrate(FeedbackType.warning);
-      Util.instance.toast("获取默认保存位置失败");
+      UiUtil.vibrate(FeedbackType.warning);
+      UiUtil.toast("获取默认保存位置失败");
     }
   }
 
@@ -44,10 +47,10 @@ class _AddDownloadTaskState extends State<AddDownloadTask> {
     return Scaffold(
       appBar: AppBar(
         leading: AppBackButton(context),
-        title: Text("创建下载任务"),
+        title: const Text("创建下载任务"),
       ),
       body: ListView(
-        padding: EdgeInsets.all(20),
+        padding: const EdgeInsets.all(20),
         children: [
           OutlinedButton(
             onPressed: () {
@@ -55,7 +58,7 @@ class _AddDownloadTaskState extends State<AddDownloadTask> {
               showCupertinoModalPopup(
                 context: context,
                 builder: (context) {
-                  return SelectFolder(
+                  return const SelectFolder(
                     multi: false,
                   );
                 },
@@ -73,7 +76,7 @@ class _AddDownloadTaskState extends State<AddDownloadTask> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
+                      const Text(
                         "保存位置",
                         style: TextStyle(fontSize: 12),
                       ),
@@ -81,7 +84,8 @@ class _AddDownloadTaskState extends State<AddDownloadTask> {
                         height: 20,
                         child: Text(
                           saveFolder == "" ? "选择保存位置" : saveFolder,
-                          style: TextStyle(fontSize: 16, color: Colors.grey),
+                          style:
+                              const TextStyle(fontSize: 16, color: Colors.grey),
                         ),
                       ),
                     ],
@@ -90,35 +94,36 @@ class _AddDownloadTaskState extends State<AddDownloadTask> {
               ],
             ),
           ),
-          SizedBox(
+          const SizedBox(
             height: 20,
           ),
           Card(
             shape: RoundedRectangleBorder(
-                side: BorderSide(), borderRadius: BorderRadius.circular(18)),
+                side: const BorderSide(),
+                borderRadius: BorderRadius.circular(18)),
             child: Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding: const EdgeInsets.all(AppConstants.paddingSmall),
               child: TextField(
                 onChanged: (v) => url = v,
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   border: InputBorder.none,
                   labelText: '下载链接',
                 ),
               ),
             ),
           ),
-          SizedBox(
+          const SizedBox(
             height: 20,
           ),
           OutlinedButton(
             onPressed: () async {
               FocusScope.of(context).unfocus();
-              FilePickerResult? _pickedFile =
+              FilePickerResult? pickedFile =
                   await FilePicker.platform.pickFiles();
-              if (_pickedFile != null && _pickedFile.count > 0) {
-                String? path = _pickedFile.paths[0];
+              if (pickedFile != null && pickedFile.count > 0) {
+                String? path = pickedFile.paths[0];
                 if (path == null) {
-                  Util.instance.toast('文件路径为空!');
+                  UiUtil.toast('文件路径为空!');
                   return;
                 }
                 String ext = path.split(".").last;
@@ -127,7 +132,7 @@ class _AddDownloadTaskState extends State<AddDownloadTask> {
                     torrentPath = path;
                   });
                 } else {
-                  Util.instance.toast("无效的种子文件");
+                  UiUtil.toast("无效的种子文件");
                 }
               }
             },
@@ -137,14 +142,15 @@ class _AddDownloadTaskState extends State<AddDownloadTask> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
+                      const Text(
                         "种子文件",
                         style: TextStyle(fontSize: 12),
                       ),
                       Text(
                         torrentPath == "" ? "选择种子文件" : torrentPath,
                         maxLines: null,
-                        style: TextStyle(fontSize: 16, color: Colors.grey),
+                        style:
+                            const TextStyle(fontSize: 16, color: Colors.grey),
                       ),
                     ],
                   ),
@@ -152,48 +158,55 @@ class _AddDownloadTaskState extends State<AddDownloadTask> {
               ],
             ),
           ),
-          SizedBox(
+          const SizedBox(
             height: 20,
           ),
           OutlinedButton(
             onPressed: () async {
               if (saveFolder == "") {
-                Util.instance.toast("请选择保存位置");
-                Util.instance.vibrate(FeedbackType.impact);
+                UiUtil.toast("请选择保存位置");
+                UiUtil.vibrate(FeedbackType.impact);
                 return;
               }
               if (url.trim() == "" && torrentPath == "") {
-                Util.instance.toast("请输入下载链接或选择种子文件");
+                UiUtil.toast("请输入下载链接或选择种子文件");
                 return;
               }
-              var res;
+              Map<dynamic, dynamic>? res;
               if (torrentPath != "") {
                 res = await Api.downloadTaskCreate(saveFolder, "file",
                     filePath: torrentPath);
-                if (res['success']) {
-                  Navigator.of(context)
-                      .push(CupertinoPageRoute(builder: (context) {
-                    return SelectFile(res['data']['list_id'], saveFolder);
-                  }));
+                if (res == null || res.containsKey("success") == false) {
+                  UiUtil.toast(
+                      "创建任务失败，code：${res?.getMap("error")?.getOrNull("code")}");
                 } else {
-                  Util.instance.toast("创建任务失败，code：${res['error']['code']}");
+                  if (context.mounted) {
+                    Navigator.of(context)
+                        .push(CupertinoPageRoute(builder: (context) {
+                      return SelectFile(res!['data']['list_id'], saveFolder);
+                    }));
+                  }
                 }
               } else {
                 if (url.trim() == "") {
-                  Util.instance.toast("请输入下载链接");
-                  Util.instance.vibrate(FeedbackType.light);
+                  UiUtil.toast("请输入下载链接");
+                  UiUtil.vibrate(FeedbackType.light);
                   return;
                 }
                 res = await Api.downloadTaskCreate(saveFolder, "url", url: url);
-                if (res['success']) {
-                  Util.instance.toast("创建任务成功");
-                  Navigator.of(context).pop(true);
+                if (res == null || res.containsKey("success") == false) {
+                  UiUtil.toast(
+                      "创建任务失败，code：${res?.getMap("error")?.getOrNull("code")}");
                 } else {
-                  Util.instance.toast("创建任务失败，code：${res['error']['code']}");
+                  UiUtil.toast("创建任务成功");
+                  if (context.mounted) {
+                    // ignore: use_build_context_synchronously
+                    Navigator.of(context).pop();
+                  }
                 }
               }
             },
-            child: Text(
+            child: const Text(
               ' 创建 ',
               style: TextStyle(fontSize: 18),
             ),

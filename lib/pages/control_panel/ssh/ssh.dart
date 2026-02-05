@@ -1,20 +1,25 @@
-import 'package:garden/util/function.dart';
+import 'package:garden/util/http_util.dart';
+import 'package:garden/util/ui_util.dart';
 import 'package:garden/widgets/bubble_tab_indicator.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:garden/constants/app_constants.dart';
+import 'package:garden/theme/app_colors.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_vibrate/flutter_vibrate.dart';
 
 class SshSetting extends StatefulWidget {
+  const SshSetting({super.key});
+
   @override
-  _SshSettingState createState() => _SshSettingState();
+  SshSettingState createState() => SshSettingState();
 }
 
-class _SshSettingState extends State<SshSetting>
+class SshSettingState extends State<SshSetting>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
-  TextEditingController _portController = TextEditingController();
+  final TextEditingController _portController = TextEditingController();
   bool loading = true;
   bool ssh = false;
   bool telnet = false;
@@ -38,8 +43,11 @@ class _SshSettingState extends State<SshSetting>
         _portController.value = TextEditingValue(text: sshPort);
       });
     } else {
-      Util.instance.toast("获取失败，code：${res['error']['code']}");
-      Navigator.of(context).pop();
+      UiUtil.toast("获取失败，code：${res['error']['code']}");
+      if (context.mounted) {
+        // ignore: use_build_context_synchronously
+        Navigator.of(context).pop();
+      }
     }
   }
 
@@ -48,10 +56,10 @@ class _SshSettingState extends State<SshSetting>
     return Scaffold(
       appBar: AppBar(
         leading: AppBackButton(context),
-        title: Text("终端机和SNMP"),
+        title: const Text("终端机和SNMP"),
       ),
       body: loading
-          ? Center(
+          ? const Center(
               child: CupertinoActivityIndicator(
                 radius: 14,
               ),
@@ -60,9 +68,10 @@ class _SshSettingState extends State<SshSetting>
               children: [
                 Card(
                   shape: RoundedRectangleBorder(
-                      side: BorderSide(),
+                      side: const BorderSide(),
                       borderRadius: BorderRadius.circular(18)),
-                  margin: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                  margin:
+                      const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
                   child: TabBar(
                     dividerHeight: 0,
                     isScrollable: false,
@@ -72,8 +81,8 @@ class _SshSettingState extends State<SshSetting>
                         ? Colors.white
                         : Colors.black,
                     unselectedLabelColor: Colors.grey,
-                    indicator: BubbleTabIndicator(),
-                    tabs: [
+                    indicator: const BubbleTabIndicator(),
+                    tabs: const [
                       Padding(
                         padding:
                             EdgeInsets.symmetric(vertical: 10, horizontal: 5),
@@ -92,7 +101,7 @@ class _SshSettingState extends State<SshSetting>
                     controller: _tabController,
                     children: [
                       ListView(
-                        padding: EdgeInsets.all(20),
+                        padding: const EdgeInsets.all(20),
                         children: [
                           GestureDetector(
                             onTap: () {
@@ -102,28 +111,28 @@ class _SshSettingState extends State<SshSetting>
                             },
                             child: Card(
                               shape: RoundedRectangleBorder(
-                                  side: BorderSide(),
+                                  side: const BorderSide(),
                                   borderRadius: BorderRadius.circular(18)),
                               child: Padding(
-                                padding: EdgeInsets.all(20),
+                                padding: const EdgeInsets.all(20),
                                 child: Row(
                                   children: [
-                                    Text(
+                                    const Text(
                                       "启动Telnet功能",
                                       style: TextStyle(fontSize: 16),
                                     ),
-                                    Spacer(),
+                                    const Spacer(),
                                     if (telnet)
-                                      Icon(
+                                      const Icon(
                                         CupertinoIcons.checkmark_alt,
-                                        color: Color(0xffff9813),
+                                        color: AppColors.primaryAction,
                                       ),
                                   ],
                                 ),
                               ),
                             ),
                           ),
-                          SizedBox(
+                          const SizedBox(
                             height: 20,
                           ),
                           GestureDetector(
@@ -134,36 +143,37 @@ class _SshSettingState extends State<SshSetting>
                             },
                             child: Card(
                               shape: RoundedRectangleBorder(
-                                  side: BorderSide(),
+                                  side: const BorderSide(),
                                   borderRadius: BorderRadius.circular(18)),
                               child: Padding(
-                                padding: EdgeInsets.all(20),
+                                padding: const EdgeInsets.all(20),
                                 child: Row(
                                   children: [
-                                    Text(
+                                    const Text(
                                       "启动SSH功能",
                                       style: TextStyle(fontSize: 16),
                                     ),
-                                    Spacer(),
+                                    const Spacer(),
                                     if (ssh)
-                                      Icon(
+                                      const Icon(
                                         CupertinoIcons.checkmark_alt,
-                                        color: Color(0xffff9813),
+                                        color: AppColors.primaryAction,
                                       ),
                                   ],
                                 ),
                               ),
                             ),
                           ),
-                          SizedBox(
+                          const SizedBox(
                             height: 20,
                           ),
                           Card(
                             shape: RoundedRectangleBorder(
-                                side: BorderSide(),
+                                side: const BorderSide(),
                                 borderRadius: BorderRadius.circular(18)),
                             child: Padding(
-                              padding: const EdgeInsets.all(8.0),
+                              padding: const EdgeInsets.all(
+                                  AppConstants.paddingSmall),
                               child: TextField(
                                 controller: _portController,
                                 keyboardType: TextInputType.number,
@@ -171,14 +181,14 @@ class _SshSettingState extends State<SshSetting>
                                 inputFormatters: [
                                   FilteringTextInputFormatter.digitsOnly,
                                 ],
-                                decoration: InputDecoration(
+                                decoration: const InputDecoration(
                                   border: InputBorder.none,
                                   labelText: 'SSH端口',
                                 ),
                               ),
                             ),
                           ),
-                          SizedBox(
+                          const SizedBox(
                             height: 20,
                           ),
                           OutlinedButton(
@@ -186,22 +196,22 @@ class _SshSettingState extends State<SshSetting>
                               var res =
                                   await Api.setTerminal(ssh, telnet, sshPort);
                               if (res['success']) {
-                                Util.instance.vibrate(FeedbackType.light);
-                                Util.instance.toast("应用成功");
+                                UiUtil.vibrate(FeedbackType.light);
+                                UiUtil.toast("应用成功");
                               } else {
-                                Util.instance.vibrate(FeedbackType.warning);
-                                Util.instance
+                                UiUtil.vibrate(FeedbackType.warning);
+                                HttpUtil.instance
                                     .toast("应用失败，code：${res['error']['code']}");
                               }
                             },
-                            child: Text(
+                            child: const Text(
                               ' 应用 ',
                               style: TextStyle(fontSize: 18),
                             ),
                           ),
                         ],
                       ),
-                      Center(
+                      const Center(
                         child: Text("暂未开发"),
                       ),
                     ],

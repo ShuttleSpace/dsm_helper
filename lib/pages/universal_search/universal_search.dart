@@ -2,19 +2,21 @@ import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/material.dart';
 
 class UniversalSearch extends StatefulWidget {
+  const UniversalSearch({super.key});
+
   @override
-  _UniversalSearchState createState() => _UniversalSearchState();
+  UniversalSearchState createState() => UniversalSearchState();
 }
 
-class _UniversalSearchState extends State<UniversalSearch> {
+class UniversalSearchState extends State<UniversalSearch> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         leading: AppBackButton(context),
-        title: Text("Universal Search"),
+        title: const Text("Universal Search"),
       ),
-      body: Center(
+      body: const Center(
         child: Text("待开发"),
       ),
     );

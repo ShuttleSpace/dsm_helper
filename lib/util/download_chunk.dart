@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:typed_data';
 import 'package:dio/dio.dart';
+import 'package:garden/util/log.dart';
 
 class DioDownload {
   final downloadDio = Dio();
@@ -18,15 +19,15 @@ class DioDownload {
     void Function()? done,
     void Function(Exception)? failed,
   }) async {
-    savePath = savePath + ".dsdownloading";
-    print("保存目录：${savePath}");
+    savePath = "$savePath.dsdownloading";
+    Log.info("保存目录：$savePath");
     int downloadStart = 0;
     File f = File(savePath);
     if (await f.exists()) {
       // 文件存在时拿到已下载的字节数
       downloadStart = f.lengthSync();
     }
-    print("start: $downloadStart");
+    Log.info("start: $downloadStart");
     try {
       var response = await downloadDio.get<ResponseBody>(
         url,
@@ -73,7 +74,7 @@ class DioDownload {
       });
     } on DioException catch (error) {
       if (CancelToken.isCancel(error)) {
-        print("Download cancelled");
+        Log.info("Download cancelled");
       } else {
         failed?.call(error);
       }

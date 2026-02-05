@@ -1,5 +1,5 @@
-import 'package:garden/themes/app_theme.dart';
-import 'package:garden/util/function.dart';
+import 'package:garden/util/http_util.dart';
+import 'package:garden/stores/connection_store.dart';
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -12,8 +12,9 @@ class CupertinoExtendedImage extends StatelessWidget {
   final BoxShape? boxShape;
   final BorderRadius? borderRadius;
   final Widget? placeholder;
-  CupertinoExtendedImage(
+  const CupertinoExtendedImage(
     this.url, {
+    super.key,
     this.fit,
     this.width,
     this.height,
@@ -80,7 +81,8 @@ class CupertinoCircleAvatar extends StatelessWidget {
   final double fontSize;
   final double size;
   final Color? foregroundColor;
-  CupertinoCircleAvatar({
+  const CupertinoCircleAvatar({
+    super.key,
     required this.url,
     Color? backgroundColor,
     this.size = 30,
@@ -103,13 +105,13 @@ class CupertinoCircleAvatar extends StatelessWidget {
             child: Text(
               text,
               style: TextStyle(
-                fontSize: fontSize, 
-                color: foregroundColor ?? Theme.of(context).colorScheme.surface
-              ),
+                  fontSize: fontSize,
+                  color:
+                      foregroundColor ?? Theme.of(context).colorScheme.surface),
             ),
           )
         : CupertinoExtendedImage(
-            Util.instance.baseUrl + url,
+            connectionStore.baseUrl + url,
             width: size,
             height: size,
             fit: BoxFit.contain,

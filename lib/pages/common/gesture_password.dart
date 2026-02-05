@@ -1,19 +1,20 @@
-import 'package:garden/util/function.dart';
+import 'package:garden/util/ui_util.dart';
+import 'package:garden/util/storage_util.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/material.dart';
 import 'package:gesture_password_widget/gesture_password_widget.dart';
 import 'package:flutter_vibrate/flutter_vibrate.dart';
 
 class GesturePasswordPage extends StatefulWidget {
-  GesturePasswordPage({this.title});
+  const GesturePasswordPage({super.key, this.title});
 
   final String? title;
 
   @override
-  _GesturePasswordPageState createState() => new _GesturePasswordPageState();
+  GesturePasswordPageState createState() => GesturePasswordPageState();
 }
 
-class _GesturePasswordPageState extends State<GesturePasswordPage> {
+class GesturePasswordPageState extends State<GesturePasswordPage> {
   int step = 1;
   String newPassword = "";
 
@@ -28,14 +29,14 @@ class _GesturePasswordPageState extends State<GesturePasswordPage> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
-            SizedBox(
+            const SizedBox(
               height: 40,
             ),
             Text(
               step == 1 ? "请绘制图案" : "请再绘制一遍",
-              style: TextStyle(fontSize: 26),
+              style: const TextStyle(fontSize: 26),
             ),
-            SizedBox(
+            const SizedBox(
               height: 80,
             ),
             Center(
@@ -47,19 +48,19 @@ class _GesturePasswordPageState extends State<GesturePasswordPage> {
                 minLength: 4,
                 onComplete: (s) {
                   if (step == 1) {
-                    Util.instance.vibrate(FeedbackType.light);
+                    UiUtil.vibrate(FeedbackType.light);
                     setState(() {
                       newPassword = s.join('');
                       step = 2;
                     });
                   } else if (step == 2) {
-                    if (s == newPassword) {
-                      Util.instance.vibrate(FeedbackType.success);
-                      Util.instance.setStorage("gesture_password", s.join(''));
+                    if (s.join('') == newPassword) {
+                      UiUtil.vibrate(FeedbackType.success);
+                      StorageUtil.setString("gesture_password", s.join(''));
                       Navigator.of(context).pop(true);
                     } else {
-                      Util.instance.toast("两次图案不一致，请重新设置");
-                      Util.instance.vibrate(FeedbackType.warning);
+                      UiUtil.toast("两次图案不一致，请重新设置");
+                      UiUtil.vibrate(FeedbackType.warning);
                       setState(() {
                         step = 1;
                         newPassword = "";
@@ -68,8 +69,8 @@ class _GesturePasswordPageState extends State<GesturePasswordPage> {
                   }
                 },
                 // failCallback: () {
-                //   Util.toast("至少连接4个点");
-                //   Util.vibrate(FeedbackType.warning);
+                //   HttpUtil.toast("至少连接4个点");
+                //   HttpUtil.vibrate(FeedbackType.warning);
                 //   miniGesturePassword.currentState?.setSelected('');
                 // },
                 // selectedCallback: (str) {

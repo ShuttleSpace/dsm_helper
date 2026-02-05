@@ -1,14 +1,17 @@
-import 'package:garden/util/function.dart';
+import 'package:garden/util/http_util.dart';
+import 'package:garden/util/ui_util.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class Reward extends StatefulWidget {
+  const Reward({super.key});
+
   @override
-  _RewardState createState() => _RewardState();
+  RewardState createState() => RewardState();
 }
 
-class _RewardState extends State<Reward> {
+class RewardState extends State<Reward> {
   bool loading = true;
   List rewards = [];
   @override
@@ -25,15 +28,18 @@ class _RewardState extends State<Reward> {
         rewards = res['data'];
       });
     } else {
-      Util.instance.toast("获取列表失败");
-      Navigator.of(context).pop();
+      UiUtil.toast("获取列表失败");
+      if (context.mounted) {
+        // ignore: use_build_context_synchronously
+        Navigator.of(context).pop();
+      }
     }
   }
 
   Widget _buildRewardItem(reward) {
     return Card(
       shape: RoundedRectangleBorder(
-          side: BorderSide(), borderRadius: BorderRadius.circular(18)),
+          side: const BorderSide(), borderRadius: BorderRadius.circular(18)),
       child: Row(
         children: [
           Expanded(child: Text(reward['name'])),
@@ -48,22 +54,22 @@ class _RewardState extends State<Reward> {
     return Scaffold(
       appBar: AppBar(
         leading: AppBackButton(context),
-        title: Text("打赏名单"),
+        title: const Text("打赏名单"),
       ),
       body: loading
-          ? Center(
+          ? const Center(
               child: CupertinoActivityIndicator(
                 radius: 14,
               ),
             )
           : ListView.separated(
-              padding: EdgeInsets.all(20),
+              padding: const EdgeInsets.all(20),
               itemBuilder: (context, i) {
                 return _buildRewardItem(rewards[i]);
               },
               itemCount: rewards.length,
               separatorBuilder: (context, i) {
-                return SizedBox(
+                return const SizedBox(
                   height: 20,
                 );
               },

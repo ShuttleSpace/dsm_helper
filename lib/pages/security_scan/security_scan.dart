@@ -1,18 +1,22 @@
 import 'package:garden/pages/security_scan/result_card.dart';
-import 'package:garden/util/function.dart';
+import 'package:garden/stores/connection_store.dart';
+import 'package:garden/util/http_util.dart';
 import 'package:garden/util/strings.dart';
 import 'package:garden/widgets/bubble_tab_indicator.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:garden/constants/app_constants.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 
 class SecurityScan extends StatefulWidget {
+  const SecurityScan({super.key});
+
   @override
-  _SecurityScanState createState() => _SecurityScanState();
+  SecurityScanState createState() => SecurityScanState();
 }
 
-class _SecurityScanState extends State<SecurityScan>
+class SecurityScanState extends State<SecurityScan>
     with SingleTickerProviderStateMixin {
   Map colors = {
     "safe": Colors.green,
@@ -74,10 +78,10 @@ class _SecurityScanState extends State<SecurityScan>
         ruleItems = rule['data']['items'];
         ruleItems.removeWhere((key, value) => value['status'] == "skip");
         rules = ruleItems.values.toList();
-        rules.forEach((element) {
+        for (var element in rules) {
           element['severity'] = severities[element['severity']];
           element['status'] = status[element['status']];
-        });
+        }
         rules.sort((v1, v2) {
           try {
             if (v1['status'] > v2['status']) {
@@ -120,13 +124,13 @@ class _SecurityScanState extends State<SecurityScan>
       return webManagerStrings['rules'][
           "${strId}_desc_${status == 2 ? "good" : status == 0 ? "running" : "bad"}"];
     } else {
-      if (Util.instance.strings['SYNO.SDS.SecurityScan.Instance'] != null &&
-          Util.instance.strings['SYNO.SDS.SecurityScan.Instance']['rules'] !=
+      if (connectionStore.strings['SYNO.SDS.SecurityScan.Instance'] != null &&
+          connectionStore.strings['SYNO.SDS.SecurityScan.Instance']['rules'] !=
               null) {
-        return (Util.instance.strings['SYNO.SDS.SecurityScan.Instance']['rules']
-                [
+        return (connectionStore.strings['SYNO.SDS.SecurityScan.Instance']
+                    ['rules'][
                 "${strId}_desc_${status == 2 ? "good" : status == 0 ? "running" : "bad"}"] ??
-            "$strId");
+            strId);
       } else {
         return strId;
       }
@@ -136,27 +140,27 @@ class _SecurityScanState extends State<SecurityScan>
   List<Widget> _buildItemList() {
     List<Widget> list = [];
 
-    rules.forEach((value) {
+    for (var value in rules) {
       value['strId'] = value['strId'].replaceAll("_v2", "");
       list.add(Card(
         shape: RoundedRectangleBorder(
-            side: BorderSide(), borderRadius: BorderRadius.circular(18)),
-        margin: EdgeInsets.only(bottom: 20),
+            side: const BorderSide(), borderRadius: BorderRadius.circular(18)),
+        margin: const EdgeInsets.only(bottom: 20),
         child: Padding(
-          padding: const EdgeInsets.all(20.0),
+          padding: const EdgeInsets.all(AppConstants.paddingLarge),
           child: Row(
             children: [
               Expanded(
                 child: Text(getTitle(value['strId'], value['status'])),
               ),
               value['status'] == 2
-                  ? Icon(
+                  ? const Icon(
                       Icons.check_circle,
                       color: Colors.green,
                     )
                   : value['status'] == 0
-                      ? CupertinoActivityIndicator()
-                      : Icon(
+                      ? const CupertinoActivityIndicator()
+                      : const Icon(
                           Icons.info,
                           color: Colors.red,
                         ),
@@ -164,7 +168,7 @@ class _SecurityScanState extends State<SecurityScan>
           ),
         ),
       ));
-    });
+    }
     return list;
   }
 
@@ -173,10 +177,10 @@ class _SecurityScanState extends State<SecurityScan>
     return Scaffold(
       appBar: AppBar(
         leading: AppBackButton(context),
-        title: Text("安全顾问"),
+        title: const Text("安全顾问"),
       ),
       body: loading
-          ? Center(
+          ? const Center(
               child: CupertinoActivityIndicator(
                 radius: 14,
               ),
@@ -185,9 +189,10 @@ class _SecurityScanState extends State<SecurityScan>
               children: [
                 Card(
                   shape: RoundedRectangleBorder(
-                      side: BorderSide(),
+                      side: const BorderSide(),
                       borderRadius: BorderRadius.circular(18)),
-                  margin: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                  margin:
+                      const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
                   child: TabBar(
                     dividerHeight: 0,
                     isScrollable: true,
@@ -197,8 +202,8 @@ class _SecurityScanState extends State<SecurityScan>
                         ? Colors.white
                         : Colors.black,
                     unselectedLabelColor: Colors.grey,
-                    indicator: BubbleTabIndicator(),
-                    tabs: [
+                    indicator: const BubbleTabIndicator(),
+                    tabs: const [
                       Padding(
                         padding:
                             EdgeInsets.symmetric(vertical: 10, horizontal: 5),
@@ -227,14 +232,14 @@ class _SecurityScanState extends State<SecurityScan>
                     controller: _tabController,
                     children: [
                       ListView(
-                        padding: EdgeInsets.all(20),
+                        padding: const EdgeInsets.all(20),
                         children: [
                           Card(
                             shape: RoundedRectangleBorder(
-                                side: BorderSide(),
+                                side: const BorderSide(),
                                 borderRadius: BorderRadius.circular(18)),
                             child: Padding(
-                              padding: EdgeInsets.all(20),
+                              padding: const EdgeInsets.all(20),
                               child: Row(
                                 children: [
                                   sysStatus == "running"
@@ -273,7 +278,7 @@ class _SecurityScanState extends State<SecurityScan>
                                           color: colors[sysStatus],
                                           size: 70,
                                         ),
-                                  SizedBox(
+                                  const SizedBox(
                                     width: 10,
                                   ),
                                   Column(
@@ -292,17 +297,17 @@ class _SecurityScanState extends State<SecurityScan>
                                         texts[sysStatus] != null
                                             ? texts[sysStatus]['content']
                                             : "未知状态",
-                                        style: TextStyle(fontSize: 14),
+                                        style: const TextStyle(fontSize: 14),
                                       ),
                                       if (lastScanTime.isNotBlank)
                                         Text(
                                           "上次扫描：${DateTime.fromMillisecondsSinceEpoch(int.parse(lastScanTime) * 1000).timeAgo}",
-                                          style: TextStyle(fontSize: 14),
+                                          style: const TextStyle(fontSize: 14),
                                         )
                                       else
                                         Text(
-                                          "已运行：${Util.instance.timeRemaining(DateTime.now().secondsSinceEpoch - int.parse(startTime))}",
-                                          style: TextStyle(fontSize: 14),
+                                          "已运行：${HttpUtil.instance.timeRemaining(DateTime.now().secondsSinceEpoch - int.parse(startTime))}",
+                                          style: const TextStyle(fontSize: 14),
                                         ),
                                     ],
                                   )
@@ -310,7 +315,7 @@ class _SecurityScanState extends State<SecurityScan>
                               ),
                             ),
                           ),
-                          SizedBox(
+                          const SizedBox(
                             height: 20,
                           ),
                           ResultCard(systemItems['malware']),
@@ -321,13 +326,13 @@ class _SecurityScanState extends State<SecurityScan>
                         ],
                       ),
                       ListView(
-                        padding: EdgeInsets.all(20),
+                        padding: const EdgeInsets.all(20),
                         children: _buildItemList(),
                       ),
-                      Center(
+                      const Center(
                         child: Text("待开发"),
                       ),
-                      Center(
+                      const Center(
                         child: Text("待开发"),
                       ),
                     ],

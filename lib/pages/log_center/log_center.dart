@@ -1,16 +1,20 @@
-import 'package:garden/util/function.dart';
+import 'package:garden/util/http_util.dart';
 import 'package:garden/widgets/bubble_tab_indicator.dart';
-import 'package:garden/widgets/label.dart';
+import 'package:garden/widgets/log_center/log_item.dart';
+import 'package:garden/widgets/log_center/log_level_filter.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:garden/constants/app_constants.dart';
 
 class LogCenter extends StatefulWidget {
+  const LogCenter({super.key});
+
   @override
-  _LogCenterState createState() => _LogCenterState();
+  LogCenterState createState() => LogCenterState();
 }
 
-class _LogCenterState extends State<LogCenter>
+class LogCenterState extends State<LogCenter>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
   List lastLogs = [];
@@ -78,203 +82,22 @@ class _LogCenterState extends State<LogCenter>
     }
   }
 
-  Widget _buildRecentLogItem(log) {
-    return Card(
-      shape: RoundedRectangleBorder(
-          side: BorderSide(), borderRadius: BorderRadius.circular(18)),
-      child: Padding(
-        padding: EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Label(log['prio'] == "info" ? "信息" : log['prio'],
-                    log['prio'] == "info" ? Colors.green : Colors.red),
-                SizedBox(
-                  width: 5,
-                ),
-                Text(
-                  log['fac'],
-                  style: TextStyle(fontSize: 16),
-                ),
-                SizedBox(
-                  width: 10,
-                ),
-                Expanded(
-                  child: Text(
-                    "${log['ldate']}${log['ltime']}",
-                    textAlign: TextAlign.right,
-                    style: TextStyle(color: Colors.grey),
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(
-              height: 10,
-            ),
-            Text("${log['msg'].trim()}"),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildHistoryItem(log) {
-    return Card(
-      shape: RoundedRectangleBorder(
-          side: BorderSide(), borderRadius: BorderRadius.circular(18)),
-      child: Padding(
-        padding: EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Label(log['level'] == 0 ? "信息" : "${log['level']}",
-                    log['level'] == 0 ? Colors.green : Colors.red),
-                SizedBox(
-                  width: 5,
-                ),
-                Text(
-                  log['user'],
-                  style: TextStyle(fontSize: 16),
-                ),
-                SizedBox(
-                  width: 10,
-                ),
-                Expanded(
-                  child: Text(
-                    "${log['time']}",
-                    textAlign: TextAlign.right,
-                    style: TextStyle(color: Colors.grey),
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(
-              height: 10,
-            ),
-            Text("${log['event'].trim()}"),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildLogItem(log) {
-    return Card(
-      shape: RoundedRectangleBorder(
-          side: BorderSide(), borderRadius: BorderRadius.circular(18)),
-      child: Padding(
-        padding: EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Label(
-                    log['level'] == "info"
-                        ? "信息"
-                        : log['level'] == "warn"
-                            ? "警告"
-                            : log['level'] == "error"
-                                ? "错误"
-                                : log['level'],
-                    log['level'] == "info"
-                        ? Colors.green
-                        : log['level'] == "warn"
-                            ? Colors.orange
-                            : log['level'] == "error"
-                                ? Colors.red
-                                : Colors.red),
-                SizedBox(
-                  width: 5,
-                ),
-                Label(log['logtype'], Colors.lightBlueAccent),
-                SizedBox(
-                  width: 5,
-                ),
-                Text(
-                  log['who'],
-                  style: TextStyle(fontSize: 16),
-                ),
-                SizedBox(
-                  width: 10,
-                ),
-                Expanded(
-                  child: Text(
-                    "${log['time']}",
-                    textAlign: TextAlign.right,
-                    style: TextStyle(color: Colors.grey),
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(
-              height: 10,
-            ),
-            Text("${log['descr'].trim()}"),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildLogLevelFilter(
-      int count, String type, IconData icondata, Color color) {
-    return InkWell(
-      onTap: () {
-        setState(() {
-          if (logsDisplayLevel == type) {
-            logsDisplayLevel = '';
-          } else {
-            logsDisplayLevel = type;
-          }
-          logsDisplay
-            ..clear()
-            ..addAll(logs.takeWhile((t) => t['level'] == type));
-        });
-      },
-      child: ColorFiltered(
-        colorFilter: logsDisplayLevel == type
-            ? ColorFilter.mode(Colors.transparent, BlendMode.multiply)
-            : ColorFilter.mode(Colors.grey[100]!, BlendMode.saturation),
-        child: Row(
-          children: [
-            Icon(
-              icondata,
-              color: color,
-              size: 20,
-            ),
-            SizedBox(
-              width: 5,
-            ),
-            Text("$count"),
-            SizedBox(
-              width: 5,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         leading: AppBackButton(context),
-        title: Text("日志中心"),
+        title: const Text("日志中心"),
       ),
       body: Column(
         children: [
           Card(
             shape: RoundedRectangleBorder(
-                side: BorderSide(), borderRadius: BorderRadius.circular(18)),
-            margin: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                side: const BorderSide(),
+                borderRadius: BorderRadius.circular(18)),
+            margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
             child: Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding: const EdgeInsets.all(AppConstants.paddingSmall),
               child: TabBar(
                 dividerHeight: 0,
                 isScrollable: true,
@@ -286,10 +109,10 @@ class _LogCenterState extends State<LogCenter>
                 unselectedLabelColor: Colors.grey,
                 indicator: BubbleTabIndicator(
                   indicatorColor: Theme.of(context).scaffoldBackgroundColor,
-                  shadowColor: Util.getAdjustColor(
+                  shadowColor: HttpUtil.getAdjustColor(
                       Theme.of(context).scaffoldBackgroundColor, -20),
                 ),
-                tabs: [
+                tabs: const [
                   Padding(
                     padding: EdgeInsets.symmetric(vertical: 10, horizontal: 5),
                     child: Text("概述"),
@@ -327,14 +150,14 @@ class _LogCenterState extends State<LogCenter>
               controller: _tabController,
               children: [
                 loadingRecent
-                    ? Center(
+                    ? const Center(
                         child: CupertinoActivityIndicator(
                           radius: 14,
                         ),
                       )
                     : Column(
                         children: [
-                          SizedBox(
+                          const SizedBox(
                             height: 20,
                           ),
                           Expanded(
@@ -343,13 +166,15 @@ class _LogCenterState extends State<LogCenter>
                                 return getData(start: lastLogs.length);
                               },
                               child: ListView.separated(
-                                padding: EdgeInsets.symmetric(horizontal: 20),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: AppConstants.paddingLarge),
                                 itemBuilder: (context, i) {
-                                  return _buildRecentLogItem(lastLogs[i]);
+                                  return LogItem(
+                                      log: lastLogs[i], logType: 'recent');
                                 },
                                 itemCount: lastLogs.length,
                                 separatorBuilder: (context, i) {
-                                  return SizedBox(
+                                  return const SizedBox(
                                     height: 20,
                                   );
                                 },
@@ -359,36 +184,93 @@ class _LogCenterState extends State<LogCenter>
                         ],
                       ),
                 loadingLogs
-                    ? Center(
+                    ? const Center(
                         child: CupertinoActivityIndicator(
                           radius: 14,
                         ),
                       )
                     : Column(
                         children: [
-                          SizedBox(
+                          const SizedBox(
                             height: 20,
                           ),
                           Card(
                             shape: RoundedRectangleBorder(
-                                side: BorderSide(),
+                                side: const BorderSide(),
                                 borderRadius: BorderRadius.circular(18)),
-                            margin: EdgeInsets.symmetric(horizontal: 20),
+                            margin: const EdgeInsets.symmetric(
+                                horizontal: AppConstants.paddingLarge),
                             child: Padding(
-                              padding: const EdgeInsets.all(8.0),
+                              padding: const EdgeInsets.all(
+                                  AppConstants.paddingSmall),
                               child: Row(
                                 children: [
-                                  _buildLogLevelFilter(infoCount, 'info',
-                                      Icons.info, Colors.lightBlueAccent),
-                                  _buildLogLevelFilter(warnCount, 'warning',
-                                      Icons.warning, Colors.orange),
-                                  _buildLogLevelFilter(errorCount, 'error',
-                                      Icons.cancel, Colors.red),
+                                  LogLevelFilter(
+                                    count: infoCount,
+                                    type: 'info',
+                                    iconData: Icons.info,
+                                    color: Colors.lightBlueAccent,
+                                    isActive: logsDisplayLevel == 'info',
+                                    onTap: () {
+                                      setState(() {
+                                        if (logsDisplayLevel == 'info') {
+                                          logsDisplayLevel = '';
+                                        } else {
+                                          logsDisplayLevel = 'info';
+                                        }
+                                        logsDisplay
+                                          ..clear()
+                                          ..addAll(logs.takeWhile(
+                                              (t) => t['level'] == 'info'));
+                                      });
+                                    },
+                                  ),
+                                  LogLevelFilter(
+                                    count: warnCount,
+                                    type: 'warning',
+                                    iconData: Icons.warning,
+                                    color: Colors.orange,
+                                    isActive: logsDisplayLevel == 'warning',
+                                    onTap: () {
+                                      setState(() {
+                                        if (logsDisplayLevel == 'warning') {
+                                          logsDisplayLevel = '';
+                                        } else {
+                                          logsDisplayLevel = 'warning';
+                                        }
+                                        logsDisplay
+                                          ..clear()
+                                          ..addAll(logs.takeWhile(
+                                              (t) => t['level'] == 'warning'));
+                                      });
+                                    },
+                                  ),
+                                  LogLevelFilter(
+                                    count: errorCount,
+                                    type: 'error',
+                                    iconData: Icons.cancel,
+                                    color: Colors.red,
+                                    isActive: logsDisplayLevel == 'error',
+                                    onTap: () {
+                                      setState(() {
+                                        if (logsDisplayLevel == 'error') {
+                                          logsDisplayLevel = '';
+                                        } else {
+                                          logsDisplayLevel = 'error';
+                                        }
+                                        logsDisplay
+                                          ..clear()
+                                          ..addAll(logs.takeWhile(
+                                              (t) => t['level'] == 'error'));
+                                      });
+                                    },
+                                  ),
                                   Expanded(
                                       child: Padding(
-                                    padding: const EdgeInsets.all(8.0),
+                                    padding: const EdgeInsets.all(
+                                        AppConstants.paddingSmall),
                                     child: TextField(
-                                      style: TextStyle(
+                                      style: const TextStyle(
                                         fontSize: 12,
                                       ),
                                       onChanged: (value) {
@@ -399,7 +281,7 @@ class _LogCenterState extends State<LogCenter>
                                                 t['descr'].contains(value)));
                                         });
                                       },
-                                      decoration: InputDecoration(
+                                      decoration: const InputDecoration(
                                           contentPadding:
                                               EdgeInsets.only(left: 3),
                                           isCollapsed: true,
@@ -412,18 +294,20 @@ class _LogCenterState extends State<LogCenter>
                               ),
                             ),
                           ),
-                          SizedBox(
+                          const SizedBox(
                             height: 20,
                           ),
                           Expanded(
                             child: ListView.separated(
-                              padding: EdgeInsets.symmetric(horizontal: 20),
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: AppConstants.paddingLarge),
                               itemBuilder: (context, i) {
-                                return _buildLogItem(logsDisplay[i]);
+                                return LogItem(
+                                    log: logsDisplay[i], logType: 'log');
                               },
                               itemCount: logsDisplay.length,
                               separatorBuilder: (context, i) {
-                                return SizedBox(
+                                return const SizedBox(
                                   height: 20,
                                 );
                               },
@@ -432,33 +316,33 @@ class _LogCenterState extends State<LogCenter>
                         ],
                       ),
                 loadingHistory
-                    ? Center(
+                    ? const Center(
                         child: CupertinoActivityIndicator(
                           radius: 14,
                         ),
                       )
                     : ListView.separated(
-                        padding: EdgeInsets.all(20),
+                        padding: const EdgeInsets.all(20),
                         itemBuilder: (context, i) {
-                          return _buildHistoryItem(histories[i]);
+                          return LogItem(log: histories[i], logType: 'history');
                         },
                         itemCount: histories.length,
                         separatorBuilder: (context, i) {
-                          return SizedBox(
+                          return const SizedBox(
                             height: 20,
                           );
                         },
                       ),
-                Center(
+                const Center(
                   child: Text("暂未开发"),
                 ),
-                Center(
+                const Center(
                   child: Text("暂未开发"),
                 ),
-                Center(
+                const Center(
                   child: Text("暂未开发"),
                 ),
-                Center(
+                const Center(
                   child: Text("暂未开发"),
                 ),
               ],

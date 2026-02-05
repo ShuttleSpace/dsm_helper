@@ -1,21 +1,22 @@
 import 'dart:async';
 
 import 'package:garden/pages/control_panel/public_access/edit_ddns.dart';
-import 'package:garden/util/function.dart';
+import 'package:garden/util/http_util.dart';
 import 'package:garden/widgets/bubble_tab_indicator.dart';
 import 'package:garden/widgets/label.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:garden/constants/app_constants.dart';
 
 class PublicAccess extends StatefulWidget {
-  const PublicAccess();
+  const PublicAccess({super.key});
 
   @override
-  _PublicAccessState createState() => _PublicAccessState();
+  PublicAccessState createState() => PublicAccessState();
 }
 
-class _PublicAccessState extends State<PublicAccess>
+class PublicAccessState extends State<PublicAccess>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
   List providers = [];
@@ -33,7 +34,7 @@ class _PublicAccessState extends State<PublicAccess>
   void initState() {
     _tabController = TabController(length: 1, vsync: this);
     getData();
-    timer = Timer.periodic(Duration(seconds: 1), (timer) {
+    timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       getData();
     });
     super.initState();
@@ -49,7 +50,7 @@ class _PublicAccessState extends State<PublicAccess>
     var res = await Api.publicAccessInfo();
     if (res['success']) {
       List result = res['data']['result'];
-      result.forEach((item) {
+      for (var item in result) {
         if (item['success'] == true) {
           switch (item['api']) {
             case "SYNO.Core.DDNS.Provider":
@@ -81,7 +82,7 @@ class _PublicAccessState extends State<PublicAccess>
               break;
           }
         }
-      });
+      }
     }
   }
 
@@ -102,10 +103,10 @@ class _PublicAccessState extends State<PublicAccess>
       },
       child: Card(
         shape: RoundedRectangleBorder(
-            side: BorderSide(), borderRadius: BorderRadius.circular(18)),
-        margin: EdgeInsets.only(top: 20, left: 20, right: 20),
+            side: const BorderSide(), borderRadius: BorderRadius.circular(18)),
+        margin: const EdgeInsets.only(top: 20, left: 20, right: 20),
         child: Padding(
-          padding: const EdgeInsets.all(8.0),
+          padding: const EdgeInsets.all(AppConstants.paddingSmall),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -113,9 +114,9 @@ class _PublicAccessState extends State<PublicAccess>
                 children: [
                   Text(
                     "${ddns['provider']}",
-                    style: TextStyle(fontWeight: FontWeight.w600),
+                    style: const TextStyle(fontWeight: FontWeight.w600),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     width: 5,
                   ),
                   Label(
@@ -127,19 +128,19 @@ class _PublicAccessState extends State<PublicAccess>
                   ),
                 ],
               ),
-              SizedBox(
+              const SizedBox(
                 height: 5,
               ),
               Row(
                 children: [
                   Text("${ddns['hostname']}"),
-                  SizedBox(
+                  const SizedBox(
                     width: 10,
                   ),
                   Text("${ddns['ip']}"),
                 ],
               ),
-              SizedBox(
+              const SizedBox(
                 height: 5,
               ),
               Row(
@@ -160,10 +161,10 @@ class _PublicAccessState extends State<PublicAccess>
     return Scaffold(
       appBar: AppBar(
         leading: AppBackButton(context),
-        title: Text("外部访问"),
+        title: const Text("外部访问"),
         actions: [
           Padding(
-            padding: EdgeInsets.only(right: 10, top: 8, bottom: 8),
+            padding: const EdgeInsets.only(right: 10, top: 8, bottom: 8),
             child: OutlinedButton(
               onPressed: () async {
                 Navigator.of(context)
@@ -174,17 +175,17 @@ class _PublicAccessState extends State<PublicAccess>
                   );
                 }));
               },
-              child: Icon(Icons.add),
+              child: const Icon(Icons.add),
             ),
           ),
           Padding(
-            padding: EdgeInsets.only(right: 10, top: 8, bottom: 8),
+            padding: const EdgeInsets.only(right: 10, top: 8, bottom: 8),
             child: OutlinedButton(
               onPressed: () async {
                 await Api.ddnsUpdate();
                 getData();
               },
-              child: Icon(Icons.refresh),
+              child: const Icon(Icons.refresh),
             ),
           ),
         ],
@@ -197,7 +198,7 @@ class _PublicAccessState extends State<PublicAccess>
               color: Theme.of(context).scaffoldBackgroundColor,
               borderRadius: BorderRadius.circular(20),
             ),
-            margin: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+            margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
             child: TabBar(
               isScrollable: false,
               controller: _tabController,
@@ -208,10 +209,10 @@ class _PublicAccessState extends State<PublicAccess>
               unselectedLabelColor: Colors.grey,
               indicator: BubbleTabIndicator(
                 indicatorColor: Theme.of(context).scaffoldBackgroundColor,
-                shadowColor: Util.getAdjustColor(
+                shadowColor: HttpUtil.getAdjustColor(
                     Theme.of(context).scaffoldBackgroundColor, -20),
               ),
-              tabs: [
+              tabs: const [
                 Padding(
                   padding: EdgeInsets.symmetric(vertical: 10, horizontal: 5),
                   child: Text("DDNS"),

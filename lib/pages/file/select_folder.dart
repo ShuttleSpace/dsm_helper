@@ -1,19 +1,25 @@
-import 'package:garden/themes/app_theme.dart';
-import 'package:garden/util/function.dart';
+import 'package:garden/theme/app_theme.dart';
+import 'package:garden/util/file_type_util.dart';
+import 'package:garden/util/format_util.dart';
+import 'package:garden/util/ui_util.dart';
+import 'package:garden/stores/connection_store.dart';
+import 'package:garden/util/http_util.dart';
 import 'package:garden/widgets/file_icon.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:garden/constants/app_constants.dart';
+import 'package:garden/theme/app_colors.dart';
 
 class SelectFolder extends StatefulWidget {
   final bool multi;
   final bool folder;
-  SelectFolder({this.multi = false, this.folder = true});
+  const SelectFolder({super.key, this.multi = false, this.folder = true});
   @override
-  _SelectFolderState createState() => _SelectFolderState();
+  SelectFolderState createState() => SelectFolderState();
 }
 
-class _SelectFolderState extends State<SelectFolder> {
-  ScrollController _scrollController = ScrollController();
+class SelectFolderState extends State<SelectFolder> {
+  final ScrollController _scrollController = ScrollController();
   List paths = ["/"];
   List files = [];
   List selectedFiles = [];
@@ -86,7 +92,7 @@ class _SelectFolderState extends State<SelectFolder> {
     }
     double offset = _scrollController.position.maxScrollExtent;
     _scrollController.animateTo(offset,
-        duration: Duration(milliseconds: 200), curve: Curves.ease);
+        duration: const Duration(milliseconds: 200), curve: Curves.ease);
   }
 
   setPaths(String path) {
@@ -105,8 +111,9 @@ class _SelectFolderState extends State<SelectFolder> {
 
   Widget _buildPathItem(BuildContext context, int index) {
     return Container(
-      margin: index == 0 ? EdgeInsets.only(left: 20) : null,
-      padding: const EdgeInsets.symmetric(vertical: 10),
+      margin: index == 0 ? const EdgeInsets.only(left: 20) : null,
+      padding:
+          const EdgeInsets.symmetric(vertical: AppConstants.paddingSmall + 2),
       child: OutlinedButton(
         onPressed: () {
           String path = "";
@@ -115,25 +122,26 @@ class _SelectFolderState extends State<SelectFolder> {
             path = "/";
           } else {
             items = paths.getRange(1, index + 1).toList().cast();
-            path = "/" + items.join("/");
+            path = "/${items.join("/")}";
           }
           goPath(path);
         },
         child: index == 0
-            ? Icon(
+            ? const Icon(
                 CupertinoIcons.home,
                 size: 16,
               )
             : Text(
                 paths[index],
-                style: TextStyle(fontSize: 12),
+                style: const TextStyle(fontSize: 12),
               ),
       ),
     );
   }
 
   Widget _buildFileItem(file) {
-    FileTypeEnum fileType = Util.instance.fileType(file['name']);
+    FileTypeEnum fileType =
+        FileTypeUtil.toFileTypeEnum(FileTypeUtil.getFileType(file['name']));
     String path = file['path'];
     return Padding(
       padding: const EdgeInsets.only(top: 20.0, left: 20, right: 20),
@@ -151,18 +159,18 @@ class _SelectFolderState extends State<SelectFolder> {
           // margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
           child: Row(
             children: [
-              SizedBox(
+              const SizedBox(
                 width: 20,
               ),
               Hero(
-                tag: Util.instance.baseUrl +
-                    "/webapi/entry.cgi?path=${Uri.encodeComponent(path)}&size=original&api=SYNO.FileStation.Thumb&method=get&version=2&_sid=${Util.instance.sid}&animate=true",
+                tag:
+                    "${connectionStore.baseUrl}/webapi/entry.cgi?path=${Uri.encodeComponent(path)}&size=original&api=SYNO.FileStation.Thumb&method=get&version=2&_sid=${connectionStore.sid}&animate=true",
                 child: FileIcon(
                   file['isdir'] ? FileTypeEnum.folder : fileType,
                   thumb: file['path'],
                 ),
               ),
-              SizedBox(
+              const SizedBox(
                 width: 10,
               ),
               Expanded(
@@ -171,18 +179,17 @@ class _SelectFolderState extends State<SelectFolder> {
                   children: [
                     Text(
                       file['name'],
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 16,
                       ),
                     ),
-                    SizedBox(
+                    const SizedBox(
                       height: 5,
                     ),
                     Text(
                       (file['isdir']
                               ? ""
-                              : "${Util.instance.formatSize(file['additional']['size'])}" +
-                                  " | ") +
+                              : "${FormatUtil.formatSize(file['additional']['size'])} | ") +
                           DateTime.fromMillisecondsSinceEpoch(
                                   file['additional']['time']['crtime'] * 1000)
                               .format("Y/m/d H:i:s"),
@@ -193,7 +200,7 @@ class _SelectFolderState extends State<SelectFolder> {
                   ],
                 ),
               ),
-              SizedBox(
+              const SizedBox(
                 width: 10,
               ),
               OutlinedButton(
@@ -212,9 +219,9 @@ class _SelectFolderState extends State<SelectFolder> {
                 },
                 child: SizedBox(
                   child: selectedFiles.contains(file['path'])
-                      ? Icon(
+                      ? const Icon(
                           CupertinoIcons.checkmark_alt,
-                          color: Color(0xffff9813),
+                          color: AppColors.primaryAction,
                         )
                       : null,
                 ),
@@ -255,7 +262,7 @@ class _SelectFolderState extends State<SelectFolder> {
         color: Theme.of(context).scaffoldBackgroundColor,
         child: SafeArea(
           top: false,
-          child: Container(
+          child: SizedBox(
             height: MediaQuery.sizeOf(context).height * 0.8,
             child: Column(
               children: [
@@ -273,8 +280,8 @@ class _SelectFolderState extends State<SelectFolder> {
                           scrollDirection: Axis.horizontal,
                           separatorBuilder: (context, i) {
                             return Container(
-                              padding: EdgeInsets.symmetric(vertical: 14),
-                              child: Icon(
+                              padding: const EdgeInsets.symmetric(vertical: 14),
+                              child: const Icon(
                                 CupertinoIcons.right_chevron,
                                 size: 14,
                               ),
@@ -284,7 +291,8 @@ class _SelectFolderState extends State<SelectFolder> {
                       ),
                       if (paths.length > 1)
                         Container(
-                          padding: const EdgeInsets.symmetric(vertical: 10),
+                          padding: const EdgeInsets.symmetric(
+                              vertical: AppConstants.paddingSmall + 2),
                           child: OutlinedButton(
                             onPressed: () {
                               String name = "";
@@ -299,33 +307,32 @@ class _SelectFolderState extends State<SelectFolder> {
                                         children: [
                                           Card(
                                             shape: RoundedRectangleBorder(
-                                                side: BorderSide(),
+                                                side: const BorderSide(),
                                                 borderRadius:
                                                     BorderRadius.circular(5)),
-                                            margin: EdgeInsets.symmetric(
+                                            margin: const EdgeInsets.symmetric(
                                                 horizontal: 50),
                                             child: Padding(
-                                              padding: EdgeInsets.all(20),
+                                              padding: const EdgeInsets.all(20),
                                               child: Column(
                                                 children: [
-                                                  Text(
+                                                  const Text(
                                                     "新建文件夹",
                                                     style: TextStyle(
                                                         fontSize: 20,
                                                         fontWeight:
                                                             FontWeight.w500),
                                                   ),
-                                                  SizedBox(
+                                                  const SizedBox(
                                                     height: 16,
                                                   ),
                                                   Card(
-                                                    shape:
-                                                        RoundedRectangleBorder(
-                                                            side: BorderSide(),
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .circular(
-                                                                        5)),
+                                                    shape: RoundedRectangleBorder(
+                                                        side:
+                                                            const BorderSide(),
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(5)),
                                                     child: Padding(
                                                       padding:
                                                           const EdgeInsets.all(
@@ -334,7 +341,7 @@ class _SelectFolderState extends State<SelectFolder> {
                                                         onChanged: (v) =>
                                                             name = v,
                                                         decoration:
-                                                            InputDecoration(
+                                                            const InputDecoration(
                                                           border:
                                                               InputBorder.none,
                                                           hintText: "请输入文件夹名",
@@ -343,7 +350,7 @@ class _SelectFolderState extends State<SelectFolder> {
                                                       ),
                                                     ),
                                                   ),
-                                                  SizedBox(
+                                                  const SizedBox(
                                                     height: 20,
                                                   ),
                                                   Row(
@@ -353,7 +360,7 @@ class _SelectFolderState extends State<SelectFolder> {
                                                           onPressed: () async {
                                                             if (name.trim() ==
                                                                 "") {
-                                                              Util.instance
+                                                              HttpUtil.instance
                                                                   .toast(
                                                                       "请输入文件夹名");
                                                               return;
@@ -369,7 +376,7 @@ class _SelectFolderState extends State<SelectFolder> {
                                                                     path, name);
                                                             if (res[
                                                                 'success']) {
-                                                              Util.instance
+                                                              HttpUtil.instance
                                                                   .toast(
                                                                       "文件夹创建成功");
                                                               refresh();
@@ -386,23 +393,24 @@ class _SelectFolderState extends State<SelectFolder> {
                                                                           [
                                                                           'code'] ==
                                                                       414) {
-                                                                Util.instance.toast(
+                                                                UiUtil.toast(
                                                                     "文件夹创建失败：指定的名称已存在");
                                                               } else {
-                                                                Util.instance
+                                                                HttpUtil
+                                                                    .instance
                                                                     .toast(
                                                                         "文件夹创建失败");
                                                               }
                                                             }
                                                           },
-                                                          child: Text(
+                                                          child: const Text(
                                                             "确定",
                                                             style: TextStyle(
                                                                 fontSize: 18),
                                                           ),
                                                         ),
                                                       ),
-                                                      SizedBox(
+                                                      const SizedBox(
                                                         width: 16,
                                                       ),
                                                       Expanded(
@@ -412,7 +420,7 @@ class _SelectFolderState extends State<SelectFolder> {
                                                                     context)
                                                                 .pop();
                                                           },
-                                                          child: Text(
+                                                          child: const Text(
                                                             "取消",
                                                             style: TextStyle(
                                                                 fontSize: 18),
@@ -430,37 +438,38 @@ class _SelectFolderState extends State<SelectFolder> {
                                     );
                                   });
                             },
-                            child: Text(
+                            child: const Text(
                               "新建",
                               style: TextStyle(fontSize: 14),
                             ),
                           ),
                         ),
-                      SizedBox(
+                      const SizedBox(
                         width: 10,
                       ),
                       Container(
-                        padding: const EdgeInsets.symmetric(vertical: 10),
+                        padding: const EdgeInsets.symmetric(
+                            vertical: AppConstants.paddingSmall + 2),
                         child: OutlinedButton(
                           onPressed: () {
-                            if (selectedFiles.length > 0) {
+                            if (selectedFiles.isNotEmpty) {
                               Navigator.of(context).pop(selectedFiles);
                             } else {
                               if (paths.length > 1) {
                                 Navigator.of(context)
                                     .pop([paths.join("/").substring(1)]);
                               } else {
-                                Util.instance.toast("无法选择根目录");
+                                UiUtil.toast("无法选择根目录");
                               }
                             }
                           },
-                          child: Text(
+                          child: const Text(
                             "选择",
                             style: TextStyle(fontSize: 14),
                           ),
                         ),
                       ),
-                      SizedBox(
+                      const SizedBox(
                         width: 20,
                       ),
                     ],
@@ -468,7 +477,7 @@ class _SelectFolderState extends State<SelectFolder> {
                 ),
                 Expanded(
                   child: loading
-                      ? Center(
+                      ? const Center(
                           child: CupertinoActivityIndicator(
                             radius: 14,
                           ),
@@ -476,7 +485,7 @@ class _SelectFolderState extends State<SelectFolder> {
                       : success
                           ? ListView(
                               padding: EdgeInsets.only(
-                                  bottom: selectedFiles.length > 0 ? 140 : 20),
+                                  bottom: selectedFiles.isNotEmpty ? 140 : 20),
                               children: files
                                   .where((file) => file['isdir'])
                                   .map(_buildFileItem)
@@ -486,8 +495,8 @@ class _SelectFolderState extends State<SelectFolder> {
                               child: Column(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  Text("$msg"),
-                                  SizedBox(
+                                  Text(msg),
+                                  const SizedBox(
                                     height: 20,
                                   ),
                                   SizedBox(
@@ -498,7 +507,7 @@ class _SelectFolderState extends State<SelectFolder> {
                                             paths.join("/").substring(1);
                                         goPath(path);
                                       },
-                                      child: Text(
+                                      child: const Text(
                                         ' 刷新 ',
                                         style: TextStyle(fontSize: 18),
                                       ),

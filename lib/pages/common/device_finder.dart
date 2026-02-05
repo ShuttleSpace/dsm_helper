@@ -1,6 +1,6 @@
 import 'dart:convert';
+import 'package:garden/util/ui_util.dart';
 
-import 'package:garden/util/function.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
@@ -8,12 +8,12 @@ import 'package:webview_flutter/webview_flutter.dart';
 class DeviceFinder extends StatefulWidget {
   final String url;
   final String? title;
-  DeviceFinder({required this.url, this.title = "设备发现"});
+  const DeviceFinder({super.key, required this.url, this.title = "设备发现"});
   @override
-  _DeviceFinderState createState() => _DeviceFinderState();
+  DeviceFinderState createState() => DeviceFinderState();
 }
 
-class _DeviceFinderState extends State<DeviceFinder> {
+class DeviceFinderState extends State<DeviceFinder> {
   final WebViewController _webviewController = WebViewController();
   bool _isSearching = false;
   List<Map<String, String>> _devices = [];
@@ -38,7 +38,7 @@ class _DeviceFinderState extends State<DeviceFinder> {
             debugPrint("onPageFinished");
             setState(() {});
             // 等待页面完全加载后再注入 JavaScript
-            Future.delayed(Duration(milliseconds: 500), () {
+            Future.delayed(const Duration(milliseconds: 500), () {
               // 允许混合内容
               _webviewController.runJavaScript('''
                 console.log("Setting up CSP...");
@@ -79,7 +79,7 @@ Page resource error:
 
   void _injectJavaScript() {
     // 注入JavaScript代码来监听设备发现
-    final jsCode = '''
+    const jsCode = '''
 (function() {
   console.log("DeviceFinder script injected");
   
@@ -285,11 +285,11 @@ Page resource error:
 
           setState(() {
             _devices = devices;
-            _showDeviceList = devices.length > 0;
+            _showDeviceList = devices.isNotEmpty;
             _isSearching = false;
           });
 
-          Util.instance.toast("找到 ${devices.length} 个设备");
+          UiUtil.toast("找到 ${devices.length} 个设备");
         }
       }
     } catch (e) {
@@ -318,7 +318,7 @@ Page resource error:
         ),
         actions: [
           Padding(
-            padding: EdgeInsets.only(right: 10, top: 8, bottom: 8),
+            padding: const EdgeInsets.only(right: 10, top: 8, bottom: 8),
             child: OutlinedButton(
               onPressed: _isSearching
                   ? null
@@ -350,10 +350,10 @@ Page resource error:
                 // 设备列表遮罩层
                 if (_showDeviceList && _devices.isNotEmpty)
                   Container(
-                    color: Colors.black.withOpacity(0.5),
+                    color: Colors.black.withValues(alpha: .5),
                     child: Center(
                       child: Container(
-                        margin: EdgeInsets.all(20),
+                        margin: const EdgeInsets.all(20),
                         decoration: BoxDecoration(
                           color: Theme.of(context).scaffoldBackgroundColor,
                           borderRadius: BorderRadius.circular(12),
@@ -367,11 +367,11 @@ Page resource error:
                           children: [
                             // 标题栏
                             Container(
-                              padding: EdgeInsets.all(16),
+                              padding: const EdgeInsets.all(16),
                               decoration: BoxDecoration(
                                 border: Border(
                                   bottom: BorderSide(
-                                    color: Colors.grey.withOpacity(0.3),
+                                    color: Colors.grey.withValues(alpha: .3),
                                   ),
                                 ),
                               ),
@@ -381,13 +381,13 @@ Page resource error:
                                 children: [
                                   Text(
                                     '找到 ${_devices.length} 个设备',
-                                    style: TextStyle(
+                                    style: const TextStyle(
                                       fontSize: 18,
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
                                   IconButton(
-                                    icon: Icon(Icons.close),
+                                    icon: const Icon(Icons.close),
                                     onPressed: () {
                                       setState(() {
                                         _showDeviceList = false;
@@ -401,28 +401,29 @@ Page resource error:
                             Flexible(
                               child: ListView.separated(
                                 shrinkWrap: true,
-                                padding: EdgeInsets.all(16),
+                                padding: const EdgeInsets.all(16),
                                 itemCount: _devices.length,
-                                separatorBuilder: (context, index) => Divider(),
+                                separatorBuilder: (context, index) =>
+                                    const Divider(),
                                 itemBuilder: (context, index) {
                                   final device = _devices[index];
                                   return InkWell(
                                     onTap: () => _selectDevice(device),
                                     child: Padding(
-                                      padding:
-                                          EdgeInsets.symmetric(vertical: 12),
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 12),
                                       child: Column(
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
                                         children: [
                                           Text(
                                             device['name'] ?? '未知设备',
-                                            style: TextStyle(
+                                            style: const TextStyle(
                                               fontSize: 16,
                                               fontWeight: FontWeight.bold,
                                             ),
                                           ),
-                                          SizedBox(height: 4),
+                                          const SizedBox(height: 4),
                                           Text(
                                             'IP: ${device['host'] ?? ''}',
                                             style: TextStyle(
@@ -456,7 +457,7 @@ Page resource error:
           ),
           SafeArea(
             child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+              padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
               child: Row(
                 children: <Widget>[
                   FutureBuilder<bool>(
@@ -478,7 +479,7 @@ Page resource error:
                       );
                     },
                   ),
-                  SizedBox(
+                  const SizedBox(
                     width: 10,
                   ),
                   FutureBuilder<bool>(
@@ -500,24 +501,24 @@ Page resource error:
                       );
                     },
                   ),
-                  Spacer(),
+                  const Spacer(),
                   OutlinedButton(
                     onPressed: () {
                       Navigator.of(context).pop();
                     },
-                    child: Icon(
+                    child: const Icon(
                       Icons.close,
                       size: 22,
                     ),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     width: 10,
                   ),
                   OutlinedButton(
                     onPressed: () {
                       _webviewController.reload();
                     },
-                    child: Icon(
+                    child: const Icon(
                       Icons.replay,
                       size: 22,
                     ),

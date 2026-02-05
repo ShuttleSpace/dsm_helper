@@ -1,19 +1,24 @@
 import 'dart:async';
+import 'package:garden/util/format_util.dart';
+import 'package:garden/util/log.dart';
+import 'package:garden/util/ui_util.dart';
 
-import 'package:garden/util/function.dart';
+import 'package:garden/util/http_util.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:garden/constants/app_constants.dart';
+import 'package:garden/theme/app_colors.dart';
 import 'package:flutter/services.dart';
 
 class FileDetail extends StatefulWidget {
   final Map file;
-  FileDetail(this.file);
+  const FileDetail(this.file, {super.key});
   @override
-  _FileDetailState createState() => _FileDetailState();
+  FileDetailState createState() => FileDetailState();
 }
 
-class _FileDetailState extends State<FileDetail> {
+class FileDetailState extends State<FileDetail> {
   Timer? timer;
   bool loadingSize = true;
   int size = 0;
@@ -34,9 +39,9 @@ class _FileDetailState extends State<FileDetail> {
   getDirSize() async {
     var task = await Api.dirSizeTask(widget.file['path']);
     if (task['success']) {
-      timer = Timer.periodic(Duration(seconds: 1), (timer) async {
+      timer = Timer.periodic(const Duration(seconds: 1), (timer) async {
         var result = await Api.dirSizeResult(task['data']['taskid']);
-        print(result);
+        Log.info(result);
         if (result['success'] && result['data']['finished']) {
           timer.cancel();
           setState(() {
@@ -61,18 +66,19 @@ class _FileDetailState extends State<FileDetail> {
       ),
       body: ListView(
         children: [
-          SizedBox(
+          const SizedBox(
             height: 30,
           ),
           Card(
             shape: RoundedRectangleBorder(
-                side: BorderSide(), borderRadius: BorderRadius.circular(18)),
-            margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                side: const BorderSide(),
+                borderRadius: BorderRadius.circular(18)),
+            margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
             child: Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding: const EdgeInsets.all(AppConstants.paddingSmall),
               child: Row(
                 children: [
-                  Text("名称："),
+                  const Text("名称："),
                   Expanded(
                     child: Text(widget.file['name']),
                   ),
@@ -82,13 +88,14 @@ class _FileDetailState extends State<FileDetail> {
           ),
           Card(
             shape: RoundedRectangleBorder(
-                side: BorderSide(), borderRadius: BorderRadius.circular(18)),
-            margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                side: const BorderSide(),
+                borderRadius: BorderRadius.circular(18)),
+            margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
             child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
               child: Row(
                 children: [
-                  Text("位置："),
+                  const Text("位置："),
                   Expanded(
                     child: Text(
                       widget.file['path'],
@@ -97,16 +104,16 @@ class _FileDetailState extends State<FileDetail> {
                   OutlinedButton(
                     onPressed: () async {
                       ClipboardData data =
-                          new ClipboardData(text: widget.file['path']);
+                          ClipboardData(text: widget.file['path']);
                       Clipboard.setData(data);
-                      Util.instance.toast("已复制到剪贴板");
+                      UiUtil.toast("已复制到剪贴板");
                     },
-                    child: SizedBox(
+                    child: const SizedBox(
                       width: 20,
                       height: 20,
                       child: Icon(
                         Icons.copy,
-                        color: Color(0xffff9813),
+                        color: AppColors.primaryAction,
                         size: 16,
                       ),
                     ),
@@ -117,13 +124,14 @@ class _FileDetailState extends State<FileDetail> {
           ),
           Card(
             shape: RoundedRectangleBorder(
-                side: BorderSide(), borderRadius: BorderRadius.circular(18)),
-            margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                side: const BorderSide(),
+                borderRadius: BorderRadius.circular(18)),
+            margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
             child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
               child: Row(
                 children: [
-                  Text("路径："),
+                  const Text("路径："),
                   Expanded(
                     child: Text(
                       "${widget.file['additional']['real_path']}",
@@ -131,17 +139,17 @@ class _FileDetailState extends State<FileDetail> {
                   ),
                   OutlinedButton(
                     onPressed: () async {
-                      ClipboardData data = new ClipboardData(
+                      ClipboardData data = ClipboardData(
                           text: widget.file['additional']['real_path']);
                       Clipboard.setData(data);
-                      Util.instance.toast("已复制到剪贴板");
+                      UiUtil.toast("已复制到剪贴板");
                     },
-                    child: SizedBox(
+                    child: const SizedBox(
                       width: 20,
                       height: 20,
                       child: Icon(
                         Icons.copy,
-                        color: Color(0xffff9813),
+                        color: AppColors.primaryAction,
                         size: 16,
                       ),
                     ),
@@ -152,16 +160,17 @@ class _FileDetailState extends State<FileDetail> {
           ),
           Card(
             shape: RoundedRectangleBorder(
-                side: BorderSide(), borderRadius: BorderRadius.circular(18)),
-            margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                side: const BorderSide(),
+                borderRadius: BorderRadius.circular(18)),
+            margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
             child: Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding: const EdgeInsets.all(AppConstants.paddingSmall),
               child: Row(
                 children: [
-                  Text("大小："),
+                  const Text("大小："),
                   loadingSize
-                      ? CupertinoActivityIndicator()
-                      : Text(Util.instance.formatSize(size))
+                      ? const CupertinoActivityIndicator()
+                      : Text(FormatUtil.formatSize(size))
                 ],
               ),
             ),
@@ -169,15 +178,16 @@ class _FileDetailState extends State<FileDetail> {
           if (widget.file['isdir'])
             Card(
               shape: RoundedRectangleBorder(
-                  side: BorderSide(), borderRadius: BorderRadius.circular(18)),
-              margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  side: const BorderSide(),
+                  borderRadius: BorderRadius.circular(18)),
+              margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
               child: Padding(
-                padding: const EdgeInsets.all(8.0),
+                padding: const EdgeInsets.all(AppConstants.paddingSmall),
                 child: Row(
                   children: [
-                    Text("包含："),
+                    const Text("包含："),
                     loadingSize
-                        ? CupertinoActivityIndicator()
+                        ? const CupertinoActivityIndicator()
                         : Text("$folderCount个文件夹，$fileCount个文件")
                   ],
                 ),
@@ -185,13 +195,14 @@ class _FileDetailState extends State<FileDetail> {
             ),
           Card(
             shape: RoundedRectangleBorder(
-                side: BorderSide(), borderRadius: BorderRadius.circular(18)),
-            margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                side: const BorderSide(),
+                borderRadius: BorderRadius.circular(18)),
+            margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
             child: Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding: const EdgeInsets.all(AppConstants.paddingSmall),
               child: Row(
                 children: [
-                  Text("创建时间："),
+                  const Text("创建时间："),
                   Text(DateTime.fromMillisecondsSinceEpoch(
                           widget.file['additional']['time']['ctime'] * 1000)
                       .format("Y-m-d H:i:s"))
@@ -201,13 +212,14 @@ class _FileDetailState extends State<FileDetail> {
           ),
           Card(
             shape: RoundedRectangleBorder(
-                side: BorderSide(), borderRadius: BorderRadius.circular(18)),
-            margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                side: const BorderSide(),
+                borderRadius: BorderRadius.circular(18)),
+            margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
             child: Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding: const EdgeInsets.all(AppConstants.paddingSmall),
               child: Row(
                 children: [
-                  Text("修改时间："),
+                  const Text("修改时间："),
                   Text(DateTime.fromMillisecondsSinceEpoch(
                           widget.file['additional']['time']['mtime'] * 1000)
                       .format("Y-m-d H:i:s"))

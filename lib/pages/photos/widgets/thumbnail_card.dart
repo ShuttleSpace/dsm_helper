@@ -1,10 +1,11 @@
 import 'package:garden/models/photos/thumbnail_model.dart';
+import 'package:garden/theme/app_colors.dart';
 import 'package:garden/widgets/cupertino_image.dart';
 import 'package:flutter/material.dart';
 
 class ThumbnailCard extends StatelessWidget {
   const ThumbnailCard(this.thumbnails,
-      {required this.width, this.folderId, this.isTeam = false});
+      {super.key, required this.width, this.folderId, this.isTeam = false});
   final int? folderId;
   final List<ThumbnailModel> thumbnails;
   final double width;
@@ -20,9 +21,9 @@ class ThumbnailCard extends StatelessWidget {
           color: Colors.white,
           borderRadius: BorderRadius.circular(18),
         ),
-        child: thumbnails.length == 0
+        child: thumbnails.isEmpty
             ? Container(
-                color: Color(0xffE9E9E9),
+                color: AppColors.placeholderBackgroundLight,
                 child: Center(
                   child: Image.asset(
                     "assets/icons/folder_empty.png",
@@ -40,13 +41,13 @@ class ThumbnailCard extends StatelessWidget {
                     placeholder: Container(
                       width: width,
                       height: width,
-                      color: Color(0xffE9E9E9),
+                      color: AppColors.placeholderBackgroundLight,
                     ),
                   )
                 : thumbnails.length == 2
                     ? Column(
                         children: [
-                          Container(
+                          SizedBox(
                             width: width,
                             height: (width - 2) / 2,
                             child: CupertinoExtendedImage(
@@ -58,14 +59,14 @@ class ThumbnailCard extends StatelessWidget {
                               placeholder: Container(
                                 width: width,
                                 height: (width - 2) / 2,
-                                color: Color(0xffE9E9E9),
+                                color: AppColors.placeholderBackgroundLight,
                               ),
                             ),
                           ),
-                          SizedBox(
+                          const SizedBox(
                             height: 2,
                           ),
-                          Container(
+                          SizedBox(
                             width: width,
                             height: (width - 2) / 2,
                             child: CupertinoExtendedImage(
@@ -77,7 +78,7 @@ class ThumbnailCard extends StatelessWidget {
                               placeholder: Container(
                                 width: width,
                                 height: (width - 2) / 2,
-                                color: Color(0xffE9E9E9),
+                                color: AppColors.placeholderBackgroundLight,
                               ),
                             ),
                           )
@@ -97,7 +98,8 @@ class ThumbnailCard extends StatelessWidget {
                                     fit: BoxFit.cover,
                                     boxShape: BoxShape.rectangle,
                                     placeholder: Container(
-                                      color: Color(0xffE9E9E9),
+                                      color:
+                                          AppColors.placeholderBackgroundLight,
                                     ),
                                   );
                                 } else {
@@ -108,7 +110,8 @@ class ThumbnailCard extends StatelessWidget {
                                     fit: BoxFit.cover,
                                     boxShape: BoxShape.rectangle,
                                     placeholder: Container(
-                                      color: Color(0xffE9E9E9),
+                                      color:
+                                          AppColors.placeholderBackgroundLight,
                                     ),
                                   );
                                 }
@@ -128,12 +131,13 @@ class ThumbnailCard extends StatelessWidget {
                                     fit: BoxFit.cover,
                                     boxShape: BoxShape.rectangle,
                                     placeholder: Container(
-                                      color: Color(0xffE9E9E9),
+                                      color:
+                                          AppColors.placeholderBackgroundLight,
                                     ),
                                   );
                                 } else {
                                   return Container(
-                                    color: Color(0xffE9E9E9),
+                                    color: AppColors.placeholderBackgroundLight,
                                   );
                                 }
                               })

@@ -1,22 +1,30 @@
-import 'package:draggable_scrollbar/draggable_scrollbar.dart';
-import 'package:garden/util/function.dart';
+import 'package:garden/util/ui_util.dart';
+import 'package:garden/util/http_util.dart';
 import 'package:garden/widgets/bubble_tab_indicator.dart';
-import 'package:garden/widgets/label.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:garden/widgets/docker/container_basic_info.dart';
+import 'package:garden/widgets/docker/container_ports.dart';
+import 'package:garden/widgets/docker/container_volumes.dart';
+import 'package:garden/widgets/docker/container_links.dart';
+import 'package:garden/widgets/docker/container_networks.dart';
+import 'package:garden/widgets/docker/container_envs.dart';
+import 'package:garden/widgets/docker/container_processes.dart';
+import 'package:garden/widgets/docker/log_date_selector.dart';
+import 'package:garden/widgets/docker/log_list.dart';
 
 class ContainerDetail extends StatefulWidget {
   final String name;
-  ContainerDetail(this.name);
+  const ContainerDetail(this.name, {super.key});
   @override
-  _ContainerDetailState createState() => _ContainerDetailState();
+  ContainerDetailState createState() => ContainerDetailState();
 }
 
-class _ContainerDetailState extends State<ContainerDetail>
+class ContainerDetailState extends State<ContainerDetail>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
-  ScrollController _scrollController = ScrollController();
+  final ScrollController _scrollController = ScrollController();
   bool loading = true;
   List ports = [];
   List networks = [];
@@ -69,7 +77,7 @@ class _ContainerDetailState extends State<ContainerDetail>
       }
       getLogDates();
     } else {
-      Util.instance.toast("获取详情失败");
+      UiUtil.toast("获取详情失败");
     }
   }
 
@@ -78,7 +86,7 @@ class _ContainerDetailState extends State<ContainerDetail>
     if (res['success']) {
       setState(() {
         logDates = res['data']['dates'];
-        if (logDates.length > 0) {
+        if (logDates.isNotEmpty) {
           selectedDate = logDates[0];
         }
       });
@@ -96,226 +104,11 @@ class _ContainerDetailState extends State<ContainerDetail>
     }
   }
 
-  Widget _buildPortItem(port) {
-    return Padding(
-      padding: EdgeInsets.only(top: 5),
-      child: Row(
-        children: [
-          Expanded(
-            child: Text(
-              "${port['host_port']}",
-              textAlign: TextAlign.center,
-            ),
-          ),
-          Expanded(
-            child: Text(
-              "${port['container_port']}",
-              textAlign: TextAlign.center,
-            ),
-          ),
-          Expanded(
-            child: Text(
-              "${port['type']}",
-              textAlign: TextAlign.center,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildVolumeItem(volume) {
-    return Padding(
-      padding: EdgeInsets.only(top: 5),
-      child: Row(
-        children: [
-          Expanded(
-            flex: 2,
-            child: Text(
-              "${volume['host_volume_file']}",
-              textAlign: TextAlign.center,
-            ),
-          ),
-          Expanded(
-            flex: 2,
-            child: Text(
-              "${volume['mount_point']}",
-              textAlign: TextAlign.center,
-            ),
-          ),
-          Expanded(
-            child: Text(
-              "${volume['type']}",
-              textAlign: TextAlign.center,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildLinkItem(link) {
-    return Padding(
-      padding: EdgeInsets.only(top: 5),
-      child: Row(
-        children: [
-          Expanded(
-            child: Text(
-              "${link['link_container']}",
-              textAlign: TextAlign.center,
-            ),
-          ),
-          Expanded(
-            child: Text(
-              "${link['alias']}",
-              textAlign: TextAlign.center,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildNetworkItem(network) {
-    return Padding(
-      padding: EdgeInsets.only(top: 5),
-      child: Row(
-        children: [
-          Expanded(
-            child: Text(
-              "${network['name']}",
-              textAlign: TextAlign.center,
-            ),
-          ),
-          Expanded(
-            child: Text(
-              "${network['driver']}",
-              textAlign: TextAlign.center,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildEnvItem(env) {
-    return Padding(
-      padding: EdgeInsets.only(top: 5),
-      child: Row(
-        children: [
-          Text(
-            "${env['key']}：",
-            style: TextStyle(fontWeight: FontWeight.w600),
-          ),
-          Expanded(
-            child: Text(
-              "${env['value']}",
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildProcessItem(process) {
-    return Card(
-      shape: RoundedRectangleBorder(
-          side: BorderSide(), borderRadius: BorderRadius.circular(18)),
-      margin: EdgeInsets.symmetric(horizontal: 20),
-      child: Padding(
-        padding: EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    "进程：${process['pid']}",
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-                Expanded(
-                  child: Text(
-                    "CPU：${process['cpu']}%",
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-                Expanded(
-                  child: Text(
-                    "RAM：${Util.instance.formatSize(process['memory'], fixed: 0)}",
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(
-              height: 5,
-            ),
-            Text(process['command']),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildLogItem(log) {
-    return Card(
-      shape: RoundedRectangleBorder(
-          side: BorderSide(), borderRadius: BorderRadius.circular(18)),
-      child: Padding(
-        padding: EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Label("${log['stream']}", Colors.lightGreen),
-                Spacer(),
-                Text(
-                  "${log['created']}",
-                  style: TextStyle(color: Colors.grey),
-                ),
-              ],
-            ),
-            SizedBox(
-              height: 5,
-            ),
-            Text(log['text']),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildDateItem(date) {
-    String str = date;
-    return GestureDetector(
-      onTap: () {
-        setState(() {
-          selectedDate = date;
-        });
-        getLog();
-      },
-      child: Card(
-        shape: RoundedRectangleBorder(
-            side: BorderSide(), borderRadius: BorderRadius.circular(18)),
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-          child: Column(
-            children: [
-              Text(
-                "${str.substring(5)}",
-              ),
-              Text(
-                "${str.substring(0, 4)}",
-                style: TextStyle(color: Colors.grey),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
+  void _onDateSelected(String date) {
+    setState(() {
+      selectedDate = date;
+    });
+    getLog();
   }
 
   @override
@@ -326,7 +119,7 @@ class _ContainerDetailState extends State<ContainerDetail>
         title: Text(widget.name),
       ),
       body: loading
-          ? Center(
+          ? const Center(
               child: CupertinoActivityIndicator(
                 radius: 14,
               ),
@@ -335,9 +128,10 @@ class _ContainerDetailState extends State<ContainerDetail>
               children: [
                 Card(
                   shape: RoundedRectangleBorder(
-                      side: BorderSide(),
+                      side: const BorderSide(),
                       borderRadius: BorderRadius.circular(18)),
-                  margin: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                  margin:
+                      const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
                   child: TabBar(
                     dividerHeight: 0,
                     isScrollable: false,
@@ -347,8 +141,8 @@ class _ContainerDetailState extends State<ContainerDetail>
                         ? Colors.white
                         : Colors.black,
                     unselectedLabelColor: Colors.grey,
-                    indicator: BubbleTabIndicator(),
-                    tabs: [
+                    indicator: const BubbleTabIndicator(),
+                    tabs: const [
                       Padding(
                         padding:
                             EdgeInsets.symmetric(vertical: 10, horizontal: 5),
@@ -373,370 +167,31 @@ class _ContainerDetailState extends State<ContainerDetail>
                     children: [
                       ListView(
                         children: [
-                          Card(
-                            shape: RoundedRectangleBorder(
-                                side: BorderSide(),
-                                borderRadius: BorderRadius.circular(18)),
-                            margin: EdgeInsets.symmetric(
-                                horizontal: 20, vertical: 10),
-                            child: Padding(
-                              padding: EdgeInsets.symmetric(
-                                  horizontal: 20, vertical: 15),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    "基本信息",
-                                    style: TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.w600),
-                                  ),
-                                  SizedBox(
-                                    height: 5,
-                                  ),
-                                  Row(
-                                    children: [
-                                      Text("启动时间："),
-                                      Expanded(
-                                        child: Text(
-                                          DateTime.fromMillisecondsSinceEpoch(
-                                                  upTime * 1000)
-                                              .timeAgo,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  SizedBox(
-                                    height: 5,
-                                  ),
-                                  Row(
-                                    children: [
-                                      Text("快捷方式："),
-                                      Expanded(
-                                        child: Text(
-                                          shortcut['enable_shortcut']
-                                              ? (shortcut['enable_status_page']
-                                                  ? "状态页面"
-                                                  : shortcut['enable_web_page']
-                                                      ? shortcut['web_page_url']
-                                                      : "")
-                                              : "无",
-                                          maxLines: 1,
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  SizedBox(
-                                    height: 5,
-                                  ),
-                                  Row(
-                                    children: [
-                                      Text("CPU优先顺序："),
-                                      Expanded(
-                                        child: Text(
-                                          cpuPriority > 50
-                                              ? "高"
-                                              : cpuPriority == 50
-                                                  ? "中"
-                                                  : cpuPriority < 50
-                                                      ? "低"
-                                                      : "",
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  SizedBox(
-                                    height: 5,
-                                  ),
-                                  Row(
-                                    children: [
-                                      Text("内存限制："),
-                                      Expanded(
-                                        child: Text(
-                                          memory > 0
-                                              ? Util.instance.formatSize(memory)
-                                              : "自动",
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  SizedBox(
-                                    height: 5,
-                                  ),
-                                  Row(
-                                    children: [
-                                      Text("执行命令："),
-                                      Expanded(
-                                        child: Text(
-                                          cmd,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            ),
+                          ContainerBasicInfo(
+                            upTime: upTime,
+                            shortcut: shortcut,
+                            cpuPriority: cpuPriority,
+                            memory: memory,
+                            cmd: cmd,
                           ),
-                          Card(
-                            shape: RoundedRectangleBorder(
-                                side: BorderSide(),
-                                borderRadius: BorderRadius.circular(18)),
-                            margin: EdgeInsets.symmetric(
-                                horizontal: 20, vertical: 10),
-                            child: Padding(
-                              padding: EdgeInsets.symmetric(
-                                  horizontal: 20, vertical: 15),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    "端口设置",
-                                    style: TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.w600),
-                                  ),
-                                  SizedBox(
-                                    height: 5,
-                                  ),
-                                  Row(
-                                    children: [
-                                      Expanded(
-                                        child: Text(
-                                          "本地端口",
-                                          textAlign: TextAlign.center,
-                                        ),
-                                      ),
-                                      Expanded(
-                                        child: Text(
-                                          "容器端口",
-                                          textAlign: TextAlign.center,
-                                        ),
-                                      ),
-                                      Expanded(
-                                        child: Text(
-                                          "类型",
-                                          textAlign: TextAlign.center,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  ...ports.map(_buildPortItem).toList(),
-                                ],
-                              ),
-                            ),
-                          ),
-                          Card(
-                            shape: RoundedRectangleBorder(
-                                side: BorderSide(),
-                                borderRadius: BorderRadius.circular(18)),
-                            margin: EdgeInsets.symmetric(
-                                horizontal: 20, vertical: 10),
-                            child: Padding(
-                              padding: EdgeInsets.symmetric(
-                                  horizontal: 20, vertical: 15),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    "卷",
-                                    style: TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.w600),
-                                  ),
-                                  SizedBox(
-                                    height: 5,
-                                  ),
-                                  Row(
-                                    children: [
-                                      Expanded(
-                                        flex: 2,
-                                        child: Text(
-                                          "文件/文件夹",
-                                          textAlign: TextAlign.center,
-                                        ),
-                                      ),
-                                      Expanded(
-                                        flex: 2,
-                                        child: Text(
-                                          "装载路径",
-                                          textAlign: TextAlign.center,
-                                        ),
-                                      ),
-                                      Expanded(
-                                        child: Text(
-                                          "类型",
-                                          textAlign: TextAlign.center,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  ...volumes.map(_buildVolumeItem).toList(),
-                                ],
-                              ),
-                            ),
-                          ),
-                          Card(
-                            shape: RoundedRectangleBorder(
-                                side: BorderSide(),
-                                borderRadius: BorderRadius.circular(18)),
-                            margin: EdgeInsets.symmetric(
-                                horizontal: 20, vertical: 10),
-                            child: Padding(
-                              padding: EdgeInsets.symmetric(
-                                  horizontal: 20, vertical: 15),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    "链接",
-                                    style: TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.w600),
-                                  ),
-                                  SizedBox(
-                                    height: 5,
-                                  ),
-                                  Row(
-                                    children: [
-                                      Expanded(
-                                        child: Text(
-                                          "容器名称",
-                                          textAlign: TextAlign.center,
-                                        ),
-                                      ),
-                                      Expanded(
-                                        child: Text(
-                                          "别名",
-                                          textAlign: TextAlign.center,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  ...links.map(_buildLinkItem).toList(),
-                                ],
-                              ),
-                            ),
-                          ),
-                          Card(
-                            shape: RoundedRectangleBorder(
-                                side: BorderSide(),
-                                borderRadius: BorderRadius.circular(18)),
-                            margin: EdgeInsets.symmetric(
-                                horizontal: 20, vertical: 10),
-                            child: Padding(
-                              padding: EdgeInsets.symmetric(
-                                  horizontal: 20, vertical: 15),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    "网络",
-                                    style: TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.w600),
-                                  ),
-                                  SizedBox(
-                                    height: 5,
-                                  ),
-                                  Row(
-                                    children: [
-                                      Expanded(
-                                        child: Text(
-                                          "网络名称",
-                                          textAlign: TextAlign.center,
-                                        ),
-                                      ),
-                                      Expanded(
-                                        child: Text(
-                                          "驱动程序",
-                                          textAlign: TextAlign.center,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  ...networks.map(_buildNetworkItem).toList(),
-                                ],
-                              ),
-                            ),
-                          ),
-                          Card(
-                            shape: RoundedRectangleBorder(
-                                side: BorderSide(),
-                                borderRadius: BorderRadius.circular(18)),
-                            margin: EdgeInsets.symmetric(
-                                horizontal: 20, vertical: 10),
-                            child: Padding(
-                              padding: EdgeInsets.symmetric(
-                                  horizontal: 20, vertical: 15),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    "环境变量",
-                                    style: TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.w600),
-                                  ),
-                                  ...envs.map(_buildEnvItem).toList(),
-                                ],
-                              ),
-                            ),
-                          ),
+                          ContainerPorts(ports: ports),
+                          ContainerVolumes(volumes: volumes),
+                          ContainerLinks(links: links),
+                          ContainerNetworks(networks: networks),
+                          ContainerEnvs(envs: envs),
                         ],
                       ),
-                      ListView.separated(
-                          itemBuilder: (context, i) {
-                            return _buildProcessItem(processes[i]);
-                          },
-                          separatorBuilder: (context, i) {
-                            return SizedBox(
-                              height: 20,
-                            );
-                          },
-                          itemCount: processes.length),
+                      ContainerProcesses(processes: processes),
                       Row(
                         children: [
-                          Expanded(
-                            child: CupertinoScrollbar(
-                              child: ListView.separated(
-                                padding: EdgeInsets.only(
-                                    left: 20, right: 10, top: 20),
-                                itemBuilder: (context, i) {
-                                  return _buildDateItem(logDates[i]);
-                                },
-                                separatorBuilder: (context, i) {
-                                  return SizedBox(
-                                    height: 20,
-                                  );
-                                },
-                                itemCount: logDates.length,
-                              ),
-                            ),
+                          LogDateSelector(
+                            logDates: logDates,
+                            selectedDate: selectedDate,
+                            onDateSelected: _onDateSelected,
                           ),
-                          Expanded(
-                            flex: 2,
-                            child: DraggableScrollbar.semicircle(
-                              backgroundColor:
-                                  Theme.of(context).scaffoldBackgroundColor,
-                              scrollbarTimeToFade: Duration(seconds: 1),
-                              controller: _scrollController,
-                              child: ListView.separated(
-                                controller: _scrollController,
-                                padding: EdgeInsets.only(
-                                    left: 10, right: 20, top: 20),
-                                itemBuilder: (context, i) {
-                                  return _buildLogItem(
-                                      logs.reversed.toList()[i]);
-                                },
-                                separatorBuilder: (context, i) {
-                                  return SizedBox(
-                                    height: 20,
-                                  );
-                                },
-                                itemCount: logs.length,
-                              ),
-                            ),
+                          LogList(
+                            logs: logs,
+                            scrollController: _scrollController,
                           ),
                         ],
                       ),

@@ -4,6 +4,7 @@ import 'package:extended_image/extended_image.dart';
 /// make hero better when slide out
 class HeroWidget extends StatefulWidget {
   const HeroWidget({
+    super.key,
     required this.child,
     required this.tag,
     required this.slidePagekey,
@@ -14,10 +15,10 @@ class HeroWidget extends StatefulWidget {
   final Object tag;
   final GlobalKey<ExtendedImageSlidePageState> slidePagekey;
   @override
-  _HeroWidgetState createState() => _HeroWidgetState();
+  HeroWidgetState createState() => HeroWidgetState();
 }
 
-class _HeroWidgetState extends State<HeroWidget> {
+class HeroWidgetState extends State<HeroWidget> {
   RectTween? _rectTween;
   @override
   Widget build(BuildContext context) {

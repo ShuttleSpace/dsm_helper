@@ -2,16 +2,17 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:garden/models/player.dart';
-import 'package:garden/providers/audio_player_provider.dart';
-import 'package:garden/themes/app_theme.dart';
+import 'package:garden/stores/app_store.dart';
+import 'package:garden/theme/app_theme.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:garden/constants/app_constants.dart';
 import 'package:media_kit/media_kit.dart';
-import 'package:provider/provider.dart';
 
 class AudioPlayer extends StatefulWidget {
-  AudioPlayer({
+  const AudioPlayer({
+    super.key,
     required this.name,
     required this.url,
   });
@@ -32,8 +33,8 @@ class _AudioPlayerState extends State<AudioPlayer> {
 
   @override
   void initState() {
-    var audioPlayerProvider = context.read<AudioPlayerProvider>();
-    _player = audioPlayerProvider.player;
+    _player = appStore.player ?? Player();
+    appStore.setPlayer(_player);
     title = widget.name;
 
     // 初始化状态控制器
@@ -62,8 +63,8 @@ class _AudioPlayerState extends State<AudioPlayer> {
     });
 
     // 设置音频源
-    if (audioPlayerProvider.url != widget.url) {
-      audioPlayerProvider.setUrl(widget.url, title);
+    if (appStore.audioUrl != widget.url) {
+      appStore.setAudioUrl(widget.url, title);
       _setSource();
     }
 
@@ -99,7 +100,7 @@ class _AudioPlayerState extends State<AudioPlayer> {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Padding(
-                  padding: const EdgeInsets.all(8.0),
+                  padding: const EdgeInsets.all(AppConstants.paddingSmall),
                   child: Center(
                     child: Image.asset(
                       "assets/music_cover.png",
@@ -107,11 +108,11 @@ class _AudioPlayerState extends State<AudioPlayer> {
                     ),
                   ),
                 ),
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
                 Text(title),
               ],
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             ControlButtons(
               player: _player,
               stateController: _stateController,
@@ -134,6 +135,7 @@ class ControlButtons extends StatelessWidget {
   final StreamController<PlayerStateX> stateController;
 
   const ControlButtons({
+    super.key,
     required this.player,
     required this.stateController,
   });
@@ -204,7 +206,7 @@ class ControlButtons extends StatelessWidget {
           },
         ),
 
-        SizedBox(width: 30),
+        const SizedBox(width: 30),
 
         // 播放/暂停按钮
         StreamBuilder<PlayerStateX>(
@@ -212,19 +214,19 @@ class ControlButtons extends StatelessWidget {
           builder: (context, snapshot) {
             if (snapshot.data == PlayerStateX.buffering) {
               return OutlinedButton(
-                child: const CupertinoActivityIndicator(radius: 24),
                 onPressed: player.play,
+                child: const CupertinoActivityIndicator(radius: 24),
               );
             } else if (snapshot.data == PlayerStateX.stopped ||
                 snapshot.data == PlayerStateX.paused) {
               return OutlinedButton(
-                child: const Icon(Icons.play_arrow, size: 64),
                 onPressed: player.play,
+                child: const Icon(Icons.play_arrow, size: 64),
               );
             } else if (snapshot.data == PlayerStateX.playing) {
               return OutlinedButton(
-                child: const Icon(Icons.pause, size: 64),
                 onPressed: player.pause,
+                child: const Icon(Icons.pause, size: 64),
               );
             } else {
               // 播放完成，重新播放
@@ -236,7 +238,7 @@ class ControlButtons extends StatelessWidget {
           },
         ),
 
-        SizedBox(width: 30),
+        const SizedBox(width: 30),
 
         // 速度按钮
         StreamBuilder<double>(
@@ -273,6 +275,7 @@ class SeekBar extends StatefulWidget {
   final ValueChanged<Duration>? onChangeEnd;
 
   const SeekBar({
+    super.key,
     required this.player,
     this.onChanged,
     this.onChangeEnd,
@@ -327,7 +330,7 @@ class SeekBarState extends State<SeekBar> {
                 activeTrackColor: Colors.blue.shade100,
                 inactiveTrackColor: Colors.grey.shade300,
               ) ??
-              SliderThemeData(),
+              const SliderThemeData(),
           child: ExcludeSemantics(
             child: StreamBuilder<Duration>(
               stream: widget.player.stream.buffer,
@@ -377,7 +380,8 @@ class SeekBarState extends State<SeekBar> {
                   },
                 ),
                 Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 20),
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: AppConstants.paddingLarge),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [

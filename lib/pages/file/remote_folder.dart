@@ -1,17 +1,22 @@
 import 'package:garden/pages/file/select_folder.dart';
-import 'package:garden/util/function.dart';
+import 'package:garden/util/ui_util.dart';
+import 'package:garden/util/http_util.dart';
 import 'package:garden/widgets/bubble_tab_indicator.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:garden/constants/app_constants.dart';
+import 'package:garden/theme/app_colors.dart';
 import 'package:flutter_vibrate/flutter_vibrate.dart';
 
 class RemoteFolder extends StatefulWidget {
+  const RemoteFolder({super.key});
+
   @override
-  _RemoteFolderState createState() => _RemoteFolderState();
+  RemoteFolderState createState() => RemoteFolderState();
 }
 
-class _RemoteFolderState extends State<RemoteFolder>
+class RemoteFolderState extends State<RemoteFolder>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
   String serverIp = "";
@@ -30,14 +35,15 @@ class _RemoteFolderState extends State<RemoteFolder>
     return Scaffold(
       appBar: AppBar(
         leading: AppBackButton(context),
-        title: Text("装载远程文件夹"),
+        title: const Text("装载远程文件夹"),
       ),
       body: Column(
         children: [
           Card(
             shape: RoundedRectangleBorder(
-                side: BorderSide(), borderRadius: BorderRadius.circular(18)),
-            margin: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                side: const BorderSide(),
+                borderRadius: BorderRadius.circular(18)),
+            margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
             child: TabBar(
               dividerHeight: 0,
               controller: _tabController,
@@ -48,10 +54,10 @@ class _RemoteFolderState extends State<RemoteFolder>
               unselectedLabelColor: Colors.grey,
               indicator: BubbleTabIndicator(
                 indicatorColor: Theme.of(context).scaffoldBackgroundColor,
-                shadowColor: Util.getAdjustColor(
+                shadowColor: HttpUtil.getAdjustColor(
                     Theme.of(context).scaffoldBackgroundColor, -20),
               ),
-              tabs: [
+              tabs: const [
                 Padding(
                   padding: EdgeInsets.symmetric(vertical: 10, horizontal: 5),
                   child: Text("CIFS"),
@@ -68,60 +74,63 @@ class _RemoteFolderState extends State<RemoteFolder>
               controller: _tabController,
               children: [
                 ListView(
-                  padding: EdgeInsets.all(20),
+                  padding: const EdgeInsets.all(20),
                   children: [
                     Card(
                       shape: RoundedRectangleBorder(
-                          side: BorderSide(),
+                          side: const BorderSide(),
                           borderRadius: BorderRadius.circular(18)),
                       child: Padding(
-                        padding: const EdgeInsets.all(8.0),
+                        padding:
+                            const EdgeInsets.all(AppConstants.paddingSmall),
                         child: TextField(
                           onChanged: (v) => serverIp = v,
-                          decoration: InputDecoration(
+                          decoration: const InputDecoration(
                               border: InputBorder.none,
                               labelText: '远程文件夹',
                               hintText: r"示例:\\192.168.1.1\share"),
                         ),
                       ),
                     ),
-                    SizedBox(
+                    const SizedBox(
                       height: 20,
                     ),
                     Card(
                       shape: RoundedRectangleBorder(
-                          side: BorderSide(),
+                          side: const BorderSide(),
                           borderRadius: BorderRadius.circular(18)),
                       child: Padding(
-                        padding: const EdgeInsets.all(8.0),
+                        padding:
+                            const EdgeInsets.all(AppConstants.paddingSmall),
                         child: TextField(
                           onChanged: (v) => account = v,
-                          decoration: InputDecoration(
+                          decoration: const InputDecoration(
                             border: InputBorder.none,
                             labelText: '账号',
                           ),
                         ),
                       ),
                     ),
-                    SizedBox(
+                    const SizedBox(
                       height: 20,
                     ),
                     Card(
                       shape: RoundedRectangleBorder(
-                          side: BorderSide(),
+                          side: const BorderSide(),
                           borderRadius: BorderRadius.circular(18)),
                       child: Padding(
-                        padding: const EdgeInsets.all(8.0),
+                        padding:
+                            const EdgeInsets.all(AppConstants.paddingSmall),
                         child: TextField(
                           onChanged: (v) => passwd = v,
-                          decoration: InputDecoration(
+                          decoration: const InputDecoration(
                             border: InputBorder.none,
                             labelText: '密码',
                           ),
                         ),
                       ),
                     ),
-                    SizedBox(
+                    const SizedBox(
                       height: 20,
                     ),
                     OutlinedButton(
@@ -130,7 +139,7 @@ class _RemoteFolderState extends State<RemoteFolder>
                         showCupertinoModalPopup(
                           context: context,
                           builder: (context) {
-                            return SelectFolder(
+                            return const SelectFolder(
                               multi: false,
                             );
                           },
@@ -148,7 +157,7 @@ class _RemoteFolderState extends State<RemoteFolder>
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(
+                                const Text(
                                   "装载到",
                                   style: TextStyle(fontSize: 12),
                                 ),
@@ -169,7 +178,7 @@ class _RemoteFolderState extends State<RemoteFolder>
                         ],
                       ),
                     ),
-                    SizedBox(
+                    const SizedBox(
                       height: 20,
                     ),
                     GestureDetector(
@@ -180,61 +189,62 @@ class _RemoteFolderState extends State<RemoteFolder>
                       },
                       child: Card(
                         shape: RoundedRectangleBorder(
-                            side: BorderSide(),
+                            side: const BorderSide(),
                             borderRadius: BorderRadius.circular(18)),
                         child: Padding(
-                          padding: const EdgeInsets.all(8.0),
+                          padding:
+                              const EdgeInsets.all(AppConstants.paddingSmall),
                           child: Row(
                             children: [
-                              Text("开机时自动装载"),
-                              Spacer(),
+                              const Text("开机时自动装载"),
+                              const Spacer(),
                               if (autoMount)
-                                Icon(
+                                const Icon(
                                   CupertinoIcons.checkmark_alt,
-                                  color: Color(0xffff9813),
+                                  color: AppColors.primaryAction,
                                 ),
                             ],
                           ),
                         ),
                       ),
                     ),
-                    SizedBox(
+                    const SizedBox(
                       height: 20,
                     ),
                     OutlinedButton(
                       onPressed: () async {
                         if (mountPoint == "") {
-                          Util.instance.toast("请选择保存位置");
-                          Util.instance.vibrate(FeedbackType.impact);
+                          UiUtil.toast("请选择保存位置");
+                          UiUtil.vibrate(FeedbackType.impact);
                           return;
                         }
                         if (serverIp.trim() == "") {
-                          Util.instance.toast("请输入远程文件夹地址");
+                          UiUtil.toast("请输入远程文件夹地址");
                           return;
                         }
                         var res = await Api.mountFolder(
                             serverIp, account, passwd, mountPoint, autoMount);
                         if (res['success']) {
-                          Util.instance.toast("装载成功");
-                          Util.instance.vibrate(FeedbackType.light);
+                          UiUtil.toast("装载成功");
+                          UiUtil.vibrate(FeedbackType.light);
                         } else {
-                          Util.instance.vibrate(FeedbackType.warning);
+                          UiUtil.vibrate(FeedbackType.warning);
                           if (res['error']['code'] == 436) {
-                            Util.instance.toast("远程文件夹地址有误");
+                            UiUtil.toast("远程文件夹地址有误");
                           } else {
-                            Util.instance
+                            HttpUtil.instance
                                 .toast("装载失败，代码${res['error']['code']}");
                           }
                         }
                       },
-                      child: Text(
+                      child: const Text(
                         ' 装载 ',
                         style: TextStyle(fontSize: 18),
                       ),
                     ),
                   ],
                 ),
-                Center(
+                const Center(
                   child: Text("开发中"),
                 ),
               ],

@@ -2,19 +2,21 @@ import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/material.dart';
 
 class MonitorSetting extends StatefulWidget {
+  const MonitorSetting({super.key});
+
   @override
-  _MonitorSettingState createState() => _MonitorSettingState();
+  MonitorSettingState createState() => MonitorSettingState();
 }
 
-class _MonitorSettingState extends State<MonitorSetting> {
+class MonitorSettingState extends State<MonitorSetting> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         leading: AppBackButton(context),
-        title: Text("设置"),
+        title: const Text("设置"),
       ),
-      body: Center(
+      body: const Center(
         child: Text("开发中……"),
       ),
     );

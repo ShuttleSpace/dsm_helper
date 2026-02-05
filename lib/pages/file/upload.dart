@@ -1,17 +1,21 @@
 import 'dart:io';
+import 'package:garden/util/file_type_util.dart';
+import 'package:garden/util/log.dart';
+import 'package:garden/util/ui_util.dart';
 
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:dio/dio.dart';
 import 'package:garden/pages/common/select_local_folder.dart';
 import 'package:garden/pages/file/select_folder.dart';
-import 'package:garden/themes/app_theme.dart';
-import 'package:garden/util/function.dart';
+import 'package:garden/theme/app_theme.dart';
+import 'package:garden/util/http_util.dart';
 import 'package:garden/widgets/file_icon.dart';
 import 'package:garden/widgets/label.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:garden/constants/app_constants.dart';
 import 'package:flutter_vibrate/flutter_vibrate.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -20,9 +24,9 @@ import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 class Upload extends StatefulWidget {
   final String path;
   final List<String>? selectedFilesPath;
-  Upload(this.path, {this.selectedFilesPath});
+  const Upload(this.path, {super.key, this.selectedFilesPath});
   @override
-  _UploadState createState() => _UploadState();
+  UploadState createState() => UploadState();
 }
 
 class UploadItem {
@@ -42,7 +46,7 @@ class UploadItem {
   }
 }
 
-class _UploadState extends State<Upload> {
+class UploadState extends State<Upload> {
   String savePath = "";
   List<UploadItem> uploads = [];
   @override
@@ -65,7 +69,7 @@ class _UploadState extends State<Upload> {
 
   Widget _buildUploadStatus(UploadItem upload) {
     if (upload.status == UploadStatus.complete) {
-      return Label(
+      return const Label(
         "上传完成",
         Colors.lightGreen,
         fill: true,
@@ -73,7 +77,7 @@ class _UploadState extends State<Upload> {
         height: 22,
       );
     } else if (upload.status == UploadStatus.failed) {
-      return Label(
+      return const Label(
         "上传失败",
         Colors.redAccent,
         fill: true,
@@ -81,7 +85,7 @@ class _UploadState extends State<Upload> {
         height: 22,
       );
     } else if (upload.status == UploadStatus.canceled) {
-      return Label(
+      return const Label(
         "取消上传",
         Colors.redAccent,
         fill: true,
@@ -97,7 +101,7 @@ class _UploadState extends State<Upload> {
         height: 22,
       );
     } else if (upload.status == UploadStatus.wait) {
-      return Label(
+      return const Label(
         "等待上传",
         Colors.lightBlueAccent,
         fill: true,
@@ -110,7 +114,8 @@ class _UploadState extends State<Upload> {
   }
 
   Widget _buildUploadItem(UploadItem upload) {
-    FileTypeEnum fileType = Util.instance.fileType(upload.path);
+    FileTypeEnum fileType =
+        FileTypeUtil.toFileTypeEnum(FileTypeUtil.getFileType(upload.path));
     // String path = file['path'];
     return Padding(
       padding:
@@ -120,7 +125,7 @@ class _UploadState extends State<Upload> {
         // margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
         child: Row(
           children: [
-            SizedBox(
+            const SizedBox(
               width: 20,
             ),
             Hero(
@@ -131,7 +136,7 @@ class _UploadState extends State<Upload> {
                 network: false,
               ),
             ),
-            SizedBox(
+            const SizedBox(
               width: 10,
             ),
             Expanded(
@@ -139,8 +144,8 @@ class _UploadState extends State<Upload> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    "${upload.name}",
-                    style: TextStyle(
+                    upload.name,
+                    style: const TextStyle(
                       fontSize: 14,
                     ),
                   ),
@@ -151,18 +156,18 @@ class _UploadState extends State<Upload> {
                           fontSize: 12,
                           color: AppTheme.of(context).placeholderColor),
                     ),
-                  SizedBox(
+                  const SizedBox(
                     height: 5,
                   ),
                   _buildUploadStatus(upload),
                 ],
               ),
             ),
-            SizedBox(
+            const SizedBox(
               width: 10,
             ),
             AnimatedSwitcher(
-              duration: Duration(milliseconds: 200),
+              duration: const Duration(milliseconds: 200),
               child: OutlinedButton(
                 onPressed: () {
                   showCupertinoModalPopup(
@@ -172,16 +177,17 @@ class _UploadState extends State<Upload> {
                         color: Colors.transparent,
                         child: Card(
                           shape: RoundedRectangleBorder(
-                              side: BorderSide(),
+                              side: const BorderSide(),
                               borderRadius: BorderRadius.circular(18)),
                           child: SafeArea(
                             top: false,
                             child: Padding(
-                              padding: const EdgeInsets.all(8.0),
+                              padding: const EdgeInsets.all(
+                                  AppConstants.paddingSmall),
                               child: Column(
                                 mainAxisSize: MainAxisSize.min,
                                 children: <Widget>[
-                                  Text(
+                                  const Text(
                                     "选择操作",
                                     style: TextStyle(
                                         fontSize: 20,
@@ -189,7 +195,7 @@ class _UploadState extends State<Upload> {
                                         fontWeight: FontWeight.w500),
                                   ),
                                   if (upload.status == UploadStatus.failed) ...[
-                                    SizedBox(
+                                    const SizedBox(
                                       height: 22,
                                     ),
                                     OutlinedButton(
@@ -199,13 +205,13 @@ class _UploadState extends State<Upload> {
                                         });
                                         Navigator.of(context).pop();
                                       },
-                                      child: Text(
+                                      child: const Text(
                                         "重试",
                                         style: TextStyle(fontSize: 18),
                                       ),
                                     ),
                                   ],
-                                  SizedBox(
+                                  const SizedBox(
                                     height: 22,
                                   ),
                                   OutlinedButton(
@@ -215,26 +221,26 @@ class _UploadState extends State<Upload> {
                                       });
                                       Navigator.of(context).pop();
                                     },
-                                    child: Text(
+                                    child: const Text(
                                       "取消上传",
                                       style: TextStyle(
                                           fontSize: 18,
                                           color: Colors.redAccent),
                                     ),
                                   ),
-                                  SizedBox(
+                                  const SizedBox(
                                     height: 16,
                                   ),
                                   OutlinedButton(
                                     onPressed: () async {
                                       Navigator.of(context).pop();
                                     },
-                                    child: Text(
+                                    child: const Text(
                                       "取消",
                                       style: TextStyle(fontSize: 18),
                                     ),
                                   ),
-                                  SizedBox(
+                                  const SizedBox(
                                     height: 8,
                                   ),
                                 ],
@@ -246,13 +252,13 @@ class _UploadState extends State<Upload> {
                     },
                   );
                 },
-                child: Icon(
+                child: const Icon(
                   CupertinoIcons.right_chevron,
                   size: 18,
                 ),
               ),
             ),
-            SizedBox(
+            const SizedBox(
               width: 20,
             ),
           ],
@@ -266,20 +272,20 @@ class _UploadState extends State<Upload> {
     return Scaffold(
       appBar: AppBar(
         leading: AppBackButton(context),
-        title: Text(
+        title: const Text(
           "文件上传",
         ),
       ),
       body: Column(
         children: [
           Padding(
-            padding: EdgeInsets.all(20),
+            padding: const EdgeInsets.all(20),
             child: OutlinedButton(
               onPressed: () {
                 showCupertinoModalPopup(
                   context: context,
                   builder: (context) {
-                    return SelectFolder(
+                    return const SelectFolder(
                       multi: false,
                     );
                   },
@@ -296,13 +302,13 @@ class _UploadState extends State<Upload> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
+                    const Text(
                       "上传位置",
                       style: TextStyle(fontSize: 12),
                     ),
                     Text(
                       savePath == "" ? "请选择上传位置" : savePath,
-                      style: TextStyle(fontSize: 16, color: Colors.grey),
+                      style: const TextStyle(fontSize: 16, color: Colors.grey),
                     ),
                   ],
                 ),
@@ -310,7 +316,7 @@ class _UploadState extends State<Upload> {
             ),
           ),
           Expanded(
-            child: uploads.length > 0
+            child: uploads.isNotEmpty
                 ? ListView.builder(
                     itemBuilder: (context, i) {
                       return _buildUploadItem(uploads[i]);
@@ -327,7 +333,7 @@ class _UploadState extends State<Upload> {
           ),
           SafeArea(
             child: Padding(
-              padding: EdgeInsets.all(20),
+              padding: const EdgeInsets.all(20),
               child: Row(
                 children: [
                   Expanded(
@@ -340,22 +346,23 @@ class _UploadState extends State<Upload> {
                               color: Colors.transparent,
                               child: Card(
                                 shape: RoundedRectangleBorder(
-                                    side: BorderSide(),
+                                    side: const BorderSide(),
                                     borderRadius: BorderRadius.circular(18)),
                                 child: SafeArea(
                                   top: false,
                                   child: Padding(
-                                    padding: const EdgeInsets.all(8.0),
+                                    padding: const EdgeInsets.all(
+                                        AppConstants.paddingSmall),
                                     child: Column(
                                       mainAxisSize: MainAxisSize.min,
                                       children: <Widget>[
-                                        Text(
+                                        const Text(
                                           "选择添加方式",
                                           style: TextStyle(
                                               fontSize: 20,
                                               fontWeight: FontWeight.w500),
                                         ),
-                                        SizedBox(
+                                        const SizedBox(
                                           height: 12,
                                         ),
                                         OutlinedButton(
@@ -365,11 +372,11 @@ class _UploadState extends State<Upload> {
                                                 await AssetPicker.pickAssets(
                                                     context,
                                                     pickerConfig:
-                                                        AssetPickerConfig(
+                                                        const AssetPickerConfig(
                                                             maxAssets: 1000));
                                             if (assets != null &&
                                                 assets.isNotEmpty) {
-                                              assets.forEach((asset) {
+                                              for (var asset in assets) {
                                                 asset.file.then((file) {
                                                   if (file == null) {
                                                     return;
@@ -382,17 +389,17 @@ class _UploadState extends State<Upload> {
                                                             .last));
                                                   });
                                                 });
-                                              });
+                                              }
                                             } else {
                                               debugPrint("未选择文件");
                                             }
                                           },
-                                          child: Text(
+                                          child: const Text(
                                             "上传图片",
                                             style: TextStyle(fontSize: 18),
                                           ),
                                         ),
-                                        SizedBox(
+                                        const SizedBox(
                                           height: 20,
                                         ),
                                         OutlinedButton(
@@ -411,7 +418,7 @@ class _UploadState extends State<Upload> {
                                                     .request()
                                                     .isGranted;
                                                 if (!permission) {
-                                                  Util.instance
+                                                  HttpUtil.instance
                                                       .toast("安卓11需授权文件管理权限");
                                                   return;
                                                 }
@@ -422,87 +429,98 @@ class _UploadState extends State<Upload> {
                                                     .request()
                                                     .isGranted;
                                                 if (!permission) {
-                                                  Util.instance
+                                                  HttpUtil.instance
                                                       .toast("请先授权APP访问存储权限");
                                                   return;
                                                 }
                                               }
-                                              showCupertinoModalBottomSheet<
-                                                  List<FileSystemEntity>>(
-                                                context: context,
-                                                builder: (context) {
-                                                  return SelectLocalFolder(
-                                                    multi: true,
-                                                    folder: false,
-                                                  );
-                                                },
-                                              ).then((res) {
-                                                if (res != null &&
-                                                    res.length > 0) {
-                                                  res.forEach((entry) {
-                                                    if (FileSystemEntity
-                                                        .isFileSync(
-                                                            entry.path)) {
-                                                      setState(() {
-                                                        uploads.add(UploadItem(
-                                                            entry.path,
-                                                            entry.path
-                                                                .split("/")
-                                                                .last));
-                                                      });
-                                                    } else {
-                                                      Directory directory =
-                                                          Directory(entry.path);
-                                                      directory
-                                                          .list(recursive: true)
-                                                          .forEach((element) {
-                                                        if (!element.path
-                                                            .split("/")
-                                                            .last
-                                                            .startsWith(".")) {
-                                                          if (FileSystemEntity
-                                                              .isFileSync(
-                                                                  element
-                                                                      .path)) {
-                                                            List<String> slice =
-                                                                element.path
-                                                                    .replaceFirst(
-                                                                        "${entry.path}/",
-                                                                        "")
-                                                                    .split("/");
-                                                            setState(() {
-                                                              uploads.add(UploadItem(
-                                                                  element.path,
-                                                                  slice.last,
-                                                                  subPath: slice
-                                                                      .getRange(
-                                                                          0,
-                                                                          slice.length -
-                                                                              1)
-                                                                      .join(
-                                                                          "/")));
-                                                            });
+                                              if (context.mounted) {
+                                                showCupertinoModalBottomSheet<
+                                                    List<FileSystemEntity>>(
+                                                  context: context,
+                                                  builder: (context) {
+                                                    return const SelectLocalFolder(
+                                                      multi: true,
+                                                      folder: false,
+                                                    );
+                                                  },
+                                                ).then((res) {
+                                                  if (res != null &&
+                                                      res.isNotEmpty) {
+                                                    for (var entry in res) {
+                                                      if (FileSystemEntity
+                                                          .isFileSync(
+                                                              entry.path)) {
+                                                        setState(() {
+                                                          uploads.add(
+                                                              UploadItem(
+                                                                  entry.path,
+                                                                  entry
+                                                                      .path
+                                                                      .split(
+                                                                          "/")
+                                                                      .last));
+                                                        });
+                                                      } else {
+                                                        Directory directory =
+                                                            Directory(
+                                                                entry.path);
+                                                        directory
+                                                            .list(
+                                                                recursive: true)
+                                                            .forEach((element) {
+                                                          if (!element.path
+                                                              .split("/")
+                                                              .last
+                                                              .startsWith(
+                                                                  ".")) {
+                                                            if (FileSystemEntity
+                                                                .isFileSync(
+                                                                    element
+                                                                        .path)) {
+                                                              List<String>
+                                                                  slice =
+                                                                  element.path
+                                                                      .replaceFirst(
+                                                                          "${entry.path}/",
+                                                                          "")
+                                                                      .split(
+                                                                          "/");
+                                                              setState(() {
+                                                                uploads.add(UploadItem(
+                                                                    element
+                                                                        .path,
+                                                                    slice.last,
+                                                                    subPath: slice
+                                                                        .getRange(
+                                                                            0,
+                                                                            slice.length -
+                                                                                1)
+                                                                        .join(
+                                                                            "/")));
+                                                              });
+                                                            }
                                                           }
-                                                        }
-                                                      });
+                                                        });
+                                                      }
                                                     }
-                                                  });
-                                                }
-                                                // if (res != null && res.length == 1) {
-                                                //   setState(() {
-                                                //     downloadPath = res[0];
-                                                //     Util.downloadSavePath = res[0];
-                                                //     Util.setStorage("download_save_path", res[0]);
-                                                //   });
-                                                // }
-                                              });
+                                                  }
+                                                  // if (res != null && res.length == 1) {
+                                                  //   setState(() {
+                                                  //     downloadPath = res[0];
+                                                  //     HttpUtil.downloadSavePath = res[0];
+                                                  //     HttpUtil.setStorage("download_save_path", res[0]);
+                                                  //   });
+                                                  // }
+                                                });
+                                              }
                                             } else {
                                               FilePickerResult? result =
                                                   await FilePicker.platform
                                                       .pickFiles(
                                                           allowMultiple: true);
                                               if (result == null) {
-                                                Util.instance.toast('选择文件为空!');
+                                                UiUtil.toast('选择文件为空!');
                                                 return;
                                               }
                                               setState(() {
@@ -517,24 +535,24 @@ class _UploadState extends State<Upload> {
                                               });
                                             }
                                           },
-                                          child: Text(
+                                          child: const Text(
                                             "上传文件",
                                             style: TextStyle(fontSize: 18),
                                           ),
                                         ),
-                                        SizedBox(
+                                        const SizedBox(
                                           height: 20,
                                         ),
                                         OutlinedButton(
                                           onPressed: () async {
                                             Navigator.of(context).pop();
                                           },
-                                          child: Text(
+                                          child: const Text(
                                             "取消",
                                             style: TextStyle(fontSize: 18),
                                           ),
                                         ),
-                                        SizedBox(
+                                        const SizedBox(
                                           height: 8,
                                         ),
                                       ],
@@ -546,18 +564,18 @@ class _UploadState extends State<Upload> {
                           },
                         );
                       },
-                      child: Text("添加文件"),
+                      child: const Text("添加文件"),
                     ),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     width: 20,
                   ),
                   Expanded(
                     child: OutlinedButton(
                       onPressed: () async {
                         if (savePath.isBlank) {
-                          Util.instance.vibrate(FeedbackType.warning);
-                          Util.instance.toast("请选择上传位置");
+                          UiUtil.vibrate(FeedbackType.warning);
+                          UiUtil.toast("请选择上传位置");
                           return;
                         }
                         // return;
@@ -570,7 +588,7 @@ class _UploadState extends State<Upload> {
                           setState(() {
                             upload.status = UploadStatus.running;
                           });
-                          // print("上传路径：$savePath${upload.subPath.isNotBlank ? "/${upload.subPath}" : ""}");
+                          // Log.info("上传路径：$savePath${upload.subPath.isNotBlank ? "/${upload.subPath}" : ""}");
                           var res = await Api.upload(
                               "$savePath${upload.subPath.isNotBlank ? "/${upload.subPath}" : ""}",
                               upload.path,
@@ -580,7 +598,7 @@ class _UploadState extends State<Upload> {
                               upload.fileSize = total;
                             });
                           });
-                          print(res);
+                          Log.info(res);
                           if (res['success']) {
                             setState(() {
                               upload.status = UploadStatus.complete;
@@ -592,7 +610,7 @@ class _UploadState extends State<Upload> {
                           }
                         }
                       },
-                      child: Text("开始上传"),
+                      child: const Text("开始上传"),
                     ),
                   ),
                 ],

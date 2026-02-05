@@ -9,6 +9,7 @@
 /// wallpaper_path : "/usr/syno/etc/preference/admin/3.png"
 /// wallpaper_position : "fill"
 /// wallpaper_type : "history"
+library;
 
 class WallpaperModel {
   WallpaperModel({

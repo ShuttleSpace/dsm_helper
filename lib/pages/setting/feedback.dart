@@ -1,50 +1,52 @@
-import 'package:garden/util/function.dart';
+import 'package:garden/util/ui_util.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/material.dart';
+import 'package:garden/constants/app_constants.dart';
 
 class Feedback extends StatefulWidget {
-  const Feedback();
+  const Feedback({super.key});
 
   @override
-  _FeedbackState createState() => _FeedbackState();
+  FeedbackState createState() => FeedbackState();
 }
 
-class _FeedbackState extends State<Feedback> {
+class FeedbackState extends State<Feedback> {
   String content = "";
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         leading: AppBackButton(context),
-        title: Text("问题反馈"),
+        title: const Text("问题反馈"),
       ),
       body: ListView(
-        padding: EdgeInsets.all(20),
+        padding: const EdgeInsets.all(20),
         children: [
           Card(
             shape: RoundedRectangleBorder(
-                side: BorderSide(), borderRadius: BorderRadius.circular(18)),
+                side: const BorderSide(),
+                borderRadius: BorderRadius.circular(18)),
             child: Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding: const EdgeInsets.all(AppConstants.paddingSmall),
               child: TextField(
                 onChanged: (v) => content = v,
                 maxLines: 5,
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   border: InputBorder.none,
                   labelText: '请输入反馈内容',
                 ),
               ),
             ),
           ),
-          SizedBox(
+          const SizedBox(
             height: 20,
           ),
           OutlinedButton(
               onPressed: () {
-                Util.instance.toast("感谢您的反馈");
+                UiUtil.toast("感谢您的反馈");
                 Navigator.of(context).pop();
               },
-              child: Row(
+              child: const Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(

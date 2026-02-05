@@ -1,21 +1,25 @@
 import 'dart:convert';
+import 'package:garden/util/ui_util.dart';
+import 'package:garden/stores/connection_store.dart';
 
-import 'package:garden/util/function.dart';
+import 'package:garden/util/http_util.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:garden/constants/app_constants.dart';
+import 'package:garden/theme/app_colors.dart';
 import 'package:flutter/services.dart';
 
 class OtpBind extends StatefulWidget {
   final String username;
   final String email;
-  OtpBind(this.username, this.email);
+  const OtpBind(this.username, this.email, {super.key});
   @override
-  _OtpBindState createState() => _OtpBindState();
+  OtpBindState createState() => OtpBindState();
 }
 
-class _OtpBindState extends State<OtpBind> {
-  TextEditingController _emailController = TextEditingController();
+class OtpBindState extends State<OtpBind> {
+  final TextEditingController _emailController = TextEditingController();
   String email = '';
   int step = 0;
   Uint8List qrData = Uint8List(0);
@@ -38,38 +42,39 @@ class _OtpBindState extends State<OtpBind> {
     return Scaffold(
       appBar: AppBar(
         leading: AppBackButton(context),
-        title: Text("二步验证"),
+        title: const Text("二步验证"),
       ),
       body: ListView(
-        padding: EdgeInsets.all(20),
+        padding: const EdgeInsets.all(20),
         children: [
           if (step == 0) ...[
-            Text("请输入电子邮件地址。如果您的移动设备遗失，可将紧急验证代码发送到在此提供的电子邮件地址。"),
-            SizedBox(
+            const Text("请输入电子邮件地址。如果您的移动设备遗失，可将紧急验证代码发送到在此提供的电子邮件地址。"),
+            const SizedBox(
               height: 20,
             ),
             Card(
               shape: RoundedRectangleBorder(
-                  side: BorderSide(), borderRadius: BorderRadius.circular(18)),
+                  side: const BorderSide(),
+                  borderRadius: BorderRadius.circular(18)),
               child: Padding(
-                padding: const EdgeInsets.all(8.0),
+                padding: const EdgeInsets.all(AppConstants.paddingSmall),
                 child: TextField(
                   controller: _emailController,
                   onChanged: (v) => email = v,
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     border: InputBorder.none,
                     labelText: '电子邮件',
                   ),
                 ),
               ),
             ),
-            SizedBox(
+            const SizedBox(
               height: 20,
             ),
             OutlinedButton(
               onPressed: () async {
                 if (email.isBlank) {
-                  Util.instance.toast("请输入邮箱");
+                  UiUtil.toast("请输入邮箱");
                   return;
                 }
                 if (emailSaving) {
@@ -82,70 +87,72 @@ class _OtpBindState extends State<OtpBind> {
 
                 if (res['success']) {
                   var qrcode = await Api.getQrCode(
-                      "${widget.username}@${Util.instance.hostname}");
+                      "${widget.username}@${connectionStore.hostname}");
                   if (qrcode['success']) {
                     setState(() {
-                      qrData = Base64Decoder().convert(qrcode['data']['img']);
+                      qrData =
+                          const Base64Decoder().convert(qrcode['data']['img']);
                       key = qrcode['data']['key'];
                       step = 1;
                     });
                   } else {
-                    Util.instance.toast("获取二部验证数据出错，代码${res['error']['code']}");
+                    UiUtil.toast("获取二部验证数据出错，代码${res['error']['code']}");
                   }
                 } else {
-                  Util.instance.toast("保存邮箱出错，代码${res['error']['code']}");
+                  UiUtil.toast("保存邮箱出错，代码${res['error']['code']}");
                 }
                 setState(() {
                   emailSaving = false;
                 });
               },
               child: emailSaving
-                  ? CupertinoActivityIndicator(
+                  ? const CupertinoActivityIndicator(
                       radius: 13,
                     )
-                  : Text(
+                  : const Text(
                       ' 下一步 ',
                       style: TextStyle(fontSize: 18),
                     ),
             ),
           ] else if (step == 1) ...[
-            Text(
+            const Text(
                 "DSM 支持以下验证器应用程序： Google Authenticator, Authy等，打开验证器，扫描以下二维码，或者手动输入秘钥"),
-            SizedBox(
+            const SizedBox(
               height: 20,
             ),
             Center(
               child: Image.memory(qrData),
             ),
-            SizedBox(
+            const SizedBox(
               height: 20,
             ),
             Card(
               shape: RoundedRectangleBorder(
-                  side: BorderSide(), borderRadius: BorderRadius.circular(18)),
+                  side: const BorderSide(),
+                  borderRadius: BorderRadius.circular(18)),
               child: Padding(
-                padding: EdgeInsets.all(20),
+                padding: const EdgeInsets.all(20),
                 child: Row(
                   children: [
                     Expanded(
                       child: Text(
-                        "账号：${widget.username}@${Util.instance.hostname}",
+                        "账号：${widget.username}@${connectionStore.hostname}",
                       ),
                     ),
                     OutlinedButton(
                       onPressed: () async {
-                        ClipboardData data = new ClipboardData(
+                        ClipboardData data = ClipboardData(
                             text:
-                                "${widget.username}@${Util.instance.hostname}");
+                                "${widget.username}@${connectionStore.hostname}");
                         Clipboard.setData(data);
-                        Util.instance.toast("已复制到剪贴板");
+                        UiUtil.toast("已复制到剪贴板");
                       },
-                      child: SizedBox(
+                      child: const SizedBox(
                         width: 20,
                         height: 20,
                         child: Icon(
                           Icons.copy,
-                          color: Color(0xffff9813),
+                          color: AppColors.primaryAction,
                           size: 16,
                         ),
                       ),
@@ -154,14 +161,15 @@ class _OtpBindState extends State<OtpBind> {
                 ),
               ),
             ),
-            SizedBox(
+            const SizedBox(
               height: 20,
             ),
             Card(
               shape: RoundedRectangleBorder(
-                  side: BorderSide(), borderRadius: BorderRadius.circular(18)),
+                  side: const BorderSide(),
+                  borderRadius: BorderRadius.circular(18)),
               child: Padding(
-                padding: EdgeInsets.all(20),
+                padding: const EdgeInsets.all(20),
                 child: Row(
                   children: [
                     Expanded(
@@ -171,16 +179,16 @@ class _OtpBindState extends State<OtpBind> {
                     ),
                     OutlinedButton(
                       onPressed: () async {
-                        ClipboardData data = new ClipboardData(text: "$key");
+                        ClipboardData data = ClipboardData(text: key);
                         Clipboard.setData(data);
-                        Util.instance.toast("已复制到剪贴板");
+                        UiUtil.toast("已复制到剪贴板");
                       },
-                      child: SizedBox(
+                      child: const SizedBox(
                         width: 20,
                         height: 20,
                         child: Icon(
                           Icons.copy,
-                          color: Color(0xffff9813),
+                          color: AppColors.primaryAction,
                           size: 16,
                         ),
                       ),
@@ -189,30 +197,31 @@ class _OtpBindState extends State<OtpBind> {
                 ),
               ),
             ),
-            SizedBox(
+            const SizedBox(
               height: 20,
             ),
             Card(
               shape: RoundedRectangleBorder(
-                  side: BorderSide(), borderRadius: BorderRadius.circular(18)),
+                  side: const BorderSide(),
+                  borderRadius: BorderRadius.circular(18)),
               child: Padding(
-                padding: const EdgeInsets.all(8.0),
+                padding: const EdgeInsets.all(AppConstants.paddingSmall),
                 child: TextField(
                   onChanged: (v) => code = v,
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     border: InputBorder.none,
                     labelText: '6位验证代码',
                   ),
                 ),
               ),
             ),
-            SizedBox(
+            const SizedBox(
               height: 20,
             ),
             OutlinedButton(
               onPressed: () async {
                 if (code.isBlank) {
-                  Util.instance.toast("请输入6位验证代码");
+                  UiUtil.toast("请输入6位验证代码");
                   return;
                 }
                 if (codeChecking) {
@@ -228,30 +237,30 @@ class _OtpBindState extends State<OtpBind> {
                     step = 2;
                   });
                 } else {
-                  Util.instance.toast("保存邮箱出错，代码${res['error']['code']}");
+                  UiUtil.toast("保存邮箱出错，代码${res['error']['code']}");
                 }
                 setState(() {
                   emailSaving = false;
                 });
               },
               child: codeChecking
-                  ? CupertinoActivityIndicator(
+                  ? const CupertinoActivityIndicator(
                       radius: 13,
                     )
-                  : Text(
+                  : const Text(
                       ' 下一步 ',
                       style: TextStyle(fontSize: 18),
                     ),
             ),
           ] else if (step == 2) ...[
-            Text(
+            const Text(
                 "两步骤验证设置完成。下次登录 DSM 时，将提示您输入验证器应用程序生成的验证代码。两步骤验证对于用某些移动应用程序进行登录有影响。为避免遇到任何难题，请确认您已安装任何需要登录 DSM 的移动应用程序的最新版本。"),
-            Text("注意：您可在“帐户活动” &gt; “记住的设备”中管理最常用的设备。"),
+            const Text("注意：您可在“帐户活动” &gt; “记住的设备”中管理最常用的设备。"),
             OutlinedButton(
               onPressed: () async {
                 Navigator.of(context).pop(true);
               },
-              child: Text(
+              child: const Text(
                 ' 完成 ',
                 style: TextStyle(fontSize: 18),
               ),

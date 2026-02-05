@@ -1,20 +1,30 @@
 import 'package:garden/pages/control_panel/power/add_power_task.dart';
-import 'package:garden/themes/app_theme.dart';
-import 'package:garden/util/function.dart';
-import 'package:garden/util/neu_picker.dart';
+import 'package:garden/util/ui_util.dart';
+import 'package:garden/theme/app_theme.dart';
+import 'package:garden/util/http_util.dart';
 import 'package:garden/widgets/bubble_tab_indicator.dart';
-import 'package:garden/widgets/label.dart';
 import 'package:garden/widgets/neu_back_button.dart';
+import 'package:garden/widgets/control_panel/power_task_item.dart';
+import 'package:garden/widgets/control_panel/memory_compression_card.dart';
+import 'package:garden/widgets/control_panel/power_recovery_card.dart';
+import 'package:garden/widgets/control_panel/beep_control_card.dart';
+import 'package:garden/widgets/control_panel/fan_mode_card.dart';
+import 'package:garden/widgets/control_panel/led_brightness_card.dart';
+import 'package:garden/widgets/control_panel/hibernation_settings_card.dart';
+import 'package:garden/widgets/control_panel/usb_hibernation_card.dart';
+import 'package:garden/widgets/control_panel/auto_power_off_card.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_vibrate/flutter_vibrate.dart';
 
 class Power extends StatefulWidget {
+  const Power({super.key});
+
   @override
-  _PowerState createState() => _PowerState();
+  PowerState createState() => PowerState();
 }
 
-class _PowerState extends State<Power> with SingleTickerProviderStateMixin {
+class PowerState extends State<Power> with SingleTickerProviderStateMixin {
   late TabController _tabController;
   bool loading = true;
   bool enableZram = false;
@@ -82,7 +92,7 @@ class _PowerState extends State<Power> with SingleTickerProviderStateMixin {
           loading = false;
         });
         List result = res['data']['result'];
-        result.forEach((item) {
+        for (var item in result) {
           if (item['success'] == true) {
             switch (item['api']) {
               case "SYNO.Core.Hardware.ZRAM":
@@ -151,143 +161,9 @@ class _PowerState extends State<Power> with SingleTickerProviderStateMixin {
                 break;
             }
           }
-        });
+        }
       }
     });
-  }
-
-  Map weekday = {
-    "0": "周日",
-    "1": "周一",
-    "2": "周二",
-    "3": "周三",
-    "4": "周四",
-    "5": "周五",
-    "6": "周六",
-  };
-  Widget _buildPowerTaskItem(task) {
-    String weekdays = "";
-    if (task['weekdays'] == "0,1,2,3,4,5,6") {
-      weekdays = "每天";
-    } else if (task['weekdays'] == "1,2,3,4,5") {
-      weekdays = "平日";
-    } else if (task['weekdays'] == "0,6") {
-      weekdays = "假日";
-    } else {
-      List days = task['weekdays'].split(",");
-      weekdays = days.map((e) => weekday[e]).join(",");
-    }
-    return GestureDetector(
-      onTap: () {
-        setState(() {
-          task['enabled'] = !task['enabled'];
-        });
-      },
-      child: Card(
-        shape: RoundedRectangleBorder(
-            side: BorderSide(), borderRadius: BorderRadius.circular(18)),
-        margin: EdgeInsets.only(top: 20, left: 20, right: 20),
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-          child: Row(
-            children: [
-              SizedBox(
-                width: 22,
-                child: task['enabled']
-                    ? Icon(
-                        CupertinoIcons.checkmark_alt,
-                        color: Color(0xffff9813),
-                        size: 22,
-                      )
-                    : null,
-              ),
-              SizedBox(
-                width: 20,
-              ),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Text(
-                            "${task['hour'].toString().padLeft(2, "0")}:${task['min'].toString().padLeft(2, "0")}"),
-                        SizedBox(
-                          width: 5,
-                        ),
-                        Label(
-                            task['type'] == "power_on" ? "开机" : "关机",
-                            task['type'] == "power_on"
-                                ? Colors.green
-                                : Colors.orangeAccent),
-                      ],
-                    ),
-                    SizedBox(
-                      height: 5,
-                    ),
-                    Text(
-                      "$weekdays",
-                      style: TextStyle(color: Colors.grey, fontSize: 12),
-                    ),
-                  ],
-                ),
-              ),
-              Column(
-                children: [
-                  OutlinedButton(
-                    onPressed: () {
-                      setState(() {
-                        powerTasks.remove(task);
-                      });
-                    },
-                    child: Icon(
-                      Icons.remove_circle_outline,
-                      color: Colors.red,
-                    ),
-                  ),
-                  SizedBox(
-                    height: 10,
-                  ),
-                  OutlinedButton(
-                    onPressed: () {
-                      Navigator.of(context)
-                          .push(CupertinoPageRoute(
-                              builder: (context) {
-                                return AddPowerTask(
-                                  "编辑计划管理",
-                                  task: task,
-                                );
-                              },
-                              settings: RouteSettings(name: "edit_power_task")))
-                          .then((value) {
-                        if (value != null) {
-                          for (var item in powerTasks) {
-                            if (item != task &&
-                                item['hour'] == value['hour'] &&
-                                item['min'] == value['min']) {
-                              Util.instance.toast("无效或重复规则");
-                              Util.instance.vibrate(FeedbackType.warning);
-                              return;
-                            }
-                          }
-                          setState(() {
-                            task = value;
-                          });
-                        }
-                      });
-                    },
-                    child: Icon(
-                      Icons.edit_outlined,
-                      color: Colors.orangeAccent,
-                    ),
-                  ),
-                ],
-              )
-            ],
-          ),
-        ),
-      ),
-    );
   }
 
   @override
@@ -295,10 +171,10 @@ class _PowerState extends State<Power> with SingleTickerProviderStateMixin {
     return Scaffold(
       appBar: AppBar(
         leading: AppBackButton(context),
-        title: Text("硬件和电源"),
+        title: const Text("硬件和电源"),
       ),
       body: loading
-          ? Center(
+          ? const Center(
               child: CupertinoActivityIndicator(
                 radius: 14,
               ),
@@ -307,9 +183,10 @@ class _PowerState extends State<Power> with SingleTickerProviderStateMixin {
               children: [
                 Card(
                   shape: RoundedRectangleBorder(
-                      side: BorderSide(),
+                      side: const BorderSide(),
                       borderRadius: BorderRadius.circular(18)),
-                  margin: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                  margin:
+                      const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
                   child: TabBar(
                     dividerHeight: 0,
                     isScrollable: true,
@@ -319,8 +196,8 @@ class _PowerState extends State<Power> with SingleTickerProviderStateMixin {
                         ? Colors.white
                         : Colors.black,
                     unselectedLabelColor: Colors.grey,
-                    indicator: BubbleTabIndicator(),
-                    tabs: [
+                    indicator: const BubbleTabIndicator(),
+                    tabs: const [
                       Padding(
                         padding:
                             EdgeInsets.symmetric(vertical: 10, horizontal: 5),
@@ -353,859 +230,81 @@ class _PowerState extends State<Power> with SingleTickerProviderStateMixin {
                           Expanded(
                             child: ListView(
                               children: [
-                                Card(
-                                  shape: RoundedRectangleBorder(
-                                      side: BorderSide(),
-                                      borderRadius: BorderRadius.circular(18)),
-                                  margin: EdgeInsets.only(
-                                      top: 20, left: 20, right: 20),
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(20.0),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          "内存压缩",
-                                          style: TextStyle(
-                                              fontSize: 18,
-                                              fontWeight: FontWeight.w600),
-                                        ),
-                                        SizedBox(
-                                          height: 20,
-                                        ),
-                                        Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            GestureDetector(
-                                              onTap: () async {
-                                                setState(() {
-                                                  enableZram = !enableZram;
-                                                });
-                                              },
-                                              child: Card(
-                                                shape: RoundedRectangleBorder(
-                                                    side: BorderSide(),
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            5)),
-                                                child: Padding(
-                                                  padding:
-                                                      const EdgeInsets.all(8.0),
-                                                  child: Row(
-                                                    children: [
-                                                      Text("启用内存压缩可提高系统响应性能"),
-                                                      Spacer(),
-                                                      if (enableZram)
-                                                        Icon(
-                                                          CupertinoIcons
-                                                              .checkmark_alt,
-                                                          color:
-                                                              Color(0xffff9813),
-                                                          size: 22,
-                                                        ),
-                                                    ],
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ],
-                                    ),
-                                  ),
+                                MemoryCompressionCard(
+                                  enableZram: enableZram,
+                                  onToggle: (value) {
+                                    setState(() {
+                                      enableZram = value;
+                                    });
+                                  },
                                 ),
-                                Card(
-                                  shape: RoundedRectangleBorder(
-                                      side: BorderSide(),
-                                      borderRadius: BorderRadius.circular(18)),
-                                  margin: EdgeInsets.only(
-                                      top: 20, left: 20, right: 20),
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(20.0),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          "电源自动恢复",
-                                          style: TextStyle(
-                                              fontSize: 18,
-                                              fontWeight: FontWeight.w600),
-                                        ),
-                                        SizedBox(
-                                          height: 20,
-                                        ),
-                                        Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            GestureDetector(
-                                              onTap: () async {
-                                                setState(() {
-                                                  powerRecovery[
-                                                          'rc_power_config'] =
-                                                      !powerRecovery[
-                                                          'rc_power_config'];
-                                                });
-                                              },
-                                              child: Card(
-                                                shape: RoundedRectangleBorder(
-                                                    side: BorderSide(),
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            5)),
-                                                child: Padding(
-                                                  padding:
-                                                      const EdgeInsets.all(8.0),
-                                                  child: Row(
-                                                    children: [
-                                                      Text("修复电源问题后自动重新启动"),
-                                                      Spacer(),
-                                                      if (powerRecovery[
-                                                          'rc_power_config'])
-                                                        Icon(
-                                                          CupertinoIcons
-                                                              .checkmark_alt,
-                                                          color:
-                                                              Color(0xffff9813),
-                                                          size: 22,
-                                                        ),
-                                                    ],
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                            if (powerRecovery[
-                                                    'internal_lan_num'] !=
-                                                null)
-                                              for (int i = 1;
-                                                  i <=
-                                                      powerRecovery[
-                                                          'internal_lan_num'];
-                                                  i++)
-                                                if (powerRecovery['wol$i'] !=
-                                                    null) ...[
-                                                  SizedBox(
-                                                    height: 20,
-                                                  ),
-                                                  GestureDetector(
-                                                    onTap: () async {
-                                                      setState(() {
-                                                        powerRecovery['wol$i'] =
-                                                            !powerRecovery[
-                                                                'wol$i'];
-                                                      });
-                                                    },
-                                                    child: Card(
-                                                      shape:
-                                                          RoundedRectangleBorder(
-                                                              side:
-                                                                  BorderSide(),
-                                                              borderRadius:
-                                                                  BorderRadius
-                                                                      .circular(
-                                                                          5)),
-                                                      child: Padding(
-                                                        padding:
-                                                            const EdgeInsets
-                                                                .all(8.0),
-                                                        child: Row(
-                                                          children: [
-                                                            Text(
-                                                                "启用局域网 $i 的局域网唤醒"),
-                                                            Spacer(),
-                                                            if (powerRecovery[
-                                                                'wol$i'])
-                                                              Icon(
-                                                                CupertinoIcons
-                                                                    .checkmark_alt,
-                                                                color: Color(
-                                                                    0xffff9813),
-                                                                size: 22,
-                                                              ),
-                                                          ],
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ],
-                                          ],
-                                        ),
-                                      ],
-                                    ),
-                                  ),
+                                PowerRecoveryCard(
+                                  powerRecovery: powerRecovery,
+                                  onRcPowerConfigChanged: (value) {
+                                    setState(() {
+                                      powerRecovery['rc_power_config'] = value;
+                                    });
+                                  },
+                                  onWolChanged: (index, value) {
+                                    setState(() {
+                                      powerRecovery['wol$index'] = value;
+                                    });
+                                  },
                                 ),
-                                Card(
-                                  shape: RoundedRectangleBorder(
-                                      side: BorderSide(),
-                                      borderRadius: BorderRadius.circular(18)),
-                                  margin: EdgeInsets.only(
-                                      top: 20, left: 20, right: 20),
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(20.0),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          "哔声控制",
-                                          style: TextStyle(
-                                              fontSize: 18,
-                                              fontWeight: FontWeight.w600),
-                                        ),
-                                        SizedBox(
-                                          height: 20,
-                                        ),
-                                        Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            if (beepControl[
-                                                        'support_fan_fail'] !=
-                                                    null &&
-                                                beepControl[
-                                                    'support_fan_fail']) ...[
-                                              GestureDetector(
-                                                onTap: () async {
-                                                  setState(() {
-                                                    beepControl['fan_fail'] =
-                                                        !beepControl[
-                                                            'fan_fail'];
-                                                  });
-                                                },
-                                                child: Card(
-                                                  shape: RoundedRectangleBorder(
-                                                      side: BorderSide(),
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              5)),
-                                                  child: Padding(
-                                                    padding:
-                                                        const EdgeInsets.all(
-                                                            8.0),
-                                                    child: Row(
-                                                      children: [
-                                                        Text("冷却风扇故障"),
-                                                        Spacer(),
-                                                        if (beepControl[
-                                                            'fan_fail'])
-                                                          Icon(
-                                                            CupertinoIcons
-                                                                .checkmark_alt,
-                                                            color: Color(
-                                                                0xffff9813),
-                                                            size: 22,
-                                                          ),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                ),
-                                              ),
-                                              SizedBox(
-                                                height: 20,
-                                              ),
-                                            ],
-                                            if (beepControl[
-                                                        'support_volume_crash'] !=
-                                                    null &&
-                                                beepControl[
-                                                    'support_volume_crash']) ...[
-                                              GestureDetector(
-                                                onTap: () async {
-                                                  setState(() {
-                                                    beepControl[
-                                                            'volume_crash'] =
-                                                        !beepControl[
-                                                            'volume_crash'];
-                                                  });
-                                                },
-                                                child: Card(
-                                                  shape: RoundedRectangleBorder(
-                                                      side: BorderSide(),
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              5)),
-                                                  child: Padding(
-                                                    padding:
-                                                        const EdgeInsets.all(
-                                                            8.0),
-                                                    child: Row(
-                                                      children: [
-                                                        Text("存储空间降级或毁损"),
-                                                        Spacer(),
-                                                        if (beepControl[
-                                                            'volume_crash'])
-                                                          Icon(
-                                                            CupertinoIcons
-                                                                .checkmark_alt,
-                                                            color: Color(
-                                                                0xffff9813),
-                                                            size: 22,
-                                                          ),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                ),
-                                              ),
-                                              SizedBox(
-                                                height: 20,
-                                              ),
-                                            ],
-                                            if (beepControl[
-                                                        'support_volume_or_cache_crash'] !=
-                                                    null &&
-                                                beepControl[
-                                                    'support_volume_or_cache_crash']) ...[
-                                              GestureDetector(
-                                                onTap: () async {
-                                                  setState(() {
-                                                    beepControl[
-                                                            'support_volume_or_cache_crash'] =
-                                                        !beepControl[
-                                                            'support_volume_or_cache_crash'];
-                                                  });
-                                                },
-                                                child: Card(
-                                                  shape: RoundedRectangleBorder(
-                                                      side: BorderSide(),
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              5)),
-                                                  child: Padding(
-                                                    padding:
-                                                        const EdgeInsets.all(
-                                                            8.0),
-                                                    child: Row(
-                                                      children: [
-                                                        Text("存储空间或 SSD 缓存异常"),
-                                                        Spacer(),
-                                                        if (beepControl[
-                                                            'support_volume_or_cache_crash'])
-                                                          Icon(
-                                                            CupertinoIcons
-                                                                .checkmark_alt,
-                                                            color: Color(
-                                                                0xffff9813),
-                                                            size: 22,
-                                                          ),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                ),
-                                              ),
-                                              SizedBox(
-                                                height: 20,
-                                              ),
-                                            ],
-                                            if (beepControl[
-                                                        'support_ssd_cache_crash'] !=
-                                                    null &&
-                                                beepControl[
-                                                    'support_ssd_cache_crash']) ...[
-                                              GestureDetector(
-                                                onTap: () async {
-                                                  setState(() {
-                                                    beepControl[
-                                                            'ssd_cache_crash'] =
-                                                        !beepControl[
-                                                            'ssd_cache_crash'];
-                                                  });
-                                                },
-                                                child: Card(
-                                                  shape: RoundedRectangleBorder(
-                                                      side: BorderSide(),
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              5)),
-                                                  child: Padding(
-                                                    padding:
-                                                        const EdgeInsets.all(
-                                                            8.0),
-                                                    child: Row(
-                                                      children: [
-                                                        Text("SSD 缓存异常"),
-                                                        Spacer(),
-                                                        if (beepControl[
-                                                            'ssd_cache_crash'])
-                                                          Icon(
-                                                            CupertinoIcons
-                                                                .checkmark_alt,
-                                                            color: Color(
-                                                                0xffff9813),
-                                                            size: 22,
-                                                          ),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                ),
-                                              ),
-                                              SizedBox(
-                                                height: 20,
-                                              ),
-                                            ],
-                                            if (beepControl[
-                                                        'support_poweron_beep'] !=
-                                                    null &&
-                                                beepControl[
-                                                    'support_poweron_beep']) ...[
-                                              GestureDetector(
-                                                onTap: () async {
-                                                  setState(() {
-                                                    beepControl[
-                                                            'poweron_beep'] =
-                                                        !beepControl[
-                                                            'poweron_beep'];
-                                                  });
-                                                },
-                                                child: Card(
-                                                  shape: RoundedRectangleBorder(
-                                                      side: BorderSide(),
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              5)),
-                                                  child: Padding(
-                                                    padding:
-                                                        const EdgeInsets.all(
-                                                            8.0),
-                                                    child: Row(
-                                                      children: [
-                                                        Text("系统开机"),
-                                                        Spacer(),
-                                                        if (beepControl[
-                                                            'poweron_beep'])
-                                                          Icon(
-                                                            CupertinoIcons
-                                                                .checkmark_alt,
-                                                            color: Color(
-                                                                0xffff9813),
-                                                            size: 22,
-                                                          ),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                ),
-                                              ),
-                                              SizedBox(
-                                                height: 20,
-                                              ),
-                                            ],
-                                            if (beepControl[
-                                                        'support_poweroff_beep'] !=
-                                                    null &&
-                                                beepControl[
-                                                    'support_poweroff_beep']) ...[
-                                              GestureDetector(
-                                                onTap: () async {
-                                                  setState(() {
-                                                    beepControl[
-                                                            'poweroff_beep'] =
-                                                        !beepControl[
-                                                            'poweroff_beep'];
-                                                  });
-                                                },
-                                                child: Card(
-                                                  shape: RoundedRectangleBorder(
-                                                      side: BorderSide(),
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              5)),
-                                                  child: Padding(
-                                                    padding:
-                                                        const EdgeInsets.all(
-                                                            8.0),
-                                                    child: Row(
-                                                      children: [
-                                                        Text("按下电源按钮后系统关机"),
-                                                        Spacer(),
-                                                        if (beepControl[
-                                                            'poweroff_beep'])
-                                                          Icon(
-                                                            CupertinoIcons
-                                                                .checkmark_alt,
-                                                            color: Color(
-                                                                0xffff9813),
-                                                            size: 22,
-                                                          ),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                ),
-                                              ),
-                                              SizedBox(
-                                                height: 20,
-                                              ),
-                                            ],
-                                            if (beepControl[
-                                                        'support_redundant_power_fail'] !=
-                                                    null &&
-                                                beepControl[
-                                                    'support_redundant_power_fail']) ...[
-                                              GestureDetector(
-                                                onTap: () async {
-                                                  setState(() {
-                                                    beepControl[
-                                                            'redundant_power_fail'] =
-                                                        !beepControl[
-                                                            'redundant_power_fail'];
-                                                  });
-                                                },
-                                                child: Card(
-                                                  shape: RoundedRectangleBorder(
-                                                      side: BorderSide(),
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              5)),
-                                                  child: Padding(
-                                                    padding:
-                                                        const EdgeInsets.all(
-                                                            8.0),
-                                                    child: Row(
-                                                      children: [
-                                                        Text("冗余电源离线"),
-                                                        Spacer(),
-                                                        if (beepControl[
-                                                            'redundant_power_fail'])
-                                                          Icon(
-                                                            CupertinoIcons
-                                                                .checkmark_alt,
-                                                            color: Color(
-                                                                0xffff9813),
-                                                            size: 22,
-                                                          ),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                ),
-                                              ),
-                                              SizedBox(
-                                                height: 20,
-                                              ),
-                                            ],
-                                            if (beepControl[
-                                                        'support_reset_beep'] !=
-                                                    null &&
-                                                beepControl[
-                                                    'support_reset_beep']) ...[
-                                              GestureDetector(
-                                                onTap: () async {
-                                                  setState(() {
-                                                    beepControl['reset_beep'] =
-                                                        !beepControl[
-                                                            'reset_beep'];
-                                                  });
-                                                },
-                                                child: Card(
-                                                  shape: RoundedRectangleBorder(
-                                                      side: BorderSide(),
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              5)),
-                                                  child: Padding(
-                                                    padding:
-                                                        const EdgeInsets.all(
-                                                            8.0),
-                                                    child: Row(
-                                                      children: [
-                                                        Text("系统重置"),
-                                                        Spacer(),
-                                                        if (beepControl[
-                                                            'reset_beep'])
-                                                          Icon(
-                                                            CupertinoIcons
-                                                                .checkmark_alt,
-                                                            color: Color(
-                                                                0xffff9813),
-                                                            size: 22,
-                                                          ),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                ),
-                                              ),
-                                              SizedBox(
-                                                height: 20,
-                                              ),
-                                            ],
-                                          ],
-                                        ),
-                                      ],
-                                    ),
-                                  ),
+                                BeepControlCard(
+                                  beepControl: beepControl,
+                                  onBeepOptionChanged: (key, value) {
+                                    setState(() {
+                                      beepControl[key] = value;
+                                    });
+                                  },
                                 ),
-                                Card(
-                                  shape: RoundedRectangleBorder(
-                                      side: BorderSide(),
-                                      borderRadius: BorderRadius.circular(18)),
-                                  margin: EdgeInsets.only(
-                                      top: 20, left: 20, right: 20),
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(20.0),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          "风扇模式",
-                                          style: TextStyle(
-                                              fontSize: 18,
-                                              fontWeight: FontWeight.w600),
-                                        ),
-                                        SizedBox(
-                                          height: 20,
-                                        ),
-                                        Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            GestureDetector(
-                                              onTap: () async {
-                                                setState(() {
-                                                  fanSpeed['dual_fan_speed'] =
-                                                      "fullfan";
-                                                });
-                                              },
-                                              child: Card(
-                                                shape: RoundedRectangleBorder(
-                                                    side: BorderSide(),
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            5)),
-                                                child: Padding(
-                                                  padding:
-                                                      const EdgeInsets.all(8.0),
-                                                  child: Row(
-                                                    children: [
-                                                      Expanded(
-                                                        child: Column(
-                                                          crossAxisAlignment:
-                                                              CrossAxisAlignment
-                                                                  .start,
-                                                          children: [
-                                                            Text("全速模式"),
-                                                            Text(
-                                                              "风扇以全速工作可保持系统冷却，但会产生较大的噪音。",
-                                                              style: TextStyle(
-                                                                  fontSize: 12,
-                                                                  color: Colors
-                                                                      .grey),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                      ),
-                                                      SizedBox(
-                                                        width: 10,
-                                                      ),
-                                                      SizedBox(
-                                                        width: 22,
-                                                        child: fanSpeed[
-                                                                    'dual_fan_speed'] ==
-                                                                "fullfan"
-                                                            ? Icon(
-                                                                CupertinoIcons
-                                                                    .checkmark_alt,
-                                                                color: Color(
-                                                                    0xffff9813),
-                                                                size: 22,
-                                                              )
-                                                            : null,
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                            SizedBox(
-                                              height: 20,
-                                            ),
-                                            GestureDetector(
-                                              onTap: () async {
-                                                setState(() {
-                                                  fanSpeed['dual_fan_speed'] =
-                                                      "coolfan";
-                                                });
-                                              },
-                                              child: Card(
-                                                shape: RoundedRectangleBorder(
-                                                    side: BorderSide(),
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            5)),
-                                                child: Padding(
-                                                  padding:
-                                                      const EdgeInsets.all(8.0),
-                                                  child: Row(
-                                                    children: [
-                                                      Expanded(
-                                                        child: Column(
-                                                          crossAxisAlignment:
-                                                              CrossAxisAlignment
-                                                                  .start,
-                                                          children: [
-                                                            Text("低温模式"),
-                                                            Text(
-                                                              "风扇以较高的速度工作可保持系统冷却，但会产生较大的噪音。",
-                                                              style: TextStyle(
-                                                                  fontSize: 12,
-                                                                  color: Colors
-                                                                      .grey),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                      ),
-                                                      SizedBox(
-                                                        width: 10,
-                                                      ),
-                                                      SizedBox(
-                                                        width: 22,
-                                                        child: fanSpeed[
-                                                                    'dual_fan_speed'] ==
-                                                                "coolfan"
-                                                            ? Icon(
-                                                                CupertinoIcons
-                                                                    .checkmark_alt,
-                                                                color: Color(
-                                                                    0xffff9813),
-                                                                size: 22,
-                                                              )
-                                                            : null,
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                            SizedBox(
-                                              height: 20,
-                                            ),
-                                            GestureDetector(
-                                              onTap: () async {
-                                                setState(() {
-                                                  fanSpeed['dual_fan_speed'] =
-                                                      'quietfan';
-                                                });
-                                              },
-                                              child: Card(
-                                                shape: RoundedRectangleBorder(
-                                                    side: BorderSide(),
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            5)),
-                                                child: Padding(
-                                                  padding:
-                                                      const EdgeInsets.all(8.0),
-                                                  child: Row(
-                                                    children: [
-                                                      Expanded(
-                                                        child: Column(
-                                                          crossAxisAlignment:
-                                                              CrossAxisAlignment
-                                                                  .start,
-                                                          children: [
-                                                            Text("静音模式"),
-                                                            Text(
-                                                              "风扇以较低的速度工作所产生的噪音较低，但过程中系统可能会变热。",
-                                                              style: TextStyle(
-                                                                  fontSize: 12,
-                                                                  color: Colors
-                                                                      .grey),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                      ),
-                                                      SizedBox(
-                                                        width: 10,
-                                                      ),
-                                                      SizedBox(
-                                                        width: 22,
-                                                        child: fanSpeed[
-                                                                    'dual_fan_speed'] ==
-                                                                'quietfan'
-                                                            ? Icon(
-                                                                CupertinoIcons
-                                                                    .checkmark_alt,
-                                                                color: Color(
-                                                                    0xffff9813),
-                                                                size: 22,
-                                                              )
-                                                            : null,
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ],
-                                    ),
-                                  ),
+                                FanModeCard(
+                                  fanSpeed: fanSpeed,
+                                  onFanModeChanged: (mode) {
+                                    setState(() {
+                                      fanSpeed['dual_fan_speed'] = mode;
+                                    });
+                                  },
                                 ),
-                                SizedBox(
+                                const SizedBox(
                                   height: 20,
                                 ),
-                                Card(
-                                  shape: RoundedRectangleBorder(
-                                      side: BorderSide(),
-                                      borderRadius: BorderRadius.circular(18)),
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(20.0),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          "LED 亮度控制",
-                                          style: TextStyle(
-                                              fontSize: 18,
-                                              fontWeight: FontWeight.w600),
-                                        ),
-                                        SizedBox(
-                                          height: 20,
-                                        ),
-                                        Slider(
-                                          value:
-                                              led['led_brightness'].toDouble(),
-                                          onChanged: (v) {
-                                            setState(() {
-                                              led['led_brightness'] = v.toInt();
-                                            });
-                                          },
-                                          min: 0,
-                                          max: 3,
-                                        ),
-                                      ],
-                                    ),
-                                  ),
+                                LedBrightnessCard(
+                                  led: led,
+                                  onBrightnessChanged: (value) {
+                                    setState(() {
+                                      led['led_brightness'] = value;
+                                    });
+                                  },
                                 ),
-                                SizedBox(
+                                const SizedBox(
                                   height: 20,
                                 ),
                               ],
                             ),
                           ),
                           Padding(
-                            padding: EdgeInsets.all(20),
+                            padding: const EdgeInsets.all(20),
                             child: OutlinedButton(
                               onPressed: () async {
                                 var res = await Api.powerSet(enableZram,
                                     powerRecovery, beepControl, fanSpeed, led);
                                 if (res['success']) {
                                   if (res['data']['has_fail'] == false) {
-                                    Util.instance.vibrate(FeedbackType.light);
-                                    Util.instance.toast("保存成功");
+                                    UiUtil.vibrate(FeedbackType.light);
+                                    UiUtil.toast("保存成功");
                                   } else {
-                                    Util.instance.vibrate(FeedbackType.warning);
-                                    Util.instance.toast("设置未完全保存成功");
+                                    UiUtil.vibrate(FeedbackType.warning);
+                                    UiUtil.toast("设置未完全保存成功");
                                   }
                                   getData();
                                 } else {
-                                  Util.instance
+                                  HttpUtil.instance
                                       .toast("保存失败,代码${res['error']['code']}");
                                 }
                               },
-                              child: Text(
+                              child: const Text(
                                 ' 保存 ',
                                 style: TextStyle(fontSize: 18),
                               ),
@@ -1216,10 +315,53 @@ class _PowerState extends State<Power> with SingleTickerProviderStateMixin {
                       Column(
                         children: [
                           Expanded(
-                            child: powerTasks.length > 0
+                            child: powerTasks.isNotEmpty
                                 ? ListView.builder(
                                     itemBuilder: (context, i) {
-                                      return _buildPowerTaskItem(powerTasks[i]);
+                                      return PowerTaskItem(
+                                        task: powerTasks[i],
+                                        onEnabledChanged: (task) {
+                                          setState(() {
+                                            task['enabled'] = !task['enabled'];
+                                          });
+                                        },
+                                        onRemove: (task) {
+                                          setState(() {
+                                            powerTasks.remove(task);
+                                          });
+                                        },
+                                        onEdit: (task) {
+                                          Navigator.of(context)
+                                              .push(CupertinoPageRoute(
+                                                  builder: (context) {
+                                                    return AddPowerTask(
+                                                      "编辑计划管理",
+                                                      task: task,
+                                                    );
+                                                  },
+                                                  settings: const RouteSettings(
+                                                      name: "edit_power_task")))
+                                              .then((value) {
+                                            if (value != null) {
+                                              for (var item in powerTasks) {
+                                                if (item != task &&
+                                                    item['hour'] ==
+                                                        value['hour'] &&
+                                                    item['min'] ==
+                                                        value['min']) {
+                                                  UiUtil.toast("无效或重复规则");
+                                                  UiUtil.vibrate(
+                                                      FeedbackType.warning);
+                                                  return;
+                                                }
+                                              }
+                                              setState(() {
+                                                task = value;
+                                              });
+                                            }
+                                          });
+                                        },
+                                      );
                                     },
                                     itemCount: powerTasks.length,
                                   )
@@ -1233,7 +375,7 @@ class _PowerState extends State<Power> with SingleTickerProviderStateMixin {
                                   ),
                           ),
                           Padding(
-                            padding: EdgeInsets.all(20),
+                            padding: const EdgeInsets.all(20),
                             child: Row(
                               children: [
                                 Expanded(
@@ -1242,19 +384,19 @@ class _PowerState extends State<Power> with SingleTickerProviderStateMixin {
                                       Navigator.of(context)
                                           .push(CupertinoPageRoute(
                                               builder: (context) {
-                                                return AddPowerTask(
+                                                return const AddPowerTask(
                                                   "新增计划管理",
                                                 );
                                               },
-                                              settings: RouteSettings(
+                                              settings: const RouteSettings(
                                                   name: "edit_power_task")))
                                           .then((value) {
                                         if (value != null) {
                                           for (var item in powerTasks) {
                                             if (item['hour'] == value['hour'] &&
                                                 item['min'] == value['min']) {
-                                              Util.instance.toast("无效或重复规则");
-                                              Util.instance.vibrate(
+                                              UiUtil.toast("无效或重复规则");
+                                              UiUtil.vibrate(
                                                   FeedbackType.warning);
                                               return;
                                             }
@@ -1265,13 +407,13 @@ class _PowerState extends State<Power> with SingleTickerProviderStateMixin {
                                         }
                                       });
                                     },
-                                    child: Text(
+                                    child: const Text(
                                       ' 新增 ',
                                       style: TextStyle(fontSize: 18),
                                     ),
                                   ),
                                 ),
-                                SizedBox(
+                                const SizedBox(
                                   width: 20,
                                 ),
                                 Expanded(
@@ -1294,14 +436,14 @@ class _PowerState extends State<Power> with SingleTickerProviderStateMixin {
                                       var res = await Api.powerScheduleSave(
                                           powerOns, powerOffs);
                                       if (res['success']) {
-                                        Util.instance.toast("保存成功");
+                                        UiUtil.toast("保存成功");
                                         getData();
                                       } else {
-                                        Util.instance.toast(
+                                        UiUtil.toast(
                                             "保存失败,代码${res['error']['code']}");
                                       }
                                     },
-                                    child: Text(
+                                    child: const Text(
                                       ' 保存 ',
                                       style: TextStyle(fontSize: 18),
                                     ),
@@ -1317,380 +459,60 @@ class _PowerState extends State<Power> with SingleTickerProviderStateMixin {
                           Expanded(
                             child: ListView(
                               children: [
-                                Card(
-                                  shape: RoundedRectangleBorder(
-                                      side: BorderSide(),
-                                      borderRadius: BorderRadius.circular(18)),
-                                  margin: EdgeInsets.only(
-                                      top: 20, left: 20, right: 20),
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(20.0),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          "内部硬盘和外接 SATA 硬盘在闲置超过指定的时间后将进入休眠。",
-                                          style: TextStyle(
-                                              fontSize: 12, color: Colors.grey),
-                                        ),
-                                        SizedBox(
-                                          height: 20,
-                                        ),
-                                        GestureDetector(
-                                          onTap: () {
-                                            showCupertinoModalPopup(
-                                                context: context,
-                                                builder: (context) {
-                                                  return NeuPicker(
-                                                    dataList
-                                                        .map((e) => e['title'])
-                                                        .toList()
-                                                        .cast(),
-                                                    value: dataList.indexWhere(
-                                                        (element) =>
-                                                            element['value'] ==
-                                                            hibernation[
-                                                                'internal_hd_idletime']),
-                                                    onConfirm: (v) {
-                                                      setState(() {
-                                                        hibernation[
-                                                                'internal_hd_idletime'] =
-                                                            dataList[v]
-                                                                ['value'];
-                                                      });
-                                                    },
-                                                  );
-                                                });
-                                          },
-                                          child: Card(
-                                            shape: RoundedRectangleBorder(
-                                                side: BorderSide(),
-                                                borderRadius:
-                                                    BorderRadius.circular(5)),
-                                            child: Padding(
-                                              padding:
-                                                  const EdgeInsets.all(8.0),
-                                              child: Row(
-                                                children: [
-                                                  Text("时间"),
-                                                  Spacer(),
-                                                  Text(
-                                                      "${dataList.where((element) => element['value'] == hibernation['internal_hd_idletime']).first['title']}"),
-                                                ],
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                        SizedBox(
-                                          height: 20,
-                                        ),
-                                        GestureDetector(
-                                          onTap: () async {
-                                            if (hibernation[
-                                                    'internal_hd_idletime'] >
-                                                0)
-                                              setState(() {
-                                                hibernation['sata_deep_sleep'] =
-                                                    hibernation['sata_deep_sleep'] ==
-                                                            1
-                                                        ? 0
-                                                        : 1;
-                                              });
-                                          },
-                                          child: Card(
-                                            shape: RoundedRectangleBorder(
-                                                side: BorderSide(),
-                                                borderRadius:
-                                                    BorderRadius.circular(5)),
-                                            child: Padding(
-                                              padding:
-                                                  const EdgeInsets.all(8.0),
-                                              child: Row(
-                                                children: [
-                                                  Expanded(
-                                                    child: Text(
-                                                        "启动进阶硬盘休眠以将设备的耗电量降至最低"),
-                                                  ),
-                                                  SizedBox(
-                                                    width: 10,
-                                                  ),
-                                                  SizedBox(
-                                                    width: 22,
-                                                    child: hibernation[
-                                                                'sata_deep_sleep'] ==
-                                                            1
-                                                        ? Icon(
-                                                            CupertinoIcons
-                                                                .checkmark_alt,
-                                                            color: Color(
-                                                                0xffff9813),
-                                                            size: 22,
-                                                          )
-                                                        : null,
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
+                                HibernationSettingsCard(
+                                  hibernation: hibernation,
+                                  dataList: dataList,
+                                  onIdleTimeChanged: (value) {
+                                    setState(() {
+                                      hibernation['internal_hd_idletime'] =
+                                          value;
+                                    });
+                                  },
+                                  onDeepSleepChanged: (value) {
+                                    setState(() {
+                                      hibernation['sata_deep_sleep'] =
+                                          value ? 1 : 0;
+                                    });
+                                  },
                                 ),
-                                Card(
-                                  shape: RoundedRectangleBorder(
-                                      side: BorderSide(),
-                                      borderRadius: BorderRadius.circular(18)),
-                                  margin: EdgeInsets.only(
-                                      top: 20, left: 20, right: 20),
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(20.0),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          "USB 硬盘在超过设置的闲置时间后将开始休眠（仅适用于支持休眠的 USB 设备）。",
-                                          style: TextStyle(
-                                              fontSize: 12, color: Colors.grey),
-                                        ),
-                                        SizedBox(
-                                          height: 20,
-                                        ),
-                                        GestureDetector(
-                                          onTap: () {
-                                            showCupertinoModalPopup(
-                                                context: context,
-                                                builder: (context) {
-                                                  return NeuPicker(
-                                                    dataList
-                                                        .map((e) => e['title'])
-                                                        .toList()
-                                                        .cast(),
-                                                    value: dataList.indexWhere(
-                                                        (element) =>
-                                                            element['value'] ==
-                                                            hibernation[
-                                                                'usb_idletime']),
-                                                    onConfirm: (v) {
-                                                      setState(() {
-                                                        hibernation[
-                                                                'usb_idletime'] =
-                                                            dataList[v]
-                                                                ['value'];
-                                                      });
-                                                    },
-                                                  );
-                                                });
-                                          },
-                                          child: Card(
-                                            shape: RoundedRectangleBorder(
-                                                side: BorderSide(),
-                                                borderRadius:
-                                                    BorderRadius.circular(5)),
-                                            child: Padding(
-                                              padding:
-                                                  const EdgeInsets.all(8.0),
-                                              child: Row(
-                                                children: [
-                                                  Text("时间"),
-                                                  Spacer(),
-                                                  Text(
-                                                      "${dataList.where((element) => element['value'] == hibernation['usb_idletime']).first['title']}"),
-                                                ],
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                        SizedBox(
-                                          height: 20,
-                                        ),
-                                        GestureDetector(
-                                          onTap: () async {
-                                            if (hibernation[
-                                                        'internal_hd_idletime'] >
-                                                    0 ||
-                                                hibernation['usb_idletime'] > 0)
-                                              setState(() {
-                                                hibernation['enable_log'] =
-                                                    !hibernation['enable_log'];
-                                              });
-                                          },
-                                          child: Card(
-                                            shape: RoundedRectangleBorder(
-                                                side: BorderSide(),
-                                                borderRadius:
-                                                    BorderRadius.circular(5)),
-                                            child: Padding(
-                                              padding:
-                                                  const EdgeInsets.all(8.0),
-                                              child: Row(
-                                                children: [
-                                                  Expanded(
-                                                    child: Text("启用硬盘休眠日志"),
-                                                  ),
-                                                  SizedBox(
-                                                    width: 10,
-                                                  ),
-                                                  SizedBox(
-                                                    width: 22,
-                                                    child: hibernation[
-                                                            'enable_log']
-                                                        ? Icon(
-                                                            CupertinoIcons
-                                                                .checkmark_alt,
-                                                            color: Color(
-                                                                0xffff9813),
-                                                            size: 22,
-                                                          )
-                                                        : null,
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
+                                UsbHibernationCard(
+                                  hibernation: hibernation,
+                                  dataList: dataList,
+                                  onUsbIdleTimeChanged: (value) {
+                                    setState(() {
+                                      hibernation['usb_idletime'] = value;
+                                    });
+                                  },
+                                  onEnableLogChanged: (value) {
+                                    setState(() {
+                                      hibernation['enable_log'] = value;
+                                    });
+                                  },
                                 ),
                                 if (powerRecovery['wol1'] != null)
-                                  Card(
-                                    shape: RoundedRectangleBorder(
-                                        side: BorderSide(),
-                                        borderRadius:
-                                            BorderRadius.circular(18)),
-                                    margin: EdgeInsets.only(
-                                        top: 20, left: 20, right: 20),
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(20.0),
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            "在内部硬盘休眠所配置时间段后，DS 经由局域网唤醒进入待机状态（欧盟 Lot 26 规范）。",
-                                            style: TextStyle(
-                                                fontSize: 12,
-                                                color: Colors.grey),
-                                          ),
-                                          SizedBox(
-                                            height: 20,
-                                          ),
-                                          GestureDetector(
-                                            onTap: () async {
-                                              if (powerRecovery['wol1'] &&
-                                                  hibernation[
-                                                          'internal_hd_idletime'] >
-                                                      0)
-                                                setState(() {
-                                                  hibernation[
-                                                          'auto_poweroff_enable'] =
-                                                      !hibernation[
-                                                          'auto_poweroff_enable'];
-                                                  hibernation[
-                                                      'auto_poweroff_time'] = 10;
-                                                });
-                                            },
-                                            child: Card(
-                                              shape: RoundedRectangleBorder(
-                                                  side: BorderSide(),
-                                                  borderRadius:
-                                                      BorderRadius.circular(5)),
-                                              child: Padding(
-                                                padding:
-                                                    const EdgeInsets.all(8.0),
-                                                child: Row(
-                                                  children: [
-                                                    Expanded(
-                                                      child: Text("启用自动关机"),
-                                                    ),
-                                                    SizedBox(
-                                                      width: 10,
-                                                    ),
-                                                    SizedBox(
-                                                      width: 22,
-                                                      child: hibernation[
-                                                              'auto_poweroff_enable']
-                                                          ? Icon(
-                                                              CupertinoIcons
-                                                                  .checkmark_alt,
-                                                              color: Color(
-                                                                  0xffff9813),
-                                                              size: 22,
-                                                            )
-                                                          : null,
-                                                    ),
-                                                  ],
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                          SizedBox(
-                                            height: 20,
-                                          ),
-                                          GestureDetector(
-                                            onTap: () {
-                                              if (hibernation[
-                                                  'auto_poweroff_enable'])
-                                                showCupertinoModalPopup(
-                                                    context: context,
-                                                    builder: (context) {
-                                                      return NeuPicker(
-                                                        dataList
-                                                            .getRange(1,
-                                                                dataList.length)
-                                                            .map((e) =>
-                                                                e['title'])
-                                                            .toList()
-                                                            .cast(),
-                                                        value: dataList.indexWhere(
-                                                                (element) =>
-                                                                    element[
-                                                                        'value'] ==
-                                                                    hibernation[
-                                                                        'auto_poweroff_time']) -
-                                                            1,
-                                                        onConfirm: (v) {
-                                                          setState(() {
-                                                            hibernation[
-                                                                    'auto_poweroff_time'] =
-                                                                dataList[v]
-                                                                    ['value'];
-                                                          });
-                                                        },
-                                                      );
-                                                    });
-                                            },
-                                            child: Card(
-                                              shape: RoundedRectangleBorder(
-                                                  side: BorderSide(),
-                                                  borderRadius:
-                                                      BorderRadius.circular(5)),
-                                              child: Padding(
-                                                padding:
-                                                    const EdgeInsets.all(8.0),
-                                                child: Row(
-                                                  children: [
-                                                    Text("时间"),
-                                                    Spacer(),
-                                                    Text(
-                                                        "${hibernation['auto_poweroff_enable'] ? dataList.where((element) => element['value'] == hibernation['auto_poweroff_time']).first['title'] : ""}"),
-                                                  ],
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
+                                  AutoPowerOffCard(
+                                    powerRecovery: powerRecovery,
+                                    hibernation: hibernation,
+                                    dataList: dataList,
+                                    onAutoPowerOffEnableChanged: (value) {
+                                      setState(() {
+                                        hibernation['auto_poweroff_enable'] =
+                                            value;
+                                        hibernation['auto_poweroff_time'] = 10;
+                                      });
+                                    },
+                                    onAutoPowerOffTimeChanged: (value) {
+                                      setState(() {
+                                        hibernation['auto_poweroff_time'] =
+                                            value;
+                                      });
+                                    },
                                   ),
                               ],
                             ),
                           ),
                           Padding(
-                            padding: EdgeInsets.all(20),
+                            padding: const EdgeInsets.all(20),
                             child: OutlinedButton(
                               onPressed: () async {
                                 var res = await Api.powerHibernationSave(
@@ -1706,14 +528,14 @@ class _PowerState extends State<Power> with SingleTickerProviderStateMixin {
                                       hibernation['auto_poweroff_time'],
                                 );
                                 if (res['success']) {
-                                  Util.instance.toast("保存成功");
+                                  UiUtil.toast("保存成功");
                                   getData();
                                 } else {
-                                  Util.instance
+                                  HttpUtil.instance
                                       .toast("保存失败,代码${res['error']['code']}");
                                 }
                               },
-                              child: Text(
+                              child: const Text(
                                 ' 保存 ',
                                 style: TextStyle(fontSize: 18),
                               ),
@@ -1721,7 +543,7 @@ class _PowerState extends State<Power> with SingleTickerProviderStateMixin {
                           ),
                         ],
                       ),
-                      Center(
+                      const Center(
                         child: Text("待开发"),
                       ),
                     ],

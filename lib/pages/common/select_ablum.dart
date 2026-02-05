@@ -1,18 +1,21 @@
 import 'package:flutter/cupertino.dart';
+import 'package:garden/util/ui_util.dart';
 import 'package:flutter/material.dart';
-import 'package:garden/util/function.dart';
+import 'package:garden/constants/app_constants.dart';
+import 'package:garden/theme/app_colors.dart';
 import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 
 class SelectAlbum extends StatefulWidget {
   final bool multi;
   final bool folder;
   final List<AssetPathEntity>? selected;
-  SelectAlbum({this.multi = false, this.folder = true, this.selected});
+  const SelectAlbum(
+      {super.key, this.multi = false, this.folder = true, this.selected});
   @override
-  _SelectAlbumState createState() => _SelectAlbumState();
+  SelectAlbumState createState() => SelectAlbumState();
 }
 
-class _SelectAlbumState extends State<SelectAlbum> {
+class SelectAlbumState extends State<SelectAlbum> {
   List<AssetPathEntity> albums = [];
   List<AssetPathEntity> selectedAlbums = [];
   bool success = true;
@@ -32,7 +35,7 @@ class _SelectAlbumState extends State<SelectAlbum> {
     setState(() {
       albums = list;
       if (albums.isEmpty) {
-        Util.instance.toast('not found album!');
+        UiUtil.toast('not found album!');
       }
     });
   }
@@ -66,10 +69,10 @@ class _SelectAlbumState extends State<SelectAlbum> {
           // margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
           child: Row(
             children: [
-              SizedBox(
+              const SizedBox(
                 width: 20,
               ),
-              SizedBox(
+              const SizedBox(
                 width: 10,
               ),
               Expanded(
@@ -78,35 +81,35 @@ class _SelectAlbumState extends State<SelectAlbum> {
                   builder: (context, snapshot) {
                     return Text(
                       "${album.name} (${snapshot.data})",
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 16,
                       ),
                     );
                   },
                 ),
               ),
-              SizedBox(
+              const SizedBox(
                 width: 10,
               ),
               Card(
                 shape: RoundedRectangleBorder(
-                    side: BorderSide(),
+                    side: const BorderSide(),
                     borderRadius: BorderRadius.circular(18)),
                 child: Padding(
-                  padding: const EdgeInsets.all(8.0),
+                  padding: const EdgeInsets.all(AppConstants.paddingSmall),
                   child: SizedBox(
                     width: 20,
                     height: 20,
                     child: selectedAlbums.contains(album)
-                        ? Icon(
+                        ? const Icon(
                             CupertinoIcons.checkmark_alt,
-                            color: Color(0xffff9813),
+                            color: AppColors.primaryAction,
                           )
                         : null,
                   ),
                 ),
               ),
-              SizedBox(
+              const SizedBox(
                 width: 20,
               ),
             ],
@@ -120,7 +123,7 @@ class _SelectAlbumState extends State<SelectAlbum> {
   Widget build(BuildContext context) {
     return Material(
       color: Theme.of(context).scaffoldBackgroundColor,
-      child: Container(
+      child: SizedBox(
         height: MediaQuery.sizeOf(context).height * 0.8,
         child: SafeArea(
           top: false,
@@ -132,20 +135,21 @@ class _SelectAlbumState extends State<SelectAlbum> {
                 alignment: Alignment.centerLeft,
                 child: Row(
                   children: [
-                    Spacer(),
+                    const Spacer(),
                     Container(
-                      padding: const EdgeInsets.symmetric(vertical: 10),
+                      padding: const EdgeInsets.symmetric(
+                          vertical: AppConstants.paddingSmall + 2),
                       child: OutlinedButton(
                         onPressed: () {
                           Navigator.of(context).pop(selectedAlbums);
                         },
-                        child: Text(
+                        child: const Text(
                           "完成",
                           style: TextStyle(fontSize: 12, color: Colors.blue),
                         ),
                       ),
                     ),
-                    SizedBox(
+                    const SizedBox(
                       width: 20,
                     ),
                   ],
@@ -153,7 +157,7 @@ class _SelectAlbumState extends State<SelectAlbum> {
               ),
               Expanded(
                   child: ListView(
-                padding: EdgeInsets.only(bottom: 20),
+                padding: const EdgeInsets.only(bottom: 20),
                 children: albums.map(_buildAlbumItem).toList(),
               )),
             ],

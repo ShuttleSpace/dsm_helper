@@ -1,4 +1,5 @@
-import 'package:garden/util/function.dart';
+import 'package:garden/util/http_util.dart';
+import 'package:garden/util/log.dart';
 
 /// id : 1
 /// type : 1
@@ -16,8 +17,9 @@ class GroupsModel {
 
   /// @deprecated
   static Future<GroupsModel> fetch() async {
-    var res = await Util.instance.post("${Util.instance.appUrl}/app/groups");
-    print("[GroupsModel] $res");
+    var res =
+        await HttpUtil.instance.post("${HttpUtil.instance.appUrl}/app/groups");
+    Log.info("[GroupsModel] $res");
     if (res['code'] == 1) {
       List<GroupModel> qq = [];
       List<GroupModel> wechat = [];

@@ -1,18 +1,22 @@
 import 'dart:convert';
+import 'package:garden/util/log.dart';
+import 'package:garden/util/ui_util.dart';
 
-import 'package:garden/util/function.dart';
+import 'package:garden/util/http_util.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:garden/constants/app_constants.dart';
+import 'package:garden/theme/app_colors.dart';
 
 class UninstallPackage extends StatefulWidget {
   final Map package;
-  UninstallPackage(this.package);
+  const UninstallPackage(this.package, {super.key});
   @override
-  _UninstallPackageState createState() => _UninstallPackageState();
+  UninstallPackageState createState() => UninstallPackageState();
 }
 
-class _UninstallPackageState extends State<UninstallPackage> {
+class UninstallPackageState extends State<UninstallPackage> {
   bool loading = true;
   bool uninstalling = false;
   List pageData = [];
@@ -29,10 +33,10 @@ class _UninstallPackageState extends State<UninstallPackage> {
         loading = false;
         pageData = jsonDecode(
             Uri.decodeComponent(res['data']['additional']['uninstall_pages']));
-        print(pageData);
+        Log.info(pageData);
       });
     } else {
-      Util.instance.toast("获取卸载信息失败，代码${res['error']['code']}");
+      UiUtil.toast("获取卸载信息失败，代码${res['error']['code']}");
     }
   }
 
@@ -46,9 +50,9 @@ class _UninstallPackageState extends State<UninstallPackage> {
       },
       child: Card(
         shape: RoundedRectangleBorder(
-            side: BorderSide(), borderRadius: BorderRadius.circular(18)),
+            side: const BorderSide(), borderRadius: BorderRadius.circular(18)),
         child: Padding(
-          padding: EdgeInsets.all(20),
+          padding: const EdgeInsets.all(20),
           child: Row(
             children: [
               Expanded(
@@ -56,17 +60,17 @@ class _UninstallPackageState extends State<UninstallPackage> {
               ),
               Card(
                 shape: RoundedRectangleBorder(
-                    side: BorderSide(),
+                    side: const BorderSide(),
                     borderRadius: BorderRadius.circular(18)),
                 child: Padding(
-                  padding: const EdgeInsets.all(8.0),
+                  padding: const EdgeInsets.all(AppConstants.paddingSmall),
                   child: SizedBox(
                     width: 20,
                     height: 20,
                     child: item['checked']
-                        ? Icon(
+                        ? const Icon(
                             CupertinoIcons.checkmark_alt,
-                            color: Color(0xffff9813),
+                            color: AppColors.primaryAction,
                           )
                         : null,
                   ),
@@ -83,17 +87,17 @@ class _UninstallPackageState extends State<UninstallPackage> {
     List subItems = item['subitems'];
     return Card(
       shape: RoundedRectangleBorder(
-          side: BorderSide(), borderRadius: BorderRadius.circular(18)),
+          side: const BorderSide(), borderRadius: BorderRadius.circular(18)),
       child: Padding(
-        padding: EdgeInsets.all(20),
+        padding: const EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(item['desc']),
-            SizedBox(
+            const SizedBox(
               height: 20,
             ),
-            ...subItems.map(_buildSubItem).toList(),
+            ...subItems.map(_buildSubItem),
           ],
         ),
       ),
@@ -103,18 +107,18 @@ class _UninstallPackageState extends State<UninstallPackage> {
   Widget _buildData(data) {
     List items = data['items'];
     return Padding(
-      padding: EdgeInsets.all(20),
+      padding: const EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             data['step_title'],
-            style: TextStyle(fontSize: 24),
+            style: const TextStyle(fontSize: 24),
           ),
-          SizedBox(
+          const SizedBox(
             height: 20,
           ),
-          ...items.map(_buildItem).toList(),
+          ...items.map(_buildItem),
         ],
       ),
     );
@@ -130,7 +134,7 @@ class _UninstallPackageState extends State<UninstallPackage> {
         ),
       ),
       body: loading
-          ? Center(
+          ? const Center(
               child: CupertinoActivityIndicator(
                 radius: 14,
               ),
@@ -148,7 +152,8 @@ class _UninstallPackageState extends State<UninstallPackage> {
                       ),
                     ),
                     Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 20),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: AppConstants.paddingLarge),
                       child: OutlinedButton(
                         onPressed: () async {
                           //获取额外参数
@@ -177,24 +182,27 @@ class _UninstallPackageState extends State<UninstallPackage> {
                           });
                           await Api.uninstallPackageTask(widget.package['id'],
                               extra: extra);
-                          Util.instance.toast("卸载成功");
-                          Navigator.of(context).pop();
-                          Navigator.of(context).pop();
+                          UiUtil.toast("卸载成功");
+                          if (context.mounted) {
+                            // ignore: use_build_context_synchronously
+                            Navigator.of(context).pop();
+                            Navigator.of(context).pop();
+                          }
                         },
                         // margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                        child: Text(
+                        child: const Text(
                           "确认卸载",
                           style: TextStyle(fontSize: 18),
                         ),
                       ),
                     ),
-                    SizedBox(
+                    const SizedBox(
                       height: 20,
                     ),
                   ],
                 ),
                 if (uninstalling)
-                  Center(
+                  const Center(
                     child: CupertinoActivityIndicator(
                       radius: 14,
                     ),

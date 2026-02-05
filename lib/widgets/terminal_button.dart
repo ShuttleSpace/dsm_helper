@@ -1,5 +1,5 @@
-import 'package:garden/themes/app_theme.dart';
-import 'package:garden/util/function.dart';
+import 'package:garden/theme/app_theme.dart';
+import 'package:garden/util/ui_util.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_vibrate/flutter_vibrate.dart';
 
@@ -10,7 +10,7 @@ class TerminalButton extends StatelessWidget {
   final Widget child;
   final bool active;
   const TerminalButton(
-      {this.onPressed, required this.child, this.active = false});
+      {super.key, this.onPressed, required this.child, this.active = false});
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +19,7 @@ class TerminalButton extends StatelessWidget {
     
     return GestureDetector(
       onTap: () {
-        Util.instance.vibrate(FeedbackType.light);
+        UiUtil.vibrate(FeedbackType.light);
         onPressed?.call();
       },
       child: Container(

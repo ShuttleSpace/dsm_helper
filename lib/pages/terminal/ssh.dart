@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:dartssh2/dartssh2.dart';
+import 'package:garden/util/log.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:garden/widgets/virtual_keyboard.dart';
 import 'package:flutter/material.dart';
@@ -13,12 +14,12 @@ class Ssh extends StatefulWidget {
   final String port;
   final String username;
   final String password;
-  Ssh(this.host, this.port, this.username, this.password);
+  const Ssh(this.host, this.port, this.username, this.password, {super.key});
   @override
-  _SshState createState() => _SshState();
+  SshState createState() => SshState();
 }
 
-class _SshState extends State<Ssh> {
+class SshState extends State<Ssh> {
   final keyboard = VirtualKeyboard(defaultInputHandler);
   Terminal terminal = Terminal();
   String title = "终端";
@@ -60,7 +61,7 @@ class _SshState extends State<Ssh> {
     terminal.buffer.setCursor(0, 0);
 
     terminal.onTitleChange = (title) {
-      print(title);
+      Log.info("terminal title changed: : $title");
       setState(() => this.title = title);
     };
 
@@ -74,12 +75,12 @@ class _SshState extends State<Ssh> {
 
     session.stdout
         .cast<List<int>>()
-        .transform(Utf8Decoder())
+        .transform(const Utf8Decoder())
         .listen(terminal.write);
 
     session.stderr
         .cast<List<int>>()
-        .transform(Utf8Decoder())
+        .transform(const Utf8Decoder())
         .listen(terminal.write);
   }
 

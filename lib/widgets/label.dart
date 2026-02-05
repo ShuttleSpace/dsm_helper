@@ -1,13 +1,8 @@
-/*
- * 创建日期：23/12/19 下午 05:31
- * 版权所有：青岛人才在线企业服务管理有限公司
- */
-
 import 'package:flutter/material.dart';
 
 class Label extends StatelessWidget {
-  Label(this.name, this.color,
-      {this.fill = false, this.fontSize = 12, this.height = 24});
+  const Label(this.name, this.color,
+      {super.key, this.fill = false, this.fontSize = 12, this.height = 24});
   final String name;
   final Color color;
   final bool fill;
@@ -22,15 +17,12 @@ class Label extends StatelessWidget {
         color: fill ? color : Colors.transparent,
         borderRadius: BorderRadius.circular(18),
       ),
-      padding: EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
       child: Text(
         name,
         style: TextStyle(
-          color: fill 
-              ? Theme.of(context).colorScheme.surface 
-              : color, 
-          fontSize: fontSize
-        ),
+            color: fill ? Theme.of(context).colorScheme.surface : color,
+            fontSize: fontSize),
       ),
     );
   }

@@ -1,6 +1,9 @@
 import 'dart:convert';
+import 'package:garden/util/log.dart';
+import 'package:garden/util/ui_util.dart';
+import 'package:garden/util/storage_util.dart';
 
-import 'package:garden/util/function.dart';
+import 'package:garden/util/http_util.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -8,11 +11,13 @@ import 'add_server.dart';
 import 'ssh.dart';
 
 class SelectServer extends StatefulWidget {
+  const SelectServer({super.key});
+
   @override
-  _SelectServerState createState() => _SelectServerState();
+  SelectServerState createState() => SelectServerState();
 }
 
-class _SelectServerState extends State<SelectServer> {
+class SelectServerState extends State<SelectServer> {
   bool loading = true;
   List servers = [];
   @override
@@ -22,7 +27,7 @@ class _SelectServerState extends State<SelectServer> {
   }
 
   getData() async {
-    String str = await Util.instance.getStorage("terminal_servers") ?? '';
+    String str = await StorageUtil.getString("terminal_servers") ?? '';
     setState(() {
       loading = false;
       if (str.isNotBlank) {
@@ -31,13 +36,13 @@ class _SelectServerState extends State<SelectServer> {
         servers = [];
       }
     });
-    print(servers);
+    Log.info(servers);
   }
 
   Widget _buildServerItem(int index) {
     var server = servers[index];
     return Padding(
-      padding: EdgeInsets.only(bottom: 20),
+      padding: const EdgeInsets.only(bottom: 20),
       child: OutlinedButton(
         onPressed: () async {
           Navigator.of(context).push(CupertinoPageRoute(
@@ -45,10 +50,10 @@ class _SelectServerState extends State<SelectServer> {
                 return Ssh(server['host'], server['port'], server['account'],
                     server['password']);
               },
-              settings: RouteSettings(name: "ssh_client")));
+              settings: const RouteSettings(name: "ssh_client")));
         },
         child: Container(
-          padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
           child: Row(
             children: [
               Expanded(
@@ -57,14 +62,14 @@ class _SelectServerState extends State<SelectServer> {
                   children: [
                     Text(
                       "${server['account']}",
-                      style: TextStyle(fontSize: 18),
+                      style: const TextStyle(fontSize: 18),
                     ),
-                    SizedBox(
+                    const SizedBox(
                       height: 5,
                     ),
                     Text(
                       "${server['host']}:${server['port']}",
-                      style: TextStyle(fontSize: 16, color: Colors.grey),
+                      style: const TextStyle(fontSize: 16, color: Colors.grey),
                     ),
                   ],
                 ),
@@ -76,7 +81,8 @@ class _SelectServerState extends State<SelectServer> {
                           builder: (context) {
                             return AddServer(index: index);
                           },
-                          settings: RouteSettings(name: "add_ssh_server")))
+                          settings:
+                              const RouteSettings(name: "add_ssh_server")))
                       .then((value) {
                     getData();
                   });
@@ -86,7 +92,7 @@ class _SelectServerState extends State<SelectServer> {
                   width: 20,
                 ),
               ),
-              SizedBox(
+              const SizedBox(
                 width: 10,
               ),
               OutlinedButton(
@@ -95,9 +101,9 @@ class _SelectServerState extends State<SelectServer> {
                     servers.remove(server);
                   });
 
-                  Util.instance
+                  HttpUtil.instance
                       .setStorage("terminal_servers", jsonEncode(servers));
-                  Util.instance.toast("删除成功");
+                  UiUtil.toast("删除成功");
                 },
                 child: Image.asset(
                   "assets/icons/delete.png",
@@ -116,36 +122,36 @@ class _SelectServerState extends State<SelectServer> {
     return Scaffold(
       appBar: AppBar(
         leading: AppBackButton(context),
-        title: Text("选择服务器"),
+        title: const Text("选择服务器"),
         actions: [
           Padding(
-            padding: EdgeInsets.only(right: 10, top: 8, bottom: 8),
+            padding: const EdgeInsets.only(right: 10, top: 8, bottom: 8),
             child: OutlinedButton(
               onPressed: () {
                 Navigator.of(context)
                     .push(CupertinoPageRoute(
                         builder: (context) {
-                          return AddServer();
+                          return const AddServer();
                         },
-                        settings: RouteSettings(name: "add_ssh_server")))
+                        settings: const RouteSettings(name: "add_ssh_server")))
                     .then((value) {
                   getData();
                 });
               },
-              child: Icon(Icons.add),
+              child: const Icon(Icons.add),
             ),
           )
         ],
       ),
       body: loading
-          ? Center(
+          ? const Center(
               child: CupertinoActivityIndicator(
                 radius: 14,
               ),
             )
-          : servers.length > 0
+          : servers.isNotEmpty
               ? ListView.builder(
-                  padding: EdgeInsets.all(20),
+                  padding: const EdgeInsets.all(20),
                   itemBuilder: (context, i) {
                     return _buildServerItem(i);
                   },
@@ -155,10 +161,10 @@ class _SelectServerState extends State<SelectServer> {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Text(
+                      const Text(
                         "未添加服务器",
                       ),
-                      SizedBox(
+                      const SizedBox(
                         height: 20,
                       ),
                       SizedBox(
@@ -168,15 +174,15 @@ class _SelectServerState extends State<SelectServer> {
                             Navigator.of(context)
                                 .push(CupertinoPageRoute(
                                     builder: (context) {
-                                      return AddServer();
+                                      return const AddServer();
                                     },
-                                    settings:
-                                        RouteSettings(name: "add_ssh_server")))
+                                    settings: const RouteSettings(
+                                        name: "add_ssh_server")))
                                 .then((value) {
                               getData();
                             });
                           },
-                          child: Text(
+                          child: const Text(
                             ' 添加 ',
                             style: TextStyle(fontSize: 18),
                           ),

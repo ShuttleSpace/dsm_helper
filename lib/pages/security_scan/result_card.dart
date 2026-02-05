@@ -1,11 +1,11 @@
-import 'package:garden/util/function.dart';
+import 'package:garden/stores/connection_store.dart';
 import 'package:garden/util/strings.dart';
 import 'package:flutter/material.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 
 class ResultCard extends StatelessWidget {
   final Map data;
-  ResultCard(this.data);
+  ResultCard(this.data, {super.key});
   final Map colors = {
     "safe": Colors.green,
     "risk": Colors.red,
@@ -25,7 +25,7 @@ class ResultCard extends StatelessWidget {
     data['fail'].forEach((k, v) {
       if (v > 0) {
         items.add(Text(
-          "${(webManagerStrings['securityscan']['securityscan_check_${k}_${data['category']}'] ?? Util.instance.strings['SYNO.SDS.SecurityScan.Instance']['securityscan']["securityscan_check_${k}_${data['category']}"]).replaceAll("{0}", "${data['fail'][k]}")}",
+          "${(webManagerStrings['securityscan']['securityscan_check_${k}_${data['category']}'] ?? connectionStore.strings['SYNO.SDS.SecurityScan.Instance']['securityscan']["securityscan_check_${k}_${data['category']}"]).replaceAll("{0}", "${data['fail'][k]}")}",
           style: TextStyle(color: colors[k]),
         ));
       }
@@ -37,20 +37,20 @@ class ResultCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       shape: RoundedRectangleBorder(
-          side: BorderSide(), borderRadius: BorderRadius.circular(18)),
-      margin: EdgeInsets.only(bottom: 20),
+          side: const BorderSide(), borderRadius: BorderRadius.circular(18)),
+      margin: const EdgeInsets.only(bottom: 20),
       child: Padding(
-        padding: EdgeInsets.all(20),
+        padding: const EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
               children: [
                 Text(
-                  "${webManagerStrings['securityscan']['securityscan_category_${data['category']}'] ?? Util.instance.strings['SYNO.SDS.SecurityScan.Instance']['securityscan']['securityscan_category_${data['category']}']}",
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+                  "${webManagerStrings['securityscan']['securityscan_category_${data['category']}'] ?? connectionStore.strings['SYNO.SDS.SecurityScan.Instance']['securityscan']['securityscan_category_${data['category']}']}",
+                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
                 ),
-                Spacer(),
+                const Spacer(),
                 if (data['progress'] == 100)
                   Icon(
                     icons[data['failSeverity']],
@@ -88,25 +88,25 @@ class ResultCard extends StatelessWidget {
                   )
               ],
             ),
-            SizedBox(
+            const SizedBox(
               height: 5,
             ),
             if (data['progress'] == 100)
               if (data['failSeverity'] == "safe")
                 Text(
-                  "${webManagerStrings['securityscan']['securityscan_check_pass_${data['category']}'] ?? Util.instance.strings['SYNO.SDS.SecurityScan.Instance']['securityscan']["securityscan_check_pass_${data['category']}"]}",
-                  style: TextStyle(color: Colors.green),
+                  "${webManagerStrings['securityscan']['securityscan_check_pass_${data['category']}'] ?? connectionStore.strings['SYNO.SDS.SecurityScan.Instance']['securityscan']["securityscan_check_pass_${data['category']}"]}",
+                  style: const TextStyle(color: Colors.green),
                 )
               else
                 ..._buildFailItems()
             else ...[
               Text(
-                "${webManagerStrings['securityscan']['securityscan_check_desc_${data['category']}'] ?? Util.instance.strings['SYNO.SDS.SecurityScan.Instance']['securityscan']["securityscan_check_desc_${data['category']}"]}",
-                style: TextStyle(color: Colors.blue),
+                "${webManagerStrings['securityscan']['securityscan_check_desc_${data['category']}'] ?? connectionStore.strings['SYNO.SDS.SecurityScan.Instance']['securityscan']["securityscan_check_desc_${data['category']}"]}",
+                style: const TextStyle(color: Colors.blue),
               ),
               Text(
-                "${webManagerStrings['rules']["${data['runningItem']}_desc_running"] ?? Util.instance.strings['SYNO.SDS.SecurityScan.Instance']['rules']["${data['runningItem']}_desc_running"]}",
-                style: TextStyle(color: Colors.blue),
+                "${webManagerStrings['rules']["${data['runningItem']}_desc_running"] ?? connectionStore.strings['SYNO.SDS.SecurityScan.Instance']['rules']["${data['runningItem']}_desc_running"]}",
+                style: const TextStyle(color: Colors.blue),
               ),
             ],
           ],

@@ -1,26 +1,34 @@
-import 'package:garden/util/function.dart';
+import 'package:garden/util/http_util.dart';
+import 'package:garden/util/log.dart';
+import 'package:garden/util/ui_util.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:garden/constants/app_constants.dart';
+import 'package:garden/theme/app_colors.dart';
 import 'package:flutter_vibrate/flutter_vibrate.dart';
 
 class LogSetting extends StatefulWidget {
   final String protocol;
-  LogSetting(this.protocol);
+  const LogSetting(this.protocol, {super.key});
   @override
-  _LogSettingState createState() => _LogSettingState();
+  LogSettingState createState() => LogSettingState();
 }
 
-class _LogSettingState extends State<LogSetting> {
+class LogSettingState extends State<LogSetting> {
   Map setting = {};
   bool loading = true;
   @override
   void initState() {
-    getData();
+    getData(() {
+      if (context.mounted) {
+        Navigator.of(context).pop();
+      }
+    });
     super.initState();
   }
 
-  getData() async {
+  getData(VoidCallback? callback) async {
     var res = await Api.fileServiceLog(widget.protocol);
     if (res['success']) {
       setState(() {
@@ -28,8 +36,8 @@ class _LogSettingState extends State<LogSetting> {
         loading = false;
       });
     } else {
-      Util.instance.toast("获取失败，code：${res['error']['code']}");
-      Navigator.of(context).pop();
+      UiUtil.toast("获取失败，code：${res['error']['code']}");
+      callback?.call();
     }
   }
 
@@ -38,10 +46,10 @@ class _LogSettingState extends State<LogSetting> {
     return Scaffold(
       appBar: AppBar(
         leading: AppBackButton(context),
-        title: Text("日志设置"),
+        title: const Text("日志设置"),
       ),
       body: loading
-          ? Center(
+          ? const Center(
               child: CupertinoActivityIndicator(
                 radius: 14,
               ),
@@ -50,7 +58,7 @@ class _LogSettingState extends State<LogSetting> {
               children: [
                 Expanded(
                   child: ListView(
-                    padding: EdgeInsets.all(20),
+                    padding: const EdgeInsets.all(20),
                     children: [
                       GestureDetector(
                         onTap: () async {
@@ -61,28 +69,29 @@ class _LogSettingState extends State<LogSetting> {
                         },
                         child: Card(
                           shape: RoundedRectangleBorder(
-                              side: BorderSide(),
+                              side: const BorderSide(),
                               borderRadius: BorderRadius.circular(18)),
                           child: Padding(
-                            padding: const EdgeInsets.all(8.0),
+                            padding:
+                                const EdgeInsets.all(AppConstants.paddingSmall),
                             child: Row(
                               children: [
-                                Text(
+                                const Text(
                                   '创建',
                                   style: TextStyle(fontSize: 18),
                                 ),
-                                Spacer(),
+                                const Spacer(),
                                 if (setting['create'] == "1")
-                                  Icon(
+                                  const Icon(
                                     CupertinoIcons.checkmark_alt,
-                                    color: Color(0xffff9813),
+                                    color: AppColors.primaryAction,
                                   ),
                               ],
                             ),
                           ),
                         ),
                       ),
-                      SizedBox(
+                      const SizedBox(
                         height: 20,
                       ),
                       GestureDetector(
@@ -94,28 +103,29 @@ class _LogSettingState extends State<LogSetting> {
                         },
                         child: Card(
                           shape: RoundedRectangleBorder(
-                              side: BorderSide(),
+                              side: const BorderSide(),
                               borderRadius: BorderRadius.circular(18)),
                           child: Padding(
-                            padding: const EdgeInsets.all(8.0),
+                            padding:
+                                const EdgeInsets.all(AppConstants.paddingSmall),
                             child: Row(
                               children: [
-                                Text(
+                                const Text(
                                   '写入',
                                   style: TextStyle(fontSize: 18),
                                 ),
-                                Spacer(),
+                                const Spacer(),
                                 if (setting['write'] == "1")
-                                  Icon(
+                                  const Icon(
                                     CupertinoIcons.checkmark_alt,
-                                    color: Color(0xffff9813),
+                                    color: AppColors.primaryAction,
                                   ),
                               ],
                             ),
                           ),
                         ),
                       ),
-                      SizedBox(
+                      const SizedBox(
                         height: 20,
                       ),
                       GestureDetector(
@@ -127,28 +137,29 @@ class _LogSettingState extends State<LogSetting> {
                         },
                         child: Card(
                           shape: RoundedRectangleBorder(
-                              side: BorderSide(),
+                              side: const BorderSide(),
                               borderRadius: BorderRadius.circular(18)),
                           child: Padding(
-                            padding: const EdgeInsets.all(8.0),
+                            padding:
+                                const EdgeInsets.all(AppConstants.paddingSmall),
                             child: Row(
                               children: [
-                                Text(
+                                const Text(
                                   '移动',
                                   style: TextStyle(fontSize: 18),
                                 ),
-                                Spacer(),
+                                const Spacer(),
                                 if (setting['move'] == "1")
-                                  Icon(
+                                  const Icon(
                                     CupertinoIcons.checkmark_alt,
-                                    color: Color(0xffff9813),
+                                    color: AppColors.primaryAction,
                                   ),
                               ],
                             ),
                           ),
                         ),
                       ),
-                      SizedBox(
+                      const SizedBox(
                         height: 20,
                       ),
                       GestureDetector(
@@ -160,28 +171,29 @@ class _LogSettingState extends State<LogSetting> {
                         },
                         child: Card(
                           shape: RoundedRectangleBorder(
-                              side: BorderSide(),
+                              side: const BorderSide(),
                               borderRadius: BorderRadius.circular(18)),
                           child: Padding(
-                            padding: const EdgeInsets.all(8.0),
+                            padding:
+                                const EdgeInsets.all(AppConstants.paddingSmall),
                             child: Row(
                               children: [
-                                Text(
+                                const Text(
                                   '删除',
                                   style: TextStyle(fontSize: 18),
                                 ),
-                                Spacer(),
+                                const Spacer(),
                                 if (setting['delete'] == "1")
-                                  Icon(
+                                  const Icon(
                                     CupertinoIcons.checkmark_alt,
-                                    color: Color(0xffff9813),
+                                    color: AppColors.primaryAction,
                                   ),
                               ],
                             ),
                           ),
                         ),
                       ),
-                      SizedBox(
+                      const SizedBox(
                         height: 20,
                       ),
                       GestureDetector(
@@ -193,28 +205,29 @@ class _LogSettingState extends State<LogSetting> {
                         },
                         child: Card(
                           shape: RoundedRectangleBorder(
-                              side: BorderSide(),
+                              side: const BorderSide(),
                               borderRadius: BorderRadius.circular(18)),
                           child: Padding(
-                            padding: const EdgeInsets.all(8.0),
+                            padding:
+                                const EdgeInsets.all(AppConstants.paddingSmall),
                             child: Row(
                               children: [
-                                Text(
+                                const Text(
                                   '读取',
                                   style: TextStyle(fontSize: 18),
                                 ),
-                                Spacer(),
+                                const Spacer(),
                                 if (setting['read'] == "1")
-                                  Icon(
+                                  const Icon(
                                     CupertinoIcons.checkmark_alt,
-                                    color: Color(0xffff9813),
+                                    color: AppColors.primaryAction,
                                   ),
                               ],
                             ),
                           ),
                         ),
                       ),
-                      SizedBox(
+                      const SizedBox(
                         height: 20,
                       ),
                       GestureDetector(
@@ -226,51 +239,54 @@ class _LogSettingState extends State<LogSetting> {
                         },
                         child: Card(
                           shape: RoundedRectangleBorder(
-                              side: BorderSide(),
+                              side: const BorderSide(),
                               borderRadius: BorderRadius.circular(18)),
                           child: Padding(
-                            padding: const EdgeInsets.all(8.0),
+                            padding:
+                                const EdgeInsets.all(AppConstants.paddingSmall),
                             child: Row(
                               children: [
-                                Text(
+                                const Text(
                                   '重命名',
                                   style: TextStyle(fontSize: 18),
                                 ),
-                                Spacer(),
+                                const Spacer(),
                                 if (setting['rename'] == "1")
-                                  Icon(
+                                  const Icon(
                                     CupertinoIcons.checkmark_alt,
-                                    color: Color(0xffff9813),
+                                    color: AppColors.primaryAction,
                                   ),
                               ],
                             ),
                           ),
                         ),
                       ),
-                      SizedBox(
+                      const SizedBox(
                         height: 20,
                       ),
                     ],
                   ),
                 ),
                 Padding(
-                  padding: EdgeInsets.all(20),
+                  padding: const EdgeInsets.all(20),
                   child: OutlinedButton(
                     onPressed: () async {
                       var res = await Api.fileServiceLogSave(
                           widget.protocol, setting);
-                      print(res);
+                      Log.info("fileServiceLogSave res: $res");
                       if (res['success']) {
-                        Util.instance.vibrate(FeedbackType.light);
-                        Util.instance.toast("应用成功");
-                        Navigator.of(context).pop();
+                        UiUtil.vibrate(FeedbackType.light);
+                        UiUtil.toast("应用成功");
+                        if (context.mounted) {
+                          Navigator.of(context).pop();
+                        }
                       } else {
-                        Util.instance.vibrate(FeedbackType.warning);
-                        Util.instance
+                        UiUtil.vibrate(FeedbackType.warning);
+                        HttpUtil.instance
                             .toast("应用失败，code:${res['error']['code']}");
                       }
                     },
-                    child: Text(
+                    child: const Text(
                       ' 应用 ',
                       style: TextStyle(fontSize: 18),
                     ),

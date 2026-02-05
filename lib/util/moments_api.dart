@@ -1,5 +1,6 @@
 import 'dart:async';
-import 'function.dart';
+import 'package:garden/stores/connection_store.dart';
+import 'http_util.dart';
 
 class MomentsApi {
   static Future<Map> timeline(
@@ -7,16 +8,16 @@ class MomentsApi {
     Map<String, dynamic> data = {
       "timeline_group_unit": '"day"',
       "api":
-          '"SYNO.${Util.instance.version == 7 ? "Foto" : "Photo"}.Browse.$category"',
+          '"SYNO.${connectionStore.version >= 7 ? "Foto" : "Photo"}.Browse.$category"',
       "method": category == "Timeline" ? '"get"' : '"get_timeline"',
       "version":
-          Util.instance.version == 7 ? (category == "Timeline" ? 2 : 3) : 1,
-      "_sid": Util.instance.sid,
+          connectionStore.version >= 7 ? (category == "Timeline" ? 2 : 3) : 1,
+      "_sid": connectionStore.sid,
     };
     if (type != null) {
       data['type'] = '"$type"';
     }
-    var res = await Util.instance.post("entry.cgi", data: data);
+    var res = await HttpUtil.instance.post("entry.cgi", data: data);
     return res;
   }
 
@@ -35,10 +36,10 @@ class MomentsApi {
       "additional":
           '["thumbnail","resolution","orientation","video_convert","video_meta","address"]',
       "api":
-          '"SYNO.${Util.instance.version == 7 ? "Foto" : "Photo"}.Browse.$category"',
+          '"SYNO.${connectionStore.version >= 7 ? "Foto" : "Photo"}.Browse.$category"',
       "method": '"list"',
-      "version": Util.instance.version == 7 ? 1 : 2,
-      "_sid": Util.instance.sid,
+      "version": connectionStore.version >= 7 ? 1 : 2,
+      "_sid": connectionStore.sid,
     };
     if (type != null) {
       data['type'] = '"$type"';
@@ -52,19 +53,19 @@ class MomentsApi {
     if (albumId != null) {
       data['album_id'] = albumId;
     }
-    var res = await Util.instance.post("entry.cgi", data: data);
+    var res = await HttpUtil.instance.post("entry.cgi", data: data);
     return res;
   }
 
   static Future<Map> category() async {
     Map<String, dynamic> data = {
       "api":
-          '"SYNO.${Util.instance.version == 7 ? "Foto" : "Photo"}.Browse.Category"',
+          '"SYNO.${connectionStore.version >= 7 ? "Foto" : "Photo"}.Browse.Category"',
       "method": '"get"',
       "version": 1,
-      "_sid": Util.instance.sid,
+      "_sid": connectionStore.sid,
     };
-    var res = await Util.instance.post("entry.cgi", data: data);
+    var res = await HttpUtil.instance.post("entry.cgi", data: data);
     return res;
   }
 
@@ -83,12 +84,12 @@ class MomentsApi {
       "sort_by": '"$sortBy"',
       "sort_direction": '"$sortDirection"',
       "api":
-          '"SYNO.${Util.instance.version == 7 ? "Foto" : "Photo"}.Browse.Album"',
+          '"SYNO.${connectionStore.version >= 7 ? "Foto" : "Photo"}.Browse.Album"',
       "method": '"list"',
-      "version": Util.instance.version == 7 ? 1 : 2,
-      "_sid": Util.instance.sid,
+      "version": connectionStore.version >= 7 ? 1 : 2,
+      "_sid": connectionStore.sid,
     };
-    var res = await Util.instance.post("entry.cgi", data: data);
+    var res = await HttpUtil.instance.post("entry.cgi", data: data);
     return res;
   }
 
@@ -103,9 +104,9 @@ class MomentsApi {
       "api": '"SYNO.Foto.Browse.Geocoding"',
       "method": '"list"',
       "version": 1,
-      "_sid": Util.instance.sid,
+      "_sid": connectionStore.sid,
     };
-    var res = await Util.instance.post("entry.cgi", data: data);
+    var res = await HttpUtil.instance.post("entry.cgi", data: data);
     return res;
   }
 
@@ -121,9 +122,9 @@ class MomentsApi {
       "api": '"SYNO.Foto${isTeam ? 'Team' : ''}.Browse.GeneralTag"',
       "method": '"list"',
       "version": 1,
-      "_sid": Util.instance.sid,
+      "_sid": connectionStore.sid,
     };
-    var res = await Util.instance.post("entry.cgi", data: data);
+    var res = await HttpUtil.instance.post("entry.cgi", data: data);
     return res;
   }
 
@@ -135,12 +136,12 @@ class MomentsApi {
       "start_time": start,
       "end_time": end,
       "api":
-          '"SYNO.${Util.instance.version == 7 ? "Foto" : "Photo"}.Browse.Timeline"',
+          '"SYNO.${connectionStore.version >= 7 ? "Foto" : "Photo"}.Browse.Timeline"',
       "method": '"get_geocoding"',
       "version": 1,
-      "_sid": Util.instance.sid,
+      "_sid": connectionStore.sid,
     };
-    var res = await Util.instance.post("entry.cgi", data: data);
+    var res = await HttpUtil.instance.post("entry.cgi", data: data);
     return res;
   }
 
@@ -150,12 +151,12 @@ class MomentsApi {
       "limit": 4,
       "additional": '["thumbnail"]',
       "api":
-          '"SYNO.${Util.instance.version == 7 ? "Foto" : "Photo"}.Browse.RecentlyAdded"',
+          '"SYNO.${connectionStore.version >= 7 ? "Foto" : "Photo"}.Browse.RecentlyAdded"',
       "method": '"list"',
       "version": 3,
-      "_sid": Util.instance.sid,
+      "_sid": connectionStore.sid,
     };
-    var res = await Util.instance.post("entry.cgi", data: data);
+    var res = await HttpUtil.instance.post("entry.cgi", data: data);
     return res;
   }
 
@@ -163,12 +164,12 @@ class MomentsApi {
     Map<String, dynamic> data = {
       "timeline_group_unit": '"day"',
       "api":
-          '"SYNO.${Util.instance.version == 7 ? "Foto" : "Photo"}.Browse.RecentlyAdded"',
+          '"SYNO.${connectionStore.version >= 7 ? "Foto" : "Photo"}.Browse.RecentlyAdded"',
       "method": '"get_timeline"',
-      "version": Util.instance.version == 7 ? 3 : 1,
-      "_sid": Util.instance.sid,
+      "version": connectionStore.version >= 7 ? 3 : 1,
+      "_sid": connectionStore.sid,
     };
-    var res = await Util.instance.post("entry.cgi", data: data);
+    var res = await HttpUtil.instance.post("entry.cgi", data: data);
     return res;
   }
 
@@ -180,10 +181,10 @@ class MomentsApi {
       "additional":
           '["thumbnail","resolution","orientation","video_convert","video_meta","address"]',
       "api":
-          '"SYNO.${Util.instance.version == 7 ? "Foto" : "Photo"}.Browse.RecentlyAdded"',
+          '"SYNO.${connectionStore.version >= 7 ? "Foto" : "Photo"}.Browse.RecentlyAdded"',
       "method": '"list"',
-      "version": Util.instance.version == 7 ? 1 : 2,
-      "_sid": Util.instance.sid,
+      "version": connectionStore.version >= 7 ? 1 : 2,
+      "_sid": connectionStore.sid,
     };
     if (year != null && month != null && day != null) {
       int start = DateTime(year, month, day, 8).secondsSinceEpoch;
@@ -194,7 +195,7 @@ class MomentsApi {
     if (albumId != null) {
       data['album_id'] = albumId;
     }
-    var res = await Util.instance.post("entry.cgi", data: data);
+    var res = await HttpUtil.instance.post("entry.cgi", data: data);
     return res;
   }
 }

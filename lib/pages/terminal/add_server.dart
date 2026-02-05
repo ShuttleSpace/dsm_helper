@@ -1,19 +1,22 @@
 import 'dart:convert';
+import 'package:garden/util/ui_util.dart';
+import 'package:garden/util/storage_util.dart';
 
 import 'package:flutter/cupertino.dart';
 import 'package:garden/pages/common/device_finder.dart';
-import 'package:garden/util/function.dart';
+import 'package:garden/util/http_util.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/material.dart';
+import 'package:garden/constants/app_constants.dart';
 
 class AddServer extends StatefulWidget {
   final int index;
-  AddServer({this.index = 0});
+  const AddServer({super.key, this.index = 0});
   @override
-  _AddServerState createState() => _AddServerState();
+  AddServerState createState() => AddServerState();
 }
 
-class _AddServerState extends State<AddServer> {
+class AddServerState extends State<AddServer> {
   List servers = [];
 
   String host = "";
@@ -21,10 +24,11 @@ class _AddServerState extends State<AddServer> {
   String password = "";
   String port = "22";
 
-  TextEditingController _hostController = TextEditingController();
-  TextEditingController _accountController = TextEditingController();
-  TextEditingController _passwordController = TextEditingController();
-  TextEditingController _portController = TextEditingController(text: "22");
+  final TextEditingController _hostController = TextEditingController();
+  final TextEditingController _accountController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _portController =
+      TextEditingController(text: "22");
 
   @override
   void initState() {
@@ -33,7 +37,7 @@ class _AddServerState extends State<AddServer> {
   }
 
   getData() async {
-    String str = await Util.instance.getStorage("terminal_servers") ?? '';
+    String str = await StorageUtil.getString("terminal_servers") ?? '';
     setState(() {
       if (str.isNotBlank) {
         servers = json.decode(str);
@@ -63,7 +67,7 @@ class _AddServerState extends State<AddServer> {
     servers[widget.index] = server;
 
     // print(servers);
-    Util.instance.setStorage("terminal_servers", jsonEncode(servers));
+    StorageUtil.setString("terminal_servers", jsonEncode(servers));
     Navigator.of(context).pop();
   }
 
@@ -72,13 +76,14 @@ class _AddServerState extends State<AddServer> {
     return Scaffold(
       appBar: AppBar(
         leading: AppBackButton(context),
-        title: Text("添加服务器"),
+        title: const Text("添加服务器"),
         actions: [
           Padding(
-            padding: EdgeInsetsGeometry.only(right: 10, top: 8, bottom: 8),
+            padding:
+                const EdgeInsetsGeometry.only(right: 10, top: 8, bottom: 8),
             child: OutlinedButton(
               style: OutlinedButton.styleFrom(
-                minimumSize: Size(36, 36),
+                minimumSize: const Size(36, 36),
                 tapTargetSize: MaterialTapTargetSize.shrinkWrap,
               ),
               onPressed: () async {
@@ -86,7 +91,7 @@ class _AddServerState extends State<AddServer> {
                 final result = await Navigator.of(context).push(
                   CupertinoPageRoute(
                     builder: (context) {
-                      return DeviceFinder(
+                      return const DeviceFinder(
                         url: "https://finds.synology.com",
                         title: "设备发现",
                       );
@@ -104,14 +109,14 @@ class _AddServerState extends State<AddServer> {
                       _hostController.value = TextEditingValue(text: host);
                       _portController.value = TextEditingValue(text: port);
                     });
-                    Util.instance.toast("已选择设备: ${data['name'] ?? host}");
+                    UiUtil.toast("已选择设备: ${data['name'] ?? host}");
                   } catch (e) {
                     debugPrint("Error parsing device info: $e");
-                    Util.instance.toast("解析设备信息失败");
+                    UiUtil.toast("解析设备信息失败");
                   }
                 }
               },
-              child: Icon(
+              child: const Icon(
                 Icons.open_in_browser,
                 size: 20,
               ),
@@ -124,16 +129,17 @@ class _AddServerState extends State<AddServer> {
           FocusScope.of(context).unfocus();
         },
         child: ListView(
-          padding: EdgeInsets.all(20),
+          padding: const EdgeInsets.all(20),
           children: <Widget>[
-            SizedBox(
+            const SizedBox(
               height: 20,
             ),
             Card(
               shape: RoundedRectangleBorder(
-                  side: BorderSide(), borderRadius: BorderRadius.circular(18)),
+                  side: const BorderSide(),
+                  borderRadius: BorderRadius.circular(18)),
               child: Padding(
-                padding: const EdgeInsets.all(8.0),
+                padding: const EdgeInsets.all(AppConstants.paddingSmall),
                 child: Row(
                   children: [
                     Expanded(
@@ -142,7 +148,7 @@ class _AddServerState extends State<AddServer> {
                         controller: _hostController,
                         onChanged: (v) => host = v,
                         autocorrect: false,
-                        decoration: InputDecoration(
+                        decoration: const InputDecoration(
                           border: InputBorder.none,
                           labelText: '网址/IP',
                         ),
@@ -153,7 +159,7 @@ class _AddServerState extends State<AddServer> {
                       child: TextField(
                         onChanged: (v) => port = v,
                         controller: _portController,
-                        decoration: InputDecoration(
+                        decoration: const InputDecoration(
                           border: InputBorder.none,
                           labelText: '端口',
                         ),
@@ -163,44 +169,46 @@ class _AddServerState extends State<AddServer> {
                 ),
               ),
             ),
-            SizedBox(
+            const SizedBox(
               height: 20,
             ),
             Card(
               shape: RoundedRectangleBorder(
-                  side: BorderSide(), borderRadius: BorderRadius.circular(18)),
+                  side: const BorderSide(),
+                  borderRadius: BorderRadius.circular(18)),
               child: Padding(
-                padding: const EdgeInsets.all(8.0),
+                padding: const EdgeInsets.all(AppConstants.paddingSmall),
                 child: TextField(
                   controller: _accountController,
                   onChanged: (v) => account = v,
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     border: InputBorder.none,
                     labelText: '账号',
                   ),
                 ),
               ),
             ),
-            SizedBox(
+            const SizedBox(
               height: 20,
             ),
             Card(
               shape: RoundedRectangleBorder(
-                  side: BorderSide(), borderRadius: BorderRadius.circular(18)),
+                  side: const BorderSide(),
+                  borderRadius: BorderRadius.circular(18)),
               child: Padding(
-                padding: const EdgeInsets.all(8.0),
+                padding: const EdgeInsets.all(AppConstants.paddingSmall),
                 child: TextField(
                   controller: _passwordController,
                   onChanged: (v) => password = v,
                   obscureText: true,
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     border: InputBorder.none,
                     labelText: '密码',
                   ),
                 ),
               ),
             ),
-            SizedBox(
+            const SizedBox(
               height: 20,
             ),
             // SizedBox(
@@ -208,7 +216,7 @@ class _AddServerState extends State<AddServer> {
             // ),
             OutlinedButton(
               onPressed: _save,
-              child: Text(
+              child: const Text(
                 ' 保存 ',
                 style: TextStyle(fontSize: 18),
               ),

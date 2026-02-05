@@ -1,0 +1,30 @@
+curl "http://192.168.8.40:5000/webapi/auth.cgi" \
+  -d "api=SYNO.API.Auth" \
+  -d "version=7" \
+  -d "method=login" \
+  -d "account=humphrey" \
+  -d "passwd=LocalHost8080" \
+  -d "session=FileStation" \
+  -d "format=sid" \
+  -d "otp=186453"
+
+
+curl -k -X POST 'http://192.168.8.40:5000/webapi/auth.cgi' \
+  -d 'api=SYNO.API.Auth' \
+  -d 'version=7' \
+  -d 'method=login' \
+  -d 'account=humphrey' \
+  -d 'passwd=LocalHost8080' \
+  -d 'session=FileStation' \
+  -d 'format=sid' \
+  -d 'otp=607896'
+
+curl 'http://192.168.8.40:5000/webapi/query.cgi?api=SYNO.API.Info&version=1&method=query&query=all'
+
+
+curl 'http://192.168.8.40:5000/webapi/query.cgi?api=SYNO.FileStation.Info&version=1'
+curl 'http://192.168.8.40:5000/webapi/query.cgi?api=SYNO.FileStation.Info&version=&method=get'
+
+curl 'http://192.168.8.40:5000/webapi/entry.cgi?api=SYNO.API.Info&version=1&method=query&query=SYNO.API.Auth'
+
+curl 'http://192.168.8.40:5000/webapi/entry.cgi?api=SYNO.API.Auth&version=6&method=login&account=humphrey&passwd=LocalHost8080&enable_syno_token=yes&format=sid&otp_code=030375&enable_device_token=yes'

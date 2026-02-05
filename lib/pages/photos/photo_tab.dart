@@ -3,7 +3,8 @@ import 'package:garden/pages/photos/timeline.dart';
 import 'package:flutter/material.dart';
 
 class PhotoTab extends StatelessWidget {
-  PhotoTab(this.isTeam, this.isTimeline, {this.timelineKey, this.folderKey});
+  const PhotoTab(this.isTeam, this.isTimeline,
+      {super.key, this.timelineKey, this.folderKey});
   final bool isTimeline;
   final bool isTeam;
   final GlobalKey<TimelineState>? timelineKey;

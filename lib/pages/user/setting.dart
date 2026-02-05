@@ -1,18 +1,23 @@
 import 'package:garden/pages/user/otp_bind.dart';
-import 'package:garden/util/function.dart';
+import 'package:garden/util/ui_util.dart';
+import 'package:garden/util/http_util.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:garden/constants/app_constants.dart';
+import 'package:garden/theme/app_colors.dart';
 
 class UserSetting extends StatefulWidget {
+  const UserSetting({super.key});
+
   @override
-  _UserSettingState createState() => _UserSettingState();
+  UserSettingState createState() => UserSettingState();
 }
 
-class _UserSettingState extends State<UserSetting> {
-  TextEditingController _usernameController = TextEditingController();
-  TextEditingController _fullnameController = TextEditingController();
-  TextEditingController _emailController = TextEditingController();
+class UserSettingState extends State<UserSetting> {
+  final TextEditingController _usernameController = TextEditingController();
+  final TextEditingController _fullnameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
   Map normalUser = {};
   bool loading = true;
   bool saving = false;
@@ -43,8 +48,11 @@ class _UserSettingState extends State<UserSetting> {
           TextEditingValue(text: normalUser['fullname']);
       _emailController.value = TextEditingValue(text: normalUser['email']);
     } else {
-      Util.instance.toast("加载失败，code:${res['error']['code']}");
-      Navigator.of(context).pop();
+      UiUtil.toast("加载失败，code:${res['error']['code']}");
+      if (context.mounted) {
+        // ignore: use_build_context_synchronously
+        Navigator.of(context).pop();
+      }
     }
   }
 
@@ -53,47 +61,47 @@ class _UserSettingState extends State<UserSetting> {
     return Scaffold(
       appBar: AppBar(
         leading: AppBackButton(context),
-        title: Text("个人设置"),
+        title: const Text("个人设置"),
       ),
       body: loading
-          ? Center(
+          ? const Center(
               child: CupertinoActivityIndicator(
                 radius: 14,
               ),
             )
           : ListView(
-              padding: EdgeInsets.all(20),
+              padding: const EdgeInsets.all(20),
               children: [
                 Card(
                   shape: RoundedRectangleBorder(
-                      side: BorderSide(),
+                      side: const BorderSide(),
                       borderRadius: BorderRadius.circular(18)),
                   child: Padding(
-                    padding: const EdgeInsets.all(8.0),
+                    padding: const EdgeInsets.all(AppConstants.paddingSmall),
                     child: TextField(
                       controller: _usernameController,
                       onChanged: (v) => changedData['username'] = v,
                       enabled: false,
-                      decoration: InputDecoration(
+                      decoration: const InputDecoration(
                         border: InputBorder.none,
                         labelText: '名称',
                       ),
                     ),
                   ),
                 ),
-                SizedBox(
+                const SizedBox(
                   height: 20,
                 ),
                 Card(
                   shape: RoundedRectangleBorder(
-                      side: BorderSide(),
+                      side: const BorderSide(),
                       borderRadius: BorderRadius.circular(18)),
                   child: Padding(
-                    padding: const EdgeInsets.all(8.0),
+                    padding: const EdgeInsets.all(AppConstants.paddingSmall),
                     child: TextField(
                       controller: _fullnameController,
                       onChanged: (v) => changedData['fullname'] = v,
-                      decoration: InputDecoration(
+                      decoration: const InputDecoration(
                         border: InputBorder.none,
                         labelText: '描述',
                       ),
@@ -101,54 +109,54 @@ class _UserSettingState extends State<UserSetting> {
                   ),
                 ),
                 if (!normalUser['disallowchpasswd']) ...[
-                  SizedBox(
+                  const SizedBox(
                     height: 20,
                   ),
                   Card(
                     shape: RoundedRectangleBorder(
-                        side: BorderSide(),
+                        side: const BorderSide(),
                         borderRadius: BorderRadius.circular(18)),
                     child: Padding(
-                      padding: const EdgeInsets.all(8.0),
+                      padding: const EdgeInsets.all(AppConstants.paddingSmall),
                       child: TextField(
                         onChanged: (v) => changedData['old_password'] = v,
-                        decoration: InputDecoration(
+                        decoration: const InputDecoration(
                           border: InputBorder.none,
                           labelText: '密码',
                         ),
                       ),
                     ),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 20,
                   ),
                   Card(
                     shape: RoundedRectangleBorder(
-                        side: BorderSide(),
+                        side: const BorderSide(),
                         borderRadius: BorderRadius.circular(18)),
                     child: Padding(
-                      padding: const EdgeInsets.all(8.0),
+                      padding: const EdgeInsets.all(AppConstants.paddingSmall),
                       child: TextField(
                         onChanged: (v) => changedData['password'] = v,
-                        decoration: InputDecoration(
+                        decoration: const InputDecoration(
                           border: InputBorder.none,
                           labelText: '新密码',
                         ),
                       ),
                     ),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 20,
                   ),
                   Card(
                     shape: RoundedRectangleBorder(
-                        side: BorderSide(),
+                        side: const BorderSide(),
                         borderRadius: BorderRadius.circular(18)),
                     child: Padding(
-                      padding: const EdgeInsets.all(8.0),
+                      padding: const EdgeInsets.all(AppConstants.paddingSmall),
                       child: TextField(
                         onChanged: (v) => changedData['confirm_password'] = v,
-                        decoration: InputDecoration(
+                        decoration: const InputDecoration(
                           border: InputBorder.none,
                           labelText: '确认密码',
                         ),
@@ -156,26 +164,26 @@ class _UserSettingState extends State<UserSetting> {
                     ),
                   ),
                 ],
-                SizedBox(
+                const SizedBox(
                   height: 20,
                 ),
                 Card(
                   shape: RoundedRectangleBorder(
-                      side: BorderSide(),
+                      side: const BorderSide(),
                       borderRadius: BorderRadius.circular(18)),
                   child: Padding(
-                    padding: const EdgeInsets.all(8.0),
+                    padding: const EdgeInsets.all(AppConstants.paddingSmall),
                     child: TextField(
                       controller: _emailController,
                       onChanged: (v) => changedData['email'] = v,
-                      decoration: InputDecoration(
+                      decoration: const InputDecoration(
                         border: InputBorder.none,
                         labelText: '邮箱',
                       ),
                     ),
                   ),
                 ),
-                SizedBox(
+                const SizedBox(
                   height: 20,
                 ),
                 GestureDetector(
@@ -193,7 +201,7 @@ class _UserSettingState extends State<UserSetting> {
                                 return OtpBind(normalUser['username'],
                                     normalUser['email']);
                               },
-                              settings: RouteSettings(name: "otp_bind")))
+                              settings: const RouteSettings(name: "otp_bind")))
                           .then((res) {
                         if (res != null && res) {
                           setState(() {
@@ -205,25 +213,25 @@ class _UserSettingState extends State<UserSetting> {
                   },
                   child: Card(
                     shape: RoundedRectangleBorder(
-                        side: BorderSide(),
+                        side: const BorderSide(),
                         borderRadius: BorderRadius.circular(18)),
                     child: Padding(
-                      padding: const EdgeInsets.all(8.0),
+                      padding: const EdgeInsets.all(AppConstants.paddingSmall),
                       child: Row(
                         children: [
-                          Text("两步认证"),
-                          Spacer(),
+                          const Text("两步认证"),
+                          const Spacer(),
                           if (normalUser['OTP_enable'])
-                            Icon(
+                            const Icon(
                               CupertinoIcons.checkmark_alt,
-                              color: Color(0xffff9813),
+                              color: AppColors.primaryAction,
                             ),
                         ],
                       ),
                     ),
                   ),
                 ),
-                SizedBox(
+                const SizedBox(
                   height: 20,
                 ),
                 OutlinedButton(
@@ -241,12 +249,12 @@ class _UserSettingState extends State<UserSetting> {
                       changedData.remove("confirm_password");
                     } else {
                       if (changedData['password'] == "") {
-                        Util.instance.toast("请输入新密码");
+                        UiUtil.toast("请输入新密码");
                         return;
                       }
                       if (changedData['confirm_password'] !=
                           changedData['password']) {
-                        Util.instance.toast("确认密码与新密码不一致");
+                        UiUtil.toast("确认密码与新密码不一致");
                         return;
                       }
                     }
@@ -261,20 +269,23 @@ class _UserSettingState extends State<UserSetting> {
                     });
                     var res = await Api.normalUser("set", changedData: data);
                     if (res['success']) {
-                      Util.instance.toast("保存成功");
-                      Navigator.of(context).pop(true);
+                      UiUtil.toast("保存成功");
+                      if (context.mounted) {
+                        // ignore: use_build_context_synchronously
+                        Navigator.of(context).pop();
+                      }
                     } else {
                       setState(() {
                         saving = false;
                       });
-                      Util.instance.toast("保存失败，原因:${res['error']['code']}");
+                      UiUtil.toast("保存失败，原因:${res['error']['code']}");
                     }
                   },
                   child: saving
-                      ? CupertinoActivityIndicator(
+                      ? const CupertinoActivityIndicator(
                           radius: 13,
                         )
-                      : Text(
+                      : const Text(
                           ' 保存 ',
                           style: TextStyle(fontSize: 18),
                         ),

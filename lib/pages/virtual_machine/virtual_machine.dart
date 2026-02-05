@@ -1,41 +1,42 @@
 import 'dart:async';
+import 'package:garden/util/log.dart';
+import 'package:garden/util/ui_util.dart';
 
-import 'package:garden/themes/app_theme.dart';
-import 'package:garden/util/function.dart';
-import 'package:garden/widgets/animation_progress_bar.dart';
-import 'package:garden/widgets/label.dart';
+import 'package:garden/constants/app_constants.dart';
+import 'package:garden/util/http_util.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:garden/widgets/virtual_machine/host_item.dart';
+import 'package:garden/widgets/virtual_machine/guest_item.dart';
+import 'package:garden/widgets/virtual_machine/repo_item.dart';
+import 'package:garden/widgets/virtual_machine/cluster_summary_card.dart';
+import 'package:garden/widgets/virtual_machine/power_confirm_dialog.dart';
 
 class VirtualMachine extends StatefulWidget {
+  const VirtualMachine({super.key});
+
   @override
-  _VirtualMachineState createState() => _VirtualMachineState();
+  VirtualMachineState createState() => VirtualMachineState();
 }
 
-class _VirtualMachineState extends State<VirtualMachine> {
+class VirtualMachineState extends State<VirtualMachine> {
   late Timer timer;
   bool loading = true;
   bool hostLoading = true;
   bool guestLoading = true;
   bool repoLoading = true;
   Map<String, bool> powerLoading = {};
-  var cluster;
+  dynamic cluster;
   List hosts = [];
   List guests = [];
   List repos = [];
   int _currentIndex = 0;
-  
-  // 主题颜色
-  Color get _errorColor => Theme.of(context).extension<AppTheme>()?.errorColor ?? Colors.redAccent;
-  Color get _successColor => Theme.of(context).extension<AppTheme>()?.successColor ?? Colors.green;
-  Color get _warningColor => Theme.of(context).extension<AppTheme>()?.warningColor ?? Colors.orange;
-  Color get _infoColor => Theme.of(context).extension<AppTheme>()?.infoColor ?? Colors.blue;
-  
+
   @override
   void initState() {
     getData();
-    timer = Timer.periodic(Duration(seconds: 5), (timer) {
+    timer = Timer.periodic(const Duration(seconds: 5), (timer) {
       getData();
     });
     super.initState();
@@ -48,97 +49,26 @@ class _VirtualMachineState extends State<VirtualMachine> {
   }
 
   power(guest, String action) async {
-    // print(guest);
-    // String title = "";
-    // if (guest['has_agent']) {
-    //   title = "确认操作";
-    // } else {
-    //   title = "所选虚拟机上未安装 Guest Agent，可能无法成功关闭。 是否确定要继续？";
-    // }
     showCupertinoModalPopup(
       context: context,
       builder: (context) {
-        return Material(
-          color: Colors.transparent,
-          child: Card(
-            shape: RoundedRectangleBorder(
-                side: BorderSide(), borderRadius: BorderRadius.circular(18)),
-            child: SafeArea(
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: <Widget>[
-                    Text(
-                      "确认操作",
-                      style:
-                          TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
-                    ),
-                    SizedBox(
-                      height: 12,
-                    ),
-                    Text(
-                      action == "poweroff"
-                          ? "如果您强制关闭虚拟机，可能出现数据丟失或文件系统错误。是否确定继续？"
-                          : "如果您虚拟机上未安装Guest Agent，可能无法成功关闭，是否确定继续？",
-                      style:
-                          TextStyle(fontSize: 20, fontWeight: FontWeight.w400),
-                    ),
-                    SizedBox(
-                      height: 22,
-                    ),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: OutlinedButton(
-                            onPressed: () async {
-                              Navigator.of(context).pop();
-                              setState(() {
-                                powerLoading[guest['id']] = true;
-                              });
-                              var res = await Api.vmmPower(guest['id'], action);
-                              if (res['success']) {
-                                Util.instance.toast("请求发送成功");
-                                getGuests();
-                              } else {
-                                Util.instance
-                                    .toast("请求发送失败，代码：${res['error']['code']}");
-                              }
-                              setState(() {
-                                powerLoading[guest['id']] = false;
-                              });
-                            },
-                            child: Text(
-                              "确认",
-                              style: TextStyle(
-                                  fontSize: 18, color: Colors.redAccent),
-                            ),
-                          ),
-                        ),
-                        SizedBox(
-                          width: 16,
-                        ),
-                        Expanded(
-                          child: OutlinedButton(
-                            onPressed: () async {
-                              Navigator.of(context).pop();
-                            },
-                            child: Text(
-                              "取消",
-                              style: TextStyle(fontSize: 18),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    SizedBox(
-                      height: 8,
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
+        return PowerConfirmDialog(
+          action: action,
+          onConfirm: () async {
+            setState(() {
+              powerLoading[guest['id']] = true;
+            });
+            var res = await Api.vmmPower(guest['id'], action);
+            if (res['success']) {
+              UiUtil.toast("请求发送成功");
+              getGuests();
+            } else {
+              UiUtil.toast("请求发送失败，代码：${res['error']['code']}");
+            }
+            setState(() {
+              powerLoading[guest['id']] = false;
+            });
+          },
         );
       },
     );
@@ -147,11 +77,12 @@ class _VirtualMachineState extends State<VirtualMachine> {
   getData() async {
     var res = await Api.cluster("get");
     if (res['success']) {
-      if (mounted)
+      if (mounted) {
         setState(() {
           cluster = res['data'];
           loading = false;
         });
+      }
       if (_currentIndex == 0) {
         getHosts();
       } else if (_currentIndex == 1) {
@@ -165,7 +96,7 @@ class _VirtualMachineState extends State<VirtualMachine> {
   getHosts() async {
     var res = await Api.cluster("get_host");
     if (res['success']) {
-      if (mounted)
+      if (mounted) {
         setState(() {
           hosts = res['data']['hosts'];
           hosts.sort((a, b) {
@@ -173,13 +104,14 @@ class _VirtualMachineState extends State<VirtualMachine> {
           });
           hostLoading = false;
         });
+      }
     }
   }
 
   getGuests() async {
     var res = await Api.cluster("get_guest");
     if (res['success']) {
-      if (mounted)
+      if (mounted) {
         setState(() {
           guests = res['data']['guests'];
           guests.sort((a, b) {
@@ -187,13 +119,14 @@ class _VirtualMachineState extends State<VirtualMachine> {
           });
           guestLoading = false;
         });
+      }
     }
   }
 
   getRepos() async {
     var res = await Api.cluster("get_repo");
     if (res['success']) {
-      if (mounted)
+      if (mounted) {
         setState(() {
           repos = res['data']['repos'];
           repos.sort((a, b) {
@@ -201,432 +134,48 @@ class _VirtualMachineState extends State<VirtualMachine> {
           });
           repoLoading = false;
         });
+      }
     }
   }
 
-  Widget _buildNetworkItem(network, index) {
-    return Padding(
-      padding: EdgeInsets.only(top: 20),
-      child: Row(
-        children: [
-          SizedBox(width: 80, child: Text("局域网${index + 1}：")),
-          Icon(
-            Icons.upload_sharp,
-            color: Colors.blue,
-          ),
-          Text(
-            Util.instance.formatSize(network['tx']) + "/S",
-            style: TextStyle(color: Colors.blue),
-          ),
-          Spacer(),
-          Icon(
-            Icons.download_sharp,
-            color: Colors.green,
-          ),
-          Text(
-            Util.instance.formatSize(network['rx']) + "/S",
-            style: TextStyle(color: Colors.green),
-          ),
-        ],
-      ),
-    );
-  }
-
   Widget _buildHostItem(host) {
-    List networks = host['nics'];
-    return Card(
-      shape: RoundedRectangleBorder(
-          side: BorderSide(), borderRadius: BorderRadius.circular(18)),
-      child: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Text(
-                  host['name'],
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
-                ),
-                Spacer(),
-                host['type'] == "healthy"
-                    ? Label("正常", Colors.green)
-                    : host['type'] == "warning"
-                        ? Label("警告", Colors.orange)
-                        : Label("错误", Colors.red),
-              ],
-            ),
-            SizedBox(
-              height: 20,
-            ),
-            Row(
-              children: [
-                SizedBox(
-                  width: 50,
-                  child: Text("CPU："),
-                ),
-                Expanded(
-                  child: Card(
-                    shape: RoundedRectangleBorder(
-                        side: BorderSide(),
-                        borderRadius: BorderRadius.circular(18)),
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: FAProgressBar(
-                        backgroundColor: Colors.transparent,
-                        changeColorValue: 90,
-                        changeProgressColor: Colors.red,
-                        progressColor: Colors.blue,
-                        currentValue: host['cpu_usage'],
-                        displayText: '%',
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(
-              height: 20,
-            ),
-            Row(
-              children: [
-                SizedBox(
-                  width: 50,
-                  child: Text("RAM："),
-                ),
-                Expanded(
-                  child: Card(
-                    shape: RoundedRectangleBorder(
-                        side: BorderSide(),
-                        borderRadius: BorderRadius.circular(18)),
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: FAProgressBar(
-                        backgroundColor: Colors.transparent,
-                        changeColorValue: 90,
-                        changeProgressColor: Colors.red,
-                        progressColor: Colors.blue,
-                        currentValue: host['ram_usage'],
-                        displayText: '%',
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            ...networks.map((network) {
-              return _buildNetworkItem(network, networks.indexOf(network));
-            }).toList(),
-          ],
-        ),
-      ),
-    );
+    return HostItem(host: host);
   }
 
   Widget _buildGuestItem(guest) {
     if (powerLoading[guest['id']] == null) {
       powerLoading[guest['id']] = false;
     }
-    List networks = guest['nics'];
-    return Card(
-      shape: RoundedRectangleBorder(
-          side: BorderSide(), borderRadius: BorderRadius.circular(18)),
-      margin: EdgeInsets.only(bottom: 20),
-      child: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Text(
-                  guest['name'],
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
-                ),
-                Spacer(),
-                guest['type'] == "healthy"
-                    ? (guest['status'] == "none"
-                        ? Label(
-                            "运行中",
-                            Colors.green,
-                            fill: true,
-                          )
-                        : guest['status'] == "shutdown"
-                            ? Label("已关机", Colors.green)
-                            : Label("正常", Colors.green))
-                    : guest['type'] == "warning"
-                        ? Label("警告", Colors.orange)
-                        : Label("错误", Colors.red),
-                SizedBox(
-                  width: 10,
-                ),
-                GestureDetector(
-                  onTap: () async {
-                    if (powerLoading[guest['id']] == true) {
-                      return;
-                    }
-                    if (guest['type'] == "healthy") {
-                      if (guest['status'] == "none") {
-                        showCupertinoModalPopup(
-                          context: context,
-                          builder: (context) {
-                            return Material(
-                              color: Colors.transparent,
-                              child: Card(
-                                shape: RoundedRectangleBorder(
-                                    side: BorderSide(),
-                                    borderRadius: BorderRadius.circular(18)),
-                                child: SafeArea(
-                                  top: false,
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Column(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: <Widget>[
-                                        Text(
-                                          "选择操作",
-                                          style: TextStyle(
-                                              fontSize: 20,
-                                              fontWeight: FontWeight.w500),
-                                        ),
-                                        SizedBox(
-                                          height: 12,
-                                        ),
-                                        OutlinedButton(
-                                          onPressed: () async {
-                                            Navigator.of(context).pop();
-                                            power(guest, "shutdown");
-                                          },
-                                          child: Text(
-                                            "关机",
-                                            style: TextStyle(
-                                                fontSize: 18,
-                                                color: Colors.redAccent),
-                                          ),
-                                        ),
-                                        SizedBox(
-                                          height: 22,
-                                        ),
-                                        OutlinedButton(
-                                          onPressed: () async {
-                                            Navigator.of(context).pop();
-                                            power(guest, "poweroff");
-                                          },
-                                          child: Text(
-                                            "强制关机",
-                                            style: TextStyle(
-                                                fontSize: 18,
-                                                color: Colors.redAccent),
-                                          ),
-                                        ),
-                                        SizedBox(
-                                          height: 22,
-                                        ),
-                                        OutlinedButton(
-                                          onPressed: () async {
-                                            Navigator.of(context).pop();
-                                            power(guest, "reboot");
-                                          },
-                                          child: Text(
-                                            "重新启动",
-                                            style: TextStyle(
-                                                fontSize: 18,
-                                                color: Colors.redAccent),
-                                          ),
-                                        ),
-                                        SizedBox(
-                                          height: 8,
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            );
-                          },
-                        );
-                      } else {
-                        //开机
-                        setState(() {
-                          powerLoading[guest['id']] = true;
-                        });
-                        var check = await Api.checkPowerOn(guest['id']);
-                        print(check);
-                        if (check['success']) {
-                          var res = await Api.vmmPower(guest['id'], "poweron");
-                          if (res['success']) {
-                            Util.instance.toast("开机请求发送成功");
-                            getGuests();
-                          } else {
-                            Util.instance
-                                .toast("开机请求发送失败，代码：${res['error']['code']}");
-                          }
-                        } else {
-                          Util.instance.toast("无法开机");
-                        }
-                      }
-                    } else {
-                      Util.instance.toast("虚拟机状态未知，无法操作");
-                    }
-                  },
-                  child: powerLoading[guest['id']] == true
-                      ? CupertinoActivityIndicator()
-                      : Image.asset(
-                          "assets/icons/shutdown.png",
-                          width: 20,
-                        ),
-                ),
-              ],
-            ),
-            if (guest['status'] != "shutdown") ...[
-              SizedBox(
-                height: 20,
-              ),
-              Row(
-                children: [
-                  SizedBox(
-                    width: 50,
-                    child: Text("CPU："),
-                  ),
-                  Expanded(
-                    child: Card(
-                      shape: RoundedRectangleBorder(
-                          side: BorderSide(),
-                          borderRadius: BorderRadius.circular(18)),
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: FAProgressBar(
-                          backgroundColor: Colors.transparent,
-                          changeColorValue: 90,
-                          changeProgressColor: Colors.red,
-                          progressColor: Colors.blue,
-                          currentValue: guest['cpu_usage'] ~/ 10,
-                          displayText: '.${guest['cpu_usage'] % 10}%',
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(
-                height: 20,
-              ),
-              Row(
-                children: [
-                  SizedBox(
-                    width: 50,
-                    child: Text("RAM："),
-                  ),
-                  Expanded(
-                    child: Card(
-                      shape: RoundedRectangleBorder(
-                          side: BorderSide(),
-                          borderRadius: BorderRadius.circular(18)),
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: FAProgressBar(
-                          backgroundColor: Colors.transparent,
-                          changeColorValue: 90,
-                          changeProgressColor: Colors.red,
-                          progressColor: Colors.blue,
-                          currentValue: guest['ram_usage'] ~/ 100,
-                          displayText:
-                              '.${(guest['ram_usage'] % 100).toString().padLeft(2, "0")}%',
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              ...networks.map((network) {
-                return _buildNetworkItem(network, networks.indexOf(network));
-              }).toList(),
-            ],
-          ],
-        ),
-      ),
+    return GuestItem(
+      guest: guest,
+      powerLoading: powerLoading,
+      onPowerAction: (action) => power(guest, action),
+      onPowerOn: () async {
+        setState(() {
+          powerLoading[guest['id']] = true;
+        });
+        var check = await Api.checkPowerOn(guest['id']);
+        Log.info(check);
+        if (check['success']) {
+          var res = await Api.vmmPower(guest['id'], "poweron");
+          if (res['success']) {
+            UiUtil.toast("开机请求发送成功");
+            getGuests();
+          } else {
+            UiUtil.toast("开机请求发送失败，代码：${res['error']['code']}");
+          }
+        } else {
+          UiUtil.toast("无法开机");
+        }
+        setState(() {
+          powerLoading[guest['id']] = false;
+        });
+      },
     );
   }
 
   Widget _buildRepoItem(repo) {
-    return Card(
-      shape: RoundedRectangleBorder(
-          side: BorderSide(), borderRadius: BorderRadius.circular(18)),
-      margin: EdgeInsets.only(bottom: 20),
-      child: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Text(
-                  repo['name'],
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
-                ),
-                Spacer(),
-                repo['type'] == "healthy"
-                    ? Label("正常", Colors.green)
-                    : repo['type'] == "warning"
-                        ? Label(
-                            repo['status'] == "provision_warning"
-                                ? "空间不足"
-                                : repo['status'],
-                            Colors.orange)
-                        : Label("${repo['status']}", Colors.red),
-              ],
-            ),
-            Padding(
-              padding: EdgeInsets.only(top: 10),
-              child: Row(
-                children: [
-                  Text(
-                    Util.instance.formatSize(int.parse(repo['used'])),
-                    style: TextStyle(color: Colors.blue),
-                  ),
-                  Text(
-                    " / ",
-                    style: TextStyle(color: Colors.grey),
-                  ),
-                  Text(
-                    Util.instance.formatSize(int.parse(repo['size'])),
-                    style: TextStyle(color: Colors.grey),
-                  ),
-                ],
-              ),
-            ),
-            SizedBox(
-              height: 10,
-            ),
-            Row(
-              children: [
-                Expanded(
-                  child: Card(
-                    shape: RoundedRectangleBorder(
-                        side: BorderSide(),
-                        borderRadius: BorderRadius.circular(18)),
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: FAProgressBar(
-                        backgroundColor: Colors.transparent,
-                        changeColorValue: 90,
-                        changeProgressColor: Colors.red,
-                        progressColor: Colors.blue,
-                        currentValue: ((int.parse(repo['used']) /
-                                    int.parse(repo['size'])) *
-                                100)
-                            .floor(),
-                        displayText: '%',
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
+    return RepoItem(repo: repo);
   }
 
   @override
@@ -634,193 +183,79 @@ class _VirtualMachineState extends State<VirtualMachine> {
     return Scaffold(
       appBar: AppBar(
         leading: AppBackButton(context),
-        title: Text("Virtual Machine Manager"),
+        title: const Text("Virtual Machine Manager"),
       ),
       body: loading
-          ? Center(
+          ? const Center(
               child: CupertinoActivityIndicator(
                 radius: 14,
               ),
             )
           : Column(
               children: [
-                GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      _currentIndex = 0;
-                    });
-                    getHosts();
-                  },
-                  child: Card(
-                    shape: RoundedRectangleBorder(
-                        side: BorderSide(),
-                        borderRadius: BorderRadius.circular(18)),
-                    margin: EdgeInsets.all(20),
-                    child: Padding(
-                      padding: const EdgeInsets.all(20.0),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: Card(
-                              shape: RoundedRectangleBorder(
-                                  side: BorderSide(),
-                                  borderRadius: BorderRadius.circular(18)),
-                              child: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Column(
-                                  children: [
-                                    Row(
-                                      children: [
-                                        Text("主机"),
-                                        Spacer(),
-                                        Text(
-                                            "${cluster['host_summ']['error'] + cluster['host_summ']['healthy'] + cluster['host_summ']['warning']}"),
-                                      ],
-                                    ),
-                                    SizedBox(
-                                      height: 10,
-                                    ),
-                                    if (cluster['host_summ']['error'] > 0)
-                                      Text(
-                                        "${cluster['host_summ']['error']}",
-                                        style: TextStyle(
-                                            fontSize: 40, color: Colors.red),
-                                      )
-                                    else if (cluster['host_summ']['warning'] >
-                                        0)
-                                      Text(
-                                        "${cluster['host_summ']['warning']}",
-                                        style: TextStyle(
-                                            fontSize: 40, color: Colors.orange),
-                                      )
-                                    else
-                                      Text(
-                                        "${cluster['host_summ']['healthy']}",
-                                        style: TextStyle(
-                                            fontSize: 40, color: Colors.green),
-                                      ),
-                                  ],
-                                ),
-                              ),
-                            ),
+                Card(
+                  shape: RoundedRectangleBorder(
+                      side: const BorderSide(),
+                      borderRadius: BorderRadius.circular(18)),
+                  margin: const EdgeInsets.all(20),
+                  child: Padding(
+                    padding: const EdgeInsets.all(AppConstants.paddingLarge),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: ClusterSummaryCard(
+                            title: "主机",
+                            totalCount: cluster['host_summ']['error'] +
+                                cluster['host_summ']['healthy'] +
+                                cluster['host_summ']['warning'],
+                            errorCount: cluster['host_summ']['error'],
+                            warningCount: cluster['host_summ']['warning'],
+                            healthyCount: cluster['host_summ']['healthy'],
+                            onTap: () {
+                              setState(() {
+                                _currentIndex = 0;
+                              });
+                              getHosts();
+                            },
                           ),
-                          SizedBox(
-                            width: 20,
+                        ),
+                        const SizedBox(width: 20),
+                        Expanded(
+                          child: ClusterSummaryCard(
+                            title: "虚拟机",
+                            totalCount: cluster['guest_summ']['error'] +
+                                cluster['guest_summ']['healthy'] +
+                                cluster['guest_summ']['warning'],
+                            errorCount: cluster['guest_summ']['error'],
+                            warningCount: cluster['guest_summ']['warning'],
+                            healthyCount: cluster['guest_summ']['healthy'],
+                            onTap: () {
+                              setState(() {
+                                _currentIndex = 1;
+                              });
+                              getGuests();
+                            },
                           ),
-                          Expanded(
-                            child: GestureDetector(
-                              onTap: () {
-                                setState(() {
-                                  _currentIndex = 1;
-                                });
-                                getGuests();
-                              },
-                              child: Card(
-                                shape: RoundedRectangleBorder(
-                                    side: BorderSide(),
-                                    borderRadius: BorderRadius.circular(18)),
-                                child: Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Column(
-                                    children: [
-                                      Row(
-                                        children: [
-                                          Text("虚拟机"),
-                                          Spacer(),
-                                          Text(
-                                              "${cluster['guest_summ']['error'] + cluster['guest_summ']['healthy'] + cluster['guest_summ']['warning']}"),
-                                        ],
-                                      ),
-                                      SizedBox(
-                                        height: 10,
-                                      ),
-                                      if (cluster['guest_summ']['error'] > 0)
-                                        Text(
-                                          "${cluster['guest_summ']['error']}",
-                                          style: TextStyle(
-                                              fontSize: 40, color: Colors.red),
-                                        )
-                                      else if (cluster['guest_summ']
-                                              ['warning'] >
-                                          0)
-                                        Text(
-                                          "${cluster['guest_summ']['warning']}",
-                                          style: TextStyle(
-                                              fontSize: 40,
-                                              color: Colors.orange),
-                                        )
-                                      else
-                                        Text(
-                                          "${cluster['guest_summ']['healthy']}",
-                                          style: TextStyle(
-                                              fontSize: 40,
-                                              color: Colors.green),
-                                        ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ),
+                        ),
+                        const SizedBox(width: 20),
+                        Expanded(
+                          child: ClusterSummaryCard(
+                            title: "存储",
+                            totalCount: cluster['repo_summ']['error'] +
+                                cluster['repo_summ']['healthy'] +
+                                cluster['repo_summ']['warning'],
+                            errorCount: cluster['repo_summ']['error'],
+                            warningCount: cluster['repo_summ']['warning'],
+                            healthyCount: cluster['repo_summ']['healthy'],
+                            onTap: () {
+                              setState(() {
+                                _currentIndex = 2;
+                              });
+                              getRepos();
+                            },
                           ),
-                          SizedBox(
-                            width: 20,
-                          ),
-                          Expanded(
-                            child: GestureDetector(
-                              onTap: () {
-                                setState(() {
-                                  _currentIndex = 2;
-                                });
-                                getRepos();
-                              },
-                              child: Card(
-                                shape: RoundedRectangleBorder(
-                                    side: BorderSide(),
-                                    borderRadius: BorderRadius.circular(18)),
-                                child: Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Column(
-                                    children: [
-                                      Row(
-                                        children: [
-                                          Text("存储"),
-                                          Spacer(),
-                                          Text(
-                                              "${cluster['repo_summ']['error'] + cluster['repo_summ']['healthy'] + cluster['repo_summ']['warning']}"),
-                                        ],
-                                      ),
-                                      SizedBox(
-                                        height: 10,
-                                      ),
-                                      if (cluster['repo_summ']['error'] > 0)
-                                        Text(
-                                          "${cluster['repo_summ']['error']}",
-                                          style: TextStyle(
-                                              fontSize: 40, color: Colors.red),
-                                        )
-                                      else if (cluster['repo_summ']['warning'] >
-                                          0)
-                                        Text(
-                                          "${cluster['repo_summ']['warning']}",
-                                          style: TextStyle(
-                                              fontSize: 40,
-                                              color: Colors.orange),
-                                        )
-                                      else
-                                        Text(
-                                          "${cluster['repo_summ']['healthy']}",
-                                          style: TextStyle(
-                                              fontSize: 40,
-                                              color: Colors.green),
-                                        ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
@@ -829,39 +264,39 @@ class _VirtualMachineState extends State<VirtualMachine> {
                     index: _currentIndex,
                     children: [
                       hostLoading
-                          ? Center(
+                          ? const Center(
                               child: CupertinoActivityIndicator(
                                 radius: 14,
                               ),
                             )
                           : ListView.builder(
-                              padding: EdgeInsets.all(20),
+                              padding: const EdgeInsets.all(20),
                               itemBuilder: (context, i) {
                                 return _buildHostItem(hosts[i]);
                               },
                               itemCount: hosts.length,
                             ),
                       guestLoading
-                          ? Center(
+                          ? const Center(
                               child: CupertinoActivityIndicator(
                                 radius: 14,
                               ),
                             )
                           : ListView.builder(
-                              padding: EdgeInsets.all(20),
+                              padding: const EdgeInsets.all(20),
                               itemBuilder: (context, i) {
                                 return _buildGuestItem(guests[i]);
                               },
                               itemCount: guests.length,
                             ),
                       repoLoading
-                          ? Center(
+                          ? const Center(
                               child: CupertinoActivityIndicator(
                                 radius: 14,
                               ),
                             )
                           : ListView.builder(
-                              padding: EdgeInsets.all(20),
+                              padding: const EdgeInsets.all(20),
                               itemBuilder: (context, i) {
                                 return _buildRepoItem(repos[i]);
                               },

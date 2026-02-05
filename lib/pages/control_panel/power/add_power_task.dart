@@ -1,17 +1,19 @@
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:garden/constants/app_constants.dart';
+import 'package:garden/theme/app_colors.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 
 class AddPowerTask extends StatefulWidget {
   final String title;
   final Map? task;
-  AddPowerTask(this.title, {this.task});
+  const AddPowerTask(this.title, {super.key, this.task});
   @override
-  _AddPowerTaskState createState() => _AddPowerTaskState();
+  AddPowerTaskState createState() => AddPowerTaskState();
 }
 
-class _AddPowerTaskState extends State<AddPowerTask> {
+class AddPowerTaskState extends State<AddPowerTask> {
   Map task = {
     "enabled": true,
     "hour": 0,
@@ -39,21 +41,22 @@ class _AddPowerTaskState extends State<AddPowerTask> {
         title: Text(widget.title),
       ),
       body: ListView(
-        padding: EdgeInsets.all(20),
+        padding: const EdgeInsets.all(20),
         children: [
           Card(
             shape: RoundedRectangleBorder(
-                side: BorderSide(), borderRadius: BorderRadius.circular(18)),
+                side: const BorderSide(),
+                borderRadius: BorderRadius.circular(18)),
             child: Padding(
-              padding: EdgeInsets.all(20),
+              padding: const EdgeInsets.all(20),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
+                  const Text(
                     "类型",
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 20,
                   ),
                   Row(
@@ -67,18 +70,19 @@ class _AddPowerTaskState extends State<AddPowerTask> {
                           },
                           child: Card(
                             shape: RoundedRectangleBorder(
-                                side: BorderSide(),
+                                side: const BorderSide(),
                                 borderRadius: BorderRadius.circular(18)),
                             child: Padding(
-                              padding: const EdgeInsets.all(8.0),
+                              padding: const EdgeInsets.all(
+                                  AppConstants.paddingSmall),
                               child: Row(
                                 children: [
-                                  Text("开机"),
-                                  Spacer(),
+                                  const Text("开机"),
+                                  const Spacer(),
                                   if (task['type'] == "power_on")
-                                    Icon(
+                                    const Icon(
                                       CupertinoIcons.checkmark_alt,
-                                      color: Color(0xffff9813),
+                                      color: AppColors.primaryAction,
                                     ),
                                 ],
                               ),
@@ -86,7 +90,7 @@ class _AddPowerTaskState extends State<AddPowerTask> {
                           ),
                         ),
                       ),
-                      SizedBox(
+                      const SizedBox(
                         width: 20,
                       ),
                       Expanded(
@@ -98,18 +102,19 @@ class _AddPowerTaskState extends State<AddPowerTask> {
                           },
                           child: Card(
                             shape: RoundedRectangleBorder(
-                                side: BorderSide(),
+                                side: const BorderSide(),
                                 borderRadius: BorderRadius.circular(18)),
                             child: Padding(
-                              padding: const EdgeInsets.all(8.0),
+                              padding: const EdgeInsets.all(
+                                  AppConstants.paddingSmall),
                               child: Row(
                                 children: [
-                                  Text("关机"),
-                                  Spacer(),
+                                  const Text("关机"),
+                                  const Spacer(),
                                   if (task['type'] == "power_off")
-                                    Icon(
+                                    const Icon(
                                       CupertinoIcons.checkmark_alt,
-                                      color: Color(0xffff9813),
+                                      color: AppColors.primaryAction,
                                     ),
                                 ],
                               ),
@@ -123,22 +128,23 @@ class _AddPowerTaskState extends State<AddPowerTask> {
               ),
             ),
           ),
-          SizedBox(
+          const SizedBox(
             height: 20,
           ),
           Card(
             shape: RoundedRectangleBorder(
-                side: BorderSide(), borderRadius: BorderRadius.circular(18)),
+                side: const BorderSide(),
+                borderRadius: BorderRadius.circular(18)),
             child: Padding(
-              padding: EdgeInsets.all(20),
+              padding: const EdgeInsets.all(20),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
+                  const Text(
                     "星期",
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 20,
                   ),
                   Row(
@@ -160,18 +166,19 @@ class _AddPowerTaskState extends State<AddPowerTask> {
                           },
                           child: Card(
                             shape: RoundedRectangleBorder(
-                                side: BorderSide(),
+                                side: const BorderSide(),
                                 borderRadius: BorderRadius.circular(18)),
                             child: Padding(
-                              padding: const EdgeInsets.all(8.0),
+                              padding: const EdgeInsets.all(
+                                  AppConstants.paddingSmall),
                               child: Row(
                                 children: [
-                                  Text("日"),
-                                  Spacer(),
+                                  const Text("日"),
+                                  const Spacer(),
                                   if (weekdays.contains("0"))
-                                    Icon(
+                                    const Icon(
                                       CupertinoIcons.checkmark_alt,
-                                      color: Color(0xffff9813),
+                                      color: AppColors.primaryAction,
                                     ),
                                 ],
                               ),
@@ -179,7 +186,7 @@ class _AddPowerTaskState extends State<AddPowerTask> {
                           ),
                         ),
                       ),
-                      SizedBox(
+                      const SizedBox(
                         width: 10,
                       ),
                       Expanded(
@@ -199,18 +206,19 @@ class _AddPowerTaskState extends State<AddPowerTask> {
                           },
                           child: Card(
                             shape: RoundedRectangleBorder(
-                                side: BorderSide(),
+                                side: const BorderSide(),
                                 borderRadius: BorderRadius.circular(18)),
                             child: Padding(
-                              padding: const EdgeInsets.all(8.0),
+                              padding: const EdgeInsets.all(
+                                  AppConstants.paddingSmall),
                               child: Row(
                                 children: [
-                                  Text("一"),
-                                  Spacer(),
+                                  const Text("一"),
+                                  const Spacer(),
                                   if (weekdays.contains("1"))
-                                    Icon(
+                                    const Icon(
                                       CupertinoIcons.checkmark_alt,
-                                      color: Color(0xffff9813),
+                                      color: AppColors.primaryAction,
                                     ),
                                 ],
                               ),
@@ -218,7 +226,7 @@ class _AddPowerTaskState extends State<AddPowerTask> {
                           ),
                         ),
                       ),
-                      SizedBox(
+                      const SizedBox(
                         width: 10,
                       ),
                       Expanded(
@@ -238,18 +246,19 @@ class _AddPowerTaskState extends State<AddPowerTask> {
                           },
                           child: Card(
                             shape: RoundedRectangleBorder(
-                                side: BorderSide(),
+                                side: const BorderSide(),
                                 borderRadius: BorderRadius.circular(18)),
                             child: Padding(
-                              padding: const EdgeInsets.all(8.0),
+                              padding: const EdgeInsets.all(
+                                  AppConstants.paddingSmall),
                               child: Row(
                                 children: [
-                                  Text("二"),
-                                  Spacer(),
+                                  const Text("二"),
+                                  const Spacer(),
                                   if (weekdays.contains("2"))
-                                    Icon(
+                                    const Icon(
                                       CupertinoIcons.checkmark_alt,
-                                      color: Color(0xffff9813),
+                                      color: AppColors.primaryAction,
                                     ),
                                 ],
                               ),
@@ -257,7 +266,7 @@ class _AddPowerTaskState extends State<AddPowerTask> {
                           ),
                         ),
                       ),
-                      SizedBox(
+                      const SizedBox(
                         width: 10,
                       ),
                       Expanded(
@@ -277,18 +286,19 @@ class _AddPowerTaskState extends State<AddPowerTask> {
                           },
                           child: Card(
                             shape: RoundedRectangleBorder(
-                                side: BorderSide(),
+                                side: const BorderSide(),
                                 borderRadius: BorderRadius.circular(18)),
                             child: Padding(
-                              padding: const EdgeInsets.all(8.0),
+                              padding: const EdgeInsets.all(
+                                  AppConstants.paddingSmall),
                               child: Row(
                                 children: [
-                                  Text("三"),
-                                  Spacer(),
+                                  const Text("三"),
+                                  const Spacer(),
                                   if (weekdays.contains("3"))
-                                    Icon(
+                                    const Icon(
                                       CupertinoIcons.checkmark_alt,
-                                      color: Color(0xffff9813),
+                                      color: AppColors.primaryAction,
                                     ),
                                 ],
                               ),
@@ -298,7 +308,7 @@ class _AddPowerTaskState extends State<AddPowerTask> {
                       ),
                     ],
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 20,
                   ),
                   Row(
@@ -320,18 +330,19 @@ class _AddPowerTaskState extends State<AddPowerTask> {
                           },
                           child: Card(
                             shape: RoundedRectangleBorder(
-                                side: BorderSide(),
+                                side: const BorderSide(),
                                 borderRadius: BorderRadius.circular(18)),
                             child: Padding(
-                              padding: const EdgeInsets.all(8.0),
+                              padding: const EdgeInsets.all(
+                                  AppConstants.paddingSmall),
                               child: Row(
                                 children: [
-                                  Text("四"),
-                                  Spacer(),
+                                  const Text("四"),
+                                  const Spacer(),
                                   if (weekdays.contains("4"))
-                                    Icon(
+                                    const Icon(
                                       CupertinoIcons.checkmark_alt,
-                                      color: Color(0xffff9813),
+                                      color: AppColors.primaryAction,
                                     ),
                                 ],
                               ),
@@ -339,7 +350,7 @@ class _AddPowerTaskState extends State<AddPowerTask> {
                           ),
                         ),
                       ),
-                      SizedBox(
+                      const SizedBox(
                         width: 10,
                       ),
                       Expanded(
@@ -359,18 +370,19 @@ class _AddPowerTaskState extends State<AddPowerTask> {
                           },
                           child: Card(
                             shape: RoundedRectangleBorder(
-                                side: BorderSide(),
+                                side: const BorderSide(),
                                 borderRadius: BorderRadius.circular(18)),
                             child: Padding(
-                              padding: const EdgeInsets.all(8.0),
+                              padding: const EdgeInsets.all(
+                                  AppConstants.paddingSmall),
                               child: Row(
                                 children: [
-                                  Text("五"),
-                                  Spacer(),
+                                  const Text("五"),
+                                  const Spacer(),
                                   if (weekdays.contains("5"))
-                                    Icon(
+                                    const Icon(
                                       CupertinoIcons.checkmark_alt,
-                                      color: Color(0xffff9813),
+                                      color: AppColors.primaryAction,
                                     ),
                                 ],
                               ),
@@ -378,7 +390,7 @@ class _AddPowerTaskState extends State<AddPowerTask> {
                           ),
                         ),
                       ),
-                      SizedBox(
+                      const SizedBox(
                         width: 10,
                       ),
                       Expanded(
@@ -398,18 +410,19 @@ class _AddPowerTaskState extends State<AddPowerTask> {
                           },
                           child: Card(
                             shape: RoundedRectangleBorder(
-                                side: BorderSide(),
+                                side: const BorderSide(),
                                 borderRadius: BorderRadius.circular(18)),
                             child: Padding(
-                              padding: const EdgeInsets.all(8.0),
+                              padding: const EdgeInsets.all(
+                                  AppConstants.paddingSmall),
                               child: Row(
                                 children: [
-                                  Text("六"),
-                                  Spacer(),
+                                  const Text("六"),
+                                  const Spacer(),
                                   if (weekdays.contains("6"))
-                                    Icon(
+                                    const Icon(
                                       CupertinoIcons.checkmark_alt,
-                                      color: Color(0xffff9813),
+                                      color: AppColors.primaryAction,
                                     ),
                                 ],
                               ),
@@ -417,7 +430,7 @@ class _AddPowerTaskState extends State<AddPowerTask> {
                           ),
                         ),
                       ),
-                      SizedBox(
+                      const SizedBox(
                         width: 10,
                       ),
                       Expanded(flex: 1, child: Container()),
@@ -427,22 +440,23 @@ class _AddPowerTaskState extends State<AddPowerTask> {
               ),
             ),
           ),
-          SizedBox(
+          const SizedBox(
             height: 20,
           ),
           Card(
             shape: RoundedRectangleBorder(
-                side: BorderSide(), borderRadius: BorderRadius.circular(18)),
+                side: const BorderSide(),
+                borderRadius: BorderRadius.circular(18)),
             child: Padding(
-              padding: EdgeInsets.all(20),
+              padding: const EdgeInsets.all(20),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
+                  const Text(
                     "时间",
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 20,
                   ),
                   Row(
@@ -466,18 +480,19 @@ class _AddPowerTaskState extends State<AddPowerTask> {
                           },
                           child: Card(
                             shape: RoundedRectangleBorder(
-                                side: BorderSide(),
+                                side: const BorderSide(),
                                 borderRadius: BorderRadius.circular(18)),
                             child: Padding(
-                              padding: const EdgeInsets.all(8.0),
+                              padding: const EdgeInsets.all(
+                                  AppConstants.paddingSmall),
                               child: Row(
                                 children: [
                                   Text(
                                       "${task['hour'].toString().padLeft(2, "0")}:${task['min'].toString().padLeft(2, "0")}"),
-                                  Spacer(),
-                                  Icon(
+                                  const Spacer(),
+                                  const Icon(
                                     CupertinoIcons.right_chevron,
-                                    color: Color(0xffff9813),
+                                    color: AppColors.primaryAction,
                                   ),
                                 ],
                               ),
@@ -491,14 +506,14 @@ class _AddPowerTaskState extends State<AddPowerTask> {
               ),
             ),
           ),
-          SizedBox(
+          const SizedBox(
             height: 40,
           ),
           OutlinedButton(
             onPressed: () {
               Navigator.of(context).pop(task);
             },
-            child: Text(
+            child: const Text(
               ' 确定 ',
               style: TextStyle(fontSize: 18),
             ),

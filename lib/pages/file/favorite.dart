@@ -1,5 +1,6 @@
-import 'package:garden/themes/app_theme.dart';
-import 'package:garden/util/function.dart';
+import 'package:garden/theme/app_theme.dart';
+import 'package:garden/util/ui_util.dart';
+import 'package:garden/util/http_util.dart';
 import 'package:garden/widgets/file_icon.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -7,12 +8,12 @@ import 'package:flutter_vibrate/flutter_vibrate.dart';
 
 class Favorite extends StatefulWidget {
   final Function callback;
-  Favorite(this.callback);
+  const Favorite(this.callback, {super.key});
   @override
-  _FavoriteState createState() => _FavoriteState();
+  FavoriteState createState() => FavoriteState();
 }
 
-class _FavoriteState extends State<Favorite> {
+class FavoriteState extends State<Favorite> {
   bool favoriteLoading = true;
   List favorites = [];
   @override
@@ -42,29 +43,29 @@ class _FavoriteState extends State<Favorite> {
       child: OutlinedButton(
         onPressed: () {
           if (favorite['status'] == "broken") {
-            Util.instance.toast("文件或目录不存在");
+            UiUtil.toast("文件或目录不存在");
           } else {
             Navigator.of(context).pop(favorite['path']);
             widget.callback(favorite['path']);
           }
         },
         child: Padding(
-          padding: EdgeInsets.all(20),
+          padding: const EdgeInsets.all(20),
           child: Row(
             children: [
-              FileIcon(
+              const FileIcon(
                 FileTypeEnum.folder,
               ),
-              SizedBox(
+              const SizedBox(
                 width: 10,
               ),
               Expanded(child: Text(favorite['name'])),
-              SizedBox(
+              const SizedBox(
                 width: 10,
               ),
               OutlinedButton(
                 onPressed: () {
-                  Util.instance.vibrate(FeedbackType.light);
+                  UiUtil.vibrate(FeedbackType.light);
                   showCupertinoModalPopup(
                     context: context,
                     builder: (context) {
@@ -72,22 +73,22 @@ class _FavoriteState extends State<Favorite> {
                         color: Colors.transparent,
                         child: Card(
                           shape: RoundedRectangleBorder(
-                              side: BorderSide(),
+                              side: const BorderSide(),
                               borderRadius: BorderRadius.circular(18)),
                           child: SafeArea(
                             top: false,
                             child: Padding(
-                              padding: EdgeInsets.all(20),
+                              padding: const EdgeInsets.all(20),
                               child: Column(
                                 mainAxisSize: MainAxisSize.min,
                                 children: <Widget>[
-                                  Text(
+                                  const Text(
                                     "选择操作",
                                     style: TextStyle(
                                         fontSize: 20,
                                         fontWeight: FontWeight.w500),
                                   ),
-                                  SizedBox(
+                                  const SizedBox(
                                     height: 20,
                                   ),
                                   Wrap(
@@ -122,21 +123,22 @@ class _FavoriteState extends State<Favorite> {
                                                     children: [
                                                       Card(
                                                         shape: RoundedRectangleBorder(
-                                                            side: BorderSide(),
+                                                            side:
+                                                                const BorderSide(),
                                                             borderRadius:
                                                                 BorderRadius
                                                                     .circular(
                                                                         5)),
-                                                        margin: EdgeInsets
+                                                        margin: const EdgeInsets
                                                             .symmetric(
-                                                                horizontal: 50),
+                                                            horizontal: 50),
                                                         child: Padding(
                                                           padding:
-                                                              EdgeInsets.all(
-                                                                  20),
+                                                              const EdgeInsets
+                                                                  .all(20),
                                                           child: Column(
                                                             children: [
-                                                              Text(
+                                                              const Text(
                                                                 "重命名",
                                                                 style: TextStyle(
                                                                     fontSize:
@@ -145,13 +147,13 @@ class _FavoriteState extends State<Favorite> {
                                                                         FontWeight
                                                                             .w500),
                                                               ),
-                                                              SizedBox(
+                                                              const SizedBox(
                                                                 height: 16,
                                                               ),
                                                               Card(
                                                                 shape: RoundedRectangleBorder(
                                                                     side:
-                                                                        BorderSide(),
+                                                                        const BorderSide(),
                                                                     borderRadius:
                                                                         BorderRadius.circular(
                                                                             5)),
@@ -169,7 +171,7 @@ class _FavoriteState extends State<Favorite> {
                                                                     controller:
                                                                         nameController,
                                                                     decoration:
-                                                                        InputDecoration(
+                                                                        const InputDecoration(
                                                                       border: InputBorder
                                                                           .none,
                                                                       hintText:
@@ -180,7 +182,7 @@ class _FavoriteState extends State<Favorite> {
                                                                   ),
                                                                 ),
                                                               ),
-                                                              SizedBox(
+                                                              const SizedBox(
                                                                 height: 16,
                                                               ),
                                                               Row(
@@ -192,7 +194,8 @@ class _FavoriteState extends State<Favorite> {
                                                                           () async {
                                                                         if (name.trim() ==
                                                                             "") {
-                                                                          Util.instance
+                                                                          HttpUtil
+                                                                              .instance
                                                                               .toast("请输入新文件名");
                                                                           return;
                                                                         }
@@ -203,21 +206,22 @@ class _FavoriteState extends State<Favorite> {
                                                                             name);
                                                                         if (res[
                                                                             'success']) {
-                                                                          Util.instance
+                                                                          HttpUtil
+                                                                              .instance
                                                                               .toast("重命名成功");
                                                                           getData();
                                                                         } else {
                                                                           if (res['error']['errors'] != null &&
                                                                               res['error']['errors'].length > 0 &&
                                                                               res['error']['errors'][0]['code'] == 414) {
-                                                                            Util.instance.toast("重命名失败：指定的名称已存在");
+                                                                            UiUtil.toast("重命名失败：指定的名称已存在");
                                                                           } else {
-                                                                            Util.instance.toast("重命名失败");
+                                                                            UiUtil.toast("重命名失败");
                                                                           }
                                                                         }
                                                                       },
                                                                       child:
-                                                                          Text(
+                                                                          const Text(
                                                                         "确定",
                                                                         style: TextStyle(
                                                                             fontSize:
@@ -225,7 +229,7 @@ class _FavoriteState extends State<Favorite> {
                                                                       ),
                                                                     ),
                                                                   ),
-                                                                  SizedBox(
+                                                                  const SizedBox(
                                                                     width: 16,
                                                                   ),
                                                                   Expanded(
@@ -237,7 +241,7 @@ class _FavoriteState extends State<Favorite> {
                                                                             .pop();
                                                                       },
                                                                       child:
-                                                                          Text(
+                                                                          const Text(
                                                                         "取消",
                                                                         style: TextStyle(
                                                                             fontSize:
@@ -263,7 +267,7 @@ class _FavoriteState extends State<Favorite> {
                                                 "assets/icons/edit.png",
                                                 width: 30,
                                               ),
-                                              Text(
+                                              const Text(
                                                 "重命名",
                                                 style: TextStyle(fontSize: 12),
                                               ),
@@ -279,7 +283,7 @@ class _FavoriteState extends State<Favorite> {
                                         child: OutlinedButton(
                                           onPressed: () async {
                                             Navigator.of(context).pop();
-                                            Util.instance
+                                            HttpUtil.instance
                                                 .vibrate(FeedbackType.warning);
                                             showCupertinoModalPopup(
                                               context: context,
@@ -287,13 +291,12 @@ class _FavoriteState extends State<Favorite> {
                                                 return Material(
                                                   color: Colors.transparent,
                                                   child: Card(
-                                                    shape:
-                                                        RoundedRectangleBorder(
-                                                            side: BorderSide(),
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .circular(
-                                                                        5)),
+                                                    shape: RoundedRectangleBorder(
+                                                        side:
+                                                            const BorderSide(),
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(5)),
                                                     child: Padding(
                                                       padding:
                                                           const EdgeInsets.all(
@@ -302,7 +305,7 @@ class _FavoriteState extends State<Favorite> {
                                                         mainAxisSize:
                                                             MainAxisSize.min,
                                                         children: <Widget>[
-                                                          Text(
+                                                          const Text(
                                                             "取消收藏",
                                                             style: TextStyle(
                                                                 fontSize: 20,
@@ -310,10 +313,10 @@ class _FavoriteState extends State<Favorite> {
                                                                     FontWeight
                                                                         .w500),
                                                           ),
-                                                          SizedBox(
+                                                          const SizedBox(
                                                             height: 12,
                                                           ),
-                                                          Text(
+                                                          const Text(
                                                             "确定取消收藏？",
                                                             style: TextStyle(
                                                                 fontSize: 20,
@@ -321,7 +324,7 @@ class _FavoriteState extends State<Favorite> {
                                                                     FontWeight
                                                                         .w400),
                                                           ),
-                                                          SizedBox(
+                                                          const SizedBox(
                                                             height: 22,
                                                           ),
                                                           Row(
@@ -339,16 +342,19 @@ class _FavoriteState extends State<Favorite> {
                                                                             favorite['path']);
                                                                     if (res[
                                                                         'success']) {
-                                                                      Util.instance
+                                                                      HttpUtil
+                                                                          .instance
                                                                           .vibrate(
                                                                               FeedbackType.light);
-                                                                      Util.instance
+                                                                      HttpUtil
+                                                                          .instance
                                                                           .toast(
                                                                               "取消收藏成功");
                                                                       getData();
                                                                     }
                                                                   },
-                                                                  child: Text(
+                                                                  child:
+                                                                      const Text(
                                                                     "取消收藏",
                                                                     style: TextStyle(
                                                                         fontSize:
@@ -358,7 +364,7 @@ class _FavoriteState extends State<Favorite> {
                                                                   ),
                                                                 ),
                                                               ),
-                                                              SizedBox(
+                                                              const SizedBox(
                                                                 width: 20,
                                                               ),
                                                               Expanded(
@@ -370,7 +376,8 @@ class _FavoriteState extends State<Favorite> {
                                                                             context)
                                                                         .pop();
                                                                   },
-                                                                  child: Text(
+                                                                  child:
+                                                                      const Text(
                                                                     "取消",
                                                                     style: TextStyle(
                                                                         fontSize:
@@ -380,7 +387,7 @@ class _FavoriteState extends State<Favorite> {
                                                               ),
                                                             ],
                                                           ),
-                                                          SizedBox(
+                                                          const SizedBox(
                                                             height: 8,
                                                           ),
                                                         ],
@@ -397,7 +404,7 @@ class _FavoriteState extends State<Favorite> {
                                                 "assets/icons/collect.png",
                                                 width: 30,
                                               ),
-                                              Text(
+                                              const Text(
                                                 "取消收藏",
                                                 style: TextStyle(fontSize: 12),
                                               ),
@@ -407,19 +414,19 @@ class _FavoriteState extends State<Favorite> {
                                       ),
                                     ],
                                   ),
-                                  SizedBox(
+                                  const SizedBox(
                                     height: 16,
                                   ),
                                   OutlinedButton(
                                     onPressed: () async {
                                       Navigator.of(context).pop();
                                     },
-                                    child: Text(
+                                    child: const Text(
                                       "取消",
                                       style: TextStyle(fontSize: 18),
                                     ),
                                   ),
-                                  SizedBox(
+                                  const SizedBox(
                                     height: 8,
                                   ),
                                 ],
@@ -432,7 +439,7 @@ class _FavoriteState extends State<Favorite> {
                   );
                 },
                 // padding: EdgeInsets.zero,
-                child: Icon(
+                child: const Icon(
                   CupertinoIcons.right_chevron,
                   size: 18,
                 ),
@@ -451,7 +458,7 @@ class _FavoriteState extends State<Favorite> {
       height: MediaQuery.sizeOf(context).height,
       color: Theme.of(context).scaffoldBackgroundColor,
       child: favoriteLoading
-          ? Center(
+          ? const Center(
               child: CupertinoActivityIndicator(
                 radius: 14,
               ),
@@ -460,7 +467,7 @@ class _FavoriteState extends State<Favorite> {
               height: double.infinity,
               color: Theme.of(context).scaffoldBackgroundColor,
               width: MediaQuery.sizeOf(context).width * 0.7,
-              child: favorites.length > 0
+              child: favorites.isNotEmpty
                   ? ListView.builder(
                       padding: EdgeInsets.only(
                           left: 20,

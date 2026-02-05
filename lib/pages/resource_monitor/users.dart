@@ -1,14 +1,18 @@
-import 'package:garden/util/function.dart';
+import 'package:garden/util/http_util.dart';
+import 'package:garden/util/log.dart';
+import 'package:garden/util/ui_util.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class Users extends StatefulWidget {
+  const Users({super.key});
+
   @override
-  _UsersState createState() => _UsersState();
+  UsersState createState() => UsersState();
 }
 
-class _UsersState extends State<Users> {
+class UsersState extends State<Users> {
   bool loading = true;
   List users = [];
   @override
@@ -19,15 +23,18 @@ class _UsersState extends State<Users> {
 
   getData() async {
     var res = await Api.currentConnect();
-    print(res);
+    Log.info(res);
     if (res['success']) {
       setState(() {
         loading = false;
         users = res['data']['items'];
       });
     } else {
-      Util.instance.toast("获取目前连接用户失败，代码${res['error']['code']}");
-      Navigator.of(context).pop();
+      UiUtil.toast("获取目前连接用户失败，代码${res['error']['code']}");
+      if (context.mounted) {
+        // ignore: use_build_context_synchronously
+        Navigator.of(context).pop();
+      }
     }
   }
 
@@ -35,10 +42,10 @@ class _UsersState extends State<Users> {
     user['running'] = user['running'] ?? false;
     return Card(
       shape: RoundedRectangleBorder(
-          side: BorderSide(), borderRadius: BorderRadius.circular(18)),
-      margin: EdgeInsets.only(top: 20, left: 20, right: 20),
+          side: const BorderSide(), borderRadius: BorderRadius.circular(18)),
+      margin: const EdgeInsets.only(top: 20, left: 20, right: 20),
       child: Padding(
-        padding: EdgeInsets.all(20),
+        padding: const EdgeInsets.all(20),
         child: Row(
           children: [
             Expanded(
@@ -50,7 +57,7 @@ class _UsersState extends State<Users> {
                         child: Text(
                           "${user['who']}",
                           overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
+                          style: const TextStyle(
                               fontWeight: FontWeight.w600, fontSize: 18),
                         ),
                       ),
@@ -64,7 +71,7 @@ class _UsersState extends State<Users> {
                       ),
                     ],
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 10,
                   ),
                   Row(
@@ -87,7 +94,7 @@ class _UsersState extends State<Users> {
                       ),
                     ],
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 10,
                   ),
                   Row(
@@ -104,7 +111,7 @@ class _UsersState extends State<Users> {
                 ],
               ),
             ),
-            SizedBox(
+            const SizedBox(
               width: 10,
             ),
             OutlinedButton(
@@ -119,33 +126,33 @@ class _UsersState extends State<Users> {
                       color: Colors.transparent,
                       child: Card(
                         shape: RoundedRectangleBorder(
-                            side: BorderSide(),
+                            side: const BorderSide(),
                             borderRadius: BorderRadius.circular(18)),
                         child: SafeArea(
                           top: false,
                           child: Padding(
-                            padding: EdgeInsets.all(20),
+                            padding: const EdgeInsets.all(20),
                             child: Column(
                               mainAxisSize: MainAxisSize.min,
                               children: <Widget>[
-                                Text(
+                                const Text(
                                   "终止连接",
                                   style: TextStyle(
                                       fontSize: 20,
                                       color: Colors.black,
                                       fontWeight: FontWeight.w500),
                                 ),
-                                SizedBox(
+                                const SizedBox(
                                   height: 12,
                                 ),
-                                Text(
+                                const Text(
                                   "确认要终止此连接？",
                                   style: TextStyle(
                                       fontSize: 20,
                                       color: Colors.black,
                                       fontWeight: FontWeight.w400),
                                 ),
-                                SizedBox(
+                                const SizedBox(
                                   height: 22,
                                 ),
                                 Row(
@@ -166,10 +173,10 @@ class _UsersState extends State<Users> {
                                           });
 
                                           if (res['success']) {
-                                            Util.instance.toast("连接已终止");
+                                            UiUtil.toast("连接已终止");
                                           }
                                         },
-                                        child: Text(
+                                        child: const Text(
                                           "终止连接",
                                           style: TextStyle(
                                               fontSize: 18,
@@ -177,7 +184,7 @@ class _UsersState extends State<Users> {
                                         ),
                                       ),
                                     ),
-                                    SizedBox(
+                                    const SizedBox(
                                       width: 16,
                                     ),
                                     Expanded(
@@ -185,7 +192,7 @@ class _UsersState extends State<Users> {
                                         onPressed: () async {
                                           Navigator.of(context).pop();
                                         },
-                                        child: Text(
+                                        child: const Text(
                                           "取消",
                                           style: TextStyle(fontSize: 18),
                                         ),
@@ -193,7 +200,7 @@ class _UsersState extends State<Users> {
                                     ),
                                   ],
                                 ),
-                                SizedBox(
+                                const SizedBox(
                                   height: 8,
                                 ),
                               ],
@@ -209,8 +216,8 @@ class _UsersState extends State<Users> {
                 width: 20,
                 height: 20,
                 child: user['running']
-                    ? CupertinoActivityIndicator()
-                    : Icon(
+                    ? const CupertinoActivityIndicator()
+                    : const Icon(
                         Icons.remove_circle_outline,
                         color: Colors.red,
                         size: 18,
@@ -228,21 +235,21 @@ class _UsersState extends State<Users> {
     return Scaffold(
       appBar: AppBar(
         leading: AppBackButton(context),
-        title: Text("目前连接用户"),
+        title: const Text("目前连接用户"),
         actions: [
           Padding(
-            padding: EdgeInsets.only(right: 10, top: 8, bottom: 8),
+            padding: const EdgeInsets.only(right: 10, top: 8, bottom: 8),
             child: OutlinedButton(
               onPressed: () {
                 getData();
               },
-              child: Icon(Icons.refresh),
+              child: const Icon(Icons.refresh),
             ),
           ),
         ],
       ),
       body: loading
-          ? Center(
+          ? const Center(
               child: CupertinoActivityIndicator(
                 radius: 14,
               ),
@@ -253,7 +260,7 @@ class _UsersState extends State<Users> {
               },
               itemCount: users.length,
               separatorBuilder: (context, i) {
-                return SizedBox(
+                return const SizedBox(
                   height: 20,
                 );
               },

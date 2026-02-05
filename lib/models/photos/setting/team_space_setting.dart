@@ -1,4 +1,5 @@
-import 'package:garden/util/function.dart';
+import 'package:garden/util/http_util.dart';
+import 'package:garden/stores/connection_store.dart';
 
 class TeamSpaceSetting {
   TeamSpaceSetting({
@@ -11,12 +12,12 @@ class TeamSpaceSetting {
   static Future<TeamSpaceSetting> fetch() async {
     Map<String, dynamic> data = {
       "api":
-          '"SYNO.${Util.instance.version == 7 ? "Foto" : "Photo"}.Setting.TeamSpace',
+          '"SYNO.${connectionStore.version >= 7 ? "Foto" : "Photo"}.Setting.TeamSpace',
       "method": "get",
       "version": 1,
-      "_sid": Util.instance.sid,
+      "_sid": connectionStore.sid,
     };
-    var res = await Util.instance.post("entry.cgi", data: data);
+    var res = await HttpUtil.instance.post("entry.cgi", data: data);
     if (res['success']) {
       return TeamSpaceSetting.fromJson(res['data']);
     } else {

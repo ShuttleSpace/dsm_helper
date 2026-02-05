@@ -2,19 +2,21 @@ import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/material.dart';
 
 class ISCSIManger extends StatefulWidget {
+  const ISCSIManger({super.key});
+
   @override
-  _ISCSIMangerState createState() => _ISCSIMangerState();
+  ISCSIMangerState createState() => ISCSIMangerState();
 }
 
-class _ISCSIMangerState extends State<ISCSIManger> {
+class ISCSIMangerState extends State<ISCSIManger> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         leading: AppBackButton(context),
-        title: Text("iSCSI Manager"),
+        title: const Text("iSCSI Manager"),
       ),
-      body: Center(
+      body: const Center(
         child: Text("待开发"),
       ),
     );

@@ -1,24 +1,33 @@
 import 'dart:convert';
+import 'package:garden/util/log.dart';
+import 'package:garden/util/ui_util.dart';
+import 'package:garden/util/storage_util.dart';
+import 'package:garden/stores/connection_store.dart';
 import 'dart:io';
 import 'dart:ui';
 
 import 'package:cool_ui/cool_ui.dart';
 import 'package:dio/dio.dart';
 import 'package:garden/pages/common/select_ablum.dart';
-import 'package:garden/util/function.dart';
+import 'package:garden/util/http_util.dart';
 import 'package:garden/widgets/file_icon.dart';
 import 'package:garden/widgets/label.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:garden/constants/app_constants.dart';
+import 'package:garden/theme/app_colors.dart';
 import 'package:flutter_vibrate/flutter_vibrate.dart';
+import 'package:simple_logger/simple_logger.dart';
 import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 
 import '../file/select_folder.dart';
 
 class Backup extends StatefulWidget {
+  const Backup({super.key});
+
   @override
-  _BackupState createState() => _BackupState();
+  BackupState createState() => BackupState();
 }
 
 class UploadItem {
@@ -43,11 +52,11 @@ class UploadItem {
   }
 }
 
-class _BackupState extends State<Backup> {
+class BackupState extends State<Backup> {
   List<AssetEntity> uploads = [];
   List<AssetPathEntity> albums = [];
   String backupFolder = "";
-  DateTime? lastBackupTime = DateTime.now().add(Duration(days: -5));
+  DateTime? lastBackupTime = DateTime.now().add(const Duration(days: -5));
   UploadItem? uploading;
   bool cancel = false;
   bool continueBackup = true;
@@ -58,15 +67,14 @@ class _BackupState extends State<Backup> {
   }
 
   getData() async {
-    String last = await Util.instance.getStorage("last_backup_time") ?? '';
+    String last = await StorageUtil.getString("last_backup_time") ?? '';
 
     lastBackupTime = last.isNotBlank
         ? DateTime.fromMillisecondsSinceEpoch(int.parse(last))
         : null;
-    backupFolder = await Util.instance.getStorage("backup_folder") ?? '';
+    backupFolder = await StorageUtil.getString("backup_folder") ?? '';
     setState(() {});
-    String backupAlbumStr =
-        await Util.instance.getStorage("backup_album") ?? '';
+    String backupAlbumStr = await StorageUtil.getString("backup_album") ?? '';
     List backupAlbums = [];
     if (await PhotoManager.requestPermissionExtend() ==
         PermissionState.authorized) {
@@ -74,24 +82,24 @@ class _BackupState extends State<Backup> {
         backupAlbums = json.decode(backupAlbumStr);
 
         List<AssetPathEntity> list = await PhotoManager.getAssetPathList();
-        list.forEach((album) {
+        for (var album in list) {
           if (backupAlbums.contains(album.id)) {
             albums.add(album);
           }
-        });
+        }
         setState(() {});
       }
     } else {
-      Util.instance.vibrate(FeedbackType.warning);
-      Util.instance.toast("请先允许${Util.instance.appName}访问相册");
+      UiUtil.vibrate(FeedbackType.warning);
+      UiUtil.toast("请先允许${connectionStore.appName}访问相册");
     }
 
     getAssetCount();
     // if (Platform.isAndroid) {
-    //   String last = await Util.getStorage("last_backup_time");
+    //   String last = await HttpUtil.getStorage("last_backup_time");
     //
     //   lastBackupTime = last.isNotBlank ? DateTime.fromMillisecondsSinceEpoch(int.parse(last)) : null;
-    //   backupFolder = await Util.getStorage("backup_folder") ?? "";
+    //   backupFolder = await HttpUtil.getStorage("backup_folder") ?? "";
     //   setState(() {});
     //   Directory directory = Directory(backupSource);
     //   List<FileSystemEntity> list = directory.listSync();
@@ -125,16 +133,16 @@ class _BackupState extends State<Backup> {
 
   getAssetCount() async {
     uploads = [];
-    albums.forEach((path) async {
-      // path.filterOption.copyWith(orders: [OrderOption(type: OrderOptionType.createDate, asc: true)]);
-      // var length = await path.assetCountAsync;
-      // if (length > 0) {
-      List<AssetEntity> assetList =
-          await path.getAssetListRange(start: 0, end: 100000000);
-      setState(() {
-        uploads.addAll(assetList);
-      });
-      // }
+    var futs = albums
+        .map((item) => item.getAssetListRange(start: 0, end: 100000000))
+        .toList();
+    var value = await Future.wait(futs);
+    var values = value.fold([], (prev, el) {
+      prev.addAll(el);
+      return prev;
+    });
+    setState(() {
+      uploads.addAll(values as List<AssetEntity>);
     });
   }
 
@@ -160,16 +168,16 @@ class _BackupState extends State<Backup> {
     return Scaffold(
       appBar: AppBar(
         leading: AppBackButton(context),
-        title: Text("相册备份"),
+        title: const Text("相册备份"),
         actions: [
           Padding(
-            padding: EdgeInsets.only(right: 10, top: 8, bottom: 8),
+            padding: const EdgeInsets.only(right: 10, top: 8, bottom: 8),
             child: OutlinedButton(
               onPressed: () async {
                 var hide = showWeuiLoadingToast(context: context);
                 await PhotoManager.clearFileCache();
                 hide();
-                Util.instance.toast("缓存清理完成");
+                UiUtil.toast("缓存清理完成");
               },
               child: Text(
                 "清理缓存",
@@ -181,14 +189,15 @@ class _BackupState extends State<Backup> {
         ],
       ),
       body: ListView(
-        padding: EdgeInsets.all(20),
+        padding: const EdgeInsets.all(20),
         children: [
           ...[
             Card(
               shape: RoundedRectangleBorder(
-                  side: BorderSide(), borderRadius: BorderRadius.circular(18)),
+                  side: const BorderSide(),
+                  borderRadius: BorderRadius.circular(18)),
               child: Padding(
-                padding: const EdgeInsets.all(8.0),
+                padding: const EdgeInsets.all(AppConstants.paddingSmall),
                 child: Stack(
                   children: [
                     Container(
@@ -215,8 +224,8 @@ class _BackupState extends State<Backup> {
                                   height: 40,
                                   width: 40,
                                 )
-                              : FileIcon(FileTypeEnum.image),
-                          SizedBox(
+                              : const FileIcon(FileTypeEnum.image),
+                          const SizedBox(
                             width: 20,
                           ),
                           Expanded(
@@ -228,16 +237,16 @@ class _BackupState extends State<Backup> {
                                       '[Idle]',
                                   overflow: TextOverflow.ellipsis,
                                   maxLines: 2,
-                                  style: TextStyle(fontSize: 13),
+                                  style: const TextStyle(fontSize: 13),
                                 ),
-                                SizedBox(
+                                const SizedBox(
                                   height: 5,
                                 ),
                                 Text(
                                   uploading?.file?.parent.path ?? '[Idle]',
                                   overflow: TextOverflow.ellipsis,
                                   maxLines: 1,
-                                  style: TextStyle(
+                                  style: const TextStyle(
                                       fontSize: 12, color: Colors.grey),
                                 ),
                               ],
@@ -250,7 +259,7 @@ class _BackupState extends State<Backup> {
                 ),
               ),
             ),
-            SizedBox(
+            const SizedBox(
               height: 20,
             ),
           ],
@@ -259,7 +268,7 @@ class _BackupState extends State<Backup> {
               if (res != null && res.length == 1) {
                 setState(() {
                   backupFolder = res[0];
-                  Util.instance.setStorage("backup_folder", backupFolder);
+                  StorageUtil.setString("backup_folder", backupFolder);
                 });
               }
             }),
@@ -268,57 +277,57 @@ class _BackupState extends State<Backup> {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
+                    const Text(
                       "备份目的地",
                       style: TextStyle(fontSize: 12),
                     ),
                     Text(
                       backupFolder == "" ? "请选择目的地" : backupFolder,
-                      style: TextStyle(fontSize: 16, color: Colors.grey),
+                      style: const TextStyle(fontSize: 16, color: Colors.grey),
                     ),
                   ],
                 ),
               ],
             ),
           ),
-          SizedBox(
+          const SizedBox(
             height: 20,
           ),
           OutlinedButton(
             onPressed: () {
               _onChooseBackupSourceDialog(context).then((res) {
-                print(res);
+                Log.logger.log(Level.INFO, "choose backup source dir: $res");
                 if (res != null) {
                   setState(() {
                     albums = res;
                   });
                   List backupAlbums = albums.map((e) => e.id).toList();
-                  Util.instance
+                  HttpUtil.instance
                       .setStorage("backup_album", json.encode(backupAlbums));
 
                   getAssetCount();
                 }
               });
             },
-            child: Container(
+            child: SizedBox(
               width: double.infinity,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
+                  const Text(
                     "备份源",
                     style: TextStyle(fontSize: 12),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 5,
                   ),
-                  albums.length > 0
+                  albums.isNotEmpty
                       ? Wrap(
                           runSpacing: 10,
                           spacing: 10,
                           children: albums.map(_buildAlbumLabel).toList(),
                         )
-                      : Text(
+                      : const Text(
                           "未选择备份源",
                           style: TextStyle(fontSize: 16, color: Colors.grey),
                         ),
@@ -326,7 +335,7 @@ class _BackupState extends State<Backup> {
               ),
             ),
           ),
-          SizedBox(
+          const SizedBox(
             height: 20,
           ),
           GestureDetector(
@@ -337,16 +346,17 @@ class _BackupState extends State<Backup> {
             },
             child: Card(
               shape: RoundedRectangleBorder(
-                  side: BorderSide(), borderRadius: BorderRadius.circular(18)),
+                  side: const BorderSide(),
+                  borderRadius: BorderRadius.circular(18)),
               child: Padding(
-                padding: const EdgeInsets.all(8.0),
+                padding: const EdgeInsets.all(AppConstants.paddingSmall),
                 child: Row(
                   children: [
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
+                          const Text(
                             "继续备份",
                             style: TextStyle(fontSize: 18),
                           ),
@@ -354,26 +364,28 @@ class _BackupState extends State<Backup> {
                             lastBackupTime != null
                                 ? lastBackupTime?.format("Y-m-d H:i:s") ?? ''
                                 : "从未备份过",
-                            style: TextStyle(fontSize: 16, color: Colors.grey),
+                            style: const TextStyle(
+                                fontSize: 16, color: Colors.grey),
                           ),
                           Text(
                             "${uploads.where((AssetEntity upload) => (upload.modifiedDateTime.millisecondsSinceEpoch > (lastBackupTime?.millisecondsSinceEpoch ?? 0)) && upload.type == AssetType.image).length}张照片 ${uploads.where((upload) => (upload.modifiedDateTime.millisecondsSinceEpoch > (lastBackupTime?.millisecondsSinceEpoch ?? 0)) && upload.type == AssetType.video).length}个视频",
-                            style: TextStyle(fontSize: 16, color: Colors.grey),
+                            style: const TextStyle(
+                                fontSize: 16, color: Colors.grey),
                           ),
                         ],
                       ),
                     ),
                     if (continueBackup)
-                      Icon(
+                      const Icon(
                         CupertinoIcons.checkmark_alt,
-                        color: Color(0xffff9813),
+                        color: AppColors.primaryAction,
                       ),
                   ],
                 ),
               ),
             ),
           ),
-          SizedBox(
+          const SizedBox(
             height: 20,
           ),
           GestureDetector(
@@ -384,70 +396,74 @@ class _BackupState extends State<Backup> {
             },
             child: Card(
               shape: RoundedRectangleBorder(
-                  side: BorderSide(), borderRadius: BorderRadius.circular(18)),
+                  side: const BorderSide(),
+                  borderRadius: BorderRadius.circular(18)),
               child: Padding(
-                padding: const EdgeInsets.all(8.0),
+                padding: const EdgeInsets.all(AppConstants.paddingSmall),
                 child: Row(
                   children: [
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
+                          const Text(
                             "全新备份",
                             style: TextStyle(fontSize: 18),
                           ),
                           Text(
                             "${uploads.where((upload) => upload.type == AssetType.image).length}张照片 ${uploads.where((upload) => upload.type == AssetType.video).length}个视频",
-                            style: TextStyle(fontSize: 16, color: Colors.grey),
+                            style: const TextStyle(
+                                fontSize: 16, color: Colors.grey),
                           ),
                         ],
                       ),
                     ),
                     if (!continueBackup)
-                      Icon(
+                      const Icon(
                         CupertinoIcons.checkmark_alt,
-                        color: Color(0xffff9813),
+                        color: AppColors.primaryAction,
                       ),
                   ],
                 ),
               ),
             ),
           ),
-          SizedBox(
+          const SizedBox(
             height: 20,
           ),
           GestureDetector(
             onTap: () {
-              Util.instance.toast("暂不支持自动备份");
+              UiUtil.toast("暂不支持自动备份");
             },
             child: Card(
               shape: RoundedRectangleBorder(
-                  side: BorderSide(), borderRadius: BorderRadius.circular(18)),
+                  side: const BorderSide(),
+                  borderRadius: BorderRadius.circular(18)),
               child: Padding(
-                padding: const EdgeInsets.all(8.0),
+                padding: const EdgeInsets.all(AppConstants.paddingSmall),
                 child: Row(
                   children: [
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
+                          const Text(
                             "自动备份",
                             style: TextStyle(fontSize: 18),
                           ),
                           Text(
-                            "打开${Util.instance.appName}后自动从上次备份位置继续备份",
-                            style: TextStyle(fontSize: 14, color: Colors.grey),
+                            "打开${connectionStore.appName}后自动从上次备份位置继续备份",
+                            style: const TextStyle(
+                                fontSize: 14, color: Colors.grey),
                           ),
                         ],
                       ),
                     ),
-                    SizedBox(
+                    const SizedBox(
                       width: 20,
                       // child: Icon(
                       //   CupertinoIcons.checkmark_alt,
-                      //   color: Color(0xffff9813),
+                      //   color: AppColors.primaryAction,
                       // ),
                     ),
                   ],
@@ -455,20 +471,20 @@ class _BackupState extends State<Backup> {
               ),
             ),
           ),
-          SizedBox(
+          const SizedBox(
             height: 20,
           ),
           uploading == null
               ? OutlinedButton(
                   onPressed: _onStartBackup,
-                  child: Text("开始备份"),
+                  child: const Text("开始备份"),
                 )
               : OutlinedButton(
                   onPressed: () async {
                     cancel = true;
-                    Util.instance.toast("当前文件上传完成后将暂停任务");
+                    UiUtil.toast("当前文件上传完成后将暂停任务");
                   },
-                  child: Text("暂停备份"),
+                  child: const Text("暂停备份"),
                 ),
         ],
       ),
@@ -483,8 +499,9 @@ class _BackupState extends State<Backup> {
         return Material(
           child: Card(
             shape: RoundedRectangleBorder(
-                side: BorderSide(), borderRadius: BorderRadius.circular(18)),
-            child: SelectFolder(
+                side: const BorderSide(),
+                borderRadius: BorderRadius.circular(18)),
+            child: const SelectFolder(
               multi: false,
             ),
           ),
@@ -500,7 +517,8 @@ class _BackupState extends State<Backup> {
         return Material(
           child: Card(
             shape: RoundedRectangleBorder(
-                side: BorderSide(), borderRadius: BorderRadius.circular(18)),
+                side: const BorderSide(),
+                borderRadius: BorderRadius.circular(18)),
             child: SelectAlbum(
               multi: true,
               selected: albums,
@@ -513,13 +531,13 @@ class _BackupState extends State<Backup> {
 
   void _onStartBackup() async {
     if (backupFolder.isBlank) {
-      Util.instance.vibrate(FeedbackType.warning);
-      Util.instance.toast("请选择备份目的地");
+      UiUtil.vibrate(FeedbackType.warning);
+      UiUtil.toast("请选择备份目的地");
       return;
     }
-    if (albums.length == 0) {
-      Util.instance.vibrate(FeedbackType.warning);
-      Util.instance.toast("请选择备份源");
+    if (albums.isEmpty) {
+      UiUtil.vibrate(FeedbackType.warning);
+      UiUtil.toast("请选择备份源");
       return;
     }
     List<AssetEntity> tasks;
@@ -546,7 +564,7 @@ class _BackupState extends State<Backup> {
         setState(() {
           uploading = null;
         });
-        Util.instance.toast("备份任务已暂停");
+        UiUtil.toast("备份任务已暂停");
         break;
       }
       uploading = UploadItem(
@@ -574,7 +592,7 @@ class _BackupState extends State<Backup> {
           uploading!.file!.deleteSync();
         }
 
-        Util.instance.setStorage("last_backup_time",
+        StorageUtil.setString("last_backup_time",
             uploading!.modifyTime!.millisecondsSinceEpoch.toString());
         setState(() {
           lastBackupTime = uploading!.modifyTime;
@@ -586,8 +604,8 @@ class _BackupState extends State<Backup> {
         });
       }
       if (i == tasks.length - 1) {
-        Util.instance.toast("备份已完成");
-        Util.instance.vibrate(FeedbackType.light);
+        UiUtil.toast("备份已完成");
+        UiUtil.vibrate(FeedbackType.light);
         setState(() {
           uploading = null;
           lastBackupTime = DateTime.now();

@@ -26,18 +26,18 @@ extension DateTimeExt on DateTime {
   }
 
   bool isSameDay(DateTime otherTime) {
-    return this.year == otherTime.year &&
-        this.month == otherTime.month &&
-        this.day == otherTime.day;
+    return year == otherTime.year &&
+        month == otherTime.month &&
+        day == otherTime.day;
   }
 
   bool isSameMonth(DateTime otherTime) {
-    return this.year == otherTime.year && this.month == otherTime.month;
+    return year == otherTime.year && month == otherTime.month;
   }
 
   String get timeAgo {
     int elapsed =
-        DateTime.now().millisecondsSinceEpoch - this.millisecondsSinceEpoch;
+        DateTime.now().millisecondsSinceEpoch - millisecondsSinceEpoch;
 
     final num seconds = elapsed ~/ 1000;
     final num minutes = seconds ~/ 60;
@@ -65,5 +65,5 @@ extension DateTimeExt on DateTime {
     return result;
   }
 
-  int get secondsSinceEpoch => this.millisecondsSinceEpoch ~/ 1000;
+  int get secondsSinceEpoch => millisecondsSinceEpoch ~/ 1000;
 }

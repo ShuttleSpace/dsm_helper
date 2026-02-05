@@ -1,18 +1,23 @@
-import 'package:garden/util/function.dart';
+import 'package:garden/util/http_util.dart';
+import 'package:garden/util/file_type_util.dart';
+import 'package:garden/util/format_util.dart';
+import 'package:garden/util/ui_util.dart';
 import 'package:garden/widgets/file_icon.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:garden/constants/app_constants.dart';
+import 'package:garden/theme/app_colors.dart';
 
 class SelectFile extends StatefulWidget {
   final List listId;
   final String destination;
-  SelectFile(this.listId, this.destination);
+  const SelectFile(this.listId, this.destination, {super.key});
   @override
-  _SelectFileState createState() => _SelectFileState();
+  SelectFileState createState() => SelectFileState();
 }
 
-class _SelectFileState extends State<SelectFile> {
+class SelectFileState extends State<SelectFile> {
   String title = "";
   List files = [];
   List selectedFiles = [];
@@ -29,18 +34,19 @@ class _SelectFileState extends State<SelectFile> {
       setState(() {
         title = res['data']['title'];
         files = res['data']['files'];
-        files.forEach((element) {
+        for (var element in files) {
           selectedFiles.add(element['index']);
-        });
+        }
         size = res['data']['size'];
       });
     } else {
-      Util.instance.toast("获取文件列表失败，代码${res['error']['code']}");
+      UiUtil.toast("获取文件列表失败，代码${res['error']['code']}");
     }
   }
 
   Widget _buildFileItem(file) {
-    FileTypeEnum fileType = Util.instance.fileType(file['name']);
+    FileTypeEnum fileType =
+        FileTypeUtil.toFileTypeEnum(FileTypeUtil.getFileType(file['name']));
     return GestureDetector(
       onTap: () {
         if (selectedFiles.contains(file['index'])) {
@@ -55,18 +61,18 @@ class _SelectFileState extends State<SelectFile> {
       },
       child: Card(
         shape: RoundedRectangleBorder(
-            side: BorderSide(), borderRadius: BorderRadius.circular(18)),
+            side: const BorderSide(), borderRadius: BorderRadius.circular(18)),
         child: Padding(
-          padding: EdgeInsets.symmetric(vertical: 20),
+          padding: const EdgeInsets.symmetric(vertical: 20),
           child: Row(
             children: [
-              SizedBox(
+              const SizedBox(
                 width: 20,
               ),
               FileIcon(
                 fileType, //file['isdir'] ? FileType.folder :
               ),
-              SizedBox(
+              const SizedBox(
                 width: 10,
               ),
               Expanded(
@@ -75,42 +81,42 @@ class _SelectFileState extends State<SelectFile> {
                   children: [
                     Text(
                       file['name'],
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 16,
                       ),
                     ),
-                    SizedBox(
+                    const SizedBox(
                       height: 5,
                     ),
                     Text(
-                      "${Util.instance.formatSize(file['size'])}",
-                      style: TextStyle(fontSize: 12, color: Colors.grey),
+                      FormatUtil.formatSize(file['size']),
+                      style: const TextStyle(fontSize: 12, color: Colors.grey),
                     ),
                   ],
                 ),
               ),
-              SizedBox(
+              const SizedBox(
                 width: 10,
               ),
               Card(
                 shape: RoundedRectangleBorder(
-                    side: BorderSide(),
+                    side: const BorderSide(),
                     borderRadius: BorderRadius.circular(18)),
                 child: Padding(
-                  padding: const EdgeInsets.all(8.0),
+                  padding: const EdgeInsets.all(AppConstants.paddingSmall),
                   child: SizedBox(
                     width: 20,
                     height: 20,
                     child: selectedFiles.contains(file['index'])
-                        ? Icon(
+                        ? const Icon(
                             CupertinoIcons.checkmark_alt,
-                            color: Color(0xffff9813),
+                            color: AppColors.primaryAction,
                           )
                         : null,
                   ),
                 ),
               ),
-              SizedBox(
+              const SizedBox(
                 width: 20,
               ),
             ],
@@ -125,41 +131,43 @@ class _SelectFileState extends State<SelectFile> {
     return Scaffold(
       appBar: AppBar(
         leading: AppBackButton(context),
-        title: Text("选择下载文件"),
+        title: const Text("选择下载文件"),
       ),
       body: Column(
         children: [
-          SizedBox(
+          const SizedBox(
             height: 20,
           ),
           Card(
             shape: RoundedRectangleBorder(
-                side: BorderSide(), borderRadius: BorderRadius.circular(18)),
-            margin: EdgeInsets.symmetric(horizontal: 20),
+                side: const BorderSide(),
+                borderRadius: BorderRadius.circular(18)),
+            margin: const EdgeInsets.symmetric(
+                horizontal: AppConstants.paddingLarge),
             child: Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding: const EdgeInsets.all(AppConstants.paddingSmall),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text("$title"),
-                  SizedBox(
+                  Text(title),
+                  const SizedBox(
                     height: 10,
                   ),
                   Text(
-                    "${Util.instance.formatSize(size)}",
-                    style: TextStyle(fontSize: 12, color: Colors.grey),
+                    FormatUtil.formatSize(size),
+                    style: const TextStyle(fontSize: 12, color: Colors.grey),
                   ),
                 ],
               ),
             ),
           ),
-          SizedBox(
+          const SizedBox(
             height: 20,
           ),
           // NeuCard(
           //   curveType: CurveType.flat,
           //   bevel: 20,
-          //   margin: EdgeInsets.symmetric(horizontal: 20),
+          //   margin: EdgeInsets.symmetric(horizontal: AppConstants.paddingLarge),
           //   decoration: NeumorphicDecoration(
           //     color: Theme.of(context).scaffoldBackgroundColor,
           //     borderRadius: BorderRadius.circular(20),
@@ -207,36 +215,40 @@ class _SelectFileState extends State<SelectFile> {
           // ),
           Expanded(
             child: ListView.separated(
-              padding: EdgeInsets.symmetric(horizontal: 20),
+              padding: const EdgeInsets.symmetric(
+                  horizontal: AppConstants.paddingLarge),
               itemBuilder: (context, i) {
                 return _buildFileItem(files[i]);
               },
               itemCount: files.length,
               separatorBuilder: (context, i) {
-                return SizedBox(
+                return const SizedBox(
                   height: 20,
                 );
               },
             ),
           ),
           Padding(
-            padding: EdgeInsets.all(20),
+            padding: const EdgeInsets.all(20),
             child: OutlinedButton(
               onPressed: () async {
-                if (selectedFiles.length > 0) {
+                if (selectedFiles.isNotEmpty) {
                   var res = await Api.downloadCreate(
                       widget.listId[0], widget.destination, selectedFiles);
                   if (res['success']) {
-                    Util.instance.toast("下载任务创建成功");
-                    Navigator.of(context).pop();
-                    Navigator.of(context).pop();
+                    UiUtil.toast("下载任务创建成功");
+                    if (context.mounted) {
+                      // ignore: use_build_context_synchronously
+                      Navigator.of(context).pop();
+                      Navigator.of(context).pop();
+                    }
                   }
                 } else {
-                  Util.instance.toast("请选择要下载的文件");
+                  UiUtil.toast("请选择要下载的文件");
                 }
               },
               // margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-              child: Text(
+              child: const Text(
                 "开始下载",
                 style: TextStyle(fontSize: 18),
               ),

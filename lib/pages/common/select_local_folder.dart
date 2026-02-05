@@ -1,20 +1,23 @@
 import 'dart:io';
-
-import 'package:garden/util/function.dart';
-import 'package:garden/widgets/file_icon.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:garden/constants/app_constants.dart';
+import 'package:garden/theme/app_colors.dart';
+import 'package:garden/util/file_types.dart';
+import 'package:garden/util/file_type_util.dart';
+import 'package:garden/util/http_util.dart';
+import 'package:garden/widgets/file_icon.dart';
 
 class SelectLocalFolder extends StatefulWidget {
   final bool multi;
   final bool folder;
-  SelectLocalFolder({this.multi = false, this.folder = true});
+  const SelectLocalFolder({super.key, this.multi = false, this.folder = true});
   @override
-  _SelectLocalFolderState createState() => _SelectLocalFolderState();
+  SelectLocalFolderState createState() => SelectLocalFolderState();
 }
 
-class _SelectLocalFolderState extends State<SelectLocalFolder> {
-  ScrollController _scrollController = ScrollController();
+class SelectLocalFolderState extends State<SelectLocalFolder> {
+  final ScrollController _scrollController = ScrollController();
   List<String> paths = ["/"];
   List<FileSystemEntity> files = [];
   List<FileSystemEntity> selectedFiles = [];
@@ -31,7 +34,7 @@ class _SelectLocalFolderState extends State<SelectLocalFolder> {
       directory = Directory("/storage/emulated/0/");
     } else {
       directory =
-          Directory("/storage/emulated/0/" + paths.join("/").substring(1));
+          Directory("/storage/emulated/0/${paths.join("/").substring(1)}");
     }
     files = [];
     await directory.list().forEach((element) {
@@ -57,7 +60,7 @@ class _SelectLocalFolderState extends State<SelectLocalFolder> {
     await getData();
     double offset = _scrollController.position.maxScrollExtent;
     _scrollController.animateTo(offset,
-        duration: Duration(milliseconds: 200), curve: Curves.ease);
+        duration: const Duration(milliseconds: 200), curve: Curves.ease);
   }
 
   setPaths(String path) {
@@ -75,8 +78,9 @@ class _SelectLocalFolderState extends State<SelectLocalFolder> {
 
   Widget _buildPathItem(BuildContext context, int index) {
     return Container(
-      margin: index == 0 ? EdgeInsets.only(left: 20) : null,
-      padding: const EdgeInsets.symmetric(vertical: 10),
+      margin: index == 0 ? const EdgeInsets.only(left: 20) : null,
+      padding:
+          const EdgeInsets.symmetric(vertical: AppConstants.paddingSmall + 2),
       child: OutlinedButton(
         onPressed: () {
           String path = "";
@@ -90,20 +94,21 @@ class _SelectLocalFolderState extends State<SelectLocalFolder> {
           goPath(path);
         },
         child: index == 0
-            ? Icon(
+            ? const Icon(
                 CupertinoIcons.home,
                 size: 16,
               )
             : Text(
                 paths[index],
-                style: TextStyle(fontSize: 12),
+                style: const TextStyle(fontSize: 12),
               ),
       ),
     );
   }
 
   Widget _buildFileItem(FileSystemEntity file) {
-    FileTypeEnum fileType = Util.instance.fileType(file.path);
+    FileTypeEnum fileType =
+        FileTypeUtil.toFileTypeEnum(FileTypeUtil.getFileType(file.path));
     bool isFile = FileSystemEntity.isFileSync(file.path);
     return Padding(
       padding: const EdgeInsets.only(top: 20.0, left: 20, right: 20),
@@ -120,7 +125,7 @@ class _SelectLocalFolderState extends State<SelectLocalFolder> {
           // margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
           child: Row(
             children: [
-              SizedBox(
+              const SizedBox(
                 width: 20,
               ),
               FileIcon(
@@ -128,18 +133,18 @@ class _SelectLocalFolderState extends State<SelectLocalFolder> {
                 thumb: file.path,
                 network: false,
               ),
-              SizedBox(
+              const SizedBox(
                 width: 10,
               ),
               Expanded(
                 child: Text(
                   file.path.split("/").last,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 16,
                   ),
                 ),
               ),
-              SizedBox(
+              const SizedBox(
                 width: 10,
               ),
               OutlinedButton(
@@ -160,14 +165,14 @@ class _SelectLocalFolderState extends State<SelectLocalFolder> {
                   width: 20,
                   height: 20,
                   child: selectedFiles.contains(file)
-                      ? Icon(
+                      ? const Icon(
                           CupertinoIcons.checkmark_alt,
-                          color: Color(0xffff9813),
+                          color: AppColors.primaryAction,
                         )
                       : null,
                 ),
               ),
-              SizedBox(
+              const SizedBox(
                 width: 20,
               ),
             ],
@@ -203,7 +208,7 @@ class _SelectLocalFolderState extends State<SelectLocalFolder> {
       onPopInvokedWithResult: onWillPop,
       child: Material(
         color: Theme.of(context).scaffoldBackgroundColor,
-        child: Container(
+        child: SizedBox(
           height: MediaQuery.sizeOf(context).height * 0.8,
           child: SafeArea(
             top: false,
@@ -223,8 +228,8 @@ class _SelectLocalFolderState extends State<SelectLocalFolder> {
                           scrollDirection: Axis.horizontal,
                           separatorBuilder: (context, i) {
                             return Container(
-                              padding: EdgeInsets.symmetric(vertical: 14),
-                              child: Icon(
+                              padding: const EdgeInsets.symmetric(vertical: 14),
+                              child: const Icon(
                                 CupertinoIcons.right_chevron,
                                 size: 14,
                               ),
@@ -233,28 +238,29 @@ class _SelectLocalFolderState extends State<SelectLocalFolder> {
                         ),
                       ),
                       Container(
-                        padding: const EdgeInsets.symmetric(vertical: 10),
+                        padding: const EdgeInsets.symmetric(
+                            vertical: AppConstants.paddingSmall + 2),
                         child: OutlinedButton(
                           onPressed: () {
-                            if (selectedFiles.length > 0) {
+                            if (selectedFiles.isNotEmpty) {
                               Navigator.of(context).pop(selectedFiles);
                             } else {
                               if (paths.length > 1) {
                                 Navigator.of(context).pop([
                                   Directory(
-                                      "/storage/emulated/0" + paths.join("/"))
+                                      "/storage/emulated/0${paths.join("/")}")
                                 ]);
                               }
                               // Navigator.of(context).pop(["/storage/emulated/0" + paths.join("/").substring(1)]);
                             }
                           },
-                          child: Text(
+                          child: const Text(
                             "完成",
                             style: TextStyle(fontSize: 12, color: Colors.blue),
                           ),
                         ),
                       ),
-                      SizedBox(
+                      const SizedBox(
                         width: 20,
                       ),
                     ],
@@ -263,7 +269,7 @@ class _SelectLocalFolderState extends State<SelectLocalFolder> {
                 Expanded(
                   child: ListView(
                     padding: EdgeInsets.only(
-                        bottom: selectedFiles.length > 0 ? 140 : 20),
+                        bottom: selectedFiles.isNotEmpty ? 140 : 20),
                     children: files.map(_buildFileItem).toList(),
                   ),
                 ),

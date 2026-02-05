@@ -1,0 +1,49 @@
+import 'package:background_downloader/background_downloader.dart';
+import 'package:flutter/material.dart';
+import 'package:garden/constants/app_constants.dart';
+
+/// 显示下载状态的组件
+class DownloadStatusWidget extends StatelessWidget {
+  final TaskStatus status;
+  final int progress;
+
+  const DownloadStatusWidget({
+    super.key,
+    required this.status,
+    required this.progress,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    if (status == TaskStatus.complete) {
+      return _buildStatusCard("下载完成");
+    } else if (status == TaskStatus.failed) {
+      return _buildStatusCard("下载失败");
+    } else if (status == TaskStatus.canceled) {
+      return _buildStatusCard("取消下载");
+    } else if (status == TaskStatus.paused) {
+      return _buildStatusCard("暂停下载");
+    } else if (status == TaskStatus.running) {
+      return _buildStatusCard("$progress%");
+    } else if (status == TaskStatus.enqueued) {
+      return _buildStatusCard("等待下载");
+    } else {
+      return Container();
+    }
+  }
+
+  Widget _buildStatusCard(String text) {
+    return Card(
+      shape: RoundedRectangleBorder(
+          side: const BorderSide(), borderRadius: BorderRadius.circular(18)),
+      margin: const EdgeInsets.only(bottom: 3),
+      child: Padding(
+        padding: const EdgeInsets.all(AppConstants.paddingSmall),
+        child: Text(
+          text,
+          style: const TextStyle(fontSize: 10, color: Colors.white),
+        ),
+      ),
+    );
+  }
+}

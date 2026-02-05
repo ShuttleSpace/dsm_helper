@@ -1,27 +1,30 @@
 import 'package:draggable_scrollbar/draggable_scrollbar.dart';
+import 'package:garden/util/format_util.dart';
+import 'package:garden/stores/connection_store.dart';
 import 'package:garden/pages/common/image_preview.dart';
-import 'package:garden/util/function.dart';
+import 'package:garden/theme/app_colors.dart';
 import 'package:garden/util/moments_api.dart';
 import 'package:garden/widgets/cupertino_image.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:garden/widgets/transparent_router.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:garden/constants/app_constants.dart';
 
 class Timeline extends StatefulWidget {
   final String? category;
   final String? type;
   final String title;
-  Timeline(this.title, {this.category, this.type});
+  const Timeline(this.title, {super.key, this.category, this.type});
   @override
-  _TimelineState createState() => _TimelineState();
+  TimelineState createState() => TimelineState();
 }
 
-class _TimelineState extends State<Timeline> {
+class TimelineState extends State<Timeline> {
   List timeline = [];
   double photoWidth = 0;
   bool loadingTimeline = true;
-  ScrollController _scrollController = ScrollController();
+  final ScrollController _scrollController = ScrollController();
   @override
   void initState() {
     getData();
@@ -34,7 +37,7 @@ class _TimelineState extends State<Timeline> {
     if (res['success'] && mounted) {
       setState(() {
         timeline = [];
-        if (Util.instance.version == 7) {
+        if (connectionStore.version == 7) {
           for (var section in res['data']['section']) {
             timeline.addAll(section['list']);
           }
@@ -100,7 +103,7 @@ class _TimelineState extends State<Timeline> {
         duration = photo['additional']['video_convert'][0]['metadata']
                 ['duration'] ~/
             1000;
-        timeLong = Util.instance.timeLong(duration);
+        timeLong = FormatUtil.timeLong(duration);
       } else {
         timeLong = {
           "hours": 0,
@@ -110,9 +113,9 @@ class _TimelineState extends State<Timeline> {
       }
     }
     String thumbUrl =
-        '${Util.instance.baseUrl}/webapi/entry.cgi?id=${photo['additional']['thumbnail']['unit_id']}&cache_key="${photo['additional']['thumbnail']['cache_key']}"&type="unit"&size="sm"&api="SYNO.${Util.instance.version == 7 ? "Foto" : "Photo"}.Thumbnail"&method="get"&version=1&_sid=${Util.instance.sid}';
+        '${connectionStore.baseUrl}/webapi/entry.cgi?id=${photo['additional']['thumbnail']['unit_id']}&cache_key="${photo['additional']['thumbnail']['cache_key']}"&type="unit"&size="sm"&api="SYNO.${connectionStore.version >= 7 ? "Foto" : "Photo"}.Thumbnail"&method="get"&version=1&_sid=${connectionStore.sid}';
     String originalUrl =
-        '${Util.instance.baseUrl}/webapi/entry.cgi?id=${photo['additional']['thumbnail']['unit_id']}&cache_key="${photo['additional']['thumbnail']['cache_key']}"&type="unit"&size="xl"&api="SYNO.${Util.instance.version == 7 ? "Foto" : "Photo"}.Thumbnail"&method="get"&version=1&_sid=${Util.instance.sid}';
+        '${connectionStore.baseUrl}/webapi/entry.cgi?id=${photo['additional']['thumbnail']['unit_id']}&cache_key="${photo['additional']['thumbnail']['cache_key']}"&type="unit"&size="xl"&api="SYNO.${connectionStore.version >= 7 ? "Foto" : "Photo"}.Thumbnail"&method="get"&version=1&_sid=${connectionStore.sid}';
     return GestureDetector(
       onTap: () {
         Navigator.of(context).push(TransparentPageRoute(
@@ -126,7 +129,7 @@ class _TimelineState extends State<Timeline> {
           },
         ));
       },
-      child: Container(
+      child: SizedBox(
         width: photoWidth,
         height: photoWidth,
         child: Stack(
@@ -142,7 +145,7 @@ class _TimelineState extends State<Timeline> {
                 placeholder: Container(
                   width: photoWidth,
                   height: photoWidth,
-                  color: Color(0xffE9E9E9),
+                  color: AppColors.placeholderBackgroundLight,
                 ),
               ),
             ),
@@ -152,15 +155,15 @@ class _TimelineState extends State<Timeline> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(
+                    const Icon(
                       Icons.play_circle_fill,
                       color: Colors.white,
                       size: 40,
                     ),
-                    SizedBox(height: 5),
+                    const SizedBox(height: 5),
                     Text(
                       "${timeLong['hours'].toString().padLeft(2, "0")}:${timeLong['minutes'].toString().padLeft(2, "0")}:${timeLong['seconds'].toString().padLeft(2, "0")}",
-                      style: TextStyle(color: Colors.white, fontSize: 12),
+                      style: const TextStyle(color: Colors.white, fontSize: 12),
                     ),
                   ],
                 ),
@@ -180,7 +183,8 @@ class _TimelineState extends State<Timeline> {
         Container(
           alignment: Alignment.centerLeft,
           height: 40,
-          padding: const EdgeInsets.symmetric(horizontal: 20),
+          padding:
+              const EdgeInsets.symmetric(horizontal: AppConstants.paddingLarge),
           child: Row(
             children: [
               Text(
@@ -200,12 +204,12 @@ class _TimelineState extends State<Timeline> {
         GridView.builder(
           shrinkWrap: true,
           // crossAxisCount: 4,
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 4, mainAxisSpacing: 2, crossAxisSpacing: 2),
           itemCount: line['item_count'],
-          physics: NeverScrollableScrollPhysics(),
+          physics: const NeverScrollableScrollPhysics(),
           itemBuilder: (context, i) {
-            if (items.length == 0) {
+            if (items.isEmpty) {
               return Container(
                 color: Colors.grey,
                 width: photoWidth,
@@ -254,12 +258,12 @@ class _TimelineState extends State<Timeline> {
         title: Text(widget.title),
       ),
       body: loadingTimeline
-          ? Center(
+          ? const Center(
               child: CupertinoActivityIndicator(
                 radius: 14,
               ),
             )
-          : timeline.length > 0
+          : timeline.isNotEmpty
               ? DraggableScrollbar.semicircle(
                   labelTextBuilder: (position) {
                     var line = timeline
@@ -267,15 +271,16 @@ class _TimelineState extends State<Timeline> {
                             element['position']['start'] <= position &&
                             element['position']['end'] >= position)
                         .toList();
-                    if (line.length > 0) {
+                    if (line.isNotEmpty) {
                       return Container(
-                        padding: EdgeInsets.symmetric(horizontal: 20),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: AppConstants.paddingLarge),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: [
                             Text(
                               "${line[0]['month']}月",
-                              style: TextStyle(fontSize: 30),
+                              style: const TextStyle(fontSize: 30),
                             ),
                             Column(
                               mainAxisAlignment: MainAxisAlignment.center,
@@ -289,14 +294,14 @@ class _TimelineState extends State<Timeline> {
                         ),
                       );
                     } else {
-                      return Placeholder(
+                      return const Placeholder(
                         child: Center(
                           child: Text('[x]'),
                         ),
                       );
                     }
                   },
-                  labelConstraints: BoxConstraints(
+                  labelConstraints: const BoxConstraints(
                       minHeight: 60,
                       maxHeight: 60,
                       minWidth: 140,
@@ -310,7 +315,7 @@ class _TimelineState extends State<Timeline> {
                     itemCount: timeline.length,
                   ),
                 )
-              : Center(
+              : const Center(
                   child: Text("无项目"),
                 ),
     );

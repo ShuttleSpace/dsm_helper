@@ -1,16 +1,21 @@
 import 'package:garden/pages/control_panel/task_scheduler/task_record.dart';
-import 'package:garden/util/function.dart';
+import 'package:garden/util/ui_util.dart';
+import 'package:garden/util/http_util.dart';
 import 'package:garden/widgets/label.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:garden/constants/app_constants.dart';
+import 'package:garden/theme/app_colors.dart';
 
 class TaskScheduler extends StatefulWidget {
+  const TaskScheduler({super.key});
+
   @override
-  _TaskSchedulerState createState() => _TaskSchedulerState();
+  TaskSchedulerState createState() => TaskSchedulerState();
 }
 
-class _TaskSchedulerState extends State<TaskScheduler> {
+class TaskSchedulerState extends State<TaskScheduler> {
   bool loading = true;
   List tasks = [];
   @override
@@ -27,8 +32,11 @@ class _TaskSchedulerState extends State<TaskScheduler> {
         tasks = res['data']['tasks'];
       });
     } else {
-      Util.instance.toast("加载失败");
-      Navigator.of(context).pop();
+      UiUtil.toast("加载失败");
+      if (context.mounted) {
+        // ignore: use_build_context_synchronously
+        Navigator.of(context).pop();
+      }
     }
   }
 
@@ -37,10 +45,11 @@ class _TaskSchedulerState extends State<TaskScheduler> {
     task['set'] = task['set'] ?? false;
     return Card(
       shape: RoundedRectangleBorder(
-          side: BorderSide(), borderRadius: BorderRadius.circular(18)),
-      margin: EdgeInsets.symmetric(vertical: 10),
+          side: const BorderSide(), borderRadius: BorderRadius.circular(18)),
+      margin:
+          const EdgeInsets.symmetric(vertical: AppConstants.paddingSmall + 2),
       child: Padding(
-        padding: EdgeInsets.all(20),
+        padding: const EdgeInsets.all(20),
         child: Row(
           children: [
             Expanded(
@@ -50,31 +59,31 @@ class _TaskSchedulerState extends State<TaskScheduler> {
                   Row(
                     children: [
                       Label(task['owner'], Colors.lightBlueAccent),
-                      SizedBox(
+                      const SizedBox(
                         width: 5,
                       ),
                       Expanded(
                         child: Text(
                           task['name'],
-                          style: TextStyle(fontSize: 18),
+                          style: const TextStyle(fontSize: 18),
                         ),
                       ),
                     ],
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 5,
                   ),
-                  Text(task['app_name'] != null ? task['app_name'] : "用户定义的脚本"),
-                  SizedBox(
+                  Text(task['app_name'] ?? "用户定义的脚本"),
+                  const SizedBox(
                     height: 5,
                   ),
                   Text(
                     "下次：${task['type'] == 'script' ? task['next_trigger_time'] : (task['next_trigger_time'] == 'bootup' ? '开机' : task['next_trigger_time'] == 'shutdown' ? '关机' : task['next_trigger_time'])} ",
-                    style: TextStyle(fontSize: 13),
+                    style: const TextStyle(fontSize: 13),
                   ),
                   Text(
                     task['action'],
-                    style: TextStyle(color: Colors.grey, fontSize: 12),
+                    style: const TextStyle(color: Colors.grey, fontSize: 12),
                   ),
                 ],
               ),
@@ -96,31 +105,31 @@ class _TaskSchedulerState extends State<TaskScheduler> {
                         task['enable'] = !task['enable'];
                       });
                     } else {
-                      Util.instance.toast("操作失败，code：${res['error']['code']}");
+                      UiUtil.toast("操作失败，code：${res['error']['code']}");
                     }
                   },
                   child: Card(
                     shape: RoundedRectangleBorder(
-                        side: BorderSide(),
+                        side: const BorderSide(),
                         borderRadius: BorderRadius.circular(18)),
                     child: Padding(
-                      padding: const EdgeInsets.all(8.0),
+                      padding: const EdgeInsets.all(AppConstants.paddingSmall),
                       child: SizedBox(
                         width: 20,
                         height: 20,
                         child: task['set']
-                            ? CupertinoActivityIndicator()
+                            ? const CupertinoActivityIndicator()
                             : task['enable']
-                                ? Icon(
+                                ? const Icon(
                                     CupertinoIcons.checkmark_alt,
-                                    color: Color(0xffff9813),
+                                    color: AppColors.primaryAction,
                                   )
                                 : null,
                       ),
                     ),
                   ),
                 ),
-                SizedBox(
+                const SizedBox(
                   height: 5,
                 ),
                 if (task['type'] == 'script')
@@ -130,19 +139,19 @@ class _TaskSchedulerState extends State<TaskScheduler> {
                           builder: (context) {
                             return TaskRecord(task['id']);
                           },
-                          settings: RouteSettings(name: "task_record")));
+                          settings: const RouteSettings(name: "task_record")));
                     },
-                    child: SizedBox(
+                    child: const SizedBox(
                       width: 20,
                       height: 20,
                       child: Icon(
                         CupertinoIcons.list_bullet,
-                        color: Color(0xffff9813),
+                        color: AppColors.primaryAction,
                         size: 16,
                       ),
                     ),
                   ),
-                SizedBox(
+                const SizedBox(
                   height: 5,
                 ),
                 OutlinedButton(
@@ -153,13 +162,13 @@ class _TaskSchedulerState extends State<TaskScheduler> {
                     setState(() {
                       task['running'] = true;
                     });
-                    var res;
+                    Map<dynamic, dynamic> res;
                     if (task['type'] == 'script') {
                       res = await Api.taskRun([task['id']]);
                     } else if (task['type'] == 'event_script') {
                       res = await Api.eventRun([task['name']]);
                     } else {
-                      Util.instance.toast("暂不支持此类型任务");
+                      UiUtil.toast("暂不支持此类型任务");
                       return;
                     }
 
@@ -167,9 +176,9 @@ class _TaskSchedulerState extends State<TaskScheduler> {
                       task['running'] = false;
                     });
                     if (res['success']) {
-                      Util.instance.toast("任务计划执行成功");
+                      UiUtil.toast("任务计划执行成功");
                     } else {
-                      Util.instance
+                      HttpUtil.instance
                           .toast("任务计划执行失败，code：${res['error']['code']}");
                     }
                   },
@@ -177,10 +186,10 @@ class _TaskSchedulerState extends State<TaskScheduler> {
                     width: 20,
                     height: 20,
                     child: task['running']
-                        ? CupertinoActivityIndicator()
-                        : Icon(
+                        ? const CupertinoActivityIndicator()
+                        : const Icon(
                             CupertinoIcons.play_arrow_solid,
-                            color: Color(0xffff9813),
+                            color: AppColors.primaryAction,
                             size: 16,
                           ),
                   ),
@@ -198,7 +207,7 @@ class _TaskSchedulerState extends State<TaskScheduler> {
     return Scaffold(
       appBar: AppBar(
         leading: AppBackButton(context),
-        title: Text("任务计划"),
+        title: const Text("任务计划"),
       ),
       body: loading
           ? Container(
@@ -207,14 +216,14 @@ class _TaskSchedulerState extends State<TaskScheduler> {
               color: Theme.of(context)
                   .scaffoldBackgroundColor
                   .withValues(alpha: .7),
-              child: Center(
+              child: const Center(
                 child: CupertinoActivityIndicator(
                   radius: 14,
                 ),
               ),
             )
           : ListView.builder(
-              padding: EdgeInsets.all(20),
+              padding: const EdgeInsets.all(20),
               itemBuilder: (context, i) {
                 return _buildTaskItem(tasks[i]);
               },

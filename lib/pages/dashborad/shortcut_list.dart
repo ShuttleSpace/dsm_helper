@@ -1,4 +1,5 @@
 import 'package:garden/models/shortcut_item_model.dart';
+import 'package:garden/stores/connection_store.dart';
 import 'package:garden/pages/common/browser.dart';
 import 'package:garden/pages/control_panel/control_panel.dart';
 import 'package:garden/pages/docker/detail.dart';
@@ -10,9 +11,9 @@ import 'package:garden/pages/packages/packages.dart';
 import 'package:garden/pages/resource_monitor/resource_monitor.dart';
 import 'package:garden/pages/storage_manager/storage_manager.dart';
 import 'package:garden/pages/virtual_machine/virtual_machine.dart';
-import 'package:garden/util/function.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:garden/constants/app_constants.dart';
 
 import '../photos/photos.dart';
 
@@ -39,15 +40,15 @@ class ShortcutList extends StatelessWidget {
   final List? validAppViewOrder;
   const ShortcutList(this.shortcutItems, this.system, this.volumes, this.disks,
       this.appNotify, this.context,
-      {this.validAppViewOrder});
+      {super.key, this.validAppViewOrder});
 
   @override
   Widget build(BuildContext ctx) {
     return Card(
       shape: RoundedRectangleBorder(
-          side: BorderSide(), borderRadius: BorderRadius.circular(18)),
-      margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-      child: Container(
+          side: const BorderSide(), borderRadius: BorderRadius.circular(18)),
+      margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+      child: SizedBox(
         height: 140,
         child: ListView.builder(
           scrollDirection: Axis.horizontal,
@@ -64,7 +65,7 @@ class ShortcutList extends StatelessWidget {
     String icon = "";
     String name = "";
     int unread = 0;
-    Widget page = Placeholder(
+    Widget page = const Placeholder(
       child: Center(
         child: Text('空空如也~'),
       ),
@@ -73,16 +74,17 @@ class ShortcutList extends StatelessWidget {
     switch (shortcut.className) {
       case "SYNO.SDS.PkgManApp.Instance":
         icon =
-            "assets/applications/${Util.instance.version}/package_center.png";
+            "assets/applications/${connectionStore.version}/package_center.png";
         name = "套件中心";
-        page = Packages('DSM ${Util.instance.version}.0-10049');
+        page = Packages('DSM ${connectionStore.version}.0-10049');
         routerName = "packages";
         if (appNotify['SYNO.SDS.PkgManApp.Instance'] != null) {
           unread = appNotify['SYNO.SDS.PkgManApp.Instance']['unread'];
         }
         break;
       case "SYNO.SDS.AdminCenter.Application":
-        icon = "assets/applications/${Util.instance.version}/control_panel.png";
+        icon =
+            "assets/applications/${connectionStore.version}/control_panel.png";
         name = "控制面板";
         page = ControlPanel(
             system,
@@ -98,9 +100,9 @@ class ShortcutList extends StatelessWidget {
         break;
       case "SYNO.SDS.StorageManager.Instance":
         icon =
-            "assets/applications/${Util.instance.version}/storage_manager.png";
+            "assets/applications/${connectionStore.version}/storage_manager.png";
         name = "存储空间管理员";
-        page = StorageManager();
+        page = const StorageManager();
         routerName = "storage_manager";
         break;
       case "SYNO.SDS.Docker.Application":
@@ -109,13 +111,13 @@ class ShortcutList extends StatelessWidget {
             true) {
           icon = "assets/applications/container_manager.png";
           name = "Container Manager";
-          page = Docker(
+          page = const Docker(
             title: "Container Manager",
           );
         } else {
           icon = "assets/applications/docker.png";
           name = "Docker";
-          page = Docker();
+          page = const Docker();
         }
 
         routerName = "docker";
@@ -142,16 +144,16 @@ class ShortcutList extends StatelessWidget {
 
         break;
       case "SYNO.SDS.LogCenter.Instance":
-        icon = "assets/applications/${Util.instance.version}/log_center.png";
+        icon = "assets/applications/${connectionStore.version}/log_center.png";
         name = "日志中心";
-        page = LogCenter();
+        page = const LogCenter();
         routerName = "log_center";
         break;
       case "SYNO.SDS.ResourceMonitor.Instance":
         icon =
-            "assets/applications/${Util.instance.version}/resource_monitor.png";
+            "assets/applications/${connectionStore.version}/resource_monitor.png";
         name = "资源监控";
-        page = ResourceMonitor();
+        page = const ResourceMonitor();
         routerName = "resource_monitor";
 
         break;
@@ -160,33 +162,33 @@ class ShortcutList extends StatelessWidget {
       //   break;
       case "SYNO.SDS.Virtualization.Application":
         icon =
-            "assets/applications/${Util.instance.version}/virtual_machine.png";
+            "assets/applications/${connectionStore.version}/virtual_machine.png";
         name = "Virtual Machine Manager";
-        page = VirtualMachine();
+        page = const VirtualMachine();
         routerName = "virtual_machine_manager";
         break;
       case "SYNO.Photo.AppInstance":
         icon = "assets/applications/6/moments.png";
         name = "Moments";
-        page = Moments();
+        page = const Moments();
         routerName = "moments";
         break;
       case "SYNO.Foto.AppInstance":
         icon = "assets/applications/7/synology_photos.png";
         name = "Synology Photos";
-        page = Photos();
+        page = const Photos();
         routerName = "photos";
         break;
       case "SYNO.SDS.DownloadStation.Application":
         icon = "assets/applications/download_station.png";
         name = "Download Station";
-        page = DownloadStation();
+        page = const DownloadStation();
         routerName = "download_station";
         break;
       case "SYNO.SDS.XLPan.Application":
         icon = "assets/applications/xunlei.png";
         name = "迅雷";
-        page = Browser(
+        page = const Browser(
           title: "迅雷-远程设备",
           url: "https://pan.xunlei.com/yc/?fromApp=paipai",
         );
@@ -195,7 +197,7 @@ class ShortcutList extends StatelessWidget {
     }
     if (icon != "") {
       return Padding(
-        padding: EdgeInsets.symmetric(horizontal: 10, vertical: 15),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 15),
         child: GestureDetector(
           onTap: () {
             Navigator.of(context).push(CupertinoPageRoute(
@@ -206,7 +208,8 @@ class ShortcutList extends StatelessWidget {
           },
           child: Card(
             shape: RoundedRectangleBorder(
-                side: BorderSide(), borderRadius: BorderRadius.circular(18)),
+                side: const BorderSide(),
+                borderRadius: BorderRadius.circular(18)),
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 8.0),
               child: Stack(
@@ -214,22 +217,23 @@ class ShortcutList extends StatelessWidget {
                   Align(
                     alignment: Alignment.center,
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 10),
+                      padding: const EdgeInsets.symmetric(
+                          vertical: AppConstants.paddingSmall + 2),
                       child: Column(
                         children: [
                           Image.asset(
                             icon,
                             width: 50,
                           ),
-                          SizedBox(
+                          const SizedBox(
                             height: 5,
                           ),
                           Text(
-                            "$name",
+                            name,
                             textAlign: TextAlign.center,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
-                            style: TextStyle(fontSize: 14),
+                            style: const TextStyle(fontSize: 14),
                           ),
                         ],
                       ),
@@ -249,7 +253,7 @@ class ShortcutList extends StatelessWidget {
                           boxShadow: [
                             BoxShadow(
                                 color: Colors.black.withValues(alpha: .5),
-                                offset: Offset(1, 1)),
+                                offset: const Offset(1, 1)),
                           ],
                         ),
                       ),
@@ -261,7 +265,7 @@ class ShortcutList extends StatelessWidget {
         ),
       );
     } else {
-      return SizedBox();
+      return const SizedBox();
     }
   }
 }

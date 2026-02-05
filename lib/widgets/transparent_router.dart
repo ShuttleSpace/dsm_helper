@@ -2,24 +2,16 @@ import 'package:flutter/widgets.dart';
 
 class TransparentPageRoute<T> extends PageRouteBuilder<T> {
   TransparentPageRoute({
-    RouteSettings? settings,
-    required RoutePageBuilder pageBuilder,
-    RouteTransitionsBuilder transitionsBuilder = _defaultTransitionsBuilder,
-    Duration transitionDuration = const Duration(milliseconds: 150),
-    bool barrierDismissible = false,
-    Color? barrierColor,
-    String? barrierLabel,
-    bool maintainState = true,
+    super.settings,
+    required super.pageBuilder,
+    super.transitionsBuilder = _defaultTransitionsBuilder,
+    super.transitionDuration = const Duration(milliseconds: 150),
+    super.barrierDismissible,
+    super.barrierColor,
+    super.barrierLabel,
+    super.maintainState,
   }) : super(
-          settings: settings,
           opaque: false,
-          pageBuilder: pageBuilder,
-          transitionsBuilder: transitionsBuilder,
-          transitionDuration: transitionDuration,
-          barrierDismissible: barrierDismissible,
-          barrierColor: barrierColor,
-          barrierLabel: barrierLabel,
-          maintainState: maintainState,
         );
 }
 

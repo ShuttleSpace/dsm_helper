@@ -2,13 +2,16 @@ import 'package:garden/pages/common/browser.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:garden/constants/app_constants.dart';
 
 class OpenSource extends StatefulWidget {
+  const OpenSource({super.key});
+
   @override
-  _OpenSourceState createState() => _OpenSourceState();
+  OpenSourceState createState() => OpenSourceState();
 }
 
-class _OpenSourceState extends State<OpenSource> {
+class OpenSourceState extends State<OpenSource> {
   List list = [
     {
       "name": "cupertino_icons",
@@ -152,32 +155,34 @@ class _OpenSourceState extends State<OpenSource> {
     return Scaffold(
       appBar: AppBar(
         leading: AppBackButton(context),
-        title: Text(
+        title: const Text(
           "开源插件",
         ),
       ),
       body: CupertinoScrollbar(
         child: ListView.separated(
-          padding: EdgeInsets.symmetric(vertical: 20),
+          padding: const EdgeInsets.symmetric(vertical: 20),
           separatorBuilder: (context, i) {
-            return SizedBox(
+            return const SizedBox(
               height: 20,
             );
           },
           itemBuilder: (context, i) {
             return Card(
               shape: RoundedRectangleBorder(
-                  side: BorderSide(), borderRadius: BorderRadius.circular(18)),
-              margin: EdgeInsets.symmetric(horizontal: 20),
+                  side: const BorderSide(),
+                  borderRadius: BorderRadius.circular(18)),
+              margin: const EdgeInsets.symmetric(
+                  horizontal: AppConstants.paddingLarge),
               child: Padding(
-                padding: EdgeInsets.all(20),
+                padding: const EdgeInsets.all(20),
                 child: Row(
                   children: [
                     Text(
                       list[i]['name'],
-                      style: TextStyle(fontSize: 16),
+                      style: const TextStyle(fontSize: 16),
                     ),
-                    Spacer(),
+                    const Spacer(),
                     OutlinedButton(
                       onPressed: () {
                         Navigator.of(context).push(
@@ -185,12 +190,12 @@ class _OpenSourceState extends State<OpenSource> {
                             return Browser(
                               title: "${list[i]['name']}",
                               url:
-                                  "https://pub.dev/packages/" + list[i]['name'],
+                                  "https://pub.dev/packages/${list[i]['name']}",
                             );
                           }),
                         );
                       },
-                      child: Text("详情"),
+                      child: const Text("详情"),
                     ),
                   ],
                 ),

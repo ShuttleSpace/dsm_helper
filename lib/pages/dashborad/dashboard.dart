@@ -1,8 +1,10 @@
 import 'dart:async';
+import 'package:garden/util/format_util.dart';
+import 'package:garden/stores/settings_store.dart';
+import 'package:garden/stores/connection_store.dart';
 import 'dart:math';
 
 import 'package:garden/models/api_model.dart';
-import 'package:garden/models/setting/group_model.dart';
 import 'package:garden/models/shortcut_item_model.dart';
 import 'package:garden/models/wallpaper_model.dart';
 import 'package:garden/pages/control_panel/external_device/external_device.dart';
@@ -16,30 +18,30 @@ import 'package:garden/pages/log_center/log_center.dart';
 import 'package:garden/pages/notify/notify.dart';
 import 'package:garden/pages/resource_monitor/performance.dart';
 import 'package:garden/pages/resource_monitor/resource_monitor.dart';
-import 'package:garden/providers/setting.dart';
-import 'package:garden/providers/shortcut.dart';
-import 'package:garden/providers/wallpaper.dart';
-import 'package:garden/themes/app_theme.dart';
-import 'package:garden/util/function.dart';
+import 'package:garden/stores/app_store.dart';
+import 'package:garden/theme/app_theme.dart';
+import 'package:garden/util/http_util.dart';
 import 'package:garden/widgets/animation_progress_bar.dart';
-import 'package:garden/widgets/label.dart';
+import 'package:garden/widgets/dashboard/dashboard_log_item.dart';
+import 'package:garden/widgets/dashboard/dashboard_task_item.dart';
+import 'package:garden/widgets/dashboard/dashboard_user_item.dart';
+import 'package:garden/widgets/dashboard/esata_device_card.dart';
+import 'package:garden/widgets/dashboard/volume_card.dart';
 import 'package:extended_image/extended_image.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:percent_indicator/circular_percent_indicator.dart';
-import 'package:provider/provider.dart';
-import 'package:url_launcher/url_launcher_string.dart';
+import 'package:garden/constants/app_constants.dart';
+import 'package:signals_flutter/signals_flutter.dart';
 
 class Dashboard extends StatefulWidget {
-  Dashboard({key}) : super(key: key);
+  const Dashboard({super.key});
   @override
   DashboardState createState() => DashboardState();
 }
 
 class DashboardState extends State<Dashboard> {
-  GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   Map utilization = {};
   List volumes = [];
   List disks = [];
@@ -82,18 +84,15 @@ class DashboardState extends State<Dashboard> {
 
   // 主题颜色 - 根据 AppTheme 获取
   Color get _errorColor =>
-      Theme.of(context).extension<AppTheme>()?.errorColor ?? _errorColor;
+      Theme.of(context).extension<AppTheme>()?.errorColor ?? Colors.redAccent;
   Color get _successColor =>
-      Theme.of(context).extension<AppTheme>()?.successColor ?? _successColor;
-  Color get _warningColor =>
-      Theme.of(context).extension<AppTheme>()?.warningColor ?? _warningColor;
+      Theme.of(context).extension<AppTheme>()?.successColor ?? Colors.teal;
   Color get _infoColor =>
-      Theme.of(context).extension<AppTheme>()?.infoColor ?? _infoColor;
+      Theme.of(context).extension<AppTheme>()?.infoColor ?? Colors.limeAccent;
   Color get _uploadColor => Colors.blueAccent;
   Color get _downloadColor => _successColor;
-  Color get _chartGridColor => Theme.of(context).colorScheme.outlineVariant;
   Color get _chartTextColor =>
-      Theme.of(context).colorScheme.onSurface.withOpacity(0.6);
+      Theme.of(context).colorScheme.onSurface.withAlpha(153);
 
   @override
   void initState() {
@@ -113,176 +112,9 @@ class DashboardState extends State<Dashboard> {
     return _scaffoldKey.currentState?.isDrawerOpen ?? false;
   }
 
-  /// @deprecated
-  getGroups() async {
-    Util.instance.groups = await GroupsModel.fetch();
-    if (Util.instance.notReviewAccount) {
-      showFirstLaunchDialog();
-    }
-  }
-
   closeDrawer() {
     if (_scaffoldKey.currentState?.isDrawerOpen ?? false) {
       Navigator.of(context).pop();
-    }
-  }
-
-  showFirstLaunchDialog() async {
-    bool firstLaunch =
-        await Util.instance.getStorage("first_launch_channel") == null;
-    if (firstLaunch) {
-      showCupertinoDialog(
-        context: context,
-        builder: (context) {
-          return Material(
-            color: Colors.transparent,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Card(
-                  shape: RoundedRectangleBorder(
-                      side: BorderSide(),
-                      borderRadius: BorderRadius.circular(18)),
-                  margin: EdgeInsets.symmetric(horizontal: 50),
-                  child: Padding(
-                    padding: EdgeInsets.all(20),
-                    child: Column(
-                      children: [
-                        Text(
-                          "温馨提示",
-                          style: TextStyle(
-                              fontSize: 20, fontWeight: FontWeight.w500),
-                        ),
-                        SizedBox(
-                          height: 16,
-                        ),
-                        Card(
-                          shape: RoundedRectangleBorder(
-                              side: BorderSide(),
-                              borderRadius: BorderRadius.circular(18)),
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Text("前往'设置-关闭广告'页面，即可关闭开屏广告。"),
-                          ),
-                        ),
-                        SizedBox(
-                          height: 20,
-                        ),
-                        Card(
-                          shape: RoundedRectangleBorder(
-                              side: BorderSide(),
-                              borderRadius: BorderRadius.circular(18)),
-                          child: Padding(
-                              padding: EdgeInsets.all(15),
-                              child: Column(
-                                children: Util.instance.groups.channel
-                                        ?.map((e) {
-                                      return Padding(
-                                        padding:
-                                            EdgeInsets.symmetric(vertical: 5),
-                                        child: Row(
-                                          children: [
-                                            Image.asset(
-                                              "assets/icons/qq.png",
-                                              width: 20,
-                                            ),
-                                            SizedBox(
-                                              width: 10,
-                                            ),
-                                            Text(
-                                              "${e.displayName}",
-                                              style: TextStyle(fontSize: 16),
-                                            ),
-                                            Spacer(),
-                                            OutlinedButton(
-                                              onPressed: () {
-                                                launchUrlString(e.key ?? '',
-                                                    mode: LaunchMode
-                                                        .externalApplication);
-                                              },
-                                              child: Text("加入"),
-                                            ),
-                                          ],
-                                        ),
-                                      );
-                                    }).toList() ??
-                                    [],
-                              )),
-                        ),
-                        SizedBox(
-                          height: 20,
-                        ),
-                        Card(
-                          shape: RoundedRectangleBorder(
-                              side: BorderSide(),
-                              borderRadius: BorderRadius.circular(18)),
-                          child: Padding(
-                              padding: EdgeInsets.all(15),
-                              child: Column(
-                                children: Util.instance.groups.wechat?.map((e) {
-                                      return Padding(
-                                        padding:
-                                            EdgeInsets.symmetric(vertical: 5),
-                                        child: Row(
-                                          children: [
-                                            Image.asset(
-                                              "assets/icons/wechat.png",
-                                              width: 20,
-                                            ),
-                                            SizedBox(
-                                              width: 10,
-                                            ),
-                                            Text(
-                                              "${e.displayName}",
-                                              style: TextStyle(fontSize: 16),
-                                            ),
-                                            Spacer(),
-                                            OutlinedButton(
-                                              onPressed: () {
-                                                ClipboardData data =
-                                                    new ClipboardData(
-                                                        text: e.name ?? '');
-                                                Clipboard.setData(data);
-                                                Util.instance.toast("已复制到剪贴板");
-                                              },
-                                              child: Text("复制"),
-                                            ),
-                                          ],
-                                        ),
-                                      );
-                                    }).toList() ??
-                                    [],
-                              )),
-                        ),
-                        SizedBox(
-                          height: 20,
-                        ),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: OutlinedButton(
-                                onPressed: () async {
-                                  Navigator.of(context).pop();
-                                  Util.instance
-                                      .setStorage("first_launch_channel", "0");
-                                },
-                                child: Text(
-                                  "我知道了",
-                                  style: TextStyle(fontSize: 18),
-                                ),
-                              ),
-                            ),
-                          ],
-                        )
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          );
-        },
-      );
     }
   }
 
@@ -291,7 +123,7 @@ class DashboardState extends State<Dashboard> {
     debugPrint("notifyStrings");
     if (res['success']) {
       setState(() {
-        Util.instance.notifyStrings = res['data'] ?? {};
+        connectionStore.setNotifyStrings(res['data'] ?? {});
       });
     }
   }
@@ -300,7 +132,7 @@ class DashboardState extends State<Dashboard> {
     var res = await Api.externalDevice();
     if (res['success']) {
       List result = res['data']['result'];
-      result.forEach((item) {
+      for (var item in result) {
         if (item['success'] == true) {
           switch (item['api']) {
             case "SYNO.Core.ExternalDevice.Storage.eSATA":
@@ -315,7 +147,7 @@ class DashboardState extends State<Dashboard> {
               break;
           }
         }
-      });
+      }
     }
   }
 
@@ -328,7 +160,7 @@ class DashboardState extends State<Dashboard> {
                 (converter['thumb_remain'] ?? 0) +
                 (converter['video_remain'] ?? 0) >
             0)) {
-          Future.delayed(Duration(seconds: 5))
+          Future.delayed(const Duration(seconds: 5))
               .then((value) => getMediaConverter());
         }
       });
@@ -365,10 +197,10 @@ class DashboardState extends State<Dashboard> {
         }
         if (init['data']['Session'] != null) {
           hostname = init['data']['Session']['hostname'];
-          Util.instance.hostname = hostname;
+          connectionStore.setHostname(hostname);
         }
         if (init['data']['Strings'] != null) {
-          Util.instance.strings = init['data']['Strings'] ?? {};
+          connectionStore.setStrings(init['data']['Strings'] ?? {});
         }
       });
     }
@@ -390,7 +222,7 @@ class DashboardState extends State<Dashboard> {
       });
 
       List result = res['data']['result'];
-      result.forEach((item) {
+      for (var item in result) {
         if (item['success'] == true) {
           switch (item['api']) {
             case "SYNO.Core.System.Utilization":
@@ -405,7 +237,7 @@ class DashboardState extends State<Dashboard> {
             case "SYNO.Core.System":
               setState(() {
                 system = item['data'];
-                Util.instance.systemVersion(system['firmware_ver']);
+                HttpUtil.instance.systemVersion(system['firmware_ver']);
               });
               break;
             case "SYNO.Core.CurrentConnection":
@@ -454,7 +286,7 @@ class DashboardState extends State<Dashboard> {
         // else if(item['api'] == ""){
         //
         // }
-      });
+      }
     } else {
       setState(() {
         if (loading) {
@@ -474,13 +306,13 @@ class DashboardState extends State<Dashboard> {
   }
 
   bool _isCardItemCollapsed(String itemName) =>
-      Util.instance.dashboardCardCollapseState[itemName] == true;
+      settingsStore.dashboardCardCollapseState[itemName] == true;
 
-  Widget _CardItemCollapse(String itemName) {
+  Widget _cardItemCollapse(String itemName) {
     return IconButton(
         onPressed: () {
           setState(() {
-            Util.instance.dashboardCardCollapseState[itemName] =
+            settingsStore.dashboardCardCollapseState[itemName] =
                 !(_isCardItemCollapsed(itemName));
           });
         },
@@ -493,30 +325,31 @@ class DashboardState extends State<Dashboard> {
     if (widget == "SYNO.SDS.SystemInfoApp.SystemHealthWidget") {
       return GestureDetector(
         onTap: () {
-          if (Util.instance.notReviewAccount)
+          if (connectionStore.notReviewAccount) {
             Navigator.of(context).push(CupertinoPageRoute(builder: (context) {
               return SystemInfo(0, system, volumes, disks);
             }));
+          }
         },
         child: Card(
           shape: RoundedRectangleBorder(
-              side: BorderSide(), borderRadius: BorderRadius.circular(18)),
-          margin: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+              side: const BorderSide(),
+              borderRadius: BorderRadius.circular(18)),
+          margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
           child: Padding(
-            padding: const EdgeInsets.all(8.0),
+            padding: const EdgeInsets.all(AppConstants.paddingSmall),
             child: Stack(
               children: [
-                Consumer<WallpaperProvider>(
-                  builder: (context, wallpaperProvider, _) {
+                Watch(
+                  (context) {
                     return Stack(
                       children: [
-                        if (wallpaperProvider.showWallpaper &&
+                        if (appStore.showWallpaper &&
                             wallpaperModel != null &&
                             (wallpaperModel!.customizeWallpaper == true ||
                                 wallpaperModel!.customizeBackground == true))
                           ExtendedImage.network(
-                            Util.instance.baseUrl +
-                                "/webapi/entry.cgi?api=SYNO.Core.PersonalSettings&method=wallpaper&version=1&path=%22%22&retina=true&_sid=${Util.instance.sid}",
+                            "${connectionStore.baseUrl}/webapi/entry.cgi?api=SYNO.Core.PersonalSettings&method=wallpaper&version=1&path=%22%22&retina=true&_sid=${connectionStore.sid}",
                             height: 170,
                             width: double.infinity,
                             fit: BoxFit.cover,
@@ -536,7 +369,7 @@ class DashboardState extends State<Dashboard> {
                         ClipRRect(
                           borderRadius: BorderRadius.circular(20),
                           child: Padding(
-                            padding: EdgeInsets.all(20),
+                            padding: const EdgeInsets.all(20),
                             child: DefaultTextStyle(
                               style: TextStyle(
                                 color: Theme.of(context)
@@ -553,10 +386,10 @@ class DashboardState extends State<Dashboard> {
                                         width: 26,
                                         height: 26,
                                       ),
-                                      SizedBox(
+                                      const SizedBox(
                                         width: 10,
                                       ),
-                                      Text(
+                                      const Text(
                                         "系统状态",
                                         style: TextStyle(
                                             fontSize: 18,
@@ -564,34 +397,34 @@ class DashboardState extends State<Dashboard> {
                                       ),
                                     ],
                                   ),
-                                  SizedBox(
+                                  const SizedBox(
                                     height: 5,
                                   ),
                                   if (system['model'] != null)
                                     Padding(
-                                      padding: EdgeInsets.only(top: 5),
+                                      padding: const EdgeInsets.only(top: 5),
                                       child: Row(
                                         children: [
-                                          Text("产品型号："),
+                                          const Text("产品型号："),
                                           Text("${system['model']}"),
                                         ],
                                       ),
                                     ),
-                                  SizedBox(
+                                  const SizedBox(
                                     height: 5,
                                   ),
                                   Row(
                                     children: [
-                                      Text("系统名称："),
-                                      Text("$hostname"),
+                                      const Text("系统名称："),
+                                      Text(hostname),
                                     ],
                                   ),
                                   if (system['sys_temp'] != null)
                                     Padding(
-                                      padding: EdgeInsets.only(top: 5),
+                                      padding: const EdgeInsets.only(top: 5),
                                       child: Row(
                                         children: [
-                                          Text("散热状态："),
+                                          const Text("散热状态："),
                                           Text(
                                             "${system['sys_temp']}℃ ${system['temperature_warning'] == null ? (system['sys_temp'] > 80 ? "警告" : "正常") : (system['temperature_warning'] ? "警告" : "正常")}",
                                             style: TextStyle(
@@ -613,12 +446,12 @@ class DashboardState extends State<Dashboard> {
                                   if (system['up_time'] != null &&
                                       system['up_time'] != "")
                                     Padding(
-                                      padding: EdgeInsets.only(top: 5),
+                                      padding: const EdgeInsets.only(top: 5),
                                       child: Row(
                                         children: [
-                                          Text("运行时间："),
-                                          Text(
-                                              "${Util.instance.parseOpTime(system['up_time'])}"),
+                                          const Text("运行时间："),
+                                          Text(FormatUtil.parseOpTime(
+                                              system['up_time'])),
                                         ],
                                       ),
                                     ),
@@ -637,20 +470,21 @@ class DashboardState extends State<Dashboard> {
         ),
       );
     } else if (widget == "SYNO.SDS.SystemInfoApp.ConnectionLogWidget" &&
-        connectedUsers.length > 0) {
+        connectedUsers.isNotEmpty) {
       return Card(
         shape: RoundedRectangleBorder(
-            side: BorderSide(), borderRadius: BorderRadius.circular(18)),
-        margin: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+            side: const BorderSide(), borderRadius: BorderRadius.circular(18)),
+        margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
         child: Padding(
-          padding: const EdgeInsets.all(8.0),
+          padding: const EdgeInsets.all(AppConstants.paddingSmall),
           child: Column(
             children: [
-              SizedBox(
+              const SizedBox(
                 height: 20,
               ),
               Padding(
-                padding: EdgeInsets.symmetric(horizontal: 20),
+                padding: const EdgeInsets.symmetric(
+                    horizontal: AppConstants.paddingLarge),
                 child: Row(
                   children: [
                     Image.asset(
@@ -658,22 +492,25 @@ class DashboardState extends State<Dashboard> {
                       width: 26,
                       height: 26,
                     ),
-                    SizedBox(
+                    const SizedBox(
                       width: 10,
                     ),
-                    Text(
+                    const Text(
                       "登录用户",
                       style:
                           TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
                     ),
-                    Spacer(),
-                    _CardItemCollapse("ConnectionLog")
+                    const Spacer(),
+                    _cardItemCollapse("ConnectionLog")
                   ],
                 ),
               ),
               if (_isCardItemCollapsed('ConnectionLog'))
-                ...connectedUsers.map(_buildUserItem).toList(),
-              SizedBox(
+                ...connectedUsers.map((user) => DashboardUserItem(
+                      user: user,
+                      onKickSuccess: getData,
+                    )),
+              const SizedBox(
                 height: 20,
               ),
             ],
@@ -684,22 +521,24 @@ class DashboardState extends State<Dashboard> {
       return GestureDetector(
         onTap: () {
           Navigator.of(context).push(CupertinoPageRoute(builder: (context) {
-            return TaskScheduler();
+            return const TaskScheduler();
           }));
         },
         child: Card(
           shape: RoundedRectangleBorder(
-              side: BorderSide(), borderRadius: BorderRadius.circular(18)),
-          margin: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+              side: const BorderSide(),
+              borderRadius: BorderRadius.circular(18)),
+          margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
           child: Padding(
-            padding: const EdgeInsets.all(8.0),
+            padding: const EdgeInsets.all(AppConstants.paddingSmall),
             child: Column(
               children: [
-                SizedBox(
+                const SizedBox(
                   height: 20,
                 ),
                 Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 20),
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: AppConstants.paddingLarge),
                   child: Row(
                     children: [
                       Image.asset(
@@ -707,22 +546,22 @@ class DashboardState extends State<Dashboard> {
                         width: 26,
                         height: 26,
                       ),
-                      SizedBox(
+                      const SizedBox(
                         width: 10,
                       ),
-                      Text(
+                      const Text(
                         "计划任务",
                         style: TextStyle(
                             fontSize: 18, fontWeight: FontWeight.w600),
                       ),
-                      Spacer(),
-                      _CardItemCollapse("TaskScheduler")
+                      const Spacer(),
+                      _cardItemCollapse("TaskScheduler")
                     ],
                   ),
                 ),
                 if (_isCardItemCollapsed('TaskScheduler'))
-                  ...tasks.map(_buildTaskItem).toList(),
-                SizedBox(
+                  ...tasks.map((task) => DashboardTaskItem(task: task)),
+                const SizedBox(
                   height: 20,
                 ),
               ],
@@ -735,23 +574,25 @@ class DashboardState extends State<Dashboard> {
         onTap: () {
           Navigator.of(context).push(CupertinoPageRoute(
               builder: (context) {
-                return LogCenter();
+                return const LogCenter();
               },
-              settings: RouteSettings(name: "log_center")));
+              settings: const RouteSettings(name: "log_center")));
         },
         child: Card(
           shape: RoundedRectangleBorder(
-              side: BorderSide(), borderRadius: BorderRadius.circular(18)),
-          margin: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+              side: const BorderSide(),
+              borderRadius: BorderRadius.circular(18)),
+          margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
           child: Padding(
-            padding: const EdgeInsets.all(8.0),
+            padding: const EdgeInsets.all(AppConstants.paddingSmall),
             child: Column(
               children: [
-                SizedBox(
+                const SizedBox(
                   height: 20,
                 ),
                 Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 20),
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: AppConstants.paddingLarge),
                   child: Row(
                     children: [
                       Image.asset(
@@ -759,30 +600,30 @@ class DashboardState extends State<Dashboard> {
                         width: 26,
                         height: 26,
                       ),
-                      SizedBox(
+                      const SizedBox(
                         width: 10,
                       ),
-                      Text(
+                      const Text(
                         "最新日志",
                         style: TextStyle(
                             fontSize: 18, fontWeight: FontWeight.w600),
                       ),
-                      Spacer(),
-                      _CardItemCollapse("RecentLog")
+                      const Spacer(),
+                      _cardItemCollapse("RecentLog")
                     ],
                   ),
                 ),
-                SizedBox(
+                const SizedBox(
                   height: 10,
                 ),
                 if (_isCardItemCollapsed('RecentLog'))
                   SizedBox(
                     height: 300,
-                    child: latestLog.length > 0
+                    child: latestLog.isNotEmpty
                         ? CupertinoScrollbar(
                             child: ListView.builder(
                               itemBuilder: (context, i) {
-                                return _buildLogItem(latestLog[i]);
+                                return DashboardLogItem(log: latestLog[i]);
                               },
                               itemCount: latestLog.length,
                             ),
@@ -795,7 +636,7 @@ class DashboardState extends State<Dashboard> {
                             ),
                           ),
                   ),
-                SizedBox(
+                const SizedBox(
                   height: 10,
                 ),
               ],
@@ -807,22 +648,24 @@ class DashboardState extends State<Dashboard> {
       return GestureDetector(
         onTap: () {
           Navigator.of(context).push(CupertinoPageRoute(builder: (context) {
-            return ResourceMonitor();
+            return const ResourceMonitor();
           }));
         },
         child: Card(
           shape: RoundedRectangleBorder(
-              side: BorderSide(), borderRadius: BorderRadius.circular(18)),
-          margin: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+              side: const BorderSide(),
+              borderRadius: BorderRadius.circular(18)),
+          margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
           child: Padding(
-            padding: const EdgeInsets.all(8.0),
+            padding: const EdgeInsets.all(AppConstants.paddingSmall),
             child: Column(
               children: [
-                SizedBox(
+                const SizedBox(
                   height: 20,
                 ),
                 Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 20),
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: AppConstants.paddingLarge),
                   child: Row(
                     children: [
                       Image.asset(
@@ -830,38 +673,39 @@ class DashboardState extends State<Dashboard> {
                         width: 26,
                         height: 26,
                       ),
-                      SizedBox(
+                      const SizedBox(
                         width: 10,
                       ),
-                      Text(
+                      const Text(
                         "资源监控",
                         style: TextStyle(
                             fontSize: 18, fontWeight: FontWeight.w600),
                       ),
-                      Spacer(),
-                      _CardItemCollapse("ResourceMonitor")
+                      const Spacer(),
+                      _cardItemCollapse("ResourceMonitor")
                     ],
                   ),
                 ),
                 if (_isCardItemCollapsed('ResourceMonitor')) ...[
-                  SizedBox(
+                  const SizedBox(
                     height: 10,
                   ),
                   GestureDetector(
                     onTap: () {
                       Navigator.of(context).push(CupertinoPageRoute(
                           builder: (context) {
-                            return Performance(
+                            return const Performance(
                               tabIndex: 1,
                             );
                           },
-                          settings: RouteSettings(name: "performance")));
+                          settings: const RouteSettings(name: "performance")));
                     },
                     child: Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 20),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: AppConstants.paddingLarge),
                       child: Row(
                         children: [
-                          SizedBox(
+                          const SizedBox(
                             width: 60,
                             child: Text("CPU："),
                           ),
@@ -884,24 +728,25 @@ class DashboardState extends State<Dashboard> {
                       ),
                     ),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 15,
                   ),
                   GestureDetector(
                     onTap: () {
                       Navigator.of(context).push(CupertinoPageRoute(
                           builder: (context) {
-                            return Performance(
+                            return const Performance(
                               tabIndex: 2,
                             );
                           },
-                          settings: RouteSettings(name: "performance")));
+                          settings: const RouteSettings(name: "performance")));
                     },
                     child: Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 20),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: AppConstants.paddingLarge),
                       child: Row(
                         children: [
-                          SizedBox(width: 60, child: Text("RAM：")),
+                          const SizedBox(width: 60, child: Text("RAM：")),
                           Expanded(
                             child: FAProgressBar(
                               backgroundColor: Colors.transparent,
@@ -920,35 +765,34 @@ class DashboardState extends State<Dashboard> {
                       ),
                     ),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 15,
                   ),
                   GestureDetector(
                     onTap: () {
                       Navigator.of(context).push(CupertinoPageRoute(
                           builder: (context) {
-                            return Performance(
+                            return const Performance(
                               tabIndex: 3,
                             );
                           },
-                          settings: RouteSettings(name: "performance")));
+                          settings: const RouteSettings(name: "performance")));
                     },
                     child: Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 20),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: AppConstants.paddingLarge),
                       child: Row(
                         children: [
-                          SizedBox(width: 60, child: Text("网络：")),
+                          const SizedBox(width: 60, child: Text("网络：")),
                           Icon(
                             Icons.upload_sharp,
                             color: _uploadColor,
                           ),
                           Text(
-                            Util.instance.formatSize(
-                                    utilization['network']?[0]?['tx'] ?? 0) +
-                                "/S",
+                            "${FormatUtil.formatSize(utilization['network']?[0]?['tx'] ?? 0)}/S",
                             style: TextStyle(color: _uploadColor),
                           ),
-                          SizedBox(
+                          const SizedBox(
                             width: 30,
                           ),
                           Icon(
@@ -956,27 +800,25 @@ class DashboardState extends State<Dashboard> {
                             color: _downloadColor,
                           ),
                           Text(
-                            Util.instance.formatSize(
-                                    utilization['network'][0]['rx'] ?? 0) +
-                                "/S",
+                            "${FormatUtil.formatSize(utilization['network'][0]['rx'] ?? 0)}/S",
                             style: TextStyle(color: _downloadColor),
                           ),
                         ],
                       ),
                     ),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 5,
                   ),
                   GestureDetector(
                     onTap: () {
                       Navigator.of(context).push(CupertinoPageRoute(
                           builder: (context) {
-                            return Performance(
+                            return const Performance(
                               tabIndex: 3,
                             );
                           },
-                          settings: RouteSettings(name: "performance")));
+                          settings: const RouteSettings(name: "performance")));
                     },
                     child: AspectRatio(
                       aspectRatio: 1.70,
@@ -984,10 +826,10 @@ class DashboardState extends State<Dashboard> {
                         padding: const EdgeInsets.all(20),
                         child: Card(
                           shape: RoundedRectangleBorder(
-                              side: BorderSide(),
+                              side: const BorderSide(),
                               borderRadius: BorderRadius.circular(18)),
                           child: Padding(
-                            padding: EdgeInsets.all(10),
+                            padding: const EdgeInsets.all(10),
                             child: LineChart(
                               LineChartData(
                                 lineTouchData: LineTouchData(
@@ -1008,27 +850,27 @@ class DashboardState extends State<Dashboard> {
                                           fontSize: 14,
                                         );
                                         return LineTooltipItem(
-                                            '${touchedSpot.bar.color == _uploadColor ? "上传" : "下载"}:${Util.instance.formatSize(touchedSpot.y.floor())}',
+                                            '${touchedSpot.bar.color == _uploadColor ? "上传" : "下载"}:${FormatUtil.formatSize(touchedSpot.y.floor())}',
                                             textStyle);
                                       }).toList();
                                     },
                                   ),
                                 ),
-                                gridData: FlGridData(
+                                gridData: const FlGridData(
                                   show: false,
                                 ),
                                 titlesData: FlTitlesData(
                                   show: true,
-                                  bottomTitles: AxisTitles(
+                                  bottomTitles: const AxisTitles(
                                     sideTitles: SideTitles(
                                       showTitles: false,
                                       reservedSize: 22,
                                     ),
                                   ),
-                                  topTitles: AxisTitles(
+                                  topTitles: const AxisTitles(
                                     sideTitles: SideTitles(showTitles: false),
                                   ),
-                                  rightTitles: AxisTitles(
+                                  rightTitles: const AxisTitles(
                                     sideTitles: SideTitles(showTitles: false),
                                   ),
                                   leftTitles: AxisTitles(
@@ -1041,7 +883,7 @@ class DashboardState extends State<Dashboard> {
                                       // getTitles: chartTitle,
                                       getTitlesWidget: (value, _) {
                                         return Text(
-                                            Util.instance
+                                            HttpUtil.instance
                                                 .formatSize(value, fixed: 0),
                                             style: TextStyle(
                                               color: _chartTextColor,
@@ -1049,7 +891,7 @@ class DashboardState extends State<Dashboard> {
                                             ));
                                       },
                                       reservedSize: 35,
-                                      interval: Util.instance
+                                      interval: HttpUtil.instance
                                           .chartInterval(maxNetworkSpeed),
                                     ),
                                   ),
@@ -1071,7 +913,7 @@ class DashboardState extends State<Dashboard> {
                                     color: Colors.blue,
                                     barWidth: 2,
                                     isStrokeCapRound: true,
-                                    dotData: FlDotData(
+                                    dotData: const FlDotData(
                                       show: false,
                                     ),
                                     belowBarData: BarAreaData(
@@ -1089,7 +931,7 @@ class DashboardState extends State<Dashboard> {
                                     color: Colors.green,
                                     barWidth: 2,
                                     isStrokeCapRound: true,
-                                    dotData: FlDotData(
+                                    dotData: const FlDotData(
                                       show: false,
                                     ),
                                     belowBarData: BarAreaData(
@@ -1123,17 +965,19 @@ class DashboardState extends State<Dashboard> {
             },
             child: Card(
               shape: RoundedRectangleBorder(
-                  side: BorderSide(), borderRadius: BorderRadius.circular(18)),
-              margin: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+                  side: const BorderSide(),
+                  borderRadius: BorderRadius.circular(18)),
+              margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
               child: Padding(
-                padding: const EdgeInsets.all(8.0),
+                padding: const EdgeInsets.all(AppConstants.paddingSmall),
                 child: Column(
                   children: [
-                    SizedBox(
+                    const SizedBox(
                       height: 20,
                     ),
                     Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 20),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: AppConstants.paddingLarge),
                       child: Row(
                         children: [
                           Image.asset(
@@ -1141,22 +985,22 @@ class DashboardState extends State<Dashboard> {
                             width: 26,
                             height: 26,
                           ),
-                          SizedBox(
+                          const SizedBox(
                             width: 10,
                           ),
-                          Text(
+                          const Text(
                             "存储",
                             style: TextStyle(
                                 fontSize: 18, fontWeight: FontWeight.w600),
                           ),
-                          Spacer(),
-                          _CardItemCollapse("StorageUsage")
+                          const Spacer(),
+                          _cardItemCollapse("StorageUsage")
                         ],
                       ),
                     ),
                     if (_isCardItemCollapsed('StorageUsage'))
-                      ...volumes.map(_buildVolumeItem).toList(),
-                    SizedBox(
+                      ...volumes.map((volume) => VolumeCard(volume: volume)),
+                    const SizedBox(
                       height: 20,
                     ),
                   ],
@@ -1164,20 +1008,22 @@ class DashboardState extends State<Dashboard> {
               ),
             ),
           ),
-          if (ssdCaches.length > 0)
+          if (ssdCaches.isNotEmpty)
             Card(
               shape: RoundedRectangleBorder(
-                  side: BorderSide(), borderRadius: BorderRadius.circular(18)),
-              margin: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+                  side: const BorderSide(),
+                  borderRadius: BorderRadius.circular(18)),
+              margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
               child: Padding(
-                padding: const EdgeInsets.all(8.0),
+                padding: const EdgeInsets.all(AppConstants.paddingSmall),
                 child: Column(
                   children: [
-                    SizedBox(
+                    const SizedBox(
                       height: 20,
                     ),
                     Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 20),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: AppConstants.paddingLarge),
                       child: Row(
                         children: [
                           Image.asset(
@@ -1185,22 +1031,23 @@ class DashboardState extends State<Dashboard> {
                             width: 26,
                             height: 26,
                           ),
-                          SizedBox(
+                          const SizedBox(
                             width: 10,
                           ),
-                          Text(
+                          const Text(
                             "缓存",
                             style: TextStyle(
                                 fontSize: 18, fontWeight: FontWeight.w600),
                           ),
-                          Spacer(),
-                          _CardItemCollapse("StorageUsage")
+                          const Spacer(),
+                          _cardItemCollapse("StorageUsage")
                         ],
                       ),
                     ),
                     if (_isCardItemCollapsed('StorageUsage'))
-                      ...ssdCaches.map(_buildSSDCacheItem).toList(),
-                    SizedBox(
+                      ...ssdCaches.map(
+                          (volume) => VolumeCard(volume: volume, isSSD: true)),
+                    const SizedBox(
                       height: 20,
                     ),
                   ],
@@ -1212,17 +1059,18 @@ class DashboardState extends State<Dashboard> {
     } else if (widget == "SYNO.SDS.SystemInfoApp.FileChangeLogWidget") {
       return Card(
         shape: RoundedRectangleBorder(
-            side: BorderSide(), borderRadius: BorderRadius.circular(18)),
-        margin: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+            side: const BorderSide(), borderRadius: BorderRadius.circular(18)),
+        margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
         child: Padding(
-          padding: const EdgeInsets.all(8.0),
+          padding: const EdgeInsets.all(AppConstants.paddingSmall),
           child: Column(
             children: [
-              SizedBox(
+              const SizedBox(
                 height: 20,
               ),
               Padding(
-                padding: EdgeInsets.symmetric(horizontal: 20),
+                padding: const EdgeInsets.symmetric(
+                    horizontal: AppConstants.paddingLarge),
                 child: Row(
                   children: [
                     Image.asset(
@@ -1230,30 +1078,30 @@ class DashboardState extends State<Dashboard> {
                       width: 26,
                       height: 26,
                     ),
-                    SizedBox(
+                    const SizedBox(
                       width: 10,
                     ),
-                    Text(
+                    const Text(
                       "文件更改日志",
                       style:
                           TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
                     ),
-                    Spacer(),
-                    _CardItemCollapse("FileChangeLog")
+                    const Spacer(),
+                    _cardItemCollapse("FileChangeLog")
                   ],
                 ),
               ),
-              SizedBox(
+              const SizedBox(
                 height: 10,
               ),
               if (_isCardItemCollapsed('FileChangeLog'))
                 SizedBox(
                   height: 300,
-                  child: fileLogs.length > 0
+                  child: fileLogs.isNotEmpty
                       ? CupertinoScrollbar(
                           child: ListView.builder(
                             itemBuilder: (context, i) {
-                              return _buildFileLogItem(fileLogs[i]);
+                              return DashboardFileLogItem(log: fileLogs[i]);
                             },
                             itemCount: fileLogs.length,
                           ),
@@ -1266,7 +1114,7 @@ class DashboardState extends State<Dashboard> {
                           ),
                         ),
                 ),
-              SizedBox(
+              const SizedBox(
                 height: 10,
               ),
             ],
@@ -1278,544 +1126,9 @@ class DashboardState extends State<Dashboard> {
     }
   }
 
-  Widget _buildUserItem(user) {
-    user['running'] = user['running'] ?? false;
-    DateTime loginTime =
-        DateTime.parse(user['time'].toString().replaceAll("/", "-"));
-    DateTime currentTime = DateTime.now();
-    Map timeLong =
-        Util.instance.timeLong(currentTime.difference(loginTime).inSeconds);
-    return Card(
-      shape: RoundedRectangleBorder(
-          side: BorderSide(), borderRadius: BorderRadius.circular(18)),
-      margin: EdgeInsets.only(top: 20, left: 20, right: 20),
-      child: Padding(
-        padding: EdgeInsets.all(10),
-        child: Row(
-          children: [
-            Expanded(
-              child: Text(
-                "${user['who']}",
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-            Expanded(
-              child: Text(
-                "${user['type']}",
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-            Expanded(
-              child: Text(
-                "${timeLong['hours'].toString().padLeft(2, "0")}:${timeLong['minutes'].toString().padLeft(2, "0")}:${timeLong['seconds'].toString().padLeft(2, "0")}",
-                overflow: TextOverflow.ellipsis,
-                textAlign: TextAlign.right,
-              ),
-            ),
-            SizedBox(
-              width: 5,
-            ),
-            OutlinedButton(
-              onPressed: () async {
-                if (user['running']) {
-                  return;
-                }
-                showCupertinoModalPopup(
-                  context: context,
-                  builder: (context) {
-                    return Material(
-                      color: Colors.transparent,
-                      child: Card(
-                        shape: RoundedRectangleBorder(
-                            side: BorderSide(),
-                            borderRadius: BorderRadius.circular(18)),
-                        child: SafeArea(
-                          top: false,
-                          child: Padding(
-                            padding: EdgeInsets.all(20),
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: <Widget>[
-                                Text(
-                                  "终止连接",
-                                  style: TextStyle(
-                                      fontSize: 20,
-                                      color: Colors.black,
-                                      fontWeight: FontWeight.w500),
-                                ),
-                                SizedBox(
-                                  height: 12,
-                                ),
-                                Text(
-                                  "确认要终止此连接？",
-                                  style: TextStyle(
-                                      fontSize: 20,
-                                      color: Colors.black,
-                                      fontWeight: FontWeight.w400),
-                                ),
-                                SizedBox(
-                                  height: 22,
-                                ),
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      child: OutlinedButton(
-                                        onPressed: () async {
-                                          Navigator.of(context).pop();
-                                          setState(() {
-                                            user['running'] = true;
-                                          });
-                                          var res = await Api.kickConnection({
-                                            "who": user['who'],
-                                            "from": user['from']
-                                          });
-                                          setState(() {
-                                            user['running'] = false;
-                                          });
-
-                                          if (res['success']) {
-                                            Util.instance.toast("连接已终止");
-                                          }
-                                        },
-                                        child: Text(
-                                          "终止连接",
-                                          style: TextStyle(
-                                              fontSize: 18, color: _errorColor),
-                                        ),
-                                      ),
-                                    ),
-                                    SizedBox(
-                                      width: 16,
-                                    ),
-                                    Expanded(
-                                      child: OutlinedButton(
-                                        onPressed: () async {
-                                          Navigator.of(context).pop();
-                                        },
-                                        child: Text(
-                                          "取消",
-                                          style: TextStyle(fontSize: 18),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                SizedBox(
-                                  height: 8,
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                    );
-                  },
-                );
-              },
-              child: SizedBox(
-                width: 20,
-                height: 20,
-                child: user['running']
-                    ? CupertinoActivityIndicator()
-                    : Icon(
-                        Icons.remove_circle_outline,
-                        color: Colors.red,
-                        size: 18,
-                      ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildTaskItem(task) {
-    task['running'] = task['running'] ?? false;
-    return Card(
-      shape: RoundedRectangleBorder(
-          side: BorderSide(), borderRadius: BorderRadius.circular(18)),
-      margin: EdgeInsets.only(top: 20, left: 20, right: 20),
-      child: Padding(
-        padding: EdgeInsets.all(10),
-        child: Row(
-          children: [
-            Expanded(
-              child: Text(
-                "${task['name']}",
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-            SizedBox(
-              width: 5,
-            ),
-            Text(
-              "${task['next_trigger_time']}",
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-            SizedBox(
-              width: 5,
-            ),
-            OutlinedButton(
-              onPressed: () async {
-                if (task['running']) {
-                  return;
-                }
-                setState(() {
-                  task['running'] = true;
-                });
-                var res = await Api.taskRun([task['id']]);
-                setState(() {
-                  task['running'] = false;
-                });
-                if (res['success']) {
-                  Util.instance.toast("任务计划执行成功");
-                } else {
-                  Util.instance.toast("任务计划执行失败，code：${res['error']['code']}");
-                }
-              },
-              child: SizedBox(
-                width: 20,
-                height: 20,
-                child: task['running']
-                    ? CupertinoActivityIndicator()
-                    : Icon(
-                        CupertinoIcons.play_arrow_solid,
-                        color: Color(0xffff9813),
-                        size: 16,
-                      ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildLogItem(log) {
-    return Card(
-      shape: RoundedRectangleBorder(
-          side: BorderSide(), borderRadius: BorderRadius.circular(18)),
-      clipBehavior: Clip.hardEdge,
-      margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-      child: Padding(
-        padding: const EdgeInsets.all(10.0),
-        child: Text(
-          maxLines: 3,
-          "${log['msg']}",
-          overflow: TextOverflow.ellipsis,
-        ),
-      ),
-    );
-  }
-
-  Widget _buildFileLogItem(log) {
-    return Card(
-      shape: RoundedRectangleBorder(
-          side: BorderSide(), borderRadius: BorderRadius.circular(18)),
-      margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Row(
-          children: [
-            Icon(log['cmd'] == "delete"
-                ? Icons.delete
-                : log['cmd'] == "copy"
-                    ? Icons.copy
-                    : log['cmd'] == "edit"
-                        ? Icons.edit
-                        : log['cmd'] == "move"
-                            ? Icons.drive_file_move_outline
-                            : log['cmd'] == "download"
-                                ? Icons.download_outlined
-                                : log['cmd'] == "upload"
-                                    ? Icons.upload_outlined
-                                    : log['cmd'] == "rename"
-                                        ? Icons.drive_file_rename_outline
-                                        : Icons.code),
-            Expanded(
-              child: Text(
-                "${log['descr']}",
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildVolumeItem(volume) {
-    double used =
-        int.parse(volume['size']['used']) / int.parse(volume['size']['total']);
-    return Card(
-      shape: RoundedRectangleBorder(
-          side: BorderSide(), borderRadius: BorderRadius.circular(5)),
-      margin: EdgeInsets.only(top: 20, left: 20, right: 20),
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Row(
-          children: [
-            CircularPercentIndicator(
-              radius: 40,
-              animation: true,
-              linearGradient: LinearGradient(
-                colors: used <= 0.9
-                    ? [
-                        Colors.blue,
-                        Colors.blueAccent,
-                      ]
-                    : [
-                        Colors.red,
-                        Colors.orangeAccent,
-                      ],
-              ),
-              animateFromLastPercent: true,
-              circularStrokeCap: CircularStrokeCap.round,
-              lineWidth: 12,
-              backgroundColor: Colors.black12,
-              percent: used,
-              center: Text(
-                "${(used * 100).toStringAsFixed(0)}%",
-                style: TextStyle(
-                    color: used <= 0.9 ? Colors.blue : Colors.red,
-                    fontSize: 22),
-              ),
-            ),
-            SizedBox(
-              width: 10,
-            ),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Text(
-                        "${volume['deploy_path'] != null ? volume['deploy_path'].toString().replaceFirst("volume_", "存储空间 ") : volume['id'].toString().replaceFirst("volume_", "存储空间 ")}",
-                        style: TextStyle(fontWeight: FontWeight.w600),
-                      ),
-                      SizedBox(
-                        width: 5,
-                      ),
-                      volume['status'] == "normal"
-                          ? Label(
-                              "正常",
-                              Colors.green,
-                              fill: true,
-                            )
-                          : volume['status'] == "background"
-                              ? Label(
-                                  "正在检查硬盘",
-                                  Colors.lightBlueAccent,
-                                  fill: true,
-                                )
-                              : volume['status'] == "attention"
-                                  ? Label(
-                                      "注意",
-                                      Colors.orangeAccent,
-                                      fill: true,
-                                    )
-                                  : Label(
-                                      volume['status'],
-                                      Colors.red,
-                                      fill: true,
-                                    ),
-                    ],
-                  ),
-                  SizedBox(
-                    height: 5,
-                  ),
-                  Text(
-                      "已用：${Util.instance.formatSize(int.parse(volume['size']['used']))}"),
-                  SizedBox(
-                    height: 5,
-                  ),
-                  Text(
-                      "可用：${Util.instance.formatSize(int.parse(volume['size']['total']) - int.parse(volume['size']['used']))}"),
-                  SizedBox(
-                    height: 5,
-                  ),
-                  Text(
-                      "容量：${Util.instance.formatSize(int.parse(volume['size']['total']))}"),
-                ],
-              ),
-            )
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildSSDCacheItem(volume) {
-    double percent =
-        int.parse(volume['size']['used'] ?? volume['size']['reusable']) /
-            int.parse(volume['size']['total']);
-    return Card(
-      shape: RoundedRectangleBorder(
-          side: BorderSide(), borderRadius: BorderRadius.circular(18)),
-      margin: EdgeInsets.only(top: 20, left: 20, right: 20),
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Row(
-          children: [
-            CircularPercentIndicator(
-              radius: 40,
-              animation: true,
-              linearGradient: LinearGradient(
-                colors: percent <= 0.9
-                    ? [
-                        Colors.blue,
-                        Colors.blueAccent,
-                      ]
-                    : [
-                        Colors.red,
-                        Colors.orangeAccent,
-                      ],
-              ),
-              animateFromLastPercent: true,
-              circularStrokeCap: CircularStrokeCap.round,
-              lineWidth: 12,
-              backgroundColor: Colors.black12,
-              percent: percent,
-              center: Text(
-                "${(percent * 100).toStringAsFixed(0)}%",
-                style: TextStyle(
-                    color: percent <= 0.9 ? Colors.blue : Colors.red,
-                    fontSize: 22),
-              ),
-            ),
-            SizedBox(
-              width: 10,
-            ),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Text(
-                        "${volume['id'].toString().replaceFirst("ssd_", "SSD 缓存 ")}",
-                        style: TextStyle(fontWeight: FontWeight.w600),
-                      ),
-                      SizedBox(
-                        width: 5,
-                      ),
-                      volume['status'] == "normal"
-                          ? Label(
-                              "正常",
-                              Colors.green,
-                              fill: true,
-                            )
-                          : volume['status'] == "background"
-                              ? Label(
-                                  "正在检查硬盘",
-                                  Colors.lightBlueAccent,
-                                  fill: true,
-                                )
-                              : volume['status'] == "attention"
-                                  ? Label(
-                                      "注意",
-                                      Colors.orangeAccent,
-                                      fill: true,
-                                    )
-                                  : Label(
-                                      volume['status'],
-                                      Colors.red,
-                                      fill: true,
-                                    ),
-                    ],
-                  ),
-                  SizedBox(
-                    height: 5,
-                  ),
-                  Text(
-                      "已用：${Util.instance.formatSize(int.parse(volume['size']['used'] ?? volume['size']['reusable']))}"),
-                  SizedBox(
-                    height: 5,
-                  ),
-                  Text(
-                      "可用：${Util.instance.formatSize(int.parse(volume['size']['total']) - int.parse(volume['size']['used'] ?? volume['size']['reusable']))}"),
-                  SizedBox(
-                    height: 5,
-                  ),
-                  Text(
-                      "容量：${Util.instance.formatSize(int.parse(volume['size']['total']))}"),
-                ],
-              ),
-            )
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildESataItem(esata) {
-    return Card(
-      shape: RoundedRectangleBorder(
-          side: BorderSide(), borderRadius: BorderRadius.circular(18)),
-      margin: EdgeInsets.only(bottom: 20),
-      child: Padding(
-        padding: EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Text(
-                  "${esata['dev_title']}",
-                ),
-                SizedBox(
-                  width: 10,
-                ),
-                esata['status'] == "normal"
-                    ? Label(
-                        "正常",
-                        Colors.green,
-                        fill: true,
-                      )
-                    : Label(
-                        esata['status'],
-                        Colors.red,
-                        fill: true,
-                      ),
-                SizedBox(
-                  width: 10,
-                ),
-                Spacer(),
-                OutlinedButton(
-                  onPressed: () async {
-                    var res = await Api.ejectEsata(esata['dev_id']);
-                    if (res['success']) {
-                      Util.instance.toast("设备已退出");
-                      getData();
-                    } else {
-                      Util.instance.toast("设备退出失败，代码${res['error']['code']}");
-                    }
-                  },
-                  child: SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: Image.asset(
-                      "assets/icons/eject.png",
-                      width: 20,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
-    SettingProvider settingProvider = Provider.of<SettingProvider>(context);
-    ShortcutProvider shortcutProvider = Provider.of<ShortcutProvider>(context);
-    refreshDuration = settingProvider.refreshDuration;
+    refreshDuration = appStore.refreshDuration;
     return Scaffold(
       key: _scaffoldKey,
       appBar: AppBar(
@@ -1824,9 +1137,9 @@ class DashboardState extends State<Dashboard> {
           children: [
             Row(
               children: [
-                if (Util.instance.notReviewAccount)
+                if (connectionStore.notReviewAccount)
                   Padding(
-                    padding: EdgeInsets.only(left: 10, top: 8, bottom: 8),
+                    padding: const EdgeInsets.only(left: 10, top: 8, bottom: 8),
                     child: OutlinedButton(
                       onPressed: () {
                         _scaffoldKey.currentState?.openDrawer();
@@ -1837,9 +1150,9 @@ class DashboardState extends State<Dashboard> {
                       ),
                     ),
                   ),
-                if ((esatas + usbs).length > 0)
+                if ((esatas + usbs).isNotEmpty)
                   Padding(
-                    padding: EdgeInsets.only(left: 10, top: 8, bottom: 8),
+                    padding: const EdgeInsets.only(left: 10, top: 8, bottom: 8),
                     child: OutlinedButton(
                       onPressed: () {
                         showCupertinoModalPopup(
@@ -1849,28 +1162,30 @@ class DashboardState extends State<Dashboard> {
                               color: Colors.transparent,
                               child: Card(
                                 shape: RoundedRectangleBorder(
-                                    side: BorderSide(),
+                                    side: const BorderSide(),
                                     borderRadius: BorderRadius.circular(18)),
                                 child: SafeArea(
                                   top: false,
                                   child: Padding(
-                                    padding: EdgeInsets.all(20),
+                                    padding: const EdgeInsets.all(20),
                                     child: Column(
                                       mainAxisSize: MainAxisSize.min,
                                       children: <Widget>[
-                                        Text(
+                                        const Text(
                                           "外接设备",
                                           style: TextStyle(
                                               fontSize: 20,
                                               color: Colors.black,
                                               fontWeight: FontWeight.w500),
                                         ),
-                                        SizedBox(
+                                        const SizedBox(
                                           height: 12,
                                         ),
                                         ...(esatas + usbs)
-                                            .map(_buildESataItem)
-                                            .toList(),
+                                            .map((esata) => ESataDeviceCard(
+                                                  esata: esata,
+                                                  onEjectSuccess: getData,
+                                                )),
                                         Row(
                                           children: [
                                             Expanded(
@@ -1879,20 +1194,21 @@ class DashboardState extends State<Dashboard> {
                                                   Navigator.of(context).push(
                                                       CupertinoPageRoute(
                                                           builder: (context) {
-                                                            return ExternalDevice();
+                                                            return const ExternalDevice();
                                                           },
-                                                          settings: RouteSettings(
-                                                              name:
-                                                                  "external_device")));
+                                                          settings:
+                                                              const RouteSettings(
+                                                                  name:
+                                                                      "external_device")));
                                                 },
-                                                child: Text(
+                                                child: const Text(
                                                   "查看详情",
                                                   style:
                                                       TextStyle(fontSize: 18),
                                                 ),
                                               ),
                                             ),
-                                            SizedBox(
+                                            const SizedBox(
                                               width: 16,
                                             ),
                                             Expanded(
@@ -1900,7 +1216,7 @@ class DashboardState extends State<Dashboard> {
                                                 onPressed: () async {
                                                   Navigator.of(context).pop();
                                                 },
-                                                child: Text(
+                                                child: const Text(
                                                   "取消",
                                                   style:
                                                       TextStyle(fontSize: 18),
@@ -1909,7 +1225,7 @@ class DashboardState extends State<Dashboard> {
                                             ),
                                           ],
                                         ),
-                                        SizedBox(
+                                        const SizedBox(
                                           height: 8,
                                         ),
                                       ],
@@ -1932,7 +1248,7 @@ class DashboardState extends State<Dashboard> {
                         (converter['video_remain'] ?? 0) >
                     0))
                   Padding(
-                    padding: EdgeInsets.only(left: 10, top: 8, bottom: 8),
+                    padding: const EdgeInsets.only(left: 10, top: 8, bottom: 8),
                     child: OutlinedButton(
                       onPressed: () {
                         showCupertinoModalPopup(
@@ -1947,10 +1263,10 @@ class DashboardState extends State<Dashboard> {
                       ),
                     ),
                   ),
-                Spacer(),
-                if (Util.instance.notReviewAccount)
+                const Spacer(),
+                if (connectionStore.notReviewAccount)
                   Padding(
-                    padding: EdgeInsets.only(right: 8, top: 8, bottom: 8),
+                    padding: const EdgeInsets.only(right: 8, top: 8, bottom: 8),
                     child: OutlinedButton(
                       onPressed: () {
                         Navigator.of(context)
@@ -1973,7 +1289,7 @@ class DashboardState extends State<Dashboard> {
                     ),
                   ),
                 Padding(
-                  padding: EdgeInsets.symmetric(vertical: 8),
+                  padding: const EdgeInsets.symmetric(vertical: 8),
                   child: OutlinedButton(
                     onPressed: () {
                       Navigator.of(context)
@@ -1981,7 +1297,7 @@ class DashboardState extends State<Dashboard> {
                               builder: (context) {
                                 return Notify(notifies);
                               },
-                              settings: RouteSettings(name: "notify")))
+                              settings: const RouteSettings(name: "notify")))
                           .then((res) {
                         if (res != null && res) {
                           setState(() {
@@ -1998,7 +1314,7 @@ class DashboardState extends State<Dashboard> {
                           width: 20,
                           height: 20,
                         ),
-                        if (notifies.length > 0)
+                        if (notifies.isNotEmpty)
                           Container(
                             decoration: BoxDecoration(
                               color: Colors.red,
@@ -2013,28 +1329,27 @@ class DashboardState extends State<Dashboard> {
                 ),
               ],
             ),
-            Text("控制台")
+            const Text("控制台")
           ],
         ),
         automaticallyImplyLeading: false,
       ),
       body: loading
-          ? Center(
+          ? const Center(
               child: CupertinoActivityIndicator(
                 radius: 14,
               ),
             )
           : success
               ? ListView(
-                  padding: EdgeInsets.symmetric(vertical: 20),
+                  padding: const EdgeInsets.symmetric(vertical: 20),
                   children: [
                     if (shortcutItems
-                                .where((element) => supportedShortcuts
-                                    .contains(element.className))
-                                .length >
-                            0 &&
-                        Util.instance.notReviewAccount &&
-                        shortcutProvider.showShortcut)
+                            .where((element) =>
+                                supportedShortcuts.contains(element.className))
+                            .isNotEmpty &&
+                        connectionStore.notReviewAccount &&
+                        appStore.showShortcut)
                       ShortcutList(
                         shortcutItems,
                         system,
@@ -2044,20 +1359,20 @@ class DashboardState extends State<Dashboard> {
                         context,
                         validAppViewOrder: validAppViewOrder,
                       ),
-                    if (widgets.length > 0)
+                    if (widgets.isNotEmpty)
                       ...widgets.map((widget) {
                         return _buildWidgetItem(widget);
                         // return Text(widget);
-                      }).toList()
+                      })
                     else
                       Center(
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Text(
+                            const Text(
                               "未添加小组件",
                             ),
-                            SizedBox(
+                            const SizedBox(
                               height: 20,
                             ),
                             SizedBox(
@@ -2077,7 +1392,7 @@ class DashboardState extends State<Dashboard> {
                                     }
                                   });
                                 },
-                                child: Text(
+                                child: const Text(
                                   ' 添加 ',
                                   style: TextStyle(fontSize: 18),
                                 ),
@@ -2092,8 +1407,8 @@ class DashboardState extends State<Dashboard> {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Text("$msg"),
-                      SizedBox(
+                      Text(msg),
+                      const SizedBox(
                         height: 20,
                       ),
                       SizedBox(
@@ -2102,7 +1417,7 @@ class DashboardState extends State<Dashboard> {
                           onPressed: () {
                             getData();
                           },
-                          child: Text(
+                          child: const Text(
                             ' 刷新 ',
                             style: TextStyle(fontSize: 18),
                           ),
@@ -2111,7 +1426,7 @@ class DashboardState extends State<Dashboard> {
                     ],
                   ),
                 ),
-      drawer: applications.length > 0
+      drawer: applications.isNotEmpty
           ? ApplicationList(applications, system, volumes, disks, appNotify)
           : null,
     );

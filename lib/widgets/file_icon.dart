@@ -1,6 +1,8 @@
 import 'dart:io';
+import 'package:garden/stores/connection_store.dart';
 
-import 'package:garden/util/function.dart';
+import 'package:garden/util/http_util.dart';
+import 'package:garden/util/log.dart';
 import 'package:garden/widgets/cupertino_image.dart';
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
@@ -12,8 +14,9 @@ class FileIcon extends StatelessWidget {
   final double width;
   final double height;
   final BoxFit fit;
-  FileIcon(this.fileType,
-      {this.thumb = '',
+  const FileIcon(this.fileType,
+      {super.key,
+      this.thumb = '',
       this.network = true,
       this.width = 40,
       this.height = 40,
@@ -33,11 +36,10 @@ class FileIcon extends StatelessWidget {
         height: height,
       );
     } else if (fileType == FileTypeEnum.movie) {
-      print(thumb);
+      Log.info(thumb);
       return network
           ? CupertinoExtendedImage(
-              Util.instance.baseUrl +
-                  "/webapi/entry.cgi?path=${Uri.encodeComponent(thumb)}&size=medium&api=SYNO.FileStation.Thumb&method=get&version=2&_sid=${Util.instance.sid}&animate=true",
+              "${connectionStore.baseUrl}/webapi/entry.cgi?path=${Uri.encodeComponent(thumb)}&size=medium&api=SYNO.FileStation.Thumb&method=get&version=2&_sid=${connectionStore.sid}&animate=true",
               width: width,
               height: height,
               fit: fit,
@@ -61,8 +63,7 @@ class FileIcon extends StatelessWidget {
     } else if (fileType == FileTypeEnum.image) {
       return network
           ? CupertinoExtendedImage(
-              Util.instance.baseUrl +
-                  "/webapi/entry.cgi?path=${Uri.encodeComponent(thumb)}&size=small&api=SYNO.FileStation.Thumb&method=get&version=2&_sid=${Util.instance.sid}&animate=true",
+              "${connectionStore.baseUrl}/webapi/entry.cgi?path=${Uri.encodeComponent(thumb)}&size=small&api=SYNO.FileStation.Thumb&method=get&version=2&_sid=${connectionStore.sid}&animate=true",
               width: width,
               height: height,
               fit: fit,

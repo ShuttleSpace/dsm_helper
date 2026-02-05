@@ -2,30 +2,32 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
-import 'package:garden/pages/common/browser.dart' as dsm;
-import 'package:garden/pages/common/device_finder.dart';
-import 'package:garden/pages/login/accounts.dart';
-import 'package:garden/pages/setting/license.dart';
-import 'package:garden/util/function.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_vibrate/flutter_vibrate.dart';
+import 'package:garden/util/log.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:garden/pages/common/device_finder.dart';
+import 'package:garden/pages/login/accounts.dart';
+import 'package:garden/stores/connection_store.dart';
+import 'package:garden/theme/app_colors.dart';
+import 'package:garden/util/http_util.dart';
+import 'package:garden/util/storage_util.dart';
+import 'package:garden/util/ui_util.dart';
 
 class Login extends StatefulWidget {
   final Map? server;
   final String? type;
-  Login({this.server, this.type = "login"});
+  const Login({super.key, this.server, this.type = "login"});
   @override
-  _LoginState createState() => _LoginState();
+  LoginState createState() => LoginState();
 }
 
-class _LoginState extends State<Login> {
-  TapGestureRecognizer _licenseRecognizer = TapGestureRecognizer();
-  TapGestureRecognizer _privacyRecognizer = TapGestureRecognizer();
+class LoginState extends State<Login> {
+  final TapGestureRecognizer _licenseRecognizer = TapGestureRecognizer();
+  final TapGestureRecognizer _privacyRecognizer = TapGestureRecognizer();
   Map updateInfo = {};
   String host = "";
   String baseUrl = '';
@@ -45,18 +47,18 @@ class _LoginState extends State<Login> {
   bool rememberDevice = true;
   bool read = true;
   bool passwordVisible = false;
-  TextEditingController _hostController = TextEditingController();
-  TextEditingController _accountController = TextEditingController();
-  TextEditingController _noteController = TextEditingController();
-  TextEditingController _passwordController = TextEditingController();
-  TextEditingController _portController = TextEditingController();
-  TextEditingController _otpController = TextEditingController();
+  final TextEditingController _hostController = TextEditingController();
+  final TextEditingController _accountController = TextEditingController();
+  final TextEditingController _noteController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _portController = TextEditingController();
+  final TextEditingController _otpController = TextEditingController();
   List servers = [];
   List qcAddresses = [];
   CancelToken cancelToken = CancelToken();
   @override
   initState() {
-    Util.instance.getStorage("read").then((value) {
+    StorageUtil.getString("read").then((value) {
       if (value != null && value.isNotBlank && value == "1") {
         setState(() {
           read = true;
@@ -71,7 +73,7 @@ class _LoginState extends State<Login> {
         read = true;
       });
     }
-    Util.instance.getStorage("servers").then((serverString) {
+    StorageUtil.getString("servers").then((serverString) {
       if (serverString != null && serverString.isNotBlank) {
         servers = jsonDecode(serverString);
       }
@@ -102,8 +104,8 @@ class _LoginState extends State<Login> {
             _passwordController.value = TextEditingValue(text: password);
           }
         });
-        Util.instance.cookie = widget.server?['cookie'];
-        Util.instance.sid = widget.server?['sid'];
+        connectionStore.setCookie(widget.server?['cookie']);
+        connectionStore.setSid(widget.server?['sid']);
         if (widget.server?['action'] == "login") {
           _login();
         }
@@ -117,168 +119,6 @@ class _LoginState extends State<Login> {
     });
 
     super.initState();
-  }
-
-  checkAgreement() async {
-    String agreement = await Util.instance.getStorage("agreement") ?? '';
-    if (agreement != '1') {
-      showCupertinoDialog(
-        context: context,
-        builder: (context) {
-          return Material(
-            color: Colors.transparent,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Card(
-                  shape: RoundedRectangleBorder(
-                      side: BorderSide(),
-                      borderRadius: BorderRadius.circular(18)),
-                  margin: EdgeInsets.symmetric(horizontal: 50),
-                  child: Padding(
-                    padding: EdgeInsets.all(20),
-                    child: Column(
-                      children: [
-                        Card(
-                          shape: RoundedRectangleBorder(
-                              side: BorderSide(),
-                              borderRadius: BorderRadius.circular(18)),
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Text.rich(
-                              TextSpan(
-                                children: [
-                                  TextSpan(
-                                      text:
-                                          "感谢您使用${Util.instance.appName}，为保护您的个人信息安全，我们将依据${Util.instance.appName}的"),
-                                  TextSpan(
-                                    text: "用户协议",
-                                    style: TextStyle(
-                                        decoration: TextDecoration.underline,
-                                        color: Colors.blue),
-                                    recognizer: _licenseRecognizer
-                                      ..onTap = () {
-                                        FocusScope.of(context).unfocus();
-                                        Navigator.of(context).push(
-                                            CupertinoPageRoute(
-                                                builder: (context) {
-                                          return License();
-                                        }));
-                                      },
-                                  ),
-                                  TextSpan(text: " 和 "),
-                                  TextSpan(
-                                    text: "隐私政策",
-                                    style: TextStyle(
-                                        decoration: TextDecoration.underline,
-                                        color: Colors.blue),
-                                    recognizer: _privacyRecognizer
-                                      ..onTap = () {
-                                        FocusScope.of(context).unfocus();
-                                        Navigator.of(context).push(
-                                            CupertinoPageRoute(
-                                                builder: (context) {
-                                          return dsm.Browser(
-                                            url:
-                                                '${Util.instance.appUrl}/privacy',
-                                            title: "隐私政策",
-                                          );
-                                        }));
-                                      },
-                                  ),
-                                  TextSpan(
-                                      text:
-                                          "来帮助您了解：我们如何收集个人信息、如何使用及存储个人信息以及您享有的相关权利\n"),
-                                  TextSpan(
-                                      text:
-                                          "在您使用${Util.instance.appName}前，请务必仔细阅读"),
-                                  TextSpan(
-                                    text: "用户协议",
-                                    style: TextStyle(
-                                        decoration: TextDecoration.underline,
-                                        color: Colors.blue),
-                                    recognizer: _licenseRecognizer
-                                      ..onTap = () {
-                                        FocusScope.of(context).unfocus();
-                                        Navigator.of(context).push(
-                                            CupertinoPageRoute(
-                                                builder: (context) {
-                                          return License();
-                                        }));
-                                      },
-                                  ),
-                                  TextSpan(text: "和 "),
-                                  TextSpan(
-                                    text: "隐私政策",
-                                    style: TextStyle(
-                                        decoration: TextDecoration.underline,
-                                        color: Colors.blue),
-                                    recognizer: _privacyRecognizer
-                                      ..onTap = () {
-                                        FocusScope.of(context).unfocus();
-                                        Navigator.of(context).push(
-                                            CupertinoPageRoute(
-                                                builder: (context) {
-                                          return dsm.Browser(
-                                            url:
-                                                '${Util.instance.appUrl}/privacy',
-                                            title: "隐私政策",
-                                          );
-                                        }));
-                                      },
-                                  ),
-                                  TextSpan(
-                                      text: "以了解详细内容，如您同意，请点击'同意并继续'开始使用我们的服务"),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                        SizedBox(
-                          height: 20,
-                        ),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: OutlinedButton(
-                                onPressed: () async {
-                                  Navigator.of(context).pop();
-                                  Util.instance.setStorage("read", "1");
-                                  Util.instance.setStorage(
-                                      "agreement", read ? "1" : "0");
-                                },
-                                child: Text(
-                                  "同意并继续",
-                                  style: TextStyle(fontSize: 18),
-                                ),
-                              ),
-                            ),
-                            SizedBox(
-                              width: 16,
-                            ),
-                            Expanded(
-                              child: OutlinedButton(
-                                onPressed: () async {
-                                  SystemNavigator.pop();
-                                },
-                                child: Text(
-                                  "不同意",
-                                  style: TextStyle(fontSize: 18),
-                                ),
-                              ),
-                            ),
-                          ],
-                        )
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          );
-        },
-      );
-    }
   }
 
   @override
@@ -305,21 +145,21 @@ class _LoginState extends State<Login> {
   }
 
   getInfo() async {
-    sid = await Util.instance.getStorage("sid") ?? '';
-    smid = await Util.instance.getStorage("smid") ?? '';
-    String httpsString = await Util.instance.getStorage("https") ?? '';
-    host = await Util.instance.getStorage("host") ?? "";
-    baseUrl = await Util.instance.getStorage("base_url") ?? '';
-    String portString = await Util.instance.getStorage("port") ?? '';
-    account = await Util.instance.getStorage("account") ?? '';
-    note = await Util.instance.getStorage("note") ?? '';
-    password = await Util.instance.getStorage("password") ?? '';
-    String autoLoginString = await Util.instance.getStorage("auto_login") ?? '';
+    sid = await StorageUtil.getString("sid") ?? '';
+    smid = await StorageUtil.getString("smid") ?? '';
+    String httpsString = await StorageUtil.getString("https") ?? '';
+    host = await StorageUtil.getString("host") ?? "";
+    baseUrl = await StorageUtil.getString("base_url") ?? '';
+    String portString = await StorageUtil.getString("port") ?? '';
+    account = await StorageUtil.getString("account") ?? '';
+    note = await StorageUtil.getString("note") ?? '';
+    password = await StorageUtil.getString("password") ?? '';
+    String autoLoginString = await StorageUtil.getString("auto_login") ?? '';
 
     String rememberPasswordString =
-        await Util.instance.getStorage("remember_password") ?? '';
-    String checkSslString = await Util.instance.getStorage("check_ssl") ?? '';
-    Util.instance.cookie = smid;
+        await StorageUtil.getString("remember_password") ?? '';
+    String checkSslString = await StorageUtil.getString("check_ssl") ?? '';
+    connectionStore.setCookie(smid);
 
     if (httpsString.isNotBlank) {
       setState(() {
@@ -363,17 +203,17 @@ class _LoginState extends State<Login> {
   }
 
   checkLogin() async {
-    Util.instance.account = account;
+    connectionStore.setAccount(account);
     if (sid.isNotBlank && host.isNotBlank) {
       if (baseUrl.isNotBlank) {
-        Util.instance.baseUrl = baseUrl;
+        connectionStore.setBaseUrl(baseUrl);
       } else {
-        Util.instance.baseUrl = "${https ? "https" : "http"}://$host:$port";
+        connectionStore.setBaseUrl("${https ? "https" : "http"}://$host:$port");
       }
       //开始自动登录
-      debugPrint("BaseUrl:$baseUrl");
-      debugPrint("Util.BaseUrl:${Util.instance.baseUrl}");
-      Util.instance.sid = sid;
+      Log.info("BaseUrl:$baseUrl");
+      Log.info("HttpUtil.BaseUrl:${connectionStore.baseUrl}");
+      connectionStore.setSid(sid);
       //如果开启了自动登录，则判断当前登录状态
       if (autoLogin) {
         setState(() {
@@ -388,27 +228,30 @@ class _LoginState extends State<Login> {
             });
           } else {
             //如果登录失效，尝试重新登录
-            debugPrint("尝试重新登录");
+            Log.info("尝试重新登录");
             _login();
           }
         } else {
           //登录有效，进入首页
-          Navigator.of(context)
-              .pushNamedAndRemoveUntil("/home", (route) => false);
+          if (context.mounted) {
+            // ignore: use_build_context_synchronously
+            Navigator.of(context)
+                .pushNamedAndRemoveUntil("/home", (route) => false);
+          }
         }
       }
     }
   }
 
   _login() async {
-    Util.instance.checkSsl = checkSsl;
+    connectionStore.setCheckSsl(checkSsl);
     FocusScope.of(context).unfocus();
     if (host.trim() == "") {
-      Util.instance.toast("请输入网址/IP/QuickConnect ID");
+      UiUtil.toast("请输入网址/IP/QuickConnect ID");
       return;
     }
     if (account == "") {
-      Util.instance.toast("请输入账号");
+      UiUtil.toast("请输入账号");
       return;
     }
     setState(() {
@@ -417,7 +260,7 @@ class _LoginState extends State<Login> {
     if (host.contains(".") || host.contains(':')) {
       String baseUri =
           "${https ? "https" : "http"}://${host.trim()}:${port.trim()}";
-      debugPrint(baseUri);
+      Log.info("baseUri: $baseUri");
       doLogin(baseUri);
     } else {
       qcLogin();
@@ -425,7 +268,7 @@ class _LoginState extends State<Login> {
   }
 
   qcLogin({String qcHost = "global.quickconnect.cn"}) async {
-    debugPrint("QuickConnectID:$host");
+    Log.info("QuickConnectID:$host");
     var res = await Api.quickConnect(host, baseUrl: qcHost);
     if (res['errno'] == 0) {
       if (res['server']['fqdn'] != "NULL") {
@@ -468,7 +311,7 @@ class _LoginState extends State<Login> {
 
       bool finded = false;
       for (var address in qcAddresses) {
-        print(qcAddresses);
+        Log.info(qcAddresses);
         Api.pingpong(address, (res) {
           if (res != null) {
             if (!finded) {
@@ -485,7 +328,7 @@ class _LoginState extends State<Login> {
         res['sites'].length > 0) {
       qcLogin(qcHost: res['sites'][0]);
     } else {
-      Util.instance.toast("无法连接到服务器，请检查QuickConnect ID是否正确");
+      UiUtil.toast("无法连接到服务器，请检查QuickConnect ID是否正确");
       setState(() {
         login = false;
       });
@@ -505,28 +348,28 @@ class _LoginState extends State<Login> {
     });
     if (res['success'] == true) {
       //记住登录信息
-      Util.instance.account = account;
-      Util.instance.setStorage("https", https ? "1" : "0");
-      Util.instance.setStorage("host", host.trim());
-      Util.instance.setStorage("port", port);
-      Util.instance.setStorage("base_url", baseUri);
-      Util.instance.setStorage("account", account);
-      Util.instance.setStorage("note", note);
-      Util.instance
+      connectionStore.setAccount(account);
+      StorageUtil.setString("https", https ? "1" : "0");
+      StorageUtil.setString("host", host.trim());
+      StorageUtil.setString("port", port);
+      StorageUtil.setString("base_url", baseUri);
+      StorageUtil.setString("account", account);
+      StorageUtil.setString("note", note);
+      HttpUtil.instance
           .setStorage("remember_password", rememberPassword ? "1" : "0");
-      Util.instance.setStorage("auto_login", autoLogin ? "1" : "0");
-      Util.instance.setStorage("check_ssl", checkSsl ? "1" : "0");
-      Util.instance.sid = res['data']['sid'];
+      StorageUtil.setString("auto_login", autoLogin ? "1" : "0");
+      StorageUtil.setString("check_ssl", checkSsl ? "1" : "0");
+      connectionStore.setSid(res['data']['sid']);
       if (rememberPassword) {
-        Util.instance.setStorage("password", password);
+        StorageUtil.setString("password", password);
       } else {
-        Util.instance.removeStorage("password");
+        StorageUtil.remove("password");
       }
       if (autoLogin) {
-        Util.instance.setStorage("sid", res['data']['sid']);
+        StorageUtil.setString("sid", res['data']['sid']);
       }
 
-      Util.instance.baseUrl = baseUri;
+      connectionStore.setBaseUrl(baseUri);
 
       //添加服务器记录
       bool exist = false;
@@ -535,7 +378,7 @@ class _LoginState extends State<Login> {
             servers[i]['host'] == host &&
             servers[i]['port'] == port &&
             servers[i]['account'] == account) {
-          debugPrint("账号已存在，更新信息");
+          Log.info("账号已存在，更新信息");
           if (rememberPassword) {
             servers[i]['password'] = password;
           } else {
@@ -546,14 +389,14 @@ class _LoginState extends State<Login> {
           servers[i]['note'] = note;
           servers[i]['auto_login'] = autoLogin;
           servers[i]['check_ssl'] = checkSsl;
-          servers[i]['cookie'] = Util.instance.cookie;
+          servers[i]['cookie'] = connectionStore.cookie;
           servers[i]['sid'] = res['data']['sid'];
           servers[i]['base_url'] = baseUri;
           exist = true;
         }
       }
       if (!exist) {
-        debugPrint("账号不存在");
+        Log.info("账号不存在");
         Map server = {
           "https": https,
           "host": host,
@@ -564,7 +407,7 @@ class _LoginState extends State<Login> {
           "remember_password": rememberPassword,
           "auto_login": autoLogin,
           "check_ssl": checkSsl,
-          "cookie": Util.instance.cookie,
+          "cookie": connectionStore.cookie,
           "sid": res['data']['sid'],
         };
         if (rememberPassword) {
@@ -574,36 +417,42 @@ class _LoginState extends State<Login> {
         }
         servers.add(server);
       }
-      Util.instance.setStorage("servers", jsonEncode(servers));
+      StorageUtil.setString("servers", jsonEncode(servers));
       if (widget.type == "login") {
-        Navigator.of(context)
-            .pushNamedAndRemoveUntil("/home", (route) => false);
+        if (context.mounted) {
+          // ignore: use_build_context_synchronously
+          Navigator.of(context)
+              .pushNamedAndRemoveUntil("/home", (route) => false);
+        }
       } else {
-        Navigator.of(context).pop(true);
+        if (context.mounted) {
+          // ignore: use_build_context_synchronously
+          Navigator.of(context).pop();
+        }
       }
     } else {
-      Util.instance.vibrate(FeedbackType.warning);
+      UiUtil.vibrate(FeedbackType.warning);
       if (res['error']['code'] == 400) {
-        Util.instance.toast("用户名/密码有误");
+        UiUtil.toast("用户名/密码有误");
       } else if (res['error']['code'] == 403) {
-        Util.instance.toast("请输入二次验证代码");
+        UiUtil.toast("请输入二次验证代码");
         setState(() {
           needOtp = true;
         });
       } else if (res['error']['code'] == 404) {
         _otpController.clear();
-        Util.instance.toast("错误的验证代码。请再试一次。");
+        UiUtil.toast("错误的验证代码。请再试一次。");
       } else {
-        Util.instance.toast("登录失败，code:${res['error']['code']}");
+        UiUtil.toast("登录失败，code:${res['error']['code']}");
       }
     }
   }
 
   // wakeup() async {
-  //   print("wakeup");
+  //   Log.info("wakeup");
   //   // final client = HttpDnsClient("http://180.76.76.76");
   //   // final result = await client.lookup("baidu.com");
-  //   // print(result);
+  //   // Log.info(result);
   //   String ipv4 = '192.168.0.100';
   //   IPv4Address ipv4Address;
   //   MACAddress macAddress;
@@ -611,7 +460,7 @@ class _LoginState extends State<Login> {
   //     ipv4Address = IPv4Address(ipv4);
   //     //Continue execution
   //   } else {
-  //     Util.toast("IP地址有误");
+  //     HttpUtil.toast("IP地址有误");
   //     return;
   //     // Handle invalid address case
   //   }
@@ -620,12 +469,12 @@ class _LoginState extends State<Login> {
   //     macAddress = MACAddress(mac);
   //     //Continue execution
   //   } else {
-  //     Util.toast("MAC地址有误");
+  //     HttpUtil.toast("MAC地址有误");
   //     return;
   //     // Handle invalid address case
   //   }
   //   WakeOnLAN wol = WakeOnLAN(ipv4Address, macAddress, port: 1234);
-  //   await wol.wake().then((v) => print('sent'));
+  //   await wol.wake().then((v) => Log.info('sent'));
   // }
 
   _openDeviceFinder() async {
@@ -633,7 +482,7 @@ class _LoginState extends State<Login> {
     final result = await Navigator.of(context).push(
       CupertinoPageRoute(
         builder: (context) {
-          return DeviceFinder(
+          return const DeviceFinder(
             url: "https://finds.synology.com",
             title: "设备发现",
           );
@@ -651,10 +500,10 @@ class _LoginState extends State<Login> {
           _hostController.value = TextEditingValue(text: host);
           _portController.value = TextEditingValue(text: port);
         });
-        Util.instance.toast("已选择设备: ${data['name'] ?? host}");
+        UiUtil.toast("已选择设备: ${data['name'] ?? host}");
       } catch (e) {
-        debugPrint("Error parsing device info: $e");
-        Util.instance.toast("解析设备信息失败");
+        Log.info("Error parsing device info: $e");
+        UiUtil.toast("解析设备信息失败");
       }
     }
   }
@@ -667,14 +516,14 @@ class _LoginState extends State<Login> {
           widget.type == "login" ? "账号登录" : "添加账号",
         ),
         actions: [
-          if (servers.length > 0)
+          if (servers.isNotEmpty)
             Padding(
-              padding: EdgeInsets.only(right: 10, top: 8, bottom: 8),
+              padding: const EdgeInsets.only(right: 10, top: 8, bottom: 8),
               child: OutlinedButton(
                 onPressed: () {
                   Navigator.of(context)
                       .push(CupertinoPageRoute(builder: (context) {
-                    return Accounts();
+                    return const Accounts();
                   }));
                 },
                 child: Image.asset(
@@ -685,14 +534,15 @@ class _LoginState extends State<Login> {
               ),
             ),
           Padding(
-            padding: EdgeInsetsGeometry.only(right: 10, top: 8, bottom: 8),
+            padding:
+                const EdgeInsetsGeometry.only(right: 10, top: 8, bottom: 8),
             child: OutlinedButton(
               onPressed: _openDeviceFinder,
               style: OutlinedButton.styleFrom(
-                minimumSize: Size(36, 36),
+                minimumSize: const Size(36, 36),
                 tapTargetSize: MaterialTapTargetSize.shrinkWrap,
               ),
-              child: Icon(
+              child: const Icon(
                 Icons.open_in_browser,
                 size: 20,
               ),
@@ -705,14 +555,15 @@ class _LoginState extends State<Login> {
           FocusScope.of(context).unfocus();
         },
         child: ListView(
-          padding: EdgeInsets.all(20),
+          padding: const EdgeInsets.all(20),
           children: <Widget>[
-            SizedBox(
+            const SizedBox(
               height: 20,
             ),
             Card(
               shape: RoundedRectangleBorder(
-                  side: BorderSide(), borderRadius: BorderRadius.circular(18)),
+                  side: const BorderSide(),
+                  borderRadius: BorderRadius.circular(18)),
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 12.0),
                 child: Row(
@@ -737,17 +588,17 @@ class _LoginState extends State<Login> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            SizedBox(
+                            const SizedBox(
                               height: 4,
                             ),
-                            Text(
+                            const Text(
                               "协议",
                               style: TextStyle(
                                   fontSize: 12, color: Colors.grey, height: 1),
                             ),
                             Text(
                               https ? "https" : "http",
-                              style: TextStyle(fontSize: 16),
+                              style: const TextStyle(fontSize: 16),
                             ),
                           ],
                         ),
@@ -767,7 +618,7 @@ class _LoginState extends State<Login> {
                         onEditingComplete: () {
                           FocusScope.of(context).nextFocus();
                         },
-                        decoration: InputDecoration(
+                        decoration: const InputDecoration(
                           border: InputBorder.none,
                           labelText: '网址/IP/QuickConnect ID',
                         ),
@@ -783,7 +634,7 @@ class _LoginState extends State<Login> {
                           onEditingComplete: () {
                             FocusScope.of(context).nextFocus();
                           },
-                          decoration: InputDecoration(
+                          decoration: const InputDecoration(
                             border: InputBorder.none,
                             labelText: '端口',
                           ),
@@ -793,7 +644,7 @@ class _LoginState extends State<Login> {
                 ),
               ),
             ),
-            SizedBox(
+            const SizedBox(
               height: 20,
             ),
             Row(
@@ -801,7 +652,7 @@ class _LoginState extends State<Login> {
                 Expanded(
                   child: Card(
                     shape: RoundedRectangleBorder(
-                        side: BorderSide(),
+                        side: const BorderSide(),
                         borderRadius: BorderRadius.circular(18)),
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 12.0),
@@ -814,7 +665,7 @@ class _LoginState extends State<Login> {
                         onEditingComplete: () {
                           FocusScope.of(context).nextFocus();
                         },
-                        decoration: InputDecoration(
+                        decoration: const InputDecoration(
                           border: InputBorder.none,
                           labelText: '账号',
                         ),
@@ -822,13 +673,13 @@ class _LoginState extends State<Login> {
                     ),
                   ),
                 ),
-                SizedBox(
+                const SizedBox(
                   width: 20,
                 ),
                 Expanded(
                   child: Card(
                     shape: RoundedRectangleBorder(
-                        side: BorderSide(),
+                        side: const BorderSide(),
                         borderRadius: BorderRadius.circular(18)),
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 12.0),
@@ -840,7 +691,7 @@ class _LoginState extends State<Login> {
                         onEditingComplete: () {
                           FocusScope.of(context).nextFocus();
                         },
-                        decoration: InputDecoration(
+                        decoration: const InputDecoration(
                           border: InputBorder.none,
                           labelText: '备注',
                         ),
@@ -850,12 +701,13 @@ class _LoginState extends State<Login> {
                 ),
               ],
             ),
-            SizedBox(
+            const SizedBox(
               height: 20,
             ),
             Card(
               shape: RoundedRectangleBorder(
-                  side: BorderSide(), borderRadius: BorderRadius.circular(18)),
+                  side: const BorderSide(),
+                  borderRadius: BorderRadius.circular(18)),
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 12.0),
                 child: TextField(
@@ -881,7 +733,7 @@ class _LoginState extends State<Login> {
                 ),
               ),
             ),
-            SizedBox(
+            const SizedBox(
               height: 20,
             ),
             if (needOtp) ...[
@@ -890,7 +742,7 @@ class _LoginState extends State<Login> {
                   Expanded(
                     child: Card(
                       shape: RoundedRectangleBorder(
-                          side: BorderSide(),
+                          side: const BorderSide(),
                           borderRadius: BorderRadius.circular(18)),
                       child: Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 12.0),
@@ -902,7 +754,7 @@ class _LoginState extends State<Login> {
                           onEditingComplete: () {
                             FocusScope.of(context).unfocus();
                           },
-                          decoration: InputDecoration(
+                          decoration: const InputDecoration(
                             border: InputBorder.none,
                             labelText: '二步验证代码',
                           ),
@@ -910,7 +762,7 @@ class _LoginState extends State<Login> {
                       ),
                     ),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     width: 10,
                   ),
                   Expanded(
@@ -923,18 +775,18 @@ class _LoginState extends State<Login> {
                       },
                       child: Card(
                         shape: RoundedRectangleBorder(
-                            side: BorderSide(),
+                            side: const BorderSide(),
                             borderRadius: BorderRadius.circular(18)),
                         child: Padding(
                           padding: const EdgeInsets.all(12.0),
                           child: Row(
                             children: [
-                              Text("记住设备"),
-                              Spacer(),
+                              const Text("记住设备"),
+                              const Spacer(),
                               if (rememberDevice)
-                                Icon(
+                                const Icon(
                                   CupertinoIcons.checkmark_alt,
-                                  color: Color(0xffff9813),
+                                  color: AppColors.primaryAction,
                                 ),
                             ],
                           ),
@@ -944,7 +796,7 @@ class _LoginState extends State<Login> {
                   ),
                 ],
               ),
-              SizedBox(
+              const SizedBox(
                 height: 20,
               ),
             ],
@@ -962,18 +814,18 @@ class _LoginState extends State<Login> {
                     },
                     child: Card(
                       shape: RoundedRectangleBorder(
-                          side: BorderSide(),
+                          side: const BorderSide(),
                           borderRadius: BorderRadius.circular(18)),
                       child: Padding(
                         padding: const EdgeInsets.all(12.0),
                         child: Row(
                           children: [
-                            Text("记住密码"),
-                            Spacer(),
+                            const Text("记住密码"),
+                            const Spacer(),
                             if (rememberPassword)
-                              Icon(
+                              const Icon(
                                 CupertinoIcons.checkmark_alt,
-                                color: Color(0xffff9813),
+                                color: AppColors.primaryAction,
                               ),
                           ],
                         ),
@@ -981,7 +833,7 @@ class _LoginState extends State<Login> {
                     ),
                   ),
                 ),
-                SizedBox(
+                const SizedBox(
                   width: 20,
                 ),
                 Expanded(
@@ -996,18 +848,18 @@ class _LoginState extends State<Login> {
                     },
                     child: Card(
                       shape: RoundedRectangleBorder(
-                          side: BorderSide(),
+                          side: const BorderSide(),
                           borderRadius: BorderRadius.circular(18)),
                       child: Padding(
                         padding: const EdgeInsets.all(12.0),
                         child: Row(
                           children: [
-                            Text("自动登录"),
-                            Spacer(),
+                            const Text("自动登录"),
+                            const Spacer(),
                             if (autoLogin)
-                              Icon(
+                              const Icon(
                                 CupertinoIcons.checkmark_alt,
-                                color: Color(0xffff9813),
+                                color: AppColors.primaryAction,
                               ),
                           ],
                         ),
@@ -1017,12 +869,12 @@ class _LoginState extends State<Login> {
                 ),
               ],
             ),
-            SizedBox(
+            const SizedBox(
               height: 20,
             ),
             if (https)
               Padding(
-                padding: EdgeInsets.only(bottom: 20),
+                padding: const EdgeInsets.only(bottom: 20),
                 child: GestureDetector(
                   onTap: () {
                     setState(() {
@@ -1031,18 +883,18 @@ class _LoginState extends State<Login> {
                   },
                   child: Card(
                     shape: RoundedRectangleBorder(
-                        side: BorderSide(),
+                        side: const BorderSide(),
                         borderRadius: BorderRadius.circular(18)),
                     child: Padding(
                       padding: const EdgeInsets.all(12.0),
                       child: Row(
                         children: [
-                          Text("验证SSL证书"),
-                          Spacer(),
+                          const Text("验证SSL证书"),
+                          const Spacer(),
                           if (checkSsl)
-                            Icon(
+                            const Icon(
                               CupertinoIcons.checkmark_alt,
-                              color: Color(0xffff9813),
+                              color: AppColors.primaryAction,
                             ),
                         ],
                       ),
@@ -1056,9 +908,9 @@ class _LoginState extends State<Login> {
 
             OutlinedButton(
               onPressed: () {
-                print(login);
+                Log.info(login);
                 // if (!read) {
-                //   Util.instance.toast("请先阅读并同意用户协议和隐私政策");
+                //   UiUtil.toast("请先阅读并同意用户协议和隐私政策");
                 //   return;
                 // }
                 if (login) {
@@ -1073,7 +925,7 @@ class _LoginState extends State<Login> {
                 }
               },
               child: login
-                  ? Row(
+                  ? const Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         CupertinoActivityIndicator(
@@ -1090,7 +942,7 @@ class _LoginState extends State<Login> {
                     )
                   : Text(
                       widget.type == "login" ? ' 登录 ' : ' 添加 ',
-                      style: TextStyle(fontSize: 18),
+                      style: const TextStyle(fontSize: 18),
                     ),
             ),
           ],

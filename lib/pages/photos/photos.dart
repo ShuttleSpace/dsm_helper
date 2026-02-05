@@ -8,7 +8,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class Photos extends StatefulWidget {
-  const Photos();
+  const Photos({super.key});
 
   @override
   State<Photos> createState() => _PhotosState();
@@ -39,9 +39,10 @@ class _PhotosState extends State<Photos> {
           enableSearch: false,
           enableFilter: false,
           textAlign: TextAlign.center,
-          textStyle: TextStyle(fontSize: 12),
-          inputDecorationTheme: InputDecorationTheme(border: InputBorder.none),
-          dropdownMenuEntries: [
+          textStyle: const TextStyle(fontSize: 12),
+          inputDecorationTheme:
+              const InputDecorationTheme(border: InputBorder.none),
+          dropdownMenuEntries: const [
             DropdownMenuEntry(value: 0, label: '图片'),
             DropdownMenuEntry(value: 1, label: '相册'),
             DropdownMenuEntry(value: 2, label: '共享'),
@@ -55,7 +56,7 @@ class _PhotosState extends State<Photos> {
         actions: [
           if (currentIndex != 2)
             Padding(
-              padding: EdgeInsets.only(right: 10, top: 8, bottom: 8),
+              padding: const EdgeInsets.only(right: 10, top: 8, bottom: 8),
               child: OutlinedButton(
                 onPressed: () {
                   showCupertinoModalPopup(
@@ -65,12 +66,12 @@ class _PhotosState extends State<Photos> {
                         color: Colors.transparent,
                         child: Card(
                           shape: RoundedRectangleBorder(
-                              side: BorderSide(),
+                              side: const BorderSide(),
                               borderRadius: BorderRadius.circular(18)),
                           child: SafeArea(
                             top: false,
                             child: Padding(
-                              padding: EdgeInsets.all(8),
+                              padding: const EdgeInsets.all(8),
                               child: Column(
                                 mainAxisSize: MainAxisSize.min,
                                 children: <Widget>[
@@ -92,10 +93,10 @@ class _PhotosState extends State<Photos> {
                                     },
                                     child: Text(
                                       "切换到${isTeam ? '个人空间' : '共享空间'}",
-                                      style: TextStyle(fontSize: 18),
+                                      style: const TextStyle(fontSize: 18),
                                     ),
                                   ),
-                                  SizedBox(
+                                  const SizedBox(
                                     height: 16,
                                   ),
                                   if (currentIndex == 0) ...[
@@ -115,10 +116,10 @@ class _PhotosState extends State<Photos> {
                                       },
                                       child: Text(
                                         "切换到${isTimeline ? '文件夹' : '时间线'}视图",
-                                        style: TextStyle(fontSize: 18),
+                                        style: const TextStyle(fontSize: 18),
                                       ),
                                     ),
-                                    SizedBox(
+                                    const SizedBox(
                                       height: 16,
                                     ),
                                   ],
@@ -126,12 +127,12 @@ class _PhotosState extends State<Photos> {
                                     onPressed: () async {
                                       Navigator.of(context).pop();
                                     },
-                                    child: Text(
+                                    child: const Text(
                                       "取消",
                                       style: TextStyle(fontSize: 18),
                                     ),
                                   ),
-                                  SizedBox(
+                                  const SizedBox(
                                     height: 8,
                                   ),
                                 ],
@@ -167,7 +168,7 @@ class _PhotosState extends State<Photos> {
                 AlbumTab(
                   isTeam,
                 ),
-                ShareTab(),
+                const ShareTab(),
               ],
             ),
           ),

@@ -1,21 +1,25 @@
-import 'package:garden/util/function.dart';
+import 'package:garden/util/http_util.dart';
+import 'package:garden/util/format_util.dart';
+import 'package:garden/util/ui_util.dart';
 import 'package:garden/widgets/bubble_tab_indicator.dart';
 import 'package:garden/widgets/label.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:garden/constants/app_constants.dart';
+import 'package:garden/theme/app_colors.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_vibrate/flutter_vibrate.dart';
 import 'add_tracker.dart';
 
 class DownloadDetail extends StatefulWidget {
   final String id;
-  DownloadDetail(this.id);
+  const DownloadDetail(this.id, {super.key});
   @override
-  _DownloadDetailState createState() => _DownloadDetailState();
+  DownloadDetailState createState() => DownloadDetailState();
 }
 
-class _DownloadDetailState extends State<DownloadDetail>
+class DownloadDetailState extends State<DownloadDetail>
     with TickerProviderStateMixin {
   late TabController _tabController;
   bool loading = true;
@@ -27,7 +31,7 @@ class _DownloadDetailState extends State<DownloadDetail>
   List files = [];
 
   bool showAddTrackerButton = false;
-  var task;
+  dynamic task;
   @override
   void initState() {
     getData();
@@ -102,30 +106,30 @@ class _DownloadDetailState extends State<DownloadDetail>
   Widget _buildFileItem(file) {
     return Card(
       shape: RoundedRectangleBorder(
-          side: BorderSide(), borderRadius: BorderRadius.circular(18)),
+          side: const BorderSide(), borderRadius: BorderRadius.circular(18)),
       child: Padding(
-        padding: const EdgeInsets.all(8.0),
+        padding: const EdgeInsets.all(AppConstants.paddingSmall),
         child: Column(
           children: [
             Text(
               "${file['name']}",
-              style: TextStyle(fontWeight: FontWeight.w600),
+              style: const TextStyle(fontWeight: FontWeight.w600),
             ),
-            SizedBox(
+            const SizedBox(
               height: 10,
             ),
             Row(
               children: [
-                Text("${Util.instance.formatSize(file['size_downloaded'])} / "),
-                Text("${Util.instance.formatSize(file['size'])}"),
-                SizedBox(
+                Text("${FormatUtil.formatSize(file['size_downloaded'])} / "),
+                Text(FormatUtil.formatSize(file['size'])),
+                const SizedBox(
                   width: 10,
                 ),
                 Text(
                   "${(file['size_downloaded'] * 100 / file['size']).toStringAsFixed(2)} %",
-                  style: TextStyle(color: Colors.blue),
+                  style: const TextStyle(color: Colors.blue),
                 ),
-                Spacer(),
+                const Spacer(),
                 Label(
                   file['priority'] == "normal"
                       ? "一般"
@@ -150,45 +154,45 @@ class _DownloadDetailState extends State<DownloadDetail>
   Widget _buildPeerItem(peer) {
     return Card(
       shape: RoundedRectangleBorder(
-          side: BorderSide(), borderRadius: BorderRadius.circular(18)),
+          side: const BorderSide(), borderRadius: BorderRadius.circular(18)),
       child: Padding(
-        padding: const EdgeInsets.all(8.0),
+        padding: const EdgeInsets.all(AppConstants.paddingSmall),
         child: Column(
           children: [
             Row(
               children: [
                 Text("${peer['ip']}"),
-                Spacer(),
+                const Spacer(),
                 Text("${peer['client']}"),
               ],
             ),
-            SizedBox(
+            const SizedBox(
               height: 10,
             ),
             Row(
               children: [
                 Text("进度：${(peer['progress'] * 100).toStringAsFixed(0)}%"),
-                Spacer(),
-                Icon(
+                const Spacer(),
+                const Icon(
                   Icons.download_sharp,
                   color: Colors.green,
                   size: 16,
                 ),
                 Text(
-                  "${Util.instance.formatSize(peer['speed_download'])}",
-                  style: TextStyle(color: Colors.green),
+                  FormatUtil.formatSize(peer['speed_download']),
+                  style: const TextStyle(color: Colors.green),
                 ),
-                SizedBox(
+                const SizedBox(
                   width: 10,
                 ),
-                Icon(
+                const Icon(
                   Icons.upload_sharp,
                   color: Colors.blue,
                   size: 16,
                 ),
                 Text(
-                  "${Util.instance.formatSize(peer['speed_upload'])}",
-                  style: TextStyle(color: Colors.blue),
+                  FormatUtil.formatSize(peer['speed_upload']),
+                  style: const TextStyle(color: Colors.blue),
                 ),
               ],
             ),
@@ -201,30 +205,30 @@ class _DownloadDetailState extends State<DownloadDetail>
   Widget _buildTrackerItem(tracker) {
     return Card(
       shape: RoundedRectangleBorder(
-          side: BorderSide(), borderRadius: BorderRadius.circular(18)),
+          side: const BorderSide(), borderRadius: BorderRadius.circular(18)),
       child: Padding(
-        padding: const EdgeInsets.all(8.0),
+        padding: const EdgeInsets.all(AppConstants.paddingSmall),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text("${tracker['url']}"),
-            SizedBox(
+            const SizedBox(
               height: 10,
             ),
             Row(
               children: [
                 Text(
                   "种子数：${tracker['seeds'] >= 0 ? tracker['seeds'] : "-"}",
-                  style: TextStyle(color: Colors.green),
+                  style: const TextStyle(color: Colors.green),
                 ),
-                SizedBox(
+                const SizedBox(
                   width: 10,
                 ),
                 Text(
                   "Peer数：${tracker['peers'] >= 0 ? tracker['peers'] : "-"}",
-                  style: TextStyle(color: Colors.blue),
+                  style: const TextStyle(color: Colors.blue),
                 ),
-                SizedBox(
+                const SizedBox(
                   width: 10,
                 ),
                 Expanded(
@@ -249,13 +253,13 @@ class _DownloadDetailState extends State<DownloadDetail>
     return Scaffold(
       appBar: AppBar(
         leading: AppBackButton(context),
-        title: Text("任务详情"),
+        title: const Text("任务详情"),
         actions: [
           Padding(
-            padding: EdgeInsets.only(right: 10, top: 8, bottom: 8),
+            padding: const EdgeInsets.only(right: 10, top: 8, bottom: 8),
             child: OutlinedButton(
               onPressed: () {
-                Util.instance.vibrate(FeedbackType.warning);
+                UiUtil.vibrate(FeedbackType.warning);
                 showCupertinoModalPopup(
                   context: context,
                   builder: (context) {
@@ -263,31 +267,32 @@ class _DownloadDetailState extends State<DownloadDetail>
                       color: Colors.transparent,
                       child: Card(
                         shape: RoundedRectangleBorder(
-                            side: BorderSide(),
+                            side: const BorderSide(),
                             borderRadius: BorderRadius.circular(18)),
                         child: SafeArea(
                           top: false,
                           child: Padding(
-                            padding: const EdgeInsets.all(8.0),
+                            padding:
+                                const EdgeInsets.all(AppConstants.paddingSmall),
                             child: Column(
                               mainAxisSize: MainAxisSize.min,
                               children: <Widget>[
-                                Text(
+                                const Text(
                                   "确认删除",
                                   style: TextStyle(
                                       fontSize: 20,
                                       fontWeight: FontWeight.w500),
                                 ),
-                                SizedBox(
+                                const SizedBox(
                                   height: 12,
                                 ),
-                                Text(
+                                const Text(
                                   "确认要删除此任务？",
                                   style: TextStyle(
                                       fontSize: 20,
                                       fontWeight: FontWeight.w400),
                                 ),
-                                SizedBox(
+                                const SizedBox(
                                   height: 22,
                                 ),
                                 Row(
@@ -300,14 +305,17 @@ class _DownloadDetailState extends State<DownloadDetail>
                                               await Api.downloadTaskAction(
                                                   [task['id']], "delete");
                                           if (res['success']) {
-                                            Util.instance.toast("任务删除成功");
-                                            Navigator.of(context).pop(true);
+                                            UiUtil.toast("任务删除成功");
+                                            if (context.mounted) {
+                                              // ignore: use_build_context_synchronously
+                                              Navigator.of(context).pop();
+                                            }
                                           } else {
-                                            Util.instance.toast(
+                                            UiUtil.toast(
                                                 "任务删除失败，代码：${res['error']['code']}");
                                           }
                                         },
-                                        child: Text(
+                                        child: const Text(
                                           "确认删除",
                                           style: TextStyle(
                                               fontSize: 18,
@@ -315,7 +323,7 @@ class _DownloadDetailState extends State<DownloadDetail>
                                         ),
                                       ),
                                     ),
-                                    SizedBox(
+                                    const SizedBox(
                                       width: 20,
                                     ),
                                     Expanded(
@@ -323,7 +331,7 @@ class _DownloadDetailState extends State<DownloadDetail>
                                         onPressed: () async {
                                           Navigator.of(context).pop();
                                         },
-                                        child: Text(
+                                        child: const Text(
                                           "取消",
                                           style: TextStyle(fontSize: 18),
                                         ),
@@ -331,7 +339,7 @@ class _DownloadDetailState extends State<DownloadDetail>
                                     ),
                                   ],
                                 ),
-                                SizedBox(
+                                const SizedBox(
                                   height: 8,
                                 ),
                               ],
@@ -353,7 +361,7 @@ class _DownloadDetailState extends State<DownloadDetail>
         ],
       ),
       body: loading
-          ? Center(
+          ? const Center(
               child: CupertinoActivityIndicator(
                 radius: 14,
               ),
@@ -362,9 +370,10 @@ class _DownloadDetailState extends State<DownloadDetail>
               children: [
                 Card(
                   shape: RoundedRectangleBorder(
-                      side: BorderSide(),
+                      side: const BorderSide(),
                       borderRadius: BorderRadius.circular(18)),
-                  margin: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                  margin:
+                      const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
                   child: TabBar(
                     dividerHeight: 0,
                     isScrollable: true,
@@ -374,35 +383,35 @@ class _DownloadDetailState extends State<DownloadDetail>
                         ? Colors.white
                         : Colors.black,
                     unselectedLabelColor: Colors.grey,
-                    indicator: BubbleTabIndicator(),
+                    indicator: const BubbleTabIndicator(),
                     tabs: [
-                      Padding(
+                      const Padding(
                         padding:
                             EdgeInsets.symmetric(vertical: 10, horizontal: 5),
                         child: Text("常规"),
                       ),
-                      Padding(
+                      const Padding(
                         padding:
                             EdgeInsets.symmetric(vertical: 10, horizontal: 5),
                         child: Text("传输信息"),
                       ),
                       if (task['type'] == "bt" && task['status'] == 2) ...[
-                        Padding(
+                        const Padding(
                           padding:
                               EdgeInsets.symmetric(vertical: 10, horizontal: 5),
                           child: Text("Tracker服务器"),
                         ),
-                        Padding(
+                        const Padding(
                           padding:
                               EdgeInsets.symmetric(vertical: 10, horizontal: 5),
                           child: Text("Peer数"),
                         ),
-                        Padding(
+                        const Padding(
                           padding:
                               EdgeInsets.symmetric(vertical: 10, horizontal: 5),
                           child: Text("文件"),
                         ),
-                        Padding(
+                        const Padding(
                           padding:
                               EdgeInsets.symmetric(vertical: 10, horizontal: 5),
                           child: Text("预览"),
@@ -419,16 +428,17 @@ class _DownloadDetailState extends State<DownloadDetail>
                         children: [
                           Card(
                             shape: RoundedRectangleBorder(
-                                side: BorderSide(),
+                                side: const BorderSide(),
                                 borderRadius: BorderRadius.circular(18)),
-                            margin: EdgeInsets.symmetric(
+                            margin: const EdgeInsets.symmetric(
                                 horizontal: 20, vertical: 10),
                             child: Padding(
-                              padding: const EdgeInsets.all(8.0),
+                              padding: const EdgeInsets.all(
+                                  AppConstants.paddingSmall),
                               child: Row(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text("文件名："),
+                                  const Text("文件名："),
                                   Expanded(
                                     child: Text(task['title']),
                                   ),
@@ -438,16 +448,16 @@ class _DownloadDetailState extends State<DownloadDetail>
                           ),
                           Card(
                             shape: RoundedRectangleBorder(
-                                side: BorderSide(),
+                                side: const BorderSide(),
                                 borderRadius: BorderRadius.circular(18)),
-                            margin: EdgeInsets.symmetric(
+                            margin: const EdgeInsets.symmetric(
                                 horizontal: 20, vertical: 10),
                             child: Padding(
-                              padding: EdgeInsets.symmetric(
+                              padding: const EdgeInsets.symmetric(
                                   horizontal: 20, vertical: 15),
                               child: Row(
                                 children: [
-                                  Text("保存位置："),
+                                  const Text("保存位置："),
                                   Expanded(
                                     child: Text(
                                       task['additional']['detail']
@@ -460,19 +470,21 @@ class _DownloadDetailState extends State<DownloadDetail>
                           ),
                           Card(
                             shape: RoundedRectangleBorder(
-                                side: BorderSide(),
+                                side: const BorderSide(),
                                 borderRadius: BorderRadius.circular(18)),
-                            margin: EdgeInsets.symmetric(
+                            margin: const EdgeInsets.symmetric(
                                 horizontal: 20, vertical: 10),
                             child: Padding(
-                              padding: EdgeInsets.symmetric(
+                              padding: const EdgeInsets.symmetric(
                                   horizontal: 20, vertical: 15),
                               child: Row(
                                 children: [
-                                  Text("文件大小："),
+                                  const Text("文件大小："),
                                   Expanded(
                                     child: Text(
-                                      "${task['size'] > 0 ? Util.instance.formatSize(task['size']) : "未取得"}",
+                                      task['size'] > 0
+                                          ? FormatUtil.formatSize(task['size'])
+                                          : "未取得",
                                     ),
                                   ),
                                 ],
@@ -481,15 +493,16 @@ class _DownloadDetailState extends State<DownloadDetail>
                           ),
                           Card(
                             shape: RoundedRectangleBorder(
-                                side: BorderSide(),
+                                side: const BorderSide(),
                                 borderRadius: BorderRadius.circular(18)),
-                            margin: EdgeInsets.symmetric(
+                            margin: const EdgeInsets.symmetric(
                                 horizontal: 20, vertical: 10),
                             child: Padding(
-                              padding: const EdgeInsets.all(8.0),
+                              padding: const EdgeInsets.all(
+                                  AppConstants.paddingSmall),
                               child: Row(
                                 children: [
-                                  Text("用户名："),
+                                  const Text("用户名："),
                                   Text("${task['username']}"),
                                 ],
                               ),
@@ -497,33 +510,34 @@ class _DownloadDetailState extends State<DownloadDetail>
                           ),
                           Card(
                             shape: RoundedRectangleBorder(
-                                side: BorderSide(),
+                                side: const BorderSide(),
                                 borderRadius: BorderRadius.circular(18)),
-                            margin: EdgeInsets.symmetric(
+                            margin: const EdgeInsets.symmetric(
                                 horizontal: 20, vertical: 10),
                             child: Padding(
-                              padding: const EdgeInsets.all(8.0),
+                              padding: const EdgeInsets.all(
+                                  AppConstants.paddingSmall),
                               child: Row(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text("网址："),
+                                  const Text("网址："),
                                   Expanded(
                                       child: Text(
                                           "${task['additional']['detail']['uri']}")),
                                   OutlinedButton(
                                     onPressed: () async {
-                                      ClipboardData data = new ClipboardData(
+                                      ClipboardData data = ClipboardData(
                                           text: task['additional']['detail']
                                               ['uri']);
                                       Clipboard.setData(data);
-                                      Util.instance.toast("已复制到剪贴板");
+                                      UiUtil.toast("已复制到剪贴板");
                                     },
-                                    child: SizedBox(
+                                    child: const SizedBox(
                                       width: 20,
                                       height: 20,
                                       child: Icon(
                                         Icons.copy,
-                                        color: Color(0xffff9813),
+                                        color: AppColors.primaryAction,
                                         size: 16,
                                       ),
                                     ),
@@ -534,15 +548,16 @@ class _DownloadDetailState extends State<DownloadDetail>
                           ),
                           Card(
                             shape: RoundedRectangleBorder(
-                                side: BorderSide(),
+                                side: const BorderSide(),
                                 borderRadius: BorderRadius.circular(18)),
-                            margin: EdgeInsets.symmetric(
+                            margin: const EdgeInsets.symmetric(
                                 horizontal: 20, vertical: 10),
                             child: Padding(
-                              padding: const EdgeInsets.all(8.0),
+                              padding: const EdgeInsets.all(
+                                  AppConstants.paddingSmall),
                               child: Row(
                                 children: [
-                                  Text("创建时间："),
+                                  const Text("创建时间："),
                                   Text(DateTime.fromMillisecondsSinceEpoch(
                                           task['additional']['detail']
                                                   ['created_time'] *
@@ -554,15 +569,16 @@ class _DownloadDetailState extends State<DownloadDetail>
                           ),
                           Card(
                             shape: RoundedRectangleBorder(
-                                side: BorderSide(),
+                                side: const BorderSide(),
                                 borderRadius: BorderRadius.circular(18)),
-                            margin: EdgeInsets.symmetric(
+                            margin: const EdgeInsets.symmetric(
                                 horizontal: 20, vertical: 10),
                             child: Padding(
-                              padding: const EdgeInsets.all(8.0),
+                              padding: const EdgeInsets.all(
+                                  AppConstants.paddingSmall),
                               child: Row(
                                 children: [
-                                  Text("完成时间："),
+                                  const Text("完成时间："),
                                   Text(task['additional']['detail']
                                               ['completed_time'] >
                                           0
@@ -578,19 +594,20 @@ class _DownloadDetailState extends State<DownloadDetail>
                           ),
                           Card(
                             shape: RoundedRectangleBorder(
-                                side: BorderSide(),
+                                side: const BorderSide(),
                                 borderRadius: BorderRadius.circular(18)),
-                            margin: EdgeInsets.symmetric(
+                            margin: const EdgeInsets.symmetric(
                                 horizontal: 20, vertical: 10),
                             child: Padding(
-                              padding: const EdgeInsets.all(8.0),
+                              padding: const EdgeInsets.all(
+                                  AppConstants.paddingSmall),
                               child: Row(
                                 children: [
-                                  Text("预计等待时间："),
+                                  const Text("预计等待时间："),
                                   Text(task['additional']['detail']
                                               ['waiting_seconds'] >
                                           0
-                                      ? Util.instance.timeRemaining(
+                                      ? HttpUtil.instance.timeRemaining(
                                           task['additional']['detail']
                                               ['waiting_seconds'])
                                       : "无法取得"),
@@ -604,52 +621,53 @@ class _DownloadDetailState extends State<DownloadDetail>
                         children: [
                           Card(
                             shape: RoundedRectangleBorder(
-                                side: BorderSide(),
+                                side: const BorderSide(),
                                 borderRadius: BorderRadius.circular(18)),
-                            margin: EdgeInsets.symmetric(
+                            margin: const EdgeInsets.symmetric(
                                 horizontal: 20, vertical: 10),
                             child: Padding(
-                              padding: const EdgeInsets.all(8.0),
+                              padding: const EdgeInsets.all(
+                                  AppConstants.paddingSmall),
                               child: Row(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text("状态："),
+                                  const Text("状态："),
                                   Expanded(
                                     child: task['status'] == 1
-                                        ? Text(
+                                        ? const Text(
                                             "等待中",
                                             style:
                                                 TextStyle(color: Colors.grey),
                                           )
                                         : task['status'] == 2
                                             ? Text(
-                                                "${Util.instance.formatSize(task['additional']['transfer']['speed_download'])}/s",
-                                                style: TextStyle(
+                                                "${FormatUtil.formatSize(task['additional']['transfer']['speed_download'])}/s",
+                                                style: const TextStyle(
                                                     color:
                                                         Colors.lightBlueAccent),
                                               )
                                             : task['status'] == 3
-                                                ? Text(
+                                                ? const Text(
                                                     "已暂停",
                                                     style: TextStyle(
                                                         color: Colors.grey),
                                                   )
                                                 : task['status'] == 5
-                                                    ? Text(
+                                                    ? const Text(
                                                         "已完成",
                                                         style: TextStyle(
                                                             color:
                                                                 Colors.green),
                                                       )
                                                     : task['status'] == 6
-                                                        ? Text(
+                                                        ? const Text(
                                                             "检查中",
                                                             style: TextStyle(
                                                                 color: Colors
                                                                     .grey),
                                                           )
                                                         : task['status'] == 101
-                                                            ? Text(
+                                                            ? const Text(
                                                                 "错误",
                                                                 style: TextStyle(
                                                                     color: Colors
@@ -657,7 +675,7 @@ class _DownloadDetailState extends State<DownloadDetail>
                                                               )
                                                             : task['status'] ==
                                                                     105
-                                                                ? Text(
+                                                                ? const Text(
                                                                     "空间不足",
                                                                     style: TextStyle(
                                                                         color: Colors
@@ -665,7 +683,7 @@ class _DownloadDetailState extends State<DownloadDetail>
                                                                   )
                                                                 : task['status'] ==
                                                                         113
-                                                                    ? Text(
+                                                                    ? const Text(
                                                                         "重复的任务",
                                                                         style: TextStyle(
                                                                             color:
@@ -673,7 +691,7 @@ class _DownloadDetailState extends State<DownloadDetail>
                                                                       )
                                                                     : Text(
                                                                         "代码：${task['status']}",
-                                                                        style: TextStyle(
+                                                                        style: const TextStyle(
                                                                             color:
                                                                                 Colors.red),
                                                                       ),
@@ -684,21 +702,20 @@ class _DownloadDetailState extends State<DownloadDetail>
                           ),
                           Card(
                             shape: RoundedRectangleBorder(
-                                side: BorderSide(),
+                                side: const BorderSide(),
                                 borderRadius: BorderRadius.circular(18)),
-                            margin: EdgeInsets.symmetric(
+                            margin: const EdgeInsets.symmetric(
                                 horizontal: 20, vertical: 10),
                             child: Padding(
-                              padding: EdgeInsets.symmetric(
+                              padding: const EdgeInsets.symmetric(
                                   horizontal: 20, vertical: 15),
                               child: Row(
                                 children: [
-                                  Text("已下载："),
+                                  const Text("已下载："),
                                   Expanded(
                                     child: Text(
-                                      Util.instance.formatSize(
-                                          task['additional']['transfer']
-                                              ['size_downloaded']),
+                                      FormatUtil.formatSize(task['additional']
+                                          ['transfer']['size_downloaded']),
                                     ),
                                   ),
                                 ],
@@ -707,19 +724,19 @@ class _DownloadDetailState extends State<DownloadDetail>
                           ),
                           Card(
                             shape: RoundedRectangleBorder(
-                                side: BorderSide(),
+                                side: const BorderSide(),
                                 borderRadius: BorderRadius.circular(18)),
-                            margin: EdgeInsets.symmetric(
+                            margin: const EdgeInsets.symmetric(
                                 horizontal: 20, vertical: 10),
                             child: Padding(
-                              padding: EdgeInsets.symmetric(
+                              padding: const EdgeInsets.symmetric(
                                   horizontal: 20, vertical: 15),
                               child: Row(
                                 children: [
-                                  Text("已上传："),
+                                  const Text("已上传："),
                                   Expanded(
                                     child: Text(
-                                      "${Util.instance.formatSize(task['additional']['transfer']['size_uploaded'])} （${task['additional']['transfer']['size_downloaded'] > 0 ? (task['additional']['transfer']['size_uploaded'] / task['additional']['transfer']['size_downloaded'] * 100).toStringAsFixed(2) : "0"}%)",
+                                      "${FormatUtil.formatSize(task['additional']['transfer']['size_uploaded'])} （${task['additional']['transfer']['size_downloaded'] > 0 ? (task['additional']['transfer']['size_uploaded'] / task['additional']['transfer']['size_downloaded'] * 100).toStringAsFixed(2) : "0"}%)",
                                     ),
                                   ),
                                 ],
@@ -728,16 +745,16 @@ class _DownloadDetailState extends State<DownloadDetail>
                           ),
                           Card(
                             shape: RoundedRectangleBorder(
-                                side: BorderSide(),
+                                side: const BorderSide(),
                                 borderRadius: BorderRadius.circular(18)),
-                            margin: EdgeInsets.symmetric(
+                            margin: const EdgeInsets.symmetric(
                                 horizontal: 20, vertical: 10),
                             child: Padding(
-                              padding: EdgeInsets.symmetric(
+                              padding: const EdgeInsets.symmetric(
                                   horizontal: 20, vertical: 15),
                               child: Row(
                                 children: [
-                                  Text("进度："),
+                                  const Text("进度："),
                                   Expanded(
                                     child: Text(
                                       "${task['size'] > 0 ? (task['additional']['transfer']['size_downloaded'] / task['size'] * 100).toStringAsFixed(2) : "0"}%",
@@ -749,33 +766,39 @@ class _DownloadDetailState extends State<DownloadDetail>
                           ),
                           Card(
                             shape: RoundedRectangleBorder(
-                                side: BorderSide(),
+                                side: const BorderSide(),
                                 borderRadius: BorderRadius.circular(18)),
-                            margin: EdgeInsets.symmetric(
+                            margin: const EdgeInsets.symmetric(
                                 horizontal: 20, vertical: 10),
                             child: Padding(
-                              padding: const EdgeInsets.all(8.0),
+                              padding: const EdgeInsets.all(
+                                  AppConstants.paddingSmall),
                               child: Row(
                                 children: [
-                                  Text("速度："),
-                                  Text(
-                                      "${task['additional']['transfer']['speed_download'] > 0 ? Util.instance.formatSize(task['additional']['transfer']['speed_download']) : "无法取得"}"),
+                                  const Text("速度："),
+                                  Text(task['additional']['transfer']
+                                              ['speed_download'] >
+                                          0
+                                      ? FormatUtil.formatSize(task['additional']
+                                          ['transfer']['speed_download'])
+                                      : "无法取得"),
                                 ],
                               ),
                             ),
                           ),
                           Card(
                             shape: RoundedRectangleBorder(
-                                side: BorderSide(),
+                                side: const BorderSide(),
                                 borderRadius: BorderRadius.circular(18)),
-                            margin: EdgeInsets.symmetric(
+                            margin: const EdgeInsets.symmetric(
                                 horizontal: 20, vertical: 10),
                             child: Padding(
-                              padding: const EdgeInsets.all(8.0),
+                              padding: const EdgeInsets.all(
+                                  AppConstants.paddingSmall),
                               child: Row(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text("Peer数："),
+                                  const Text("Peer数："),
                                   Expanded(
                                       child: Text(
                                           "${task['additional']['detail']['total_peers'] > 0 ? task['additional']['detail']['total_peers'] : "无法取得"}")),
@@ -785,15 +808,16 @@ class _DownloadDetailState extends State<DownloadDetail>
                           ),
                           Card(
                             shape: RoundedRectangleBorder(
-                                side: BorderSide(),
+                                side: const BorderSide(),
                                 borderRadius: BorderRadius.circular(18)),
-                            margin: EdgeInsets.symmetric(
+                            margin: const EdgeInsets.symmetric(
                                 horizontal: 20, vertical: 10),
                             child: Padding(
-                              padding: const EdgeInsets.all(8.0),
+                              padding: const EdgeInsets.all(
+                                  AppConstants.paddingSmall),
                               child: Row(
                                 children: [
-                                  Text("分块总数："),
+                                  const Text("分块总数："),
                                   Expanded(
                                       child: Text(
                                           "${task['additional']['detail']['total_pieces'] > 0 ? task['additional']['detail']['total_pieces'] : "无法取得"}")),
@@ -803,15 +827,16 @@ class _DownloadDetailState extends State<DownloadDetail>
                           ),
                           Card(
                             shape: RoundedRectangleBorder(
-                                side: BorderSide(),
+                                side: const BorderSide(),
                                 borderRadius: BorderRadius.circular(18)),
-                            margin: EdgeInsets.symmetric(
+                            margin: const EdgeInsets.symmetric(
                                 horizontal: 20, vertical: 10),
                             child: Padding(
-                              padding: const EdgeInsets.all(8.0),
+                              padding: const EdgeInsets.all(
+                                  AppConstants.paddingSmall),
                               child: Row(
                                 children: [
-                                  Text("已下载分块数："),
+                                  const Text("已下载分块数："),
                                   Text(
                                       "${task['additional']['transfer']['downloaded_pieces']}"),
                                 ],
@@ -820,51 +845,68 @@ class _DownloadDetailState extends State<DownloadDetail>
                           ),
                           Card(
                             shape: RoundedRectangleBorder(
-                                side: BorderSide(),
+                                side: const BorderSide(),
                                 borderRadius: BorderRadius.circular(18)),
-                            margin: EdgeInsets.symmetric(
+                            margin: const EdgeInsets.symmetric(
                                 horizontal: 20, vertical: 10),
                             child: Padding(
-                              padding: const EdgeInsets.all(8.0),
+                              padding: const EdgeInsets.all(
+                                  AppConstants.paddingSmall),
                               child: Row(
                                 children: [
-                                  Text("已做种时间："),
-                                  Text(
-                                      "${Util.instance.timeRemaining(task['additional']['detail']['seed_elapsed'])}"),
+                                  const Text("已做种时间："),
+                                  Text(HttpUtil.instance.timeRemaining(
+                                      task['additional']['detail']
+                                          ['seed_elapsed'])),
                                 ],
                               ),
                             ),
                           ),
                           Card(
                             shape: RoundedRectangleBorder(
-                                side: BorderSide(),
+                                side: const BorderSide(),
                                 borderRadius: BorderRadius.circular(18)),
-                            margin: EdgeInsets.symmetric(
+                            margin: const EdgeInsets.symmetric(
                                 horizontal: 20, vertical: 10),
                             child: Padding(
-                              padding: const EdgeInsets.all(8.0),
+                              padding: const EdgeInsets.all(
+                                  AppConstants.paddingSmall),
                               child: Row(
                                 children: [
-                                  Text("开始时间："),
-                                  Text(
-                                      "${DateTime.fromMillisecondsSinceEpoch(task['additional']['detail']['started_time'] * 1000).format("Y-m-d H:i:s")}"),
+                                  const Text("开始时间："),
+                                  Text(DateTime.fromMillisecondsSinceEpoch(
+                                          task['additional']['detail']
+                                                  ['started_time'] *
+                                              1000)
+                                      .format("Y-m-d H:i:s")),
                                 ],
                               ),
                             ),
                           ),
                           Card(
                             shape: RoundedRectangleBorder(
-                                side: BorderSide(),
+                                side: const BorderSide(),
                                 borderRadius: BorderRadius.circular(18)),
-                            margin: EdgeInsets.symmetric(
+                            margin: const EdgeInsets.symmetric(
                                 horizontal: 20, vertical: 10),
                             child: Padding(
-                              padding: const EdgeInsets.all(8.0),
+                              padding: const EdgeInsets.all(
+                                  AppConstants.paddingSmall),
                               child: Row(
                                 children: [
-                                  Text("剩余时间："),
-                                  Text(
-                                      "${task['additional']['transfer']['speed_download'] > 0 ? Util.instance.timeRemaining(((task['size'] - task['additional']['transfer']['size_downloaded']) / task['additional']['transfer']['speed_download']).ceil()) : "无法取得"}"),
+                                  const Text("剩余时间："),
+                                  Text(task['additional']['transfer']
+                                              ['speed_download'] >
+                                          0
+                                      ? HttpUtil.instance.timeRemaining(
+                                          ((task['size'] -
+                                                      task['additional']
+                                                              ['transfer']
+                                                          ['size_downloaded']) /
+                                                  task['additional']['transfer']
+                                                      ['speed_download'])
+                                              .ceil())
+                                      : "无法取得"),
                                 ],
                               ),
                             ),
@@ -873,69 +915,69 @@ class _DownloadDetailState extends State<DownloadDetail>
                       ),
                       if (task['type'] == "bt" && task['status'] == 2) ...[
                         loadingTrackers
-                            ? Center(
+                            ? const Center(
                                 child: CupertinoActivityIndicator(
                                   radius: 14,
                                 ),
                               )
-                            : trackers.length == 0
-                                ? Center(
+                            : trackers.isEmpty
+                                ? const Center(
                                     child: Text("无Tracker"),
                                   )
                                 : ListView.separated(
-                                    padding: EdgeInsets.all(20),
+                                    padding: const EdgeInsets.all(20),
                                     itemBuilder: (context, i) {
                                       return _buildTrackerItem(trackers[i]);
                                     },
                                     separatorBuilder: (context, i) {
-                                      return SizedBox(
+                                      return const SizedBox(
                                         height: 20,
                                       );
                                     },
                                     itemCount: trackers.length),
                         loadingPeers
-                            ? Center(
+                            ? const Center(
                                 child: CupertinoActivityIndicator(
                                   radius: 14,
                                 ),
                               )
-                            : peers.length == 0
-                                ? Center(
+                            : peers.isEmpty
+                                ? const Center(
                                     child: Text("无Peer"),
                                   )
                                 : ListView.separated(
-                                    padding: EdgeInsets.all(20),
+                                    padding: const EdgeInsets.all(20),
                                     itemBuilder: (context, i) {
                                       return _buildPeerItem(peers[i]);
                                     },
                                     separatorBuilder: (context, i) {
-                                      return SizedBox(
+                                      return const SizedBox(
                                         height: 20,
                                       );
                                     },
                                     itemCount: peers.length),
                         loadingFiles
-                            ? Center(
+                            ? const Center(
                                 child: CupertinoActivityIndicator(
                                   radius: 14,
                                 ),
                               )
-                            : files.length == 0
-                                ? Center(
+                            : files.isEmpty
+                                ? const Center(
                                     child: Text("无文件"),
                                   )
                                 : ListView.separated(
-                                    padding: EdgeInsets.all(20),
+                                    padding: const EdgeInsets.all(20),
                                     itemBuilder: (context, i) {
                                       return _buildFileItem(files[i]);
                                     },
                                     separatorBuilder: (context, i) {
-                                      return SizedBox(
+                                      return const SizedBox(
                                         height: 20,
                                       );
                                     },
                                     itemCount: files.length),
-                        Center(
+                        const Center(
                           child: Text("暂不支持预览"),
                         ),
                       ],
@@ -946,14 +988,14 @@ class _DownloadDetailState extends State<DownloadDetail>
             ),
       floatingActionButton: showAddTrackerButton
           ? FloatingActionButton(
-              child: Icon(Icons.add),
+              child: const Icon(Icons.add),
               onPressed: () {
                 Navigator.of(context)
                     .push(CupertinoPageRoute(
                         builder: (context) {
                           return AddTracker(widget.id);
                         },
-                        settings: RouteSettings(name: "add_tracker")))
+                        settings: const RouteSettings(name: "add_tracker")))
                     .then((res) {
                   if (res != null && res) {
                     getTrackers();

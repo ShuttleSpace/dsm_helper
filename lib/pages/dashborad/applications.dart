@@ -1,4 +1,5 @@
 import 'package:garden/pages/common/browser.dart';
+import 'package:garden/stores/connection_store.dart';
 import 'package:garden/pages/control_panel/control_panel.dart';
 import 'package:garden/pages/docker/docker.dart';
 import 'package:garden/pages/download_station/download_station.dart';
@@ -10,8 +11,8 @@ import 'package:garden/pages/resource_monitor/resource_monitor.dart';
 import 'package:garden/pages/security_scan/security_scan.dart';
 import 'package:garden/pages/storage_manager/storage_manager.dart';
 import 'package:garden/pages/virtual_machine/virtual_machine.dart';
+import 'package:garden/constants/app_constants.dart';
 import 'package:garden/util/badge.dart';
-import 'package:garden/util/function.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart' hide Badge;
 
@@ -22,7 +23,8 @@ class ApplicationList extends StatelessWidget {
   final List disks;
   final Map appNotify;
   const ApplicationList(
-      this.applications, this.system, this.volumes, this.disks, this.appNotify);
+      this.applications, this.system, this.volumes, this.disks, this.appNotify,
+      {super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +33,8 @@ class ApplicationList extends StatelessWidget {
       color: Theme.of(context).scaffoldBackgroundColor,
       child: SafeArea(
         child: ListView(
-          padding: EdgeInsets.symmetric(horizontal: 20),
+          padding:
+              const EdgeInsets.symmetric(horizontal: AppConstants.paddingLarge),
           children: [
             Wrap(
               spacing: 20,
@@ -46,7 +49,7 @@ class ApplicationList extends StatelessWidget {
 
   List<Widget> _buildApplicationList(BuildContext context) {
     List<Widget> apps = [];
-    applications.forEach((application) {
+    for (var application in applications) {
       switch (application) {
         case "SYNO.SDS.AdminCenter.Application":
           apps.add(
@@ -64,14 +67,14 @@ class ApplicationList extends StatelessWidget {
                               : appNotify['SYNO.SDS.AdminCenter.Application']
                                   ['fn']);
                     },
-                    settings: RouteSettings(name: "control_panel")));
+                    settings: const RouteSettings(name: "control_panel")));
               },
               child: Card(
                 shape: RoundedRectangleBorder(
-                    side: BorderSide(),
+                    side: const BorderSide(),
                     borderRadius: BorderRadius.circular(18)),
                 child: Padding(
-                  padding: const EdgeInsets.all(8.0),
+                  padding: const EdgeInsets.all(AppConstants.paddingSmall),
                   child: Stack(
                     children: [
                       Align(
@@ -79,15 +82,15 @@ class ApplicationList extends StatelessWidget {
                         child: Column(
                           children: [
                             Image.asset(
-                              "assets/applications/${Util.instance.version}/control_panel.png",
+                              "assets/applications/${connectionStore.version}/control_panel.png",
                               height: 45,
                               width: 45,
                               fit: BoxFit.contain,
                             ),
-                            SizedBox(
+                            const SizedBox(
                               height: 5,
                             ),
-                            Text("控制面板"),
+                            const Text("控制面板"),
                           ],
                         ),
                       ),
@@ -116,14 +119,14 @@ class ApplicationList extends StatelessWidget {
                     builder: (context) {
                       return Packages(system['firmware_ver']);
                     },
-                    settings: RouteSettings(name: "packages")));
+                    settings: const RouteSettings(name: "packages")));
               },
               child: Card(
                 shape: RoundedRectangleBorder(
-                    side: BorderSide(),
+                    side: const BorderSide(),
                     borderRadius: BorderRadius.circular(18)),
                 child: Padding(
-                  padding: const EdgeInsets.all(8.0),
+                  padding: const EdgeInsets.all(AppConstants.paddingSmall),
                   child: Stack(
                     children: [
                       Align(
@@ -131,15 +134,15 @@ class ApplicationList extends StatelessWidget {
                         child: Column(
                           children: [
                             Image.asset(
-                              "assets/applications/${Util.instance.version}/package_center.png",
+                              "assets/applications/${connectionStore.version}/package_center.png",
                               height: 45,
                               width: 45,
                               fit: BoxFit.contain,
                             ),
-                            SizedBox(
+                            const SizedBox(
                               height: 5,
                             ),
-                            Text("套件中心"),
+                            const Text("套件中心"),
                           ],
                         ),
                       ),
@@ -165,28 +168,28 @@ class ApplicationList extends StatelessWidget {
                 Navigator.of(context).pop();
                 Navigator.of(context).push(CupertinoPageRoute(
                     builder: (context) {
-                      return ResourceMonitor();
+                      return const ResourceMonitor();
                     },
-                    settings: RouteSettings(name: "resource_monitor")));
+                    settings: const RouteSettings(name: "resource_monitor")));
               },
               child: Card(
                 shape: RoundedRectangleBorder(
-                    side: BorderSide(),
+                    side: const BorderSide(),
                     borderRadius: BorderRadius.circular(18)),
                 child: Padding(
-                  padding: const EdgeInsets.all(8.0),
+                  padding: const EdgeInsets.all(AppConstants.paddingSmall),
                   child: Column(
                     children: [
                       Image.asset(
-                        "assets/applications/${Util.instance.version}/resource_monitor.png",
+                        "assets/applications/${connectionStore.version}/resource_monitor.png",
                         height: 45,
                         width: 45,
                         fit: BoxFit.contain,
                       ),
-                      SizedBox(
+                      const SizedBox(
                         height: 5,
                       ),
-                      Text("资源监控"),
+                      const Text("资源监控"),
                     ],
                   ),
                 ),
@@ -201,28 +204,28 @@ class ApplicationList extends StatelessWidget {
                 Navigator.of(context).pop();
                 Navigator.of(context).push(CupertinoPageRoute(
                     builder: (context) {
-                      return StorageManager();
+                      return const StorageManager();
                     },
-                    settings: RouteSettings(name: "storage_manager")));
+                    settings: const RouteSettings(name: "storage_manager")));
               },
               child: Card(
                 shape: RoundedRectangleBorder(
-                    side: BorderSide(),
+                    side: const BorderSide(),
                     borderRadius: BorderRadius.circular(18)),
                 child: Padding(
-                  padding: const EdgeInsets.all(8.0),
+                  padding: const EdgeInsets.all(AppConstants.paddingSmall),
                   child: Column(
                     children: [
                       Image.asset(
-                        "assets/applications/${Util.instance.version}/storage_manager.png",
+                        "assets/applications/${connectionStore.version}/storage_manager.png",
                         height: 45,
                         width: 45,
                         fit: BoxFit.contain,
                       ),
-                      SizedBox(
+                      const SizedBox(
                         height: 5,
                       ),
-                      Text("存储空间管理员"),
+                      const Text("存储空间管理员"),
                     ],
                   ),
                 ),
@@ -237,28 +240,28 @@ class ApplicationList extends StatelessWidget {
                 Navigator.of(context).pop();
                 Navigator.of(context).push(CupertinoPageRoute(
                     builder: (context) {
-                      return LogCenter();
+                      return const LogCenter();
                     },
-                    settings: RouteSettings(name: "log_center")));
+                    settings: const RouteSettings(name: "log_center")));
               },
               child: Card(
                 shape: RoundedRectangleBorder(
-                    side: BorderSide(),
+                    side: const BorderSide(),
                     borderRadius: BorderRadius.circular(18)),
                 child: Padding(
-                  padding: const EdgeInsets.all(8.0),
+                  padding: const EdgeInsets.all(AppConstants.paddingSmall),
                   child: Column(
                     children: [
                       Image.asset(
-                        "assets/applications/${Util.instance.version}/log_center.png",
+                        "assets/applications/${connectionStore.version}/log_center.png",
                         height: 45,
                         width: 45,
                         fit: BoxFit.contain,
                       ),
-                      SizedBox(
+                      const SizedBox(
                         height: 5,
                       ),
-                      Text("日志中心"),
+                      const Text("日志中心"),
                     ],
                   ),
                 ),
@@ -274,17 +277,17 @@ class ApplicationList extends StatelessWidget {
                 Navigator.of(context).push(
                   CupertinoPageRoute(
                       builder: (context) {
-                        return SecurityScan();
+                        return const SecurityScan();
                       },
-                      settings: RouteSettings(name: "security_scan")),
+                      settings: const RouteSettings(name: "security_scan")),
                 );
               },
               child: Card(
                 shape: RoundedRectangleBorder(
-                    side: BorderSide(),
+                    side: const BorderSide(),
                     borderRadius: BorderRadius.circular(18)),
                 child: Padding(
-                  padding: const EdgeInsets.all(8.0),
+                  padding: const EdgeInsets.all(AppConstants.paddingSmall),
                   child: Stack(
                     children: [
                       Align(
@@ -292,15 +295,15 @@ class ApplicationList extends StatelessWidget {
                         child: Column(
                           children: [
                             Image.asset(
-                              "assets/applications/${Util.instance.version}/security_scan.png",
+                              "assets/applications/${connectionStore.version}/security_scan.png",
                               height: 45,
                               width: 45,
                               fit: BoxFit.contain,
                             ),
-                            SizedBox(
+                            const SizedBox(
                               height: 5,
                             ),
-                            Text("安全顾问"),
+                            const Text("安全顾问"),
                           ],
                         ),
                       ),
@@ -326,7 +329,7 @@ class ApplicationList extends StatelessWidget {
               onTap: () {
                 Navigator.of(context).push(
                   CupertinoPageRoute(builder: (context) {
-                    return Browser(
+                    return const Browser(
                       title: "迅雷-远程设备",
                       url: "https://pan.xunlei.com/yc",
                     );
@@ -335,10 +338,10 @@ class ApplicationList extends StatelessWidget {
               },
               child: Card(
                 shape: RoundedRectangleBorder(
-                    side: BorderSide(),
+                    side: const BorderSide(),
                     borderRadius: BorderRadius.circular(18)),
                 child: Padding(
-                  padding: const EdgeInsets.all(8.0),
+                  padding: const EdgeInsets.all(AppConstants.paddingSmall),
                   child: Column(
                     children: [
                       Image.asset(
@@ -347,10 +350,10 @@ class ApplicationList extends StatelessWidget {
                         width: 45,
                         fit: BoxFit.contain,
                       ),
-                      SizedBox(
+                      const SizedBox(
                         height: 5,
                       ),
-                      Text("迅雷"),
+                      const Text("迅雷"),
                     ],
                   ),
                 ),
@@ -365,29 +368,30 @@ class ApplicationList extends StatelessWidget {
                 Navigator.of(context).pop();
                 Navigator.of(context).push(CupertinoPageRoute(
                   builder: (context) {
-                    return VirtualMachine();
+                    return const VirtualMachine();
                   },
-                  settings: RouteSettings(name: "virtual_machine_manager"),
+                  settings:
+                      const RouteSettings(name: "virtual_machine_manager"),
                 ));
               },
               child: Card(
                 shape: RoundedRectangleBorder(
-                    side: BorderSide(),
+                    side: const BorderSide(),
                     borderRadius: BorderRadius.circular(18)),
                 child: Padding(
-                  padding: const EdgeInsets.all(8.0),
+                  padding: const EdgeInsets.all(AppConstants.paddingSmall),
                   child: Column(
                     children: [
                       Image.asset(
-                        "assets/applications/${Util.instance.version}/virtual_machine.png",
+                        "assets/applications/${connectionStore.version}/virtual_machine.png",
                         height: 45,
                         width: 45,
                         fit: BoxFit.contain,
                       ),
-                      SizedBox(
+                      const SizedBox(
                         height: 5,
                       ),
-                      Text(
+                      const Text(
                         "Virtual Machine Manager",
                         maxLines: 1,
                         textAlign: TextAlign.center,
@@ -407,17 +411,17 @@ class ApplicationList extends StatelessWidget {
                 Navigator.of(context).pop();
                 Navigator.of(context).push(CupertinoPageRoute(
                   builder: (context) {
-                    return Docker();
+                    return const Docker();
                   },
-                  settings: RouteSettings(name: "docker"),
+                  settings: const RouteSettings(name: "docker"),
                 ));
               },
               child: Card(
                 shape: RoundedRectangleBorder(
-                    side: BorderSide(),
+                    side: const BorderSide(),
                     borderRadius: BorderRadius.circular(18)),
                 child: Padding(
-                  padding: const EdgeInsets.all(8.0),
+                  padding: const EdgeInsets.all(AppConstants.paddingSmall),
                   child: Column(
                     children: [
                       Image.asset(
@@ -426,10 +430,10 @@ class ApplicationList extends StatelessWidget {
                         width: 45,
                         fit: BoxFit.contain,
                       ),
-                      SizedBox(
+                      const SizedBox(
                         height: 5,
                       ),
-                      Text(
+                      const Text(
                         "Docker",
                         maxLines: 1,
                         textAlign: TextAlign.center,
@@ -449,14 +453,14 @@ class ApplicationList extends StatelessWidget {
                 Navigator.of(context).pop();
                 Navigator.of(context).push(CupertinoPageRoute(
                   builder: (context) {
-                    return Docker(title: "Container Manager");
+                    return const Docker(title: "Container Manager");
                   },
-                  settings: RouteSettings(name: "Container Manager"),
+                  settings: const RouteSettings(name: "Container Manager"),
                 ));
               },
               child: Card(
                 shape: RoundedRectangleBorder(
-                    side: BorderSide(),
+                    side: const BorderSide(),
                     borderRadius: BorderRadius.circular(18)),
                 child: Column(
                   children: [
@@ -468,10 +472,10 @@ class ApplicationList extends StatelessWidget {
                           width: 45,
                           fit: BoxFit.contain,
                         ),
-                        SizedBox(
+                        const SizedBox(
                           height: 5,
                         ),
-                        Text(
+                        const Text(
                           "Container Manager",
                           maxLines: 1,
                           textAlign: TextAlign.center,
@@ -492,17 +496,17 @@ class ApplicationList extends StatelessWidget {
                 Navigator.of(context).pop();
                 Navigator.of(context).push(CupertinoPageRoute(
                   builder: (context) {
-                    return DownloadStation();
+                    return const DownloadStation();
                   },
-                  settings: RouteSettings(name: "download_station"),
+                  settings: const RouteSettings(name: "download_station"),
                 ));
               },
               child: Card(
                 shape: RoundedRectangleBorder(
-                    side: BorderSide(),
+                    side: const BorderSide(),
                     borderRadius: BorderRadius.circular(18)),
                 child: Padding(
-                  padding: const EdgeInsets.all(8.0),
+                  padding: const EdgeInsets.all(AppConstants.paddingSmall),
                   child: Column(
                     children: [
                       Image.asset(
@@ -511,10 +515,10 @@ class ApplicationList extends StatelessWidget {
                         width: 45,
                         fit: BoxFit.contain,
                       ),
-                      SizedBox(
+                      const SizedBox(
                         height: 5,
                       ),
-                      Text(
+                      const Text(
                         "Download Station",
                         maxLines: 1,
                         textAlign: TextAlign.center,
@@ -534,17 +538,17 @@ class ApplicationList extends StatelessWidget {
                 Navigator.of(context).pop();
                 Navigator.of(context).push(CupertinoPageRoute(
                   builder: (context) {
-                    return Moments();
+                    return const Moments();
                   },
-                  settings: RouteSettings(name: "moments"),
+                  settings: const RouteSettings(name: "moments"),
                 ));
               },
               child: Card(
                 shape: RoundedRectangleBorder(
-                    side: BorderSide(),
+                    side: const BorderSide(),
                     borderRadius: BorderRadius.circular(18)),
                 child: Padding(
-                  padding: const EdgeInsets.all(8.0),
+                  padding: const EdgeInsets.all(AppConstants.paddingSmall),
                   child: Column(
                     children: [
                       Image.asset(
@@ -553,10 +557,10 @@ class ApplicationList extends StatelessWidget {
                         width: 45,
                         fit: BoxFit.contain,
                       ),
-                      SizedBox(
+                      const SizedBox(
                         height: 5,
                       ),
-                      Text(
+                      const Text(
                         "Moments",
                         maxLines: 1,
                         textAlign: TextAlign.center,
@@ -576,17 +580,17 @@ class ApplicationList extends StatelessWidget {
                 Navigator.of(context).pop();
                 Navigator.of(context).push(CupertinoPageRoute(
                   builder: (context) {
-                    return Photos();
+                    return const Photos();
                   },
-                  settings: RouteSettings(name: "photos"),
+                  settings: const RouteSettings(name: "photos"),
                 ));
               },
               child: Card(
                 shape: RoundedRectangleBorder(
-                    side: BorderSide(),
+                    side: const BorderSide(),
                     borderRadius: BorderRadius.circular(18)),
                 child: Padding(
-                  padding: const EdgeInsets.all(8.0),
+                  padding: const EdgeInsets.all(AppConstants.paddingSmall),
                   child: Column(
                     children: [
                       Image.asset(
@@ -595,10 +599,10 @@ class ApplicationList extends StatelessWidget {
                         width: 45,
                         fit: BoxFit.contain,
                       ),
-                      SizedBox(
+                      const SizedBox(
                         height: 5,
                       ),
-                      Text(
+                      const Text(
                         "Synology Photos",
                         maxLines: 1,
                         textAlign: TextAlign.center,
@@ -612,7 +616,7 @@ class ApplicationList extends StatelessWidget {
           );
           break;
       }
-    });
+    }
     // if (applications.contains("SYNO.SDS.EzInternet.Instance")) {
     //   apps.add(
     //     NeuCard(
@@ -762,7 +766,7 @@ class ApplicationList extends StatelessWidget {
     //         child: Column(
     //           children: [
     //             Image.asset(
-    //               "assets/applications/${Util.version}/universal_search.png",
+    //               "assets/applications/${HttpUtil.version}/universal_search.png",
     //               height: 45,
     //               width: 45,
     //               fit: BoxFit.contain,

@@ -1,23 +1,25 @@
 import 'package:garden/pages/docker/detail.dart';
-import 'package:garden/themes/app_theme.dart';
-import 'package:garden/util/function.dart';
+import 'package:garden/util/ui_util.dart';
+import 'package:garden/util/http_util.dart';
 import 'package:garden/util/log.dart';
-import 'package:garden/widgets/bubble_tab_indicator.dart';
+import 'package:garden/widgets/action_dialog.dart';
 import 'package:garden/widgets/animation_progress_bar.dart';
-import 'package:garden/widgets/label.dart';
+import 'package:garden/widgets/bubble_tab_indicator.dart';
+import 'package:garden/widgets/docker/container_item.dart';
+import 'package:garden/widgets/docker/image_item.dart';
 import 'package:garden/widgets/neu_back_button.dart';
-import 'package:extended_text/extended_text.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:garden/constants/app_constants.dart';
 
 class Docker extends StatefulWidget {
   final String title;
-  Docker({this.title = 'Docker'});
+  const Docker({super.key, this.title = 'Docker'});
   @override
-  _DockerState createState() => _DockerState();
+  DockerState createState() => DockerState();
 }
 
-class _DockerState extends State<Docker> with SingleTickerProviderStateMixin {
+class DockerState extends State<Docker> with SingleTickerProviderStateMixin {
   late TabController _tabController;
   List containers = [];
   List images = [];
@@ -26,16 +28,6 @@ class _DockerState extends State<Docker> with SingleTickerProviderStateMixin {
   Map utilization = {};
   bool containerLoading = true;
   bool imageLoading = true;
-
-  // 主题颜色
-  Color get _errorColor =>
-      Theme.of(context).extension<AppTheme>()?.errorColor ?? Colors.redAccent;
-  Color get _successColor =>
-      Theme.of(context).extension<AppTheme>()?.successColor ?? Colors.green;
-  Color get _warningColor =>
-      Theme.of(context).extension<AppTheme>()?.warningColor ?? Colors.orange;
-  Color get _infoColor =>
-      Theme.of(context).extension<AppTheme>()?.infoColor ?? Colors.blue;
 
   @override
   void initState() {
@@ -52,7 +44,7 @@ class _DockerState extends State<Docker> with SingleTickerProviderStateMixin {
     });
     if (res['success']) {
       List result = res['data']['result'];
-      result.forEach((item) {
+      for (var item in result) {
         if (item['success'] == true) {
           switch (item['api']) {
             case "SYNO.Core.System.Utilization":
@@ -70,8 +62,8 @@ class _DockerState extends State<Docker> with SingleTickerProviderStateMixin {
               break;
             case "SYNO.Docker.Container.Resource":
               List resources = item['data']['resources'];
-              resources.forEach((resource) {
-                containers.forEach((container) {
+              for (var resource in resources) {
+                for (var container in containers) {
                   if (resource['name'] == container['name']) {
                     setState(() {
                       container['cpu'] = resource['cpu'];
@@ -79,12 +71,12 @@ class _DockerState extends State<Docker> with SingleTickerProviderStateMixin {
                       container['memoryPercent'] = resource['memoryPercent'];
                     });
                   }
-                });
-              });
+                }
+              }
               break;
           }
         }
-      });
+      }
     }
   }
 
@@ -96,7 +88,7 @@ class _DockerState extends State<Docker> with SingleTickerProviderStateMixin {
     });
     if (res['success']) {
       List result = res['data']['result'];
-      result.forEach((item) {
+      for (var item in result) {
         if (item['success'] == true) {
           switch (item['api']) {
             case "SYNO.Docker.Image":
@@ -114,466 +106,57 @@ class _DockerState extends State<Docker> with SingleTickerProviderStateMixin {
               break;
           }
         }
-      });
+      }
     }
   }
 
   power(container, String action, {bool preserveProfile = false}) async {
     if (action == "signal" || action == "delete") {
-      showCupertinoModalPopup(
+      final message = action == "signal"
+          ? "是否确定要强制停止容器？所有未保存的数据将丢失！"
+          : preserveProfile
+              ? "容器 ${container['name']} 将被清除。清除后，容器中的所有数据将丢失。是否确定继续？"
+              : "容器 ${container['name']} 将被删除。删除后，容器中的所有数据将丢失。是否确定继续？";
+
+      final confirmed = await ActionDialog.show(
         context: context,
-        builder: (context) {
-          return Material(
-            color: Colors.transparent,
-            child: Card(
-              shape: RoundedRectangleBorder(
-                  side: BorderSide(), borderRadius: BorderRadius.circular(18)),
-              child: SafeArea(
-                top: false,
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: <Widget>[
-                      Text(
-                        "确认操作",
-                        style: TextStyle(
-                            fontSize: 20, fontWeight: FontWeight.w500),
-                      ),
-                      SizedBox(
-                        height: 12,
-                      ),
-                      Text(
-                        action == "signal"
-                            ? "是否确定要强制停止容器？所有未保存的数据将丢失！"
-                            : preserveProfile
-                                ? "容器 ${container['name']} 将被清除。清除后，容器中的所有数据将丢失。是否确定继续？"
-                                : "容器 ${container['name']} 将被删除。删除后，容器中的所有数据将丢失。是否确定继续？",
-                        style: TextStyle(
-                            fontSize: 20, fontWeight: FontWeight.w400),
-                      ),
-                      SizedBox(
-                        height: 22,
-                      ),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: OutlinedButton(
-                              onPressed: () async {
-                                Navigator.of(context).pop();
-                                setState(() {
-                                  powerLoading[container['id']] = true;
-                                });
-                                var res = await Api.dockerPower(
-                                    container['name'], action,
-                                    preserveProfile: preserveProfile);
-                                if (res['success']) {
-                                  Util.instance.toast("请求发送成功");
-                                  getContainer();
-                                } else {
-                                  Util.instance.toast(
-                                      "请求发送失败，代码：${res['error']['code']}");
-                                }
-                                setState(() {
-                                  powerLoading[container['id']] = false;
-                                });
-                              },
-                              child: Text(
-                                "确认",
-                                style: TextStyle(
-                                    fontSize: 18, color: Colors.redAccent),
-                              ),
-                            ),
-                          ),
-                          SizedBox(
-                            width: 16,
-                          ),
-                          Expanded(
-                            child: OutlinedButton(
-                              onPressed: () async {
-                                Navigator.of(context).pop();
-                              },
-                              child: Text(
-                                "取消",
-                                style: TextStyle(fontSize: 18),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      SizedBox(
-                        height: 8,
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          );
-        },
+        title: "确认操作",
+        message: message,
+        confirmText: "确认",
+        isDanger: true,
       );
+
+      if (confirmed == true) {
+        setState(() {
+          powerLoading[container['id']] = true;
+        });
+        var res = await Api.dockerPower(container['name'], action,
+            preserveProfile: preserveProfile);
+        if (res['success']) {
+          UiUtil.toast("请求发送成功");
+          getContainer();
+        } else {
+          UiUtil.toast("请求发送失败，代码：${res['error']['code']}");
+        }
+        setState(() {
+          powerLoading[container['id']] = false;
+        });
+      }
     } else {
       setState(() {
         powerLoading[container['id']] = true;
       });
       var res = await Api.dockerPower(container['name'], action);
       if (res['success']) {
-        Util.instance.toast("请求发送成功");
+        UiUtil.toast("请求发送成功");
         getContainer();
       } else {
-        Util.instance.toast("请求发送失败，代码：${res['error']['code']}");
+        UiUtil.toast("请求发送失败，代码：${res['error']['code']}");
       }
       setState(() {
         powerLoading[container['id']] = false;
       });
     }
-  }
-
-  Widget _buildContainerItem(container) {
-    if (powerLoading[container['id']] == null) {
-      powerLoading[container['id']] = false;
-    }
-    return GestureDetector(
-      onTap: () {
-        Navigator.of(context).push(CupertinoPageRoute(
-            builder: (context) {
-              return ContainerDetail(container['name']);
-            },
-            settings: RouteSettings(name: "docker_container_detail")));
-      },
-      child: Card(
-        shape: RoundedRectangleBorder(
-            side: BorderSide(), borderRadius: BorderRadius.circular(18)),
-        margin: EdgeInsets.only(bottom: 20),
-        child: Padding(
-          padding: EdgeInsets.all(20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Expanded(
-                    child: Column(
-                      children: [
-                        Row(
-                          children: [
-                            Text(
-                              container['name'],
-                              style: TextStyle(
-                                  fontSize: 18, fontWeight: FontWeight.w600),
-                            ),
-                            Spacer(),
-                            container['status'] == "running"
-                                ? Label("运行中", Colors.green)
-                                : container['status'] == "stopped"
-                                    ? Label("已停止", Colors.red)
-                                    : Label(container['status'], Colors.orange),
-                          ],
-                        ),
-                        SizedBox(
-                          height: 10,
-                        ),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: Text(
-                                container['image'],
-                                style:
-                                    TextStyle(fontSize: 12, color: Colors.grey),
-                              ),
-                            ),
-                            SizedBox(
-                              width: 10,
-                            ),
-                            if (container['status'] == "running")
-                              Text(
-                                DateTime.fromMillisecondsSinceEpoch(
-                                        container['up_time'] * 1000)
-                                    .timeAgo,
-                                style:
-                                    TextStyle(fontSize: 12, color: Colors.grey),
-                              ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                  SizedBox(
-                    width: 20,
-                  ),
-                  GestureDetector(
-                    onTap: () async {
-                      if (powerLoading[container['id']] == true) {
-                        return;
-                      }
-
-                      showCupertinoModalPopup(
-                        context: context,
-                        builder: (context) {
-                          return Material(
-                            color: Colors.transparent,
-                            child: Card(
-                              shape: RoundedRectangleBorder(
-                                  side: BorderSide(),
-                                  borderRadius: BorderRadius.circular(18)),
-                              child: SafeArea(
-                                top: false,
-                                child: Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: <Widget>[
-                                      Text(
-                                        "选择操作",
-                                        style: TextStyle(
-                                            fontSize: 20,
-                                            fontWeight: FontWeight.w500),
-                                      ),
-                                      SizedBox(
-                                        height: 12,
-                                      ),
-                                      if (container['status'] == "stopped") ...[
-                                        OutlinedButton(
-                                          onPressed: () async {
-                                            Navigator.of(context).pop();
-                                            power(container, "start");
-                                          },
-                                          child: Text(
-                                            "启动",
-                                            style: TextStyle(fontSize: 18),
-                                          ),
-                                        ),
-                                        SizedBox(
-                                          height: 22,
-                                        ),
-                                        OutlinedButton(
-                                          onPressed: () async {
-                                            Navigator.of(context).pop();
-                                            power(container, "delete",
-                                                preserveProfile: true);
-                                          },
-                                          child: Text(
-                                            "清除",
-                                            style: TextStyle(
-                                                fontSize: 18,
-                                                color: Colors.redAccent),
-                                          ),
-                                        ),
-                                        SizedBox(
-                                          height: 22,
-                                        ),
-                                        OutlinedButton(
-                                          onPressed: () async {
-                                            Navigator.of(context).pop();
-                                            power(container, "delete",
-                                                preserveProfile: false);
-                                          },
-                                          child: Text(
-                                            "删除",
-                                            style: TextStyle(
-                                                fontSize: 18,
-                                                color: Colors.redAccent),
-                                          ),
-                                        ),
-                                      ] else ...[
-                                        OutlinedButton(
-                                          onPressed: () async {
-                                            Navigator.of(context).pop();
-                                            power(container, "stop");
-                                          },
-                                          child: Text(
-                                            "停止",
-                                            style: TextStyle(
-                                                fontSize: 18,
-                                                color: Colors.redAccent),
-                                          ),
-                                        ),
-                                        SizedBox(
-                                          height: 22,
-                                        ),
-                                        OutlinedButton(
-                                          onPressed: () async {
-                                            Navigator.of(context).pop();
-                                            power(container, "signal");
-                                          },
-                                          child: Text(
-                                            "强制停止",
-                                            style: TextStyle(
-                                                fontSize: 18,
-                                                color: Colors.redAccent),
-                                          ),
-                                        ),
-                                        SizedBox(
-                                          height: 22,
-                                        ),
-                                        OutlinedButton(
-                                          onPressed: () async {
-                                            Navigator.of(context).pop();
-                                            power(container, "restart");
-                                          },
-                                          child: Text(
-                                            "重新启动",
-                                            style: TextStyle(
-                                                fontSize: 18,
-                                                color: Colors.redAccent),
-                                          ),
-                                        ),
-                                      ],
-                                      SizedBox(
-                                        height: 8,
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ),
-                          );
-                        },
-                      );
-                    },
-                    child: Card(
-                      shape: RoundedRectangleBorder(
-                          side: BorderSide(),
-                          borderRadius: BorderRadius.circular(18)),
-                      child: powerLoading[container['id']] == true
-                          ? CupertinoActivityIndicator()
-                          : Image.asset(
-                              "assets/icons/shutdown.png",
-                              width: 20,
-                            ),
-                    ),
-                  ),
-                ],
-              ),
-              if (container['status'] == "running") ...[
-                SizedBox(
-                  height: 10,
-                ),
-                Row(
-                  children: [
-                    Expanded(
-                      child: Column(
-                        children: [
-                          Row(
-                            children: [
-                              Text("CPU"),
-                              Spacer(),
-                              Text(
-                                "${container['cpu'].toStringAsFixed(2)}%",
-                                style: TextStyle(
-                                    color: Colors.blue,
-                                    fontWeight: FontWeight.w600),
-                              ),
-                            ],
-                          ),
-                          SizedBox(
-                            height: 10,
-                          ),
-                          FAProgressBar(
-                            backgroundColor: Colors.transparent,
-                            changeColorValue: 90,
-                            changeProgressColor: Colors.red,
-                            progressColor: Colors.blue,
-                            size: 20,
-                            displayText: "%",
-                            currentValue: (container['cpu']).ceil(),
-                          ),
-                        ],
-                      ),
-                    ),
-                    SizedBox(
-                      width: 20,
-                    ),
-                    Expanded(
-                      child: Column(
-                        children: [
-                          Row(
-                            children: [
-                              Text("内存"),
-                              Spacer(),
-                              Text(
-                                "${Util.instance.formatSize(container['memory'], fixed: 0)}",
-                                style: TextStyle(
-                                    color: Colors.green,
-                                    fontWeight: FontWeight.w600),
-                              ),
-                            ],
-                          ),
-                          SizedBox(
-                            height: 10,
-                          ),
-                          FAProgressBar(
-                            backgroundColor: Colors.transparent,
-                            changeColorValue: 90,
-                            changeProgressColor: Colors.red,
-                            progressColor: Colors.green,
-                            size: 20,
-                            displayText: "%",
-                            currentValue: container['memoryPercent'].ceil(),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildImageItem(image) {
-    return Card(
-      shape: RoundedRectangleBorder(
-          side: BorderSide(), borderRadius: BorderRadius.circular(18)),
-      child: Padding(
-        padding: EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Flexible(
-                  child: ExtendedText(
-                    "${image['repository']}:${image['tags'].join(",")}",
-                    maxLines: 1,
-                    overflowWidget: TextOverflowWidget(
-                      position: TextOverflowPosition.middle,
-                      align: TextOverflowAlign.right,
-                      child: Text(
-                        "…",
-                        style: TextStyle(color: Colors.grey),
-                      ),
-                    ),
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                ),
-                SizedBox(
-                  width: 10,
-                ),
-                Label(
-                    Util.instance
-                        .formatSize(image['size'], fixed: 0, format: 1000),
-                    Theme.of(context).primaryColor),
-              ],
-            ),
-            if (image['description'] != null || image['description'] != '') ...[
-              SizedBox(
-                height: 10,
-              ),
-              Text(
-                "${image['description']}",
-                style: TextStyle(
-                  color: Colors.grey,
-                ),
-              )
-            ],
-          ],
-        ),
-      ),
-    );
   }
 
   @override
@@ -587,8 +170,9 @@ class _DockerState extends State<Docker> with SingleTickerProviderStateMixin {
         children: [
           Card(
             shape: RoundedRectangleBorder(
-                side: BorderSide(), borderRadius: BorderRadius.circular(18)),
-            margin: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                side: const BorderSide(),
+                borderRadius: BorderRadius.circular(18)),
+            margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
             child: TabBar(
               dividerHeight: 0,
               isScrollable: false,
@@ -598,8 +182,8 @@ class _DockerState extends State<Docker> with SingleTickerProviderStateMixin {
                   ? Colors.white
                   : Colors.black,
               unselectedLabelColor: Colors.grey,
-              indicator: BubbleTabIndicator(),
-              tabs: [
+              indicator: const BubbleTabIndicator(),
+              tabs: const [
                 Padding(
                   padding: EdgeInsets.symmetric(vertical: 10, horizontal: 5),
                   child: Text("容器"),
@@ -620,23 +204,24 @@ class _DockerState extends State<Docker> with SingleTickerProviderStateMixin {
               controller: _tabController,
               children: [
                 containerLoading
-                    ? Center(
+                    ? const Center(
                         child: CupertinoActivityIndicator(
                           radius: 14,
                         ),
                       )
                     : ListView(
-                        padding: EdgeInsets.all(20),
+                        padding: const EdgeInsets.all(20),
                         children: [
                           Row(
                             children: [
                               Expanded(
                                 child: Card(
                                   shape: RoundedRectangleBorder(
-                                      side: BorderSide(),
+                                      side: const BorderSide(),
                                       borderRadius: BorderRadius.circular(18)),
                                   child: Padding(
-                                    padding: const EdgeInsets.all(20.0),
+                                    padding: const EdgeInsets.all(
+                                        AppConstants.paddingLarge),
                                     child: Column(
                                       children: [
                                         Row(
@@ -647,10 +232,10 @@ class _DockerState extends State<Docker> with SingleTickerProviderStateMixin {
                                               "assets/icons/cpu.png",
                                               width: 50,
                                             ),
-                                            SizedBox(
+                                            const SizedBox(
                                               width: 10,
                                             ),
-                                            Text(
+                                            const Text(
                                               "CPU",
                                               style: TextStyle(
                                                   fontSize: 20,
@@ -658,7 +243,7 @@ class _DockerState extends State<Docker> with SingleTickerProviderStateMixin {
                                             ),
                                           ],
                                         ),
-                                        SizedBox(
+                                        const SizedBox(
                                           height: 10,
                                         ),
                                         FAProgressBar(
@@ -676,16 +261,16 @@ class _DockerState extends State<Docker> with SingleTickerProviderStateMixin {
                                   ),
                                 ),
                               ),
-                              SizedBox(
+                              const SizedBox(
                                 width: 20,
                               ),
                               Expanded(
                                 child: Card(
                                   shape: RoundedRectangleBorder(
-                                      side: BorderSide(),
+                                      side: const BorderSide(),
                                       borderRadius: BorderRadius.circular(18)),
                                   child: Padding(
-                                    padding: EdgeInsets.all(20),
+                                    padding: const EdgeInsets.all(20),
                                     child: Column(
                                       children: [
                                         Row(
@@ -696,10 +281,10 @@ class _DockerState extends State<Docker> with SingleTickerProviderStateMixin {
                                               "assets/icons/ram.png",
                                               width: 50,
                                             ),
-                                            SizedBox(
+                                            const SizedBox(
                                               width: 10,
                                             ),
-                                            Text(
+                                            const Text(
                                               "内存",
                                               style: TextStyle(
                                                   fontSize: 20,
@@ -707,7 +292,7 @@ class _DockerState extends State<Docker> with SingleTickerProviderStateMixin {
                                             ),
                                           ],
                                         ),
-                                        SizedBox(
+                                        const SizedBox(
                                           height: 10,
                                         ),
                                         FAProgressBar(
@@ -726,30 +311,48 @@ class _DockerState extends State<Docker> with SingleTickerProviderStateMixin {
                               ),
                             ],
                           ),
-                          SizedBox(
+                          const SizedBox(
                             height: 20,
                           ),
-                          ...containers.map(_buildContainerItem).toList(),
+                          ...containers.map((container) => ContainerItem(
+                                container: container,
+                                isLoading:
+                                    powerLoading[container['id']] ?? false,
+                                onTap: () {
+                                  Navigator.of(context).push(CupertinoPageRoute(
+                                      builder: (context) {
+                                        return ContainerDetail(
+                                            container['name']);
+                                      },
+                                      settings: const RouteSettings(
+                                          name: "docker_container_detail")));
+                                },
+                                onAction: (action,
+                                    {bool preserveProfile = false}) {
+                                  power(container, action,
+                                      preserveProfile: preserveProfile);
+                                },
+                              )),
                         ],
                       ),
                 imageLoading
-                    ? Center(
+                    ? const Center(
                         child: CupertinoActivityIndicator(
                           radius: 14,
                         ),
                       )
                     : ListView.separated(
-                        padding: EdgeInsets.all(20),
+                        padding: const EdgeInsets.all(20),
                         itemBuilder: (context, i) {
-                          return _buildImageItem(images[i]);
+                          return ImageItem(image: images[i]);
                         },
                         separatorBuilder: (context, i) {
-                          return SizedBox(
+                          return const SizedBox(
                             height: 20,
                           );
                         },
                         itemCount: images.length),
-                Center(
+                const Center(
                   child: Text("开发中"),
                 ),
               ],

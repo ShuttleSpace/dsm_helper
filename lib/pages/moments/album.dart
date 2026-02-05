@@ -1,5 +1,6 @@
 import 'package:garden/pages/moments/photos.dart';
-import 'package:garden/util/function.dart';
+import 'package:garden/stores/connection_store.dart';
+import 'package:garden/theme/app_colors.dart';
 import 'package:garden/util/moments_api.dart';
 import 'package:garden/widgets/cupertino_image.dart';
 import 'package:garden/widgets/neu_back_button.dart';
@@ -9,12 +10,12 @@ import 'package:flutter/material.dart';
 class Album extends StatefulWidget {
   final bool shared;
   final String title;
-  Album(this.title, {this.shared = false});
+  const Album(this.title, {super.key, this.shared = false});
   @override
-  _AlbumState createState() => _AlbumState();
+  AlbumState createState() => AlbumState();
 }
 
-class _AlbumState extends State<Album> {
+class AlbumState extends State<Album> {
   bool loadingAlbum = true;
   double albumWidth = 0;
   List album = [];
@@ -36,7 +37,7 @@ class _AlbumState extends State<Album> {
 
   Widget _buildAlbumItem(album) {
     String thumbUrl =
-        '${Util.instance.baseUrl}/webapi/entry.cgi?id=${album['additional']['thumbnail']['unit_id']}&cache_key="${album['additional']['thumbnail']['cache_key']}"&type="unit"&size="sm"&api="SYNO.${Util.instance.version == 7 ? "Foto" : "Photo"}.Thumbnail"&method="get"&version=1&_sid=${Util.instance.sid}';
+        '${connectionStore.baseUrl}/webapi/entry.cgi?id=${album['additional']['thumbnail']['unit_id']}&cache_key="${album['additional']['thumbnail']['cache_key']}"&type="unit"&size="sm"&api="SYNO.${connectionStore.version >= 7 ? "Foto" : "Photo"}.Thumbnail"&method="get"&version=1&_sid=${connectionStore.sid}';
     String tag = "album-${album['additional']['thumbnail']['unit_id']}";
     return GestureDetector(
       onTap: () {
@@ -49,7 +50,7 @@ class _AlbumState extends State<Album> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
+          SizedBox(
             width: albumWidth,
             height: albumWidth,
             child: Hero(
@@ -64,22 +65,22 @@ class _AlbumState extends State<Album> {
                 placeholder: Container(
                   width: albumWidth,
                   height: albumWidth,
-                  color: Color(0xffE9E9E9),
+                  color: AppColors.placeholderBackgroundLight,
                 ),
               ),
             ),
           ),
-          SizedBox(
+          const SizedBox(
             height: 5,
           ),
           Text(
             "${album['name']}",
-            style: TextStyle(fontSize: 14),
+            style: const TextStyle(fontSize: 14),
             maxLines: 1,
           ),
           Text(
             "${album['item_count']}",
-            style: TextStyle(fontSize: 12, color: Colors.grey),
+            style: const TextStyle(fontSize: 12, color: Colors.grey),
           ),
         ],
       ),
@@ -96,25 +97,25 @@ class _AlbumState extends State<Album> {
         title: Text(widget.title),
       ),
       body: loadingAlbum
-          ? Center(
+          ? const Center(
               child: CupertinoActivityIndicator(
                 radius: 14,
               ),
             )
-          : album.length > 0
+          : album.isNotEmpty
               ? ListView(
-                  padding: EdgeInsets.all(20),
+                  padding: const EdgeInsets.all(20),
                   children: [
                     Wrap(
                       runSpacing: 20,
                       spacing: 20,
                       children: [
-                        ...album.map(_buildAlbumItem).toList(),
+                        ...album.map(_buildAlbumItem),
                       ],
                     )
                   ],
                 )
-              : Container(
+              : const SizedBox(
                   height: 500,
                   child: Center(
                     child: Text("无手动创建的相册"),

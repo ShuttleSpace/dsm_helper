@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 class TimelinePage extends StatefulWidget {
   const TimelinePage({
+    super.key,
     this.title,
     this.type,
     this.geocodingId = 0,

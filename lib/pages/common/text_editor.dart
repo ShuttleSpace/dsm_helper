@@ -7,13 +7,13 @@ import 'package:flutter_highlight/themes/github.dart';
 class TextEditor extends StatefulWidget {
   final String fileName;
   final String content;
-  TextEditor({required this.fileName, required this.content});
+  const TextEditor({super.key, required this.fileName, required this.content});
   @override
-  _TextEditorState createState() => _TextEditorState();
+  TextEditorState createState() => TextEditorState();
 }
 
-class _TextEditorState extends State<TextEditor> {
-  ScrollController _scrollController = ScrollController();
+class TextEditorState extends State<TextEditor> {
+  final ScrollController _scrollController = ScrollController();
   late String language;
   @override
   void initState() {
@@ -72,7 +72,7 @@ class _TextEditorState extends State<TextEditor> {
     return Scaffold(
       appBar: AppBar(
         leading: AppBackButton(context),
-        title: Text("查看文件"),
+        title: const Text("查看文件"),
       ),
       body: DraggableScrollbar.semicircle(
         controller: _scrollController,
@@ -91,7 +91,7 @@ class _TextEditorState extends State<TextEditor> {
               theme: githubTheme,
 
               // Specify padding
-              padding: EdgeInsets.all(12),
+              padding: const EdgeInsets.all(12),
             )
           ],
         ),

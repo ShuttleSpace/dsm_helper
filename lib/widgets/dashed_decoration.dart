@@ -175,7 +175,7 @@ class DashedDecoration extends Decoration {
       // TODO(ianh): fade the image from transparent
       border: BoxBorder.lerp(null, border, factor),
       borderRadius: BorderRadiusGeometry.lerp(null, borderRadius, factor) ??
-          BorderRadius.all(Radius.circular(10)),
+          const BorderRadius.all(Radius.circular(10)),
       boxShadow: BoxShadow.lerpList(null, boxShadow, factor),
       gradient: gradient?.scale(factor),
       shape: shape,
@@ -231,7 +231,7 @@ class DashedDecoration extends Decoration {
       border: BoxBorder.lerp(a.border, b.border, t),
       borderRadius:
           BorderRadiusGeometry.lerp(a.borderRadius, b.borderRadius, t) ??
-              BorderRadius.all(Radius.circular(10)),
+              const BorderRadius.all(Radius.circular(10)),
       boxShadow: BoxShadow.lerpList(a.boxShadow, b.boxShadow, t),
       gradient: Gradient.lerp(a.gradient, b.gradient, t),
       shape: t < 0.5 ? a.shape : b.shape,
@@ -304,14 +304,14 @@ class DashedDecoration extends Decoration {
   }
 
   @override
-  _BoxDecorationPainter createBoxPainter([VoidCallback? onChanged]) {
-    return _BoxDecorationPainter(this, onChanged);
+  BoxDecorationPainter createBoxPainter([VoidCallback? onChanged]) {
+    return BoxDecorationPainter(this, onChanged);
   }
 }
 
 /// An object that paints a [DashedDecoration] into a canvas.
-class _BoxDecorationPainter extends BoxPainter {
-  _BoxDecorationPainter(this._decoration, VoidCallback? onChanged)
+class BoxDecorationPainter extends BoxPainter {
+  BoxDecorationPainter(this._decoration, VoidCallback? onChanged)
       : super(onChanged);
 
   final DashedDecoration _decoration;
@@ -323,8 +323,9 @@ class _BoxDecorationPainter extends BoxPainter {
     if ((_rectForCachedBackgroundPaint != rect)) {
       final Paint paint = Paint();
       paint.blendMode = _decoration.backgroundBlendMode ?? BlendMode.color;
-      if (_decoration.color != null)
+      if (_decoration.color != null) {
         paint.color = _decoration.color ?? Colors.black;
+      }
       paint.shader = _decoration.gradient
           ?.createShader(rect, textDirection: textDirection);
       _rectForCachedBackgroundPaint = rect;
@@ -363,9 +364,10 @@ class _BoxDecorationPainter extends BoxPainter {
 
   void _paintBackgroundColor(
       Canvas canvas, Rect rect, TextDirection textDirection) {
-    if (_decoration.color != null || _decoration.gradient != null)
+    if (_decoration.color != null || _decoration.gradient != null) {
       _paintBox(canvas, rect, _getBackgroundPaint(rect, textDirection),
           textDirection);
+    }
   }
 
   DecorationImagePainter? _imagePainter;
@@ -420,34 +422,34 @@ class _BoxDecorationPainter extends BoxPainter {
       ..strokeWidth = _decoration.strokeHeight ?? 3
       ..style = PaintingStyle.stroke;
 
-    Path _topPath = getDashedPath(
+    Path topPath = getDashedPath(
       a: math.Point(rect.topLeft.dx, rect.topLeft.dy),
       b: math.Point(rect.topRight.dx, rect.topRight.dy),
       gap: _decoration.gap,
     );
 
-    Path _rightPath = getDashedPath(
+    Path rightPath = getDashedPath(
       a: math.Point(rect.topRight.dx, rect.topRight.dy),
       b: math.Point(rect.bottomRight.dx, rect.bottomRight.dy),
       gap: _decoration.gap,
     );
 
-    Path _bottomPath = getDashedPath(
+    Path bottomPath = getDashedPath(
       a: math.Point(rect.bottomLeft.dx, rect.bottomLeft.dy),
       b: math.Point(rect.bottomRight.dx, rect.bottomRight.dy),
       gap: _decoration.gap,
     );
 
-    Path _leftPath = getDashedPath(
+    Path leftPath = getDashedPath(
       a: math.Point(rect.topLeft.dx, rect.topLeft.dy),
       b: math.Point(rect.bottomLeft.dx, rect.bottomLeft.dy),
       gap: _decoration.gap,
     );
 
-    canvas.drawPath(_topPath, dashedPaint);
-    canvas.drawPath(_rightPath, dashedPaint);
-    canvas.drawPath(_bottomPath, dashedPaint);
-    canvas.drawPath(_leftPath, dashedPaint);
+    canvas.drawPath(topPath, dashedPaint);
+    canvas.drawPath(rightPath, dashedPaint);
+    canvas.drawPath(bottomPath, dashedPaint);
+    canvas.drawPath(leftPath, dashedPaint);
 //    }
   }
 

@@ -1,17 +1,22 @@
 import 'package:garden/pages/file/share.dart';
-import 'package:garden/util/function.dart';
+import 'package:garden/util/file_type_util.dart';
+import 'package:garden/util/http_util.dart';
+import 'package:garden/util/log.dart';
 import 'package:garden/widgets/file_icon.dart';
 import 'package:garden/widgets/label.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:garden/constants/app_constants.dart';
 
 class ShareManager extends StatefulWidget {
+  const ShareManager({super.key});
+
   @override
-  _ShareManagerState createState() => _ShareManagerState();
+  ShareManagerState createState() => ShareManagerState();
 }
 
-class _ShareManagerState extends State<ShareManager> {
+class ShareManagerState extends State<ShareManager> {
   List links = [];
   bool loading = true;
   @override
@@ -22,7 +27,7 @@ class _ShareManagerState extends State<ShareManager> {
 
   getData() async {
     var res = await Api.listShare();
-    print(res);
+    Log.info(res);
     if (res['success']) {
       setState(() {
         loading = false;
@@ -32,9 +37,11 @@ class _ShareManagerState extends State<ShareManager> {
   }
 
   Widget _buildLinkItem(link) {
-    FileTypeEnum fileType = Util.instance.fileType(link['path']);
+    FileTypeEnum fileType =
+        FileTypeUtil.toFileTypeEnum(FileTypeUtil.getFileType(link['path']));
     return Padding(
-      padding: EdgeInsets.symmetric(vertical: 10),
+      padding:
+          const EdgeInsets.symmetric(vertical: AppConstants.paddingSmall + 2),
       child: OutlinedButton(
         onPressed: () {
           Navigator.of(context)
@@ -44,7 +51,7 @@ class _ShareManagerState extends State<ShareManager> {
                       link: link,
                     );
                   },
-                  settings: RouteSettings(name: "share")))
+                  settings: const RouteSettings(name: "share")))
               .then((res) {
             setState(() {
               loading = true;
@@ -66,16 +73,16 @@ class _ShareManagerState extends State<ShareManager> {
                         fileType,
                         thumb: link['path'],
                       ),
-                SizedBox(
+                const SizedBox(
                   width: 5,
                 ),
                 Text(
                   link['name'],
-                  style: TextStyle(fontSize: 16),
+                  style: const TextStyle(fontSize: 16),
                 ),
               ],
             ),
-            SizedBox(
+            const SizedBox(
               height: 10,
             ),
             Row(
@@ -89,16 +96,16 @@ class _ShareManagerState extends State<ShareManager> {
                                 ? "未生效"
                                 : link['status'],
                     link['status'] == "valid" ? Colors.green : Colors.red),
-                SizedBox(
+                const SizedBox(
                   width: 5,
                 ),
                 link['enable_upload']
-                    ? Label(
+                    ? const Label(
                         "文件请求",
                         Colors.lightBlueAccent,
                         fill: true,
                       )
-                    : Label(
+                    : const Label(
                         "共享链接",
                         Colors.greenAccent,
                         fill: true,
@@ -116,18 +123,18 @@ class _ShareManagerState extends State<ShareManager> {
     return Scaffold(
       appBar: AppBar(
         leading: AppBackButton(context),
-        title: Text(
+        title: const Text(
           "共享链接管理",
         ),
       ),
       body: loading
-          ? Center(
+          ? const Center(
               child: CupertinoActivityIndicator(
                 radius: 14,
               ),
             )
           : ListView.builder(
-              padding: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
               itemBuilder: (context, i) {
                 return _buildLinkItem(links[i]);
               },

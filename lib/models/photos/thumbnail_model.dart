@@ -1,4 +1,4 @@
-import 'package:garden/util/function.dart';
+import 'package:garden/stores/connection_store.dart';
 
 /// cache_key : "611690_1665630858"
 /// m : "ready"
@@ -35,7 +35,7 @@ class ThumbnailModel {
   String? xl;
   num? folderCoverSeq;
   String thumbUrl({String size = 'sm', int? folderId, bool isTeam = false}) {
-    return '${Util.instance.baseUrl}/webapi/entry.cgi?id=$unitId&cache_key="$cacheKey"&type="unit"&size="$size"&api="SYNO.Foto${isTeam ? 'Team' : ''}.Thumbnail"&method="get"&version=1&_sid=${Util.instance.sid}';
+    return '${connectionStore.baseUrl}/webapi/entry.cgi?id=$unitId&cache_key="$cacheKey"&type="unit"&size="$size"&api="SYNO.Foto${isTeam ? 'Team' : ''}.Thumbnail"&method="get"&version=1&_sid=${connectionStore.sid}';
   }
 
   ThumbnailModel copyWith({

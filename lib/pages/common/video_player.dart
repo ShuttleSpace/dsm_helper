@@ -1,14 +1,20 @@
 import 'dart:async';
+import 'package:garden/util/format_util.dart';
+import 'package:garden/util/log.dart';
+import 'package:garden/util/ui_util.dart';
+import 'package:garden/stores/connection_store.dart';
 import 'dart:convert';
 import 'dart:io';
 
 import 'package:android_intent_plus/android_intent.dart';
-import 'package:garden/util/function.dart';
+import 'package:garden/util/http_util.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
+import 'package:garden/constants/app_constants.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:media_kit_video/media_kit_video.dart';
+import 'package:simple_logger/simple_logger.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import 'package:xml2json/xml2json.dart';
 
@@ -18,18 +24,19 @@ class VideoPlayerPage extends StatefulWidget {
   final String? cover;
   final String? nfo;
   final bool network;
-  VideoPlayerPage(
-      {required this.url,
+  const VideoPlayerPage(
+      {super.key,
+      required this.url,
       this.name,
       this.cover,
       this.nfo,
       this.network = true});
 
   @override
-  _VideoPlayerPageState createState() => _VideoPlayerPageState();
+  VideoPlayerPageState createState() => VideoPlayerPageState();
 }
 
-class _VideoPlayerPageState extends State<VideoPlayerPage> {
+class VideoPlayerPageState extends State<VideoPlayerPage> {
   late final _player = Player();
   late final _videoController = VideoController(_player,
       configuration:
@@ -73,8 +80,8 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
         _isInitialized = true;
       });
     } catch (error) {
-      print("播放初始化异常: $error");
-      Util.instance.toast("视频加载失败，请尝试使用第三方播放器");
+      Log.logger.log(Level.INFO, "播放初始化异常: $error");
+      UiUtil.toast("视频加载失败，请尝试使用第三方播放器");
     }
   }
 
@@ -88,9 +95,9 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
   parseNfo() async {
     if (widget.nfo != null) {
       final myTransformer = Xml2Json();
-      String nfoUrl = Util.instance.baseUrl +
-          "/fbdownload/info.nfo?dlink=%22${Util.instance.utf8Encode(widget.nfo ?? '')}%22&_sid=%22${Util.instance.sid}%22&mode=open";
-      var res = await Util.instance.get(nfoUrl, decode: false);
+      String nfoUrl =
+          "${connectionStore.baseUrl}/fbdownload/info.nfo?dlink=%22${FormatUtil.utf8Encode(widget.nfo ?? '')}%22&_sid=%22${connectionStore.sid}%22&mode=open";
+      var res = await HttpUtil.instance.get(nfoUrl, decode: false);
       try {
         myTransformer.parse(res);
         var json = jsonDecode(myTransformer.toParker());
@@ -101,7 +108,9 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
           actors = nfoDetail['actor'] ?? [];
           year = nfoDetail['year'] ?? '';
         });
-      } catch (e) {}
+      } catch (e) {
+        Log.logger.log(Level.SEVERE, "nfo解析异常: $e");
+      }
     }
   }
 
@@ -120,7 +129,8 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
         leading: AppBackButton(context),
         actions: [
           Padding(
-            padding: EdgeInsets.only(left: 0, top: 8, bottom: 8, right: 8),
+            padding:
+                const EdgeInsets.only(left: 0, top: 8, bottom: 8, right: 8),
             child: OutlinedButton(
               onPressed: () async {
                 _player.pause();
@@ -152,112 +162,107 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
                 ? Colors.white
                 : Colors.black,
             child: _isInitialized
-                ? Container(
-                    child: ConstrainedBox(
-                      constraints: BoxConstraints(
-                          maxHeight: MediaQuery.sizeOf(context).height * 0.3),
-                      child: Stack(
-                        alignment: Alignment.center,
-                        children: [
-                          AspectRatio(
-                            aspectRatio: this._videoAspectRatio,
-                            child: Video(controller: _videoController),
-                          ),
-                          // 控制面板
-                          Visibility(
-                            visible: false,
-                            child: Positioned(
-                              bottom: 0,
-                              left: 0,
-                              right: 0,
-                              child: Container(
-                                color: Colors.black54,
-                                padding: EdgeInsets.symmetric(
-                                  vertical: 10,
-                                ),
-                                child: Column(
-                                  children: [
-                                    SizedBox(height: 10),
-                                    // 控制按钮
-                                    Row(
-                                      children: [
-                                        // 播放/暂停按钮
-                                        IconButton(
-                                          onPressed: () {
-                                            setState(() {
-                                              _player.playOrPause();
-                                            });
-                                          },
-                                          icon: Icon(
-                                            _player.state.playing
-                                                ? Icons.pause
-                                                : Icons.play_arrow,
-                                            color: Colors.white,
-                                          ),
+                ? ConstrainedBox(
+                    constraints: BoxConstraints(
+                        maxHeight: MediaQuery.sizeOf(context).height * 0.3),
+                    child: Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        AspectRatio(
+                          aspectRatio: _videoAspectRatio,
+                          child: Video(controller: _videoController),
+                        ),
+                        // 控制面板
+                        Visibility(
+                          visible: false,
+                          child: Positioned(
+                            bottom: 0,
+                            left: 0,
+                            right: 0,
+                            child: Container(
+                              color: Colors.black54,
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 10,
+                              ),
+                              child: Column(
+                                children: [
+                                  const SizedBox(height: 10),
+                                  // 控制按钮
+                                  Row(
+                                    children: [
+                                      // 播放/暂停按钮
+                                      IconButton(
+                                        onPressed: () {
+                                          setState(() {
+                                            _player.playOrPause();
+                                          });
+                                        },
+                                        icon: Icon(
+                                          _player.state.playing
+                                              ? Icons.pause
+                                              : Icons.play_arrow,
+                                          color: Colors.white,
                                         ),
-                                        // 时间显示
-                                        Text(
-                                          "${_formatDuration(_player.state.position)} / ${_formatDuration(_player.state.duration)}",
-                                          style: TextStyle(color: Colors.white),
+                                      ),
+                                      // 时间显示
+                                      Text(
+                                        "${_formatDuration(_player.state.position)} / ${_formatDuration(_player.state.duration)}",
+                                        style: const TextStyle(
+                                            color: Colors.white),
+                                      ),
+                                      const Spacer(),
+                                      // 倍速按钮
+                                      PopupMenuButton<double>(
+                                        icon: Row(
+                                          children: [
+                                            Text(
+                                              "${_currentSpeed}x",
+                                              style: const TextStyle(
+                                                  color: Colors.white),
+                                            ),
+                                            const Icon(
+                                              Icons.speed,
+                                              color: Colors.white,
+                                              size: 16,
+                                            ),
+                                          ],
                                         ),
-                                        Spacer(),
-                                        // 倍速按钮
-                                        PopupMenuButton<double>(
-                                          icon: Row(
-                                            children: [
-                                              Text(
-                                                "${_currentSpeed}x",
-                                                style: TextStyle(
-                                                    color: Colors.white),
-                                              ),
-                                              Icon(
-                                                Icons.speed,
-                                                color: Colors.white,
-                                                size: 16,
-                                              ),
-                                            ],
-                                          ),
-                                          onSelected: (double speed) {
-                                            _changeSpeed(speed);
-                                          },
-                                          itemBuilder: (BuildContext context) {
-                                            return speedList.entries
-                                                .map((entry) {
-                                              return PopupMenuItem<double>(
-                                                value: entry.value,
-                                                child: Text(entry.key),
-                                              );
-                                            }).toList();
-                                          },
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
+                                        onSelected: (double speed) {
+                                          _changeSpeed(speed);
+                                        },
+                                        itemBuilder: (BuildContext context) {
+                                          return speedList.entries.map((entry) {
+                                            return PopupMenuItem<double>(
+                                              value: entry.value,
+                                              child: Text(entry.key),
+                                            );
+                                          }).toList();
+                                        },
+                                      ),
+                                    ],
+                                  ),
+                                ],
                               ),
                             ),
                           ),
-                          GestureDetector(
-                            onHorizontalDragUpdate: (details) {
-                              print(
-                                  "detail: ${details.delta.dx.toInt() / MediaQuery.devicePixelRatioOf(context)}");
-                              this._player.seek(Duration(
-                                  milliseconds: this
-                                          ._player
-                                          .state
-                                          .position
-                                          .inMilliseconds +
-                                      (details.delta.dx.toInt() /
-                                              MediaQuery.devicePixelRatioOf(
-                                                  context))
-                                          .toInt()));
-                            },
-                            onVerticalDragUpdate: (details) => {
-                              // TODO: volume & brightness
-                            },
-                          )
-                        ],
-                      ),
+                        ),
+                        GestureDetector(
+                          onHorizontalDragUpdate: (details) {
+                            Log.logger.log(Level.INFO,
+                                "detail: ${details.delta.dx.toInt() / MediaQuery.devicePixelRatioOf(context)}");
+                            _player.seek(Duration(
+                                milliseconds:
+                                    _player.state.position.inMilliseconds +
+                                        (details.delta.dx.toInt() /
+                                                MediaQuery.devicePixelRatioOf(
+                                                    context))
+                                            .toInt()));
+                          },
+                          onVerticalDragUpdate: (details) => {
+                            // TODO: volume & brightness
+                          },
+                        )
+                      ],
                     ),
                   )
                 : Container(
@@ -269,10 +274,9 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
                           ? ExtendedImage.network(
                               widget.cover!.startsWith("http")
                                   ? widget.cover!
-                                  : Util.instance.baseUrl +
-                                      "/webapi/entry.cgi?path=${Uri.encodeComponent(widget.cover!)}&size=original&api=SYNO.FileStation.Thumb&method=get&version=2&_sid=${Util.instance.sid}&animate=true",
+                                  : "${connectionStore.baseUrl}/webapi/entry.cgi?path=${Uri.encodeComponent(widget.cover!)}&size=original&api=SYNO.FileStation.Thumb&method=get&version=2&_sid=${connectionStore.sid}&animate=true",
                             )
-                          : CircularProgressIndicator(),
+                          : const CircularProgressIndicator(),
                     ),
                   ),
           ),
@@ -280,46 +284,51 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
             child: ListView(
               children: [
                 Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
                   child: Text(
                     "注意：视频播放器目前使用官方库，如遇到黑屏、无声、卡顿等任何问题，请点击右上角按钮使用第三方播放器播放！${Platform.isIOS ? '(仅支持vlc player，请确保已安装)' : ''}",
-                    style: TextStyle(color: Colors.grey, fontSize: 12),
+                    style: const TextStyle(color: Colors.grey, fontSize: 12),
                   ),
                 ),
                 if (widget.nfo != null)
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 20),
+                  const Padding(
+                    padding: EdgeInsets.symmetric(
+                        horizontal: AppConstants.paddingLarge),
                     child: Text("以下信息来源于同文件夹下NFO文件，仅做参考："),
                   ),
-                SizedBox(
+                const SizedBox(
                   height: 20,
                 ),
                 if (description.isNotBlank)
                   Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
                     child: Text(description),
                   ),
-                SizedBox(
+                const SizedBox(
                   height: 10,
                 ),
                 if (year.isNotBlank)
                   Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
                     child: Text("年份：$year"),
                   ),
-                SizedBox(
+                const SizedBox(
                   height: 10,
                 ),
                 if (date.isNotBlank)
                   Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
                     child: Text("添加时间：$date"),
                   ),
-                SizedBox(
+                const SizedBox(
                   height: 20,
                 ),
-                if (actors.length > 0) ...[
-                  Padding(
+                if (actors.isNotEmpty) ...[
+                  const Padding(
                     padding: EdgeInsets.symmetric(horizontal: 20, vertical: 5),
                     child: Text("演员表："),
                   ),

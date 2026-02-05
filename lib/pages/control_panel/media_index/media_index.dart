@@ -1,15 +1,19 @@
-import 'package:garden/util/function.dart';
+import 'package:garden/util/http_util.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:garden/constants/app_constants.dart';
+import 'package:garden/theme/app_colors.dart';
 import 'dart:async';
 
 class MediaIndex extends StatefulWidget {
+  const MediaIndex({super.key});
+
   @override
-  _MediaIndexState createState() => _MediaIndexState();
+  MediaIndexState createState() => MediaIndexState();
 }
 
-class _MediaIndexState extends State<MediaIndex> {
+class MediaIndexState extends State<MediaIndex> {
   bool mediaIndexing = false;
   String thumbnailQuality = "";
   bool mobileEnabled = false;
@@ -17,7 +21,7 @@ class _MediaIndexState extends State<MediaIndex> {
   late Timer timer;
   @override
   void initState() {
-    timer = Timer.periodic(Duration(seconds: 5), (timer) {
+    timer = Timer.periodic(const Duration(seconds: 5), (timer) {
       getData();
     });
     getData();
@@ -28,7 +32,7 @@ class _MediaIndexState extends State<MediaIndex> {
     Api.mediaIndexStatus().then((res) {
       if (res['success']) {
         List result = res['data']['result'];
-        result.forEach((item) {
+        for (var item in result) {
           if (item['success'] == true) {
             switch (item['api']) {
               case "SYNO.Core.MediaIndexing":
@@ -48,7 +52,7 @@ class _MediaIndexState extends State<MediaIndex> {
                 });
             }
           }
-        });
+        }
       }
     });
   }
@@ -64,48 +68,49 @@ class _MediaIndexState extends State<MediaIndex> {
     return Scaffold(
       appBar: AppBar(
         leading: AppBackButton(context),
-        title: Text("索引服务"),
+        title: const Text("索引服务"),
       ),
       body: ListView(
         children: [
           Card(
             shape: RoundedRectangleBorder(
-                side: BorderSide(), borderRadius: BorderRadius.circular(18)),
-            margin: EdgeInsets.only(top: 20, left: 20, right: 20),
+                side: const BorderSide(),
+                borderRadius: BorderRadius.circular(18)),
+            margin: const EdgeInsets.only(top: 20, left: 20, right: 20),
             child: Padding(
-              padding: const EdgeInsets.all(20.0),
+              padding: const EdgeInsets.all(AppConstants.paddingLarge),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(
                     children: [
-                      Text(
+                      const Text(
                         "媒体索引",
                         style: TextStyle(
                             fontSize: 18, fontWeight: FontWeight.w600),
                       ),
-                      Spacer(),
+                      const Spacer(),
                       Text(
-                        "${mediaIndexing ? "索引中" : "已完成"}",
+                        mediaIndexing ? "索引中" : "已完成",
                         style: TextStyle(
                             color: mediaIndexing ? Colors.blue : Colors.green),
                       ),
                     ],
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 20,
                   ),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
+                      const Text(
                           "媒体索引功能会自动扫描存储在 DiskStation 中的多媒体文件如照片、音乐和视频，并为这些文件创建索引以供多媒体应用程序使用。"),
-                      SizedBox(
+                      const SizedBox(
                         height: 5,
                       ),
-                      Text(
+                      const Text(
                           "请注意，只有“/photo”共享文件夹内的图像文件才会在创建索引后添加到 Photo Station。"),
-                      SizedBox(
+                      const SizedBox(
                         height: 10,
                       ),
                       Row(
@@ -114,7 +119,7 @@ class _MediaIndexState extends State<MediaIndex> {
                               "应用程序：${packages.map((e) => e['name']).join("，")}"),
                         ],
                       ),
-                      SizedBox(
+                      const SizedBox(
                         height: 10,
                       ),
                       OutlinedButton(
@@ -142,35 +147,36 @@ class _MediaIndexState extends State<MediaIndex> {
           ),
           Card(
             shape: RoundedRectangleBorder(
-                side: BorderSide(), borderRadius: BorderRadius.circular(18)),
-            margin: EdgeInsets.only(top: 20, left: 20, right: 20),
+                side: const BorderSide(),
+                borderRadius: BorderRadius.circular(18)),
+            margin: const EdgeInsets.only(top: 20, left: 20, right: 20),
             child: Padding(
-              padding: const EdgeInsets.all(20.0),
+              padding: const EdgeInsets.all(AppConstants.paddingLarge),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
+                  const Text(
                     "缩图设置",
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 20,
                   ),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
+                      const Text(
                           "当您上传照片或视频供媒体服务器和 Photo Station 使用时，系统会创建缩略图来提供更好的浏览体验。您可以在此设置缩略图品质并查看创建进程。"),
-                      SizedBox(
+                      const SizedBox(
                         height: 5,
                       ),
-                      Text("注意: 创建高品质缩略图将耗用较多的时间。"),
-                      SizedBox(
+                      const Text("注意: 创建高品质缩略图将耗用较多的时间。"),
+                      const SizedBox(
                         height: 10,
                       ),
                       Row(
                         children: [
-                          Text("缩图品质："),
+                          const Text("缩图品质："),
                           Expanded(
                             child: GestureDetector(
                               onTap: () async {
@@ -183,18 +189,19 @@ class _MediaIndexState extends State<MediaIndex> {
                               },
                               child: Card(
                                 shape: RoundedRectangleBorder(
-                                    side: BorderSide(),
+                                    side: const BorderSide(),
                                     borderRadius: BorderRadius.circular(18)),
                                 child: Padding(
-                                  padding: const EdgeInsets.all(8.0),
+                                  padding: const EdgeInsets.all(
+                                      AppConstants.paddingSmall),
                                   child: Row(
                                     children: [
-                                      Text("一般品质"),
-                                      Spacer(),
+                                      const Text("一般品质"),
+                                      const Spacer(),
                                       if (thumbnailQuality == "normal")
-                                        Icon(
+                                        const Icon(
                                           CupertinoIcons.checkmark_alt,
-                                          color: Color(0xffff9813),
+                                          color: AppColors.primaryAction,
                                         ),
                                     ],
                                   ),
@@ -202,7 +209,7 @@ class _MediaIndexState extends State<MediaIndex> {
                               ),
                             ),
                           ),
-                          SizedBox(
+                          const SizedBox(
                             width: 20,
                           ),
                           Expanded(
@@ -217,18 +224,19 @@ class _MediaIndexState extends State<MediaIndex> {
                               },
                               child: Card(
                                 shape: RoundedRectangleBorder(
-                                    side: BorderSide(),
+                                    side: const BorderSide(),
                                     borderRadius: BorderRadius.circular(18)),
                                 child: Padding(
-                                  padding: const EdgeInsets.all(8.0),
+                                  padding: const EdgeInsets.all(
+                                      AppConstants.paddingSmall),
                                   child: Row(
                                     children: [
-                                      Text("高品质"),
-                                      Spacer(),
+                                      const Text("高品质"),
+                                      const Spacer(),
                                       if (thumbnailQuality == "high")
-                                        Icon(
+                                        const Icon(
                                           CupertinoIcons.checkmark_alt,
-                                          color: Color(0xffff9813),
+                                          color: AppColors.primaryAction,
                                         ),
                                     ],
                                   ),
@@ -246,30 +254,31 @@ class _MediaIndexState extends State<MediaIndex> {
           ),
           Card(
             shape: RoundedRectangleBorder(
-                side: BorderSide(), borderRadius: BorderRadius.circular(18)),
-            margin: EdgeInsets.only(top: 20, left: 20, right: 20),
+                side: const BorderSide(),
+                borderRadius: BorderRadius.circular(18)),
+            margin: const EdgeInsets.only(top: 20, left: 20, right: 20),
             child: Padding(
-              padding: const EdgeInsets.all(20.0),
+              padding: const EdgeInsets.all(AppConstants.paddingLarge),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
+                  const Text(
                     "视频设置",
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 20,
                   ),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
+                      const Text(
                           "若要在移动设备上查看 Photo Station 中“photo”共享文件夹内的视频，您可以为移动设备启用视频格式转换的功能。"),
-                      SizedBox(
+                      const SizedBox(
                         height: 5,
                       ),
-                      Text("注意: 启用此选项将耗用较多的时间和 CPU 资源。"),
-                      SizedBox(
+                      const Text("注意: 启用此选项将耗用较多的时间和 CPU 资源。"),
+                      const SizedBox(
                         height: 10,
                       ),
                       GestureDetector(
@@ -283,18 +292,19 @@ class _MediaIndexState extends State<MediaIndex> {
                         },
                         child: Card(
                           shape: RoundedRectangleBorder(
-                              side: BorderSide(),
+                              side: const BorderSide(),
                               borderRadius: BorderRadius.circular(18)),
                           child: Padding(
-                            padding: const EdgeInsets.all(8.0),
+                            padding:
+                                const EdgeInsets.all(AppConstants.paddingSmall),
                             child: Row(
                               children: [
-                                Text("启用移动设备视频转换"),
-                                Spacer(),
+                                const Text("启用移动设备视频转换"),
+                                const Spacer(),
                                 if (mobileEnabled)
-                                  Icon(
+                                  const Icon(
                                     CupertinoIcons.checkmark_alt,
-                                    color: Color(0xffff9813),
+                                    color: AppColors.primaryAction,
                                   ),
                               ],
                             ),
@@ -307,7 +317,7 @@ class _MediaIndexState extends State<MediaIndex> {
               ),
             ),
           ),
-          SizedBox(
+          const SizedBox(
             height: 20,
           )
         ],

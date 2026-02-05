@@ -1,4 +1,5 @@
 import 'package:garden/pages/control_panel/external_device/external_device.dart';
+import 'package:garden/stores/connection_store.dart';
 import 'package:garden/pages/control_panel/file_service/file_service.dart';
 import 'package:garden/pages/control_panel/media_index/media_index.dart';
 import 'package:garden/pages/control_panel/network/network.dart';
@@ -9,13 +10,13 @@ import 'package:garden/pages/control_panel/task_scheduler/task_scheduler.dart';
 import 'package:garden/pages/control_panel/update_reset/update_reset.dart';
 import 'package:garden/pages/control_panel/user_groups/user_group.dart';
 import 'package:garden/pages/control_panel/users/users.dart';
+import 'package:garden/constants/app_constants.dart';
 import 'package:garden/util/badge.dart';
-import 'package:garden/util/function.dart';
+import 'package:garden/widgets/control_panel_item.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 
 import 'shared_folders/shared_folders.dart';
 import 'package:garden/pages/control_panel/info/info.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart' hide Badge;
 
 class ControlPanel extends StatefulWidget {
@@ -23,18 +24,19 @@ class ControlPanel extends StatefulWidget {
   final List volumes;
   final List disks;
   final Map notify;
-  ControlPanel(this.system, this.volumes, this.disks, this.notify);
+  const ControlPanel(this.system, this.volumes, this.disks, this.notify,
+      {super.key});
   @override
-  _ControlPanelState createState() => _ControlPanelState();
+  ControlPanelState createState() => ControlPanelState();
 }
 
-class _ControlPanelState extends State<ControlPanel> {
+class ControlPanelState extends State<ControlPanel> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         leading: AppBackButton(context),
-        title: Text(
+        title: const Text(
           "控制面板",
         ),
       ),
@@ -42,14 +44,15 @@ class _ControlPanelState extends State<ControlPanel> {
         children: [
           Card(
             shape: RoundedRectangleBorder(
-                side: BorderSide(), borderRadius: BorderRadius.circular(18)),
-            margin: EdgeInsets.only(top: 20, left: 20, right: 20),
+                side: const BorderSide(),
+                borderRadius: BorderRadius.circular(18)),
+            margin: const EdgeInsets.only(top: 20, left: 20, right: 20),
             child: Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding: const EdgeInsets.all(AppConstants.paddingSmall),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Padding(
+                  const Padding(
                     padding: EdgeInsets.only(top: 20, left: 20, bottom: 20),
                     child: Text(
                       "文件共享",
@@ -58,155 +61,40 @@ class _ControlPanelState extends State<ControlPanel> {
                     ),
                   ),
                   Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 20),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: AppConstants.paddingLarge),
                     child: Wrap(
                       spacing: 20,
                       runSpacing: 20,
                       children: [
-                        GestureDetector(
-                          onTap: () {
-                            Navigator.of(context).push(CupertinoPageRoute(
-                                builder: (content) {
-                                  return SharedFolders();
-                                },
-                                settings:
-                                    RouteSettings(name: "share_folders")));
-                          },
-                          child: Card(
-                            shape: RoundedRectangleBorder(
-                                side: BorderSide(),
-                                borderRadius: BorderRadius.circular(18)),
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Image.asset(
-                                    "assets/control_panel/${Util.instance.version}/shared_folders.png",
-                                    height: 30,
-                                    width: 30,
-                                    fit: BoxFit.contain,
-                                  ),
-                                  SizedBox(
-                                    height: 5,
-                                  ),
-                                  Text(
-                                    "共享文件夹",
-                                    style: TextStyle(fontSize: 12),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
+                        ControlPanelItem(
+                          title: "共享文件夹",
+                          iconPath:
+                              "assets/control_panel/${connectionStore.version}/shared_folders.png",
+                          targetPage: const SharedFolders(),
+                          routeName: "share_folders",
                         ),
-                        GestureDetector(
-                          onTap: () {
-                            Navigator.of(context).push(CupertinoPageRoute(
-                                builder: (context) {
-                                  return FileService();
-                                },
-                                settings: RouteSettings(name: "file_service")));
-                          },
-                          child: Card(
-                            shape: RoundedRectangleBorder(
-                                side: BorderSide(),
-                                borderRadius: BorderRadius.circular(18)),
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Image.asset(
-                                    "assets/control_panel/${Util.instance.version}/file_services.png",
-                                    height: 30,
-                                    width: 30,
-                                    fit: BoxFit.contain,
-                                  ),
-                                  SizedBox(
-                                    height: 5,
-                                  ),
-                                  Text(
-                                    "文件服务",
-                                    style: TextStyle(fontSize: 12),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
+                        ControlPanelItem(
+                          title: "文件服务",
+                          iconPath:
+                              "assets/control_panel/${connectionStore.version}/file_services.png",
+                          targetPage: const FileService(),
+                          routeName: "file_service",
                         ),
-                        GestureDetector(
-                          onTap: () {
-                            Navigator.of(context).push(CupertinoPageRoute(
-                                builder: (context) {
-                                  return Users();
-                                },
-                                settings: RouteSettings(name: "users")));
-                          },
-                          child: Card(
-                            shape: RoundedRectangleBorder(
-                                side: BorderSide(),
-                                borderRadius: BorderRadius.circular(18)),
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Image.asset(
-                                    "assets/control_panel/${Util.instance.version}/users.png",
-                                    height: 30,
-                                    width: 30,
-                                    fit: BoxFit.contain,
-                                  ),
-                                  SizedBox(
-                                    height: 5,
-                                  ),
-                                  Text(
-                                    Util.instance.version < 7
-                                        ? "用户账户"
-                                        : "用户与群组",
-                                    style: TextStyle(fontSize: 12),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
+                        ControlPanelItem(
+                          title: connectionStore.version < 7 ? "用户账户" : "用户与群组",
+                          iconPath:
+                              "assets/control_panel/${connectionStore.version}/users.png",
+                          targetPage: const Users(),
+                          routeName: "users",
                         ),
-                        if (Util.instance.version < 7)
-                          GestureDetector(
-                            onTap: () {
-                              Navigator.of(context).push(CupertinoPageRoute(
-                                  builder: (context) {
-                                    return UserGroups();
-                                  },
-                                  settings:
-                                      RouteSettings(name: "user_groups")));
-                            },
-                            child: Card(
-                              shape: RoundedRectangleBorder(
-                                  side: BorderSide(),
-                                  borderRadius: BorderRadius.circular(18)),
-                              child: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Image.asset(
-                                      "assets/control_panel/${Util.instance.version}/groups.png",
-                                      height: 30,
-                                      width: 30,
-                                      fit: BoxFit.contain,
-                                    ),
-                                    SizedBox(
-                                      height: 5,
-                                    ),
-                                    Text(
-                                      "用户群组",
-                                      style: TextStyle(fontSize: 12),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
+                        if (connectionStore.version < 7)
+                          ControlPanelItem(
+                            title: "用户群组",
+                            iconPath:
+                                "assets/control_panel/${connectionStore.version}/groups.png",
+                            targetPage: const UserGroups(),
+                            routeName: "user_groups",
                           ),
                         // NeuCard(
                         //   width: (MediaQuery.sizeOf(context).width - 120) / 3,
@@ -221,7 +109,7 @@ class _ControlPanelState extends State<ControlPanel> {
                         //     mainAxisAlignment: MainAxisAlignment.center,
                         //     children: [
                         //       Image.asset(
-                        //         "assets/control_panel/${Util.version}/ldap.png",
+                        //         "assets/control_panel/${HttpUtil.version}/ldap.png",
                         //         height: 30,
                         //         width: 30,
                         //         fit: BoxFit.contain,
@@ -239,7 +127,7 @@ class _ControlPanelState extends State<ControlPanel> {
                       ],
                     ),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 20,
                   ),
                 ],
@@ -248,14 +136,15 @@ class _ControlPanelState extends State<ControlPanel> {
           ),
           Card(
             shape: RoundedRectangleBorder(
-                side: BorderSide(), borderRadius: BorderRadius.circular(18)),
-            margin: EdgeInsets.only(top: 20, left: 20, right: 20),
+                side: const BorderSide(),
+                borderRadius: BorderRadius.circular(18)),
+            margin: const EdgeInsets.only(top: 20, left: 20, right: 20),
             child: Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding: const EdgeInsets.all(AppConstants.paddingSmall),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Padding(
+                  const Padding(
                     padding: EdgeInsets.only(top: 20, left: 20, bottom: 20),
                     child: Text(
                       "连接性",
@@ -264,12 +153,13 @@ class _ControlPanelState extends State<ControlPanel> {
                     ),
                   ),
                   Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 20),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: AppConstants.paddingLarge),
                     child: Wrap(
                       spacing: 20,
                       runSpacing: 20,
                       children: [
-                        // if (Util.version < 7)
+                        // if (HttpUtil.version < 7)
                         //   NeuCard(
                         //     width: (MediaQuery.sizeOf(context).width - 120) / 3,
                         //     height: (MediaQuery.sizeOf(context).width - 120) / 3,
@@ -283,7 +173,7 @@ class _ControlPanelState extends State<ControlPanel> {
                         //       mainAxisAlignment: MainAxisAlignment.center,
                         //       children: [
                         //         Image.asset(
-                        //           "assets/control_panel/${Util.version}/quickconnect.png",
+                        //           "assets/control_panel/${HttpUtil.version}/quickconnect.png",
                         //           height: 30,
                         //           width: 30,
                         //           fit: BoxFit.contain,
@@ -298,78 +188,21 @@ class _ControlPanelState extends State<ControlPanel> {
                         //       ],
                         //     ),
                         //   ),
-                        GestureDetector(
-                          onTap: () {
-                            Navigator.of(context).push(CupertinoPageRoute(
-                                builder: (context) {
-                                  return PublicAccess();
-                                },
-                                settings:
-                                    RouteSettings(name: "public_access")));
-                          },
-                          child: Card(
-                            shape: RoundedRectangleBorder(
-                                side: BorderSide(),
-                                borderRadius: BorderRadius.circular(18)),
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Image.asset(
-                                    "assets/control_panel/${Util.instance.version}/public_access.png",
-                                    height: 30,
-                                    width: 30,
-                                    fit: BoxFit.contain,
-                                  ),
-                                  SizedBox(
-                                    height: 5,
-                                  ),
-                                  Text(
-                                    "外部访问",
-                                    style: TextStyle(fontSize: 12),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
+                        ControlPanelItem(
+                          title: "外部访问",
+                          iconPath:
+                              "assets/control_panel/${connectionStore.version}/public_access.png",
+                          targetPage: const PublicAccess(),
+                          routeName: "public_access",
                         ),
-                        GestureDetector(
-                          onTap: () {
-                            Navigator.of(context).push(CupertinoPageRoute(
-                                builder: (context) {
-                                  return Network();
-                                },
-                                settings: RouteSettings(name: "network")));
-                          },
-                          child: Card(
-                            shape: RoundedRectangleBorder(
-                                side: BorderSide(),
-                                borderRadius: BorderRadius.circular(18)),
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Image.asset(
-                                    "assets/control_panel/${Util.instance.version}/network.png",
-                                    height: 30,
-                                    width: 30,
-                                    fit: BoxFit.contain,
-                                  ),
-                                  SizedBox(
-                                    height: 5,
-                                  ),
-                                  Text(
-                                    "网络",
-                                    style: TextStyle(fontSize: 12),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
+                        ControlPanelItem(
+                          title: "网络",
+                          iconPath:
+                              "assets/control_panel/${connectionStore.version}/network.png",
+                          targetPage: const Network(),
+                          routeName: "network",
                         ),
-                        // if (Util.version < 7)
+                        // if (HttpUtil.version < 7)
                         //   NeuCard(
                         //     width: (MediaQuery.sizeOf(context).width - 120) / 3,
                         //     height: (MediaQuery.sizeOf(context).width - 120) / 3,
@@ -383,7 +216,7 @@ class _ControlPanelState extends State<ControlPanel> {
                         //       mainAxisAlignment: MainAxisAlignment.center,
                         //       children: [
                         //         Image.asset(
-                        //           "assets/control_panel/${Util.version}/dhcp_server.png",
+                        //           "assets/control_panel/${HttpUtil.version}/dhcp_server.png",
                         //           height: 30,
                         //           width: 30,
                         //           fit: BoxFit.contain,
@@ -398,7 +231,7 @@ class _ControlPanelState extends State<ControlPanel> {
                         //       ],
                         //     ),
                         //   ),
-                        // if (Util.version < 7)
+                        // if (HttpUtil.version < 7)
                         //   NeuCard(
                         //     width: (MediaQuery.sizeOf(context).width - 120) / 3,
                         //     height: (MediaQuery.sizeOf(context).width - 120) / 3,
@@ -440,7 +273,7 @@ class _ControlPanelState extends State<ControlPanel> {
                         //     mainAxisAlignment: MainAxisAlignment.center,
                         //     children: [
                         //       Image.asset(
-                        //         "assets/control_panel/${Util.version}/security.png",
+                        //         "assets/control_panel/${HttpUtil.version}/security.png",
                         //         height: 30,
                         //         width: 30,
                         //         fit: BoxFit.contain,
@@ -455,49 +288,18 @@ class _ControlPanelState extends State<ControlPanel> {
                         //     ],
                         //   ),
                         // ),
-                        if (Util.instance.version >= 7)
-                          GestureDetector(
-                            onTap: () {
-                              Navigator.of(context).push(CupertinoPageRoute(
-                                  builder: (content) {
-                                    return SshSetting();
-                                  },
-                                  settings:
-                                      RouteSettings(name: "ssh_setting")));
-                            },
-                            child: Card(
-                              shape: RoundedRectangleBorder(
-                                  side: BorderSide(),
-                                  borderRadius: BorderRadius.circular(18)),
-                              child: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Image.asset(
-                                      "assets/control_panel/${Util.instance.version}/terminal_and_SNMP.png",
-                                      height: 30,
-                                      width: 30,
-                                      fit: BoxFit.contain,
-                                    ),
-                                    SizedBox(
-                                      height: 5,
-                                    ),
-                                    Text(
-                                      "终端机和SNMP",
-                                      maxLines: 1,
-                                      overflow: TextOverflow.clip,
-                                      style: TextStyle(fontSize: 12),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
+                        if (connectionStore.version >= 7)
+                          ControlPanelItem(
+                            title: "终端机和SNMP",
+                            iconPath:
+                                "assets/control_panel/${connectionStore.version}/terminal_and_SNMP.png",
+                            targetPage: const SshSetting(),
+                            routeName: "ssh_setting",
                           ),
                       ],
                     ),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 20,
                   ),
                 ],
@@ -506,14 +308,15 @@ class _ControlPanelState extends State<ControlPanel> {
           ),
           Card(
             shape: RoundedRectangleBorder(
-                side: BorderSide(), borderRadius: BorderRadius.circular(18)),
-            margin: EdgeInsets.only(top: 20, left: 20, right: 20),
+                side: const BorderSide(),
+                borderRadius: BorderRadius.circular(18)),
+            margin: const EdgeInsets.only(top: 20, left: 20, right: 20),
             child: Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding: const EdgeInsets.all(AppConstants.paddingSmall),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Padding(
+                  const Padding(
                     padding: EdgeInsets.only(top: 20, left: 20, bottom: 20),
                     child: Text(
                       "系统",
@@ -522,47 +325,19 @@ class _ControlPanelState extends State<ControlPanel> {
                     ),
                   ),
                   Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 20),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: AppConstants.paddingLarge),
                     child: Wrap(
                       spacing: 20,
                       runSpacing: 20,
                       children: [
-                        GestureDetector(
-                          onTap: () {
-                            Navigator.of(context).push(CupertinoPageRoute(
-                                builder: (content) {
-                                  return SystemInfo(0, widget.system,
-                                      widget.volumes, widget.disks);
-                                },
-                                settings:
-                                    RouteSettings(name: "system_info_all")));
-                          },
-                          child: Card(
-                            shape: RoundedRectangleBorder(
-                                side: BorderSide(),
-                                borderRadius: BorderRadius.circular(18)),
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Image.asset(
-                                    "assets/control_panel/${Util.instance.version}/info_center.png",
-                                    height: 30,
-                                    width: 30,
-                                    fit: BoxFit.contain,
-                                  ),
-                                  SizedBox(
-                                    height: 5,
-                                  ),
-                                  Text(
-                                    "信息中心",
-                                    style: TextStyle(fontSize: 12),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
+                        ControlPanelItem(
+                          title: "信息中心",
+                          iconPath:
+                              "assets/control_panel/${connectionStore.version}/info_center.png",
+                          targetPage: SystemInfo(
+                              0, widget.system, widget.volumes, widget.disks),
+                          routeName: "system_info_all",
                         ),
                         // NeuCard(
                         //   width: (MediaQuery.sizeOf(context).width - 120) / 3,
@@ -577,7 +352,7 @@ class _ControlPanelState extends State<ControlPanel> {
                         //     mainAxisAlignment: MainAxisAlignment.center,
                         //     children: [
                         //       Image.asset(
-                        //         "assets/control_panel/${Util.version}/login_style.png",
+                        //         "assets/control_panel/${HttpUtil.version}/login_style.png",
                         //         height: 30,
                         //         width: 30,
                         //         fit: BoxFit.contain,
@@ -586,7 +361,7 @@ class _ControlPanelState extends State<ControlPanel> {
                         //         height: 5,
                         //       ),
                         //       Text(
-                        //         Util.version < 7 ? "主题样式" : "登录门户",
+                        //         HttpUtil.version < 7 ? "主题样式" : "登录门户",
                         //         style: TextStyle(fontSize: 12),
                         //       ),
                         //     ],
@@ -605,7 +380,7 @@ class _ControlPanelState extends State<ControlPanel> {
                         //     mainAxisAlignment: MainAxisAlignment.center,
                         //     children: [
                         //       Image.asset(
-                        //         "assets/control_panel/${Util.version}/region.png",
+                        //         "assets/control_panel/${HttpUtil.version}/region.png",
                         //         height: 30,
                         //         width: 30,
                         //         fit: BoxFit.contain,
@@ -633,7 +408,7 @@ class _ControlPanelState extends State<ControlPanel> {
                         //     mainAxisAlignment: MainAxisAlignment.center,
                         //     children: [
                         //       Image.asset(
-                        //         "assets/control_panel/${Util.version}/notifications.png",
+                        //         "assets/control_panel/${HttpUtil.version}/notifications.png",
                         //         height: 30,
                         //         width: 30,
                         //         fit: BoxFit.contain,
@@ -648,180 +423,60 @@ class _ControlPanelState extends State<ControlPanel> {
                         //     ],
                         //   ),
                         // ),
-                        if (Util.instance.version < 7)
-                          GestureDetector(
-                            onTap: () {
-                              Navigator.of(context).push(CupertinoPageRoute(
-                                  builder: (context) {
-                                    return TaskScheduler();
-                                  },
-                                  settings:
-                                      RouteSettings(name: "task_scheduler")));
-                            },
-                            child: Card(
-                              shape: RoundedRectangleBorder(
-                                  side: BorderSide(),
-                                  borderRadius: BorderRadius.circular(18)),
-                              child: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Image.asset(
-                                      "assets/control_panel/${Util.instance.version}/task_scheduler.png",
-                                      height: 30,
-                                      width: 30,
-                                      fit: BoxFit.contain,
-                                    ),
-                                    SizedBox(
-                                      height: 5,
-                                    ),
-                                    Text(
-                                      "任务计划",
-                                      style: TextStyle(fontSize: 12),
-                                    ),
-                                  ],
+                        if (connectionStore.version < 7)
+                          ControlPanelItem(
+                            title: "任务计划",
+                            iconPath:
+                                "assets/control_panel/${connectionStore.version}/task_scheduler.png",
+                            targetPage: const TaskScheduler(),
+                            routeName: "task_scheduler",
+                          ),
+                        ControlPanelItem(
+                          title: "硬件和电源",
+                          iconPath:
+                              "assets/control_panel/${connectionStore.version}/hardware_and_power.png",
+                          targetPage: const Power(),
+                          routeName: "power",
+                        ),
+                        ControlPanelItem(
+                          title: "外部设备",
+                          iconPath:
+                              "assets/control_panel/${connectionStore.version}/external_devices.png",
+                          targetPage: const ExternalDevice(),
+                          routeName: "external_device",
+                        ),
+                        Stack(
+                          children: [
+                            ControlPanelItem(
+                              title: "更新和还原",
+                              iconPath:
+                                  "assets/control_panel/${connectionStore.version}/update_and_reset.png",
+                              targetPage: const UpdateReset(),
+                              routeName: "update_and_reset",
+                            ),
+                            if (widget.notify[
+                                        'SYNO.SDS.AdminCenter.Update_Reset.Main'] !=
+                                    null &&
+                                widget.notify[
+                                            'SYNO.SDS.AdminCenter.Update_Reset.Main']
+                                        ['unread'] !=
+                                    null)
+                              Positioned(
+                                top: 8,
+                                right: 8,
+                                child: Badge(
+                                  widget.notify[
+                                          'SYNO.SDS.AdminCenter.Update_Reset.Main']
+                                      ['unread'],
+                                  size: 20,
                                 ),
                               ),
-                            ),
-                          ),
-                        GestureDetector(
-                          onTap: () {
-                            Navigator.of(context).push(CupertinoPageRoute(
-                                builder: (context) {
-                                  return Power();
-                                },
-                                settings: RouteSettings(name: "power")));
-                          },
-                          child: Card(
-                            shape: RoundedRectangleBorder(
-                                side: BorderSide(),
-                                borderRadius: BorderRadius.circular(18)),
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Image.asset(
-                                    "assets/control_panel/${Util.instance.version}/hardware_and_power.png",
-                                    height: 30,
-                                    width: 30,
-                                    fit: BoxFit.contain,
-                                  ),
-                                  SizedBox(
-                                    height: 5,
-                                  ),
-                                  Text(
-                                    "硬件和电源",
-                                    maxLines: 1,
-                                    overflow: TextOverflow.clip,
-                                    style: TextStyle(fontSize: 12),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                        GestureDetector(
-                          onTap: () {
-                            Navigator.of(context).push(CupertinoPageRoute(
-                                builder: (context) {
-                                  return ExternalDevice();
-                                },
-                                settings:
-                                    RouteSettings(name: "external_device")));
-                          },
-                          child: Card(
-                            shape: RoundedRectangleBorder(
-                                side: BorderSide(),
-                                borderRadius: BorderRadius.circular(18)),
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Image.asset(
-                                    "assets/control_panel/${Util.instance.version}/external_devices.png",
-                                    height: 30,
-                                    width: 30,
-                                    fit: BoxFit.contain,
-                                  ),
-                                  SizedBox(
-                                    height: 5,
-                                  ),
-                                  Text(
-                                    "外接设备",
-                                    style: TextStyle(fontSize: 12),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                        GestureDetector(
-                          onTap: () {
-                            Navigator.of(context)
-                                .push(CupertinoPageRoute(builder: (context) {
-                              return UpdateReset();
-                            }));
-                          },
-                          child: Card(
-                            shape: RoundedRectangleBorder(
-                                side: BorderSide(),
-                                borderRadius: BorderRadius.circular(18)),
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Stack(
-                                children: [
-                                  Center(
-                                    child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        Image.asset(
-                                          "assets/control_panel/${Util.instance.version}/update_and_reset.png",
-                                          height: 30,
-                                          width: 30,
-                                          fit: BoxFit.contain,
-                                        ),
-                                        SizedBox(
-                                          height: 5,
-                                        ),
-                                        Text(
-                                          "更新和还原",
-                                          maxLines: 1,
-                                          overflow: TextOverflow.clip,
-                                          style: TextStyle(fontSize: 12),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  if (widget.notify[
-                                              'SYNO.SDS.AdminCenter.Update_Reset.Main'] !=
-                                          null &&
-                                      widget.notify[
-                                                  'SYNO.SDS.AdminCenter.Update_Reset.Main']
-                                              ['unread'] !=
-                                          null)
-                                    Positioned(
-                                      top: 6,
-                                      right: 6,
-                                      child: Badge(
-                                        widget.notify[
-                                                'SYNO.SDS.AdminCenter.Update_Reset.Main']
-                                            ['unread'],
-                                        size: 20,
-                                      ),
-                                    ),
-                                ],
-                              ),
-                            ),
-                          ),
+                          ],
                         ),
                       ],
                     ),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 20,
                   ),
                 ],
@@ -830,14 +485,15 @@ class _ControlPanelState extends State<ControlPanel> {
           ),
           Card(
             shape: RoundedRectangleBorder(
-                side: BorderSide(), borderRadius: BorderRadius.circular(18)),
-            margin: EdgeInsets.only(top: 20, left: 20, right: 20),
+                side: const BorderSide(),
+                borderRadius: BorderRadius.circular(18)),
+            margin: const EdgeInsets.only(top: 20, left: 20, right: 20),
             child: Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding: const EdgeInsets.all(AppConstants.paddingSmall),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Padding(
+                  const Padding(
                     padding: EdgeInsets.only(top: 20, left: 20, bottom: 20),
                     child: Text(
                       "应用程序",
@@ -846,12 +502,13 @@ class _ControlPanelState extends State<ControlPanel> {
                     ),
                   ),
                   Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 20),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: AppConstants.paddingLarge),
                     child: Wrap(
                       spacing: 20,
                       runSpacing: 20,
                       children: [
-                        // if (Util.version >= 7)
+                        // if (HttpUtil.version >= 7)
                         //   NeuCard(
                         //     width: (MediaQuery.sizeOf(context).width - 120) / 3,
                         //     height: (MediaQuery.sizeOf(context).width - 120) / 3,
@@ -865,7 +522,7 @@ class _ControlPanelState extends State<ControlPanel> {
                         //       mainAxisAlignment: MainAxisAlignment.center,
                         //       children: [
                         //         Image.asset(
-                        //           "assets/control_panel/${Util.version}/synology_account.png",
+                        //           "assets/control_panel/${HttpUtil.version}/synology_account.png",
                         //           height: 30,
                         //           width: 30,
                         //           fit: BoxFit.contain,
@@ -895,7 +552,7 @@ class _ControlPanelState extends State<ControlPanel> {
                         //     mainAxisAlignment: MainAxisAlignment.center,
                         //     children: [
                         //       Image.asset(
-                        //         "assets/control_panel/${Util.version}/privilege.png",
+                        //         "assets/control_panel/${HttpUtil.version}/privilege.png",
                         //         height: 30,
                         //         width: 30,
                         //         fit: BoxFit.contain,
@@ -904,13 +561,13 @@ class _ControlPanelState extends State<ControlPanel> {
                         //         height: 5,
                         //       ),
                         //       Text(
-                        //         Util.version < 7 ? "权限" : "应用程序权限",
+                        //         HttpUtil.version < 7 ? "权限" : "应用程序权限",
                         //         style: TextStyle(fontSize: 12),
                         //       ),
                         //     ],
                         //   ),
                         // ),
-                        // if (Util.version < 7)
+                        // if (HttpUtil.version < 7)
                         //   NeuCard(
                         //     width: (MediaQuery.sizeOf(context).width - 120) / 3,
                         //     height: (MediaQuery.sizeOf(context).width - 120) / 3,
@@ -924,7 +581,7 @@ class _ControlPanelState extends State<ControlPanel> {
                         //       mainAxisAlignment: MainAxisAlignment.center,
                         //       children: [
                         //         Image.asset(
-                        //           "assets/control_panel/${Util.version}/portal.png",
+                        //           "assets/control_panel/${HttpUtil.version}/portal.png",
                         //           height: 30,
                         //           width: 30,
                         //           fit: BoxFit.contain,
@@ -941,159 +598,40 @@ class _ControlPanelState extends State<ControlPanel> {
                         //       ],
                         //     ),
                         //   ),
-                        GestureDetector(
-                          onTap: () {
-                            Navigator.of(context).push(CupertinoPageRoute(
-                                builder: (context) {
-                                  return MediaIndex();
-                                },
-                                settings: RouteSettings(name: "media_index")));
-                          },
-                          child: Card(
-                            shape: RoundedRectangleBorder(
-                                side: BorderSide(),
-                                borderRadius: BorderRadius.circular(18)),
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Image.asset(
-                                    "assets/control_panel/${Util.instance.version}/file_index.png",
-                                    height: 30,
-                                    width: 30,
-                                    fit: BoxFit.contain,
-                                  ),
-                                  SizedBox(
-                                    height: 5,
-                                  ),
-                                  Text(
-                                    "索引服务",
-                                    style: TextStyle(fontSize: 12),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
+                        ControlPanelItem(
+                          title: "索引服务",
+                          iconPath:
+                              "assets/control_panel/${connectionStore.version}/file_index.png",
+                          targetPage: const MediaIndex(),
+                          routeName: "media_index",
                         ),
-                        // if (Util.version < 7)
-                        //   NeuCard(
-                        //     width: (MediaQuery.sizeOf(context).width - 120) / 3,
-                        //     height: (MediaQuery.sizeOf(context).width - 120) / 3,
-                        //     curveType: CurveType.flat,
-                        //     decoration: NeumorphicDecoration(
-                        //       color: Theme.of(context).scaffoldBackgroundColor,
-                        //       borderRadius: BorderRadius.circular(20),
-                        //     ),
-                        //     bevel: 20,
-                        //     child: Column(
-                        //       mainAxisAlignment: MainAxisAlignment.center,
-                        //       children: [
-                        //         Image.asset(
-                        //           "assets/control_panel/${Util.version}/share_folder_sync.png",
-                        //           height: 30,
-                        //           width: 30,
-                        //           fit: BoxFit.contain,
-                        //         ),
-                        //         SizedBox(
-                        //           height: 5,
-                        //         ),
-                        //         Text(
-                        //           "共享文件夹同步",
-                        //           maxLines: 1,
-                        //           overflow: TextOverflow.clip,
-                        //           style: TextStyle(fontSize: 12),
-                        //         ),
-                        //       ],
-                        //     ),
-                        //   ),
-                        if (Util.instance.version < 7)
-                          GestureDetector(
-                            onTap: () {
-                              Navigator.of(context).push(CupertinoPageRoute(
-                                  builder: (content) {
-                                    return SshSetting();
-                                  },
-                                  settings:
-                                      RouteSettings(name: "ssh_setting")));
-                            },
-                            child: Card(
-                              shape: RoundedRectangleBorder(
-                                  side: BorderSide(),
-                                  borderRadius: BorderRadius.circular(18)),
-                              child: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Image.asset(
-                                      "assets/control_panel/${Util.instance.version}/terminal_and_SNMP.png",
-                                      height: 30,
-                                      width: 30,
-                                      fit: BoxFit.contain,
-                                    ),
-                                    SizedBox(
-                                      height: 5,
-                                    ),
-                                    Text(
-                                      "终端机和SNMP",
-                                      maxLines: 1,
-                                      overflow: TextOverflow.clip,
-                                      style: TextStyle(fontSize: 12),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
+                        if (connectionStore.version < 7)
+                          ControlPanelItem(
+                            title: "终端机和SNMP",
+                            iconPath:
+                                "assets/control_panel/${connectionStore.version}/terminal_and_SNMP.png",
+                            targetPage: const SshSetting(),
+                            routeName: "ssh_setting",
                           ),
-                        if (Util.instance.version >= 7)
-                          GestureDetector(
-                            onTap: () {
-                              Navigator.of(context).push(CupertinoPageRoute(
-                                  builder: (context) {
-                                    return TaskScheduler();
-                                  },
-                                  settings:
-                                      RouteSettings(name: "task_scheduler")));
-                            },
-                            child: Card(
-                              shape: RoundedRectangleBorder(
-                                  side: BorderSide(),
-                                  borderRadius: BorderRadius.circular(18)),
-                              child: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Image.asset(
-                                      "assets/control_panel/${Util.instance.version}/task_scheduler.png",
-                                      height: 30,
-                                      width: 30,
-                                      fit: BoxFit.contain,
-                                    ),
-                                    SizedBox(
-                                      height: 5,
-                                    ),
-                                    Text(
-                                      "任务计划",
-                                      style: TextStyle(fontSize: 12),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
+                        if (connectionStore.version >= 7)
+                          ControlPanelItem(
+                            title: "任务计划",
+                            iconPath:
+                                "assets/control_panel/${connectionStore.version}/task_scheduler.png",
+                            targetPage: const TaskScheduler(),
+                            routeName: "task_scheduler",
                           ),
                       ],
                     ),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 20,
                   ),
                 ],
               ),
             ),
           ),
-          SizedBox(
+          const SizedBox(
             height: 40,
           ),
         ],

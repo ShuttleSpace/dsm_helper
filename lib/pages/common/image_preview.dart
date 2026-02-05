@@ -1,12 +1,14 @@
 import 'dart:async';
+import 'package:garden/util/ui_util.dart';
 import 'dart:io';
 import 'dart:math';
 
-import 'package:garden/util/function.dart';
+import 'package:garden/util/http_util.dart';
 import 'package:garden/widgets/hero_widget.dart';
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:garden/constants/app_constants.dart';
 import 'package:flutter_vibrate/flutter_vibrate.dart';
 
 class ImagePreview extends StatefulWidget {
@@ -21,19 +23,20 @@ class ImagePreview extends StatefulWidget {
   final PageController pageController;
 
   ImagePreview(this.images, this.index,
-      {this.network = true,
+      {super.key,
+      this.network = true,
       this.tag,
       this.thumbs = const [],
       this.names = const [],
       this.paths = const [],
       this.onDelete})
-      : this.pageController = PageController(initialPage: index);
+      : pageController = PageController(initialPage: index);
 
   @override
-  _ImagePreviewState createState() => _ImagePreviewState();
+  ImagePreviewState createState() => ImagePreviewState();
 }
 
-class _ImagePreviewState extends State<ImagePreview>
+class ImagePreviewState extends State<ImagePreview>
     with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
   Animation<double>? _animation;
@@ -70,7 +73,7 @@ class _ImagePreviewState extends State<ImagePreview>
   }
 
   deleteFile(int index) {
-    Util.instance.vibrate(FeedbackType.warning);
+    UiUtil.vibrate(FeedbackType.warning);
     showCupertinoModalPopup(
       context: context,
       builder: (context) {
@@ -78,28 +81,29 @@ class _ImagePreviewState extends State<ImagePreview>
           color: Colors.transparent,
           child: Card(
             shape: RoundedRectangleBorder(
-                side: BorderSide(), borderRadius: BorderRadius.circular(18)),
+                side: const BorderSide(),
+                borderRadius: BorderRadius.circular(18)),
             child: Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding: const EdgeInsets.all(AppConstants.paddingSmall),
               child: SafeArea(
                 top: false,
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: <Widget>[
-                    Text(
+                    const Text(
                       "确认删除",
                       style:
                           TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
                     ),
-                    SizedBox(
+                    const SizedBox(
                       height: 12,
                     ),
-                    Text(
+                    const Text(
                       "确认要删除文件？",
                       style:
                           TextStyle(fontSize: 20, fontWeight: FontWeight.w400),
                     ),
-                    SizedBox(
+                    const SizedBox(
                       height: 22,
                     ),
                     Row(
@@ -111,7 +115,7 @@ class _ImagePreviewState extends State<ImagePreview>
                               var res =
                                   await Api.deleteTask([widget.paths[index]]);
                               if (res['success']) {
-                                Util.instance.toast("文件删除成功");
+                                UiUtil.toast("文件删除成功");
                                 if (widget.thumbs.length > index) {
                                   widget.thumbs.removeAt(index);
                                 }
@@ -129,14 +133,14 @@ class _ImagePreviewState extends State<ImagePreview>
                                 widget.onDelete?.call();
                               }
                             },
-                            child: Text(
+                            child: const Text(
                               "确认删除",
                               style: TextStyle(
                                   fontSize: 18, color: Colors.redAccent),
                             ),
                           ),
                         ),
-                        SizedBox(
+                        const SizedBox(
                           width: 20,
                         ),
                         Expanded(
@@ -144,7 +148,7 @@ class _ImagePreviewState extends State<ImagePreview>
                             onPressed: () async {
                               Navigator.of(context).pop();
                             },
-                            child: Text(
+                            child: const Text(
                               "取消",
                               style: TextStyle(fontSize: 18),
                             ),
@@ -152,7 +156,7 @@ class _ImagePreviewState extends State<ImagePreview>
                         ),
                       ],
                     ),
-                    SizedBox(
+                    const SizedBox(
                       height: 8,
                     ),
                   ],
@@ -251,7 +255,7 @@ class _ImagePreviewState extends State<ImagePreview>
                       case LoadState.failed:
                         //remove memory cached
                         state.imageProvider.evict();
-                        return Center(
+                        return const Center(
                           child: Text("图片加载失败"),
                         );
                     }
@@ -389,8 +393,8 @@ class _ImagePreviewState extends State<ImagePreview>
               image = GestureDetector(
                 child: HeroWidget(
                   tag: widget.tag ?? item,
-                  child: image,
                   slidePagekey: slidePageKey,
+                  child: image,
                   // flightShuttleBuilder: (BuildContext flightContext, Animation<double> animation, HeroFlightDirection flightDirection, BuildContext fromHeroContext, BuildContext toHeroContext) {
                   //   final Hero hero = (flightDirection == HeroFlightDirection.pop ? fromHeroContext.widget : toHeroContext.widget) as Hero;
                   //   return hero.child;
@@ -413,7 +417,7 @@ class _ImagePreviewState extends State<ImagePreview>
               initialPage: currentIndex,
             ),
             scrollDirection: Axis.horizontal,
-            physics: BouncingScrollPhysics(),
+            physics: const BouncingScrollPhysics(),
           ),
           StreamBuilder<bool>(
             builder: (c, d) {
@@ -421,11 +425,12 @@ class _ImagePreviewState extends State<ImagePreview>
 
               return Column(
                 children: [
-                  if (Util.instance.isWechatInstalled)
+                  if (HttpUtil.instance.isWechatInstalled)
                     SafeArea(
                       child: Container(
                         height: 56,
-                        padding: EdgeInsets.symmetric(horizontal: 20),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: AppConstants.paddingLarge),
                         alignment: Alignment.centerRight,
                         child: Row(
                           children: [
@@ -442,7 +447,7 @@ class _ImagePreviewState extends State<ImagePreview>
                                 } else if (widget.images[currentIndex]
                                     .startsWith("/")) {
                                 } else {
-                                  Util.instance.toast("暂不支持分享此图片");
+                                  UiUtil.toast("暂不支持分享此图片");
                                   return;
                                 }
                               },
@@ -455,7 +460,7 @@ class _ImagePreviewState extends State<ImagePreview>
                         ),
                       ),
                     ),
-                  Spacer(),
+                  const Spacer(),
                   MySwiperPlugin(
                     widget.images,
                     currentIndex,
@@ -478,7 +483,6 @@ class _ImagePreviewState extends State<ImagePreview>
 
     result = ExtendedImageSlidePage(
       key: slidePageKey,
-      child: result,
       slideAxis: SlideAxis.both,
       slideType: SlideType.onlyImage,
       onSlidingPage: (state) {
@@ -497,6 +501,7 @@ class _ImagePreviewState extends State<ImagePreview>
           rebuildSwiper.add(_showSwiper);
         }
       },
+      child: result,
     );
 
     return result;
@@ -507,7 +512,7 @@ class FileName extends StatelessWidget {
   final List names;
   final int index;
   final StreamController<int> reBuild;
-  FileName(this.names, this.index, this.reBuild);
+  const FileName(this.names, this.index, this.reBuild, {super.key});
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<int>(
@@ -527,33 +532,34 @@ class MySwiperPlugin extends StatelessWidget {
   final int index;
   final StreamController<int> reBuild;
   final Function(int)? onDelete;
-  MySwiperPlugin(this.pics, this.index, this.reBuild, {this.onDelete});
+  const MySwiperPlugin(this.pics, this.index, this.reBuild,
+      {super.key, this.onDelete});
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<int>(
       builder: (BuildContext context, data) {
         return SafeArea(
           child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
             child: Row(
               children: <Widget>[
                 OutlinedButton(
                   onPressed: () {
                     if (data.data == null) {
-                      Util.instance.toast('图片下载失败');
+                      UiUtil.toast('图片下载失败');
                       return;
                     }
-                    Util.instance
+                    HttpUtil.instance
                         .saveImage(pics[data.data!], context: context)
                         .then((res) {
                       if (res['code'] == 1) {
-                        Util.instance.toast("已保存到相册");
+                        UiUtil.toast("已保存到相册");
                       } else {
-                        Util.instance.toast("图片下载失败");
+                        UiUtil.toast("图片下载失败");
                       }
                     });
                   },
-                  child: Row(
+                  child: const Row(
                     children: <Widget>[
                       Icon(
                         Icons.file_download,
@@ -566,32 +572,32 @@ class MySwiperPlugin extends StatelessWidget {
                     ],
                   ),
                 ),
-                Spacer(),
+                const Spacer(),
                 OutlinedButton(
                   onPressed: () {
                     if (data.data == null) {
-                      Util.instance.toast('图片下载失败,请重试!');
+                      UiUtil.toast('图片下载失败,请重试!');
                       return;
                     }
                     onDelete?.call(data.data!);
                   },
-                  child: Icon(
+                  child: const Icon(
                     Icons.delete_forever,
                     size: 13,
                   ),
                 ),
-                SizedBox(
+                const SizedBox(
                   width: 10,
                 ),
                 Card(
                   shape: RoundedRectangleBorder(
-                      side: BorderSide(),
+                      side: const BorderSide(),
                       borderRadius: BorderRadius.circular(18)),
                   child: Padding(
-                    padding: const EdgeInsets.all(8.0),
+                    padding: const EdgeInsets.all(AppConstants.paddingSmall),
                     child: Text(
                       "${data.data ?? 0 + 1} / ${pics.length}",
-                      style: TextStyle(fontSize: 12),
+                      style: const TextStyle(fontSize: 12),
                     ),
                   ),
                 ),

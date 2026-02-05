@@ -4,9 +4,10 @@ import 'package:garden/widgets/neu_back_button.dart';
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:garden/constants/app_constants.dart';
 
 class GeocodingPage extends StatefulWidget {
-  const GeocodingPage(this.isTeam);
+  const GeocodingPage(this.isTeam, {super.key});
   final bool isTeam;
   @override
   State<GeocodingPage> createState() => _GeocodingPageState();
@@ -26,12 +27,12 @@ class _GeocodingPageState extends State<GeocodingPage> {
   Future getData() async {
     geocodings = await GeocodingModel.fetch(
         additional: ['thumbnail'], isTeam: widget.isTeam);
-    geocodings.forEach((element) {
+    for (var element in geocodings) {
       if (geocodingGroups[element.country] == null) {
         geocodingGroups[element.country ?? ''] = [];
       }
       geocodingGroups[element.country]?.add(element);
-    });
+    }
     setState(() {
       loading = false;
     });
@@ -42,16 +43,17 @@ class _GeocodingPageState extends State<GeocodingPage> {
     return Scaffold(
       appBar: AppBar(
         leading: AppBackButton(context),
-        title: Text("位置"),
+        title: const Text("位置"),
       ),
       body: loading
-          ? Center(
+          ? const Center(
               child: CupertinoActivityIndicator(
                 radius: 14,
               ),
             )
           : ListView.builder(
-              padding: EdgeInsets.symmetric(horizontal: 20),
+              padding: const EdgeInsets.symmetric(
+                  horizontal: AppConstants.paddingLarge),
               itemBuilder: (context, i) {
                 MapEntry<String, List<GeocodingModel>> entry =
                     geocodingGroups.entries.toList()[i];
@@ -59,8 +61,9 @@ class _GeocodingPageState extends State<GeocodingPage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Padding(
-                      padding: EdgeInsets.symmetric(vertical: 10),
-                      child: Text("${entry.key}"),
+                      padding: const EdgeInsets.symmetric(
+                          vertical: AppConstants.paddingSmall + 2),
+                      child: Text(entry.key),
                     ),
                     Wrap(
                       spacing: 20,
@@ -97,7 +100,7 @@ class _GeocodingPageState extends State<GeocodingPage> {
                                 ),
                                 Text(
                                   "${geocoding.itemCount}个项目",
-                                  style: TextStyle(
+                                  style: const TextStyle(
                                     fontSize: 12,
                                   ),
                                 ),

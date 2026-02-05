@@ -4,7 +4,7 @@
 <dict>
 	<key>com.apple.security.application-groups</key>
 	<array>
-		<string>group.fit.flutter.dsm-helper</string>
+		<string>group.fit.flutter.garden</string>
 	</array>
 </dict>
 </plist>

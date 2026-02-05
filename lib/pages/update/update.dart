@@ -1,20 +1,21 @@
-import 'package:garden/themes/app_theme.dart';
-import 'package:garden/util/function.dart';
+import 'package:garden/theme/app_theme.dart';
+import 'package:garden/util/ui_util.dart';
 import 'package:garden/widgets/animation_progress_bar.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 // import 'package:easy_app_installer/easy_app_installer.dart';
 import 'package:flutter/material.dart';
+import 'package:garden/constants/app_constants.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
 class Update extends StatefulWidget {
   final Map data;
   final bool direct;
-  Update(this.data, {this.direct = false});
+  const Update(this.data, {super.key, this.direct = false});
   @override
-  _UpdateState createState() => _UpdateState();
+  UpdateState createState() => UpdateState();
 }
 
-class _UpdateState extends State<Update> {
+class UpdateState extends State<Update> {
   bool downloading = false;
   double progress = 0;
   bool loading = true;
@@ -31,7 +32,7 @@ class _UpdateState extends State<Update> {
   download() async {
     // 检查安装应用权限
     // if (!await Permission.requestInstallPackages.request().isGranted) {
-    //   Util.toast("权限不足，无法安装更新");
+    //   HttpUtil.toast("权限不足，无法安装更新");
     // }
     setState(() {
       downloading = true;
@@ -57,7 +58,7 @@ class _UpdateState extends State<Update> {
       //   },
       // );
     } catch (e) {
-      Util.instance.toast("下载失败:$e");
+      UiUtil.toast("下载失败:$e");
     }
   }
 
@@ -66,7 +67,7 @@ class _UpdateState extends State<Update> {
     return Scaffold(
       appBar: AppBar(
         leading: AppBackButton(context),
-        title: Text(
+        title: const Text(
           "软件更新",
         ),
       ),
@@ -75,15 +76,15 @@ class _UpdateState extends State<Update> {
           Expanded(
             child: ListView(
               children: <Widget>[
-                SizedBox(
+                const SizedBox(
                   height: 50,
                 ),
                 Center(
                   child: Card(
                     shape: RoundedRectangleBorder(
-                        side: BorderSide(),
+                        side: const BorderSide(),
                         borderRadius: BorderRadius.circular(18)),
-                    child: CircleAvatar(
+                    child: const CircleAvatar(
                       backgroundImage: AssetImage(
                         "assets/logo.png",
                       ),
@@ -91,35 +92,36 @@ class _UpdateState extends State<Update> {
                     ),
                   ),
                 ),
-                SizedBox(
+                const SizedBox(
                   height: 30,
                 ),
                 Column(
                   children: [
                     Text(
                       "新版本 v${widget.data['buildVersion']} build ${widget.data['buildVersionNo']}",
-                      style: TextStyle(fontSize: 18),
+                      style: const TextStyle(fontSize: 18),
                     ),
                   ],
                 ),
-                SizedBox(
+                const SizedBox(
                   height: 40,
                 ),
                 Card(
                   shape: RoundedRectangleBorder(
-                      side: BorderSide(),
+                      side: const BorderSide(),
                       borderRadius: BorderRadius.circular(18)),
-                  margin: EdgeInsets.symmetric(horizontal: 20),
+                  margin: const EdgeInsets.symmetric(
+                      horizontal: AppConstants.paddingLarge),
                   child: Padding(
-                    padding: const EdgeInsets.all(8.0),
+                    padding: const EdgeInsets.all(AppConstants.paddingSmall),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
-                        Text(
+                        const Text(
                           "更新日志：",
                           style: TextStyle(fontSize: 16),
                         ),
-                        SizedBox(
+                        const SizedBox(
                           height: 10,
                         ),
                         Text(
@@ -139,7 +141,7 @@ class _UpdateState extends State<Update> {
               launchUrlString(widget.data['downloadURL'],
                   mode: LaunchMode.externalApplication);
             },
-            child: Text(
+            child: const Text(
               "使用浏览器下载",
               style: TextStyle(
                   color: Colors.grey,
@@ -147,18 +149,19 @@ class _UpdateState extends State<Update> {
                   fontSize: 14),
             ),
           ),
-          SizedBox(
+          const SizedBox(
             height: 20,
           ),
           if (!downloading)
             Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20),
+              padding: const EdgeInsets.symmetric(
+                  horizontal: AppConstants.paddingLarge),
               child: OutlinedButton(
                 onPressed: () {
                   download();
                 },
                 // margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                child: Text(
+                child: const Text(
                   "开始下载",
                   style: TextStyle(fontSize: 18),
                 ),
@@ -166,13 +169,14 @@ class _UpdateState extends State<Update> {
             ),
           if (downloading)
             Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20),
+              padding: const EdgeInsets.symmetric(
+                  horizontal: AppConstants.paddingLarge),
               child: Card(
                 shape: RoundedRectangleBorder(
-                    side: BorderSide(),
+                    side: const BorderSide(),
                     borderRadius: BorderRadius.circular(18)),
                 child: Padding(
-                  padding: const EdgeInsets.all(8.0),
+                  padding: const EdgeInsets.all(AppConstants.paddingSmall),
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(20),
                     child: FAProgressBar(
@@ -183,13 +187,13 @@ class _UpdateState extends State<Update> {
                       borderRadius: BorderRadius.circular(20),
                       displayText: '%',
                       displayTextStyle:
-                          TextStyle(fontSize: 18, color: Colors.white),
+                          const TextStyle(fontSize: 18, color: Colors.white),
                     ),
                   ),
                 ),
               ),
             ),
-          SizedBox(
+          const SizedBox(
             height: 30,
           ),
         ],

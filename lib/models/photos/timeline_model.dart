@@ -1,5 +1,8 @@
 import 'package:garden/models/photos/photo_model.dart';
-import 'package:garden/util/function.dart';
+import 'package:garden/stores/connection_store.dart';
+import 'package:garden/util/http_util.dart';
+import 'package:garden/util/log.dart';
+import 'package:simple_logger/simple_logger.dart';
 
 /// limit : 102
 /// list : [{"day":22,"item_count":2,"month":10,"year":2022},{"day":21,"item_count":6,"month":10,"year":2022},{"day":23,"item_count":43,"month":9,"year":2022},{"day":7,"item_count":4,"month":8,"year":2022},{"day":28,"item_count":2,"month":6,"year":2022},{"day":22,"item_count":1,"month":5,"year":2022},{"day":20,"item_count":5,"month":5,"year":2022},{"day":10,"item_count":1,"month":5,"year":2022},{"day":25,"item_count":12,"month":4,"year":2022},{"day":27,"item_count":26,"month":3,"year":2022}]
@@ -24,7 +27,7 @@ class TimelineModel {
           "SYNO.Foto${isTeam ? 'Team' : ''}.Browse.${recentlyAdd ? 'RecentlyAdded' : 'Timeline'}",
       "method": recentlyAdd ? "get_timeline" : 'get',
       "version": 2,
-      "_sid": Util.instance.sid,
+      "_sid": connectionStore.sid,
     };
     data['type'] = type;
     data['geocoding_id'] = geocodingId;
@@ -33,15 +36,15 @@ class TimelineModel {
     //   data['item_type'] = jsonEncode(itemTypes);
     //   data['method'] = "get_with_filter";
     // }
-    print(data);
-    var res = await Util.instance.post("entry.cgi", data: data);
-    print(res);
+    Log.logger.log(Level.INFO, "timeline fetch data: $data");
+    var res = await HttpUtil.instance.post("entry.cgi", data: data);
+    Log.logger.log(Level.INFO, "timeline fetch response: $res");
     if (res['success']) {
       List data = res['data']['section'];
       List<TimelineModel> timeline = [];
-      data.forEach((e) {
+      for (var e in data) {
         timeline.add(TimelineModel.fromJson(e));
-      });
+      }
       return timeline;
     } else {
       throw Exception();
@@ -68,7 +71,7 @@ class TimelineModel {
   }) =>
       TimelineModel(
         limit: limit ?? this.limit,
-        days: list ?? this.days,
+        days: list ?? days,
         offset: offset ?? this.offset,
       );
   Map<String, dynamic> toJson() {
@@ -125,7 +128,7 @@ class Day {
           "SYNO.Foto${isTeam ? 'Team' : ''}.Browse.${recentlyAdd ? 'RecentlyAdded' : 'Item'}",
       "method": 'list',
       "version": 1,
-      "_sid": Util.instance.sid,
+      "_sid": connectionStore.sid,
       "timeline_group_unit": "day",
     };
     data['type'] = type;
@@ -147,7 +150,7 @@ class Day {
       //   ]);
       // }
     }
-    var res = await Util.instance.post("entry.cgi", data: data);
+    var res = await HttpUtil.instance.post("entry.cgi", data: data);
     // print(res);
     if (res['success']) {
       photos = [];
@@ -166,12 +169,12 @@ class Day {
       "start_time": start,
       "end_time": end,
       "api":
-          '"SYNO.${Util.instance.version == 7 ? "Foto" : "Photo"}.Browse.Timeline"',
+          '"SYNO.${connectionStore.version >= 7 ? "Foto" : "Photo"}.Browse.Timeline"',
       "method": '"get_geocoding"',
       "version": 1,
-      "_sid": Util.instance.sid,
+      "_sid": connectionStore.sid,
     };
-    var res = await Util.instance.post("entry.cgi", data: data);
+    var res = await HttpUtil.instance.post("entry.cgi", data: data);
     return res;
   }
 

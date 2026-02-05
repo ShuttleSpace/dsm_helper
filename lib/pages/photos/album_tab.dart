@@ -10,11 +10,11 @@ import 'package:garden/pages/photos/widgets/thumbnail_card.dart';
 import 'package:garden/widgets/cupertino_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:garden/constants/app_constants.dart';
+import 'package:garden/theme/app_colors.dart';
 
 class AlbumTab extends StatefulWidget {
-  const AlbumTab(
-    this.isTeam,
-  );
+  const AlbumTab(this.isTeam, {super.key});
   final bool isTeam;
   @override
   State<AlbumTab> createState() => AlbumTabState();
@@ -90,7 +90,7 @@ class AlbumTabState extends State<AlbumTab> {
   Widget build(BuildContext context) {
     albumWidth = MediaQuery.sizeOf(context).width / 5;
     return ListView(
-      padding: EdgeInsets.all(20),
+      padding: const EdgeInsets.all(20),
       children: [
         Wrap(
           runSpacing: 20,
@@ -117,10 +117,10 @@ class AlbumTabState extends State<AlbumTab> {
                     width: albumWidth,
                     isTeam: isTeam,
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 5,
                   ),
-                  Text(
+                  const Text(
                     "位置",
                     style: TextStyle(fontSize: 14),
                     maxLines: 1,
@@ -150,10 +150,10 @@ class AlbumTabState extends State<AlbumTab> {
                     width: albumWidth,
                     isTeam: isTeam,
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 5,
                   ),
-                  Text(
+                  const Text(
                     "标签",
                     style: TextStyle(fontSize: 14),
                     maxLines: 1,
@@ -183,10 +183,10 @@ class AlbumTabState extends State<AlbumTab> {
                     width: albumWidth,
                     isTeam: isTeam,
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 5,
                   ),
-                  Text(
+                  const Text(
                     "视频",
                     style: TextStyle(fontSize: 14),
                     maxLines: 1,
@@ -216,10 +216,10 @@ class AlbumTabState extends State<AlbumTab> {
                     width: albumWidth,
                     isTeam: isTeam,
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 5,
                   ),
-                  Text(
+                  const Text(
                     "最近添加",
                     style: TextStyle(fontSize: 14),
                     maxLines: 1,
@@ -230,7 +230,7 @@ class AlbumTabState extends State<AlbumTab> {
             ),
           ],
         ),
-        SizedBox(
+        const SizedBox(
           height: 20,
         ),
         ...albums.map((e) {
@@ -244,7 +244,8 @@ class AlbumTabState extends State<AlbumTab> {
               }));
             },
             child: Padding(
-              padding: EdgeInsets.symmetric(vertical: 10),
+              padding: const EdgeInsets.symmetric(
+                  vertical: AppConstants.paddingSmall + 2),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(10),
                 child: Stack(
@@ -257,7 +258,7 @@ class AlbumTabState extends State<AlbumTab> {
                         height: 200,
                         fit: BoxFit.cover,
                         placeholder: Container(
-                          color: Color(0xffE9E9E9),
+                          color: AppColors.placeholderBackgroundLight,
                         ),
                       ),
                     ),
@@ -266,8 +267,8 @@ class AlbumTabState extends State<AlbumTab> {
                       bottom: 0,
                       child: Container(
                         width: MediaQuery.sizeOf(context).width - 40,
-                        padding: EdgeInsets.fromLTRB(10, 20, 10, 10),
-                        decoration: BoxDecoration(
+                        padding: const EdgeInsets.fromLTRB(10, 20, 10, 10),
+                        decoration: const BoxDecoration(
                           gradient: LinearGradient(
                             colors: [Colors.transparent, Colors.black26],
                             begin: Alignment.topCenter,
@@ -275,14 +276,14 @@ class AlbumTabState extends State<AlbumTab> {
                           ),
                         ),
                         child: DefaultTextStyle(
-                          style: TextStyle(color: Colors.white),
+                          style: const TextStyle(color: Colors.white),
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
                                 e.name ?? '',
-                                style: TextStyle(fontSize: 16),
+                                style: const TextStyle(fontSize: 16),
                               ),
                               Row(
                                 children: [
@@ -290,13 +291,13 @@ class AlbumTabState extends State<AlbumTab> {
                                     if (e.additional?.sharingInfo
                                             ?.enablePassword ==
                                         true)
-                                      Icon(
+                                      const Icon(
                                         CupertinoIcons.lock,
                                         color: Colors.white,
                                         size: 16,
                                       ),
                                     Text(e.shareText),
-                                    Text("，"),
+                                    const Text("，"),
                                   ],
                                   Text("${e.itemCount}张照片"),
                                 ],
@@ -311,7 +312,7 @@ class AlbumTabState extends State<AlbumTab> {
               ),
             ),
           );
-        }).toList(),
+        }),
       ],
     );
   }

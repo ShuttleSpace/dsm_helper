@@ -1,22 +1,27 @@
-import 'package:garden/util/function.dart';
+import 'package:garden/util/http_util.dart';
+import 'package:garden/util/format_util.dart';
+import 'package:garden/util/log.dart';
 import 'package:garden/widgets/bubble_tab_indicator.dart';
+import 'package:garden/widgets/dashboard/volume_card.dart';
 import 'package:garden/widgets/label.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:percent_indicator/circular_percent_indicator.dart';
+import 'package:garden/constants/app_constants.dart';
+import 'package:simple_logger/simple_logger.dart';
 
 class SystemInfo extends StatefulWidget {
   final int index;
   final Map system;
   final List volumes;
   final List disks;
-  SystemInfo(this.index, this.system, this.volumes, this.disks);
+  const SystemInfo(this.index, this.system, this.volumes, this.disks,
+      {super.key});
   @override
-  _SystemInfoState createState() => _SystemInfoState();
+  SystemInfoState createState() => SystemInfoState();
 }
 
-class _SystemInfoState extends State<SystemInfo>
+class SystemInfoState extends State<SystemInfo>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
   List usbDev = [];
@@ -34,7 +39,7 @@ class _SystemInfoState extends State<SystemInfo>
     });
 
     getData();
-    if (widget.volumes.length > 0 || widget.disks.length > 0) {
+    if (widget.volumes.isNotEmpty || widget.disks.isNotEmpty) {
       setState(() {
         volumes = widget.volumes;
         disks = widget.disks;
@@ -55,7 +60,7 @@ class _SystemInfoState extends State<SystemInfo>
         network = res['data'];
         nifs = network['nif'];
       });
-      print(network);
+      Log.logger.log(Level.SEVERE, "get networkInfo: $network");
     }
   }
 
@@ -76,29 +81,31 @@ class _SystemInfoState extends State<SystemInfo>
   Widget _buildNifItem(nif) {
     return Card(
       shape: RoundedRectangleBorder(
-          side: BorderSide(), borderRadius: BorderRadius.circular(18)),
-      margin: EdgeInsets.only(top: 20, left: 20, right: 20),
+          side: const BorderSide(), borderRadius: BorderRadius.circular(18)),
+      margin: const EdgeInsets.only(top: 20, left: 20, right: 20),
       child: Padding(
-        padding: const EdgeInsets.all(8.0),
+        padding: const EdgeInsets.all(AppConstants.paddingSmall),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
-              padding: EdgeInsets.only(top: 20, left: 20),
+              padding: const EdgeInsets.only(top: 20, left: 20),
               child: Text(
                 "局域网 ${nifs.indexOf(nif) + 1}",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+                style:
+                    const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
               ),
             ),
             Card(
               shape: RoundedRectangleBorder(
-                  side: BorderSide(), borderRadius: BorderRadius.circular(18)),
-              margin: EdgeInsets.only(top: 20, left: 20, right: 20),
+                  side: const BorderSide(),
+                  borderRadius: BorderRadius.circular(18)),
+              margin: const EdgeInsets.only(top: 20, left: 20, right: 20),
               child: Padding(
-                padding: const EdgeInsets.all(8.0),
+                padding: const EdgeInsets.all(AppConstants.paddingSmall),
                 child: Row(
                   children: [
-                    Expanded(
+                    const Expanded(
                       child: Text(
                         "MAC 地址",
                         overflow: TextOverflow.ellipsis,
@@ -117,13 +124,14 @@ class _SystemInfoState extends State<SystemInfo>
             ),
             Card(
               shape: RoundedRectangleBorder(
-                  side: BorderSide(), borderRadius: BorderRadius.circular(18)),
-              margin: EdgeInsets.only(top: 20, left: 20, right: 20),
+                  side: const BorderSide(),
+                  borderRadius: BorderRadius.circular(18)),
+              margin: const EdgeInsets.only(top: 20, left: 20, right: 20),
               child: Padding(
-                padding: const EdgeInsets.all(8.0),
+                padding: const EdgeInsets.all(AppConstants.paddingSmall),
                 child: Row(
                   children: [
-                    Expanded(
+                    const Expanded(
                       flex: 1,
                       child: Text(
                         "IP 地址",
@@ -143,13 +151,14 @@ class _SystemInfoState extends State<SystemInfo>
             ),
             Card(
               shape: RoundedRectangleBorder(
-                  side: BorderSide(), borderRadius: BorderRadius.circular(18)),
-              margin: EdgeInsets.only(top: 20, left: 20, right: 20),
+                  side: const BorderSide(),
+                  borderRadius: BorderRadius.circular(18)),
+              margin: const EdgeInsets.only(top: 20, left: 20, right: 20),
               child: Padding(
-                padding: const EdgeInsets.all(8.0),
+                padding: const EdgeInsets.all(AppConstants.paddingSmall),
                 child: Row(
                   children: [
-                    Expanded(
+                    const Expanded(
                       flex: 1,
                       child: Text(
                         "子网掩码",
@@ -167,7 +176,7 @@ class _SystemInfoState extends State<SystemInfo>
                 ),
               ),
             ),
-            SizedBox(
+            const SizedBox(
               height: 20,
             ),
           ],
@@ -179,10 +188,10 @@ class _SystemInfoState extends State<SystemInfo>
   Widget _buildDevItem(dev) {
     return Card(
       shape: RoundedRectangleBorder(
-          side: BorderSide(), borderRadius: BorderRadius.circular(18)),
-      margin: EdgeInsets.only(top: 20, left: 20, right: 20),
+          side: const BorderSide(), borderRadius: BorderRadius.circular(18)),
+      margin: const EdgeInsets.only(top: 20, left: 20, right: 20),
       child: Padding(
-        padding: const EdgeInsets.all(8.0),
+        padding: const EdgeInsets.all(AppConstants.paddingSmall),
         child: Row(
           children: [
             Expanded(
@@ -204,118 +213,22 @@ class _SystemInfoState extends State<SystemInfo>
     );
   }
 
-  Widget _buildVolumeItem(volume) {
-    double percent =
-        int.parse(volume['size']['used']) / int.parse(volume['size']['total']);
-    return Card(
-      shape: RoundedRectangleBorder(
-          side: BorderSide(), borderRadius: BorderRadius.circular(18)),
-      margin: EdgeInsets.only(top: 20, left: 20, right: 20),
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Row(
-          children: [
-            CircularPercentIndicator(
-              radius: 40,
-              // progressColor: Colors.lightBlueAccent,
-              animation: true,
-              linearGradient: LinearGradient(
-                colors: percent <= 0.9
-                    ? [
-                        Colors.blue,
-                        Colors.blueAccent,
-                      ]
-                    : [
-                        Colors.red,
-                        Colors.orangeAccent,
-                      ],
-              ),
-              animateFromLastPercent: true,
-              circularStrokeCap: CircularStrokeCap.round,
-              lineWidth: 12,
-              backgroundColor: Colors.black12,
-              percent: percent,
-              center: Text(
-                "${(percent * 100).toStringAsFixed(0)}%",
-                style: TextStyle(
-                    color: percent <= 0.9 ? Colors.blue : Colors.red,
-                    fontSize: 22),
-              ),
-            ),
-            SizedBox(
-              width: 10,
-            ),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Text(
-                        "存储空间 ${volume['num_id']}",
-                        style: TextStyle(fontWeight: FontWeight.w600),
-                      ),
-                      SizedBox(
-                        width: 5,
-                      ),
-                      volume['status'] == "normal"
-                          ? Label(
-                              "正常",
-                              Colors.green,
-                              fill: true,
-                            )
-                          : volume['status'] == "background"
-                              ? Label(
-                                  "正在检查硬盘",
-                                  Colors.lightBlueAccent,
-                                  fill: true,
-                                )
-                              : volume['status'] == "attention"
-                                  ? Label(
-                                      "注意",
-                                      Colors.orangeAccent,
-                                      fill: true,
-                                    )
-                                  : Label(
-                                      volume['status'],
-                                      Colors.red,
-                                      fill: true,
-                                    ),
-                    ],
-                  ),
-                  SizedBox(
-                    height: 5,
-                  ),
-                  Text("${volume['desc'] ?? (volume['vol_desc'] ?? "-")}"),
-                  SizedBox(
-                    height: 5,
-                  ),
-                  Text(
-                      "${Util.instance.formatSize(int.parse(volume['size']['used']))} / ${Util.instance.formatSize(int.parse(volume['size']['total']))}"),
-                ],
-              ),
-            )
-          ],
-        ),
-      ),
-    );
-  }
-
   Widget _buildDiskItem(disk) {
     return Card(
       shape: RoundedRectangleBorder(
-          side: BorderSide(), borderRadius: BorderRadius.circular(18)),
-      margin: EdgeInsets.only(top: 20, left: 20, right: 20),
+          side: const BorderSide(), borderRadius: BorderRadius.circular(18)),
+      margin: const EdgeInsets.only(top: 20, left: 20, right: 20),
       child: Padding(
-        padding: const EdgeInsets.all(8.0),
+        padding: const EdgeInsets.all(AppConstants.paddingSmall),
         child: Row(
           children: [
             Card(
               shape: RoundedRectangleBorder(
-                  side: BorderSide(), borderRadius: BorderRadius.circular(18)),
-              margin: EdgeInsets.all(10),
+                  side: const BorderSide(),
+                  borderRadius: BorderRadius.circular(18)),
+              margin: const EdgeInsets.all(10),
               child: Padding(
-                padding: const EdgeInsets.all(8.0),
+                padding: const EdgeInsets.all(AppConstants.paddingSmall),
                 child: Image.asset(
                   disk['isSsd']
                       ? "assets/icons/ssd.png"
@@ -324,7 +237,7 @@ class _SystemInfoState extends State<SystemInfo>
                 ),
               ),
             ),
-            SizedBox(
+            const SizedBox(
               width: 10,
             ),
             Expanded(
@@ -335,9 +248,9 @@ class _SystemInfoState extends State<SystemInfo>
                     children: [
                       Text(
                         "${disk['longName']}",
-                        style: TextStyle(fontWeight: FontWeight.w600),
+                        style: const TextStyle(fontWeight: FontWeight.w600),
                       ),
-                      SizedBox(
+                      const SizedBox(
                         width: 5,
                       ),
                       Label(
@@ -351,17 +264,17 @@ class _SystemInfoState extends State<SystemInfo>
                       ),
                     ],
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 5,
                   ),
                   Text("${disk['vendor'].trim()} ${disk['model'].trim()}"),
-                  SizedBox(
+                  const SizedBox(
                     height: 5,
                   ),
                   Row(
                     children: [
                       Text(
-                          "${Util.instance.formatSize(int.parse(disk['size_total']))}"),
+                          FormatUtil.formatSize(int.parse(disk['size_total']))),
                       Text("  ${disk['temp']}℃"),
                     ],
                   ),
@@ -379,7 +292,7 @@ class _SystemInfoState extends State<SystemInfo>
     return Scaffold(
       appBar: AppBar(
         leading: AppBackButton(context),
-        title: Text(
+        title: const Text(
           "信息中心",
         ),
       ),
@@ -387,8 +300,9 @@ class _SystemInfoState extends State<SystemInfo>
         children: [
           Card(
             shape: RoundedRectangleBorder(
-                side: BorderSide(), borderRadius: BorderRadius.circular(18)),
-            margin: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                side: const BorderSide(),
+                borderRadius: BorderRadius.circular(18)),
+            margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
             child: TabBar(
               dividerHeight: 0,
               isScrollable: true,
@@ -398,8 +312,8 @@ class _SystemInfoState extends State<SystemInfo>
                   ? Colors.white
                   : Colors.black,
               unselectedLabelColor: Colors.grey,
-              indicator: BubbleTabIndicator(),
-              tabs: [
+              indicator: const BubbleTabIndicator(),
+              tabs: const [
                 Padding(
                   padding: EdgeInsets.symmetric(vertical: 10, horizontal: 5),
                   child: Text("常规"),
@@ -432,19 +346,20 @@ class _SystemInfoState extends State<SystemInfo>
               controller: _tabController,
               children: [
                 ListView(
-                  padding: EdgeInsets.symmetric(vertical: 20),
+                  padding: const EdgeInsets.symmetric(vertical: 20),
                   children: [
                     Card(
                       shape: RoundedRectangleBorder(
-                          side: BorderSide(),
+                          side: const BorderSide(),
                           borderRadius: BorderRadius.circular(18)),
-                      margin: EdgeInsets.only(left: 20, right: 20),
+                      margin: const EdgeInsets.only(left: 20, right: 20),
                       child: Padding(
-                        padding: const EdgeInsets.all(8.0),
+                        padding:
+                            const EdgeInsets.all(AppConstants.paddingSmall),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Padding(
+                            const Padding(
                               padding: EdgeInsets.only(top: 20, left: 20),
                               child: Text(
                                 "基本信息",
@@ -454,15 +369,16 @@ class _SystemInfoState extends State<SystemInfo>
                             ),
                             Card(
                               shape: RoundedRectangleBorder(
-                                  side: BorderSide(),
+                                  side: const BorderSide(),
                                   borderRadius: BorderRadius.circular(18)),
-                              margin:
-                                  EdgeInsets.only(top: 20, left: 20, right: 20),
+                              margin: const EdgeInsets.only(
+                                  top: 20, left: 20, right: 20),
                               child: Padding(
-                                padding: const EdgeInsets.all(8.0),
+                                padding: const EdgeInsets.all(
+                                    AppConstants.paddingSmall),
                                 child: Row(
                                   children: [
-                                    Expanded(
+                                    const Expanded(
                                       child: Text(
                                         "产品序列号",
                                         overflow: TextOverflow.ellipsis,
@@ -481,15 +397,16 @@ class _SystemInfoState extends State<SystemInfo>
                             ),
                             Card(
                               shape: RoundedRectangleBorder(
-                                  side: BorderSide(),
+                                  side: const BorderSide(),
                                   borderRadius: BorderRadius.circular(18)),
-                              margin:
-                                  EdgeInsets.only(top: 20, left: 20, right: 20),
+                              margin: const EdgeInsets.only(
+                                  top: 20, left: 20, right: 20),
                               child: Padding(
-                                padding: const EdgeInsets.all(8.0),
+                                padding: const EdgeInsets.all(
+                                    AppConstants.paddingSmall),
                                 child: Row(
                                   children: [
-                                    Expanded(
+                                    const Expanded(
                                       child: Text(
                                         "产品型号",
                                         overflow: TextOverflow.ellipsis,
@@ -508,15 +425,16 @@ class _SystemInfoState extends State<SystemInfo>
                             ),
                             Card(
                               shape: RoundedRectangleBorder(
-                                  side: BorderSide(),
+                                  side: const BorderSide(),
                                   borderRadius: BorderRadius.circular(18)),
-                              margin:
-                                  EdgeInsets.only(top: 20, left: 20, right: 20),
+                              margin: const EdgeInsets.only(
+                                  top: 20, left: 20, right: 20),
                               child: Padding(
-                                padding: const EdgeInsets.all(8.0),
+                                padding: const EdgeInsets.all(
+                                    AppConstants.paddingSmall),
                                 child: Row(
                                   children: [
-                                    Expanded(
+                                    const Expanded(
                                       child: Text(
                                         "CPU",
                                         overflow: TextOverflow.ellipsis,
@@ -535,15 +453,16 @@ class _SystemInfoState extends State<SystemInfo>
                             ),
                             Card(
                               shape: RoundedRectangleBorder(
-                                  side: BorderSide(),
+                                  side: const BorderSide(),
                                   borderRadius: BorderRadius.circular(18)),
-                              margin:
-                                  EdgeInsets.only(top: 20, left: 20, right: 20),
+                              margin: const EdgeInsets.only(
+                                  top: 20, left: 20, right: 20),
                               child: Padding(
-                                padding: const EdgeInsets.all(8.0),
+                                padding: const EdgeInsets.all(
+                                    AppConstants.paddingSmall),
                                 child: Row(
                                   children: [
-                                    Expanded(
+                                    const Expanded(
                                       child: Text(
                                         "CPU核心",
                                         overflow: TextOverflow.ellipsis,
@@ -562,15 +481,16 @@ class _SystemInfoState extends State<SystemInfo>
                             ),
                             Card(
                               shape: RoundedRectangleBorder(
-                                  side: BorderSide(),
+                                  side: const BorderSide(),
                                   borderRadius: BorderRadius.circular(18)),
-                              margin:
-                                  EdgeInsets.only(top: 20, left: 20, right: 20),
+                              margin: const EdgeInsets.only(
+                                  top: 20, left: 20, right: 20),
                               child: Padding(
-                                padding: const EdgeInsets.all(8.0),
+                                padding: const EdgeInsets.all(
+                                    AppConstants.paddingSmall),
                                 child: Row(
                                   children: [
-                                    Expanded(
+                                    const Expanded(
                                       child: Text(
                                         "物理内存",
                                         overflow: TextOverflow.ellipsis,
@@ -589,15 +509,16 @@ class _SystemInfoState extends State<SystemInfo>
                             ),
                             Card(
                               shape: RoundedRectangleBorder(
-                                  side: BorderSide(),
+                                  side: const BorderSide(),
                                   borderRadius: BorderRadius.circular(18)),
-                              margin:
-                                  EdgeInsets.only(top: 20, left: 20, right: 20),
+                              margin: const EdgeInsets.only(
+                                  top: 20, left: 20, right: 20),
                               child: Padding(
-                                padding: const EdgeInsets.all(8.0),
+                                padding: const EdgeInsets.all(
+                                    AppConstants.paddingSmall),
                                 child: Row(
                                   children: [
-                                    Expanded(
+                                    const Expanded(
                                       child: Text(
                                         "DSM版本",
                                         overflow: TextOverflow.ellipsis,
@@ -616,15 +537,16 @@ class _SystemInfoState extends State<SystemInfo>
                             ),
                             Card(
                               shape: RoundedRectangleBorder(
-                                  side: BorderSide(),
+                                  side: const BorderSide(),
                                   borderRadius: BorderRadius.circular(18)),
-                              margin:
-                                  EdgeInsets.only(top: 20, left: 20, right: 20),
+                              margin: const EdgeInsets.only(
+                                  top: 20, left: 20, right: 20),
                               child: Padding(
-                                padding: const EdgeInsets.all(8.0),
+                                padding: const EdgeInsets.all(
+                                    AppConstants.paddingSmall),
                                 child: Row(
                                   children: [
-                                    Expanded(
+                                    const Expanded(
                                       child: Text(
                                         "系统时间",
                                         overflow: TextOverflow.ellipsis,
@@ -643,15 +565,16 @@ class _SystemInfoState extends State<SystemInfo>
                             ),
                             Card(
                               shape: RoundedRectangleBorder(
-                                  side: BorderSide(),
+                                  side: const BorderSide(),
                                   borderRadius: BorderRadius.circular(18)),
-                              margin:
-                                  EdgeInsets.only(top: 20, left: 20, right: 20),
+                              margin: const EdgeInsets.only(
+                                  top: 20, left: 20, right: 20),
                               child: Padding(
-                                padding: const EdgeInsets.all(8.0),
+                                padding: const EdgeInsets.all(
+                                    AppConstants.paddingSmall),
                                 child: Row(
                                   children: [
-                                    Expanded(
+                                    const Expanded(
                                       child: Text(
                                         "运行时间",
                                         overflow: TextOverflow.ellipsis,
@@ -660,7 +583,8 @@ class _SystemInfoState extends State<SystemInfo>
                                     Expanded(
                                       flex: 2,
                                       child: Text(
-                                        "${Util.instance.parseOpTime(widget.system['up_time'])}",
+                                        FormatUtil.parseOpTime(
+                                            widget.system['up_time']),
                                         overflow: TextOverflow.ellipsis,
                                       ),
                                     ),
@@ -671,15 +595,16 @@ class _SystemInfoState extends State<SystemInfo>
                             if (widget.system['sys_temp'] != null)
                               Card(
                                 shape: RoundedRectangleBorder(
-                                    side: BorderSide(),
+                                    side: const BorderSide(),
                                     borderRadius: BorderRadius.circular(18)),
-                                margin: EdgeInsets.only(
+                                margin: const EdgeInsets.only(
                                     top: 20, left: 20, right: 20),
                                 child: Padding(
-                                  padding: const EdgeInsets.all(8.0),
+                                  padding: const EdgeInsets.all(
+                                      AppConstants.paddingSmall),
                                   child: Row(
                                     children: [
-                                      Expanded(
+                                      const Expanded(
                                         child: Text(
                                           "散热状态",
                                           overflow: TextOverflow.ellipsis,
@@ -708,7 +633,7 @@ class _SystemInfoState extends State<SystemInfo>
                                   ),
                                 ),
                               ),
-                            SizedBox(
+                            const SizedBox(
                               height: 20,
                             ),
                           ],
@@ -717,15 +642,17 @@ class _SystemInfoState extends State<SystemInfo>
                     ),
                     Card(
                       shape: RoundedRectangleBorder(
-                          side: BorderSide(),
+                          side: const BorderSide(),
                           borderRadius: BorderRadius.circular(18)),
-                      margin: EdgeInsets.only(top: 20, left: 20, right: 20),
+                      margin:
+                          const EdgeInsets.only(top: 20, left: 20, right: 20),
                       child: Padding(
-                        padding: const EdgeInsets.all(8.0),
+                        padding:
+                            const EdgeInsets.all(AppConstants.paddingSmall),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Padding(
+                            const Padding(
                               padding: EdgeInsets.only(top: 20, left: 20),
                               child: Text(
                                 "时间信息",
@@ -735,15 +662,16 @@ class _SystemInfoState extends State<SystemInfo>
                             ),
                             Card(
                               shape: RoundedRectangleBorder(
-                                  side: BorderSide(),
+                                  side: const BorderSide(),
                                   borderRadius: BorderRadius.circular(18)),
-                              margin:
-                                  EdgeInsets.only(top: 20, left: 20, right: 20),
+                              margin: const EdgeInsets.only(
+                                  top: 20, left: 20, right: 20),
                               child: Padding(
-                                padding: const EdgeInsets.all(8.0),
+                                padding: const EdgeInsets.all(
+                                    AppConstants.paddingSmall),
                                 child: Row(
                                   children: [
-                                    Expanded(
+                                    const Expanded(
                                       child: Text(
                                         "服务器地址",
                                         overflow: TextOverflow.ellipsis,
@@ -762,15 +690,16 @@ class _SystemInfoState extends State<SystemInfo>
                             ),
                             Card(
                               shape: RoundedRectangleBorder(
-                                  side: BorderSide(),
+                                  side: const BorderSide(),
                                   borderRadius: BorderRadius.circular(18)),
-                              margin:
-                                  EdgeInsets.only(top: 20, left: 20, right: 20),
+                              margin: const EdgeInsets.only(
+                                  top: 20, left: 20, right: 20),
                               child: Padding(
-                                padding: const EdgeInsets.all(8.0),
+                                padding: const EdgeInsets.all(
+                                    AppConstants.paddingSmall),
                                 child: Row(
                                   children: [
-                                    Expanded(
+                                    const Expanded(
                                       flex: 1,
                                       child: Text(
                                         "时区",
@@ -788,22 +717,24 @@ class _SystemInfoState extends State<SystemInfo>
                                 ),
                               ),
                             ),
-                            SizedBox(
+                            const SizedBox(
                               height: 20,
                             ),
                           ],
                         ),
                       ),
                     ),
-                    if (usbDev.length > 0)
+                    if (usbDev.isNotEmpty)
                       Card(
-                        margin: EdgeInsets.only(top: 20, left: 20, right: 20),
+                        margin:
+                            const EdgeInsets.only(top: 20, left: 20, right: 20),
                         child: Padding(
-                          padding: const EdgeInsets.all(8.0),
+                          padding:
+                              const EdgeInsets.all(AppConstants.paddingSmall),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Padding(
+                              const Padding(
                                 padding: EdgeInsets.only(top: 20, left: 20),
                                 child: Text(
                                   "外接设备",
@@ -812,8 +743,8 @@ class _SystemInfoState extends State<SystemInfo>
                                       fontWeight: FontWeight.w600),
                                 ),
                               ),
-                              ...usbDev.map(_buildDevItem).toList(),
-                              SizedBox(
+                              ...usbDev.map(_buildDevItem),
+                              const SizedBox(
                                 height: 20,
                               ),
                             ],
@@ -825,13 +756,15 @@ class _SystemInfoState extends State<SystemInfo>
                 ListView(
                   children: [
                     Card(
-                      margin: EdgeInsets.only(top: 20, left: 20, right: 20),
+                      margin:
+                          const EdgeInsets.only(top: 20, left: 20, right: 20),
                       child: Padding(
-                        padding: const EdgeInsets.all(8.0),
+                        padding:
+                            const EdgeInsets.all(AppConstants.paddingSmall),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Padding(
+                            const Padding(
                               padding: EdgeInsets.only(top: 20, left: 20),
                               child: Text(
                                 "基本信息",
@@ -840,13 +773,14 @@ class _SystemInfoState extends State<SystemInfo>
                               ),
                             ),
                             Card(
-                              margin:
-                                  EdgeInsets.only(top: 20, left: 20, right: 20),
+                              margin: const EdgeInsets.only(
+                                  top: 20, left: 20, right: 20),
                               child: Padding(
-                                padding: const EdgeInsets.all(8.0),
+                                padding: const EdgeInsets.all(
+                                    AppConstants.paddingSmall),
                                 child: Row(
                                   children: [
-                                    Expanded(
+                                    const Expanded(
                                       child: Text(
                                         "系统名称",
                                         overflow: TextOverflow.ellipsis,
@@ -864,13 +798,14 @@ class _SystemInfoState extends State<SystemInfo>
                               ),
                             ),
                             Card(
-                              margin:
-                                  EdgeInsets.only(top: 20, left: 20, right: 20),
+                              margin: const EdgeInsets.only(
+                                  top: 20, left: 20, right: 20),
                               child: Padding(
-                                padding: const EdgeInsets.all(8.0),
+                                padding: const EdgeInsets.all(
+                                    AppConstants.paddingSmall),
                                 child: Row(
                                   children: [
-                                    Expanded(
+                                    const Expanded(
                                       flex: 1,
                                       child: Text(
                                         "DNS",
@@ -889,13 +824,14 @@ class _SystemInfoState extends State<SystemInfo>
                               ),
                             ),
                             Card(
-                              margin:
-                                  EdgeInsets.only(top: 20, left: 20, right: 20),
+                              margin: const EdgeInsets.only(
+                                  top: 20, left: 20, right: 20),
                               child: Padding(
-                                padding: const EdgeInsets.all(8.0),
+                                padding: const EdgeInsets.all(
+                                    AppConstants.paddingSmall),
                                 child: Row(
                                   children: [
-                                    Expanded(
+                                    const Expanded(
                                       flex: 1,
                                       child: Text(
                                         "默认网关",
@@ -914,13 +850,14 @@ class _SystemInfoState extends State<SystemInfo>
                               ),
                             ),
                             Card(
-                              margin:
-                                  EdgeInsets.only(top: 20, left: 20, right: 20),
+                              margin: const EdgeInsets.only(
+                                  top: 20, left: 20, right: 20),
                               child: Padding(
-                                padding: const EdgeInsets.all(8.0),
+                                padding: const EdgeInsets.all(
+                                    AppConstants.paddingSmall),
                                 child: Row(
                                   children: [
-                                    Expanded(
+                                    const Expanded(
                                       flex: 1,
                                       child: Text(
                                         "工作群组",
@@ -938,18 +875,18 @@ class _SystemInfoState extends State<SystemInfo>
                                 ),
                               ),
                             ),
-                            SizedBox(
+                            const SizedBox(
                               height: 20,
                             ),
                           ],
                         ),
                       ),
                     ),
-                    ...nifs.map(_buildNifItem).toList(),
+                    ...nifs.map(_buildNifItem),
                   ],
                 ),
                 loadingDisks
-                    ? Center(
+                    ? const Center(
                         child: CupertinoActivityIndicator(
                           radius: 14,
                         ),
@@ -957,14 +894,15 @@ class _SystemInfoState extends State<SystemInfo>
                     : ListView(
                         children: [
                           Card(
-                            margin: EdgeInsets.symmetric(
+                            margin: const EdgeInsets.symmetric(
                                 horizontal: 20, vertical: 15),
                             child: Padding(
-                              padding: const EdgeInsets.all(8.0),
+                              padding: const EdgeInsets.all(
+                                  AppConstants.paddingSmall),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Padding(
+                                  const Padding(
                                     padding: EdgeInsets.only(left: 20, top: 20),
                                     child: Text(
                                       "存储空间",
@@ -973,8 +911,9 @@ class _SystemInfoState extends State<SystemInfo>
                                           fontWeight: FontWeight.w600),
                                     ),
                                   ),
-                                  ...volumes.map(_buildVolumeItem).toList(),
-                                  SizedBox(
+                                  ...volumes.map(
+                                      (volume) => VolumeCard(volume: volume)),
+                                  const SizedBox(
                                     height: 20,
                                   ),
                                 ],
@@ -982,14 +921,15 @@ class _SystemInfoState extends State<SystemInfo>
                             ),
                           ),
                           Card(
-                            margin: EdgeInsets.symmetric(
+                            margin: const EdgeInsets.symmetric(
                                 horizontal: 20, vertical: 15),
                             child: Padding(
-                              padding: const EdgeInsets.all(8.0),
+                              padding: const EdgeInsets.all(
+                                  AppConstants.paddingSmall),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Padding(
+                                  const Padding(
                                     padding: EdgeInsets.only(left: 20, top: 20),
                                     child: Text(
                                       "硬盘",
@@ -998,8 +938,8 @@ class _SystemInfoState extends State<SystemInfo>
                                           fontWeight: FontWeight.w600),
                                     ),
                                   ),
-                                  ...disks.map(_buildDiskItem).toList(),
-                                  SizedBox(
+                                  ...disks.map(_buildDiskItem),
+                                  const SizedBox(
                                     height: 20,
                                   ),
                                 ],
@@ -1008,13 +948,13 @@ class _SystemInfoState extends State<SystemInfo>
                           ),
                         ],
                       ),
-                Center(
+                const Center(
                   child: Text("待开发"),
                 ),
-                Center(
+                const Center(
                   child: Text("待开发"),
                 ),
-                Center(
+                const Center(
                   child: Text("待开发"),
                 ),
               ],

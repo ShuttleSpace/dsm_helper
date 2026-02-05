@@ -1,20 +1,22 @@
 import 'package:garden/pages/packages/detail.dart';
-import 'package:garden/util/function.dart';
+import 'package:garden/util/log.dart';
+import 'package:garden/util/ui_util.dart';
+import 'package:garden/util/http_util.dart';
 import 'package:garden/widgets/bubble_tab_indicator.dart';
-import 'package:garden/widgets/cupertino_image.dart';
-import 'package:garden/widgets/label.dart';
 import 'package:garden/widgets/neu_back_button.dart';
+import 'package:garden/widgets/packages/package_card.dart';
+import 'package:garden/widgets/packages/update_package_item.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class Packages extends StatefulWidget {
   final String version;
-  Packages(this.version);
+  const Packages(this.version, {super.key});
   @override
-  _PackagesState createState() => _PackagesState();
+  PackagesState createState() => PackagesState();
 }
 
-class _PackagesState extends State<Packages> with TickerProviderStateMixin {
+class PackagesState extends State<Packages> with TickerProviderStateMixin {
   int packagesVersion = 1;
   int installedVersion = 1;
   late TabController _tabController;
@@ -75,7 +77,7 @@ class _PackagesState extends State<Packages> with TickerProviderStateMixin {
         }
         if (res['data']['beta_packages'] != null) {
           betas = res['data']['beta_packages'];
-          if (betas.length > 0) {
+          if (betas.isNotEmpty) {
             _tabController =
                 TabController(initialIndex: 1, length: 4, vsync: this);
           }
@@ -87,8 +89,11 @@ class _PackagesState extends State<Packages> with TickerProviderStateMixin {
         loadingAll = false;
       });
     } else {
-      Util.instance.toast("数据加载失败");
-      Navigator.of(context).pop();
+      UiUtil.toast("数据加载失败");
+      if (context.mounted) {
+        // ignore: use_build_context_synchronously
+        Navigator.of(context).pop();
+      }
       return;
     }
     getOthers();
@@ -107,9 +112,9 @@ class _PackagesState extends State<Packages> with TickerProviderStateMixin {
   }
 
   getOthers() async {
-    print("获取第三方套件");
+    Log.info("获取第三方套件");
     var res = await Api.packages(others: true, version: packagesVersion);
-    print("获取第三方套件end");
+    Log.info("获取第三方套件end");
     if (res['success']) {
       setState(() {
         if (res['data']['packages'] != null) {
@@ -127,10 +132,10 @@ class _PackagesState extends State<Packages> with TickerProviderStateMixin {
   // getLaunchedPackages() async {
   //   return;
   //   launchedPackages = [];
-  //   print("获取运行中套件");
+  //   Log.info("获取运行中套件");
   //   var res = await Api.launchedPackages();
-  //   print(res);
-  //   print("获取运行中套件end");
+  //   Log.info(res);
+  //   Log.info("获取运行中套件end");
   //   if (res['success']) {
   //     Map packages = res['data']['packages'];
   //     packages.forEach((key, value) {
@@ -144,9 +149,9 @@ class _PackagesState extends State<Packages> with TickerProviderStateMixin {
   getInstalledPackages() async {
     installedPackages = [];
 
-    print("获取已安装套件");
+    Log.info("获取已安装套件");
     var res = await Api.installedPackages(version: installedVersion);
-    print("获取已安装套件end");
+    Log.info("获取已安装套件end");
     if (res['success']) {
       setState(() {
         installedPackagesInfo = res['data']['packages'];
@@ -154,15 +159,15 @@ class _PackagesState extends State<Packages> with TickerProviderStateMixin {
       });
       calcInstalledPackage();
     } else {
-      print(res);
-      print("获取已安装套件失败");
+      Log.info(res);
+      Log.info("获取已安装套件失败");
     }
   }
 
   calcInstalledPackage() {
     canUpdatePackages = [];
-    installedPackagesInfo.forEach((installedPackageInfo) {
-      allPackages.forEach((package) {
+    for (var installedPackageInfo in installedPackagesInfo) {
+      for (var package in allPackages) {
         package['installed'] = package['installed'] ?? false;
         package['installed_version'] = package['installed_version'] ?? "";
         package['can_update'] = package['can_update'] ?? false;
@@ -170,7 +175,7 @@ class _PackagesState extends State<Packages> with TickerProviderStateMixin {
         if (installedPackageInfo['id'] == package['id']) {
           package['installed'] = true;
           package['installed_version'] = installedPackageInfo['version'];
-          package['can_update'] = Util.instance.versionCompare(
+          package['can_update'] = HttpUtil.instance.versionCompare(
                   package['installed_version'], package['version']) <
               0;
           package['additional'] = installedPackageInfo['additional'];
@@ -188,216 +193,100 @@ class _PackagesState extends State<Packages> with TickerProviderStateMixin {
           }
         }
         setState(() {});
-      });
-    });
+      }
+    }
   }
 
   List<String> getCategoryName(List categoryIds) {
     List<String> name = [];
     for (int i = 0; i < categoryIds.length; i++) {
-      categories.forEach((category) {
+      for (var category in categories) {
         if (category['id'] == categoryIds[i]) {
           name.add(category['dname']);
         }
-      });
+      }
     }
     return name;
   }
 
-  Widget _buildButton(package, {bool beta = false}) {
-    Widget button;
-    if (package['can_update'] == null || package['installed'] == null) {
-      button = Card(
-        shape: RoundedRectangleBorder(
-            side: BorderSide(), borderRadius: BorderRadius.circular(18)),
-        child: Text("获取中"),
-      );
-    } else if (package['can_update']) {
-      button = OutlinedButton(
-        onPressed: () {
-          Navigator.of(context)
-              .push(CupertinoPageRoute(
-                  builder: (context) {
-                    return PackageDetail(package, beta: beta, method: "update");
-                  },
-                  settings: RouteSettings(name: "package_detail")))
-              .then((_) async {
-            // await getLaunchedPackages();
-            await getInstalledPackages();
-            setState(() {
-              loading = false;
-            });
-          });
-        },
-        child: Text("更新"),
-      );
-    } else if (package['installed']) {
-      String text = "";
-      if (package['launched'] &&
-          package['additional'] != null &&
-          package['additional']['startable']) {
-        text = "停用";
-      } else if (package['additional'] != null &&
-          package['additional']['startable']) {
-        text = "启动";
-      } else {
-        text = "已安装";
-      }
-      button = OutlinedButton(
-        onPressed: () async {
-          if (text == "启动") {
-            setState(() {
-              loading = true;
-            });
-            var res = await Api.launchPackage(
-                package['id'], package['dsm_apps'], "start");
-            if (res['success']) {
-              Util.instance.toast("已启动");
-              // await getLaunchedPackages();
-              await getInstalledPackages();
-              setState(() {
-                loading = false;
-              });
-            }
-          } else if (text == "停用") {
-            showCupertinoModalPopup(
-              context: context,
-              builder: (context) {
-                return Material(
-                  color: Colors.transparent,
-                  child: Card(
-                    shape: RoundedRectangleBorder(
-                        side: BorderSide(),
-                        borderRadius: BorderRadius.circular(18)),
-                    child: SafeArea(
-                      top: false,
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: <Widget>[
-                            Text(
-                              "停用套件",
-                              style: TextStyle(
-                                  fontSize: 20, fontWeight: FontWeight.w500),
-                            ),
-                            SizedBox(
-                              height: 12,
-                            ),
-                            Text(
-                              "确认要停用此套件？",
-                              style: TextStyle(
-                                  fontSize: 20, fontWeight: FontWeight.w400),
-                            ),
-                            SizedBox(
-                              height: 22,
-                            ),
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: OutlinedButton(
-                                    onPressed: () async {
-                                      Navigator.of(context).pop();
-                                      setState(() {
-                                        loading = true;
-                                      });
-                                      var res = await Api.launchPackage(
-                                          package['id'],
-                                          package['dsm_apps'],
-                                          "stop");
-                                      if (res['success']) {
-                                        Util.instance.toast("已停用");
-                                        // await getLaunchedPackages();
-                                        await getInstalledPackages();
-                                        setState(() {
-                                          loading = false;
-                                        });
-                                      }
-                                    },
-                                    child: Text(
-                                      "停用",
-                                      style: TextStyle(
-                                          fontSize: 18,
-                                          color: Colors.redAccent),
-                                    ),
-                                  ),
-                                ),
-                                SizedBox(
-                                  width: 20,
-                                ),
-                                Expanded(
-                                  child: OutlinedButton(
-                                    onPressed: () async {
-                                      Navigator.of(context).pop();
-                                    },
-                                    child: Text(
-                                      "取消",
-                                      style: TextStyle(fontSize: 18),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            SizedBox(
-                              height: 8,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                );
-              },
-            );
-          }
-        },
-        child: Text(
-          "$text",
-          style: text == "启动"
-              ? null
-              : text == "停用"
-                  ? TextStyle(color: Colors.red)
-                  : TextStyle(color: Colors.grey),
-          textAlign: TextAlign.center,
-        ),
-      );
-    } else {
-      button = OutlinedButton(
-        onPressed: () {
-          Navigator.of(context)
-              .push(CupertinoPageRoute(
-                  builder: (context) {
-                    return PackageDetail(package,
-                        beta: beta, method: "install");
-                  },
-                  settings: RouteSettings(name: "package_detail")))
-              .then((_) async {
-            // await getLaunchedPackages();
-            await getInstalledPackages();
-            setState(() {
-              loading = false;
-            });
-          });
-        },
-        child: Text("安装套件"),
-      );
+  // 处理更新套件
+  Future<void> _handleUpdatePackage(Map package, {bool beta = false}) async {
+    Navigator.of(context)
+        .push(CupertinoPageRoute(
+            builder: (context) {
+              return PackageDetail(package, beta: beta, method: "update");
+            },
+            settings: const RouteSettings(name: "package_detail")))
+        .then((_) async {
+      // await getLaunchedPackages();
+      await getInstalledPackages();
+      setState(() {
+        loading = false;
+      });
+    });
+  }
+
+  // 处理安装套件
+  Future<void> _handleInstallPackage(Map package, {bool beta = false}) async {
+    Navigator.of(context)
+        .push(CupertinoPageRoute(
+            builder: (context) {
+              return PackageDetail(package, beta: beta, method: "install");
+            },
+            settings: const RouteSettings(name: "package_detail")))
+        .then((_) async {
+      // await getLaunchedPackages();
+      await getInstalledPackages();
+      setState(() {
+        loading = false;
+      });
+    });
+  }
+
+  // 处理启动套件
+  Future<void> _handleStartPackage(Map package) async {
+    setState(() {
+      loading = true;
+    });
+    var res =
+        await Api.launchPackage(package['id'], package['dsm_apps'], "start");
+    if (res['success']) {
+      UiUtil.toast("已启动");
+      // await getLaunchedPackages();
+      await getInstalledPackages();
+      setState(() {
+        loading = false;
+      });
     }
-    return button;
+  }
+
+  // 处理停止套件
+  Future<void> _handleStopPackage(Map package) async {
+    setState(() {
+      loading = true;
+    });
+    var res =
+        await Api.launchPackage(package['id'], package['dsm_apps'], "stop");
+    if (res['success']) {
+      UiUtil.toast("已停用");
+      // await getLaunchedPackages();
+      await getInstalledPackages();
+      setState(() {
+        loading = false;
+      });
+    }
   }
 
   Widget _buildUpdateItem(update) {
-    String thumbnailUrl = update['thumbnail'].last;
-    if (!thumbnailUrl.startsWith("http")) {
-      thumbnailUrl = Util.instance.baseUrl + thumbnailUrl;
-    }
-    return GestureDetector(
+    return UpdatePackageItem(
+      update: update,
       onTap: () {
         Navigator.of(context)
             .push(CupertinoPageRoute(
                 builder: (context) {
                   return PackageDetail(update);
                 },
-                settings: RouteSettings(name: "package_detail")))
+                settings: const RouteSettings(name: "package_detail")))
             .then((_) async {
           // await getLaunchedPackages();
           await getInstalledPackages();
@@ -406,76 +295,26 @@ class _PackagesState extends State<Packages> with TickerProviderStateMixin {
           });
         });
       },
-      child: Card(
-        shape: RoundedRectangleBorder(
-            side: BorderSide(), borderRadius: BorderRadius.circular(18)),
-        margin: EdgeInsets.only(bottom: 20),
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-          child: Row(
-            children: [
-              Container(
-                height: 80,
-                width: 80,
-                alignment: Alignment.center,
-                child: CupertinoExtendedImage(
-                  thumbnailUrl,
-                  width: 80,
-                  height: 80,
-                ),
-              ),
-              SizedBox(
-                width: 10,
-              ),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "${update['dname']}",
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      textAlign: TextAlign.center,
-                      style: TextStyle(fontSize: 16),
-                    ),
-                    SizedBox(
-                      height: 5,
-                    ),
-                    Text(
-                      update['version'],
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      textAlign: TextAlign.center,
-                      style: TextStyle(color: Colors.grey),
-                    ),
-                  ],
-                ),
-              ),
-              _buildButton(update),
-            ],
-          ),
-        ),
-      ),
+      onUpdate: () => _handleUpdatePackage(update),
+      onInstall: () => _handleInstallPackage(update),
+      onStart: () => _handleStartPackage(update),
+      onStop: () => _handleStopPackage(update),
     );
   }
 
   Widget _buildPackageItem(package, bool installed, {bool isBeta = false}) {
-    String thumbnailUrl = "";
-    if (package['thumbnail'].length > 0) {
-      thumbnailUrl = package['thumbnail'].last;
-      if (!thumbnailUrl.startsWith("http")) {
-        thumbnailUrl = Util.instance.baseUrl + thumbnailUrl;
-      }
-    }
-
-    return GestureDetector(
+    return PackageCard(
+      package: package,
+      installed: installed,
+      isBeta: isBeta,
+      getCategoryName: getCategoryName,
       onTap: () {
         Navigator.of(context)
             .push(CupertinoPageRoute(
                 builder: (context) {
                   return PackageDetail(package, beta: isBeta);
                 },
-                settings: RouteSettings(name: "package_detail")))
+                settings: const RouteSettings(name: "package_detail")))
             .then((_) async {
           // await getLaunchedPackages();
           await getInstalledPackages();
@@ -484,75 +323,10 @@ class _PackagesState extends State<Packages> with TickerProviderStateMixin {
           });
         });
       },
-      child: Card(
-        shape: RoundedRectangleBorder(
-            side: BorderSide(), borderRadius: BorderRadius.circular(18)),
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 20),
-                child: Column(
-                  children: [
-                    SizedBox(
-                      height: 20,
-                    ),
-                    Stack(
-                      children: [
-                        Align(
-                          alignment: Alignment.center,
-                          child: SizedBox(
-                            height: 80,
-                            child: CupertinoExtendedImage(
-                              thumbnailUrl,
-                              width: 80,
-                            ),
-                          ),
-                        ),
-                        if (isBeta ||
-                            (package['additional'] != null &&
-                                package['additional']['beta']))
-                          Align(
-                            alignment: Alignment.topRight,
-                            child: Label(
-                              "Beta",
-                              Colors.lightBlueAccent,
-                              fill: true,
-                            ),
-                          ),
-                      ],
-                    ),
-                    SizedBox(
-                      height: 10,
-                    ),
-                    SizedBox(
-                      height: 40,
-                      child: Text(
-                        "${package['dname']}",
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                    Text(
-                      // "${package['category']}",
-                      "${installed && package['additional']['updated_at'] != null ? package['additional']['updated_at'] : package['category'] is List && getCategoryName(package['category']).length > 0 ? getCategoryName(package['category']).join(",") : package['maintainer']}",
-                      maxLines: 1,
-                      overflow: TextOverflow.clip,
-                      style: TextStyle(color: Colors.grey),
-                    ),
-                  ],
-                ),
-              ),
-              Padding(
-                  padding: EdgeInsets.all(20),
-                  child: _buildButton(package, beta: isBeta)),
-            ],
-          ),
-        ),
-      ),
+      onUpdate: () => _handleUpdatePackage(package, beta: isBeta),
+      onInstall: () => _handleInstallPackage(package, beta: isBeta),
+      onStart: () => _handleStartPackage(package),
+      onStop: () => _handleStopPackage(package),
     );
   }
 
@@ -561,7 +335,7 @@ class _PackagesState extends State<Packages> with TickerProviderStateMixin {
     return Scaffold(
       appBar: AppBar(
         leading: AppBackButton(context),
-        title: Text(
+        title: const Text(
           "套件中心",
         ),
       ),
@@ -571,9 +345,10 @@ class _PackagesState extends State<Packages> with TickerProviderStateMixin {
             children: [
               Card(
                 shape: RoundedRectangleBorder(
-                    side: BorderSide(),
+                    side: const BorderSide(),
                     borderRadius: BorderRadius.circular(18)),
-                margin: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                margin:
+                    const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
                 child: TabBar(
                   dividerHeight: 0,
                   isScrollable: true,
@@ -585,27 +360,27 @@ class _PackagesState extends State<Packages> with TickerProviderStateMixin {
                   unselectedLabelColor: Colors.grey,
                   indicator: BubbleTabIndicator(
                     indicatorColor: Theme.of(context).scaffoldBackgroundColor,
-                    shadowColor: Util.getAdjustColor(
+                    shadowColor: HttpUtil.getAdjustColor(
                         Theme.of(context).scaffoldBackgroundColor, -20),
                   ),
                   tabs: [
-                    Padding(
+                    const Padding(
                       padding:
                           EdgeInsets.symmetric(vertical: 10, horizontal: 5),
                       child: Text("已安装"),
                     ),
-                    Padding(
+                    const Padding(
                       padding:
                           EdgeInsets.symmetric(vertical: 10, horizontal: 5),
                       child: Text("全部套件"),
                     ),
-                    Padding(
+                    const Padding(
                       padding:
                           EdgeInsets.symmetric(vertical: 10, horizontal: 5),
                       child: Text("社群"),
                     ),
-                    if (betas.length > 0)
-                      Padding(
+                    if (betas.isNotEmpty)
+                      const Padding(
                         padding:
                             EdgeInsets.symmetric(vertical: 10, horizontal: 5),
                         child: Text("Beta"),
@@ -619,16 +394,16 @@ class _PackagesState extends State<Packages> with TickerProviderStateMixin {
                   children: [
                     Container(
                       child: loadingInstalled
-                          ? Center(
+                          ? const Center(
                               child: CupertinoActivityIndicator(
                                 radius: 14,
                               ),
                             )
                           : ListView(
-                              padding: EdgeInsets.symmetric(
+                              padding: const EdgeInsets.symmetric(
                                   horizontal: 20, vertical: 20),
                               children: [
-                                if (canUpdatePackages.length > 0)
+                                if (canUpdatePackages.isNotEmpty)
                                   ListView.builder(
                                     itemBuilder: (content, i) {
                                       return _buildUpdateItem(
@@ -636,7 +411,8 @@ class _PackagesState extends State<Packages> with TickerProviderStateMixin {
                                     },
                                     itemCount: canUpdatePackages.length,
                                     shrinkWrap: true,
-                                    physics: NeverScrollableScrollPhysics(),
+                                    physics:
+                                        const NeverScrollableScrollPhysics(),
                                   ),
                                 Wrap(
                                   runSpacing: 20,
@@ -650,13 +426,13 @@ class _PackagesState extends State<Packages> with TickerProviderStateMixin {
                     ),
                     Container(
                       child: loadingAll
-                          ? Center(
+                          ? const Center(
                               child: CupertinoActivityIndicator(
                                 radius: 14,
                               ),
                             )
                           : ListView(
-                              padding: EdgeInsets.symmetric(
+                              padding: const EdgeInsets.symmetric(
                                   horizontal: 20, vertical: 20),
                               children: [
                                 Wrap(
@@ -671,13 +447,13 @@ class _PackagesState extends State<Packages> with TickerProviderStateMixin {
                     ),
                     Container(
                       child: loadingOthers
-                          ? Center(
+                          ? const Center(
                               child: CupertinoActivityIndicator(
                                 radius: 14,
                               ),
                             )
                           : ListView(
-                              padding: EdgeInsets.symmetric(
+                              padding: const EdgeInsets.symmetric(
                                   horizontal: 20, vertical: 20),
                               children: [
                                 Wrap(
@@ -690,10 +466,10 @@ class _PackagesState extends State<Packages> with TickerProviderStateMixin {
                               ],
                             ),
                     ),
-                    if (betas.length > 0)
+                    if (betas.isNotEmpty)
                       ListView(
-                        padding:
-                            EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 20, vertical: 20),
                         children: [
                           Wrap(
                             runSpacing: 20,
@@ -717,7 +493,7 @@ class _PackagesState extends State<Packages> with TickerProviderStateMixin {
               color: Theme.of(context)
                   .scaffoldBackgroundColor
                   .withValues(alpha: .7),
-              child: Center(
+              child: const Center(
                 child: CupertinoActivityIndicator(
                   radius: 14,
                 ),

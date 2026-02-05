@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:xterm/xterm.dart';
+import 'package:signals_flutter/signals_flutter.dart';
 
 import 'terminal_button.dart';
 
 class VirtualKeyboardView extends StatefulWidget {
-  const VirtualKeyboardView(this.keyboard, this.terminal, {key})
-      : super(key: key);
+  const VirtualKeyboardView(this.keyboard, this.terminal, {super.key});
 
   final VirtualKeyboard keyboard;
   final Terminal terminal;
@@ -19,7 +19,7 @@ class _VirtualKeyboardViewState extends State<VirtualKeyboardView> {
   Widget build(BuildContext context) {
     return Container(
       color: Colors.black,
-      padding: EdgeInsets.symmetric(horizontal: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 10),
       child: SafeArea(
         child: DefaultTextStyle(
           style: TextStyle(color: Colors.white.withValues(alpha: 0.5)),
@@ -32,13 +32,13 @@ class _VirtualKeyboardViewState extends State<VirtualKeyboardView> {
                     onPressed: () {
                       widget.terminal.keyInput(TerminalKey.escape);
                     },
-                    child: Text("ESC"),
+                    child: const Text("ESC"),
                   ),
                   TerminalButton(
                     onPressed: () {
                       widget.terminal.onOutput?.call('/');
                     },
-                    child: Text("/"),
+                    child: const Text("/"),
                   ),
                   TerminalButton(
                     onPressed: () {
@@ -49,15 +49,15 @@ class _VirtualKeyboardViewState extends State<VirtualKeyboardView> {
                       color: Colors.white.withValues(alpha: 0.5),
                     ),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     width: 40,
                   ),
-                  Spacer(),
+                  const Spacer(),
                   TerminalButton(
                     onPressed: () {
                       widget.terminal.keyInput(TerminalKey.home);
                     },
-                    child: Text(
+                    child: const Text(
                       "INS",
                       style: TextStyle(fontSize: 12),
                     ),
@@ -66,7 +66,7 @@ class _VirtualKeyboardViewState extends State<VirtualKeyboardView> {
                     onPressed: () {
                       widget.terminal.keyInput(TerminalKey.insert);
                     },
-                    child: Text(
+                    child: const Text(
                       "HOME",
                       style: TextStyle(fontSize: 12),
                     ),
@@ -75,7 +75,7 @@ class _VirtualKeyboardViewState extends State<VirtualKeyboardView> {
                     onPressed: () {
                       widget.terminal.keyInput(TerminalKey.pageUp);
                     },
-                    child: Text(
+                    child: const Text(
                       "PGUP",
                       style: TextStyle(fontSize: 12),
                     ),
@@ -88,7 +88,7 @@ class _VirtualKeyboardViewState extends State<VirtualKeyboardView> {
                     onPressed: () {
                       widget.terminal.keyInput(TerminalKey.tab);
                     },
-                    child: Text("TAB"),
+                    child: const Text("TAB"),
                   ),
                   // 左
                   TerminalButton(
@@ -120,7 +120,7 @@ class _VirtualKeyboardViewState extends State<VirtualKeyboardView> {
                       color: Colors.white.withValues(alpha: 0.5),
                     ),
                   ),
-                  Spacer(),
+                  const Spacer(),
                   TerminalButton(
                     onPressed: () {
                       setState(() {
@@ -128,7 +128,7 @@ class _VirtualKeyboardViewState extends State<VirtualKeyboardView> {
                       });
                     },
                     active: widget.keyboard.ctrl,
-                    child: Text("Ctrl"),
+                    child: const Text("Ctrl"),
                   ),
                   TerminalButton(
                     onPressed: () {
@@ -137,7 +137,7 @@ class _VirtualKeyboardViewState extends State<VirtualKeyboardView> {
                       });
                     },
                     active: widget.keyboard.alt,
-                    child: Text("Alt"),
+                    child: const Text("Alt"),
                   ),
                   TerminalButton(
                     onPressed: () {
@@ -146,25 +146,25 @@ class _VirtualKeyboardViewState extends State<VirtualKeyboardView> {
                       });
                     },
                     active: widget.keyboard.shift,
-                    child: Text("Shift"),
+                    child: const Text("Shift"),
                   ),
                   TerminalButton(
                     onPressed: () {
                       widget.terminal.keyInput(TerminalKey.delete);
                     },
-                    child: Text("DEL"),
+                    child: const Text("DEL"),
                   ),
                   TerminalButton(
                     onPressed: () {
                       widget.terminal.keyInput(TerminalKey.end);
                     },
-                    child: Text("END"),
+                    child: const Text("END"),
                   ),
                   TerminalButton(
                     onPressed: () {
                       widget.terminal.keyInput(TerminalKey.pageDown);
                     },
-                    child: Text(
+                    child: const Text(
                       "PGDN",
                       style: TextStyle(fontSize: 12),
                     ),
@@ -179,50 +179,38 @@ class _VirtualKeyboardViewState extends State<VirtualKeyboardView> {
   }
 }
 
-class VirtualKeyboard extends TerminalInputHandler with ChangeNotifier {
+class VirtualKeyboard extends TerminalInputHandler {
   final TerminalInputHandler _inputHandler;
 
   VirtualKeyboard(this._inputHandler);
 
-  bool _ctrl = false;
-
-  bool get ctrl => _ctrl;
+  final _ctrl = signal<bool>(false);
+  bool get ctrl => _ctrl.value;
 
   set ctrl(bool value) {
-    if (_ctrl != value) {
-      _ctrl = value;
-      notifyListeners();
-    }
+    _ctrl.value = value;
   }
 
-  bool _shift = false;
-
-  bool get shift => _shift;
+  final _shift = signal<bool>(false);
+  bool get shift => _shift.value;
 
   set shift(bool value) {
-    if (_shift != value) {
-      _shift = value;
-      notifyListeners();
-    }
+    _shift.value = value;
   }
 
-  bool _alt = false;
-
-  bool get alt => _alt;
+  final _alt = signal<bool>(false);
+  bool get alt => _alt.value;
 
   set alt(bool value) {
-    if (_alt != value) {
-      _alt = value;
-      notifyListeners();
-    }
+    _alt.value = value;
   }
 
   @override
   String call(TerminalKeyboardEvent event) {
     return _inputHandler.call(event.copyWith(
-          ctrl: event.ctrl || _ctrl,
-          shift: event.shift || _shift,
-          alt: event.alt || _alt,
+          ctrl: event.ctrl || ctrl,
+          shift: event.shift || shift,
+          alt: event.alt || alt,
         )) ??
         '';
   }
