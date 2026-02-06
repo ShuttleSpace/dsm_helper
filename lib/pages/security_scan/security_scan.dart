@@ -8,6 +8,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:garden/constants/app_constants.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
+import 'package:signals/signals_flutter.dart';
 
 class SecurityScan extends StatefulWidget {
   const SecurityScan({super.key});
@@ -72,7 +73,7 @@ class SecurityScanState extends State<SecurityScan>
   }
 
   getData() async {
-    var rule = await Api.securityRule();
+    var rule = await DsmApi.securityRule();
     if (rule['success']) {
       setState(() {
         ruleItems = rule['data']['items'];
@@ -104,7 +105,7 @@ class SecurityScanState extends State<SecurityScan>
         ruleUpdating = rule['data']['isUpdating'];
       });
     }
-    var system = await Api.securitySystem();
+    var system = await DsmApi.securitySystem();
     if (system['success']) {
       setState(() {
         loading = false;
@@ -124,7 +125,9 @@ class SecurityScanState extends State<SecurityScan>
       return webManagerStrings['rules'][
           "${strId}_desc_${status == 2 ? "good" : status == 0 ? "running" : "bad"}"];
     } else {
-      if (connectionStore.strings['SYNO.SDS.SecurityScan.Instance'] != null &&
+      if (connectionStore.strings
+                  .watch(context)['SYNO.SDS.SecurityScan.Instance'] !=
+              null &&
           connectionStore.strings['SYNO.SDS.SecurityScan.Instance']['rules'] !=
               null) {
         return (connectionStore.strings['SYNO.SDS.SecurityScan.Instance']
@@ -306,7 +309,7 @@ class SecurityScanState extends State<SecurityScan>
                                         )
                                       else
                                         Text(
-                                          "已运行：${HttpUtil.instance.timeRemaining(DateTime.now().secondsSinceEpoch - int.parse(startTime))}",
+                                          "已运行：${(DateTime.now().secondsSinceEpoch - int.parse(startTime)).timeRemaining()}",
                                           style: const TextStyle(fontSize: 14),
                                         ),
                                     ],

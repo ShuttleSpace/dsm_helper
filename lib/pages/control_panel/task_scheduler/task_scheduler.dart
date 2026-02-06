@@ -25,7 +25,7 @@ class TaskSchedulerState extends State<TaskScheduler> {
   }
 
   getData() async {
-    var res = await Api.taskScheduler();
+    var res = await DsmApi.taskScheduler();
     if (res['success']) {
       setState(() {
         loading = false;
@@ -96,7 +96,8 @@ class TaskSchedulerState extends State<TaskScheduler> {
                     setState(() {
                       task['set'] = true;
                     });
-                    var res = await Api.taskEnable(task['id'], !task['enable']);
+                    var res =
+                        await DsmApi.taskEnable(task['id'], !task['enable']);
                     setState(() {
                       task['set'] = false;
                     });
@@ -164,9 +165,9 @@ class TaskSchedulerState extends State<TaskScheduler> {
                     });
                     Map<dynamic, dynamic> res;
                     if (task['type'] == 'script') {
-                      res = await Api.taskRun([task['id']]);
+                      res = await DsmApi.taskRun([task['id']]);
                     } else if (task['type'] == 'event_script') {
-                      res = await Api.eventRun([task['name']]);
+                      res = await DsmApi.eventRun([task['name']]);
                     } else {
                       UiUtil.toast("暂不支持此类型任务");
                       return;
@@ -178,8 +179,7 @@ class TaskSchedulerState extends State<TaskScheduler> {
                     if (res['success']) {
                       UiUtil.toast("任务计划执行成功");
                     } else {
-                      HttpUtil.instance
-                          .toast("任务计划执行失败，code：${res['error']['code']}");
+                      UiUtil.toast("任务计划执行失败，code：${res['error']['code']}");
                     }
                   },
                   child: SizedBox(

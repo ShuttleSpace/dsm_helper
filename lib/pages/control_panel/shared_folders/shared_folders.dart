@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:garden/util/format_util.dart';
 import 'package:garden/util/log.dart';
 import 'package:garden/util/ui_util.dart';
 
@@ -31,7 +30,7 @@ class SharedFoldersState extends State<SharedFolders> {
   }
 
   getVolumes() async {
-    var res = await Api.volumes();
+    var res = await DsmApi.volumes();
     if (res['success']) {
       setState(() {
         volumes = res['data']['volumes'];
@@ -44,7 +43,7 @@ class SharedFoldersState extends State<SharedFolders> {
     setState(() {
       loading = true;
     });
-    var res = await Api.shareCore(additional: [
+    var res = await DsmApi.shareCore(additional: [
       "hidden",
       "encryption",
       "is_aclmode",
@@ -124,7 +123,7 @@ class SharedFoldersState extends State<SharedFolders> {
                         child: OutlinedButton(
                           onPressed: () async {
                             Navigator.of(context).pop();
-                            var res = await Api.deleteSharedFolder([folder]);
+                            var res = await DsmApi.deleteSharedFolder([folder]);
                             Log.info(res);
                             if (res['success']) {
                               UiUtil.toast("共享文件夹删除成功");
@@ -246,7 +245,7 @@ class SharedFoldersState extends State<SharedFolders> {
                         height: 5,
                       ),
                       Text(
-                        "共享文件夹配额：${folder['quota_value'] > 0 ? FormatUtil.formatSize(folder['quota_value'] * 1024 * 1024) : "已停用"}",
+                        "共享文件夹配额：${folder['quota_value'] > 0 ? (folder['quota_value'] * 1024 * 1024).formatSize() : "已停用"}",
                         style: TextStyle(
                             fontSize: 12,
                             color: Theme.of(context)
@@ -260,7 +259,7 @@ class SharedFoldersState extends State<SharedFolders> {
                         height: 5,
                       ),
                       Text(
-                        "共享文件夹大小：${FormatUtil.formatSize(folder['share_quota_used'] * 1024 * 1024)}",
+                        "共享文件夹大小：${(folder['share_quota_used'] * 1024 * 1024).formatSize()}",
                         style: TextStyle(
                             fontSize: 12,
                             color: Theme.of(context)
@@ -375,7 +374,8 @@ class SharedFoldersState extends State<SharedFolders> {
                                         OutlinedButton(
                                           onPressed: () async {
                                             Navigator.of(context).pop();
-                                            Api.cleanRecycleBin(folder['name'])
+                                            DsmApi.cleanRecycleBin(
+                                                    folder['name'])
                                                 .then((res) {
                                               if (res['success']) {
                                                 UiUtil.toast("请求已发送");

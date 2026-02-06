@@ -1,9 +1,7 @@
 import 'dart:io';
 import 'package:garden/util/ui_util.dart';
 import 'package:garden/util/storage_util.dart';
-import 'package:garden/stores/connection_store.dart';
 
-import 'package:garden/util/http_util.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_vibrate/flutter_vibrate.dart';
@@ -24,52 +22,47 @@ class AuthPage extends StatefulWidget {
 
 class AuthPageState extends State<AuthPage> {
   final LocalAuthentication auth = LocalAuthentication();
-  bool canCheckBiometrics = false;
-  DateTime lastPopTime = DateTime.now();
   BiometricType biometricsType = BiometricType.fingerprint;
   int errorCount = 0;
   String password = "";
-  @override
-  void initState() {
-    connectionStore.setIsAuthPage(true);
-    getData();
-    super.initState();
-  }
 
   Map<BiometricType, String> biometricTypeName = {
     BiometricType.face: "FaceId",
     BiometricType.fingerprint: "指纹",
     BiometricType.iris: "人脸",
   };
+
+  @override
+  void initState() {
+    getData();
+    super.initState();
+  }
+
   @override
   void dispose() {
-    connectionStore.setIsAuthPage(false);
     auth.stopAuthentication();
     super.dispose();
   }
 
   getData() async {
-    String pass = await StorageUtil.getString("gesture_password") ?? '';
-    password = pass;
-    String launchAuthBiometricsStr =
-        await StorageUtil.getString("launch_auth_biometrics") ?? '';
-    if (launchAuthBiometricsStr == "1") {
-      canCheckBiometrics = await auth.canCheckBiometrics;
-      setState(() {});
+    password = await StorageUtil.getString("gesture_password") ?? '';
+
+    bool launchAuthBiometric =
+        await StorageUtil.getBool("launch_auth_biometrics") ?? false;
+
+    if (launchAuthBiometric) {
+      final canCheckBiometrics = await auth.canCheckBiometrics;
       if (canCheckBiometrics) {
         List<BiometricType> availableBiometrics =
             await auth.getAvailableBiometrics();
         if (Platform.isIOS) {
-          setState(() {
-            if (availableBiometrics.contains(BiometricType.face)) {
-              biometricsType = BiometricType.face;
-            } else if (availableBiometrics
-                .contains(BiometricType.fingerprint)) {
-              biometricsType = BiometricType.fingerprint;
-            } else if (availableBiometrics.contains(BiometricType.iris)) {
-              biometricsType = BiometricType.iris;
-            }
-          });
+          if (availableBiometrics.contains(BiometricType.face)) {
+            biometricsType = BiometricType.face;
+          } else if (availableBiometrics.contains(BiometricType.fingerprint)) {
+            biometricsType = BiometricType.fingerprint;
+          } else if (availableBiometrics.contains(BiometricType.iris)) {
+            biometricsType = BiometricType.iris;
+          }
         }
       }
       if (Platform.isIOS) {
@@ -119,14 +112,12 @@ class AuthPageState extends State<AuthPage> {
           }
         } else {
           UiUtil.vibrate(FeedbackType.warning);
-          HttpUtil.instance
-              .toast("${biometricTypeName[biometricsType]}验证失败，请使用图形密码登录");
+          UiUtil.toast("${biometricTypeName[biometricsType]}验证失败，请使用图形密码登录");
         }
       } on PlatformException catch (e) {
         UiUtil.vibrate(FeedbackType.warning);
         if (e.code == auth_error.notAvailable) {
-          HttpUtil.instance
-              .toast("${biometricTypeName[biometricsType]}验证不可用，请使用图形密码登录");
+          UiUtil.toast("${biometricTypeName[biometricsType]}验证不可用，请使用图形密码登录");
         } else if (e.code == auth_error.passcodeNotSet) {
           UiUtil.toast("系统未设置密码");
         } else if (e.code == auth_error.lockedOut) {
@@ -138,19 +129,6 @@ class AuthPageState extends State<AuthPage> {
     }
   }
 
-  Future<bool> onWillPop(bool didPop, result) {
-    UiUtil.vibrate(FeedbackType.light);
-    if (DateTime.now().difference(lastPopTime) > const Duration(seconds: 2)) {
-      lastPopTime = DateTime.now();
-      UiUtil.toast('再按一次退出${connectionStore.appName}');
-    } else {
-      lastPopTime = DateTime.now();
-      // 退出app
-      SystemNavigator.pop();
-    }
-    return Future.value(false);
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -158,70 +136,63 @@ class AuthPageState extends State<AuthPage> {
         automaticallyImplyLeading: false,
         title: const Text('安全验证'),
       ),
-      body: PopScope(
-        onPopInvokedWithResult: onWillPop,
-        child: Center(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              const SizedBox(
-                height: 40,
-              ),
-              const Text(
-                "请绘制解锁图案",
-                style: TextStyle(fontSize: 26),
-              ),
-              const SizedBox(
-                height: 80,
-              ),
-              Center(
-                child: GesturePasswordWidget(
-                  onComplete: (s) {
-                    if (s.join('') == password) {
-                      //密码验证通过
-                      if (widget.launch) {
-                        if (widget.launchAccountPage) {
-                          Navigator.of(context)
-                              .pushReplacementNamed("/accounts");
-                        } else {
-                          Navigator.of(context).pushReplacementNamed("/login");
-                        }
+      body: Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            const SizedBox(
+              height: 40,
+            ),
+            const Text(
+              "请绘制解锁图案",
+              style: TextStyle(fontSize: 26),
+            ),
+            const SizedBox(
+              height: 80,
+            ),
+            Center(
+              child: GesturePasswordWidget(
+                onComplete: (s) {
+                  if (s.join('') == password) {
+                    //密码验证通过
+                    if (widget.launch) {
+                      if (widget.launchAccountPage) {
+                        Navigator.of(context).pushReplacementNamed("/accounts");
                       } else {
-                        Navigator.of(context).pop();
-                      }
-                    } else {
-                      //密码验证不通过
-                      if (errorCount < 2) {
-                        UiUtil.toast("密码错误");
-                        UiUtil.vibrate(FeedbackType.warning);
-                      } else if (errorCount < 5) {
-                        errorCount++;
-                        UiUtil.toast("密码错误，连续错误5次将清空登录历史");
-                        UiUtil.vibrate(FeedbackType.warning);
-                      } else {
-                        UiUtil.toast("密码错误已达5次");
-                        UiUtil.vibrate(FeedbackType.warning);
-                        StorageUtil.remove("servers");
-                        StorageUtil.remove("https");
-                        StorageUtil.remove("host");
-                        StorageUtil.remove("port");
-                        StorageUtil.remove("account");
-                        StorageUtil.remove("remember_password");
-                        StorageUtil.remove("auto_login");
-                        StorageUtil.remove("check_ssl");
                         Navigator.of(context).pushReplacementNamed("/login");
                       }
+                    } else {
+                      Navigator.of(context).pop();
                     }
-                  },
-                  // failCallback: () {
-                  //   HttpUtil.toast("至少连接4个点");
-                  //   HttpUtil.vibrate(FeedbackType.warning);
-                  // },
-                  // selectedCallback: (str) {},
-                ),
+                  } else {
+                    //密码验证不通过
+                    if (errorCount < 2) {
+                      UiUtil.toast("密码错误");
+                      UiUtil.vibrate(FeedbackType.warning);
+                    } else if (errorCount < 5) {
+                      errorCount++;
+                      UiUtil.toast("密码错误，连续错误5次将清空登录历史");
+                      UiUtil.vibrate(FeedbackType.warning);
+                    } else {
+                      UiUtil.toast("密码错误已达5次");
+                      UiUtil.vibrate(FeedbackType.warning);
+                      StorageUtil.removes([
+                        "servers",
+                        "https",
+                        "host",
+                        "port",
+                        "account",
+                        "remember_password",
+                        "auto_login",
+                        "check_ssl"
+                      ]);
+                      Navigator.of(context).pushReplacementNamed("/login");
+                    }
+                  }
+                },
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

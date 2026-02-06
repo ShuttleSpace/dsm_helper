@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:garden/util/format_util.dart';
 import 'package:garden/constants/app_constants.dart';
+import 'package:garden/extensions/int.dart';
 import 'package:garden/widgets/label.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 
@@ -30,14 +30,15 @@ class VolumeCard extends StatelessWidget {
             : volume['id'].toString().replaceFirst("volume_", "存储空间 "));
 
     String usedSize = isSSD
-        ? FormatUtil.formatSize(
-            int.parse(volume['size']['used'] ?? volume['size']['reusable']))
-        : FormatUtil.formatSize(int.parse(volume['size']['used']));
+        ? int.parse(volume['size']['used'] ?? volume['size']['reusable'])
+            .formatSize()
+        : int.parse(volume['size']['used']).formatSize();
 
     return Card(
       shape: RoundedRectangleBorder(
           side: const BorderSide(),
-          borderRadius: isSSD ? BorderRadius.circular(18) : BorderRadius.circular(5)),
+          borderRadius:
+              isSSD ? BorderRadius.circular(18) : BorderRadius.circular(5)),
       margin: const EdgeInsets.only(top: 20, left: 20, right: 20),
       child: Padding(
         padding: const EdgeInsets.all(AppConstants.paddingSmall),
@@ -96,12 +97,11 @@ class VolumeCard extends StatelessWidget {
                     height: 5,
                   ),
                   Text(
-                      "可用：${FormatUtil.formatSize(int.parse(volume['size']['total']) - int.parse(volume['size']['used'] ?? volume['size']['reusable']))}"),
+                      "可用：${int.parse(volume['size']['total'].formatSize() - int.parse(volume['size']['used'] ?? volume['size']['reusable']))}"),
                   const SizedBox(
                     height: 5,
                   ),
-                  Text(
-                      "容量：${FormatUtil.formatSize(int.parse(volume['size']['total']))}"),
+                  Text("容量：${int.parse(volume['size']['total']).formatSize()}"),
                 ],
               ),
             )

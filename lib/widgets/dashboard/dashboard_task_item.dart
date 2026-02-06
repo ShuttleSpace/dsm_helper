@@ -56,7 +56,7 @@ class _DashboardTaskItemState extends State<DashboardTaskItem> {
                 setState(() {
                   task['running'] = true;
                 });
-                var res = await Api.taskRun([task['id']]);
+                var res = await DsmApi.taskRun([task['id']]);
                 setState(() {
                   task['running'] = false;
                 });

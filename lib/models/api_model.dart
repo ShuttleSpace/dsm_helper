@@ -12,7 +12,7 @@ class ApiModel {
   });
   static Future<Map<String, ApiModel>> fetch() async {
     Map<String, ApiModel> apis = {};
-    Map? res = await Api.api();
+    Map? res = await DsmApi.api();
     if (res?['success']) {
       res?['data'].forEach((key, value) {
         apis[key] = ApiModel.fromJson(value);

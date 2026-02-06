@@ -1,3 +1,4 @@
+import 'package:garden/extensions/color.dart';
 import 'package:garden/pages/file/select_folder.dart';
 import 'package:garden/util/ui_util.dart';
 import 'package:garden/util/http_util.dart';
@@ -54,8 +55,8 @@ class RemoteFolderState extends State<RemoteFolder>
               unselectedLabelColor: Colors.grey,
               indicator: BubbleTabIndicator(
                 indicatorColor: Theme.of(context).scaffoldBackgroundColor,
-                shadowColor: HttpUtil.getAdjustColor(
-                    Theme.of(context).scaffoldBackgroundColor, -20),
+                shadowColor:
+                    Theme.of(context).scaffoldBackgroundColor.adjust(-20),
               ),
               tabs: const [
                 Padding(
@@ -222,7 +223,7 @@ class RemoteFolderState extends State<RemoteFolder>
                           UiUtil.toast("请输入远程文件夹地址");
                           return;
                         }
-                        var res = await Api.mountFolder(
+                        var res = await DsmApi.mountFolder(
                             serverIp, account, passwd, mountPoint, autoMount);
                         if (res['success']) {
                           UiUtil.toast("装载成功");
@@ -232,8 +233,7 @@ class RemoteFolderState extends State<RemoteFolder>
                           if (res['error']['code'] == 436) {
                             UiUtil.toast("远程文件夹地址有误");
                           } else {
-                            HttpUtil.instance
-                                .toast("装载失败，代码${res['error']['code']}");
+                            UiUtil.toast("装载失败，代码${res['error']['code']}");
                           }
                         }
                       },

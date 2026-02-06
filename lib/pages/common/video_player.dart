@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:garden/util/format_util.dart';
 import 'package:garden/util/log.dart';
 import 'package:garden/util/ui_util.dart';
 import 'package:garden/stores/connection_store.dart';
@@ -14,7 +13,6 @@ import 'package:flutter/material.dart';
 import 'package:garden/constants/app_constants.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:media_kit_video/media_kit_video.dart';
-import 'package:simple_logger/simple_logger.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import 'package:xml2json/xml2json.dart';
 
@@ -80,7 +78,7 @@ class VideoPlayerPageState extends State<VideoPlayerPage> {
         _isInitialized = true;
       });
     } catch (error) {
-      Log.logger.log(Level.INFO, "播放初始化异常: $error");
+      Log.log("播放初始化异常: $error");
       UiUtil.toast("视频加载失败，请尝试使用第三方播放器");
     }
   }
@@ -96,7 +94,7 @@ class VideoPlayerPageState extends State<VideoPlayerPage> {
     if (widget.nfo != null) {
       final myTransformer = Xml2Json();
       String nfoUrl =
-          "${connectionStore.baseUrl}/fbdownload/info.nfo?dlink=%22${FormatUtil.utf8Encode(widget.nfo ?? '')}%22&_sid=%22${connectionStore.sid}%22&mode=open";
+          "${connectionStore.baseUrl}/fbdownload/info.nfo?dlink=%22${widget.nfo?.utf8()}%22&_sid=%22${connectionStore.sid}%22&mode=open";
       var res = await HttpUtil.instance.get(nfoUrl, decode: false);
       try {
         myTransformer.parse(res);
@@ -109,7 +107,7 @@ class VideoPlayerPageState extends State<VideoPlayerPage> {
           year = nfoDetail['year'] ?? '';
         });
       } catch (e) {
-        Log.logger.log(Level.SEVERE, "nfo解析异常: $e");
+        Log.log("nfo解析异常: $e");
       }
     }
   }
@@ -248,7 +246,7 @@ class VideoPlayerPageState extends State<VideoPlayerPage> {
                         ),
                         GestureDetector(
                           onHorizontalDragUpdate: (details) {
-                            Log.logger.log(Level.INFO,
+                            Log.log(
                                 "detail: ${details.delta.dx.toInt() / MediaQuery.devicePixelRatioOf(context)}");
                             _player.seek(Duration(
                                 milliseconds:

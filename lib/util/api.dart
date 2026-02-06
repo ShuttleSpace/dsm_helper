@@ -13,8 +13,9 @@ import 'package:http_parser/http_parser.dart';
 
 import 'http_util.dart';
 
-class Api {
+class DsmApi {
   static Map<String, ApiModel> apiList = {};
+
   static Future<Map> update(String buildNumber, {bool force = false}) async {
     if (Platform.isAndroid) {
       // DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
@@ -26,8 +27,7 @@ class Api {
       //   };
       // }
       String urlBase64 = "";
-      var res = await HttpUtil.instance
-          .post(HttpUtil.instance.base64ToString(urlBase64), data: {
+      var res = await HttpUtil.instance.post(urlBase64.base64(), data: {
         "_api_key": "f4621000de0337cc74a156cea513e828",
         "appKey": "ed1169bc9b9d290ef91c7e21d4ffb008",
         "buildVersion": buildNumber,
@@ -98,7 +98,7 @@ class Api {
       "method": "login",
       // "session": "FileStation",
       "enable_device_token": rememberDevice ? "yes" : "no",
-      "enable_syno_token": "yes",
+      // "enable_syno_token": "yes", // 会导致除 auth.cgi 外的请求失败
       // "isIframeLogin": "yes",
       "format": "sid",
     };
@@ -131,7 +131,7 @@ class Api {
       host: host,
       checkSsl: checkSsl,
     );
-    print(data);
+    Log.info("sharedList: $data");
     return data;
   }
 
@@ -773,6 +773,7 @@ class Api {
       "api": "SYNO.Core.DSMNotify.Strings",
       "method": "get",
       "version": 1,
+      "_sid": connectionStore.sid,
     });
     return result;
   }
@@ -1275,11 +1276,11 @@ class Api {
   static Future<Map> processGroup() async {
     var data = {
       "api": "SYNO.Core.System.ProcessGroup",
-      "method": connectionStore.version >= 7 ? 'list' : "service_info",
+      "method": connectionStore.dsmVersion.value >= 7 ? 'list' : "service_info",
       "version": 1,
       "_sid": connectionStore.sid,
     };
-    if (connectionStore.version == 7) {
+    if (connectionStore.dsmVersion.value == 7) {
       data['node'] = 'xnode-2572';
     }
     return await HttpUtil.instance.post("entry.cgi", data: data);
@@ -1331,7 +1332,8 @@ class Api {
       {"api": "SYNO.Docker.Container.Resource", "method": "get", "version": 1},
       {"api": "SYNO.Core.System.Utilization", "method": "get", "version": 1},
     ];
-    var result = await HttpUtil.instance.post("entry.cgi", data: {
+    Log.info("dockerContainerInfo: ${connectionStore.sid.value}");
+    final result = await HttpUtil.instance.post("entry.cgi", data: {
       "api": 'SYNO.Entry.Request',
       "method": 'request',
       "mode": '"parallel"',
@@ -1464,7 +1466,7 @@ class Api {
   }
 
   static Future<Map> reward() async {
-    return await HttpUtil.instance.get("${HttpUtil.instance.appUrl}/reward");
+    return await HttpUtil.instance.get("${connectionStore.appUrl}/reward");
   }
 
   static Future<Map> downloadStationInfo() async {
@@ -1999,7 +2001,7 @@ class Api {
       },
       {"api": "SYNO.Core.MediaIndexing", "method": "status", "version": 1}
     ];
-    if (connectionStore.version == 6) {
+    if (connectionStore.dsmVersion.value == 6) {
       apis.add(
         {
           "api": "SYNO.Core.MediaIndexing.MobileEnabled",
@@ -2029,7 +2031,7 @@ class Api {
         "thumbnail_quality": thumbQuality
       },
     ];
-    if (connectionStore.version == 6) {
+    if (connectionStore.dsmVersion.value == 6) {
       apis.add({
         "api": "SYNO.Core.MediaIndexing.MobileEnabled",
         "method": "set",
@@ -2058,19 +2060,11 @@ class Api {
     );
     String data = '''{
     "version":1,
-    "command":"get_server_info",
-    "serverID":"$connectConnectID",
-    "id":"dsm",
-    "get_ca_fingerprints":true
-}''';
-    // if (kDebugMode) {
-    //   (dio.httpClientAdapter as IOHttpClientAdapter).onHttpClientCreate = (client) {
-    //     client.findProxy = (uri) {
-    //       return "PROXY 192.168.0.107:7890";
-    //     };
-    //     return client;
-    //   }; //
-    // }
+        "command":"get_server_info",
+        "serverID":"$connectConnectID",
+        "id":"dsm",
+        "get_ca_fingerprints":true
+    }''';
     Response response;
     try {
       response = await dio.post("Serv.php", data: data);
@@ -2082,10 +2076,17 @@ class Api {
         return response.data;
       }
     } on DioException catch (error) {
-      Log.info("请求出错");
+      Log.error("请求出错 $baseUrl $error");
       return {
         "success": false,
         "error": {"code": error.message},
+        "data": null
+      };
+    } catch (e) {
+      Log.error("请求出错 $baseUrl $e");
+      return {
+        "success": false,
+        "error": {"code": e.toString()},
         "data": null
       };
     }
@@ -2121,10 +2122,17 @@ class Api {
         return response.data;
       }
     } on DioException catch (error) {
-      Log.info("请求出错");
+      Log.info("请求出错 $baseUrl $error");
       return {
         "success": false,
         "error": {"code": error.message},
+        "data": null
+      };
+    } catch (e) {
+      Log.info("请求出错 $baseUrl $e");
+      return {
+        "success": false,
+        "error": {"code": e.toString()},
         "data": null
       };
     }
@@ -2580,37 +2588,18 @@ enum ErrorCode {
   networkSystemBusy3(117),
   networkSystemBusy4(118),
   invalidSession(119),
-  preserve2(120),
-  preserve3(121),
-  preserve4(122),
-  preserve5(123),
-  preserve6(124),
-  preserve7(125),
-  preserve8(126),
-  preserve9(127),
-  preserve10(128),
-  preserve11(129),
-  preserve12(130),
-  preserve13(131),
-  preserve14(132),
-  preserve15(133),
-  preserve16(134),
-  preserve17(135),
-  preserve18(136),
-  preserve19(137),
-  preserve20(138),
-  preserve21(139),
-  preserve22(140),
-  preserve23(141),
-  preserve24(142),
-  preserve25(143),
-  preserve26(144),
-  preserve27(145),
-  preserve28(146),
-  preserve29(147),
-  preserve30(148),
-  preserve31(149),
+  // 120-149 preserved.
   requestSourceIPNotMatchLoginIP(150),
+  noAccountOrIncorrectPassword(400),
+  disabledAccount(401),
+  deniedPermission(402), // 账号已停用
+  twoFactorAuthRequired(403), // 要求两步验证码
+  twoFactorAuthFailed(404), // 未能认证两步（双因素）认证码
+  forceTwoFactorAuth(406), // 强制两步验证码
+  blockedIPSource(407), // IP 源被封锁
+  expiredPasswdCannotChange(408), // 过期密码无法更改
+  expiredPasswd(409), // 过期密码
+  passwdMustBeChanged(410), // 密码必须更改
   ;
 
   const ErrorCode(this.code);

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:garden/util/format_util.dart';
 import 'package:garden/constants/app_constants.dart';
+import 'package:garden/util/http_util.dart';
 import 'package:garden/widgets/label.dart';
 import 'info_card.dart';
 
@@ -58,11 +58,12 @@ class DiskItem extends StatelessWidget {
                   ],
                 ),
                 const SizedBox(height: 5),
-                Text("${disk['vendor']?.trim() ?? ''} ${disk['model']?.trim() ?? ''}"),
+                Text(
+                    "${disk['vendor']?.trim() ?? ''} ${disk['model']?.trim() ?? ''}"),
                 const SizedBox(height: 5),
                 Row(
                   children: [
-                    Text(FormatUtil.formatSize(totalSize)),
+                    Text(totalSize.formatSize()),
                     Text("  $temp℃"),
                   ],
                 ),

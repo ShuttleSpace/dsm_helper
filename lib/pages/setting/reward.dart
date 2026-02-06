@@ -21,7 +21,7 @@ class RewardState extends State<Reward> {
   }
 
   getData() async {
-    var res = await Api.reward();
+    var res = await DsmApi.reward();
     if (res['code'] == 1) {
       setState(() {
         loading = false;

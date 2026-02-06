@@ -1,5 +1,4 @@
 import 'package:garden/constants/app_constants.dart';
-import 'package:garden/util/format_util.dart';
 import 'package:garden/util/http_util.dart';
 import 'package:garden/widgets/animation_progress_bar.dart';
 import 'package:garden/widgets/label.dart';
@@ -283,7 +282,7 @@ class ContainerItem extends StatelessWidget {
                   const Text("内存"),
                   const Spacer(),
                   Text(
-                    FormatUtil.formatSize(container['memory'], fixed: 0),
+                    (int.parse(container['memory'])).formatSize(fixed: 0),
                     style: const TextStyle(
                         color: Colors.green, fontWeight: FontWeight.w600),
                   ),

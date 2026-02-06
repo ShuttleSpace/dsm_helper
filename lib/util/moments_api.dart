@@ -8,10 +8,11 @@ class MomentsApi {
     Map<String, dynamic> data = {
       "timeline_group_unit": '"day"',
       "api":
-          '"SYNO.${connectionStore.version >= 7 ? "Foto" : "Photo"}.Browse.$category"',
+          '"SYNO.${connectionStore.dsmVersion.value >= 7 ? "Foto" : "Photo"}.Browse.$category"',
       "method": category == "Timeline" ? '"get"' : '"get_timeline"',
-      "version":
-          connectionStore.version >= 7 ? (category == "Timeline" ? 2 : 3) : 1,
+      "version": connectionStore.dsmVersion.value >= 7
+          ? (category == "Timeline" ? 2 : 3)
+          : 1,
       "_sid": connectionStore.sid,
     };
     if (type != null) {
@@ -36,9 +37,9 @@ class MomentsApi {
       "additional":
           '["thumbnail","resolution","orientation","video_convert","video_meta","address"]',
       "api":
-          '"SYNO.${connectionStore.version >= 7 ? "Foto" : "Photo"}.Browse.$category"',
+          '"SYNO.${connectionStore.dsmVersion.value >= 7 ? "Foto" : "Photo"}.Browse.$category"',
       "method": '"list"',
-      "version": connectionStore.version >= 7 ? 1 : 2,
+      "version": connectionStore.dsmVersion.value >= 7 ? 1 : 2,
       "_sid": connectionStore.sid,
     };
     if (type != null) {
@@ -60,7 +61,7 @@ class MomentsApi {
   static Future<Map> category() async {
     Map<String, dynamic> data = {
       "api":
-          '"SYNO.${connectionStore.version >= 7 ? "Foto" : "Photo"}.Browse.Category"',
+          '"SYNO.${connectionStore.dsmVersion.value >= 7 ? "Foto" : "Photo"}.Browse.Category"',
       "method": '"get"',
       "version": 1,
       "_sid": connectionStore.sid,
@@ -84,9 +85,9 @@ class MomentsApi {
       "sort_by": '"$sortBy"',
       "sort_direction": '"$sortDirection"',
       "api":
-          '"SYNO.${connectionStore.version >= 7 ? "Foto" : "Photo"}.Browse.Album"',
+          '"SYNO.${connectionStore.dsmVersion.value >= 7 ? "Foto" : "Photo"}.Browse.Album"',
       "method": '"list"',
-      "version": connectionStore.version >= 7 ? 1 : 2,
+      "version": connectionStore.dsmVersion.value >= 7 ? 1 : 2,
       "_sid": connectionStore.sid,
     };
     var res = await HttpUtil.instance.post("entry.cgi", data: data);
@@ -136,7 +137,7 @@ class MomentsApi {
       "start_time": start,
       "end_time": end,
       "api":
-          '"SYNO.${connectionStore.version >= 7 ? "Foto" : "Photo"}.Browse.Timeline"',
+          '"SYNO.${connectionStore.dsmVersion.value >= 7 ? "Foto" : "Photo"}.Browse.Timeline"',
       "method": '"get_geocoding"',
       "version": 1,
       "_sid": connectionStore.sid,
@@ -151,7 +152,7 @@ class MomentsApi {
       "limit": 4,
       "additional": '["thumbnail"]',
       "api":
-          '"SYNO.${connectionStore.version >= 7 ? "Foto" : "Photo"}.Browse.RecentlyAdded"',
+          '"SYNO.${connectionStore.dsmVersion.value >= 7 ? "Foto" : "Photo"}.Browse.RecentlyAdded"',
       "method": '"list"',
       "version": 3,
       "_sid": connectionStore.sid,
@@ -164,9 +165,9 @@ class MomentsApi {
     Map<String, dynamic> data = {
       "timeline_group_unit": '"day"',
       "api":
-          '"SYNO.${connectionStore.version >= 7 ? "Foto" : "Photo"}.Browse.RecentlyAdded"',
+          '"SYNO.${connectionStore.dsmVersion.value >= 7 ? "Foto" : "Photo"}.Browse.RecentlyAdded"',
       "method": '"get_timeline"',
-      "version": connectionStore.version >= 7 ? 3 : 1,
+      "version": connectionStore.dsmVersion.value >= 7 ? 3 : 1,
       "_sid": connectionStore.sid,
     };
     var res = await HttpUtil.instance.post("entry.cgi", data: data);
@@ -181,9 +182,9 @@ class MomentsApi {
       "additional":
           '["thumbnail","resolution","orientation","video_convert","video_meta","address"]',
       "api":
-          '"SYNO.${connectionStore.version >= 7 ? "Foto" : "Photo"}.Browse.RecentlyAdded"',
+          '"SYNO.${connectionStore.dsmVersion.value >= 7 ? "Foto" : "Photo"}.Browse.RecentlyAdded"',
       "method": '"list"',
-      "version": connectionStore.version >= 7 ? 1 : 2,
+      "version": connectionStore.dsmVersion.value >= 7 ? 1 : 2,
       "_sid": connectionStore.sid,
     };
     if (year != null && month != null && day != null) {

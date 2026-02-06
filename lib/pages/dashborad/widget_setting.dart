@@ -1,4 +1,4 @@
-import 'package:garden/stores/app_store.dart';
+import 'package:garden/stores/settings_store.dart';
 import 'package:garden/util/log.dart';
 import 'package:garden/util/ui_util.dart';
 import 'package:garden/util/storage_util.dart';
@@ -43,16 +43,16 @@ class WidgetSettingState extends State<WidgetSetting> {
   List selectedWidgets = [];
   @override
   void initState() {
-    StorageUtil.getString("show_shortcut").then((showShortcutStr) {
+    StorageUtil.getBool("show_shortcut").then((showShortcutStr) {
       setState(() {
         if (showShortcutStr != null) {
-          showShortcut = showShortcutStr == "1";
+          showShortcut = showShortcutStr;
         } else {
           showShortcut = true;
         }
       });
     });
-    StorageUtil.getString("show_wallpaper").then((showWallpaperStr) {
+    StorageUtil.getBool("show_wallpaper").then((showWallpaperStr) {
       setState(() {
         if (showWallpaperStr != null) {
           showWallpaper = showWallpaperStr == "1";
@@ -96,7 +96,7 @@ class WidgetSettingState extends State<WidgetSetting> {
                   "SYNO.SDS._Widget.Instance": {"modulelist": saveWidgets},
                   // "restoreSizePos": widget.restoreSizePos
                 };
-                var res = await Api.userSetting(data);
+                var res = await DsmApi.userSetting(data);
                 if (res['success']) {
                   UiUtil.toast("保存小组件成功");
                   if (context.mounted) {
@@ -125,7 +125,7 @@ class WidgetSettingState extends State<WidgetSetting> {
                 setState(() {
                   setState(() {
                     showShortcut = !showShortcut;
-                    appStore.changeShortcut(showShortcut);
+                    settingsStore.setShowShortcut(showShortcut);
                   });
                 });
               },
@@ -171,7 +171,7 @@ class WidgetSettingState extends State<WidgetSetting> {
                 setState(() {
                   setState(() {
                     showWallpaper = !showWallpaper;
-                    appStore.changeWallpaper(showWallpaper);
+                    settingsStore.setShowWallpaper(showWallpaper);
                   });
                 });
               },

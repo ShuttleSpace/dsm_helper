@@ -36,7 +36,7 @@ class UserSettingState extends State<UserSetting> {
   }
 
   getNormalUser() async {
-    var res = await Api.normalUser("get");
+    var res = await DsmApi.normalUser("get");
     if (res['success']) {
       setState(() {
         loading = false;
@@ -267,7 +267,7 @@ class UserSettingState extends State<UserSetting> {
                         data[key] = value;
                       }
                     });
-                    var res = await Api.normalUser("set", changedData: data);
+                    var res = await DsmApi.normalUser("set", changedData: data);
                     if (res['success']) {
                       UiUtil.toast("保存成功");
                       if (context.mounted) {

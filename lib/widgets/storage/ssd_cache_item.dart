@@ -1,5 +1,5 @@
 import 'package:garden/constants/app_constants.dart';
-import 'package:garden/util/format_util.dart';
+import 'package:garden/extensions/int.dart';
 import 'package:garden/widgets/label.dart';
 import 'package:flutter/material.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
@@ -26,7 +26,8 @@ class SsdCacheItem extends StatelessWidget {
         children: [
           Card(
             shape: RoundedRectangleBorder(
-                side: const BorderSide(), borderRadius: BorderRadius.circular(18)),
+                side: const BorderSide(),
+                borderRadius: BorderRadius.circular(18)),
             margin: const EdgeInsets.all(10),
             child: Padding(
               padding: const EdgeInsets.all(AppConstants.paddingSmall),
@@ -85,17 +86,16 @@ class SsdCacheItem extends StatelessWidget {
                   height: 5,
                 ),
                 Text(
-                    "已用：${FormatUtil.formatSize(int.parse(volume['size']['used'] ?? volume['size']['reusable']))}"),
+                    "已用：${int.parse(volume['size']['used'] ?? volume['size']['reusable']).formatSize()}"),
                 const SizedBox(
                   height: 5,
                 ),
                 Text(
-                    "可用：${FormatUtil.formatSize(int.parse(volume['size']['total']) - int.parse(volume['size']['used'] ?? volume['size']['reusable']))}"),
+                    "可用：${(int.parse(volume['size']['total']) - int.parse(volume['size']['used'] ?? volume['size']['reusable'])).formatSize()}"),
                 const SizedBox(
                   height: 5,
                 ),
-                Text(
-                    "容量：${FormatUtil.formatSize(int.parse(volume['size']['total']))}"),
+                Text("容量：${int.parse(volume['size']['total']).formatSize()}"),
               ],
             ),
           )

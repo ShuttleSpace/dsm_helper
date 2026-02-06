@@ -1,5 +1,4 @@
 import 'dart:math';
-import 'package:garden/util/format_util.dart';
 import 'package:garden/util/log.dart';
 import 'package:garden/util/ui_util.dart';
 
@@ -54,7 +53,7 @@ class AddSharedFoldersState extends State<AddSharedFolders> {
     }
 
     volumeController.text =
-        "${widget.volumes[selectedVolumeIndex]['display_name']}(可用容量：${FormatUtil.formatSize(int.parse(widget.volumes[selectedVolumeIndex]['size_free_byte']))}) - ${widget.volumes[selectedVolumeIndex]['fs_type']}";
+        "${widget.volumes[selectedVolumeIndex]['display_name']}(可用容量：${int.parse(widget.volumes[selectedVolumeIndex]['size_free_byte']).formatSize()}) - ${widget.volumes[selectedVolumeIndex]['fs_type']}";
     unitController.text = units[selectedUnitIndex];
     super.initState();
   }
@@ -63,7 +62,7 @@ class AddSharedFoldersState extends State<AddSharedFolders> {
     setState(() {
       loading = true;
     });
-    var res = await Api.shareDetail(folderName);
+    var res = await DsmApi.shareDetail(folderName);
     if (res['success']) {
       var folder = res['data'];
       nameController.text = name = oldName = folder['name'];
@@ -99,7 +98,7 @@ class AddSharedFoldersState extends State<AddSharedFolders> {
         if (widget.volumes[i]['volume_path'] == folder['vol_path']) {
           selectedVolumeIndex = i;
           volumeController.text =
-              "${widget.volumes[selectedVolumeIndex]['display_name']}(可用容量：${FormatUtil.formatSize(int.parse(widget.volumes[selectedVolumeIndex]['size_free_byte']))}) - ${widget.volumes[selectedVolumeIndex]['fs_type']}";
+              "${widget.volumes[selectedVolumeIndex]['display_name']}(可用容量：${int.parse(widget.volumes[selectedVolumeIndex]['size_free_byte']).formatSize()}) - ${widget.volumes[selectedVolumeIndex]['fs_type']}";
           break;
         }
       }
@@ -155,7 +154,7 @@ class AddSharedFoldersState extends State<AddSharedFolders> {
       creating = true;
     });
 
-    var res = await Api.addSharedFolder(
+    var res = await DsmApi.addSharedFolder(
       name,
       widget.volumes[1]['volume_path'],
       desc,
@@ -288,7 +287,7 @@ class AddSharedFoldersState extends State<AddSharedFolders> {
                                               volumeController.value =
                                                   TextEditingValue(
                                                       text:
-                                                          "${widget.volumes[selectedVolumeIndex]['display_name']}(可用容量：${FormatUtil.formatSize(int.parse(widget.volumes[selectedVolumeIndex]['size_free_byte']))}) - ${widget.volumes[selectedVolumeIndex]['fs_type']}");
+                                                          "${widget.volumes[selectedVolumeIndex]['display_name']}(可用容量：${int.parse(widget.volumes[selectedVolumeIndex]['size_free_byte']).formatSize()}) - ${widget.volumes[selectedVolumeIndex]['fs_type']}");
                                               Navigator.of(context).pop();
                                             },
                                             child: Container(
@@ -300,7 +299,7 @@ class AddSharedFoldersState extends State<AddSharedFolders> {
                                                     CrossAxisAlignment.start,
                                                 children: [
                                                   Text(
-                                                      "${volume['display_name']}(可用容量：${FormatUtil.formatSize(int.parse(volume['size_free_byte']))}) - ${volume['fs_type']}"),
+                                                      "${volume['display_name']}(可用容量：${int.parse(volume['size_free_byte']).formatSize()}) - ${volume['fs_type']}"),
                                                   const SizedBox(
                                                     height: 5,
                                                   ),
@@ -675,7 +674,7 @@ class AddSharedFoldersState extends State<AddSharedFolders> {
                           children: [
                             const Text("启用共享文件夹配额"),
                             Text(
-                              "(已使用${FormatUtil.formatSize((shareQuotaUsed * 1024 * 1024).toInt())})",
+                              "(已使用${(shareQuotaUsed * 1024 * 1024).toInt().formatSize()})",
                               style: const TextStyle(color: Colors.blue),
                             ),
                             const Spacer(),

@@ -391,7 +391,7 @@ class UploadState extends State<Upload> {
                                                 });
                                               }
                                             } else {
-                                              debugPrint("未选择文件");
+                                              Log.debug("未选择文件");
                                             }
                                           },
                                           child: const Text(
@@ -418,8 +418,7 @@ class UploadState extends State<Upload> {
                                                     .request()
                                                     .isGranted;
                                                 if (!permission) {
-                                                  HttpUtil.instance
-                                                      .toast("安卓11需授权文件管理权限");
+                                                  UiUtil.toast("安卓11需授权文件管理权限");
                                                   return;
                                                 }
                                               } else {
@@ -429,8 +428,7 @@ class UploadState extends State<Upload> {
                                                     .request()
                                                     .isGranted;
                                                 if (!permission) {
-                                                  HttpUtil.instance
-                                                      .toast("请先授权APP访问存储权限");
+                                                  UiUtil.toast("请先授权APP访问存储权限");
                                                   return;
                                                 }
                                               }
@@ -589,7 +587,7 @@ class UploadState extends State<Upload> {
                             upload.status = UploadStatus.running;
                           });
                           // Log.info("上传路径：$savePath${upload.subPath.isNotBlank ? "/${upload.subPath}" : ""}");
-                          var res = await Api.upload(
+                          var res = await DsmApi.upload(
                               "$savePath${upload.subPath.isNotBlank ? "/${upload.subPath}" : ""}",
                               upload.path,
                               upload.cancelToken, (progress, total) {

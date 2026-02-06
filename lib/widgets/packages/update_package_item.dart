@@ -2,6 +2,7 @@ import 'package:garden/stores/connection_store.dart';
 import 'package:flutter/material.dart';
 import 'package:garden/widgets/cupertino_image.dart';
 import 'package:garden/widgets/packages/package_button.dart';
+import 'package:signals/signals_flutter.dart';
 
 /// 可更新套件列表项组件
 class UpdatePackageItem extends StatelessWidget {
@@ -26,7 +27,7 @@ class UpdatePackageItem extends StatelessWidget {
   Widget build(BuildContext context) {
     String thumbnailUrl = update['thumbnail'].last;
     if (!thumbnailUrl.startsWith("http")) {
-      thumbnailUrl = connectionStore.baseUrl + thumbnailUrl;
+      thumbnailUrl = connectionStore.baseUrl.watch(context) + thumbnailUrl;
     }
 
     return GestureDetector(

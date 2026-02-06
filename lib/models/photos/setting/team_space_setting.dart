@@ -12,7 +12,7 @@ class TeamSpaceSetting {
   static Future<TeamSpaceSetting> fetch() async {
     Map<String, dynamic> data = {
       "api":
-          '"SYNO.${connectionStore.version >= 7 ? "Foto" : "Photo"}.Setting.TeamSpace',
+          '"SYNO.${connectionStore.dsmVersion.value >= 7 ? "Foto" : "Photo"}.Setting.TeamSpace',
       "method": "get",
       "version": 1,
       "_sid": connectionStore.sid,

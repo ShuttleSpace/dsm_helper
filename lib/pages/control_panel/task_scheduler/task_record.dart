@@ -23,7 +23,7 @@ class TaskRecordState extends State<TaskRecord> {
   }
 
   getData() async {
-    var res = await Api.taskRecord(widget.id);
+    var res = await DsmApi.taskRecord(widget.id);
     if (res['success']) {
       setState(() {
         loading = false;

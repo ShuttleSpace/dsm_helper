@@ -1,3 +1,4 @@
+import 'package:garden/extensions/color.dart';
 import 'package:garden/util/http_util.dart';
 import 'package:garden/widgets/bubble_tab_indicator.dart';
 import 'package:garden/widgets/log_center/log_item.dart';
@@ -47,7 +48,7 @@ class LogCenterState extends State<LogCenter>
   }
 
   getData({int start = 0, int limit = 50}) async {
-    var res = await Api.lastLog(start, limit);
+    var res = await DsmApi.lastLog(start, limit);
     if (res['success']) {
       setState(() {
         loadingRecent = false;
@@ -57,7 +58,7 @@ class LogCenterState extends State<LogCenter>
   }
 
   getLogs() async {
-    var res = await Api.log(0, 1000);
+    var res = await DsmApi.log(0, 1000);
     if (res['success']) {
       setState(() {
         loadingLogs = false;
@@ -73,7 +74,7 @@ class LogCenterState extends State<LogCenter>
   }
 
   getHistories() async {
-    var res = await Api.logHistory();
+    var res = await DsmApi.logHistory();
     if (res['success']) {
       setState(() {
         loadingHistory = false;
@@ -109,8 +110,8 @@ class LogCenterState extends State<LogCenter>
                 unselectedLabelColor: Colors.grey,
                 indicator: BubbleTabIndicator(
                   indicatorColor: Theme.of(context).scaffoldBackgroundColor,
-                  shadowColor: HttpUtil.getAdjustColor(
-                      Theme.of(context).scaffoldBackgroundColor, -20),
+                  shadowColor:
+                      Theme.of(context).scaffoldBackgroundColor.adjust(-20),
                 ),
                 tabs: const [
                   Padding(

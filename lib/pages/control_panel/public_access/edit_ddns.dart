@@ -12,7 +12,6 @@ import 'package:flutter/material.dart';
 import 'package:garden/constants/app_constants.dart';
 import 'package:garden/theme/app_colors.dart';
 import 'package:flutter_vibrate/flutter_vibrate.dart';
-import 'package:simple_logger/simple_logger.dart';
 
 class EditDdns extends StatefulWidget {
   final Map? ddns;
@@ -97,16 +96,15 @@ class EditDdnsState extends State<EditDdns> {
                               }
                               Navigator.of(context).pop();
                               var res =
-                                  await Api.ddnsDelete(widget.ddns!['id']);
-                              Log.logger.log(Level.INFO, "delete ddns: $res");
+                                  await DsmApi.ddnsDelete(widget.ddns!['id']);
+                              Log.log("delete ddns: $res");
                               if (res['success']) {
                                 UiUtil.toast("DDNS删除成功");
                                 if (context.mounted) {
                                   Navigator.of(context).pop(true);
                                 }
                               } else {
-                                HttpUtil.instance
-                                    .toast("删除失败，代码:${res['error']['code']}");
+                                UiUtil.toast("删除失败，代码:${res['error']['code']}");
                               }
                             },
                             child: const Text(
@@ -380,7 +378,7 @@ class EditDdnsState extends State<EditDdns> {
                               message: const Text("测试中，请稍后"),
                               backButtonClose: true,
                               alignment: Alignment.center);
-                          var res = await Api.ddnsTest(ddns);
+                          var res = await DsmApi.ddnsTest(ddns);
                           hide();
                           Log.info("ddnsTest:$res");
                           if (res['success']) {
@@ -406,7 +404,7 @@ class EditDdnsState extends State<EditDdns> {
               child: OutlinedButton(
                 onPressed: () async {
                   if (checkForm()) {
-                    var res = await Api.ddnsSave(ddns);
+                    var res = await DsmApi.ddnsSave(ddns);
                     if (res['success']) {
                       UiUtil.toast("保存成功");
                       if (context.mounted) {

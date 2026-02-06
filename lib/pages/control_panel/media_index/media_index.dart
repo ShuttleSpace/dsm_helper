@@ -29,7 +29,7 @@ class MediaIndexState extends State<MediaIndex> {
   }
 
   getData() async {
-    Api.mediaIndexStatus().then((res) {
+    DsmApi.mediaIndexStatus().then((res) {
       if (res['success']) {
         List result = res['data']['result'];
         for (var item in result) {
@@ -127,7 +127,7 @@ class MediaIndexState extends State<MediaIndex> {
                           if (mediaIndexing) {
                             return;
                           }
-                          var res = await Api.mediaReindex();
+                          var res = await DsmApi.mediaReindex();
                           if (res['success']) {
                             getData();
                           }
@@ -183,7 +183,7 @@ class MediaIndexState extends State<MediaIndex> {
                                 setState(() {
                                   thumbnailQuality = "normal";
                                 });
-                                await Api.mediaIndexSet(
+                                await DsmApi.mediaIndexSet(
                                     thumbnailQuality, mobileEnabled);
                                 getData();
                               },
@@ -218,7 +218,7 @@ class MediaIndexState extends State<MediaIndex> {
                                 setState(() {
                                   thumbnailQuality = "high";
                                 });
-                                await Api.mediaIndexSet(
+                                await DsmApi.mediaIndexSet(
                                     thumbnailQuality, mobileEnabled);
                                 getData();
                               },
@@ -286,7 +286,7 @@ class MediaIndexState extends State<MediaIndex> {
                           setState(() {
                             mobileEnabled = !mobileEnabled;
                           });
-                          await Api.mediaIndexSet(
+                          await DsmApi.mediaIndexSet(
                               thumbnailQuality, mobileEnabled);
                           getData();
                         },

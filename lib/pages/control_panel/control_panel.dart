@@ -11,9 +11,10 @@ import 'package:garden/pages/control_panel/update_reset/update_reset.dart';
 import 'package:garden/pages/control_panel/user_groups/user_group.dart';
 import 'package:garden/pages/control_panel/users/users.dart';
 import 'package:garden/constants/app_constants.dart';
-import 'package:garden/util/badge.dart';
+import 'package:garden/widgets/badge.dart';
 import 'package:garden/widgets/control_panel_item.dart';
 import 'package:garden/widgets/neu_back_button.dart';
+import 'package:signals_flutter/signals_flutter.dart';
 
 import 'shared_folders/shared_folders.dart';
 import 'package:garden/pages/control_panel/info/info.dart';
@@ -70,29 +71,31 @@ class ControlPanelState extends State<ControlPanel> {
                         ControlPanelItem(
                           title: "共享文件夹",
                           iconPath:
-                              "assets/control_panel/${connectionStore.version}/shared_folders.png",
+                              "assets/control_panel/${connectionStore.dsmVersion}/shared_folders.png",
                           targetPage: const SharedFolders(),
                           routeName: "share_folders",
                         ),
                         ControlPanelItem(
                           title: "文件服务",
                           iconPath:
-                              "assets/control_panel/${connectionStore.version}/file_services.png",
+                              "assets/control_panel/${connectionStore.dsmVersion}/file_services.png",
                           targetPage: const FileService(),
                           routeName: "file_service",
                         ),
                         ControlPanelItem(
-                          title: connectionStore.version < 7 ? "用户账户" : "用户与群组",
+                          title: connectionStore.dsmVersion.watch(context) < 7
+                              ? "用户账户"
+                              : "用户与群组",
                           iconPath:
-                              "assets/control_panel/${connectionStore.version}/users.png",
+                              "assets/control_panel/${connectionStore.dsmVersion}/users.png",
                           targetPage: const Users(),
                           routeName: "users",
                         ),
-                        if (connectionStore.version < 7)
+                        if (connectionStore.dsmVersion < 7)
                           ControlPanelItem(
                             title: "用户群组",
                             iconPath:
-                                "assets/control_panel/${connectionStore.version}/groups.png",
+                                "assets/control_panel/${connectionStore.dsmVersion}/groups.png",
                             targetPage: const UserGroups(),
                             routeName: "user_groups",
                           ),
@@ -191,14 +194,14 @@ class ControlPanelState extends State<ControlPanel> {
                         ControlPanelItem(
                           title: "外部访问",
                           iconPath:
-                              "assets/control_panel/${connectionStore.version}/public_access.png",
+                              "assets/control_panel/${connectionStore.dsmVersion}/public_access.png",
                           targetPage: const PublicAccess(),
                           routeName: "public_access",
                         ),
                         ControlPanelItem(
                           title: "网络",
                           iconPath:
-                              "assets/control_panel/${connectionStore.version}/network.png",
+                              "assets/control_panel/${connectionStore.dsmVersion}/network.png",
                           targetPage: const Network(),
                           routeName: "network",
                         ),
@@ -288,11 +291,11 @@ class ControlPanelState extends State<ControlPanel> {
                         //     ],
                         //   ),
                         // ),
-                        if (connectionStore.version >= 7)
+                        if (connectionStore.dsmVersion >= 7)
                           ControlPanelItem(
                             title: "终端机和SNMP",
                             iconPath:
-                                "assets/control_panel/${connectionStore.version}/terminal_and_SNMP.png",
+                                "assets/control_panel/${connectionStore.dsmVersion}/terminal_and_SNMP.png",
                             targetPage: const SshSetting(),
                             routeName: "ssh_setting",
                           ),
@@ -334,7 +337,7 @@ class ControlPanelState extends State<ControlPanel> {
                         ControlPanelItem(
                           title: "信息中心",
                           iconPath:
-                              "assets/control_panel/${connectionStore.version}/info_center.png",
+                              "assets/control_panel/${connectionStore.dsmVersion}/info_center.png",
                           targetPage: SystemInfo(
                               0, widget.system, widget.volumes, widget.disks),
                           routeName: "system_info_all",
@@ -423,25 +426,25 @@ class ControlPanelState extends State<ControlPanel> {
                         //     ],
                         //   ),
                         // ),
-                        if (connectionStore.version < 7)
+                        if (connectionStore.dsmVersion < 7)
                           ControlPanelItem(
                             title: "任务计划",
                             iconPath:
-                                "assets/control_panel/${connectionStore.version}/task_scheduler.png",
+                                "assets/control_panel/${connectionStore.dsmVersion}/task_scheduler.png",
                             targetPage: const TaskScheduler(),
                             routeName: "task_scheduler",
                           ),
                         ControlPanelItem(
                           title: "硬件和电源",
                           iconPath:
-                              "assets/control_panel/${connectionStore.version}/hardware_and_power.png",
+                              "assets/control_panel/${connectionStore.dsmVersion}/hardware_and_power.png",
                           targetPage: const Power(),
                           routeName: "power",
                         ),
                         ControlPanelItem(
                           title: "外部设备",
                           iconPath:
-                              "assets/control_panel/${connectionStore.version}/external_devices.png",
+                              "assets/control_panel/${connectionStore.dsmVersion}/external_devices.png",
                           targetPage: const ExternalDevice(),
                           routeName: "external_device",
                         ),
@@ -450,7 +453,7 @@ class ControlPanelState extends State<ControlPanel> {
                             ControlPanelItem(
                               title: "更新和还原",
                               iconPath:
-                                  "assets/control_panel/${connectionStore.version}/update_and_reset.png",
+                                  "assets/control_panel/${connectionStore.dsmVersion}/update_and_reset.png",
                               targetPage: const UpdateReset(),
                               routeName: "update_and_reset",
                             ),
@@ -601,23 +604,23 @@ class ControlPanelState extends State<ControlPanel> {
                         ControlPanelItem(
                           title: "索引服务",
                           iconPath:
-                              "assets/control_panel/${connectionStore.version}/file_index.png",
+                              "assets/control_panel/${connectionStore.dsmVersion}/file_index.png",
                           targetPage: const MediaIndex(),
                           routeName: "media_index",
                         ),
-                        if (connectionStore.version < 7)
+                        if (connectionStore.dsmVersion < 7)
                           ControlPanelItem(
                             title: "终端机和SNMP",
                             iconPath:
-                                "assets/control_panel/${connectionStore.version}/terminal_and_SNMP.png",
+                                "assets/control_panel/${connectionStore.dsmVersion}/terminal_and_SNMP.png",
                             targetPage: const SshSetting(),
                             routeName: "ssh_setting",
                           ),
-                        if (connectionStore.version >= 7)
+                        if (connectionStore.dsmVersion >= 7)
                           ControlPanelItem(
                             title: "任务计划",
                             iconPath:
-                                "assets/control_panel/${connectionStore.version}/task_scheduler.png",
+                                "assets/control_panel/${connectionStore.dsmVersion}/task_scheduler.png",
                             targetPage: const TaskScheduler(),
                             routeName: "task_scheduler",
                           ),

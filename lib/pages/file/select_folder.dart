@@ -1,6 +1,6 @@
 import 'package:garden/theme/app_theme.dart';
 import 'package:garden/util/file_type_util.dart';
-import 'package:garden/util/format_util.dart';
+import 'package:garden/util/log.dart';
 import 'package:garden/util/ui_util.dart';
 import 'package:garden/stores/connection_store.dart';
 import 'package:garden/util/http_util.dart';
@@ -36,7 +36,7 @@ class SelectFolderState extends State<SelectFolder> {
     setState(() {
       loading = true;
     });
-    var res = await Api.shareList();
+    var res = await DsmApi.shareList();
     setState(() {
       success = res['success'];
     });
@@ -64,7 +64,7 @@ class SelectFolderState extends State<SelectFolder> {
     setState(() {
       loading = true;
     });
-    var res = await Api.fileList(path);
+    var res = await DsmApi.fileList(path);
     setState(() {
       success = res['success'];
     });
@@ -189,7 +189,7 @@ class SelectFolderState extends State<SelectFolder> {
                     Text(
                       (file['isdir']
                               ? ""
-                              : "${FormatUtil.formatSize(file['additional']['size'])} | ") +
+                              : "${(int.parse(file['additional']['size'])).formatSize()} | ") +
                           DateTime.fromMillisecondsSinceEpoch(
                                   file['additional']['time']['crtime'] * 1000)
                               .format("Y/m/d H:i:s"),
@@ -246,7 +246,7 @@ class SelectFolderState extends State<SelectFolder> {
       } else {
         path = paths.join("/").substring(1);
       }
-      debugPrint(path);
+      Log.debug(path);
       goPath(path);
       return Future.value(false);
     } else {
@@ -360,9 +360,8 @@ class SelectFolderState extends State<SelectFolder> {
                                                           onPressed: () async {
                                                             if (name.trim() ==
                                                                 "") {
-                                                              HttpUtil.instance
-                                                                  .toast(
-                                                                      "请输入文件夹名");
+                                                              UiUtil.toast(
+                                                                  "请输入文件夹名");
                                                               return;
                                                             }
                                                             Navigator.of(
@@ -371,14 +370,13 @@ class SelectFolderState extends State<SelectFolder> {
                                                             String path = paths
                                                                 .join("/")
                                                                 .substring(1);
-                                                            var res = await Api
+                                                            var res = await DsmApi
                                                                 .createFolder(
                                                                     path, name);
                                                             if (res[
                                                                 'success']) {
-                                                              HttpUtil.instance
-                                                                  .toast(
-                                                                      "文件夹创建成功");
+                                                              UiUtil.toast(
+                                                                  "文件夹创建成功");
                                                               refresh();
                                                             } else {
                                                               if (res['error'][
@@ -396,10 +394,8 @@ class SelectFolderState extends State<SelectFolder> {
                                                                 UiUtil.toast(
                                                                     "文件夹创建失败：指定的名称已存在");
                                                               } else {
-                                                                HttpUtil
-                                                                    .instance
-                                                                    .toast(
-                                                                        "文件夹创建失败");
+                                                                UiUtil.toast(
+                                                                    "文件夹创建失败");
                                                               }
                                                             }
                                                           },

@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:garden/stores/app_store.dart';
+import 'package:garden/stores/settings_store.dart';
 import 'package:garden/theme/app_theme.dart';
 import 'package:garden/util/http_util.dart';
 import 'package:garden/util/log.dart';
@@ -13,6 +13,7 @@ import 'package:garden/widgets/resource_monitor/disk_tab.dart';
 import 'package:garden/widgets/resource_monitor/storage_tab.dart';
 import 'package:flutter/material.dart';
 import 'package:garden/constants/app_constants.dart';
+import 'package:signals_flutter/signals_flutter.dart';
 
 /// 资源监控页面（优化版）
 class Performance extends StatefulWidget {
@@ -67,8 +68,9 @@ class PerformanceState extends State<Performance>
     _tabController =
         TabController(initialIndex: widget.tabIndex, length: 6, vsync: this);
     getData();
-    timer =
-        Timer.periodic(Duration(seconds: appStore.refreshDuration), (timer) {
+    timer = Timer.periodic(
+        Duration(seconds: settingsStore.refreshDuration.watch(context)),
+        (timer) {
       getData();
     });
     super.initState();
@@ -81,7 +83,7 @@ class PerformanceState extends State<Performance>
   }
 
   getData() async {
-    var res = await Api.utilization();
+    var res = await DsmApi.utilization();
     Log.info("performance data: $res");
     if (res['success']) {
       if (mounted) {

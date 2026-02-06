@@ -39,7 +39,7 @@ class UpdateResetState extends State<UpdateReset>
   }
 
   getData() async {
-    var res = await Api.firmwareVersion();
+    var res = await DsmApi.firmwareVersion();
     if (res['success']) {
       setState(() {
         firmwareDate = res['data']['firmware_date'];
@@ -50,7 +50,7 @@ class UpdateResetState extends State<UpdateReset>
   }
 
   checkUpdate() async {
-    var res = await Api.firmwareUpgrade();
+    var res = await DsmApi.firmwareUpgrade();
     setState(() {
       checking = false;
     });

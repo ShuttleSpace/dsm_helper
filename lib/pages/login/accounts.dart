@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:garden/constants/app_constants.dart';
 import 'package:garden/pages/login/login.dart';
 import 'package:garden/stores/connection_store.dart';
-import 'package:garden/util/format_util.dart';
 import 'package:garden/util/http_util.dart';
 import 'package:garden/util/log.dart';
 import 'package:garden/util/storage_util.dart';
@@ -14,6 +13,7 @@ import 'package:garden/util/ui_util.dart';
 import 'package:garden/widgets/label.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
+import 'package:signals/signals_flutter.dart';
 
 class Accounts extends StatefulWidget {
   const Accounts({super.key});
@@ -23,7 +23,7 @@ class Accounts extends StatefulWidget {
 }
 
 class AccountsState extends State<Accounts> {
-  List servers = [];
+  final servers = signal([]);
   Timer? timer;
   bool visible = true;
   @override
@@ -41,70 +41,65 @@ class AccountsState extends State<Accounts> {
   getData() async {
     String serverString = await StorageUtil.getString("servers") ?? '';
     if (serverString.isNotBlank) {
-      setState(() {
-        servers = json.decode(serverString);
-      });
-      getInfo();
+      servers.value = json.decode(serverString);
+      getServerInfo();
     }
   }
 
-  getInfo() async {
+  getServerInfo() async {
     timer ??= Timer.periodic(const Duration(seconds: 5), (timer) {
-      getInfo();
+      getServerInfo();
     });
-    for (var server in servers) {
+    final list = List.from(servers.value);
+    for (var server in list) {
       server['loading'] = server['loading'] ?? true;
       server['is_login'] = server['is_login'] ?? false;
       server['base_url'] = server['base_url'] ??
           "${server['https'] ? "https" : "http"}://${server['host']}:${server['port']}/";
       if (server['is_login']) {
-        serverInfo(server);
+        await refreshServerInfo(server);
       } else {
         //仅首次重新登录
         if (server['loading']) {
           String host = server['base_url'];
-          Api.shareList(
-                  sid: server['sid'],
-                  checkSsl: server['check_ssl'],
-                  cookie: server['smid'],
-                  host: host)
-              .then((checkLogin) async {
-            if (checkLogin['success']) {
+          final checkLogin = await DsmApi.shareList(
+              sid: server['sid'],
+              checkSsl: server['check_ssl'],
+              cookie: server['smid'],
+              host: host);
+          if (checkLogin['success']) {
+            server['is_login'] = true;
+            //获取系统信息
+            await refreshServerInfo(server);
+          } else {
+            //登录失败，尝试重新登录
+            final res = await DsmApi.login(
+                host: host,
+                account: server['account'],
+                password: server['password'],
+                otpCode: "",
+                rememberDevice: false,
+                cookie: server['smid']);
+            Log.info("accounts: login: $res");
+            if (res['success']) {
               server['is_login'] = true;
-              //获取系统信息
-              serverInfo(server);
+              server['sid'] = res['data']['sid'];
+              await refreshServerInfo(server);
             } else {
-              //登录失败，尝试重新登录
-              var res = await Api.login(
-                  host: host,
-                  account: server['account'],
-                  password: server['password'],
-                  otpCode: "",
-                  rememberDevice: false,
-                  cookie: server['smid']);
-              if (res['success']) {
-                setState(() {
-                  server['is_login'] = true;
-                });
-                server['sid'] = res['data']['sid'];
-                saveAccounts();
-                serverInfo(server);
-              } else {
-                setState(() {
-                  server['loading'] = false;
-                  server['error'] = '登录失败';
-                });
-              }
+              server['loading'] = false;
+              server['error'] = '登录失败';
             }
-          });
+          }
         }
       }
     }
+    servers.value = list;
+    await saveServers();
   }
 
-  saveAccounts() async {
+  saveServers() async {
     List accounts = [];
-    for (var server in servers) {
+    for (var server in servers.value) {
       accounts.add({
         "https": server['https'],
         "host": server['host'],
@@ -123,40 +118,35 @@ class AccountsState extends State<Accounts> {
     StorageUtil.setString("servers", json.encode(accounts));
   }
 
-  serverInfo(server) async {
-    var res = await Api.utilization(
+  refreshServerInfo(server) async {
+    var res = await DsmApi.utilization(
         sid: server['sid'],
         checkSsl: server['check_ssl'],
         cookie: server['smid'],
         host: "${server['base_url']}");
+    Log.info("accounts: serverInfo: $res");
     if (res['success']) {
       if (!mounted) {
         return;
       }
-      setState(() {
-        server['cpu'] = (res['data']['cpu']['user_load'] +
-            res['data']['cpu']['system_load']);
-        server['ram'] = res['data']['memory']['real_usage'];
-        if (res['data']['network'].length > 0) {
-          server['rx'] = res['data']['network'][0]['rx'];
-          server['tx'] = res['data']['network'][0]['tx'];
-        }
-        if (res['data']['disk']['total'] != null) {
-          server['read'] = res['data']['disk']['total']['read_byte'];
-          server['write'] = res['data']['disk']['total']['write_byte'];
-        }
-        server['loading'] = false;
-      });
+      server['cpu'] =
+          (res['data']['cpu']['user_load'] + res['data']['cpu']['system_load']);
+      server['ram'] = res['data']['memory']['real_usage'];
+      if (res['data']['network'].length > 0) {
+        server['rx'] = res['data']['network'][0]['rx'];
+        server['tx'] = res['data']['network'][0]['tx'];
+      }
+      if (res['data']['disk']['total'] != null) {
+        server['read'] = res['data']['disk']['total']['read_byte'];
+        server['write'] = res['data']['disk']['total']['write_byte'];
+      }
+      server['loading'] = false;
     } else if (res['error']['code'] == 105) {
-      setState(() {
-        server['loading'] = false;
-        server['error'] = "权限不足，无法获取资源监控信息";
-      });
+      server['loading'] = false;
+      server['error'] = "权限不足，无法获取资源监控信息";
     } else {
-      setState(() {
-        server['loading'] = false;
-        server['error'] = '获取资源监控信息失败';
-      });
+      server['loading'] = false;
+      server['error'] = '获取资源监控信息失败';
     }
   }
 
@@ -175,24 +165,24 @@ class AccountsState extends State<Accounts> {
           connectionStore.setAccount("${server['account']}");
           connectionStore.setBaseUrl("${server['base_url']}");
           connectionStore.setCheckSsl(server['check_ssl']);
-          StorageUtil.setString("base_url", connectionStore.baseUrl);
+          StorageUtil.setString(
+              "base_url", connectionStore.baseUrl.watch(context));
 
-          StorageUtil.setString("https", server['https'] ? "1" : "0");
+          StorageUtil.setBool("https", server['https'] ? true : false);
           StorageUtil.setString("host", server['host']);
           StorageUtil.setString("port", server['port']);
           StorageUtil.setString("account", server['account']);
           StorageUtil.setString("note", server['note'] ?? '');
-          StorageUtil.setString(
-              "remember_password", server['remember_password'] ? "1" : "0");
+          StorageUtil.setBool(
+              "remember_password", server['remember_password'] ? true : false);
           if (server['remember_password']) {
             StorageUtil.setString("password", server['password']);
           } else {
             StorageUtil.setString("password", "");
           }
-          HttpUtil.instance
-              .setStorage("auto_login", server['auto_login'] ? "1" : "0");
-          HttpUtil.instance
-              .setStorage("check_ssl", server['check_ssl'] ? "1" : "0");
+          StorageUtil.setBool(
+              "auto_login", server['auto_login'] ? true : false);
+          StorageUtil.setBool("check_ssl", server['check_ssl'] ? true : false);
           StorageUtil.setString("sid", server['sid']);
           connectionStore.setSid(server['sid']);
           connectionStore.setCookie(server['cookie']);
@@ -287,7 +277,7 @@ class AccountsState extends State<Accounts> {
                               servers.remove(server);
                             });
 
-                            saveAccounts();
+                            saveServers();
                             UiUtil.toast("删除成功");
                           },
                           child: Image.asset(
@@ -420,7 +410,7 @@ class AccountsState extends State<Accounts> {
                                           Text(
                                             server['loading']
                                                 ? "-"
-                                                : "${FormatUtil.formatSize(server['tx'], fixed: 0)}/S",
+                                                : "${(int.parse(server['tx'])).formatSize(fixed: 0)}/S",
                                             style: const TextStyle(
                                                 color: Colors.blue,
                                                 fontSize: 12),
@@ -442,7 +432,7 @@ class AccountsState extends State<Accounts> {
                                           Text(
                                             server['loading']
                                                 ? "-"
-                                                : "${FormatUtil.formatSize(server['rx'], fixed: 0)}/S",
+                                                : "${(int.parse(server['rx'])).formatSize(fixed: 0)}/S",
                                             style: const TextStyle(
                                                 color: Colors.green,
                                                 fontSize: 12),
@@ -465,7 +455,7 @@ class AccountsState extends State<Accounts> {
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
                                       Text(
-                                        "R:${server['loading'] ? "-" : "${FormatUtil.formatSize(server['read'], fixed: 0)}/S"}",
+                                        "R:${server['loading'] ? "-" : "${(int.parse(server['read'])).formatSize(fixed: 0)}/S"}",
                                         style: const TextStyle(
                                             color: Colors.blue, fontSize: 12),
                                       ),
@@ -473,7 +463,7 @@ class AccountsState extends State<Accounts> {
                                         height: 10,
                                       ),
                                       Text(
-                                        "W:${server['loading'] ? "-" : "${FormatUtil.formatSize(server['write'], fixed: 0)}/S"}",
+                                        "W:${server['loading'] ? "-" : "${(int.parse(server['write'])).formatSize(fixed: 0)}/S"}",
                                         style: const TextStyle(
                                             color: Colors.green, fontSize: 12),
                                       )
@@ -551,21 +541,15 @@ class AccountsState extends State<Accounts> {
       body: ListView.separated(
         padding: const EdgeInsets.all(20),
         itemBuilder: (context, i) {
-          return _buildServerItem(servers[i]);
+          return _buildServerItem(servers.watch(context)[i]);
         },
-        itemCount: servers.length,
+        itemCount: servers.watch(context).length,
         separatorBuilder: (context, i) {
           return const SizedBox(
             height: 20,
           );
         },
       ),
-      // floatingActionButton: FloatingActionButton(
-      //   child: Icon(Icons.refresh),
-      //   onPressed: () {
-      //     getInfo();
-      //   },
-      // ),
     );
   }
 }

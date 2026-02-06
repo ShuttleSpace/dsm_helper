@@ -2,7 +2,6 @@ import 'package:garden/models/photos/photo_model.dart';
 import 'package:garden/stores/connection_store.dart';
 import 'package:garden/util/http_util.dart';
 import 'package:garden/util/log.dart';
-import 'package:simple_logger/simple_logger.dart';
 
 /// limit : 102
 /// list : [{"day":22,"item_count":2,"month":10,"year":2022},{"day":21,"item_count":6,"month":10,"year":2022},{"day":23,"item_count":43,"month":9,"year":2022},{"day":7,"item_count":4,"month":8,"year":2022},{"day":28,"item_count":2,"month":6,"year":2022},{"day":22,"item_count":1,"month":5,"year":2022},{"day":20,"item_count":5,"month":5,"year":2022},{"day":10,"item_count":1,"month":5,"year":2022},{"day":25,"item_count":12,"month":4,"year":2022},{"day":27,"item_count":26,"month":3,"year":2022}]
@@ -36,9 +35,9 @@ class TimelineModel {
     //   data['item_type'] = jsonEncode(itemTypes);
     //   data['method'] = "get_with_filter";
     // }
-    Log.logger.log(Level.INFO, "timeline fetch data: $data");
+    Log.log("timeline fetch data: $data");
     var res = await HttpUtil.instance.post("entry.cgi", data: data);
-    Log.logger.log(Level.INFO, "timeline fetch response: $res");
+    Log.log("timeline fetch response: $res");
     if (res['success']) {
       List data = res['data']['section'];
       List<TimelineModel> timeline = [];
@@ -169,7 +168,7 @@ class Day {
       "start_time": start,
       "end_time": end,
       "api":
-          '"SYNO.${connectionStore.version >= 7 ? "Foto" : "Photo"}.Browse.Timeline"',
+          '"SYNO.${connectionStore.dsmVersion.value >= 7 ? "Foto" : "Photo"}.Browse.Timeline"',
       "method": '"get_geocoding"',
       "version": 1,
       "_sid": connectionStore.sid,

@@ -74,7 +74,7 @@ class ShareState extends State<Share> {
   }
 
   deleteShare() async {
-    var res = await Api.deleteShare([link['id']]);
+    var res = await DsmApi.deleteShare([link['id']]);
     if (res['success']) {
       UiUtil.toast("取消共享成功");
       if (context.mounted) {
@@ -92,7 +92,7 @@ class ShareState extends State<Share> {
     if (widget.paths == null || widget.paths!.isEmpty) {
       return;
     }
-    var res = await Api.createShare(widget.paths!,
+    var res = await DsmApi.createShare(widget.paths!,
         fileRequest: widget.fileRequest ?? false,
         requestName: requestName,
         requestInfo: requestInfo);
@@ -375,7 +375,7 @@ class ShareState extends State<Share> {
                               List<String> url = [];
                               id.add(link['id']);
                               url.add(link['url']);
-                              var res = await Api.editShare(link['path'], id,
+                              var res = await DsmApi.editShare(link['path'], id,
                                   url, endTime, startTime, times,
                                   fileRequest: link['enable_upload'],
                                   requestName: requestName,

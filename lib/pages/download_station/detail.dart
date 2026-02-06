@@ -1,5 +1,4 @@
 import 'package:garden/util/http_util.dart';
-import 'package:garden/util/format_util.dart';
 import 'package:garden/util/ui_util.dart';
 import 'package:garden/widgets/bubble_tab_indicator.dart';
 import 'package:garden/widgets/label.dart';
@@ -39,7 +38,7 @@ class DownloadDetailState extends State<DownloadDetail>
   }
 
   getTrackers() async {
-    var res = await Api.downloadTracker(widget.id);
+    var res = await DsmApi.downloadTracker(widget.id);
     if (res['success']) {
       setState(() {
         loadingTrackers = false;
@@ -49,7 +48,7 @@ class DownloadDetailState extends State<DownloadDetail>
   }
 
   getPeers() async {
-    var res = await Api.downloadPeer(widget.id);
+    var res = await DsmApi.downloadPeer(widget.id);
     if (res['success']) {
       setState(() {
         loadingPeers = false;
@@ -59,7 +58,7 @@ class DownloadDetailState extends State<DownloadDetail>
   }
 
   getFiles() async {
-    var res = await Api.downloadFile(widget.id);
+    var res = await DsmApi.downloadFile(widget.id);
     if (res['success']) {
       setState(() {
         loadingFiles = false;
@@ -88,7 +87,7 @@ class DownloadDetailState extends State<DownloadDetail>
   }
 
   getData() async {
-    var res = await Api.downloadDetail(widget.id);
+    var res = await DsmApi.downloadDetail(widget.id);
     setState(() {
       loading = false;
       if (res['success']) {
@@ -120,8 +119,8 @@ class DownloadDetailState extends State<DownloadDetail>
             ),
             Row(
               children: [
-                Text("${FormatUtil.formatSize(file['size_downloaded'])} / "),
-                Text(FormatUtil.formatSize(file['size'])),
+                Text("${file['size_downloaded'].formatSize()} / "),
+                Text(file['size'].formatSize()),
                 const SizedBox(
                   width: 10,
                 ),
@@ -179,7 +178,7 @@ class DownloadDetailState extends State<DownloadDetail>
                   size: 16,
                 ),
                 Text(
-                  FormatUtil.formatSize(peer['speed_download']),
+                  peer['speed_download'].formatSize(),
                   style: const TextStyle(color: Colors.green),
                 ),
                 const SizedBox(
@@ -191,7 +190,7 @@ class DownloadDetailState extends State<DownloadDetail>
                   size: 16,
                 ),
                 Text(
-                  FormatUtil.formatSize(peer['speed_upload']),
+                  peer['speed_upload'].formatSize(),
                   style: const TextStyle(color: Colors.blue),
                 ),
               ],
@@ -302,7 +301,7 @@ class DownloadDetailState extends State<DownloadDetail>
                                         onPressed: () async {
                                           Navigator.of(context).pop();
                                           var res =
-                                              await Api.downloadTaskAction(
+                                              await DsmApi.downloadTaskAction(
                                                   [task['id']], "delete");
                                           if (res['success']) {
                                             UiUtil.toast("任务删除成功");
@@ -483,7 +482,7 @@ class DownloadDetailState extends State<DownloadDetail>
                                   Expanded(
                                     child: Text(
                                       task['size'] > 0
-                                          ? FormatUtil.formatSize(task['size'])
+                                          ? task['size'].formatSize()
                                           : "未取得",
                                     ),
                                   ),
@@ -607,9 +606,9 @@ class DownloadDetailState extends State<DownloadDetail>
                                   Text(task['additional']['detail']
                                               ['waiting_seconds'] >
                                           0
-                                      ? HttpUtil.instance.timeRemaining(
-                                          task['additional']['detail']
-                                              ['waiting_seconds'])
+                                      ? (int.parse(task['additional']['detail']
+                                              ['waiting_seconds']))
+                                          .timeRemaining()
                                       : "无法取得"),
                                 ],
                               ),
@@ -641,7 +640,7 @@ class DownloadDetailState extends State<DownloadDetail>
                                           )
                                         : task['status'] == 2
                                             ? Text(
-                                                "${FormatUtil.formatSize(task['additional']['transfer']['speed_download'])}/s",
+                                                "${task['additional']['transfer']['speed_download'].formatSize()}/s",
                                                 style: const TextStyle(
                                                     color:
                                                         Colors.lightBlueAccent),
@@ -714,8 +713,9 @@ class DownloadDetailState extends State<DownloadDetail>
                                   const Text("已下载："),
                                   Expanded(
                                     child: Text(
-                                      FormatUtil.formatSize(task['additional']
-                                          ['transfer']['size_downloaded']),
+                                      task['additional']['transfer']
+                                              ['size_downloaded']
+                                          .formatSize(),
                                     ),
                                   ),
                                 ],
@@ -736,7 +736,7 @@ class DownloadDetailState extends State<DownloadDetail>
                                   const Text("已上传："),
                                   Expanded(
                                     child: Text(
-                                      "${FormatUtil.formatSize(task['additional']['transfer']['size_uploaded'])} （${task['additional']['transfer']['size_downloaded'] > 0 ? (task['additional']['transfer']['size_uploaded'] / task['additional']['transfer']['size_downloaded'] * 100).toStringAsFixed(2) : "0"}%)",
+                                      "${task['additional']['transfer']['size_uploaded'].formatSize()} （${task['additional']['transfer']['size_downloaded'] > 0 ? (task['additional']['transfer']['size_uploaded'] / task['additional']['transfer']['size_downloaded'] * 100).toStringAsFixed(2) : "0"}%)",
                                     ),
                                   ),
                                 ],
@@ -779,8 +779,9 @@ class DownloadDetailState extends State<DownloadDetail>
                                   Text(task['additional']['transfer']
                                               ['speed_download'] >
                                           0
-                                      ? FormatUtil.formatSize(task['additional']
-                                          ['transfer']['speed_download'])
+                                      ? task['additional']['transfer']
+                                              ['speed_download']
+                                          .formatSize()
                                       : "无法取得"),
                                 ],
                               ),
@@ -855,9 +856,9 @@ class DownloadDetailState extends State<DownloadDetail>
                               child: Row(
                                 children: [
                                   const Text("已做种时间："),
-                                  Text(HttpUtil.instance.timeRemaining(
-                                      task['additional']['detail']
-                                          ['seed_elapsed'])),
+                                  Text((int.parse(task['additional']['detail']
+                                          ['seed_elapsed']))
+                                      .timeRemaining()),
                                 ],
                               ),
                             ),
@@ -898,14 +899,14 @@ class DownloadDetailState extends State<DownloadDetail>
                                   Text(task['additional']['transfer']
                                               ['speed_download'] >
                                           0
-                                      ? HttpUtil.instance.timeRemaining(
-                                          ((task['size'] -
+                                      ? (int.parse(((task['size'] -
                                                       task['additional']
                                                               ['transfer']
                                                           ['size_downloaded']) /
                                                   task['additional']['transfer']
                                                       ['speed_download'])
-                                              .ceil())
+                                              .ceil()))
+                                          .timeRemaining()
                                       : "无法取得"),
                                 ],
                               ),

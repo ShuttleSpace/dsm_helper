@@ -27,7 +27,7 @@ class UninstallPackageState extends State<UninstallPackage> {
   }
 
   getData() async {
-    var res = await Api.uninstallPackageInfo(widget.package['id']);
+    var res = await DsmApi.uninstallPackageInfo(widget.package['id']);
     if (res['success']) {
       setState(() {
         loading = false;
@@ -180,7 +180,8 @@ class UninstallPackageState extends State<UninstallPackage> {
                           setState(() {
                             uninstalling = true;
                           });
-                          await Api.uninstallPackageTask(widget.package['id'],
+                          await DsmApi.uninstallPackageTask(
+                              widget.package['id'],
                               extra: extra);
                           UiUtil.toast("卸载成功");
                           if (context.mounted) {

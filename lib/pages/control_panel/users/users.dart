@@ -8,6 +8,7 @@ import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:garden/constants/app_constants.dart';
+import 'package:signals_flutter/signals_flutter.dart';
 
 class Users extends StatefulWidget {
   const Users({super.key});
@@ -29,7 +30,7 @@ class UsersState extends State<Users> with SingleTickerProviderStateMixin {
   }
 
   getData() async {
-    var res = await Api.users();
+    var res = await DsmApi.users();
     if (res['success']) {
       setState(() {
         users = res['data']['users'];
@@ -41,7 +42,7 @@ class UsersState extends State<Users> with SingleTickerProviderStateMixin {
         Navigator.of(context).pop();
       }
     }
-    var group = await Api.userGroups();
+    var group = await DsmApi.userGroups();
     if (group['success']) {
       setState(() {
         loading = false;
@@ -162,7 +163,8 @@ class UsersState extends State<Users> with SingleTickerProviderStateMixin {
     return Scaffold(
       appBar: AppBar(
         leading: AppBackButton(context),
-        title: Text(connectionStore.version < 7 ? "用户账户" : "用户与群组"),
+        title: Text(
+            connectionStore.dsmVersion.watch(context) < 7 ? "用户账户" : "用户与群组"),
       ),
       body: loading
           ? Container(
@@ -179,7 +181,7 @@ class UsersState extends State<Users> with SingleTickerProviderStateMixin {
             )
           : Column(
               children: [
-                if (connectionStore.version >= 7)
+                if (connectionStore.dsmVersion >= 7)
                   Card(
                     shape: RoundedRectangleBorder(
                         side: const BorderSide(),
@@ -211,7 +213,7 @@ class UsersState extends State<Users> with SingleTickerProviderStateMixin {
                     ),
                   ),
                 Expanded(
-                  child: connectionStore.version < 7
+                  child: connectionStore.dsmVersion < 7
                       ? ListView.builder(
                           padding: const EdgeInsets.all(20),
                           itemBuilder: (context, i) {

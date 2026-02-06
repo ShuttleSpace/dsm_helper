@@ -1,4 +1,5 @@
 import 'package:garden/theme/app_theme.dart';
+import 'package:garden/util/log.dart';
 import 'package:garden/util/ui_util.dart';
 import 'package:garden/util/http_util.dart';
 import 'package:garden/widgets/file_icon.dart';
@@ -26,7 +27,7 @@ class FavoriteState extends State<Favorite> {
     setState(() {
       favoriteLoading = true;
     });
-    var res = await Api.favoriteList();
+    var res = await DsmApi.favoriteList();
     setState(() {
       favoriteLoading = false;
     });
@@ -102,7 +103,7 @@ class FavoriteState extends State<Favorite> {
                                                 4,
                                         child: OutlinedButton(
                                           onPressed: () async {
-                                            debugPrint(favorite['path']);
+                                            Log.debug(favorite['path']);
                                             TextEditingController
                                                 nameController =
                                                 TextEditingController.fromValue(
@@ -194,21 +195,19 @@ class FavoriteState extends State<Favorite> {
                                                                           () async {
                                                                         if (name.trim() ==
                                                                             "") {
-                                                                          HttpUtil
-                                                                              .instance
-                                                                              .toast("请输入新文件名");
+                                                                          UiUtil.toast(
+                                                                              "请输入新文件名");
                                                                           return;
                                                                         }
                                                                         Navigator.of(context)
                                                                             .pop();
-                                                                        var res = await Api.favoriteRename(
+                                                                        var res = await DsmApi.favoriteRename(
                                                                             favorite['path'],
                                                                             name);
                                                                         if (res[
                                                                             'success']) {
-                                                                          HttpUtil
-                                                                              .instance
-                                                                              .toast("重命名成功");
+                                                                          UiUtil.toast(
+                                                                              "重命名成功");
                                                                           getData();
                                                                         } else {
                                                                           if (res['error']['errors'] != null &&
@@ -283,8 +282,8 @@ class FavoriteState extends State<Favorite> {
                                         child: OutlinedButton(
                                           onPressed: () async {
                                             Navigator.of(context).pop();
-                                            HttpUtil.instance
-                                                .vibrate(FeedbackType.warning);
+                                            UiUtil.vibrate(
+                                                FeedbackType.warning);
                                             showCupertinoModalPopup(
                                               context: context,
                                               builder: (context) {
@@ -337,19 +336,16 @@ class FavoriteState extends State<Favorite> {
                                                                     Navigator.of(
                                                                             context)
                                                                         .pop();
-                                                                    var res = await Api
+                                                                    var res = await DsmApi
                                                                         .favoriteDelete(
                                                                             favorite['path']);
                                                                     if (res[
                                                                         'success']) {
-                                                                      HttpUtil
-                                                                          .instance
-                                                                          .vibrate(
-                                                                              FeedbackType.light);
-                                                                      HttpUtil
-                                                                          .instance
-                                                                          .toast(
-                                                                              "取消收藏成功");
+                                                                      UiUtil.vibrate(
+                                                                          FeedbackType
+                                                                              .light);
+                                                                      UiUtil.toast(
+                                                                          "取消收藏成功");
                                                                       getData();
                                                                     }
                                                                   },

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:garden/stores/settings_store.dart';
 import 'package:garden/util/log.dart';
 import 'package:garden/util/ui_util.dart';
 import 'package:garden/util/storage_util.dart';
@@ -73,7 +74,7 @@ class HomeState extends State<Home> with WidgetsBindingObserver {
     // ReceiveSharingIntent.getMediaStream().listen((List<SharedMediaFile> value) {
     //   handleFiles(value);
     // }, onError: (err) {
-    //   debugPrint("getIntentDataStream error: $err");
+    //   Log.debug("getIntentDataStream error: $err");
     // });
     //
     // // For sharing images coming from outside the app while the app is closed
@@ -87,7 +88,7 @@ class HomeState extends State<Home> with WidgetsBindingObserver {
     //     handleTorrent(value);
     //   }
     // }, onError: (err) {
-    //   debugPrint("getLinkStream error: $err");
+    //   Log.debug("getLinkStream error: $err");
     // });
     //
     // // For sharing or opening urls/text coming from outside the app while the app is closed
@@ -168,17 +169,14 @@ class HomeState extends State<Home> with WidgetsBindingObserver {
 
   checkAuth() async {
     // Log.info("是否需要启动密码")
-    String launchAuthStr = await StorageUtil.getString("launch_auth") ?? '';
-    String launchAuthPasswordStr =
-        await StorageUtil.getString("launch_auth_password") ?? '';
-    String launchAuthBiometricsStr =
-        await StorageUtil.getString("launch_auth_biometrics") ?? '';
-    launchAuth = launchAuthStr == "1";
-    password = launchAuthPasswordStr == "1";
-    biometrics = launchAuthBiometricsStr == "1";
+    launchAuth = await StorageUtil.getBool("launch_auth") ?? false;
+    password = await StorageUtil.getBool("launch_auth_password") ?? false;
+    biometrics = await StorageUtil.getBool("launch_auth_biometrics") ?? false;
 
     authPage = launchAuth && (password || biometrics);
-    if (connectionStore.isAuthPage == false && authPage && context.mounted) {
+    if (await settingsStore.launchAccountPage.value == false &&
+        authPage &&
+        context.mounted) {
       // ignore: use_build_context_synchronously
       Navigator.of(context).push(CupertinoPageRoute(builder: (context) {
         return const AuthPage(
@@ -195,7 +193,7 @@ class HomeState extends State<Home> with WidgetsBindingObserver {
       if (kDebugMode) {
         buildNumber = '1';
       }
-      var res = await Api.update(buildNumber); //packageInfo.buildNumber
+      var res = await DsmApi.update(buildNumber); //packageInfo.buildNumber
       if (res['code'] == 1 && context.mounted) {
         showCupertinoDialog(
           // ignore: use_build_context_synchronously

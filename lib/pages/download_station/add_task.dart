@@ -31,7 +31,7 @@ class AddDownloadTaskState extends State<AddDownloadTask> {
   }
 
   getData() async {
-    var res = await Api.downloadLocation();
+    var res = await DsmApi.downloadLocation();
     if (res['success']) {
       setState(() {
         saveFolder = res['data']['default_destination'];
@@ -174,7 +174,7 @@ class AddDownloadTaskState extends State<AddDownloadTask> {
               }
               Map<dynamic, dynamic>? res;
               if (torrentPath != "") {
-                res = await Api.downloadTaskCreate(saveFolder, "file",
+                res = await DsmApi.downloadTaskCreate(saveFolder, "file",
                     filePath: torrentPath);
                 if (res == null || res.containsKey("success") == false) {
                   UiUtil.toast(
@@ -193,7 +193,8 @@ class AddDownloadTaskState extends State<AddDownloadTask> {
                   UiUtil.vibrate(FeedbackType.light);
                   return;
                 }
-                res = await Api.downloadTaskCreate(saveFolder, "url", url: url);
+                res = await DsmApi.downloadTaskCreate(saveFolder, "url",
+                    url: url);
                 if (res == null || res.containsKey("success") == false) {
                   UiUtil.toast(
                       "创建任务失败，code：${res?.getMap("error")?.getOrNull("code")}");

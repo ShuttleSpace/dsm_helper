@@ -1,3 +1,4 @@
+import 'package:garden/extensions/color.dart';
 import 'package:garden/pages/packages/detail.dart';
 import 'package:garden/util/log.dart';
 import 'package:garden/util/ui_util.dart';
@@ -66,7 +67,7 @@ class PackagesState extends State<Packages> with TickerProviderStateMixin {
   }
 
   getData() async {
-    var res = await Api.packages(version: packagesVersion);
+    var res = await DsmApi.packages(version: packagesVersion);
     if (res['success']) {
       setState(() {
         banners = res['data']['banners'];
@@ -103,7 +104,7 @@ class PackagesState extends State<Packages> with TickerProviderStateMixin {
   }
 
   getVolumes() async {
-    var res = await Api.volumes();
+    var res = await DsmApi.volumes();
     if (res['success']) {
       setState(() {
         volumes = res['data']['volumes'];
@@ -113,7 +114,7 @@ class PackagesState extends State<Packages> with TickerProviderStateMixin {
 
   getOthers() async {
     Log.info("获取第三方套件");
-    var res = await Api.packages(others: true, version: packagesVersion);
+    var res = await DsmApi.packages(others: true, version: packagesVersion);
     Log.info("获取第三方套件end");
     if (res['success']) {
       setState(() {
@@ -150,7 +151,7 @@ class PackagesState extends State<Packages> with TickerProviderStateMixin {
     installedPackages = [];
 
     Log.info("获取已安装套件");
-    var res = await Api.installedPackages(version: installedVersion);
+    var res = await DsmApi.installedPackages(version: installedVersion);
     Log.info("获取已安装套件end");
     if (res['success']) {
       setState(() {
@@ -175,9 +176,9 @@ class PackagesState extends State<Packages> with TickerProviderStateMixin {
         if (installedPackageInfo['id'] == package['id']) {
           package['installed'] = true;
           package['installed_version'] = installedPackageInfo['version'];
-          package['can_update'] = HttpUtil.instance.versionCompare(
-                  package['installed_version'], package['version']) <
-              0;
+          package['can_update'] =
+              versionCompare(package['installed_version'], package['version']) <
+                  0;
           package['additional'] = installedPackageInfo['additional'];
           if (package['installed']) {
             installedPackages.add(package);
@@ -249,7 +250,7 @@ class PackagesState extends State<Packages> with TickerProviderStateMixin {
       loading = true;
     });
     var res =
-        await Api.launchPackage(package['id'], package['dsm_apps'], "start");
+        await DsmApi.launchPackage(package['id'], package['dsm_apps'], "start");
     if (res['success']) {
       UiUtil.toast("已启动");
       // await getLaunchedPackages();
@@ -266,7 +267,7 @@ class PackagesState extends State<Packages> with TickerProviderStateMixin {
       loading = true;
     });
     var res =
-        await Api.launchPackage(package['id'], package['dsm_apps'], "stop");
+        await DsmApi.launchPackage(package['id'], package['dsm_apps'], "stop");
     if (res['success']) {
       UiUtil.toast("已停用");
       // await getLaunchedPackages();
@@ -360,8 +361,8 @@ class PackagesState extends State<Packages> with TickerProviderStateMixin {
                   unselectedLabelColor: Colors.grey,
                   indicator: BubbleTabIndicator(
                     indicatorColor: Theme.of(context).scaffoldBackgroundColor,
-                    shadowColor: HttpUtil.getAdjustColor(
-                        Theme.of(context).scaffoldBackgroundColor, -20),
+                    shadowColor:
+                        Theme.of(context).scaffoldBackgroundColor.adjust(-20),
                   ),
                   tabs: [
                     const Padding(

@@ -51,7 +51,7 @@ class AddTrackerState extends State<AddTracker> {
                 UiUtil.toast("请填写Tacker");
                 return;
               }
-              var res = await Api.downloadTrackerAdd(widget.id, trackers);
+              var res = await DsmApi.downloadTrackerAdd(widget.id, trackers);
               if (res['success']) {
                 UiUtil.toast("添加Tracker成功");
                 if (context.mounted) {

@@ -18,7 +18,6 @@ import 'package:flutter/material.dart';
 import 'package:garden/constants/app_constants.dart';
 import 'package:garden/theme/app_colors.dart';
 import 'package:flutter_vibrate/flutter_vibrate.dart';
-import 'package:simple_logger/simple_logger.dart';
 import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 
 import '../file/select_folder.dart';
@@ -296,14 +295,14 @@ class BackupState extends State<Backup> {
           OutlinedButton(
             onPressed: () {
               _onChooseBackupSourceDialog(context).then((res) {
-                Log.logger.log(Level.INFO, "choose backup source dir: $res");
+                Log.log("choose backup source dir: $res");
                 if (res != null) {
                   setState(() {
                     albums = res;
                   });
                   List backupAlbums = albums.map((e) => e.id).toList();
-                  HttpUtil.instance
-                      .setStorage("backup_album", json.encode(backupAlbums));
+                  StorageUtil.setString(
+                      "backup_album", json.encode(backupAlbums));
 
                   getAssetCount();
                 }
@@ -577,7 +576,7 @@ class BackupState extends State<Backup> {
       setState(() {
         uploading?.status = UploadStatus.running;
       });
-      var res = await Api.upload(
+      var res = await DsmApi.upload(
           backupFolder, uploading!.file!.path, uploading!.cancelToken,
           (progress, total) {
         // print("$progress,$total");

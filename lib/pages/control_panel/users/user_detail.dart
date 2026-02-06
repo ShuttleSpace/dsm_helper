@@ -92,7 +92,7 @@ class UserDetailState extends State<UserDetail>
   }
 
   getGroup() async {
-    var res = await Api.userGroup(user?['name']);
+    var res = await DsmApi.userGroup(user?['name']);
     if (res['success']) {
       setState(() {
         groups = res['data']['groups'];
@@ -106,7 +106,7 @@ class UserDetailState extends State<UserDetail>
 
   getData() async {
     getGroup();
-    var res = await Api.userDetail(user?['name']);
+    var res = await DsmApi.userDetail(user?['name']);
     if (res['success']) {
       List result = res['data']['result'];
       for (var item in result) {
@@ -612,7 +612,7 @@ class UserDetailState extends State<UserDetail>
                   });
 
                   var res =
-                      await Api.userSave(user ?? {}, addGroup, removeGroup);
+                      await DsmApi.userSave(user ?? {}, addGroup, removeGroup);
                   setState(() {
                     saving = false;
                   });

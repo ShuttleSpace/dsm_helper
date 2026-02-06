@@ -1,40 +1,40 @@
 import 'package:flutter/material.dart';
 
 /// Color 扩展
-/// 
+///
 /// 提供颜色相关的便捷方法
 extension ColorExt on Color {
   /// 设置透明度
-  /// 
+  ///
   /// [opacity] 透明度值，范围 0.0 - 1.0
   Color withOpacityValue(double opacity) {
     return withValues(alpha: opacity);
   }
 
   /// 变亮颜色
-  /// 
+  ///
   /// [amount] 变亮的程度，范围 0.0 - 1.0
   Color lighten(double amount) {
     assert(amount >= 0 && amount <= 1);
-    
+
     final hsl = HSLColor.fromColor(this);
     final lightness = (hsl.lightness + amount).clamp(0.0, 1.0);
     return hsl.withLightness(lightness).toColor();
   }
 
   /// 变暗颜色
-  /// 
+  ///
   /// [amount] 变暗的程度，范围 0.0 - 1.0
   Color darken(double amount) {
     assert(amount >= 0 && amount <= 1);
-    
+
     final hsl = HSLColor.fromColor(this);
     final lightness = (hsl.lightness - amount).clamp(0.0, 1.0);
     return hsl.withLightness(lightness).toColor();
   }
 
   /// 调整颜色亮度
-  /// 
+  ///
   /// [amount] 调整的程度，正值变亮，负值变暗
   Color adjustBrightness(double amount) {
     return amount > 0 ? lighten(amount) : darken(-amount);
@@ -77,12 +77,28 @@ extension ColorExt on Color {
   }
 
   /// 混合颜色
-  /// 
+  ///
   /// [other] 要混合的颜色
   /// [amount] 混合比例，范围 0.0 - 1.0
   Color mix(Color other, {double amount = 0.5}) {
     assert(amount >= 0 && amount <= 1);
-    
+
     return Color.lerp(this, other, amount) ?? this;
+  }
+
+  Color adjust(double amount) {
+    Map<String, int> colors = {'r': r.toInt(), 'g': g.toInt(), 'b': b.toInt()};
+
+    colors = colors.map((key, value) {
+      if (value + amount < 0) {
+        return MapEntry(key, 0);
+      }
+      if (value + amount > 255) {
+        return MapEntry(key, (value + amount).floor());
+      }
+      return MapEntry(key, (value + amount).floor());
+    });
+    return Color.fromRGBO(
+        colors['r'] ?? 0, colors['g'] ?? 0, colors['b'] ?? 0, 1);
   }
 }

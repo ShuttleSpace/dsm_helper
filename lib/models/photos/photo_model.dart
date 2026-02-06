@@ -4,7 +4,6 @@ import 'package:garden/stores/connection_store.dart';
 import 'package:garden/models/photos/thumbnail_model.dart';
 import 'package:garden/util/http_util.dart';
 import 'package:garden/util/log.dart';
-import 'package:simple_logger/simple_logger.dart';
 
 import 'folder_model.dart';
 
@@ -81,9 +80,9 @@ class PhotoModel {
       "offset": 0,
       "limit": limit ?? 5000,
     };
-    Log.logger.log(Level.INFO, "recentlyAdd data: $data");
+    Log.log("recentlyAdd data: $data");
     var res = await HttpUtil.instance.post("entry.cgi", data: data);
-    Log.logger.log(Level.INFO, "recentlyAdd response: $res");
+    Log.log("recentlyAdd response: $res");
     if (res['success']) {
       List list = res['data']['list'];
       List<PhotoModel> photos = [];

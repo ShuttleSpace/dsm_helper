@@ -80,7 +80,7 @@ class ConfirmLogoutState extends State<ConfirmLogout> {
                       child: OutlinedButton(
                         onPressed: () async {
                           if (forget) {
-                            Api.trustDevice("delete");
+                            DsmApi.trustDevice("delete");
                           }
                           StorageUtil.remove("sid");
                           // HttpUtil.removeStorage("smid");

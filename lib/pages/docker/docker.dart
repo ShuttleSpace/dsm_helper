@@ -38,7 +38,7 @@ class DockerState extends State<Docker> with SingleTickerProviderStateMixin {
   }
 
   getContainer() async {
-    var res = await Api.dockerContainerInfo();
+    var res = await DsmApi.dockerContainerInfo();
     setState(() {
       containerLoading = false;
     });
@@ -81,8 +81,8 @@ class DockerState extends State<Docker> with SingleTickerProviderStateMixin {
   }
 
   getImage() async {
-    var res = await Api.dockerImageInfo();
-    Log.logger.info(res);
+    var res = await DsmApi.dockerImageInfo();
+    Log.info(res);
     setState(() {
       imageLoading = false;
     });
@@ -130,7 +130,7 @@ class DockerState extends State<Docker> with SingleTickerProviderStateMixin {
         setState(() {
           powerLoading[container['id']] = true;
         });
-        var res = await Api.dockerPower(container['name'], action,
+        var res = await DsmApi.dockerPower(container['name'], action,
             preserveProfile: preserveProfile);
         if (res['success']) {
           UiUtil.toast("请求发送成功");
@@ -146,7 +146,7 @@ class DockerState extends State<Docker> with SingleTickerProviderStateMixin {
       setState(() {
         powerLoading[container['id']] = true;
       });
-      var res = await Api.dockerPower(container['name'], action);
+      var res = await DsmApi.dockerPower(container['name'], action);
       if (res['success']) {
         UiUtil.toast("请求发送成功");
         getContainer();

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:garden/util/format_util.dart';
 import 'package:garden/constants/app_constants.dart';
+import 'package:garden/extensions/int.dart';
 import 'package:garden/widgets/animation_progress_bar.dart';
 import 'package:garden/widgets/label.dart';
 
@@ -47,7 +47,7 @@ class RepoItem extends StatelessWidget {
               child: Row(
                 children: [
                   Text(
-                    FormatUtil.formatSize(int.parse(repo['used'])),
+                    int.parse(repo['used']).formatSize(),
                     style: const TextStyle(color: Colors.blue),
                   ),
                   const Text(
@@ -55,7 +55,7 @@ class RepoItem extends StatelessWidget {
                     style: TextStyle(color: Colors.grey),
                   ),
                   Text(
-                    FormatUtil.formatSize(int.parse(repo['size'])),
+                    int.parse(repo['size']).formatSize(),
                     style: const TextStyle(color: Colors.grey),
                   ),
                 ],

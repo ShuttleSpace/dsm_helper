@@ -22,7 +22,7 @@ class UserGroupsState extends State<UserGroups> {
   }
 
   getData() async {
-    var res = await Api.userGroups();
+    var res = await DsmApi.userGroups();
     if (res['success']) {
       setState(() {
         loading = false;

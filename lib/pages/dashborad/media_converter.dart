@@ -32,7 +32,7 @@ class MediaConverterState extends State<MediaConverter> {
   }
 
   getMediaConverter() async {
-    var res = await Api.mediaConverter("status");
+    var res = await DsmApi.mediaConverter("status");
     if (res['success'] && mounted) {
       setState(() {
         converter = res['data'];
@@ -201,7 +201,7 @@ class MediaConverterState extends State<MediaConverter> {
                         GestureDetector(
                           onTap: () async {
                             if (converter['status'] == "paused") {
-                              var res = await Api.mediaConverter("resume");
+                              var res = await DsmApi.mediaConverter("resume");
                               if (res['success']) {
                                 getMediaConverter();
                               }
@@ -321,7 +321,7 @@ class MediaConverterState extends State<MediaConverter> {
                                     );
                                   }).then((value) async {
                                 if (value != null) {
-                                  var res = await Api.mediaConverter("pause",
+                                  var res = await DsmApi.mediaConverter("pause",
                                       hours: value);
                                   if (res['success']) {
                                     getMediaConverter();

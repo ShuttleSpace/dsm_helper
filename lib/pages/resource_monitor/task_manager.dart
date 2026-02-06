@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:garden/util/format_util.dart';
 import 'package:garden/stores/connection_store.dart';
 
 import 'package:garden/util/http_util.dart';
@@ -11,6 +10,7 @@ import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:garden/constants/app_constants.dart';
+import 'package:signals_flutter/signals_flutter.dart';
 
 class TaskManager extends StatefulWidget {
   const TaskManager({super.key});
@@ -38,14 +38,14 @@ class TaskManagerState extends State<TaskManager>
   }
 
   getData() async {
-    var process = await Api.process();
-    var group = await Api.processGroup();
+    var process = await DsmApi.process();
+    var group = await DsmApi.processGroup();
     if (process['success']) {
       setState(() {
         loading = false;
         try {
           processes = process['data']['process'];
-          if (connectionStore.version == 7) {
+          if (connectionStore.dsmVersion.watch(context) == 7) {
             slices = group['data']['slices'];
           } else {
             services = group['data']['services'];
@@ -73,7 +73,8 @@ class TaskManagerState extends State<TaskManager>
         if (webManagerStrings[titles[0]][titles[1]] != null) {
           title = webManagerStrings[titles[0]][titles[1]];
         }
-      } else if (connectionStore.strings[service['display_name']][titles[0]] !=
+      } else if (connectionStore.strings.watch(context)[service['display_name']]
+                  [titles[0]] !=
               null &&
           connectionStore.strings[service['display_name']][titles[0]]
                   [titles[1]] !=
@@ -118,7 +119,7 @@ class TaskManagerState extends State<TaskManager>
   Widget _buildSliceItem(slice) {
     Map<String, int> cpuTime = {};
     if (slice['cpu_time'] is num) {
-      cpuTime = FormatUtil.timeLong(slice['cpu_time'].toInt());
+      cpuTime = (int.parse(slice['cpu_time'])).formatTime();
     }
     return Card(
       shape: RoundedRectangleBorder(
@@ -139,7 +140,7 @@ class TaskManagerState extends State<TaskManager>
                   ),
                 ),
                 Text(
-                    "内存：${slice['memory'] is num ? FormatUtil.formatSize(slice['memory'], fixed: 1) : slice['memory']}")
+                    "内存：${slice['memory'] is num ? (int.parse(slice['memory'])).formatSize(fixed: 1) : slice['memory']}")
               ],
             ),
             const SizedBox(
@@ -159,10 +160,10 @@ class TaskManagerState extends State<TaskManager>
               children: [
                 Expanded(
                     child: Text(
-                        "读取(秒)：${slice['byte_read_per_sec'] is num ? FormatUtil.formatSize(slice['byte_read_per_sec'], fixed: 1, showByte: true) : slice['byte_read_per_sec']}")),
+                        "读取(秒)：${slice['byte_read_per_sec'] is num ? (int.parse(slice['byte_read_per_sec'])).formatSize(fixed: 1, showByte: true) : slice['byte_read_per_sec']}")),
                 Expanded(
                     child: Text(
-                        "写入(秒)：${slice['byte_write_per_sec'] is num ? FormatUtil.formatSize(slice['byte_write_per_sec'], fixed: 1, showByte: true) : slice['byte_write_per_sec']}")),
+                        "写入(秒)：${slice['byte_write_per_sec'] is num ? (int.parse(slice['byte_write_per_sec'])).formatSize(fixed: 1, showByte: true) : slice['byte_write_per_sec']}")),
               ],
             ),
           ],
@@ -213,10 +214,10 @@ class TaskManagerState extends State<TaskManager>
               children: [
                 Expanded(
                     child: Text(
-                        "私有内存：${FormatUtil.formatSize(process['mem'] * 97, fixed: 1)}")),
+                        "私有内存：${(int.parse(process['mem'] * 97)).formatSize(fixed: 1)}")),
                 Expanded(
                     child: Text(
-                        "共享内存：${FormatUtil.formatSize(process['mem_shared'] * 1024, fixed: 2)}")),
+                        "共享内存：${(int.parse(process['mem_shared'] * 1024)).formatSize(fixed: 2)}")),
               ],
             ),
           ],
@@ -270,7 +271,7 @@ class TaskManagerState extends State<TaskManager>
                   child: TabBarView(
                     controller: _tabController,
                     children: [
-                      if (connectionStore.version == 7)
+                      if (connectionStore.dsmVersion.watch(context) == 7)
                         ListView.builder(
                           padding: const EdgeInsets.all(20),
                           itemBuilder: (context, i) {

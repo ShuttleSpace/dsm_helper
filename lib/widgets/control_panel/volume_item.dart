@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:garden/util/format_util.dart';
+import 'package:garden/util/http_util.dart';
 import 'package:garden/widgets/label.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'info_card.dart';
@@ -75,7 +75,7 @@ class VolumeItem extends StatelessWidget {
                 Text(volume['desc'] ?? (volume['vol_desc'] ?? "-")),
                 const SizedBox(height: 5),
                 Text(
-                  "${FormatUtil.formatSize(used)} / ${FormatUtil.formatSize(total)}",
+                  "${used.formatSize()} / ${total.formatSize()}",
                 ),
               ],
             ),

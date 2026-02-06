@@ -42,8 +42,8 @@ class ImageItem extends StatelessWidget {
                   width: 10,
                 ),
                 Label(
-                    HttpUtil.instance
-                        .formatSize(image['size'], fixed: 0, format: 1000),
+                    (int.parse(image['size']))
+                        .formatSize(fixed: 0, format: 1000),
                     Theme.of(context).primaryColor),
               ],
             ),

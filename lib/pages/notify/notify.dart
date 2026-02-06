@@ -11,6 +11,7 @@ import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/material.dart';
 import 'package:garden/constants/app_constants.dart';
 import 'package:html/parser.dart';
+import 'package:signals_flutter/signals_flutter.dart';
 
 class Notify extends StatefulWidget {
   final List notifies;
@@ -28,16 +29,18 @@ class NotifyState extends State<Notify> {
       List msgContent = [];
       String title = "";
       List<String> titles = notify['title'].split(":");
-      if (connectionStore.version == 7) {
+      if (connectionStore.dsmVersion.watch(context) == 7) {
         if (notify['title'] != null &&
-            connectionStore.notifyStrings.containsKey(notify['title'])) {
+            connectionStore.notifyStrings
+                .watch(context)
+                .containsKey(notify['title'])) {
           // Log.info(HttpUtil.notifyStrings[notify['title']]);
           title = connectionStore.notifyStrings[notify['title']]['title'];
 
           for (String content in msgs) {
             Map msgMap = json.decode(content);
-            String replaceContent =
-                connectionStore.notifyStrings[notify['title']]['msg'];
+            String replaceContent = connectionStore.notifyStrings
+                .watch(context)[notify['title']]['msg'];
 
             replaceContent = replaceContent
                 .replaceAll("%LINK_BEGIN%", "")
@@ -186,7 +189,7 @@ class NotifyState extends State<Notify> {
                 Expanded(
                   child: OutlinedButton(
                     onPressed: () async {
-                      var res = await Api.clearNotify();
+                      var res = await DsmApi.clearNotify();
                       if (res['success']) {
                         UiUtil.toast("清除成功");
                         if (context.mounted) {

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:garden/util/format_util.dart';
 import 'package:garden/util/ui_util.dart';
 import 'package:garden/util/http_util.dart';
 import 'package:garden/widgets/label.dart';
@@ -51,7 +50,7 @@ class ESataDeviceCard extends StatelessWidget {
                 const Spacer(),
                 OutlinedButton(
                   onPressed: () async {
-                    var res = await Api.ejectEsata(esata['dev_id']);
+                    var res = await DsmApi.ejectEsata(esata['dev_id']);
                     if (res['success']) {
                       UiUtil.toast("设备已退出");
                       onEjectSuccess?.call();
@@ -77,7 +76,7 @@ class ESataDeviceCard extends StatelessWidget {
             if (esata['size'] != null)
               Padding(
                 padding: const EdgeInsets.only(top: 5),
-                child: Text("容量：${FormatUtil.formatSize(esata['size'])}"),
+                child: Text("容量：${(int.parse(esata['size'])).formatSize()}"),
               ),
           ],
         ),

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:garden/util/format_util.dart';
+import 'package:garden/extensions/int.dart';
 
 class NetworkItem extends StatelessWidget {
   final Map<String, dynamic> network;
@@ -23,7 +23,7 @@ class NetworkItem extends StatelessWidget {
             color: Colors.blue,
           ),
           Text(
-            "${FormatUtil.formatSize(network['tx'])}/S",
+            "${int.parse((network['tx'])).formatSize()}/S",
             style: const TextStyle(color: Colors.blue),
           ),
           const Spacer(),
@@ -32,7 +32,7 @@ class NetworkItem extends StatelessWidget {
             color: Colors.green,
           ),
           Text(
-            "${FormatUtil.formatSize(network['rx'])}/S",
+            "${int.parse(network['rx']).formatSize()}/S",
             style: const TextStyle(color: Colors.green),
           ),
         ],

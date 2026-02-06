@@ -39,7 +39,7 @@ class StorageManagerState extends State<StorageManager>
   }
 
   getData() async {
-    var res = await Api.storage();
+    var res = await DsmApi.storage();
     if (res['success']) {
       setState(() {
         loading = false;

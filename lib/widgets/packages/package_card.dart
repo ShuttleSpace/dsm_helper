@@ -4,6 +4,7 @@ import 'package:garden/constants/app_constants.dart';
 import 'package:garden/widgets/cupertino_image.dart';
 import 'package:garden/widgets/label.dart';
 import 'package:garden/widgets/packages/package_button.dart';
+import 'package:signals/signals_flutter.dart';
 
 /// 套件卡片组件
 class PackageCard extends StatelessWidget {
@@ -36,7 +37,7 @@ class PackageCard extends StatelessWidget {
     if (package['thumbnail'].length > 0) {
       thumbnailUrl = package['thumbnail'].last;
       if (!thumbnailUrl.startsWith("http")) {
-        thumbnailUrl = connectionStore.baseUrl + thumbnailUrl;
+        thumbnailUrl = connectionStore.baseUrl.watch(context) + thumbnailUrl;
       }
     }
 
@@ -51,8 +52,8 @@ class PackageCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: AppConstants.paddingLarge),
+                padding: const EdgeInsets.symmetric(
+                    horizontal: AppConstants.paddingLarge),
                 child: Column(
                   children: [
                     const SizedBox(

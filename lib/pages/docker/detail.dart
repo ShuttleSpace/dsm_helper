@@ -50,7 +50,7 @@ class ContainerDetailState extends State<ContainerDetail>
   }
 
   getData() async {
-    var res = await Api.dockerDetail(widget.name, "get");
+    var res = await DsmApi.dockerDetail(widget.name, "get");
     if (res['success']) {
       setState(() {
         loading = false;
@@ -69,7 +69,7 @@ class ContainerDetailState extends State<ContainerDetail>
         cmd = res['data']['details']['exe_cmd'];
       });
 
-      var process = await Api.dockerDetail(widget.name, "get_process");
+      var process = await DsmApi.dockerDetail(widget.name, "get_process");
       if (process['success']) {
         setState(() {
           processes = process['data']['processes'];
@@ -82,7 +82,7 @@ class ContainerDetailState extends State<ContainerDetail>
   }
 
   getLogDates() async {
-    var res = await Api.dockerLog(widget.name, "get_date_list");
+    var res = await DsmApi.dockerLog(widget.name, "get_date_list");
     if (res['success']) {
       setState(() {
         logDates = res['data']['dates'];
@@ -96,7 +96,7 @@ class ContainerDetailState extends State<ContainerDetail>
   }
 
   getLog() async {
-    var log = await Api.dockerLog(widget.name, "get", date: selectedDate);
+    var log = await DsmApi.dockerLog(widget.name, "get", date: selectedDate);
     if (log['success']) {
       setState(() {
         logs = log['data']['logs'];

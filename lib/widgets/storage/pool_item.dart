@@ -1,5 +1,5 @@
+import 'package:garden/extensions/int.dart';
 import 'package:garden/widgets/label.dart';
-import 'package:garden/util/format_util.dart';
 import 'package:flutter/material.dart';
 
 class PoolItem extends StatelessWidget {
@@ -27,7 +27,7 @@ class PoolItem extends StatelessWidget {
                 const SizedBox(width: 10),
                 _buildStatusLabel(pool['status']),
                 const Spacer(),
-                Text(FormatUtil.formatSize(int.parse(pool['size']['total']))),
+                Text(int.parse(pool['size']['total']).formatSize()),
               ],
             ),
             const SizedBox(height: 10),

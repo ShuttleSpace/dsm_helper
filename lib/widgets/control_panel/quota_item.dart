@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:garden/util/format_util.dart';
 import 'package:garden/constants/app_constants.dart';
+import 'package:garden/extensions/int.dart';
 import 'package:garden/widgets/label.dart';
 
 /// 用户配额项
@@ -21,7 +21,8 @@ class QuotaItem extends StatelessWidget {
       child: Card(
         shape: RoundedRectangleBorder(
             side: const BorderSide(), borderRadius: BorderRadius.circular(18)),
-        margin: const EdgeInsets.symmetric(vertical: AppConstants.paddingSmall + 2),
+        margin:
+            const EdgeInsets.symmetric(vertical: AppConstants.paddingSmall + 2),
         child: Padding(
           padding: const EdgeInsets.all(20),
           child: Column(
@@ -29,19 +30,20 @@ class QuotaItem extends StatelessWidget {
             children: [
               Text(
                 "${quota['sharename']}",
-                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                style:
+                    const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
               ),
               const SizedBox(height: 10),
               if (quota['used'] != null && quota['quota'] != null)
                 Row(
                   children: [
                     const Text("已用："),
-                    Text(FormatUtil.formatSize(int.parse(quota['used']))),
+                    Text(int.parse(quota['used']).formatSize()),
                     const SizedBox(width: 10),
                     const Text("/"),
                     const SizedBox(width: 10),
                     const Text("配额："),
-                    Text(FormatUtil.formatSize(int.parse(quota['quota']))),
+                    Text(int.parse(quota['quota']).formatSize()),
                   ],
                 ),
               if (quota['used'] != null && quota['quota'] != null)
@@ -52,7 +54,10 @@ class QuotaItem extends StatelessWidget {
                     const Text("状态："),
                     int.parse(quota['used']) > int.parse(quota['quota'])
                         ? const Label("超限", Colors.red, fill: true)
-                        : int.parse(quota['used']) * 100 ~/ int.parse(quota['quota']) > 90
+                        : int.parse(quota['used']) *
+                                    100 ~/
+                                    int.parse(quota['quota']) >
+                                90
                             ? const Label("警告", Colors.orangeAccent, fill: true)
                             : const Label("正常", Colors.green, fill: true),
                   ],

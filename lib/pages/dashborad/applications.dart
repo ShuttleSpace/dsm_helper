@@ -12,7 +12,7 @@ import 'package:garden/pages/security_scan/security_scan.dart';
 import 'package:garden/pages/storage_manager/storage_manager.dart';
 import 'package:garden/pages/virtual_machine/virtual_machine.dart';
 import 'package:garden/constants/app_constants.dart';
-import 'package:garden/util/badge.dart';
+import 'package:garden/widgets/badge.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart' hide Badge;
 
@@ -82,7 +82,7 @@ class ApplicationList extends StatelessWidget {
                         child: Column(
                           children: [
                             Image.asset(
-                              "assets/applications/${connectionStore.version}/control_panel.png",
+                              "assets/applications/${connectionStore.dsmVersion}/control_panel.png",
                               height: 45,
                               width: 45,
                               fit: BoxFit.contain,
@@ -134,7 +134,7 @@ class ApplicationList extends StatelessWidget {
                         child: Column(
                           children: [
                             Image.asset(
-                              "assets/applications/${connectionStore.version}/package_center.png",
+                              "assets/applications/${connectionStore.dsmVersion}/package_center.png",
                               height: 45,
                               width: 45,
                               fit: BoxFit.contain,
@@ -181,7 +181,7 @@ class ApplicationList extends StatelessWidget {
                   child: Column(
                     children: [
                       Image.asset(
-                        "assets/applications/${connectionStore.version}/resource_monitor.png",
+                        "assets/applications/${connectionStore.dsmVersion}/resource_monitor.png",
                         height: 45,
                         width: 45,
                         fit: BoxFit.contain,
@@ -217,7 +217,7 @@ class ApplicationList extends StatelessWidget {
                   child: Column(
                     children: [
                       Image.asset(
-                        "assets/applications/${connectionStore.version}/storage_manager.png",
+                        "assets/applications/${connectionStore.dsmVersion}/storage_manager.png",
                         height: 45,
                         width: 45,
                         fit: BoxFit.contain,
@@ -253,7 +253,7 @@ class ApplicationList extends StatelessWidget {
                   child: Column(
                     children: [
                       Image.asset(
-                        "assets/applications/${connectionStore.version}/log_center.png",
+                        "assets/applications/${connectionStore.dsmVersion}/log_center.png",
                         height: 45,
                         width: 45,
                         fit: BoxFit.contain,
@@ -295,7 +295,7 @@ class ApplicationList extends StatelessWidget {
                         child: Column(
                           children: [
                             Image.asset(
-                              "assets/applications/${connectionStore.version}/security_scan.png",
+                              "assets/applications/${connectionStore.dsmVersion}/security_scan.png",
                               height: 45,
                               width: 45,
                               fit: BoxFit.contain,
@@ -383,7 +383,7 @@ class ApplicationList extends StatelessWidget {
                   child: Column(
                     children: [
                       Image.asset(
-                        "assets/applications/${connectionStore.version}/virtual_machine.png",
+                        "assets/applications/${connectionStore.dsmVersion}/virtual_machine.png",
                         height: 45,
                         width: 45,
                         fit: BoxFit.contain,

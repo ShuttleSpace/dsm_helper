@@ -83,10 +83,10 @@ class OtpBindState extends State<OtpBind> {
                 setState(() {
                   emailSaving = true;
                 });
-                var res = await Api.saveMail(email);
+                var res = await DsmApi.saveMail(email);
 
                 if (res['success']) {
-                  var qrcode = await Api.getQrCode(
+                  var qrcode = await DsmApi.getQrCode(
                       "${widget.username}@${connectionStore.hostname}");
                   if (qrcode['success']) {
                     setState(() {
@@ -230,7 +230,7 @@ class OtpBindState extends State<OtpBind> {
                 setState(() {
                   codeChecking = true;
                 });
-                var res = await Api.authOtpCode(code);
+                var res = await DsmApi.authOtpCode(code);
 
                 if (res['success']) {
                   setState(() {

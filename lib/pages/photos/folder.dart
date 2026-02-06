@@ -35,7 +35,7 @@ class FolderState extends State<Folder> {
       folders.add(root);
       fetchFolderDetail(root);
     } catch (e) {
-      debugPrint(e.toString());
+      Log.debug(e.toString());
     }
   }
 

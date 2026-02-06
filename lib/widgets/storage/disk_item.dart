@@ -1,5 +1,5 @@
 import 'package:garden/constants/app_constants.dart';
-import 'package:garden/util/format_util.dart';
+import 'package:garden/extensions/int.dart';
 import 'package:garden/widgets/label.dart';
 import 'package:flutter/material.dart';
 
@@ -110,7 +110,8 @@ class DiskItem extends StatelessWidget {
       children: [
         Card(
           shape: RoundedRectangleBorder(
-              side: const BorderSide(), borderRadius: BorderRadius.circular(18)),
+              side: const BorderSide(),
+              borderRadius: BorderRadius.circular(18)),
           margin: const EdgeInsets.all(10),
           child: Image.asset(
             disk['isSsd'] ? "assets/icons/ssd.png" : "assets/icons/hdd.png",
@@ -150,7 +151,7 @@ class DiskItem extends StatelessWidget {
               const SizedBox(height: 5),
               Text("${disk['vendor'].trim()} ${disk['model'].trim()}"),
               const SizedBox(height: 5),
-              Text(FormatUtil.formatSize(int.parse(disk['size_total']))),
+              Text(int.parse(disk['size_total']).formatSize()),
             ],
           ),
         )
@@ -194,17 +195,15 @@ class DiskItem extends StatelessWidget {
   Widget _buildStoragePoolRow() {
     String poolName = "-";
 
-    var pools = storagePools
-        .where((pool) => pool['id'] == disk['used_by'])
-        .toList();
+    var pools =
+        storagePools.where((pool) => pool['id'] == disk['used_by']).toList();
     if (pools.isNotEmpty) {
       poolName = "存储池 ${pools[0]['num_id']}";
     } else {
-      var ssds = ssdCaches.where((ssd) => ssd['id'] == disk['used_by']).toList();
+      var ssds =
+          ssdCaches.where((ssd) => ssd['id'] == disk['used_by']).toList();
       if (ssds.isNotEmpty) {
-        poolName = ssds[0]['id']
-            .toString()
-            .replaceFirst("ssd_", "SSD 缓存 ");
+        poolName = ssds[0]['id'].toString().replaceFirst("ssd_", "SSD 缓存 ");
       }
     }
 

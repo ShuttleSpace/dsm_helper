@@ -27,35 +27,38 @@
 在 `Util` 类中，以下状态适合迁移到 Signals：
 
 #### 连接状态
+
 ```dart
 // 传统方式
 Util.instance.sid = "xxx";
 Util.instance.account = "admin";
 
 // Signals 方式
-appStoreV2.setSid("xxx");
-appStoreV2.setAccount("admin");
+appStore.setSid("xxx");
+appStore.setAccount("admin");
 ```
 
 #### 用户设置
+
 ```dart
 // 传统方式
 Util.instance.vibrateOn = true;
 Util.instance.darkMode = 2;
 
 // Signals 方式
-appStoreV2.setVibrateOn(true);
-appStoreV2.changeMode(2);
+appStore.setVibrateOn(true);
+appStore.changeMode(2);
 ```
 
 #### UI 状态
+
 ```dart
 // 传统方式
 Util.instance.dashboardCardCollapseState = {...};
 // 需要手动调用 setState()
 
 // Signals 方式
-appStoreV2.toggleCardItemCollapse("itemName");
+appStore.toggleCardItemCollapse("itemName");
 // 自动触发 UI 更新
 ```
 
@@ -77,7 +80,7 @@ class MyWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Watch((context) {
-      return Text(appStoreV2.account);
+      return Text(appStore.account);
     });
   }
 }
@@ -86,12 +89,12 @@ class MyWidget extends StatelessWidget {
 #### 使用 computed 值
 
 ```dart
-// 在 AppStoreV2 中添加
+// 在 appStore 中添加
 final notReviewAccount = computed(() => _account.value != "jinx");
 
 // 在 UI 中使用
 Watch((context) {
-  if (appStoreV2.notReviewAccount.value) {
+  if (appStore.notReviewAccount.value) {
     return PremiumWidget();
   }
   return FreeWidget();
@@ -103,6 +106,7 @@ Watch((context) {
 #### 示例 1：登录状态
 
 **迁移前：**
+
 ```dart
 // 在登录页面
 await Api.login(...);
@@ -115,22 +119,24 @@ Text(Util.instance.account)
 ```
 
 **迁移后：**
+
 ```dart
 // 在登录页面
 await Api.login(...);
-appStoreV2.setSid(response['sid']);
-appStoreV2.setAccount(account);
+appStore.setSid(response['sid']);
+appStore.setAccount(account);
 // 自动触发所有使用这些状态的 UI 更新
 
 // 在其他页面使用
 Watch((context) {
-  return Text(appStoreV2.account);
+  return Text(appStore.account);
 })
 ```
 
 #### 示例 2：设置页面
 
 **迁移前：**
+
 ```dart
 class SettingPage extends StatefulWidget {
   @override
@@ -153,15 +159,16 @@ class _SettingPageState extends State<SettingPage> {
 ```
 
 **迁移后：**
+
 ```dart
 class SettingPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Watch((context) {
       return Switch(
-        value: appStoreV2.vibrateOn,
+        value: appStore.vibrateOn,
         onChanged: (value) {
-          appStoreV2.setVibrateOn(value);
+          appStore.setVibrateOn(value);
           // 不需要 setState()
         },
       );
@@ -172,11 +179,12 @@ class SettingPage extends StatelessWidget {
 
 ## 已创建的 Store 类
 
-### AppStoreV2
+### appStore
 
-`AppStoreV2` 是 `AppStore` 的增强版本，包含了从 `Util` 类迁移过来的所有状态：
+`appStore` 是 `AppStore` 的增强版本，包含了从 `Util` 类迁移过来的所有状态：
 
 #### 连接状态
+
 - `sid`: 会话 ID
 - `account`: 账户名
 - `baseUrl`: 基础 URL
@@ -185,22 +193,26 @@ class SettingPage extends StatelessWidget {
 - `checkSsl`: SSL 检查
 
 #### 震动设置
+
 - `vibrateOn`: 震动开关
 - `vibrateWarning`: 警告震动
 - `vibrateNormal`: 普通震动
 
 #### Dashboard 设置
+
 - `dashboardCardCollapseSwitch`: 卡片折叠开关
 - `dashboardCardCollapseState`: 卡片折叠状态
 - `isCardItemCollapsed()`: 检查卡片是否折叠
 - `toggleCardItemCollapse()`: 切换卡片折叠状态
 
 #### 下载设置
+
 - `downloadSavePath`: 下载保存路径
 - `downloadWifiOnly`: 仅 WiFi 下载
 - `downloadKey`: 下载页面 Key
 
 #### 其他
+
 - `strings`: 字符串资源
 - `notifyStrings`: 通知字符串
 - `version`: 版本号
@@ -210,7 +222,7 @@ class SettingPage extends StatelessWidget {
 ## 迁移检查清单
 
 - [ ] 识别所有使用 `Util.instance.xxx` 的地方
-- [ ] 更新状态访问为使用 `appStoreV2.xxx`
+- [ ] 更新状态访问为使用 `appStore.xxx`
 - [ ] 将需要响应式更新的 Widget 包裹在 `Watch()` 中
 - [ ] 删除不必要的 `setState()` 调用
 - [ ] 更新测试代码以使用 Signals

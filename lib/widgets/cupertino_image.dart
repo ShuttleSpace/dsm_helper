@@ -3,6 +3,7 @@ import 'package:garden/stores/connection_store.dart';
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:signals_flutter/signals_flutter.dart';
 
 class CupertinoExtendedImage extends StatelessWidget {
   final String url;
@@ -111,7 +112,7 @@ class CupertinoCircleAvatar extends StatelessWidget {
             ),
           )
         : CupertinoExtendedImage(
-            connectionStore.baseUrl + url,
+            connectionStore.baseUrl.watch(context) + url,
             width: size,
             height: size,
             fit: BoxFit.contain,

@@ -1,8 +1,10 @@
 import 'package:garden/stores/connection_store.dart';
+import 'package:garden/util/log.dart';
 import 'package:garden/util/moments_api.dart';
 import 'package:garden/widgets/moments/moments_content_tab.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/material.dart';
+import 'package:signals/signals_flutter.dart';
 
 class Moments extends StatefulWidget {
   const Moments({super.key});
@@ -27,7 +29,7 @@ class MomentsState extends State<Moments> {
   bool loadingTimeline = true;
   bool loadingAlbum = true;
   bool loadingShares = true;
-  
+
   @override
   void initState() {
     getData();
@@ -36,8 +38,8 @@ class MomentsState extends State<Moments> {
     getRecently();
     getVideos();
     getShares();
-    if (connectionStore.version == 7) {
-      debugPrint("DSM 版本为7");
+    if (connectionStore.dsmVersion.watch(context) == 7) {
+      Log.debug("DSM 版本为7");
       getGeocoding();
       getGeneral();
     }
@@ -50,7 +52,7 @@ class MomentsState extends State<Moments> {
     if (res['success'] && mounted) {
       setState(() {
         timeline = [];
-        if (connectionStore.version == 7) {
+        if (connectionStore.dsmVersion.watch(context) == 7) {
           for (var section in res['data']['section']) {
             timeline.addAll(section['list']);
           }

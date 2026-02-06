@@ -2,6 +2,7 @@ import 'package:garden/stores/connection_store.dart';
 import 'package:garden/util/strings.dart';
 import 'package:flutter/material.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
+import 'package:signals_flutter/signals_flutter.dart';
 
 class ResultCard extends StatelessWidget {
   final Map data;
@@ -24,10 +25,10 @@ class ResultCard extends StatelessWidget {
     List<Widget> items = [];
     data['fail'].forEach((k, v) {
       if (v > 0) {
-        items.add(Text(
-          "${(webManagerStrings['securityscan']['securityscan_check_${k}_${data['category']}'] ?? connectionStore.strings['SYNO.SDS.SecurityScan.Instance']['securityscan']["securityscan_check_${k}_${data['category']}"]).replaceAll("{0}", "${data['fail'][k]}")}",
-          style: TextStyle(color: colors[k]),
-        ));
+        items.add(Watch((context) => Text(
+              "${(webManagerStrings['securityscan']['securityscan_check_${k}_${data['category']}'] ?? connectionStore.strings['SYNO.SDS.SecurityScan.Instance']['securityscan']["securityscan_check_${k}_${data['category']}"]).replaceAll("{0}", "${data['fail'][k]}")}",
+              style: TextStyle(color: colors[k]),
+            )));
       }
     });
     return items;
@@ -48,7 +49,8 @@ class ResultCard extends StatelessWidget {
               children: [
                 Text(
                   "${webManagerStrings['securityscan']['securityscan_category_${data['category']}'] ?? connectionStore.strings['SYNO.SDS.SecurityScan.Instance']['securityscan']['securityscan_category_${data['category']}']}",
-                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+                  style: const TextStyle(
+                      fontSize: 18, fontWeight: FontWeight.w600),
                 ),
                 const Spacer(),
                 if (data['progress'] == 100)

@@ -122,7 +122,7 @@ abstract class ApiBase {
   static int? getErrorCode(Map response) {
     final error = response['error'];
     if (error is Map) {
-      return error['code'] as int?;
+      return int.tryParse(error['code']);
     }
     return null;
   }

@@ -1,5 +1,5 @@
+import 'package:garden/extensions/int.dart';
 import 'package:garden/widgets/label.dart';
-import 'package:garden/util/format_util.dart';
 import 'package:garden/widgets/storage/volume_item.dart';
 import 'package:garden/widgets/storage/disk_item.dart';
 import 'package:flutter/material.dart';
@@ -35,8 +35,7 @@ class PoolDetail extends StatelessWidget {
             _buildHeader(),
             _buildDeviceTypeSection(),
             const SizedBox(height: 5),
-            _buildInfoRow("支持多个存储空间",
-                pool['raidType'] == "single" ? "否" : "是"),
+            _buildInfoRow("支持多个存储空间", pool['raidType'] == "single" ? "否" : "是"),
             const SizedBox(height: 5),
             _buildAvailableCapacityRow(),
             const SizedBox(height: 20),
@@ -62,7 +61,7 @@ class PoolDetail extends StatelessWidget {
         _buildStatusLabel(pool['status']),
         const Spacer(),
         Text(
-            "${FormatUtil.formatSize(int.parse(pool['size']['used']))} / ${FormatUtil.formatSize(int.parse(pool['size']['total']))}"),
+            "${int.parse(pool['size']['used']).formatSize()} / ${int.parse(pool['size']['total']).formatSize()}"),
       ],
     );
   }
@@ -80,7 +79,7 @@ class PoolDetail extends StatelessWidget {
             "（无数据保护）",
             style: TextStyle(fontSize: 12, color: Colors.red),
           ),
-    ],
+      ],
     );
   }
 
@@ -102,8 +101,8 @@ class PoolDetail extends StatelessWidget {
   Widget _buildAvailableCapacityRow() {
     return _buildInfoRow(
       "可用容量",
-      FormatUtil.formatSize(
-          int.parse(pool['size']['total']) - int.parse(pool['size']['used'])),
+      (int.parse(pool['size']['total']) - int.parse(pool['size']['used']))
+          .formatSize(),
     );
   }
 
@@ -148,8 +147,9 @@ class PoolDetail extends StatelessWidget {
             const SizedBox(height: 10),
             Row(
               children: [
-                Text(
-                    pool['spares'] == null || pool['spares'].length == 0 ? "系统中无备援配置" : "暂不支持显示，共${pool['spares'].length}块"),
+                Text(pool['spares'] == null || pool['spares'].length == 0
+                    ? "系统中无备援配置"
+                    : "暂不支持显示，共${pool['spares'].length}块"),
               ],
             )
           ],

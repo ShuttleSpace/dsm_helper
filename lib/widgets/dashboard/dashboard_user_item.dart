@@ -1,5 +1,4 @@
 import 'package:flutter/cupertino.dart';
-import 'package:garden/util/format_util.dart';
 import 'package:garden/util/ui_util.dart';
 import 'package:flutter/material.dart';
 import 'package:garden/theme/app_colors.dart';
@@ -22,8 +21,7 @@ class DashboardUserItem extends StatelessWidget {
     DateTime loginTime =
         DateTime.parse(user['time'].toString().replaceAll("/", "-"));
     DateTime currentTime = DateTime.now();
-    Map timeLong =
-        FormatUtil.timeLong(currentTime.difference(loginTime).inSeconds);
+    Map timeLong = currentTime.difference(loginTime).inSeconds.formatTime();
 
     return Card(
       shape: RoundedRectangleBorder(
@@ -103,7 +101,8 @@ class DashboardUserItem extends StatelessWidget {
                                         onPressed: () async {
                                           Navigator.of(context).pop();
                                           user['running'] = true;
-                                          var res = await Api.kickConnection({
+                                          var res =
+                                              await DsmApi.kickConnection({
                                             "who": user['who'],
                                             "from": user['from']
                                           });

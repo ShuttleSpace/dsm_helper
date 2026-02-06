@@ -1,15 +1,16 @@
 import 'dart:io';
+import 'package:garden/util/storage_util.dart';
 import 'package:garden/util/ui_util.dart';
 import 'package:garden/stores/settings_store.dart';
 
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:garden/pages/common/select_local_folder.dart';
-import 'package:garden/util/http_util.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:garden/constants/app_constants.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:signals/signals_flutter.dart';
 
 class DownloadSetting extends StatefulWidget {
   const DownloadSetting({super.key});
@@ -19,17 +20,6 @@ class DownloadSetting extends StatefulWidget {
 }
 
 class DownloadSettingState extends State<DownloadSetting> {
-  String downloadPath = '';
-  @override
-  void initState() {
-    HttpUtil.instance.getDownloadPath().then((value) {
-      setState(() {
-        downloadPath = value;
-      });
-    });
-    super.initState();
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -75,10 +65,9 @@ class DownloadSettingState extends State<DownloadSetting> {
                   ).then((res) {
                     if (res != null && res.length == 1) {
                       setState(() {
-                        downloadPath = res[0].path;
                         settingsStore.setDownloadSavePath(res[0].path);
-                        HttpUtil.instance
-                            .setStorage("download_save_path", res[0].path);
+                        StorageUtil.setString(
+                            "download_save_path", res[0].path);
                       });
                     }
                   });
@@ -95,7 +84,7 @@ class DownloadSettingState extends State<DownloadSetting> {
                           style: TextStyle(fontSize: 12),
                         ),
                         Text(
-                          downloadPath,
+                          settingsStore.downloadSavePath.watch(context),
                           style:
                               const TextStyle(fontSize: 16, color: Colors.grey),
                         ),

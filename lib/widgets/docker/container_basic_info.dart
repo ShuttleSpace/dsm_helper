@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:garden/util/format_util.dart';
 import 'package:garden/util/http_util.dart';
 
 class ContainerBasicInfo extends StatelessWidget {
@@ -86,7 +85,7 @@ class ContainerBasicInfo extends StatelessWidget {
                 const Text("内存限制："),
                 Expanded(
                   child: Text(
-                    memory > 0 ? FormatUtil.formatSize(memory) : "自动",
+                    memory > 0 ? memory.formatSize() : "自动",
                   ),
                 ),
               ],

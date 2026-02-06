@@ -40,7 +40,7 @@ class NetworkState extends State<Network> with SingleTickerProviderStateMixin {
   }
 
   getData() async {
-    var res = await Api.networkStatus();
+    var res = await DsmApi.networkStatus();
     if (res['success']) {
       setState(() {
         loading = false;

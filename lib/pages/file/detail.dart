@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:garden/util/format_util.dart';
 import 'package:garden/util/log.dart';
 import 'package:garden/util/ui_util.dart';
 
@@ -37,10 +36,10 @@ class FileDetailState extends State<FileDetail> {
   }
 
   getDirSize() async {
-    var task = await Api.dirSizeTask(widget.file['path']);
+    var task = await DsmApi.dirSizeTask(widget.file['path']);
     if (task['success']) {
       timer = Timer.periodic(const Duration(seconds: 1), (timer) async {
-        var result = await Api.dirSizeResult(task['data']['taskid']);
+        var result = await DsmApi.dirSizeResult(task['data']['taskid']);
         Log.info(result);
         if (result['success'] && result['data']['finished']) {
           timer.cancel();
@@ -170,7 +169,7 @@ class FileDetailState extends State<FileDetail> {
                   const Text("大小："),
                   loadingSize
                       ? const CupertinoActivityIndicator()
-                      : Text(FormatUtil.formatSize(size))
+                      : Text(size.formatSize())
                 ],
               ),
             ),

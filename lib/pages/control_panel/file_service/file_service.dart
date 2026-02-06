@@ -11,7 +11,6 @@ import 'package:flutter/material.dart';
 import 'package:garden/constants/app_constants.dart';
 import 'package:garden/theme/app_colors.dart';
 import 'package:flutter/services.dart';
-import 'package:simple_logger/simple_logger.dart';
 
 class FileService extends StatefulWidget {
   const FileService({super.key});
@@ -53,8 +52,8 @@ class FileServiceState extends State<FileService>
   }
 
   getData(Function onFailure) async {
-    var res = await Api.fileService();
-    Log.logger.log(Level.INFO, "FileService: $res");
+    var res = await DsmApi.fileService();
+    Log.log("FileService: $res");
     if (res['success']) {
       setState(() {
         loading = false;
@@ -100,7 +99,7 @@ class FileServiceState extends State<FileService>
             case "SYNO.Core.FileServ.FTP.SFTP":
               setState(() {
                 sftp = item['data'];
-                Log.logger.log(Level.INFO, "SFTP: $sftp");
+                Log.log("SFTP: $sftp");
                 _sftpPortController.value =
                     TextEditingValue(text: "${sftp['portnum']}");
               });
@@ -738,7 +737,7 @@ class FileServiceState extends State<FileService>
                                             try {
                                               ftp['timeout'] = int.parse(v);
                                             } catch (e) {
-                                              Log.logger.log(Level.SEVERE,
+                                              Log.log(
                                                   "parse ftp timeout error $e");
                                             }
                                           },
@@ -771,7 +770,7 @@ class FileServiceState extends State<FileService>
                                             try {
                                               ftp['portnum'] = int.parse(v);
                                             } catch (e) {
-                                              Log.logger.log(Level.SEVERE,
+                                              Log.log(
                                                   "parse ftp portnum error: $e");
                                             }
                                           },
@@ -1009,7 +1008,7 @@ class FileServiceState extends State<FileService>
                                           try {
                                             sftp['portnum'] = int.parse(v);
                                           } catch (e) {
-                                            Log.logger.log(Level.SEVERE,
+                                            Log.log(
                                                 "parse ftp portnum error: $e");
                                           }
                                         },
@@ -1048,7 +1047,7 @@ class FileServiceState extends State<FileService>
                         setState(() {
                           saving = true;
                         });
-                        var res = await Api.fileServiceSave(
+                        var res = await DsmApi.fileServiceSave(
                             smb, syslogClient, afp, nfs, ftp, sftp);
 
                         if (res['success']) {

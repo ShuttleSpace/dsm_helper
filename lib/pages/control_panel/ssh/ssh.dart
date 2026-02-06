@@ -33,7 +33,7 @@ class SshSettingState extends State<SshSetting>
   }
 
   getData() async {
-    var res = await Api.terminalInfo();
+    var res = await DsmApi.terminalInfo();
     if (res['success']) {
       setState(() {
         loading = false;
@@ -193,15 +193,15 @@ class SshSettingState extends State<SshSetting>
                           ),
                           OutlinedButton(
                             onPressed: () async {
-                              var res =
-                                  await Api.setTerminal(ssh, telnet, sshPort);
+                              var res = await DsmApi.setTerminal(
+                                  ssh, telnet, sshPort);
                               if (res['success']) {
                                 UiUtil.vibrate(FeedbackType.light);
                                 UiUtil.toast("应用成功");
                               } else {
                                 UiUtil.vibrate(FeedbackType.warning);
-                                HttpUtil.instance
-                                    .toast("应用失败，code：${res['error']['code']}");
+                                UiUtil.toast(
+                                    "应用失败，code：${res['error']['code']}");
                               }
                             },
                             child: const Text(

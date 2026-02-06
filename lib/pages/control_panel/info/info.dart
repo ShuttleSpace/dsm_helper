@@ -1,5 +1,4 @@
 import 'package:garden/util/http_util.dart';
-import 'package:garden/util/format_util.dart';
 import 'package:garden/util/log.dart';
 import 'package:garden/widgets/bubble_tab_indicator.dart';
 import 'package:garden/widgets/dashboard/volume_card.dart';
@@ -8,7 +7,6 @@ import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:garden/constants/app_constants.dart';
-import 'package:simple_logger/simple_logger.dart';
 
 class SystemInfo extends StatefulWidget {
   final int index;
@@ -54,18 +52,18 @@ class SystemInfoState extends State<SystemInfo>
   }
 
   getData() async {
-    var res = await Api.networkInfo();
+    var res = await DsmApi.networkInfo();
     if (res['success']) {
       setState(() {
         network = res['data'];
         nifs = network['nif'];
       });
-      Log.logger.log(Level.SEVERE, "get networkInfo: $network");
+      Log.log("get networkInfo: $network");
     }
   }
 
   getDisks() async {
-    var res = await Api.storage();
+    var res = await DsmApi.storage();
     if (res['success']) {
       setState(() {
         loadingDisks = false;
@@ -273,8 +271,7 @@ class SystemInfoState extends State<SystemInfo>
                   ),
                   Row(
                     children: [
-                      Text(
-                          FormatUtil.formatSize(int.parse(disk['size_total']))),
+                      Text(int.parse(disk['size_total']).formatSize()),
                       Text("  ${disk['temp']}℃"),
                     ],
                   ),
@@ -583,8 +580,7 @@ class SystemInfoState extends State<SystemInfo>
                                     Expanded(
                                       flex: 2,
                                       child: Text(
-                                        FormatUtil.parseOpTime(
-                                            widget.system['up_time']),
+                                        parseOpTime(widget.system['up_time']),
                                         overflow: TextOverflow.ellipsis,
                                       ),
                                     ),

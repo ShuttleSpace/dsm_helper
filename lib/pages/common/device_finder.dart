@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:garden/util/log.dart';
 import 'package:garden/util/ui_util.dart';
 
 import 'package:garden/widgets/neu_back_button.dart';
@@ -27,7 +28,7 @@ class DeviceFinderState extends State<DeviceFinder> {
       ..setNavigationDelegate(
         NavigationDelegate(
           onPageStarted: (url) {
-            debugPrint("onPageStarted: $url");
+            Log.debug("onPageStarted: $url");
             setState(() {
               _isSearching = true;
               _showDeviceList = false;
@@ -35,7 +36,7 @@ class DeviceFinderState extends State<DeviceFinder> {
             });
           },
           onPageFinished: (_) {
-            debugPrint("onPageFinished");
+            Log.debug("onPageFinished");
             setState(() {});
             // 等待页面完全加载后再注入 JavaScript
             Future.delayed(const Duration(milliseconds: 500), () {
@@ -51,16 +52,16 @@ class DeviceFinderState extends State<DeviceFinder> {
                   console.log("CSP meta tag added");
                 }
               ''').then((_) {
-                debugPrint("CSP setup complete");
+                Log.debug("CSP setup complete");
                 _injectJavaScript();
               }).catchError((e) {
-                debugPrint("Error setting up CSP: $e");
+                Log.debug("Error setting up CSP: $e");
                 _injectJavaScript();
               });
             });
           },
           onWebResourceError: (WebResourceError error) {
-            debugPrint('''
+            Log.debug('''
 Page resource error:
   code: ${error.errorCode}
   description: ${error.description}
@@ -266,14 +267,14 @@ Page resource error:
 })();
     ''';
     _webviewController.runJavaScript(jsCode).then((_) {
-      debugPrint("JavaScript injected successfully");
+      Log.debug("JavaScript injected successfully");
     }).catchError((e) {
-      debugPrint("Error injecting JavaScript: $e");
+      Log.debug("Error injecting JavaScript: $e");
     });
   }
 
   void _handleMessageReceived(JavaScriptMessage message) {
-    debugPrint("Received message: ${message.message}");
+    Log.debug("Received message: ${message.message}");
     try {
       final data = message.message;
       if (data.isNotEmpty) {
@@ -293,7 +294,7 @@ Page resource error:
         }
       }
     } catch (e) {
-      debugPrint("Error parsing message: $e");
+      Log.debug("Error parsing message: $e");
     }
   }
 

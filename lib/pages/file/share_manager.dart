@@ -26,7 +26,7 @@ class ShareManagerState extends State<ShareManager> {
   }
 
   getData() async {
-    var res = await Api.listShare();
+    var res = await DsmApi.listShare();
     Log.info(res);
     if (res['success']) {
       setState(() {

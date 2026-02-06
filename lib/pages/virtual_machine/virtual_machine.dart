@@ -58,7 +58,7 @@ class VirtualMachineState extends State<VirtualMachine> {
             setState(() {
               powerLoading[guest['id']] = true;
             });
-            var res = await Api.vmmPower(guest['id'], action);
+            var res = await DsmApi.vmmPower(guest['id'], action);
             if (res['success']) {
               UiUtil.toast("请求发送成功");
               getGuests();
@@ -75,7 +75,7 @@ class VirtualMachineState extends State<VirtualMachine> {
   }
 
   getData() async {
-    var res = await Api.cluster("get");
+    var res = await DsmApi.cluster("get");
     if (res['success']) {
       if (mounted) {
         setState(() {
@@ -94,7 +94,7 @@ class VirtualMachineState extends State<VirtualMachine> {
   }
 
   getHosts() async {
-    var res = await Api.cluster("get_host");
+    var res = await DsmApi.cluster("get_host");
     if (res['success']) {
       if (mounted) {
         setState(() {
@@ -109,7 +109,7 @@ class VirtualMachineState extends State<VirtualMachine> {
   }
 
   getGuests() async {
-    var res = await Api.cluster("get_guest");
+    var res = await DsmApi.cluster("get_guest");
     if (res['success']) {
       if (mounted) {
         setState(() {
@@ -124,7 +124,7 @@ class VirtualMachineState extends State<VirtualMachine> {
   }
 
   getRepos() async {
-    var res = await Api.cluster("get_repo");
+    var res = await DsmApi.cluster("get_repo");
     if (res['success']) {
       if (mounted) {
         setState(() {
@@ -154,10 +154,10 @@ class VirtualMachineState extends State<VirtualMachine> {
         setState(() {
           powerLoading[guest['id']] = true;
         });
-        var check = await Api.checkPowerOn(guest['id']);
+        var check = await DsmApi.checkPowerOn(guest['id']);
         Log.info(check);
         if (check['success']) {
-          var res = await Api.vmmPower(guest['id'], "poweron");
+          var res = await DsmApi.vmmPower(guest['id'], "poweron");
           if (res['success']) {
             UiUtil.toast("开机请求发送成功");
             getGuests();

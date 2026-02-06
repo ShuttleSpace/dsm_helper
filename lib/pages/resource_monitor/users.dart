@@ -22,7 +22,7 @@ class UsersState extends State<Users> {
   }
 
   getData() async {
-    var res = await Api.currentConnect();
+    var res = await DsmApi.currentConnect();
     Log.info(res);
     if (res['success']) {
       setState(() {
@@ -164,7 +164,8 @@ class UsersState extends State<Users> {
                                           setState(() {
                                             user['running'] = true;
                                           });
-                                          var res = await Api.kickConnection({
+                                          var res =
+                                              await DsmApi.kickConnection({
                                             "who": user['who'],
                                             "from": user['from']
                                           });

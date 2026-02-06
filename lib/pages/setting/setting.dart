@@ -9,14 +9,15 @@ import 'package:garden/pages/login/confirm_logout.dart';
 import 'package:garden/pages/setting/helper_setting.dart';
 import 'package:garden/pages/terminal/select_server.dart';
 import 'package:garden/pages/user/setting.dart';
-import 'package:garden/stores/app_store.dart';
 import 'package:garden/stores/connection_store.dart';
+import 'package:garden/stores/settings_store.dart';
 import 'package:garden/util/http_util.dart';
 import 'package:garden/util/log.dart';
 import 'package:garden/util/storage_util.dart';
 import 'package:garden/util/ui_util.dart';
 import 'package:garden/widgets/terminal_button.dart';
 import 'package:garden/constants/app_constants.dart';
+import 'package:signals_flutter/signals_flutter.dart';
 
 class SettingButton extends StatelessWidget {
   final bool loading;
@@ -35,7 +36,7 @@ class SettingButton extends StatelessWidget {
         onPressed: onPressed,
         style: ButtonStyle(
           padding:
-              WidgetStateProperty.all(const EdgeInsets.symmetric(vertical: 6)),
+              WidgetStateProperty.all(const EdgeInsets.symmetric(vertical: 12)),
         ),
         child: Column(
           children: [
@@ -70,7 +71,7 @@ class ThemeButton extends StatelessWidget {
     return OutlinedButton(
       onPressed: () {
         Navigator.of(context).pop();
-        appStore.changeMode(type);
+        settingsStore.setDarkMode(type);
       },
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 8.0),
@@ -124,11 +125,9 @@ class SettingState extends State<Setting> {
     getData();
     getServers();
     getNormalUser();
-    HttpUtil.instance
-        .getStorage("account")
+    StorageUtil.getString("account")
         .then((value) => setState(() => account = value ?? ''));
-    HttpUtil.instance
-        .getStorage("host")
+    StorageUtil.getString("host")
         .then((value) => setState(() => host = value ?? ''));
     super.initState();
   }
@@ -141,7 +140,7 @@ class SettingState extends State<Setting> {
   }
 
   getData() async {
-    var res = await Api.terminalInfo();
+    var res = await DsmApi.terminalInfo();
     if (res['success']) {
       setState(() {
         ssh = res['data']['enable_ssh'];
@@ -158,7 +157,7 @@ class SettingState extends State<Setting> {
   }
 
   getNormalUser() async {
-    var res = await Api.normalUser("get");
+    var res = await DsmApi.normalUser("get");
     if (res['success']) {
       setState(() {
         otpEnable = res['data']['OTP_enable'];
@@ -176,7 +175,7 @@ class SettingState extends State<Setting> {
         rebooting = true;
       }
     });
-    var res = await Api.power(type, force);
+    var res = await DsmApi.power(type, force);
     setState(() {
       if (type == "shutdown") {
         shutdowning = false;
@@ -192,7 +191,8 @@ class SettingState extends State<Setting> {
       for (int i = 0; i < errors.length; i++) {
         List titles = errors[i].split(":");
         if (titles.length == 3) {
-          msgs.add(connectionStore.strings[titles[0]][titles[1]][titles[2]]);
+          msgs.add(
+              connectionStore.strings.value[titles[0]][titles[1]][titles[2]]);
         }
         //系统正在处理下列任务。现在关机可能会导致套件异常或数据丢失。是否确定要继续？
         if (context.mounted) {
@@ -642,7 +642,7 @@ class SettingState extends State<Setting> {
             spacing: 20,
             runSpacing: 20,
             children: [
-              if (connectionStore.notReviewAccount) ...[
+              if (connectionStore.notReviewAccount.watch(context)) ...[
                 SettingButton(
                     name: "关机",
                     icon: "shutdown",
@@ -701,8 +701,9 @@ class SettingState extends State<Setting> {
                                               setState(() {
                                                 sshLoading = true;
                                               });
-                                              var res = await Api.setTerminal(
-                                                  !ssh, telnet, sshPort);
+                                              var res =
+                                                  await DsmApi.setTerminal(
+                                                      !ssh, telnet, sshPort);
                                               Log.info(res);
                                               if (!res['success']) {
                                                 UiUtil.toast(

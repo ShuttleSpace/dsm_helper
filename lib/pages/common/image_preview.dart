@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'package:garden/stores/settings_store.dart';
+import 'package:garden/util/misc.dart';
 import 'package:garden/util/ui_util.dart';
 import 'dart:io';
 import 'dart:math';
@@ -10,6 +12,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:garden/constants/app_constants.dart';
 import 'package:flutter_vibrate/flutter_vibrate.dart';
+import 'package:signals_flutter/signals_flutter.dart';
 
 class ImagePreview extends StatefulWidget {
   final List<String> images;
@@ -112,8 +115,8 @@ class ImagePreviewState extends State<ImagePreview>
                           child: OutlinedButton(
                             onPressed: () async {
                               Navigator.of(context).pop();
-                              var res =
-                                  await Api.deleteTask([widget.paths[index]]);
+                              var res = await DsmApi.deleteTask(
+                                  [widget.paths[index]]);
                               if (res['success']) {
                                 UiUtil.toast("文件删除成功");
                                 if (widget.thumbs.length > index) {
@@ -425,7 +428,7 @@ class ImagePreviewState extends State<ImagePreview>
 
               return Column(
                 children: [
-                  if (HttpUtil.instance.isWechatInstalled)
+                  if (settingsStore.isWechatInstalled.watch(context))
                     SafeArea(
                       child: Container(
                         height: 56,
@@ -549,9 +552,7 @@ class MySwiperPlugin extends StatelessWidget {
                       UiUtil.toast('图片下载失败');
                       return;
                     }
-                    HttpUtil.instance
-                        .saveImage(pics[data.data!], context: context)
-                        .then((res) {
+                    saveImage(pics[data.data!], context: context).then((res) {
                       if (res['code'] == 1) {
                         UiUtil.toast("已保存到相册");
                       } else {

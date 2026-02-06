@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:garden/extensions/color.dart';
 import 'package:garden/pages/control_panel/public_access/edit_ddns.dart';
 import 'package:garden/util/http_util.dart';
 import 'package:garden/widgets/bubble_tab_indicator.dart';
@@ -47,7 +48,7 @@ class PublicAccessState extends State<PublicAccess>
   }
 
   getData() async {
-    var res = await Api.publicAccessInfo();
+    var res = await DsmApi.publicAccessInfo();
     if (res['success']) {
       List result = res['data']['result'];
       for (var item in result) {
@@ -96,7 +97,7 @@ class PublicAccessState extends State<PublicAccess>
           );
         })).then((value) async {
           if (value != null && value) {
-            await Api.ddnsUpdate(id: ddns['id'].replaceAll("USER_", "*"));
+            await DsmApi.ddnsUpdate(id: ddns['id'].replaceAll("USER_", "*"));
             getData();
           }
         });
@@ -182,7 +183,7 @@ class PublicAccessState extends State<PublicAccess>
             padding: const EdgeInsets.only(right: 10, top: 8, bottom: 8),
             child: OutlinedButton(
               onPressed: () async {
-                await Api.ddnsUpdate();
+                await DsmApi.ddnsUpdate();
                 getData();
               },
               child: const Icon(Icons.refresh),
@@ -209,22 +210,22 @@ class PublicAccessState extends State<PublicAccess>
               unselectedLabelColor: Colors.grey,
               indicator: BubbleTabIndicator(
                 indicatorColor: Theme.of(context).scaffoldBackgroundColor,
-                shadowColor: HttpUtil.getAdjustColor(
-                    Theme.of(context).scaffoldBackgroundColor, -20),
+                shadowColor:
+                    Theme.of(context).scaffoldBackgroundColor.adjust(-20),
               ),
               tabs: const [
                 Padding(
                   padding: EdgeInsets.symmetric(vertical: 10, horizontal: 5),
                   child: Text("DDNS"),
                 ),
-                // Padding(
-                //   padding: EdgeInsets.symmetric(vertical: 10, horizontal: 5),
-                //   child: Text("路由器配置"),
-                // ),
-                // Padding(
-                //   padding: EdgeInsets.symmetric(vertical: 10, horizontal: 5),
-                //   child: Text("高级设置"),
-                // ),
+                Padding(
+                  padding: EdgeInsets.symmetric(vertical: 10, horizontal: 5),
+                  child: Text("路由器配置"),
+                ),
+                Padding(
+                  padding: EdgeInsets.symmetric(vertical: 10, horizontal: 5),
+                  child: Text("高级设置"),
+                ),
               ],
             ),
           ),

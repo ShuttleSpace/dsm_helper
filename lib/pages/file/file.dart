@@ -1,6 +1,6 @@
 import 'dart:async';
+import 'package:garden/stores/settings_store.dart';
 import 'package:garden/util/file_type_util.dart';
-import 'package:garden/util/format_util.dart';
 import 'package:garden/util/ui_util.dart';
 import 'package:garden/util/storage_util.dart';
 import 'package:garden/stores/connection_store.dart';
@@ -10,7 +10,6 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:draggable_scrollbar/draggable_scrollbar.dart';
 import 'package:garden/pages/download/download_state.dart';
-import 'package:garden/stores/app_store.dart';
 import 'package:garden/util/log.dart';
 import 'package:flutter_vibrate/flutter_vibrate.dart';
 import 'package:garden/pages/common/audio_player.dart';
@@ -39,6 +38,7 @@ import 'package:garden/constants/app_constants.dart';
 import 'package:garden/theme/app_colors.dart';
 import 'package:flutter_floating/floating/floating.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:signals_flutter/signals_flutter.dart';
 
 enum ListType { list, icon }
 
@@ -107,7 +107,7 @@ class FilesState extends State<Files> {
   }
 
   getBackgroundTask() async {
-    var res = await Api.backgroundTask();
+    var res = await DsmApi.backgroundTask();
     if (res['success']) {
       if (res['data']['tasks'] != null && res['data']['tasks'].length > 0) {
         for (var task in res['data']['tasks']) {
@@ -148,8 +148,8 @@ class FilesState extends State<Files> {
 
   getCopyMoveTaskResult(String taskId) async {
     //获取复制/移动进度
-    var result = await Api.copyMoveResult(taskId);
-    Log.logger.info(result);
+    var result = await DsmApi.copyMoveResult(taskId);
+    Log.info(result);
     if (result['success'] != null && result['success']) {
       setState(() {
         backgroundProcess[taskId]['data'] = result['data'];
@@ -171,7 +171,7 @@ class FilesState extends State<Files> {
   getDeleteTaskResult(String taskId) async {
     //获取删除进度
     try {
-      var result = await Api.deleteResult(taskId);
+      var result = await DsmApi.deleteResult(taskId);
       if (result['success'] != null && result['success']) {
         if (result['data']['finished']) {
           if (showProcessList = true) {
@@ -192,7 +192,7 @@ class FilesState extends State<Files> {
   }
 
   getExtractTaskResult(String taskId) async {
-    var result = await Api.extractResult(taskId);
+    var result = await DsmApi.extractResult(taskId);
     if (result['success'] != null && result['success']) {
       if (result['data']['finished']) {
         if (result['data']['errors'] != null &&
@@ -313,7 +313,7 @@ class FilesState extends State<Files> {
   getCompressTaskResult(String taskId) async {
     //获取压缩进度
     try {
-      var result = await Api.compressResult(taskId);
+      var result = await DsmApi.compressResult(taskId);
       if (result['success'] != null && result['success']) {
         if (result['data']['finished']) {
           if (showProcessList = true) {
@@ -361,7 +361,7 @@ class FilesState extends State<Files> {
   initFloating() {}
 
   Future<List> getVolumes() async {
-    var res = await Api.volumes();
+    var res = await DsmApi.volumes();
     if (res['success']) {
       return res['data']['volumes'];
     } else {
@@ -427,7 +427,7 @@ class FilesState extends State<Files> {
       loading = true;
     });
     var res =
-        await Api.searchTask(folders, pattern, searchContent: searchContent);
+        await DsmApi.searchTask(folders, pattern, searchContent: searchContent);
     if (res['success']) {
       bool? r = await result(res['data']['taskid']);
       if (r == null) {
@@ -570,8 +570,8 @@ class FilesState extends State<Files> {
       }
       await HttpUtil.instance.download(filename, url);
     }
-    HttpUtil.instance
-        .toast("已添加${files.length > 1 ? "${files.length}个" : ""}下载任务，请至下载页面查看");
+    UiUtil.toast(
+        "已添加${files.length > 1 ? "${files.length}个" : ""}下载任务，请至下载页面查看");
     if (context.mounted) {
       // ignore: use_build_context_synchronously
       DownloadStateInherited.of(context)?.notifier.runLoop();
@@ -579,7 +579,7 @@ class FilesState extends State<Files> {
   }
 
   Future<bool?> result(String taskId) async {
-    var res = await Api.searchResult(taskId);
+    var res = await DsmApi.searchResult(taskId);
     if (res['success']) {
       if (res['data']['finished']) {
         searchTimer?.cancel();
@@ -602,7 +602,7 @@ class FilesState extends State<Files> {
   }
 
   getSmbFolder() async {
-    var res = await Api.smbFolder();
+    var res = await DsmApi.smbFolder();
     if (res['success']) {
       setState(() {
         smbFolders = res['data']['folders'];
@@ -611,7 +611,7 @@ class FilesState extends State<Files> {
   }
 
   getFtpFolder() async {
-    var res = await Api.remoteLink("ftp");
+    var res = await DsmApi.remoteLink("ftp");
     if (res['success']) {
       setState(() {
         ftpFolders = res['data']['folders'];
@@ -620,7 +620,7 @@ class FilesState extends State<Files> {
   }
 
   getSftpFolder() async {
-    var res = await Api.remoteLink("sftp");
+    var res = await DsmApi.remoteLink("sftp");
     if (res['success']) {
       setState(() {
         sftpFolders = res['data']['folders'];
@@ -629,7 +629,7 @@ class FilesState extends State<Files> {
   }
 
   getDavFolder() async {
-    var res = await Api.remoteLink("davs");
+    var res = await DsmApi.remoteLink("davs");
     if (res['success']) {
       setState(() {
         davFolders = res['data']['folders'];
@@ -652,7 +652,7 @@ class FilesState extends State<Files> {
       }
       loading = true;
     });
-    var res = await Api.shareList();
+    var res = await DsmApi.shareList();
     setState(() {
       loading = false;
       success = res['success'];
@@ -674,8 +674,8 @@ class FilesState extends State<Files> {
     setState(() {
       loading = true;
     });
-    var res =
-        await Api.fileList(path, sortBy: sortBy, sortDirection: sortDirection);
+    var res = await DsmApi.fileList(path,
+        sortBy: sortBy, sortDirection: sortDirection);
     setState(() {
       loading = false;
       success = res['success'];
@@ -1210,7 +1210,7 @@ class FilesState extends State<Files> {
                           child: OutlinedButton(
                             onPressed: () async {
                               Navigator.of(context).pop();
-                              var res = await Api.deleteTask(files);
+                              var res = await DsmApi.deleteTask(files);
                               backgroundProcess[res['data']['taskid']] = {
                                 "timer": null,
                                 "data": {
@@ -1264,7 +1264,7 @@ class FilesState extends State<Files> {
   }
 
   extractFile(file, {String password = ''}) async {
-    var res = await Api.extractTask(file['path'], "/${paths.join("/")}",
+    var res = await DsmApi.extractTask(file['path'], "/${paths.join("/")}",
         password: password);
     if (res['success']) {
       backgroundProcess[res['data']['taskid']] = {
@@ -1321,7 +1321,7 @@ class FilesState extends State<Files> {
                     OutlinedButton(
                       onPressed: () async {
                         Navigator.of(context).pop();
-                        var res = await Api.compressTask(file, destPath);
+                        var res = await DsmApi.compressTask(file, destPath);
                         if (res['success']) {
                           backgroundProcess[res['data']['taskid']] = {
                             "timer": null,
@@ -1438,10 +1438,10 @@ class FilesState extends State<Files> {
             ));
             break;
           case FileTypeEnum.movie:
-            String videoPlayer =
-                await StorageUtil.getString("video_player") ?? '';
+            bool useEmbeedVideoPlayer =
+                await StorageUtil.getBool("use_embeed_video_player") ?? true;
             String url =
-                "${connectionStore.baseUrl}/fbdownload/${Uri.encodeComponent(file['name'])}?dlink=%22${FormatUtil.utf8Encode(file['path'])}%22&_sid=%22${connectionStore.sid}%22&mode=open";
+                "${connectionStore.baseUrl}/fbdownload/${Uri.encodeComponent(file['name'])}?dlink=%22${(file['path'] as String).utf8()}%22&_sid=%22${connectionStore.sid}%22&mode=open";
             // String url = HttpUtil.baseUrl + "/fbdownload/${file['name']}?dlink=%22${HttpUtil.utf8Encode(file['path'])}%22&_sid=%22${HttpUtil.sid}%22&mode=open";
             // Log.info(url);
             // 调用nplayer
@@ -1449,7 +1449,7 @@ class FilesState extends State<Files> {
             // 调用vlc player
             // launchUrlString("vlc://$url");
             // return;
-            if (videoPlayer == '1') {
+            if (useEmbeedVideoPlayer == '1') {
               AndroidIntent intent = AndroidIntent(
                 action: 'action_view',
                 data: url,
@@ -1515,16 +1515,17 @@ class FilesState extends State<Files> {
               audioPlayerFloating?.close();
             }
             String url =
-                "${connectionStore.baseUrl}/fbdownload/${file['name']}?dlink=%22${FormatUtil.utf8Encode(file['path'])}%22&_sid=%22${connectionStore.sid}%22&mode=open";
+                "${connectionStore.baseUrl}/fbdownload/${file['name']}?dlink=%22${(file['path'] as String).utf8()}%22&_sid=%22${connectionStore.sid}%22&mode=open";
             Navigator.of(context).push(CupertinoPageRoute(builder: (context) {
               return AudioPlayer(
                 url: url,
                 name: file['name'],
               );
             })).then((_) {
-              if (appStore.player != null &&
-                  appStore.player!.state.playing &&
-                  !appStore.player!.state.completed) {
+              // FIXME:
+              // TODO:
+              if (settingsStore.player.value?.state.playing == true &&
+                  settingsStore.player.value?.state.completed == false) {
                 if (context.mounted) {
                   // ignore: use_build_context_synchronously
                   audioPlayerFloating?.open(context);
@@ -1577,7 +1578,7 @@ class FilesState extends State<Files> {
           case FileTypeEnum.pdf:
             Navigator.of(context).push(CupertinoPageRoute(builder: (context) {
               return PdfViewer(
-                  "${connectionStore.baseUrl}/fbdownload/${file['name']}?dlink=%22${FormatUtil.utf8Encode(file['path'])}%22&_sid=%22${connectionStore.sid}%22&mode=open",
+                  "${connectionStore.baseUrl}/fbdownload/${file['name']}?dlink=%22${(file['path'] as String).utf8()}%22&_sid=%22${connectionStore.sid}%22&mode=open",
                   file['name']);
             }));
             break;
@@ -1585,7 +1586,7 @@ class FilesState extends State<Files> {
             AndroidIntent intent = AndroidIntent(
               action: 'action_view',
               data:
-                  "${connectionStore.baseUrl}/fbdownload/${file['name']}?dlink=%22${FormatUtil.utf8Encode(file['path'])}%22&_sid=%22${connectionStore.sid}%22&mode=open",
+                  "${connectionStore.baseUrl}/fbdownload/${file['name']}?dlink=%22${(file['path'] as String).utf8()}%22&_sid=%22${connectionStore.sid}%22&mode=open",
               arguments: {},
               // type: "application/vnd.ms-powerpoint|application/vnd.openxmlformats-officedocument.presentationml.presentation",
             );
@@ -1916,26 +1917,22 @@ class FilesState extends State<Files> {
                                                                 () async {
                                                               if (name.trim() ==
                                                                   "") {
-                                                                HttpUtil
-                                                                    .instance
-                                                                    .toast(
-                                                                        "请输入新文件名");
+                                                                UiUtil.toast(
+                                                                    "请输入新文件名");
                                                                 return;
                                                               }
                                                               Navigator.of(
                                                                       context)
                                                                   .pop();
-                                                              var res = await Api
+                                                              var res = await DsmApi
                                                                   .rename(
                                                                       file[
                                                                           'path'],
                                                                       name);
                                                               if (res[
                                                                   'success']) {
-                                                                HttpUtil
-                                                                    .instance
-                                                                    .toast(
-                                                                        "重命名成功");
+                                                                UiUtil.toast(
+                                                                    "重命名成功");
                                                                 refresh();
                                                               } else {
                                                                 if (res['error']
@@ -1949,15 +1946,11 @@ class FilesState extends State<Files> {
                                                                             [
                                                                             'code'] ==
                                                                         414) {
-                                                                  HttpUtil
-                                                                      .instance
-                                                                      .toast(
-                                                                          "重命名失败：指定的名称已存在");
+                                                                  UiUtil.toast(
+                                                                      "重命名失败：指定的名称已存在");
                                                                 } else {
-                                                                  HttpUtil
-                                                                      .instance
-                                                                      .toast(
-                                                                          "重命名失败");
+                                                                  UiUtil.toast(
+                                                                      "重命名失败");
                                                                 }
                                                               }
                                                             },
@@ -2023,7 +2016,7 @@ class FilesState extends State<Files> {
                               child: OutlinedButton(
                                 onPressed: () async {
                                   Navigator.of(context).pop();
-                                  var res = await Api.favoriteAdd(
+                                  var res = await DsmApi.favoriteAdd(
                                       "${file['name']} - ${paths[1]}",
                                       file['path']);
                                   if (res['success']) {
@@ -2058,7 +2051,7 @@ class FilesState extends State<Files> {
                                 onPressed: () async {
                                   Navigator.of(context).pop();
                                   var res =
-                                      await Api.unMountFolder(file['path']);
+                                      await DsmApi.unMountFolder(file['path']);
                                   if (res['success']) {
                                     UiUtil.toast("卸载成功");
                                     refresh();
@@ -2090,8 +2083,8 @@ class FilesState extends State<Files> {
                               child: OutlinedButton(
                                 onPressed: () async {
                                   Navigator.of(context).pop();
-                                  var res =
-                                      await Api.remoteUnConnect(file['path']);
+                                  var res = await DsmApi.remoteUnConnect(
+                                      file['path']);
                                   if (res['success']) {
                                     UiUtil.toast("远程连接已断开");
                                     refresh();
@@ -2280,8 +2273,9 @@ class FilesState extends State<Files> {
                                 children: [
                                   if (!file['isdir'])
                                     TextSpan(
-                                        text: FormatUtil.formatSize(
-                                            file['additional']['size'])),
+                                        text: (int.parse(
+                                                file['additional']['size']))
+                                            .formatSize()),
                                   if (file['additional'] != null &&
                                       file['additional']['time'] != null &&
                                       file['additional']['time']['mtime'] !=
@@ -2531,7 +2525,7 @@ class FilesState extends State<Files> {
                   setState(() {
                     favoriteLoading = true;
                   });
-                  var res = await Api.favoriteList();
+                  var res = await DsmApi.favoriteList();
                   setState(() {
                     favoriteLoading = false;
                   });
@@ -2672,7 +2666,7 @@ class FilesState extends State<Files> {
               ),
             ),
           ),
-          if (connectionStore.notReviewAccount &&
+          if (connectionStore.notReviewAccount.watch(context) &&
               paths.isNotEmpty &&
               !multiSelect)
             Padding(
@@ -2985,7 +2979,7 @@ class FilesState extends State<Files> {
                                                                                 path =
                                                                                 "/${paths.join("/")}";
                                                                             var res =
-                                                                                await Api.createFolder(path, name);
+                                                                                await DsmApi.createFolder(path, name);
                                                                             if (res['success']) {
                                                                               UiUtil.toast("文件夹创建成功");
                                                                               refresh();
@@ -3451,7 +3445,7 @@ class FilesState extends State<Files> {
                                         List<String> files = selectedFiles
                                             .map((e) => e['path'] as String)
                                             .toList();
-                                        var res = await Api.copyMoveTask(
+                                        var res = await DsmApi.copyMoveTask(
                                             files, folder[0], true);
                                         if (res['success']) {
                                           setState(() {
@@ -3503,7 +3497,7 @@ class FilesState extends State<Files> {
                                         List<String> files = selectedFiles
                                             .map((e) => e['path'] as String)
                                             .toList();
-                                        var res = await Api.copyMoveTask(
+                                        var res = await DsmApi.copyMoveTask(
                                             files, folder[0], false);
                                         if (res['success']) {
                                           setState(() {

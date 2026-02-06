@@ -101,8 +101,8 @@ class SelectServerState extends State<SelectServer> {
                     servers.remove(server);
                   });
 
-                  HttpUtil.instance
-                      .setStorage("terminal_servers", jsonEncode(servers));
+                  StorageUtil.setString(
+                      "terminal_servers", jsonEncode(servers));
                   UiUtil.toast("删除成功");
                 },
                 child: Image.asset(

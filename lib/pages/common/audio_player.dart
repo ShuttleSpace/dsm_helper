@@ -2,13 +2,14 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:garden/models/player.dart';
-import 'package:garden/stores/app_store.dart';
+import 'package:garden/stores/settings_store.dart';
 import 'package:garden/theme/app_theme.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:garden/constants/app_constants.dart';
 import 'package:media_kit/media_kit.dart';
+import 'package:signals/signals_flutter.dart';
 
 class AudioPlayer extends StatefulWidget {
   const AudioPlayer({
@@ -33,8 +34,8 @@ class _AudioPlayerState extends State<AudioPlayer> {
 
   @override
   void initState() {
-    _player = appStore.player ?? Player();
-    appStore.setPlayer(_player);
+    _player = settingsStore.player.watch(context) ?? Player();
+    settingsStore.setPlayer(_player);
     title = widget.name;
 
     // 初始化状态控制器
@@ -63,8 +64,8 @@ class _AudioPlayerState extends State<AudioPlayer> {
     });
 
     // 设置音频源
-    if (appStore.audioUrl != widget.url) {
-      appStore.setAudioUrl(widget.url, title);
+    if (settingsStore.audioUrl.value != widget.url) {
+      settingsStore.setAudioUrl(widget.url, title);
       _setSource();
     }
 

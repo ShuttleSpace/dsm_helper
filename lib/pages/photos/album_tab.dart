@@ -7,6 +7,7 @@ import 'package:garden/pages/photos/general_tag_page.dart';
 import 'package:garden/pages/photos/geocoding_page.dart';
 import 'package:garden/pages/photos/timeline_page.dart';
 import 'package:garden/pages/photos/widgets/thumbnail_card.dart';
+import 'package:garden/util/log.dart';
 import 'package:garden/widgets/cupertino_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -53,21 +54,21 @@ class AlbumTabState extends State<AlbumTab> {
   getAlbum() async {
     albums = await AlbumModel.fetch(
         additional: ["sharing_info", "thumbnail"], limit: 100, isTeam: isTeam);
-    debugPrint("相册：${albums.length}");
+    Log.debug("相册：${albums.length}");
     setState(() {});
   }
 
   getRecently() async {
     recentlyAdds = await PhotoModel.recentlyAdd(
         limit: 4, isTeam: isTeam, additional: ['thumbnail'], type: 'photo');
-    debugPrint("最近添加：${recentlyAdds.length}");
+    Log.debug("最近添加：${recentlyAdds.length}");
     setState(() {});
   }
 
   getVideos() async {
     videos = await PhotoModel.fetch(
         limit: 4, isTeam: isTeam, additional: ['thumbnail'], type: 'video');
-    debugPrint("视频：${recentlyAdds.length}");
+    Log.debug("视频：${recentlyAdds.length}");
     setState(() {});
   }
 
@@ -75,14 +76,14 @@ class AlbumTabState extends State<AlbumTab> {
   getGeocoding() async {
     geocodings = await GeocodingModel.fetch(
         limit: 4, isTeam: isTeam, additional: ['thumbnail']);
-    debugPrint("位置：${recentlyAdds.length}");
+    Log.debug("位置：${recentlyAdds.length}");
     setState(() {});
   }
 
   getGeneral() async {
     generalTags = await GeneralTagModel.fetch(
         limit: 4, isTeam: isTeam, additional: ['thumbnail']);
-    debugPrint("标签：${recentlyAdds.length}");
+    Log.debug("标签：${recentlyAdds.length}");
     setState(() {});
   }
 

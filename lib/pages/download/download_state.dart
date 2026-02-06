@@ -6,6 +6,7 @@ import 'package:background_downloader/background_downloader.dart';
 import 'package:garden/pages/download/download.dart';
 import 'package:garden/util/http_util.dart';
 import 'package:flutter/widgets.dart';
+import 'package:garden/util/log.dart';
 import 'package:signals_flutter/signals_flutter.dart';
 
 class DownloadStateNotifier {
@@ -39,9 +40,10 @@ class DownloadStateNotifier {
   }
 
   void init() {
-    HttpUtil.instance.getDownloadPath().then((value) {
-      downloadPath.value = value;
-    });
+    downloadTargetDir().then((v) => {
+          // FIXME: use signals
+          // downloadPath.value = v;
+        });
     bindBackgroundIsolate();
     FileDownloader().registerCallbacks(
       taskStatusCallback: (update) =>
@@ -61,7 +63,7 @@ class DownloadStateNotifier {
       return;
     }
     _receiverPort.listen((dynamic data) {
-      debugPrint('UI Isolate Callback: $data');
+      Log.debug('UI Isolate Callback: $data');
       String id = data[0];
       TaskStatus status = data[1] ?? TaskStatus.notFound;
       int progress = data[2] ?? 0;
@@ -90,7 +92,7 @@ class DownloadStateNotifier {
         .map((e) => DownloadInfo.formTask(e as DownloadTask))
         .toList();
     loading.value = false;
-    debugPrint('runLoop: loading= ${loading.value}');
+    Log.debug('runLoop: loading= ${loading.value}');
     // 如果存在下载中任务，每秒刷新一次
     if (tasks.value
         .where((task) =>
@@ -106,7 +108,7 @@ class DownloadStateNotifier {
       multiSelect.value = false;
       selectedTasks.value = [];
     } else {
-      debugPrint("可以返回");
+      Log.debug("可以返回");
       return Future.value(true);
     }
 
@@ -115,7 +117,7 @@ class DownloadStateNotifier {
 
   static void downloadCallback(String id,
       {TaskStatus? status, double? progress}) {
-    debugPrint(
+    Log.debug(
         'Background Isolate Callback: task ($id) is in status ($status) and process ($progress)');
     IsolateNameServer.lookupPortByName('downloader_send_port')
         ?.send([id, status, progress]);

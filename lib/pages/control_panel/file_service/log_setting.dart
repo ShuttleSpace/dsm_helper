@@ -29,7 +29,7 @@ class LogSettingState extends State<LogSetting> {
   }
 
   getData(VoidCallback? callback) async {
-    var res = await Api.fileServiceLog(widget.protocol);
+    var res = await DsmApi.fileServiceLog(widget.protocol);
     if (res['success']) {
       setState(() {
         setting = res['data'];
@@ -271,7 +271,7 @@ class LogSettingState extends State<LogSetting> {
                   padding: const EdgeInsets.all(20),
                   child: OutlinedButton(
                     onPressed: () async {
-                      var res = await Api.fileServiceLogSave(
+                      var res = await DsmApi.fileServiceLogSave(
                           widget.protocol, setting);
                       Log.info("fileServiceLogSave res: $res");
                       if (res['success']) {
@@ -282,8 +282,7 @@ class LogSettingState extends State<LogSetting> {
                         }
                       } else {
                         UiUtil.vibrate(FeedbackType.warning);
-                        HttpUtil.instance
-                            .toast("应用失败，code:${res['error']['code']}");
+                        UiUtil.toast("应用失败，code:${res['error']['code']}");
                       }
                     },
                     child: const Text(

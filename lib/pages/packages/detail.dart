@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:garden/util/format_util.dart';
 import 'package:garden/util/log.dart';
 import 'package:garden/util/ui_util.dart';
 import 'package:garden/stores/connection_store.dart';
@@ -15,6 +14,7 @@ import 'package:flutter/material.dart';
 import 'package:garden/constants/app_constants.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_swiper_null_safety/flutter_swiper_null_safety.dart';
+import 'package:signals/signals_flutter.dart';
 
 class PackageDetail extends StatefulWidget {
   final Map package;
@@ -59,14 +59,14 @@ class PackageDetailState extends State<PackageDetail> {
     }
     thumbnailUrl = widget.package['thumbnail'].last;
     if (!thumbnailUrl.startsWith("http")) {
-      thumbnailUrl = connectionStore.baseUrl + thumbnailUrl;
+      thumbnailUrl = connectionStore.baseUrl.watch(context) + thumbnailUrl;
     }
     getVolumes();
     super.initState();
   }
 
   getVolumes() async {
-    var res = await Api.volumes();
+    var res = await DsmApi.volumes();
     if (res['success']) {
       setState(() {
         volumes = res['data']['volumes'];
@@ -130,7 +130,7 @@ class PackageDetailState extends State<PackageDetail> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                    "${volume['display_name']}(可用容量：${FormatUtil.formatSize(int.parse(volume['size_free_byte']))}) - ${volume['fs_type']}"),
+                                    "${volume['display_name']}(可用容量：${int.parse(volume['size_free_byte']).formatSize()}) - ${volume['fs_type']}"),
                                 const SizedBox(
                                   height: 5,
                                 ),
@@ -175,7 +175,7 @@ class PackageDetailState extends State<PackageDetail> {
     setState(() {
       installButtonText = "请稍后";
     });
-    var res = await Api.installPackageQueue(
+    var res = await DsmApi.installPackageQueue(
         widget.package['id'], widget.package['version'],
         beta: widget.beta);
     if (res['success']) {
@@ -266,7 +266,7 @@ class PackageDetailState extends State<PackageDetail> {
   }
 
   uninstallPackage() async {
-    var res = await Api.uninstallPackageTask(widget.package['id']);
+    var res = await DsmApi.uninstallPackageTask(widget.package['id']);
     if (res['success']) {
       UiUtil.toast("卸载成功");
       if (context.mounted) {
@@ -279,7 +279,7 @@ class PackageDetailState extends State<PackageDetail> {
   }
 
   install(path) async {
-    var res = await Api.installPackageTask(widget.package['id'], path);
+    var res = await DsmApi.installPackageTask(widget.package['id'], path);
     Log.info(res);
     if (res['success']) {
       UiUtil.toast("已开始安装");
@@ -290,7 +290,7 @@ class PackageDetailState extends State<PackageDetail> {
       });
       //进度
       timer = Timer.periodic(const Duration(seconds: 5), (timer) {
-        Api.installPackageStatus(res['data']['taskid']).then((value) {
+        DsmApi.installPackageStatus(res['data']['taskid']).then((value) {
           Log.info(value);
           setState(() {
             installing = !value['data']['finished'];
@@ -839,7 +839,7 @@ class PackageDetailState extends State<PackageDetail> {
                                                             Navigator.of(
                                                                     context)
                                                                 .pop();
-                                                            var res = await Api
+                                                            var res = await DsmApi
                                                                 .launchPackage(
                                                                     widget.package[
                                                                         'id'],
@@ -848,8 +848,8 @@ class PackageDetailState extends State<PackageDetail> {
                                                                     "stop");
                                                             if (res[
                                                                 'success']) {
-                                                              HttpUtil.instance
-                                                                  .toast("已停用");
+                                                              UiUtil.toast(
+                                                                  "已停用");
                                                               setState(() {
                                                                 widget.package[
                                                                         'launched'] =
@@ -901,7 +901,7 @@ class PackageDetailState extends State<PackageDetail> {
                               )
                             : OutlinedButton(
                                 onPressed: () async {
-                                  var res = await Api.launchPackage(
+                                  var res = await DsmApi.launchPackage(
                                       widget.package['id'],
                                       widget.package['dsm_apps'],
                                       "start");

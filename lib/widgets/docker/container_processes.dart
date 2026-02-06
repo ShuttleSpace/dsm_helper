@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:garden/util/format_util.dart';
 import 'package:garden/constants/app_constants.dart';
+import 'package:garden/extensions/int.dart';
 
 class ContainerProcesses extends StatelessWidget {
   final List processes;
@@ -36,7 +36,7 @@ class ContainerProcesses extends StatelessWidget {
                 ),
                 Expanded(
                   child: Text(
-                    "RAM：${FormatUtil.formatSize(process['memory'], fixed: 0)}",
+                    "RAM：${(int.parse(process['memory'])).formatSize(fixed: 0)}",
                     textAlign: TextAlign.center,
                   ),
                 ),

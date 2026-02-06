@@ -1,8 +1,8 @@
 import 'package:draggable_scrollbar/draggable_scrollbar.dart';
-import 'package:garden/util/format_util.dart';
 import 'package:garden/stores/connection_store.dart';
 import 'package:garden/pages/common/image_preview.dart';
 import 'package:garden/theme/app_colors.dart';
+import 'package:garden/util/http_util.dart';
 import 'package:garden/util/moments_api.dart';
 import 'package:garden/widgets/cupertino_image.dart';
 import 'package:garden/widgets/neu_back_button.dart';
@@ -10,6 +10,7 @@ import 'package:garden/widgets/transparent_router.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:garden/constants/app_constants.dart';
+import 'package:signals_flutter/signals_flutter.dart';
 
 class Timeline extends StatefulWidget {
   final String? category;
@@ -37,7 +38,7 @@ class TimelineState extends State<Timeline> {
     if (res['success'] && mounted) {
       setState(() {
         timeline = [];
-        if (connectionStore.version == 7) {
+        if (connectionStore.dsmVersion.watch(context) == 7) {
           for (var section in res['data']['section']) {
             timeline.addAll(section['list']);
           }
@@ -103,7 +104,7 @@ class TimelineState extends State<Timeline> {
         duration = photo['additional']['video_convert'][0]['metadata']
                 ['duration'] ~/
             1000;
-        timeLong = FormatUtil.timeLong(duration);
+        timeLong = duration.formatTime();
       } else {
         timeLong = {
           "hours": 0,
@@ -113,9 +114,9 @@ class TimelineState extends State<Timeline> {
       }
     }
     String thumbUrl =
-        '${connectionStore.baseUrl}/webapi/entry.cgi?id=${photo['additional']['thumbnail']['unit_id']}&cache_key="${photo['additional']['thumbnail']['cache_key']}"&type="unit"&size="sm"&api="SYNO.${connectionStore.version >= 7 ? "Foto" : "Photo"}.Thumbnail"&method="get"&version=1&_sid=${connectionStore.sid}';
+        '${connectionStore.baseUrl}/webapi/entry.cgi?id=${photo['additional']['thumbnail']['unit_id']}&cache_key="${photo['additional']['thumbnail']['cache_key']}"&type="unit"&size="sm"&api="SYNO.${connectionStore.dsmVersion.watch(context) >= 7 ? "Foto" : "Photo"}.Thumbnail"&method="get"&version=1&_sid=${connectionStore.sid}';
     String originalUrl =
-        '${connectionStore.baseUrl}/webapi/entry.cgi?id=${photo['additional']['thumbnail']['unit_id']}&cache_key="${photo['additional']['thumbnail']['cache_key']}"&type="unit"&size="xl"&api="SYNO.${connectionStore.version >= 7 ? "Foto" : "Photo"}.Thumbnail"&method="get"&version=1&_sid=${connectionStore.sid}';
+        '${connectionStore.baseUrl}/webapi/entry.cgi?id=${photo['additional']['thumbnail']['unit_id']}&cache_key="${photo['additional']['thumbnail']['cache_key']}"&type="unit"&size="xl"&api="SYNO.${connectionStore.dsmVersion.watch(context) >= 7 ? "Foto" : "Photo"}.Thumbnail"&method="get"&version=1&_sid=${connectionStore.sid}';
     return GestureDetector(
       onTap: () {
         Navigator.of(context).push(TransparentPageRoute(

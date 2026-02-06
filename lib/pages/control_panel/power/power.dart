@@ -86,7 +86,7 @@ class PowerState extends State<Power> with SingleTickerProviderStateMixin {
   }
 
   getData() async {
-    Api.powerStatus().then((res) {
+    DsmApi.powerStatus().then((res) {
       if (res['success']) {
         setState(() {
           loading = false;
@@ -288,7 +288,7 @@ class PowerState extends State<Power> with SingleTickerProviderStateMixin {
                             padding: const EdgeInsets.all(20),
                             child: OutlinedButton(
                               onPressed: () async {
-                                var res = await Api.powerSet(enableZram,
+                                var res = await DsmApi.powerSet(enableZram,
                                     powerRecovery, beepControl, fanSpeed, led);
                                 if (res['success']) {
                                   if (res['data']['has_fail'] == false) {
@@ -300,8 +300,8 @@ class PowerState extends State<Power> with SingleTickerProviderStateMixin {
                                   }
                                   getData();
                                 } else {
-                                  HttpUtil.instance
-                                      .toast("保存失败,代码${res['error']['code']}");
+                                  UiUtil.toast(
+                                      "保存失败,代码${res['error']['code']}");
                                 }
                               },
                               child: const Text(
@@ -433,7 +433,7 @@ class PowerState extends State<Power> with SingleTickerProviderStateMixin {
                                         e.remove("type");
                                         return e;
                                       }).toList();
-                                      var res = await Api.powerScheduleSave(
+                                      var res = await DsmApi.powerScheduleSave(
                                           powerOns, powerOffs);
                                       if (res['success']) {
                                         UiUtil.toast("保存成功");
@@ -515,7 +515,7 @@ class PowerState extends State<Power> with SingleTickerProviderStateMixin {
                             padding: const EdgeInsets.all(20),
                             child: OutlinedButton(
                               onPressed: () async {
-                                var res = await Api.powerHibernationSave(
+                                var res = await DsmApi.powerHibernationSave(
                                   internalHdIdletime:
                                       hibernation['internal_hd_idletime'],
                                   sataDeepSleep:
@@ -531,8 +531,8 @@ class PowerState extends State<Power> with SingleTickerProviderStateMixin {
                                   UiUtil.toast("保存成功");
                                   getData();
                                 } else {
-                                  HttpUtil.instance
-                                      .toast("保存失败,代码${res['error']['code']}");
+                                  UiUtil.toast(
+                                      "保存失败,代码${res['error']['code']}");
                                 }
                               },
                               child: const Text(

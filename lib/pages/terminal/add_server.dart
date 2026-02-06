@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:garden/util/log.dart';
 import 'package:garden/util/ui_util.dart';
 import 'package:garden/util/storage_util.dart';
 
@@ -111,7 +112,7 @@ class AddServerState extends State<AddServer> {
                     });
                     UiUtil.toast("已选择设备: ${data['name'] ?? host}");
                   } catch (e) {
-                    debugPrint("Error parsing device info: $e");
+                    Log.debug("Error parsing device info: $e");
                     UiUtil.toast("解析设备信息失败");
                   }
                 }

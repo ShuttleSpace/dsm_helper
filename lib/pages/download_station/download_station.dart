@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'package:garden/util/file_type_util.dart';
-import 'package:garden/util/format_util.dart';
 
 import 'package:garden/pages/download_station/add_task.dart';
 import 'package:garden/pages/download_station/detail.dart';
@@ -43,7 +42,7 @@ class DownloadStationState extends State<DownloadStation> {
   }
 
   getData() async {
-    var res = await Api.downloadStationInfo();
+    var res = await DsmApi.downloadStationInfo();
     if (!mounted) {
       return;
     }
@@ -126,7 +125,7 @@ class DownloadStationState extends State<DownloadStation> {
                               setState(() {
                                 pauseLoading[download['id']] = true;
                               });
-                              var res = await Api.downloadTaskAction(
+                              var res = await DsmApi.downloadTaskAction(
                                   [download['id']],
                                   download['status'] == 2 ? "pause" : "resume");
                               setState(() {
@@ -166,12 +165,12 @@ class DownloadStationState extends State<DownloadStation> {
                           if (download['status'] != 5)
                             TextSpan(
                               text:
-                                  "${FormatUtil.formatSize(download['additional']['transfer']['size_downloaded'])} / ",
+                                  "${download['additional']['transfer']['size_downloaded'].formatSize()} / ",
                               style: const TextStyle(
                                   fontSize: 12, color: Colors.lightBlueAccent),
                             ),
                           TextSpan(
-                            text: FormatUtil.formatSize(download['size']),
+                            text: download['size'].formatSize(),
                             style: const TextStyle(
                                 fontSize: 12, color: Colors.grey),
                           ),
@@ -183,13 +182,13 @@ class DownloadStationState extends State<DownloadStation> {
                     Expanded(
                       child: Text(
                         download['additional']['transfer']['speed_download'] > 0
-                            ? HttpUtil.instance.timeRemaining(
-                                ((download['size'] -
+                            ? (int.parse(((download['size'] -
                                             download['additional']['transfer']
                                                 ['size_downloaded']) /
                                         download['additional']['transfer']
                                             ['speed_download'])
-                                    .ceil())
+                                    .ceil()))
+                                .timeRemaining()
                             : "--:--:--",
                         style:
                             const TextStyle(fontSize: 12, color: Colors.grey),
@@ -205,7 +204,7 @@ class DownloadStationState extends State<DownloadStation> {
                           )
                         : download['status'] == 2
                             ? Text(
-                                "${FormatUtil.formatSize(download['additional']['transfer']['speed_download'])}/s",
+                                "${download['additional']['transfer']['speed_download'].formatSize()}/s",
                                 style: const TextStyle(
                                     fontSize: 12,
                                     color: Colors.lightBlueAccent),
@@ -352,7 +351,7 @@ class DownloadStationState extends State<DownloadStation> {
                     color: Colors.lightBlueAccent,
                   ),
                   Text(
-                    FormatUtil.formatSize(downloadRate),
+                    downloadRate.formatSize(),
                     style: const TextStyle(
                       color: Colors.lightBlueAccent,
                     ),
@@ -366,7 +365,7 @@ class DownloadStationState extends State<DownloadStation> {
                     color: Colors.orange,
                   ),
                   Text(
-                    FormatUtil.formatSize(uploadRate),
+                    uploadRate.formatSize(),
                     style: const TextStyle(
                       color: Colors.orange,
                     ),

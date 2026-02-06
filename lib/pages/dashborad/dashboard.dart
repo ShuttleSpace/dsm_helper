@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:garden/util/format_util.dart';
 import 'package:garden/stores/settings_store.dart';
 import 'package:garden/stores/connection_store.dart';
 import 'dart:math';
@@ -18,9 +17,9 @@ import 'package:garden/pages/log_center/log_center.dart';
 import 'package:garden/pages/notify/notify.dart';
 import 'package:garden/pages/resource_monitor/performance.dart';
 import 'package:garden/pages/resource_monitor/resource_monitor.dart';
-import 'package:garden/stores/app_store.dart';
 import 'package:garden/theme/app_theme.dart';
 import 'package:garden/util/http_util.dart';
+import 'package:garden/util/log.dart';
 import 'package:garden/widgets/animation_progress_bar.dart';
 import 'package:garden/widgets/dashboard/dashboard_log_item.dart';
 import 'package:garden/widgets/dashboard/dashboard_task_item.dart';
@@ -100,7 +99,7 @@ class DashboardState extends State<Dashboard> {
     networks = List.generate(20, (i) => {"tx": 0, "rx": 0});
     getNotifyStrings();
     ApiModel.fetch().then((apis) {
-      Api.apiList = apis;
+      DsmApi.apiList = apis;
     });
     getInfo().then((_) {
       getData(init: true);
@@ -119,8 +118,8 @@ class DashboardState extends State<Dashboard> {
   }
 
   getNotifyStrings() async {
-    var res = await Api.notifyStrings();
-    debugPrint("notifyStrings");
+    var res = await DsmApi.notifyStrings();
+    Log.debug("notifyStrings");
     if (res['success']) {
       setState(() {
         connectionStore.setNotifyStrings(res['data'] ?? {});
@@ -129,7 +128,7 @@ class DashboardState extends State<Dashboard> {
   }
 
   getExternalDevice() async {
-    var res = await Api.externalDevice();
+    var res = await DsmApi.externalDevice();
     if (res['success']) {
       List result = res['data']['result'];
       for (var item in result) {
@@ -152,7 +151,7 @@ class DashboardState extends State<Dashboard> {
   }
 
   getMediaConverter() async {
-    var res = await Api.mediaConverter("status");
+    var res = await DsmApi.mediaConverter("status");
     if (res['success'] && mounted) {
       setState(() {
         converter = res['data'];
@@ -168,7 +167,7 @@ class DashboardState extends State<Dashboard> {
   }
 
   Future<void> getInfo() async {
-    var init = await Api.initData();
+    var init = await DsmApi.initData();
     if (init['success']) {
       setState(() {
         if (init['data']['UserSettings'] != null) {
@@ -209,7 +208,7 @@ class DashboardState extends State<Dashboard> {
   getData({bool init = false}) async {
     getExternalDevice();
     getMediaConverter();
-    var res = await Api.systemInfo(widgets);
+    var res = await DsmApi.systemInfo(widgets);
 
     if (res['success']) {
       if (!mounted) {
@@ -237,7 +236,7 @@ class DashboardState extends State<Dashboard> {
             case "SYNO.Core.System":
               setState(() {
                 system = item['data'];
-                HttpUtil.instance.systemVersion(system['firmware_ver']);
+                settingsStore.setFirmwareVersion(system['firmware_ver']);
               });
               break;
             case "SYNO.Core.CurrentConnection":
@@ -312,7 +311,7 @@ class DashboardState extends State<Dashboard> {
     return IconButton(
         onPressed: () {
           setState(() {
-            settingsStore.dashboardCardCollapseState[itemName] =
+            settingsStore.dashboardCardCollapseState.watch(context)[itemName] =
                 !(_isCardItemCollapsed(itemName));
           });
         },
@@ -325,7 +324,7 @@ class DashboardState extends State<Dashboard> {
     if (widget == "SYNO.SDS.SystemInfoApp.SystemHealthWidget") {
       return GestureDetector(
         onTap: () {
-          if (connectionStore.notReviewAccount) {
+          if (connectionStore.notReviewAccount.watch(context)) {
             Navigator.of(context).push(CupertinoPageRoute(builder: (context) {
               return SystemInfo(0, system, volumes, disks);
             }));
@@ -344,7 +343,7 @@ class DashboardState extends State<Dashboard> {
                   (context) {
                     return Stack(
                       children: [
-                        if (appStore.showWallpaper &&
+                        if (settingsStore.showWallpaper.watch(context) &&
                             wallpaperModel != null &&
                             (wallpaperModel!.customizeWallpaper == true ||
                                 wallpaperModel!.customizeBackground == true))
@@ -450,8 +449,7 @@ class DashboardState extends State<Dashboard> {
                                       child: Row(
                                         children: [
                                           const Text("运行时间："),
-                                          Text(FormatUtil.parseOpTime(
-                                              system['up_time'])),
+                                          Text(parseOpTime(system['up_time'])),
                                         ],
                                       ),
                                     ),
@@ -789,7 +787,7 @@ class DashboardState extends State<Dashboard> {
                             color: _uploadColor,
                           ),
                           Text(
-                            "${FormatUtil.formatSize(utilization['network']?[0]?['tx'] ?? 0)}/S",
+                            "${(utilization['network']?[0]?['tx'] ?? 0).formatSize()}/S",
                             style: TextStyle(color: _uploadColor),
                           ),
                           const SizedBox(
@@ -800,7 +798,7 @@ class DashboardState extends State<Dashboard> {
                             color: _downloadColor,
                           ),
                           Text(
-                            "${FormatUtil.formatSize(utilization['network'][0]['rx'] ?? 0)}/S",
+                            "${(utilization['network'][0]['rx'] ?? 0).formatSize()}/S",
                             style: TextStyle(color: _downloadColor),
                           ),
                         ],
@@ -850,7 +848,7 @@ class DashboardState extends State<Dashboard> {
                                           fontSize: 14,
                                         );
                                         return LineTooltipItem(
-                                            '${touchedSpot.bar.color == _uploadColor ? "上传" : "下载"}:${FormatUtil.formatSize(touchedSpot.y.floor())}',
+                                            '${touchedSpot.bar.color == _uploadColor ? "上传" : "下载"}:${(touchedSpot.y.floor()).formatSize()}',
                                             textStyle);
                                       }).toList();
                                     },
@@ -883,16 +881,15 @@ class DashboardState extends State<Dashboard> {
                                       // getTitles: chartTitle,
                                       getTitlesWidget: (value, _) {
                                         return Text(
-                                            HttpUtil.instance
-                                                .formatSize(value, fixed: 0),
+                                            (value.toInt())
+                                                .formatSize(fixed: 0),
                                             style: TextStyle(
                                               color: _chartTextColor,
                                               fontSize: 12,
                                             ));
                                       },
                                       reservedSize: 35,
-                                      interval: HttpUtil.instance
-                                          .chartInterval(maxNetworkSpeed),
+                                      interval: maxNetworkSpeed.chartInterval(),
                                     ),
                                   ),
                                 ),
@@ -1128,7 +1125,7 @@ class DashboardState extends State<Dashboard> {
 
   @override
   Widget build(BuildContext context) {
-    refreshDuration = appStore.refreshDuration;
+    refreshDuration = settingsStore.refreshDuration.watch(context);
     return Scaffold(
       key: _scaffoldKey,
       appBar: AppBar(
@@ -1137,7 +1134,7 @@ class DashboardState extends State<Dashboard> {
           children: [
             Row(
               children: [
-                if (connectionStore.notReviewAccount)
+                if (connectionStore.notReviewAccount.watch(context))
                   Padding(
                     padding: const EdgeInsets.only(left: 10, top: 8, bottom: 8),
                     child: OutlinedButton(
@@ -1264,7 +1261,7 @@ class DashboardState extends State<Dashboard> {
                     ),
                   ),
                 const Spacer(),
-                if (connectionStore.notReviewAccount)
+                if (connectionStore.notReviewAccount.watch(context))
                   Padding(
                     padding: const EdgeInsets.only(right: 8, top: 8, bottom: 8),
                     child: OutlinedButton(
@@ -1348,8 +1345,8 @@ class DashboardState extends State<Dashboard> {
                             .where((element) =>
                                 supportedShortcuts.contains(element.className))
                             .isNotEmpty &&
-                        connectionStore.notReviewAccount &&
-                        appStore.showShortcut)
+                        connectionStore.notReviewAccount.watch(context) &&
+                        settingsStore.showShortcut.watch(context))
                       ShortcutList(
                         shortcutItems,
                         system,

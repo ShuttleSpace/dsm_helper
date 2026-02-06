@@ -1,5 +1,5 @@
 import 'package:garden/constants/app_constants.dart';
-import 'package:garden/util/format_util.dart';
+import 'package:garden/extensions/int.dart';
 import 'package:garden/widgets/label.dart';
 import 'package:flutter/material.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
@@ -14,8 +14,8 @@ class VolumeItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    double usedPercent = int.parse(volume['size']['used']) /
-        int.parse(volume['size']['total']);
+    double usedPercent =
+        int.parse(volume['size']['used']) / int.parse(volume['size']['total']);
 
     return Card(
       shape: RoundedRectangleBorder(
@@ -27,7 +27,8 @@ class VolumeItem extends StatelessWidget {
           children: [
             Card(
               shape: RoundedRectangleBorder(
-                  side: const BorderSide(), borderRadius: BorderRadius.circular(18)),
+                  side: const BorderSide(),
+                  borderRadius: BorderRadius.circular(18)),
               margin: const EdgeInsets.all(10),
               child: Padding(
                 padding: const EdgeInsets.all(AppConstants.paddingSmall),
@@ -89,18 +90,16 @@ class VolumeItem extends StatelessWidget {
                   const SizedBox(
                     height: 5,
                   ),
-                  Text(
-                      "已用：${FormatUtil.formatSize(int.parse(volume['size']['used']))}"),
+                  Text("已用：${int.parse(volume['size']['used']).formatSize()}"),
                   const SizedBox(
                     height: 5,
                   ),
                   Text(
-                      "可用：${FormatUtil.formatSize(int.parse(volume['size']['total']) - int.parse(volume['size']['used']))}"),
+                      "可用：${(int.parse(volume['size']['total']) - int.parse(volume['size']['used'])).formatSize()}"),
                   const SizedBox(
                     height: 5,
                   ),
-                  Text(
-                      "全部：${FormatUtil.formatSize(int.parse(volume['size']['total']))}"),
+                  Text("全部：${int.parse(volume['size']['total']).formatSize()}"),
                 ],
               ),
             )

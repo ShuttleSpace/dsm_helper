@@ -2,6 +2,7 @@ import 'package:garden/theme/app_colors.dart';
 import 'package:garden/stores/connection_store.dart';
 import 'package:garden/widgets/cupertino_image.dart';
 import 'package:flutter/material.dart';
+import 'package:signals_flutter/signals_flutter.dart';
 
 class CategoryItemWidget extends StatelessWidget {
   final List photos;
@@ -21,7 +22,7 @@ class CategoryItemWidget extends StatelessWidget {
     if (index < photos.length) {
       Map photo = photos[index];
       String thumbUrl =
-          '${connectionStore.baseUrl}/webapi/entry.cgi?id=${photo['additional']['thumbnail']['unit_id']}&cache_key="${photo['additional']['thumbnail']['cache_key']}"&type="unit"&size="sm"&api="SYNO.${connectionStore.version >= 7 ? "Foto" : "Photo"}.Thumbnail"&method="get"&version=1&_sid=${connectionStore.sid}';
+          '${connectionStore.baseUrl}/webapi/entry.cgi?id=${photo['additional']['thumbnail']['unit_id']}&cache_key="${photo['additional']['thumbnail']['cache_key']}"&type="unit"&size="sm"&api="SYNO.${connectionStore.dsmVersion.watch(context) >= 7 ? "Foto" : "Photo"}.Thumbnail"&method="get"&version=1&_sid=${connectionStore.sid}';
       return SizedBox(
         width: itemWidth,
         height: itemWidth,

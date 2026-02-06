@@ -1,6 +1,5 @@
 import 'package:garden/util/http_util.dart';
 import 'package:garden/util/file_type_util.dart';
-import 'package:garden/util/format_util.dart';
 import 'package:garden/util/ui_util.dart';
 import 'package:garden/widgets/file_icon.dart';
 import 'package:garden/widgets/neu_back_button.dart';
@@ -29,7 +28,7 @@ class SelectFileState extends State<SelectFile> {
   }
 
   getData() async {
-    var res = await Api.downloadFileList(widget.listId[0]);
+    var res = await DsmApi.downloadFileList(widget.listId[0]);
     if (res['success']) {
       setState(() {
         title = res['data']['title'];
@@ -89,7 +88,7 @@ class SelectFileState extends State<SelectFile> {
                       height: 5,
                     ),
                     Text(
-                      FormatUtil.formatSize(file['size']),
+                      file['size'].formatSize(),
                       style: const TextStyle(fontSize: 12, color: Colors.grey),
                     ),
                   ],
@@ -154,7 +153,7 @@ class SelectFileState extends State<SelectFile> {
                     height: 10,
                   ),
                   Text(
-                    FormatUtil.formatSize(size),
+                    size.formatSize(),
                     style: const TextStyle(fontSize: 12, color: Colors.grey),
                   ),
                 ],
@@ -233,7 +232,7 @@ class SelectFileState extends State<SelectFile> {
             child: OutlinedButton(
               onPressed: () async {
                 if (selectedFiles.isNotEmpty) {
-                  var res = await Api.downloadCreate(
+                  var res = await DsmApi.downloadCreate(
                       widget.listId[0], widget.destination, selectedFiles);
                   if (res['success']) {
                     UiUtil.toast("下载任务创建成功");

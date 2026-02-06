@@ -1,10 +1,11 @@
+import 'package:garden/extensions/int.dart';
 import 'package:garden/pages/common/image_preview.dart';
-import 'package:garden/util/format_util.dart';
 import 'package:garden/stores/connection_store.dart';
 import 'package:garden/theme/app_colors.dart';
 import 'package:garden/widgets/cupertino_image.dart';
 import 'package:garden/widgets/transparent_router.dart';
 import 'package:flutter/material.dart';
+import 'package:signals_flutter/signals_flutter.dart';
 
 class PhotoItemWidget extends StatelessWidget {
   final Map photo;
@@ -24,9 +25,10 @@ class PhotoItemWidget extends StatelessWidget {
     Map timeLong = {};
     if (photo['type'] == "video") {
       if (photo['additional']['video_convert'].length > 0) {
-        duration = photo['additional']['video_convert'][0]['metadata']['duration'] ~/
+        duration = photo['additional']['video_convert'][0]['metadata']
+                ['duration'] ~/
             1000;
-        timeLong = FormatUtil.timeLong(duration);
+        timeLong = duration.formatTime();
       } else {
         timeLong = {
           "hours": 0,
@@ -36,7 +38,7 @@ class PhotoItemWidget extends StatelessWidget {
       }
     }
     String thumbUrl =
-        '${connectionStore.baseUrl}/webapi/entry.cgi?id=${photo['additional']['thumbnail']['unit_id']}&cache_key="${photo['additional']['thumbnail']['cache_key']}"&type="unit"&size="sm"&api="SYNO.${connectionStore.version >= 7 ? "Foto" : "Photo"}.Thumbnail"&method="get"&version=1&_sid=${connectionStore.sid}';
+        '${connectionStore.baseUrl}/webapi/entry.cgi?id=${photo['additional']['thumbnail']['unit_id']}&cache_key="${photo['additional']['thumbnail']['cache_key']}"&type="unit"&size="sm"&api="SYNO.${connectionStore.dsmVersion.watch(context) >= 7 ? "Foto" : "Photo"}.Thumbnail"&method="get"&version=1&_sid=${connectionStore.sid}';
 
     return GestureDetector(
       onTap: () {
@@ -45,7 +47,7 @@ class PhotoItemWidget extends StatelessWidget {
             return ImagePreview(
               photos
                   .map((photo) =>
-                      '${connectionStore.baseUrl}/webapi/entry.cgi?id=${photo['additional']['thumbnail']['unit_id']}&cache_key="${photo['additional']['thumbnail']['cache_key']}"&type="unit"&size="xl"&api="SYNO.${connectionStore.version >= 7 ? "Foto" : "Photo"}.Thumbnail"&method="get"&version=1&_sid=${connectionStore.sid}')
+                      '${connectionStore.baseUrl}/webapi/entry.cgi?id=${photo['additional']['thumbnail']['unit_id']}&cache_key="${photo['additional']['thumbnail']['cache_key']}"&type="unit"&size="xl"&api="SYNO.${connectionStore.dsmVersion >= 7 ? "Foto" : "Photo"}.Thumbnail"&method="get"&version=1&_sid=${connectionStore.sid}')
                   .toList(),
               photos.indexOf(photo),
               tag: "photo-${photo['additional']['thumbnail']['unit_id']}",

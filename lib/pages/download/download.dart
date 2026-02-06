@@ -1,5 +1,6 @@
 import 'package:android_intent_plus/android_intent.dart';
 import 'package:garden/util/file_type_util.dart';
+import 'package:garden/util/log.dart';
 import 'package:garden/util/ui_util.dart';
 import 'package:garden/util/storage_util.dart';
 import 'package:background_downloader/background_downloader.dart';
@@ -97,9 +98,9 @@ class DownloadState extends State<Download> {
         await _downloadStateNotifier!.runLoop();
       },
       onResume: () async {
-        debugPrint(info.task.taskId);
+        Log.debug(info.task.taskId);
         var res = await downloader.resume(info.task);
-        debugPrint("resume: $res");
+        Log.debug("resume: $res");
         await _downloadStateNotifier!.runLoop();
       },
       onDelete: () {
@@ -138,9 +139,10 @@ class DownloadState extends State<Download> {
   }
 
   Future<void> _handleVideoTap(DownloadInfo info) async {
-    String videoPlayer = await StorageUtil.getString("video_player") ?? '';
-    debugPrint(videoPlayer);
-    if (videoPlayer == '1') {
+    bool useEmbeedVideoPlayer =
+        await StorageUtil.getBool("use_embeed_video_player") ?? true;
+    Log.debug(useEmbeedVideoPlayer);
+    if (!useEmbeedVideoPlayer) {
       AndroidIntent intent = AndroidIntent(
         action: 'action_view',
         data: await info.task.filePath(),

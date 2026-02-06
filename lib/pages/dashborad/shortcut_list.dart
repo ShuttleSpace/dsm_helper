@@ -74,9 +74,9 @@ class ShortcutList extends StatelessWidget {
     switch (shortcut.className) {
       case "SYNO.SDS.PkgManApp.Instance":
         icon =
-            "assets/applications/${connectionStore.version}/package_center.png";
+            "assets/applications/${connectionStore.dsmVersion}/package_center.png";
         name = "套件中心";
-        page = Packages('DSM ${connectionStore.version}.0-10049');
+        page = Packages('DSM ${connectionStore.dsmVersion}.0-10049');
         routerName = "packages";
         if (appNotify['SYNO.SDS.PkgManApp.Instance'] != null) {
           unread = appNotify['SYNO.SDS.PkgManApp.Instance']['unread'];
@@ -84,7 +84,7 @@ class ShortcutList extends StatelessWidget {
         break;
       case "SYNO.SDS.AdminCenter.Application":
         icon =
-            "assets/applications/${connectionStore.version}/control_panel.png";
+            "assets/applications/${connectionStore.dsmVersion}/control_panel.png";
         name = "控制面板";
         page = ControlPanel(
             system,
@@ -100,7 +100,7 @@ class ShortcutList extends StatelessWidget {
         break;
       case "SYNO.SDS.StorageManager.Instance":
         icon =
-            "assets/applications/${connectionStore.version}/storage_manager.png";
+            "assets/applications/${connectionStore.dsmVersion}/storage_manager.png";
         name = "存储空间管理员";
         page = const StorageManager();
         routerName = "storage_manager";
@@ -144,14 +144,15 @@ class ShortcutList extends StatelessWidget {
 
         break;
       case "SYNO.SDS.LogCenter.Instance":
-        icon = "assets/applications/${connectionStore.version}/log_center.png";
+        icon =
+            "assets/applications/${connectionStore.dsmVersion}/log_center.png";
         name = "日志中心";
         page = const LogCenter();
         routerName = "log_center";
         break;
       case "SYNO.SDS.ResourceMonitor.Instance":
         icon =
-            "assets/applications/${connectionStore.version}/resource_monitor.png";
+            "assets/applications/${connectionStore.dsmVersion}/resource_monitor.png";
         name = "资源监控";
         page = const ResourceMonitor();
         routerName = "resource_monitor";
@@ -162,7 +163,7 @@ class ShortcutList extends StatelessWidget {
       //   break;
       case "SYNO.SDS.Virtualization.Application":
         icon =
-            "assets/applications/${connectionStore.version}/virtual_machine.png";
+            "assets/applications/${connectionStore.dsmVersion}/virtual_machine.png";
         name = "Virtual Machine Manager";
         page = const VirtualMachine();
         routerName = "virtual_machine_manager";

@@ -1,5 +1,5 @@
+import 'package:garden/extensions/int.dart';
 import 'package:garden/pages/common/image_preview.dart';
-import 'package:garden/util/format_util.dart';
 import 'package:garden/stores/connection_store.dart';
 import 'package:garden/theme/app_colors.dart';
 import 'package:garden/util/moments_api.dart';
@@ -7,6 +7,7 @@ import 'package:garden/widgets/cupertino_image.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:garden/widgets/transparent_router.dart';
 import 'package:flutter/material.dart';
+import 'package:signals_flutter/signals_flutter.dart';
 
 class Photos extends StatefulWidget {
   final Map album;
@@ -36,7 +37,7 @@ class PhotosState extends State<Photos> {
 
   Widget _buildPhotoItem(photo) {
     String thumbUrl =
-        '${connectionStore.baseUrl}/webapi/entry.cgi?id=${photo['additional']['thumbnail']['unit_id']}&cache_key="${photo['additional']['thumbnail']['cache_key']}"&type="unit"&size="sm"&api="SYNO.${connectionStore.version >= 7 ? "Foto" : "Photo"}.Thumbnail"&method="get"&version=1&_sid=${connectionStore.sid}';
+        '${connectionStore.baseUrl}/webapi/entry.cgi?id=${photo['additional']['thumbnail']['unit_id']}&cache_key="${photo['additional']['thumbnail']['cache_key']}"&type="unit"&size="sm"&api="SYNO.${connectionStore.dsmVersion.watch(context) >= 7 ? "Foto" : "Photo"}.Thumbnail"&method="get"&version=1&_sid=${connectionStore.sid}';
     return GestureDetector(
       onTap: () {
         Navigator.of(context).push(TransparentPageRoute(
@@ -44,7 +45,7 @@ class PhotosState extends State<Photos> {
             return ImagePreview(
               photos
                   .map((photo) =>
-                      '${connectionStore.baseUrl}/webapi/entry.cgi?id=${photo['additional']['thumbnail']['unit_id']}&cache_key="${photo['additional']['thumbnail']['cache_key']}"&type="unit"&size="xl"&api="SYNO.${connectionStore.version >= 7 ? "Foto" : "Photo"}.Thumbnail"&method="get"&version=1&_sid=${connectionStore.sid}')
+                      '${connectionStore.baseUrl}/webapi/entry.cgi?id=${photo['additional']['thumbnail']['unit_id']}&cache_key="${photo['additional']['thumbnail']['cache_key']}"&type="unit"&size="xl"&api="SYNO.${connectionStore.dsmVersion >= 7 ? "Foto" : "Photo"}.Thumbnail"&method="get"&version=1&_sid=${connectionStore.sid}')
                   .toList(),
               photos.indexOf(photo),
               tag: "photo-ablum-${photo['additional']['thumbnail']['unit_id']}",
@@ -85,7 +86,7 @@ class PhotosState extends State<Photos> {
                     ),
                     const SizedBox(height: 5),
                     Text(
-                      "${FormatUtil.timeLong(5235)['hours'].toString().padLeft(2, "0")}:${FormatUtil.timeLong(5235)['minutes'].toString().padLeft(2, "0")}:${FormatUtil.timeLong(5235)['seconds'].toString().padLeft(2, "0")}",
+                      "${5235.formatTime()['hours'].toString().padLeft(2, "0")}:${5235.formatTime()['minutes'].toString().padLeft(2, "0")}:${5235.formatTime()['seconds'].toString().padLeft(2, "0")}",
                       style: const TextStyle(color: Colors.white, fontSize: 12),
                     ),
                   ],
@@ -127,11 +128,11 @@ class PhotosState extends State<Photos> {
                 background: Hero(
                   tag: widget.tag ?? '',
                   child: CupertinoExtendedImage(
-                    '${connectionStore.baseUrl}/webapi/entry.cgi?id=${widget.album['additional']['thumbnail']['unit_id']}&cache_key="${widget.album['additional']['thumbnail']['cache_key']}"&type="unit"&size="xl"&api="SYNO.${connectionStore.version >= 7 ? "Foto" : "Photo"}.Thumbnail"&method="get"&version=1&_sid=${connectionStore.sid}',
+                    '${connectionStore.baseUrl}/webapi/entry.cgi?id=${widget.album['additional']['thumbnail']['unit_id']}&cache_key="${widget.album['additional']['thumbnail']['cache_key']}"&type="unit"&size="xl"&api="SYNO.${connectionStore.dsmVersion >= 7 ? "Foto" : "Photo"}.Thumbnail"&method="get"&version=1&_sid=${connectionStore.sid}',
                     fit: BoxFit.cover,
                     height: 200,
                     placeholder: CupertinoExtendedImage(
-                      '${connectionStore.baseUrl}/webapi/entry.cgi?id=${widget.album['additional']['thumbnail']['unit_id']}&cache_key="${widget.album['additional']['thumbnail']['cache_key']}"&type="unit"&size="sm"&api="SYNO.${connectionStore.version >= 7 ? "Foto" : "Photo"}.Thumbnail"&method="get"&version=1&_sid=${connectionStore.sid}',
+                      '${connectionStore.baseUrl}/webapi/entry.cgi?id=${widget.album['additional']['thumbnail']['unit_id']}&cache_key="${widget.album['additional']['thumbnail']['cache_key']}"&type="unit"&size="sm"&api="SYNO.${connectionStore.dsmVersion >= 7 ? "Foto" : "Photo"}.Thumbnail"&method="get"&version=1&_sid=${connectionStore.sid}',
                       fit: BoxFit.cover,
                     ),
                   ),

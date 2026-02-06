@@ -1,5 +1,4 @@
 import 'package:garden/theme/app_theme.dart';
-import 'package:garden/util/format_util.dart';
 import 'package:garden/util/ui_util.dart';
 import 'package:garden/util/http_util.dart';
 import 'package:garden/widgets/bubble_tab_indicator.dart';
@@ -32,7 +31,7 @@ class ExternalDeviceState extends State<ExternalDevice>
   }
 
   getData() async {
-    var res = await Api.externalDevice();
+    var res = await DsmApi.externalDevice();
     if (res['success']) {
       setState(() {
         loading = false;
@@ -169,17 +168,17 @@ class ExternalDeviceState extends State<ExternalDevice>
                         height: 5,
                       ),
                       Text(
-                          "已用：${FormatUtil.formatSize(partition['used_size_mb'] * 1024 * 1024)}"),
+                          "已用：${(partition['used_size_mb'] * 1024 * 1024).formatSize()}"),
                       const SizedBox(
                         height: 5,
                       ),
                       Text(
-                          "可用：${FormatUtil.formatSize(partition['total_size_mb'] * 1024 * 1024 - partition['used_size_mb'] * 1024 * 1024)}"),
+                          "可用：${(partition['total_size_mb'] * 1024 * 1024 - partition['used_size_mb'] * 1024 * 1024).formatSize()}"),
                       const SizedBox(
                         height: 5,
                       ),
                       Text(
-                          "容量：${FormatUtil.formatSize(partition['total_size_mb'] * 1024 * 1024)}"),
+                          "容量：${(partition['total_size_mb'] * 1024 * 1024).formatSize()}"),
                     ],
                   ),
                 )
@@ -228,7 +227,7 @@ class ExternalDeviceState extends State<ExternalDevice>
                 const Spacer(),
                 OutlinedButton(
                   onPressed: () async {
-                    var res = await Api.ejectEsata(esata['dev_id']);
+                    var res = await DsmApi.ejectEsata(esata['dev_id']);
                     if (res['success']) {
                       UiUtil.toast("设备已退出");
                       getData();

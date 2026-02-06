@@ -9,10 +9,8 @@ import 'package:flutter_vibrate/flutter_vibrate.dart';
 import 'package:garden/constants/app_constants.dart';
 import 'package:garden/pages/common/gesture_password.dart';
 import 'package:garden/pages/setting/player_setting.dart';
-import 'package:garden/stores/app_store.dart';
 import 'package:garden/stores/settings_store.dart';
 import 'package:garden/theme/app_colors.dart';
-import 'package:garden/util/http_util.dart';
 import 'package:garden/util/storage_util.dart';
 import 'package:garden/util/ui_util.dart';
 import 'package:garden/widgets/neu_back_button.dart';
@@ -52,19 +50,12 @@ class HelperSettingState extends State<HelperSetting> {
   }
 
   initAuth() async {
-    String launchAuthStr = await StorageUtil.getString("launch_auth") ?? '';
-    String launchAuthPasswordStr =
-        await StorageUtil.getString("launch_auth_password") ?? '';
-    String launchAuthBiometricsStr =
-        await StorageUtil.getString("launch_auth_biometrics") ?? '';
-    String videoPlayerStr = await StorageUtil.getString("video_player") ?? '';
-    String launchAccountPageStr =
-        await StorageUtil.getString('launch_account_page') ?? '';
-    videoPlayer = videoPlayerStr == '1';
-    launchAuth = launchAuthStr == "1";
-    password = launchAuthPasswordStr == "1";
-    biometrics = launchAuthBiometricsStr == "1";
-    launchAccountPage = launchAccountPageStr == "1";
+    launchAuth = await StorageUtil.getBool("launch_auth") ?? false;
+    password = await StorageUtil.getBool("launch_auth_password") ?? false;
+    biometrics = await StorageUtil.getBool("launch_auth_biometrics") ?? false;
+    videoPlayer = await StorageUtil.getBool("use_embeed_video_player") ?? false;
+    launchAccountPage =
+        await StorageUtil.getBool('launch_account_page') ?? false;
     canCheckBiometrics = await auth.canCheckBiometrics;
     setState(() {});
     if (canCheckBiometrics) {
@@ -97,10 +88,11 @@ class HelperSettingState extends State<HelperSetting> {
           GestureDetector(
             onTap: () {
               setState(() {
-                settingsStore.setVibrateOn(!settingsStore.vibrateOn);
-                StorageUtil.setString(
-                    "vibrate_on", settingsStore.vibrateOn ? "1" : "0");
-                if (settingsStore.vibrateOn) {
+                settingsStore
+                    .setVibrateOn(!settingsStore.vibrateOn.watch(context));
+                StorageUtil.setBool(
+                    "vibrate_on", settingsStore.vibrateOn.watch(context));
+                if (settingsStore.vibrateOn.watch(context)) {
                   UiUtil.vibrate(FeedbackType.light);
                 }
               });
@@ -127,14 +119,14 @@ class HelperSettingState extends State<HelperSetting> {
                           style: TextStyle(fontSize: 16),
                         ),
                         const Spacer(),
-                        if (settingsStore.vibrateOn)
+                        if (settingsStore.vibrateOn.watch(context))
                           const Icon(
                             CupertinoIcons.checkmark_alt,
                             color: AppColors.primaryAction,
                           ),
                       ],
                     ),
-                    if (settingsStore.vibrateOn)
+                    if (settingsStore.vibrateOn.watch(context))
                       Card(
                         shape: RoundedRectangleBorder(
                             side: const BorderSide(),
@@ -148,13 +140,14 @@ class HelperSettingState extends State<HelperSetting> {
                                 onTap: () {
                                   setState(() {
                                     settingsStore.setVibrateNormal(
-                                        !settingsStore.vibrateNormal);
-                                    StorageUtil.setString(
+                                        !settingsStore.vibrateNormal
+                                            .watch(context));
+                                    StorageUtil.setBool(
                                         "vibrate_warning",
                                         settingsStore.vibrateNormal
-                                            ? "1"
-                                            : "0");
-                                    if (settingsStore.vibrateNormal) {
+                                            .watch(context));
+                                    if (settingsStore.vibrateNormal
+                                        .watch(context)) {
                                       UiUtil.vibrate(FeedbackType.light);
                                     }
                                   });
@@ -175,7 +168,8 @@ class HelperSettingState extends State<HelperSetting> {
                                               fontSize: 16, height: 1.6),
                                         ),
                                         const Spacer(),
-                                        if (settingsStore.vibrateNormal)
+                                        if (settingsStore.vibrateNormal
+                                            .watch(context))
                                           const Icon(
                                             CupertinoIcons.checkmark_alt,
                                             color: AppColors.primaryAction,
@@ -192,15 +186,15 @@ class HelperSettingState extends State<HelperSetting> {
                                 onTap: () {
                                   setState(() {
                                     settingsStore.setVibrateWarning(
-                                        !settingsStore.vibrateWarning);
-                                    StorageUtil.setString(
+                                        !settingsStore.vibrateWarning
+                                            .watch(context));
+                                    StorageUtil.setBool(
                                         "vibrate_warning",
                                         settingsStore.vibrateWarning
-                                            ? "1"
-                                            : "0");
-                                    if (settingsStore.vibrateWarning) {
-                                      HttpUtil.instance
-                                          .vibrate(FeedbackType.warning);
+                                            .watch(context));
+                                    if (settingsStore.vibrateWarning
+                                        .watch(context)) {
+                                      UiUtil.vibrate(FeedbackType.warning);
                                     }
                                   });
                                 },
@@ -220,7 +214,8 @@ class HelperSettingState extends State<HelperSetting> {
                                               fontSize: 16, height: 1.6),
                                         ),
                                         const Spacer(),
-                                        if (settingsStore.vibrateWarning)
+                                        if (settingsStore.vibrateWarning
+                                            .watch(context))
                                           const Icon(
                                             CupertinoIcons.checkmark_alt,
                                             color: AppColors.primaryAction,
@@ -254,8 +249,7 @@ class HelperSettingState extends State<HelperSetting> {
               );
               setState(() {
                 videoPlayer = !videoPlayer;
-                HttpUtil.instance
-                    .setStorage("video_player", videoPlayer ? "1" : "0");
+                StorageUtil.setBool("use_embeed_video_player", videoPlayer);
               });
             },
             child: Card(
@@ -303,10 +297,10 @@ class HelperSettingState extends State<HelperSetting> {
                           top: MediaQuery.viewPaddingOf(context).top),
                       child: NeuPicker(
                         List.generate(20, (index) => "${index + 1}"),
-                        value: List.generate(20, (index) => index + 1)
-                            .indexOf(appStore.refreshDuration),
+                        value: List.generate(20, (index) => index + 1).indexOf(
+                            settingsStore.refreshDuration.watch(context)),
                         onConfirm: (v) {
-                          appStore.setRefreshDuration(v + 1);
+                          settingsStore.setRefreshDuration(v + 1);
                         },
                       ),
                     );
@@ -334,7 +328,7 @@ class HelperSettingState extends State<HelperSetting> {
                         style: TextStyle(fontSize: 16, height: 1.6),
                       ),
                       const Spacer(),
-                      Text("${appStore.refreshDuration}秒")
+                      Text("${settingsStore.refreshDuration}秒")
                     ],
                   ),
                 ),
@@ -348,8 +342,7 @@ class HelperSettingState extends State<HelperSetting> {
             onTap: () {
               setState(() {
                 launchAccountPage = !launchAccountPage;
-                StorageUtil.setString(
-                    "launch_account_page", launchAccountPage ? "1" : "0");
+                StorageUtil.setBool("launch_account_page", launchAccountPage);
               });
             },
             child: Card(
@@ -390,7 +383,7 @@ class HelperSettingState extends State<HelperSetting> {
             onTap: () {
               setState(() {
                 launchAuth = !launchAuth;
-                StorageUtil.setString("launch_auth", launchAuth ? "1" : "0");
+                StorageUtil.setBool("launch_auth", launchAuth);
               });
             },
             child: Card(
@@ -438,11 +431,11 @@ class HelperSettingState extends State<HelperSetting> {
                                     if (password) {
                                       setState(() {
                                         password = false;
-                                        StorageUtil.setString(
-                                            "launch_auth_password", "0");
+                                        StorageUtil.setBool(
+                                            "launch_auth_password", false);
                                         biometrics = false;
-                                        StorageUtil.setString(
-                                            "launch_auth_biometrics", "0");
+                                        StorageUtil.setBool(
+                                            "launch_auth_biometrics", false);
                                       });
                                     } else {
                                       Navigator.of(context).push(
@@ -453,9 +446,9 @@ class HelperSettingState extends State<HelperSetting> {
                                         if (res != null && res) {
                                           setState(() {
                                             password = true;
-                                            StorageUtil.setString(
+                                            StorageUtil.setBool(
                                                 "launch_auth_password",
-                                                password ? "1" : "0");
+                                                password);
                                           });
                                         }
                                       });
@@ -502,8 +495,7 @@ class HelperSettingState extends State<HelperSetting> {
                                   onTap: () async {
                                     if (biometrics == false) {
                                       if (password == false) {
-                                        HttpUtil.instance
-                                            .vibrate(FeedbackType.warning);
+                                        UiUtil.vibrate(FeedbackType.warning);
                                         UiUtil.toast("请先开启图形密码后再开启指纹");
                                         return;
                                       }
@@ -541,9 +533,9 @@ class HelperSettingState extends State<HelperSetting> {
                                         auth.stopAuthentication();
                                         setState(() {
                                           biometrics = didAuthenticate;
-                                          StorageUtil.setString(
+                                          StorageUtil.setBool(
                                               "launch_auth_biometrics",
-                                              biometrics ? "1" : "0");
+                                              biometrics);
                                         });
                                       } on PlatformException catch (e) {
                                         if (e.code == auth_error.notAvailable) {
@@ -561,9 +553,9 @@ class HelperSettingState extends State<HelperSetting> {
                                     } else {
                                       setState(() {
                                         biometrics = false;
-                                        StorageUtil.setString(
+                                        StorageUtil.setBool(
                                             "launch_auth_biometrics",
-                                            biometrics ? "1" : "0");
+                                            biometrics);
                                       });
                                     }
 
@@ -648,7 +640,7 @@ class HelperSettingState extends State<HelperSetting> {
             onPressed: () {
               setState(() {
                 settingsStore.setDashboardCardCollapseSwitch(
-                    !settingsStore.dashboardCardCollapseSwitch);
+                    !settingsStore.dashboardCardCollapseSwitch.watch(context));
               });
             },
             // margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
@@ -663,7 +655,7 @@ class HelperSettingState extends State<HelperSetting> {
                   style: TextStyle(fontSize: 16),
                 ),
                 const Spacer(),
-                if (settingsStore.dashboardCardCollapseSwitch)
+                if (settingsStore.dashboardCardCollapseSwitch.watch(context))
                   const Icon(
                     CupertinoIcons.checkmark_alt,
                     color: AppColors.primaryAction,
