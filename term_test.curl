@@ -28,3 +28,5 @@ curl 'http://192.168.8.40:5000/webapi/query.cgi?api=SYNO.FileStation.Info&versio
 curl 'http://192.168.8.40:5000/webapi/entry.cgi?api=SYNO.API.Info&version=1&method=query&query=SYNO.API.Auth'
 
 curl 'http://192.168.8.40:5000/webapi/entry.cgi?api=SYNO.API.Auth&version=6&method=login&account=humphrey&passwd=LocalHost8080&enable_syno_token=yes&format=sid&otp_code=030375&enable_device_token=yes'
+
+curl -k -X POST 'http://192.168.8.40:5000/entry.cgi' -d "api=SYNO.FileStation.BackgroundTask" -d "method=list" -d "version=3" -d "_sid=bhAtxDTkFsH3S73nzEcD1apJSGI-gPTiNhyahUye_VwhKY3R_ppgp59fkCKDMCbmWO67ACf-ZgT09Q-x0lAIPY"
