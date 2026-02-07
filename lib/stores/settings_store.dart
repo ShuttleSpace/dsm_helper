@@ -256,6 +256,31 @@ class SettingsStore {
       setDownloadWifiOnly(downloadWifiOnlyStr == "1");
     }
   }
+
+  void dispose() {
+    _downloadSavePath.dispose();
+    _downloadWifiOnly.dispose();
+    _showShortcut.dispose();
+    _refreshDuration.dispose();
+    _showWallpaper.dispose();
+    _darkMode.dispose();
+
+    _dashboardCardCollapseSwitch.dispose();
+    _dashboardCardCollapseState.dispose();
+
+    _isWechatInstalled.dispose();
+    _dsmApiversion.dispose();
+    _appName.dispose();
+    _firmwareVersion.dispose();
+
+    _vibrateOn.dispose();
+    _vibrateNormal.dispose();
+    _vibrateWarning.dispose();
+
+    _player.dispose();
+    _audioName.dispose();
+    _audioUrl.dispose();
+  }
 }
 
 // 全局实例
