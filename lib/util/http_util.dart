@@ -7,7 +7,6 @@ import 'package:background_downloader/background_downloader.dart';
 import 'package:dio/dio.dart';
 import 'package:dio/io.dart';
 import 'package:garden/util/log.dart';
-import 'package:flutter/foundation.dart';
 import 'package:garden/util/storage_util.dart';
 import 'package:garden/util/ui_util.dart';
 import 'package:path_provider/path_provider.dart';

@@ -1,14 +1,11 @@
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_vibrate/flutter_vibrate.dart';
 import 'package:garden/util/log.dart';
-import 'package:package_info_plus/package_info_plus.dart';
 import 'package:garden/pages/common/device_finder.dart';
 import 'package:garden/pages/login/accounts.dart';
 import 'package:garden/stores/connection_store.dart';
