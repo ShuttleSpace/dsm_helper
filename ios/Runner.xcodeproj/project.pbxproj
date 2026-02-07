@@ -521,7 +521,7 @@
 					"$(PROJECT_DIR)/Flutter",
 				);
 				MARKETING_VERSION = "$(FLUTTER_BUILD_NAME)";
-				PRODUCT_BUNDLE_IDENTIFIER = "fit.flutter.garden";
+				PRODUCT_BUNDLE_IDENTIFIER = "io.shuttle.garden";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "Runner/Runner-Bridging-Header.h";
@@ -667,7 +667,7 @@
 					"$(PROJECT_DIR)/Flutter",
 				);
 				MARKETING_VERSION = "$(FLUTTER_BUILD_NAME)";
-				PRODUCT_BUNDLE_IDENTIFIER = "fit.flutter.garden";
+				PRODUCT_BUNDLE_IDENTIFIER = "io.shuttle.garden";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "Runner/Runner-Bridging-Header.h";
@@ -705,7 +705,7 @@
 					"$(PROJECT_DIR)/Flutter",
 				);
 				MARKETING_VERSION = "$(FLUTTER_BUILD_NAME)";
-				PRODUCT_BUNDLE_IDENTIFIER = "fit.flutter.garden";
+				PRODUCT_BUNDLE_IDENTIFIER = "io.shuttle.garden";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "Runner/Runner-Bridging-Header.h";
@@ -738,7 +738,7 @@
 				MARKETING_VERSION = 0.0.138;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = "fit.flutter.garden.Sharing-Extension";
+				PRODUCT_BUNDLE_IDENTIFIER = "io.shuttle.garden.Sharing-Extension";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
@@ -771,7 +771,7 @@
 				);
 				MARKETING_VERSION = 0.0.138;
 				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = "fit.flutter.garden.Sharing-Extension";
+				PRODUCT_BUNDLE_IDENTIFIER = "io.shuttle.garden.Sharing-Extension";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SWIFT_VERSION = 5.0;
@@ -802,7 +802,7 @@
 				);
 				MARKETING_VERSION = 0.0.138;
 				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = "fit.flutter.garden.Sharing-Extension";
+				PRODUCT_BUNDLE_IDENTIFIER = "io.shuttle.garden.Sharing-Extension";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SWIFT_VERSION = 5.0;

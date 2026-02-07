@@ -8,7 +8,7 @@
 PRODUCT_NAME = garden
 
 // The application's bundle identifier
-PRODUCT_BUNDLE_IDENTIFIER = fit.flutter.garden
+PRODUCT_BUNDLE_IDENTIFIER = io.shuttle.garden
 
 // The copyright displayed in application information
 PRODUCT_COPYRIGHT = Copyright © 2025 fit.flutter. All rights reserved.

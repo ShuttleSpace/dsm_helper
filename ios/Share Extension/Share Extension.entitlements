@@ -4,7 +4,7 @@
 <dict>
 	<key>com.apple.security.application-groups</key>
 	<array>
-		<string>group.fit.flutter.garden</string>
+		<string>group.io.shuttle.garden</string>
 	</array>
 </dict>
 </plist>

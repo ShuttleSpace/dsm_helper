@@ -1,4 +1,4 @@
-package fit.flutter.garden
+package io.shuttle.garden
 
 import io.flutter.embedding.android.FlutterActivity
 
