@@ -55,8 +55,8 @@ class LoginState extends State<Login> with SignalsMixin {
   final checkSsl = signal(true);
   final rememberDevice = signal(true);
   final passwordVisible = signal(false);
-  final servers = signal([]);
-  final qcAddresses = signal([]);
+  final servers = listSignal([]);
+  final qcAddresses = listSignal([]);
 
   @override
   initState() {
@@ -113,19 +113,6 @@ class LoginState extends State<Login> with SignalsMixin {
     _licenseRecognizer.dispose();
     _privacyRecognizer.dispose();
     super.dispose();
-  }
-
-  checkUpdate() async {
-    if (Platform.isAndroid) {
-      PackageInfo packageInfo = await PackageInfo.fromPlatform();
-      String buildNumber = packageInfo.buildNumber;
-      if (kDebugMode) {
-        buildNumber = '1';
-      }
-      final res = await DsmApi.update(buildNumber); //packageInfo.buildNumber
-      Log.info("checkUpdate: $res");
-      if (res['code'] == 1) {}
-    }
   }
 
   readAccountInfo() async {

@@ -70,7 +70,7 @@ class HttpUtil {
     Response response;
     try {
       Log.debug(
-          "curl: get -> curl '$url' ${data?.entries.map((e) => '-d "${e.key}=${e.value}"').join(' ')}");
+          "curl: '${connectionStore.baseUrl}/$url' ${data?.entries.map((e) => '-d "${e.key}=${e.value}"').join(' ')}");
       response =
           await dio.get(url, queryParameters: data, cancelToken: cancelToken);
       if (url == "auth.cgi") {
@@ -181,12 +181,9 @@ class HttpUtil {
     }
     Response response;
     try {
-      // Log.debug(
-      //     "curl: post -> curl -k -X POST '$url' ${data?.entries.map((e) => '-d "${e.key}=${e.value}"').join(' ')}");
+      Log.debug(
+          "curl: '${connectionStore.baseUrl}/$url' ${data?.entries.map((e) => '-d "${e.key}=${e.value}"').join(' ')}");
       response = await dio.post(url, data: data, cancelToken: cancelToken);
-      if (kDebugMode) {
-        // Log.info("post: ${response.data}");
-      }
       return response.data;
     } on DioException catch (error) {
       Log.error("请求出错:${headers['origin']} $url \n请求内容:$data\n 错误原因: $error");

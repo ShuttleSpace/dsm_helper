@@ -22,10 +22,11 @@ class Accounts extends StatefulWidget {
   AccountsState createState() => AccountsState();
 }
 
-class AccountsState extends State<Accounts> {
-  final servers = signal([]);
+class AccountsState extends State<Accounts> with SignalsMixin {
+  late final servers = createListSignal([]);
+  late final visible = createSignal(false);
+
   Timer? timer;
-  bool visible = true;
   @override
   void initState() {
     getData();
@@ -165,8 +166,7 @@ class AccountsState extends State<Accounts> {
           connectionStore.setAccount("${server['account']}");
           connectionStore.setBaseUrl("${server['base_url']}");
           connectionStore.setCheckSsl(server['check_ssl']);
-          StorageUtil.setString(
-              "base_url", connectionStore.baseUrl.watch(context));
+          StorageUtil.setString("base_url", connectionStore.baseUrl.value);
 
           StorageUtil.setBool("https", server['https'] ? true : false);
           StorageUtil.setString("host", server['host']);
@@ -222,7 +222,7 @@ class AccountsState extends State<Accounts> {
                                     ),
                                   ],
                                   Text(
-                                    "${visible ? server['account'] : "*****"}",
+                                    "${visible.value ? server['account'] : "*****"}",
                                     style: const TextStyle(fontSize: 18),
                                   ),
                                 ],
@@ -239,7 +239,7 @@ class AccountsState extends State<Accounts> {
                                       size: 12,
                                     ),
                                   Text(
-                                    "${visible ? server['host'] : "*****"}",
+                                    "${visible.value ? server['host'] : "*****"}",
                                     style: const TextStyle(color: Colors.grey),
                                   ),
                                 ],
@@ -502,9 +502,7 @@ class AccountsState extends State<Accounts> {
             padding: const EdgeInsets.only(right: 10, top: 8, bottom: 8),
             child: GestureDetector(
               onTap: () {
-                setState(() {
-                  visible = !visible;
-                });
+                visible.value = !visible.value;
               },
               child: Card(
                 shape: RoundedRectangleBorder(
@@ -512,7 +510,7 @@ class AccountsState extends State<Accounts> {
                     borderRadius: BorderRadius.circular(18)),
                 child: Padding(
                   padding: const EdgeInsets.all(AppConstants.paddingSmall),
-                  child: Icon(visible
+                  child: Icon(visible.value
                       ? CupertinoIcons.eye_slash_fill
                       : CupertinoIcons.eye_fill),
                 ),
@@ -541,9 +539,9 @@ class AccountsState extends State<Accounts> {
       body: ListView.separated(
         padding: const EdgeInsets.all(20),
         itemBuilder: (context, i) {
-          return _buildServerItem(servers.watch(context)[i]);
+          return _buildServerItem(servers.value[i]);
         },
-        itemCount: servers.watch(context).length,
+        itemCount: servers.value.length,
         separatorBuilder: (context, i) {
           return const SizedBox(
             height: 20,

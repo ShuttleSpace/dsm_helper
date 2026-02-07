@@ -68,6 +68,20 @@ class ConnectionStore {
     final checkSsl = await StorageUtil.getBool("check_ssl");
     connectionStore.setCheckSsl(checkSsl ?? true);
   }
+
+  void dispose() {
+    _sid.dispose();
+    _account.dispose();
+    _baseUrl.dispose();
+    _hostname.dispose();
+    _cookie.dispose();
+    _checkSsl.dispose();
+    _dsmVersion.dispose();
+    _appName.dispose();
+    _appUrl.dispose();
+    _strings.dispose();
+    _notifyStrings.dispose();
+  }
 }
 
 // 全局实例

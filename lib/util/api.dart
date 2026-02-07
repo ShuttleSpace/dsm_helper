@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'package:garden/util/log.dart';
-import 'package:garden/util/storage_util.dart';
 import 'package:garden/stores/connection_store.dart';
 import 'dart:convert';
 import 'dart:io';
@@ -15,56 +14,6 @@ import 'http_util.dart';
 
 class DsmApi {
   static Map<String, ApiModel> apiList = {};
-
-  static Future<Map> update(String buildNumber, {bool force = false}) async {
-    if (Platform.isAndroid) {
-      // DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
-      // AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
-      // if (androidInfo.brand == "HUAWEI" || androidInfo.brand == "HONOR") {
-      //   return {
-      //     "code": 0,
-      //     "msg": "已是最新版本",
-      //   };
-      // }
-      String urlBase64 = "";
-      var res = await HttpUtil.instance.post(urlBase64.base64(), data: {
-        "_api_key": "f4621000de0337cc74a156cea513e828",
-        "appKey": "ed1169bc9b9d290ef91c7e21d4ffb008",
-        "buildVersion": buildNumber,
-      });
-      if (res != null) {
-        try {
-          if (res['code'] == 0) {
-            List<String> ignoredVersions = [];
-            String ignoredVersionsString =
-                await StorageUtil.getString("ignoredVersions") ?? '';
-            if (ignoredVersionsString.isNotBlank) {
-              ignoredVersions = ignoredVersionsString.split(",");
-            }
-            if (int.parse(buildNumber) <
-                int.parse(res['data']['buildVersionNo'])) {
-              if (force ||
-                  !ignoredVersions.contains(res['data']['buildVersionNo'])) {
-                return {
-                  "code": 1,
-                  "msg": "版本更新",
-                  "data": res['data'],
-                };
-              }
-            }
-          }
-        } catch (e) {
-          Log.error(e);
-        }
-      }
-    }
-    return {
-      "code": 0,
-      "msg": "已是最新版本",
-    };
-//    var res = await HttpUtil.instance.post("base/update", data: {"platform": Platform.isAndroid ? "android" : "ios", "build": buildNumber});
-  }
-
   static Future<Map?> api() async {
     var res = await HttpUtil.instance.post("query.cgi", data: {
       "query": "all",
@@ -96,7 +45,7 @@ class DsmApi {
       "version": 6,
       "api": "SYNO.API.Auth",
       "method": "login",
-      // "session": "FileStation",
+      "session": "FileStation",
       "enable_device_token": rememberDevice ? "yes" : "no",
       // "enable_syno_token": "yes", // 会导致除 auth.cgi 外的请求失败
       // "isIframeLogin": "yes",
@@ -106,6 +55,7 @@ class DsmApi {
         host: host, data: data, cancelToken: cancelToken, cookie: cookie);
   }
 
+  /// 列出所有共享文件夹: list_share
   static Future<Map> shareList(
       {List<String> additional = const ["perm", "time", "size"],
       CancelToken? cancelToken,
@@ -132,6 +82,36 @@ class DsmApi {
       checkSsl: checkSsl,
     );
     Log.info("sharedList: $data");
+    return data;
+  }
+
+  /// 列出指定路径的子目录与文件
+  static Future<Map> listTarget(String folderPath,
+      {CancelToken? cancelToken,
+      String? sid,
+      bool? checkSsl,
+      String? cookie,
+      String? host}) async {
+    final data = await HttpUtil.instance.post(
+      "entry.cgi",
+      data: {
+        "api": '"SYNO.FileStation.List"',
+        "method": '"list"',
+        "folder_path": folderPath,
+        "version": 2,
+        "_sid": sid ?? connectionStore.sid,
+        "offset": 0,
+        "limit": 1000,
+        "sort_by": '"name"',
+        "sort_direction": '"asc"',
+        "additional": jsonEncode(["perm", "time", "size", "owner"]),
+      },
+      cancelToken: cancelToken,
+      cookie: cookie,
+      host: host,
+      checkSsl: checkSsl,
+    );
+    Log.info("listTarget: $data");
     return data;
   }
 
@@ -940,7 +920,7 @@ class DsmApi {
     };
     var data = {
       "path": uploadPath,
-      "create_parents": true,
+      "create_parents": true, // 自动创建父目录
       "size": file.lengthSync(),
       "mtime": file.lastModifiedSync().millisecondsSinceEpoch,
       "overwrite": false,

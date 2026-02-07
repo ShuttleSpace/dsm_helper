@@ -49,8 +49,6 @@ class HomeState extends State<Home> with WidgetsBindingObserver {
   @override
   void initState() {
     WidgetsBinding.instance.addObserver(this);
-    getData();
-    StorageUtil.setString("agreement", "1");
     if (Platform.isAndroid || Platform.isIOS) {
       FlutterSharingIntent.instance
           .getInitialSharing()
@@ -183,26 +181,6 @@ class HomeState extends State<Home> with WidgetsBindingObserver {
           launch: false,
         );
       }));
-    }
-  }
-
-  getData() async {
-    if (Platform.isAndroid) {
-      packageInfo = await PackageInfo.fromPlatform();
-      String buildNumber = packageInfo?.buildNumber ?? '';
-      if (kDebugMode) {
-        buildNumber = '1';
-      }
-      var res = await DsmApi.update(buildNumber); //packageInfo.buildNumber
-      if (res['code'] == 1 && context.mounted) {
-        showCupertinoDialog(
-          // ignore: use_build_context_synchronously
-          context: context,
-          builder: (context) {
-            return UpdateDialog(res['data'], packageInfo);
-          },
-        );
-      }
     }
   }
 
