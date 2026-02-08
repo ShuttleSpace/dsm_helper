@@ -7,7 +7,6 @@ import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:garden/constants/app_constants.dart';
-import 'package:garden/theme/app_colors.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 
 class ExternalDevice extends StatefulWidget {
@@ -235,12 +234,12 @@ class ExternalDeviceState extends State<ExternalDevice>
                       UiUtil.toast("设备退出失败，代码${res['error']['code']}");
                     }
                   },
-                  child: const SizedBox(
+                  child: SizedBox(
                     width: 20,
                     height: 20,
                     child: Icon(
                       CupertinoIcons.eject,
-                      color: AppColors.primaryAction,
+                      color: Theme.of(context).colorScheme.primary,
                       size: 16,
                     ),
                   ),

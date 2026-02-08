@@ -1,4 +1,4 @@
-import 'package:garden/util/moments_api.dart';
+import 'package:garden/api/dsm_api.dart';
 import 'package:garden/widgets/moments/photo_item_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:garden/constants/app_constants.dart';
@@ -27,26 +27,26 @@ class TimelineItemWidgetState extends State<TimelineItemWidget> {
   void _getLineInfo() {
     if (widget.line['items'] == null) {
       widget.line['items'] = [];
-      MomentsApi.photos(
+      dsmFotoBrowsePhotoList(
               year: widget.line['year'],
               month: widget.line['month'],
               day: widget.line['day'])
           .then((res) {
-        if (res['success'] && mounted) {
+        if (mounted) {
           setState(() {
-            widget.line['items'] = res['data']['list'];
+            widget.line['items'] = res['list'];
           });
         }
       });
     }
     if (widget.line['location'] == null) {
       widget.line['location'] = {};
-      MomentsApi.location(
+      dsmFotoBrowseTimelineLocation(
               widget.line['year'], widget.line['month'], widget.line['day'])
           .then((res) {
-        if (res['success'] && mounted) {
+        if (mounted) {
           setState(() {
-            widget.line['location'] = res['data'];
+            widget.line['location'] = res;
           });
         }
       });

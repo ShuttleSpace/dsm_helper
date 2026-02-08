@@ -1,3 +1,4 @@
+import 'dart:collection';
 import 'dart:convert';
 
 import 'package:dio/dio.dart';
@@ -5,14 +6,15 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_vibrate/flutter_vibrate.dart';
+import 'package:garden/api/dsm_api.dart';
 import 'package:garden/util/log.dart';
 import 'package:garden/pages/common/device_finder.dart';
 import 'package:garden/pages/login/accounts.dart';
 import 'package:garden/stores/connection_store.dart';
-import 'package:garden/theme/app_colors.dart';
 import 'package:garden/util/http_util.dart';
 import 'package:garden/util/storage_util.dart';
 import 'package:garden/util/ui_util.dart';
+import 'package:garden/widgets/button_style.dart';
 import 'package:signals_flutter/signals_flutter.dart';
 import 'package:wake_on_lan/wake_on_lan.dart';
 
@@ -56,49 +58,56 @@ class LoginState extends State<Login> with SignalsMixin {
   final qcAddresses = listSignal([]);
 
   @override
-  initState() {
+  initState() async {
+    if (widget.server != null) {
+      https.value = widget.server?['https'];
+      host.value = widget.server?['host'];
+      port.value = widget.server?['port'];
+      account.value = widget.server?['account'];
+      note.value = widget.server?['note'] ?? '';
+      password.value = widget.server?['password'];
+      autoLogin.value = widget.server?['auto_login'];
+      rememberPassword.value = widget.server?['remember_password'];
+      checkSsl.value = widget.server?['check_ssl'];
+
+      if (host.value.isNotBlank) {
+        _hostController.value = TextEditingValue(text: host.value);
+      }
+      if (port.value.isNotBlank) {
+        _portController.value = TextEditingValue(text: port.value);
+      }
+      if (account.value.isNotBlank) {
+        _accountController.value = TextEditingValue(text: account.value);
+      }
+      if (note.value.isNotBlank) {
+        _noteController.value = TextEditingValue(text: note.value);
+      }
+      if (password.value.isNotBlank) {
+        _passwordController.value = TextEditingValue(text: password.value);
+      }
+      final ck = widget.server?['cookie'];
+      if (ck != null && ck.isNotBlank) {
+        connectionStore.setCookie(ck);
+      }
+      final sid = widget.server?['sid'];
+      if (sid != null && sid.isNotBlank) {
+        connectionStore.setSid(sid);
+      }
+      if (widget.server?['action'] == "login") {
+        _login();
+      }
+    } else {
+      if (widget.type == "login") {
+        await readAccountInfo();
+        await checkAndLogin();
+      } else {
+        _portController.value = TextEditingValue(text: port.value);
+      }
+    }
+
     StorageUtil.getString("servers").then((serverString) {
       if (serverString != null && serverString.isNotBlank) {
         servers.value = jsonDecode(serverString);
-      }
-      if (widget.server != null) {
-        setState(() {
-          https.value = widget.server?['https'];
-          host.value = widget.server?['host'];
-          port.value = widget.server?['port'];
-          account.value = widget.server?['account'];
-          note.value = widget.server?['note'] ?? '';
-          password.value = widget.server?['password'];
-          autoLogin.value = widget.server?['auto_login'];
-          rememberPassword.value = widget.server?['remember_password'];
-          checkSsl.value = widget.server?['check_ssl'];
-          if (host.value.isNotBlank) {
-            _hostController.value = TextEditingValue(text: host.value);
-          }
-          if (port.value.isNotBlank) {
-            _portController.value = TextEditingValue(text: port.value);
-          }
-          if (account.value.isNotBlank) {
-            _accountController.value = TextEditingValue(text: account.value);
-          }
-          if (note.value.isNotBlank) {
-            _noteController.value = TextEditingValue(text: note.value);
-          }
-          if (password.value.isNotBlank) {
-            _passwordController.value = TextEditingValue(text: password.value);
-          }
-        });
-        connectionStore.setCookie(widget.server?['cookie']);
-        connectionStore.setSid(widget.server?['sid']);
-        if (widget.server?['action'] == "login") {
-          _login();
-        }
-      } else {
-        if (widget.type == "login") {
-          readAccountInfo();
-        } else {
-          _portController.value = TextEditingValue(text: port.value);
-        }
       }
     });
 
@@ -143,41 +152,41 @@ class LoginState extends State<Login> with SignalsMixin {
     if (password.value.isNotBlank) {
       _passwordController.value = TextEditingValue(text: password.value);
     }
-    checkLogin();
   }
 
-  checkLogin() async {
+  checkAndLogin() async {
     connectionStore.setAccount(account.value);
     if (sid.value.isNotBlank && host.value.isNotBlank) {
       if (baseUrl.value.isNotBlank) {
-        connectionStore.setBaseUrl(baseUrl.value);
+        connectionStore.setBaseUri(baseUrl.value);
       } else {
         connectionStore
-            .setBaseUrl("${https.value ? "https" : "http"}://$host:$port");
+            .setBaseUri("${https.value ? "https" : "http"}://$host:$port");
       }
       //开始自动登录
-      Log.info("BaseUrl:$baseUrl");
-      Log.info("HttpUtil.BaseUrl:${connectionStore.baseUrl}");
+      Log.info(
+          "connectionStore.BaseUrl:${connectionStore.baseUri}, widget.baseUrl:$baseUrl");
       connectionStore.setSid(sid.value);
       //如果开启了自动登录，则判断当前登录状态
       if (autoLogin.value) {
         hasLogined.value = true;
-        final checkLoginResult =
-            await DsmApi.shareList(cancelToken: cancelToken);
-        if (!checkLoginResult['success']) {
-          if (checkLoginResult['code'] == "用户取消") {
-            hasLogined.value = false;
-          } else {
-            //如果登录失效，尝试重新登录
-            Log.info("尝试重新登录");
-            _login();
-          }
-        } else {
-          //登录有效，进入首页
+        try {
+          await dsmFileStationListListShare(
+              additional: 'perm,time,size',
+              limit: 1000,
+              cancelToken: cancelToken);
           if (context.mounted) {
             // ignore: use_build_context_synchronously
             Navigator.of(context)
                 .pushNamedAndRemoveUntil("/home", (route) => false);
+          }
+        } on DSMException catch (e) {
+          Log.info("登录失败:${e.message}，尝试重新登录");
+          _login();
+        } on DioException catch (e) {
+          if (e.type == DioExceptionType.cancel) {
+            Log.info("用户取消登录");
+            hasLogined.value = false;
           }
         }
       }
@@ -199,87 +208,97 @@ class LoginState extends State<Login> with SignalsMixin {
     if (host.contains(".") || host.contains(':')) {
       String baseUri =
           "${https.value ? "https" : "http"}://${host.trim()}:${port.trim()}";
-      Log.info("baseUri: $baseUri");
-      doLogin(baseUri);
+      Log.info("_login: baseUri: $baseUri");
+      _accountLogin(baseUri);
     } else {
-      qcLogin();
+      _qcLogin();
     }
   }
 
-  qcLogin({String qcHost = "global.quickconnect.cn"}) async {
-    final res = await DsmApi.quickConnect(host.value, baseUrl: qcHost);
-    Log.info("QuickConnectID:$host $res");
-    final addrs = List.from(qcAddresses.value);
-    if (res['errno'] == 0) {
-      if (res['server']['fqdn'] != "NULL") {
-        addrs.add("http://${res['server']['fqdn']}/");
-      }
-      if (res['server']['external']["ip"] != null) {
-        addrs.add(
-            "http://${res['server']['external']["ip"]}:${res['service']['ext_port']}/");
-      }
-      if (res['service']['relay_ip'] != null) {
-        addrs.add(
-            "http://${res['service']['relay_ip']}:${res['service']['relay_port']}/");
-      }
-      if (res['server']['ddns'] != "NULL") {
-        addrs.add(
-            "http://${res['server']['ddns']}:${res['service']['ext_port']}/");
-      }
-      if (res['server']['interface'].length > 0) {
-        for (final interface in res['server']['interface']) {
-          addrs.add("http://${interface['ip']}:${res['service']['port']}/");
-          if (interface['ipv6'].length > 0) {
-            for (final v6 in interface['ipv6']) {
-              addrs.add("http://[${v6['address']}]:${res['service']['port']}/");
+  _qcLogin({String qcHost = "quickconnect.to/"}) async {
+    try {
+      final res = await dsmAuthQuickConnectLogin(host.value, baseUri: qcHost);
+      Log.info("qcLogin:$host $res");
+      final addrs = List.from(qcAddresses.value);
+      if (res['errno'] == 0) {
+        if (res['server']['fqdn'] != "NULL") {
+          addrs.add("http://${res['server']['fqdn']}/");
+        }
+        if (res['server']['external']["ip"] != null) {
+          addrs.add(
+              "http://${res['server']['external']["ip"]}:${res['service']['ext_port']}/");
+        }
+        if (res['service']['relay_ip'] != null) {
+          addrs.add(
+              "http://${res['service']['relay_ip']}:${res['service']['relay_port']}/");
+        }
+        if (res['server']['ddns'] != "NULL") {
+          addrs.add(
+              "http://${res['server']['ddns']}:${res['service']['ext_port']}/");
+        }
+        if (res['server']['interface'].length > 0) {
+          for (final interface in res['server']['interface']) {
+            addrs.add("http://${interface['ip']}:${res['service']['port']}/");
+            if (interface['ipv6'].length > 0) {
+              for (final v6 in interface['ipv6']) {
+                addrs.add(
+                    "http://[${v6['address']}]:${res['service']['port']}/");
+              }
             }
           }
         }
-      }
-      if (res['service']['relay_ip'] == null) {
-        final cnRes = await DsmApi.quickConnectCn(host.value,
-            baseUrl: res['env']['control_host']);
-        if (cnRes['errno'] == 0) {
-          if (cnRes['service']['relay_ip'] != null) {
-            addrs.add(
-                "http://${cnRes['service']['relay_ip']}:${cnRes['service']['relay_port']}/");
+        if (res['service']['relay_ip'] == null) {
+          final cnRes = await DsmApi.quickConnectCn(host.value,
+              baseUrl: res['env']['control_host']);
+          if (cnRes['errno'] == 0) {
+            if (cnRes['service']['relay_ip'] != null) {
+              addrs.add(
+                  "http://${cnRes['service']['relay_ip']}:${cnRes['service']['relay_port']}/");
+            }
           }
         }
-      }
 
-      bool finded = false;
-      for (final address in addrs) {
-        Log.info(addrs);
-        DsmApi.pingpong(address, (res) {
-          if (res != null) {
-            if (!finded) {
-              doLogin(res);
-            }
+        Log.info("qcLogin: $addrs");
+        for (final address in addrs) {
+          try {
+            await dsmPingpong(host: address);
+            await _accountLogin(address);
+            break;
+          } on Exception catch (e) {
+            Log.error("qcLogin: pingpong failed: $e");
           }
-        });
+        }
+      } else if (res['errno'] == 4 &&
+          res['errinfo'].startsWith("get_server_info.go") &&
+          res['sites'].length > 0) {
+        _qcLogin(qcHost: res['sites'][0]);
+      } else {
+        UiUtil.toast("无法连接到服务器，请检查QuickConnect ID是否正确");
+        hasLogined.value = false;
       }
-    } else if (res['errno'] == 4 &&
-        res['errinfo'].startsWith("get_server_info.go") &&
-        res['sites'].length > 0) {
-      qcLogin(qcHost: res['sites'][0]);
-    } else {
+      qcAddresses.value = addrs;
+    } on DioException catch (e) {
+      Log.error("qcLogin: $e");
+      UiUtil.toast("无法连接到服务器，请检查QuickConnect ID是否正确");
+      hasLogined.value = false;
+    } on DSMException catch (e) {
+      Log.error("qcLogin: $e");
       UiUtil.toast("无法连接到服务器，请检查QuickConnect ID是否正确");
       hasLogined.value = false;
     }
-    qcAddresses.value = addrs;
   }
 
-  doLogin(String baseUri) async {
-    final res = await DsmApi.login(
-        host: baseUri,
-        account: account.value,
-        password: password.value,
-        otpCode: otpCode.value,
-        cancelToken: cancelToken,
-        rememberDevice: rememberDevice.value);
-    hasLogined.value = false;
-    Log.debug("doLogin: $res");
-    if (res['success'] == true) {
+  _accountLogin(String baseUri) async {
+    try {
+      final res = await dsmAuthLogin(
+          host: baseUri,
+          account: account.value,
+          password: password.value,
+          otpCode: otpCode.value,
+          cancelToken: cancelToken,
+          rememberDevice: rememberDevice.value);
+      hasLogined.value = false;
+      Log.debug("_accountLogin: $res");
       //记住登录信息
       connectionStore.setAccount(account.value);
       StorageUtil.setBool("https", https.value);
@@ -291,7 +310,7 @@ class LoginState extends State<Login> with SignalsMixin {
       StorageUtil.setBool("remember_password", rememberPassword.value);
       StorageUtil.setBool("auto_login", autoLogin.value);
       StorageUtil.setBool("check_ssl", checkSsl.value);
-      connectionStore.setSid(res['data']['sid']);
+      StorageUtil.setBool('is_portal_port', res['data']['is_portal_port']);
       if (rememberPassword.value) {
         StorageUtil.setString("password", password.value);
       } else {
@@ -304,9 +323,8 @@ class LoginState extends State<Login> with SignalsMixin {
           StorageUtil.setString("synotoken", res['data']?['sidsynoken']);
         }
       }
-      StorageUtil.setBool('is_portal_port', res['data']['is_portal_port']);
-
-      connectionStore.setBaseUrl(baseUri);
+      connectionStore.setSid(res['data']['sid']);
+      connectionStore.setBaseUri(baseUri);
 
       final servers2 = List.from(servers.value);
       //添加服务器记录
@@ -334,7 +352,7 @@ class LoginState extends State<Login> with SignalsMixin {
         }
       }
       if (!exist) {
-        Log.info("账号不存在");
+        Log.info("此账号${account.value}不存在");
         Map server = {
           "https": https.value,
           "host": host.value,
@@ -369,27 +387,30 @@ class LoginState extends State<Login> with SignalsMixin {
           Navigator.of(context).pop();
         }
       }
-    } else {
+    } on DioException catch (e) {
+      hasLogined.value = false;
+      Log.error("login error: $e");
+      UiUtil.toast("登录失败，$e");
+    } on DSMException catch (e) {
+      hasLogined.value = false;
+      Log.error("login error: $e");
       UiUtil.vibrate(FeedbackType.warning);
-      if (res['error']['code'] == ErrorCode.noAccountOrIncorrectPassword.code) {
+      if (e.code == ErrorCode.noAccountOrIncorrectPassword.code) {
         UiUtil.toast("用户名/密码有误");
-      } else if (res['error']['code'] == ErrorCode.twoFactorAuthRequired.code) {
+      } else if (e.code == ErrorCode.twoFactorAuthRequired.code) {
         UiUtil.toast("请输入二次验证代码");
         needOtp.value = true;
-      } else if (res['error']['code'] == ErrorCode.twoFactorAuthFailed.code) {
+      } else if (e.code == ErrorCode.twoFactorAuthFailed.code) {
         _otpController.clear();
         UiUtil.toast("错误的验证代码。请再试一次。");
       } else {
-        UiUtil.toast("登录失败，code:${res['error']['code']}");
+        UiUtil.toast("登录失败，$e");
       }
     }
   }
 
   wakeup() async {
     Log.info("wakeup");
-    // final client = HttpDnsClient("http://180.76.76.76");
-    // final result = await client.lookup("baidu.com");
-    // Log.info(result);
     String ipv4 = '192.168.0.100';
     IPAddress ipv4Address;
     MACAddress macAddress;
@@ -452,10 +473,12 @@ class LoginState extends State<Login> with SignalsMixin {
           widget.type == "login" ? "账号登录" : "添加账号",
         ),
         actions: [
-          if (servers.watch(context).isNotEmpty)
+          // 历史记录
+          if (servers.value.isNotEmpty)
             Padding(
               padding: const EdgeInsets.only(right: 10, top: 8, bottom: 8),
               child: OutlinedButton(
+                style: context.stadiumButtonStyle,
                 onPressed: () {
                   Navigator.of(context)
                       .push(CupertinoPageRoute(builder: (context) {
@@ -469,15 +492,13 @@ class LoginState extends State<Login> with SignalsMixin {
                 ),
               ),
             ),
+          // 设备发现
           Padding(
             padding:
                 const EdgeInsetsGeometry.only(right: 10, top: 8, bottom: 8),
             child: OutlinedButton(
               onPressed: _openDeviceFinder,
-              style: OutlinedButton.styleFrom(
-                minimumSize: const Size(36, 36),
-                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-              ),
+              style: context.stadiumButtonStyle,
               child: const Icon(
                 Icons.open_in_browser,
                 size: 20,
@@ -497,18 +518,33 @@ class LoginState extends State<Login> with SignalsMixin {
               height: 20,
             ),
             Card(
-              shape: RoundedRectangleBorder(
-                  side: const BorderSide(),
-                  borderRadius: BorderRadius.circular(18)),
+              shape: StadiumBorder(
+                side: BorderSide(
+                    color: Theme.of(context).colorScheme.primary, width: 1.0),
+              ),
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
                 child: Row(
                   children: [
-                    SizedBox(
-                      width: 60,
-                      child: GestureDetector(
-                        onTap: () {
-                          https.value = !https.value;
+                    DropdownMenu<String>(
+                        initialSelection: 'http',
+                        requestFocusOnTap: true,
+                        label: const Text('协议'),
+                        inputDecorationTheme: InputDecorationTheme(
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(30),
+                          ),
+                        ),
+                        dropdownMenuEntries: UnmodifiableListView([
+                          const DropdownMenuEntry(
+                            value: 'http',
+                            label: 'http',
+                          ),
+                          const DropdownMenuEntry(
+                              value: 'https', label: 'https')
+                        ]),
+                        onSelected: (value) {
+                          https.value = value == 'https';
                           if (https.value && port.value == "5000") {
                             port.value = "5001";
                             _portController.value =
@@ -518,39 +554,23 @@ class LoginState extends State<Login> with SignalsMixin {
                             _portController.value =
                                 TextEditingValue(text: port.value);
                           }
-                        },
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const SizedBox(
-                              height: 4,
-                            ),
-                            const Text(
-                              "协议",
-                              style: TextStyle(
-                                  fontSize: 12, color: Colors.grey, height: 1),
-                            ),
-                            Text(
-                              https.value ? "https" : "http",
-                              style: const TextStyle(fontSize: 16),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
+                        }),
                     Expanded(
                       flex: 3,
-                      child: TextField(
-                        autocorrect: false,
-                        controller: _hostController,
-                        onChanged: (v) => host.value = v,
-                        textInputAction: TextInputAction.next,
-                        onEditingComplete: () {
-                          FocusScope.of(context).nextFocus();
-                        },
-                        decoration: const InputDecoration(
-                          border: InputBorder.none,
-                          labelText: '网址/IP/QuickConnect ID',
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                        child: TextField(
+                          autocorrect: false,
+                          controller: _hostController,
+                          onChanged: (v) => host.value = v,
+                          textInputAction: TextInputAction.next,
+                          onEditingComplete: () {
+                            FocusScope.of(context).nextFocus();
+                          },
+                          decoration: const InputDecoration(
+                            border: InputBorder.none,
+                            labelText: '网址/IP/QuickConnect ID',
+                          ),
                         ),
                       ),
                     ),
@@ -581,9 +601,7 @@ class LoginState extends State<Login> with SignalsMixin {
               children: [
                 Expanded(
                   child: Card(
-                    shape: RoundedRectangleBorder(
-                        side: const BorderSide(),
-                        borderRadius: BorderRadius.circular(18)),
+                    shape: context.stadiumShapeBorder,
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 12.0),
                       child: TextField(
@@ -608,9 +626,7 @@ class LoginState extends State<Login> with SignalsMixin {
                 ),
                 Expanded(
                   child: Card(
-                    shape: RoundedRectangleBorder(
-                        side: const BorderSide(),
-                        borderRadius: BorderRadius.circular(18)),
+                    shape: context.stadiumShapeBorder,
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 12.0),
                       child: TextField(
@@ -635,9 +651,7 @@ class LoginState extends State<Login> with SignalsMixin {
               height: 20,
             ),
             Card(
-              shape: RoundedRectangleBorder(
-                  side: const BorderSide(),
-                  borderRadius: BorderRadius.circular(18)),
+              shape: context.stadiumShapeBorder,
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 12.0),
                 child: TextField(
@@ -655,23 +669,24 @@ class LoginState extends State<Login> with SignalsMixin {
                           onPressed: () {
                             passwordVisible.value = !passwordVisible.value;
                           },
-                          icon: Icon(passwordVisible.watch(context)
-                              ? Icons.visibility
-                              : Icons.visibility_off_outlined))),
+                          icon: Icon(
+                            passwordVisible.value
+                                ? Icons.visibility_outlined
+                                : Icons.visibility_off_outlined,
+                            size: 18,
+                          ))),
                 ),
               ),
             ),
             const SizedBox(
               height: 20,
             ),
-            if (needOtp.watch(context)) ...[
+            if (needOtp.value) ...[
               Row(
                 children: [
                   Expanded(
                     child: Card(
-                      shape: RoundedRectangleBorder(
-                          side: const BorderSide(),
-                          borderRadius: BorderRadius.circular(18)),
+                      shape: context.stadiumShapeBorder,
                       child: Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 12.0),
                         child: TextField(
@@ -700,19 +715,17 @@ class LoginState extends State<Login> with SignalsMixin {
                         rememberDevice.value = !rememberDevice.value;
                       },
                       child: Card(
-                        shape: RoundedRectangleBorder(
-                            side: const BorderSide(),
-                            borderRadius: BorderRadius.circular(18)),
+                        shape: context.stadiumShapeBorder,
                         child: Padding(
                           padding: const EdgeInsets.all(12.0),
                           child: Row(
                             children: [
                               const Text("记住设备"),
                               const Spacer(),
-                              if (rememberDevice.watch(context))
-                                const Icon(
+                              if (rememberDevice.value)
+                                Icon(
                                   CupertinoIcons.checkmark_alt,
-                                  color: AppColors.primaryAction,
+                                  color: Theme.of(context).colorScheme.primary,
                                 ),
                             ],
                           ),
@@ -737,19 +750,19 @@ class LoginState extends State<Login> with SignalsMixin {
                       }
                     },
                     child: Card(
-                      shape: RoundedRectangleBorder(
-                          side: const BorderSide(),
-                          borderRadius: BorderRadius.circular(18)),
+                      shape: StadiumBorder(
+                          side: BorderSide(
+                              color: Theme.of(context).colorScheme.primary)),
                       child: Padding(
                         padding: const EdgeInsets.all(12.0),
                         child: Row(
                           children: [
                             const Text("记住密码"),
                             const Spacer(),
-                            if (rememberPassword.watch(context))
-                              const Icon(
+                            if (rememberPassword.value)
+                              Icon(
                                 CupertinoIcons.checkmark_alt,
-                                color: AppColors.primaryAction,
+                                color: Theme.of(context).colorScheme.primary,
                               ),
                           ],
                         ),
@@ -769,19 +782,17 @@ class LoginState extends State<Login> with SignalsMixin {
                       }
                     },
                     child: Card(
-                      shape: RoundedRectangleBorder(
-                          side: const BorderSide(),
-                          borderRadius: BorderRadius.circular(18)),
+                      shape: context.stadiumShapeBorder,
                       child: Padding(
                         padding: const EdgeInsets.all(12.0),
                         child: Row(
                           children: [
                             const Text("自动登录"),
                             const Spacer(),
-                            if (autoLogin.watch(context))
-                              const Icon(
+                            if (autoLogin.value)
+                              Icon(
                                 CupertinoIcons.checkmark_alt,
-                                color: AppColors.primaryAction,
+                                color: Theme.of(context).colorScheme.primary,
                               ),
                           ],
                         ),
@@ -794,7 +805,7 @@ class LoginState extends State<Login> with SignalsMixin {
             const SizedBox(
               height: 20,
             ),
-            if (https.watch(context))
+            if (https.value)
               Padding(
                 padding: const EdgeInsets.only(bottom: 20),
                 child: GestureDetector(
@@ -802,19 +813,17 @@ class LoginState extends State<Login> with SignalsMixin {
                     checkSsl.value = !checkSsl.value;
                   },
                   child: Card(
-                    shape: RoundedRectangleBorder(
-                        side: const BorderSide(),
-                        borderRadius: BorderRadius.circular(18)),
+                    shape: context.stadiumShapeBorder,
                     child: Padding(
                       padding: const EdgeInsets.all(12.0),
                       child: Row(
                         children: [
                           const Text("验证SSL证书"),
                           const Spacer(),
-                          if (checkSsl.watch(context))
-                            const Icon(
+                          if (checkSsl.value)
+                            Icon(
                               CupertinoIcons.checkmark_alt,
-                              color: AppColors.primaryAction,
+                              color: Theme.of(context).colorScheme.primary,
                             ),
                         ],
                       ),
@@ -822,14 +831,11 @@ class LoginState extends State<Login> with SignalsMixin {
                   ),
                 ),
               ),
-            // SizedBox(
-            //   height: 20,
-            // ),
-
             OutlinedButton(
+              style: context.stadiumButtonStyle,
               onPressed: () {
                 Log.info(hasLogined.value);
-                if (hasLogined.watch(context)) {
+                if (hasLogined.value) {
                   cancelToken.cancel("取消登录");
                   cancelToken = CancelToken();
                   hasLogined.value = false;
@@ -838,7 +844,7 @@ class LoginState extends State<Login> with SignalsMixin {
                   _login();
                 }
               },
-              child: hasLogined.watch(context)
+              child: hasLogined.value
                   ? const Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [

@@ -1,6 +1,7 @@
 import 'package:garden/stores/connection_store.dart';
 import 'package:flutter/material.dart';
 import 'package:garden/constants/app_constants.dart';
+import 'package:garden/widgets/button_style.dart';
 import 'package:garden/widgets/cupertino_image.dart';
 import 'package:garden/widgets/label.dart';
 import 'package:garden/widgets/packages/package_button.dart';
@@ -37,15 +38,14 @@ class PackageCard extends StatelessWidget {
     if (package['thumbnail'].length > 0) {
       thumbnailUrl = package['thumbnail'].last;
       if (!thumbnailUrl.startsWith("http")) {
-        thumbnailUrl = connectionStore.baseUrl.watch(context) + thumbnailUrl;
+        thumbnailUrl = connectionStore.baseUri.watch(context) + thumbnailUrl;
       }
     }
 
     return GestureDetector(
       onTap: onTap,
       child: Card(
-        shape: RoundedRectangleBorder(
-            side: const BorderSide(), borderRadius: BorderRadius.circular(18)),
+        shape: context.stadiumShapeBorder,
         child: Padding(
           padding: const EdgeInsets.all(AppConstants.paddingSmall),
           child: Column(

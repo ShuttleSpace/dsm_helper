@@ -1,7 +1,7 @@
+import 'package:garden/api/dsm_api.dart';
 import 'package:garden/pages/moments/photos.dart';
 import 'package:garden/stores/connection_store.dart';
 import 'package:garden/theme/app_colors.dart';
-import 'package:garden/util/moments_api.dart';
 import 'package:garden/widgets/cupertino_image.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
@@ -27,10 +27,10 @@ class AlbumState extends State<Album> {
   }
 
   getAlbum() async {
-    var res = await MomentsApi.album(shared: true);
-    if (res['success'] && mounted) {
+    var res = await dsmFotoBrowseAlbumListMoments(shared: true);
+    if (mounted) {
       setState(() {
-        album = res['data']['list'];
+        album = res['list'];
         loadingAlbum = false;
       });
     }
@@ -38,7 +38,7 @@ class AlbumState extends State<Album> {
 
   Widget _buildAlbumItem(album) {
     String thumbUrl =
-        '${connectionStore.baseUrl}/webapi/entry.cgi?id=${album['additional']['thumbnail']['unit_id']}&cache_key="${album['additional']['thumbnail']['cache_key']}"&type="unit"&size="sm"&api="SYNO.${connectionStore.dsmVersion.watch(context) >= 7 ? "Foto" : "Photo"}.Thumbnail"&method="get"&version=1&_sid=${connectionStore.sid}';
+        '${connectionStore.baseUri}/webapi/entry.cgi?id=${album['additional']['thumbnail']['unit_id']}&cache_key="${album['additional']['thumbnail']['cache_key']}"&type="unit"&size="sm"&api="SYNO.${connectionStore.dsmVersion.watch(context) >= 7 ? "Foto" : "Photo"}.Thumbnail"&method="get"&version=1&_sid=${connectionStore.sid}';
     String tag = "album-${album['additional']['thumbnail']['unit_id']}";
     return GestureDetector(
       onTap: () {

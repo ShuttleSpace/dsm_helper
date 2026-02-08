@@ -2,8 +2,8 @@ import 'dart:convert';
 import 'package:garden/util/log.dart';
 import 'package:garden/util/ui_util.dart';
 
-import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/material.dart';
+import 'package:garden/widgets/button_style.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 class DeviceFinder extends StatefulWidget {
@@ -306,20 +306,85 @@ Page resource error:
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: AppBackButton(context),
+        leading: IconButton(
+          onPressed: () async {
+            if (await _webviewController.canGoBack()) {
+              await _webviewController.goBack();
+              setState(() {});
+            } else {
+              if (context.mounted) {
+                // ignore: use_build_context_synchronously
+                Navigator.of(context).pop();
+              }
+            }
+          },
+          icon: Icon(
+            Icons.arrow_back_ios_outlined,
+            size: 22,
+            color: Theme.brightnessOf(context) == Brightness.light
+                ? Colors.black
+                : Colors.white,
+          ),
+        ),
         title: FutureBuilder<String?>(
           future: _webviewController.platform.getTitle(),
           builder: (context, snapshot) {
             if (snapshot.hasData) {
-              return Text(snapshot.data ?? widget.title ?? "加载中……");
+              return Text(snapshot.data ?? widget.title ?? "加载中……",
+                  style: TextStyle(
+                      color: Theme.brightnessOf(context) == Brightness.light
+                          ? Colors.black
+                          : Colors.white));
             } else {
-              return Text(widget.title ?? "设备发现");
+              return Text(
+                widget.title ?? "设备发现",
+                style: TextStyle(
+                    color: Theme.brightnessOf(context) == Brightness.light
+                        ? Colors.black
+                        : Colors.white),
+              );
             }
           },
         ),
         actions: [
+          const SizedBox(
+            width: 72,
+          ),
+          FutureBuilder<bool>(
+            future: _webviewController.canGoForward(),
+            builder: (context, shot) {
+              bool canGoForward = shot.data ?? false;
+              return OutlinedButton(
+                style: context.stadiumButtonStyle,
+                onPressed: canGoForward
+                    ? () async {
+                        await _webviewController.goForward();
+                        setState(() {});
+                      }
+                    : null,
+                child: Icon(
+                  Icons.arrow_forward_ios,
+                  size: 22,
+                  color: canGoForward ? Colors.black : Colors.grey,
+                ),
+              );
+            },
+          ),
+          const Spacer(),
           Padding(
-            padding: const EdgeInsets.only(right: 10, top: 8, bottom: 8),
+            padding: const EdgeInsets.all(8.0),
+            child: OutlinedButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Icon(
+                Icons.close,
+                size: 22,
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
             child: OutlinedButton(
               onPressed: _isSearching
                   ? null
@@ -454,78 +519,6 @@ Page resource error:
                     ),
                   ),
               ],
-            ),
-          ),
-          SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-              child: Row(
-                children: <Widget>[
-                  FutureBuilder<bool>(
-                    future: _webviewController.canGoBack(),
-                    builder: (context, shot) {
-                      bool canGoBack = shot.data ?? false;
-                      return OutlinedButton(
-                        onPressed: canGoBack
-                            ? () async {
-                                await _webviewController.goBack();
-                                setState(() {});
-                              }
-                            : null,
-                        child: Icon(
-                          Icons.arrow_back_ios_outlined,
-                          color: canGoBack ? Colors.black : Colors.grey,
-                          size: 22,
-                        ),
-                      );
-                    },
-                  ),
-                  const SizedBox(
-                    width: 10,
-                  ),
-                  FutureBuilder<bool>(
-                    future: _webviewController.canGoForward(),
-                    builder: (context, shot) {
-                      bool canGoForward = shot.data ?? false;
-                      return OutlinedButton(
-                        onPressed: canGoForward
-                            ? () async {
-                                await _webviewController.goForward();
-                                setState(() {});
-                              }
-                            : null,
-                        child: Icon(
-                          Icons.arrow_forward_ios,
-                          size: 22,
-                          color: canGoForward ? Colors.black : Colors.grey,
-                        ),
-                      );
-                    },
-                  ),
-                  const Spacer(),
-                  OutlinedButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                    child: const Icon(
-                      Icons.close,
-                      size: 22,
-                    ),
-                  ),
-                  const SizedBox(
-                    width: 10,
-                  ),
-                  OutlinedButton(
-                    onPressed: () {
-                      _webviewController.reload();
-                    },
-                    child: const Icon(
-                      Icons.replay,
-                      size: 22,
-                    ),
-                  ),
-                ],
-              ),
             ),
           ),
         ],

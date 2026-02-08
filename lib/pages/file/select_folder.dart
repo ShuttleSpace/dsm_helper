@@ -8,7 +8,6 @@ import 'package:garden/widgets/file_icon.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:garden/constants/app_constants.dart';
-import 'package:garden/theme/app_colors.dart';
 
 class SelectFolder extends StatefulWidget {
   final bool multi;
@@ -164,7 +163,7 @@ class SelectFolderState extends State<SelectFolder> {
               ),
               Hero(
                 tag:
-                    "${connectionStore.baseUrl}/webapi/entry.cgi?path=${Uri.encodeComponent(path)}&size=original&api=SYNO.FileStation.Thumb&method=get&version=2&_sid=${connectionStore.sid}&animate=true",
+                    "${connectionStore.baseUri}/webapi/entry.cgi?path=${Uri.encodeComponent(path)}&size=original&api=SYNO.FileStation.Thumb&method=get&version=2&_sid=${connectionStore.sid}&animate=true",
                 child: FileIcon(
                   file['isdir'] ? FileTypeEnum.folder : fileType,
                   thumb: file['path'],
@@ -219,9 +218,9 @@ class SelectFolderState extends State<SelectFolder> {
                 },
                 child: SizedBox(
                   child: selectedFiles.contains(file['path'])
-                      ? const Icon(
+                      ? Icon(
                           CupertinoIcons.checkmark_alt,
-                          color: AppColors.primaryAction,
+                          color: Theme.of(context).colorScheme.primary,
                         )
                       : null,
                 ),

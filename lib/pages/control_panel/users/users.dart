@@ -3,6 +3,7 @@ import 'package:garden/util/ui_util.dart';
 import 'package:garden/stores/connection_store.dart';
 import 'package:garden/util/http_util.dart';
 import 'package:garden/widgets/bubble_tab_indicator.dart';
+import 'package:garden/widgets/button_style.dart';
 import 'package:garden/widgets/label.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
@@ -106,8 +107,7 @@ class UsersState extends State<Users> with SingleTickerProviderStateMixin {
         });
       },
       child: Card(
-        shape: RoundedRectangleBorder(
-            side: const BorderSide(), borderRadius: BorderRadius.circular(18)),
+        shape: context.stadiumShapeBorder,
         margin:
             const EdgeInsets.symmetric(vertical: AppConstants.paddingSmall + 2),
         child: Padding(
@@ -183,9 +183,9 @@ class UsersState extends State<Users> with SingleTickerProviderStateMixin {
               children: [
                 if (connectionStore.dsmVersion >= 7)
                   Card(
-                    shape: RoundedRectangleBorder(
-                        side: const BorderSide(),
-                        borderRadius: BorderRadius.circular(18)),
+                    shape: StadiumBorder(
+                        side: BorderSide(
+                            color: Theme.of(context).colorScheme.primary)),
                     margin: const EdgeInsets.symmetric(
                         vertical: 10, horizontal: 20),
                     child: TabBar(

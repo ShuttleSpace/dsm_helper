@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:garden/constants/app_constants.dart';
+import 'package:garden/widgets/button_style.dart';
 
 class GuestPowerActionDialog extends StatelessWidget {
   final VoidCallback onShutdown;
@@ -18,8 +19,7 @@ class GuestPowerActionDialog extends StatelessWidget {
     return Material(
       color: Colors.transparent,
       child: Card(
-        shape: RoundedRectangleBorder(
-            side: const BorderSide(), borderRadius: BorderRadius.circular(18)),
+        shape: context.stadiumShapeBorder,
         child: SafeArea(
           top: false,
           child: Padding(

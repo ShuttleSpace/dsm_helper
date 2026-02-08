@@ -35,7 +35,7 @@ class ThumbnailModel {
   String? xl;
   num? folderCoverSeq;
   String thumbUrl({String size = 'sm', int? folderId, bool isTeam = false}) {
-    return '${connectionStore.baseUrl}/webapi/entry.cgi?id=$unitId&cache_key="$cacheKey"&type="unit"&size="$size"&api="SYNO.Foto${isTeam ? 'Team' : ''}.Thumbnail"&method="get"&version=1&_sid=${connectionStore.sid}';
+    return '${connectionStore.baseUri}/webapi/entry.cgi?id=$unitId&cache_key="$cacheKey"&type="unit"&size="$size"&api="SYNO.Foto${isTeam ? 'Team' : ''}.Thumbnail"&method="get"&version=1&_sid=${connectionStore.sid}';
   }
 
   ThumbnailModel copyWith({

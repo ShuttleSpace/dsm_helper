@@ -8,7 +8,7 @@ import 'package:flutter/services.dart';
 ThemeData darkTheme = ThemeData.dark().copyWith(
   extensions: <ThemeExtension>[
     AppTheme(
-      primaryColor: AppColors.primaryDark,
+      primaryColor: AppColors.primaryDark.withAlpha(125),
       placeholderColor: AppColors.textPlaceholderDark,
       titleColor: AppColors.textDark,
       progressColor: AppColors.progressDark,

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:garden/constants/app_constants.dart';
+import 'package:garden/widgets/button_style.dart';
 
 /// 批量删除确认对话框
 class DownloadBatchDeleteDialog extends StatelessWidget {
@@ -17,8 +18,7 @@ class DownloadBatchDeleteDialog extends StatelessWidget {
     return Material(
       color: Colors.transparent,
       child: Card(
-        shape: RoundedRectangleBorder(
-            side: const BorderSide(), borderRadius: BorderRadius.circular(5)),
+        shape: context.stadiumShapeBorder,
         child: SafeArea(
           top: false,
           child: Padding(

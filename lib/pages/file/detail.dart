@@ -7,7 +7,6 @@ import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:garden/constants/app_constants.dart';
-import 'package:garden/theme/app_colors.dart';
 import 'package:flutter/services.dart';
 
 class FileDetail extends StatefulWidget {
@@ -107,12 +106,12 @@ class FileDetailState extends State<FileDetail> {
                       Clipboard.setData(data);
                       UiUtil.toast("已复制到剪贴板");
                     },
-                    child: const SizedBox(
+                    child: SizedBox(
                       width: 20,
                       height: 20,
                       child: Icon(
                         Icons.copy,
-                        color: AppColors.primaryAction,
+                        color: Theme.of(context).colorScheme.primary,
                         size: 16,
                       ),
                     ),
@@ -143,12 +142,12 @@ class FileDetailState extends State<FileDetail> {
                       Clipboard.setData(data);
                       UiUtil.toast("已复制到剪贴板");
                     },
-                    child: const SizedBox(
+                    child: SizedBox(
                       width: 20,
                       height: 20,
                       child: Icon(
                         Icons.copy,
-                        color: AppColors.primaryAction,
+                        color: Theme.of(context).colorScheme.primary,
                         size: 16,
                       ),
                     ),

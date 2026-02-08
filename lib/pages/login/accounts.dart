@@ -1,8 +1,10 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:garden/api/dsm_api.dart';
 import 'package:garden/constants/app_constants.dart';
 import 'package:garden/pages/login/login.dart';
 import 'package:garden/stores/connection_store.dart';
@@ -10,6 +12,7 @@ import 'package:garden/util/http_util.dart';
 import 'package:garden/util/log.dart';
 import 'package:garden/util/storage_util.dart';
 import 'package:garden/util/ui_util.dart';
+import 'package:garden/widgets/button_style.dart';
 import 'package:garden/widgets/label.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
@@ -74,19 +77,22 @@ class AccountsState extends State<Accounts> with SignalsMixin {
             await refreshServerInfo(server);
           } else {
             //登录失败，尝试重新登录
-            final res = await DsmApi.login(
-                host: host,
-                account: server['account'],
-                password: server['password'],
-                otpCode: "",
-                rememberDevice: false,
-                cookie: server['smid']);
-            Log.info("accounts: login: $res");
-            if (res['success']) {
+            try {
+              final res = await dsmAuthLogin(
+                  host: host,
+                  account: server['account'],
+                  password: server['password'],
+                  otpCode: "",
+                  rememberDevice: false,
+                  cookie: server['smid']);
+              Log.info("accounts: login: $res");
               server['is_login'] = true;
               server['sid'] = res['data']['sid'];
               await refreshServerInfo(server);
-            } else {
+            } on DioException catch (e) {
+              Log.error("getServerInfo failed: ${e.message}");
+            } on DSMException catch (e) {
+              Log.error("getServerInfo failed: ${e.message}");
               server['loading'] = false;
               server['error'] = '登录失败';
             }
@@ -164,9 +170,9 @@ class AccountsState extends State<Accounts> with SignalsMixin {
         Log.info(server);
         if (server['is_login']) {
           connectionStore.setAccount("${server['account']}");
-          connectionStore.setBaseUrl("${server['base_url']}");
+          connectionStore.setBaseUri("${server['base_url']}");
           connectionStore.setCheckSsl(server['check_ssl']);
-          StorageUtil.setString("base_url", connectionStore.baseUrl.value);
+          StorageUtil.setString("base_url", connectionStore.baseUri.value);
 
           StorageUtil.setBool("https", server['https'] ? true : false);
           StorageUtil.setString("host", server['host']);
@@ -196,8 +202,7 @@ class AccountsState extends State<Accounts> with SignalsMixin {
         }
       },
       child: Card(
-        shape: RoundedRectangleBorder(
-            side: const BorderSide(), borderRadius: BorderRadius.circular(18)),
+        shape: context.stadiumShapeBorder,
         child: Padding(
           padding: const EdgeInsets.all(20),
           child: Row(

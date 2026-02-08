@@ -7,7 +7,6 @@ import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:garden/constants/app_constants.dart';
-import 'package:garden/theme/app_colors.dart';
 
 class WidgetSetting extends StatefulWidget {
   final List widgets;
@@ -55,7 +54,7 @@ class WidgetSettingState extends State<WidgetSetting> {
     StorageUtil.getBool("show_wallpaper").then((showWallpaperStr) {
       setState(() {
         if (showWallpaperStr != null) {
-          showWallpaper = showWallpaperStr == "1";
+          showWallpaper = showWallpaperStr;
         } else {
           showWallpaper = true;
         }
@@ -152,9 +151,9 @@ class WidgetSettingState extends State<WidgetSetting> {
                           ),
                           const Spacer(),
                           if (showShortcut)
-                            const Icon(
+                            Icon(
                               CupertinoIcons.checkmark_alt,
-                              color: AppColors.primaryAction,
+                              color: Theme.of(context).colorScheme.primary,
                             ),
                         ],
                       ),
@@ -198,9 +197,9 @@ class WidgetSettingState extends State<WidgetSetting> {
                           ),
                           const Spacer(),
                           if (showWallpaper)
-                            const Icon(
+                            Icon(
                               CupertinoIcons.checkmark_alt,
-                              color: AppColors.primaryAction,
+                              color: Theme.of(context).colorScheme.primary,
                             ),
                         ],
                       ),
@@ -229,9 +228,9 @@ class WidgetSettingState extends State<WidgetSetting> {
                     });
                   },
                   child: Card(
-                    shape: RoundedRectangleBorder(
-                        side: const BorderSide(),
-                        borderRadius: BorderRadius.circular(18)),
+                    shape: StadiumBorder(
+                        side: BorderSide(
+                            color: Theme.of(context).colorScheme.primary)),
                     margin: const EdgeInsets.symmetric(
                         vertical: 10, horizontal: 20),
                     child: Padding(
@@ -252,9 +251,10 @@ class WidgetSettingState extends State<WidgetSetting> {
                               width: 20,
                               height: 20,
                               child: selectedWidgets.contains(widget)
-                                  ? const Icon(
+                                  ? Icon(
                                       CupertinoIcons.checkmark_alt,
-                                      color: AppColors.primaryAction,
+                                      color:
+                                          Theme.of(context).colorScheme.primary,
                                     )
                                   : null,
                             ),

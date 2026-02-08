@@ -16,7 +16,7 @@ class ConnectionStore {
 
   final _sid = signal<String>('');
   final _account = signal<String>('');
-  final _baseUrl = signal<String>('https://dang8080.quickconnect.to');
+  final _baseUri = signal<String>('https://dang8080.quickconnect.to');
   final _hostname = signal<String>('');
   final _cookie = signal<String>('');
   final _checkSsl = signal<bool>(true);
@@ -28,7 +28,7 @@ class ConnectionStore {
 
   ReadonlySignal<String> get sid => _sid;
   ReadonlySignal<String> get account => _account;
-  ReadonlySignal<String> get baseUrl => _baseUrl;
+  ReadonlySignal<String> get baseUri => _baseUri;
   ReadonlySignal<String> get hostname => _hostname;
   ReadonlySignal<String> get cookie => _cookie;
   ReadonlySignal<bool> get checkSsl => _checkSsl;
@@ -42,9 +42,14 @@ class ConnectionStore {
 
   void setSid(String value) => _sid.value = value;
   void setAccount(String value) => _account.value = value;
-  void setBaseUrl(String value) => _baseUrl.value = value;
+  void setBaseUri(String value) => _baseUri.value = value;
   void setHostname(String value) => _hostname.value = value;
-  void setCookie(String value) => _cookie.value = value;
+  void setCookie(String value) async {
+    _cookie.value = value;
+    // TODO: cookie name???
+    await StorageUtil.setString("smid", value);
+  }
+
   void setCheckSsl(bool value) async {
     _checkSsl.value = value;
     await StorageUtil.setBool("check_ssl", value);
@@ -72,7 +77,7 @@ class ConnectionStore {
   void dispose() {
     _sid.dispose();
     _account.dispose();
-    _baseUrl.dispose();
+    _baseUri.dispose();
     _hostname.dispose();
     _cookie.dispose();
     _checkSsl.dispose();

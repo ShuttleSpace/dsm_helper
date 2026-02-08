@@ -756,9 +756,9 @@ class SettingState extends State<Setting> {
                   },
                   child: Card(
                     margin: EdgeInsets.zero,
-                    shape: RoundedRectangleBorder(
-                        side: const BorderSide(),
-                        borderRadius: BorderRadius.circular(18)),
+                    shape: StadiumBorder(
+                        side: BorderSide(
+                            color: Theme.of(context).colorScheme.primary)),
                     child: Padding(
                       padding: const EdgeInsets.symmetric(vertical: 6.0),
                       child: Column(

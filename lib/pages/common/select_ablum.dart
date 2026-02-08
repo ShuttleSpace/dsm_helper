@@ -2,7 +2,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:garden/util/ui_util.dart';
 import 'package:flutter/material.dart';
 import 'package:garden/constants/app_constants.dart';
-import 'package:garden/theme/app_colors.dart';
 import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 
 class SelectAlbum extends StatefulWidget {
@@ -101,9 +100,9 @@ class SelectAlbumState extends State<SelectAlbum> {
                     width: 20,
                     height: 20,
                     child: selectedAlbums.contains(album)
-                        ? const Icon(
+                        ? Icon(
                             CupertinoIcons.checkmark_alt,
-                            color: AppColors.primaryAction,
+                            color: Theme.of(context).colorScheme.primary,
                           )
                         : null,
                   ),

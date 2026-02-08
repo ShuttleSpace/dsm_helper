@@ -3,7 +3,6 @@ import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:garden/constants/app_constants.dart';
-import 'package:garden/theme/app_colors.dart';
 import 'dart:async';
 
 class MediaIndex extends StatefulWidget {
@@ -199,9 +198,11 @@ class MediaIndexState extends State<MediaIndex> {
                                       const Text("一般品质"),
                                       const Spacer(),
                                       if (thumbnailQuality == "normal")
-                                        const Icon(
+                                        Icon(
                                           CupertinoIcons.checkmark_alt,
-                                          color: AppColors.primaryAction,
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .primary,
                                         ),
                                     ],
                                   ),
@@ -234,9 +235,11 @@ class MediaIndexState extends State<MediaIndex> {
                                       const Text("高品质"),
                                       const Spacer(),
                                       if (thumbnailQuality == "high")
-                                        const Icon(
+                                        Icon(
                                           CupertinoIcons.checkmark_alt,
-                                          color: AppColors.primaryAction,
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .primary,
                                         ),
                                     ],
                                   ),
@@ -302,9 +305,10 @@ class MediaIndexState extends State<MediaIndex> {
                                 const Text("启用移动设备视频转换"),
                                 const Spacer(),
                                 if (mobileEnabled)
-                                  const Icon(
+                                  Icon(
                                     CupertinoIcons.checkmark_alt,
-                                    color: AppColors.primaryAction,
+                                    color:
+                                        Theme.of(context).colorScheme.primary,
                                   ),
                               ],
                             ),

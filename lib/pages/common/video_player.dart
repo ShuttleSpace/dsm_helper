@@ -94,7 +94,7 @@ class VideoPlayerPageState extends State<VideoPlayerPage> {
     if (widget.nfo != null) {
       final myTransformer = Xml2Json();
       String nfoUrl =
-          "${connectionStore.baseUrl}/fbdownload/info.nfo?dlink=%22${widget.nfo?.utf8()}%22&_sid=%22${connectionStore.sid}%22&mode=open";
+          "${connectionStore.baseUri}/fbdownload/info.nfo?dlink=%22${widget.nfo?.utf8()}%22&_sid=%22${connectionStore.sid}%22&mode=open";
       var res = await HttpUtil.instance.get(nfoUrl, decode: false);
       try {
         myTransformer.parse(res);
@@ -272,7 +272,7 @@ class VideoPlayerPageState extends State<VideoPlayerPage> {
                           ? ExtendedImage.network(
                               widget.cover!.startsWith("http")
                                   ? widget.cover!
-                                  : "${connectionStore.baseUrl}/webapi/entry.cgi?path=${Uri.encodeComponent(widget.cover!)}&size=original&api=SYNO.FileStation.Thumb&method=get&version=2&_sid=${connectionStore.sid}&animate=true",
+                                  : "${connectionStore.baseUri}/webapi/entry.cgi?path=${Uri.encodeComponent(widget.cover!)}&size=original&api=SYNO.FileStation.Thumb&method=get&version=2&_sid=${connectionStore.sid}&animate=true",
                             )
                           : const CircularProgressIndicator(),
                     ),

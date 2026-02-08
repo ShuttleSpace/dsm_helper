@@ -5,7 +5,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_vibrate/flutter_vibrate.dart';
 import 'package:garden/pages/download/download.dart';
-import 'package:garden/theme/app_colors.dart';
 import 'package:garden/util/http_util.dart';
 import 'package:garden/widgets/download/download_action_menu_widget.dart';
 import 'package:garden/widgets/download/download_status_widget.dart';
@@ -142,9 +141,9 @@ class DownloadTaskItemWidget extends StatelessWidget {
             width: 20,
             height: 20,
             child: selectedTasks.value.contains(info)
-                ? const Icon(
+                ? Icon(
                     CupertinoIcons.checkmark_alt,
-                    color: AppColors.primaryAction,
+                    color: Theme.of(context).colorScheme.primary,
                   )
                 : Container(),
           ),

@@ -13,7 +13,7 @@ import 'package:http_parser/http_parser.dart';
 import 'http_util.dart';
 
 class DsmApi {
-  static Map<String, ApiModel> apiList = {};
+  static Map<String, DsmApiInfo> apiList = {};
   static Future<Map?> api() async {
     var res = await HttpUtil.instance.post("query.cgi", data: {
       "query": "all",
@@ -2583,5 +2583,9 @@ enum ErrorCode {
   ;
 
   const ErrorCode(this.code);
+  factory ErrorCode.valueOf(int code) {
+    return ErrorCode.values.firstWhere((element) => element.code == code,
+        orElse: () => throw Exception("Unknown error code $code"));
+  }
   final int code;
 }

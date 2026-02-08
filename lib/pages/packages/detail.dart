@@ -59,7 +59,7 @@ class PackageDetailState extends State<PackageDetail> {
     }
     thumbnailUrl = widget.package['thumbnail'].last;
     if (!thumbnailUrl.startsWith("http")) {
-      thumbnailUrl = connectionStore.baseUrl.watch(context) + thumbnailUrl;
+      thumbnailUrl = connectionStore.baseUri.watch(context) + thumbnailUrl;
     }
     getVolumes();
     super.initState();
@@ -81,7 +81,7 @@ class PackageDetailState extends State<PackageDetail> {
 
   Widget _buildSwiperItem(String url) {
     if (!url.startsWith("http")) {
-      url = connectionStore.baseUrl + url;
+      url = connectionStore.baseUri + url;
     }
     return CupertinoExtendedImage(
       url,
@@ -378,9 +378,9 @@ class PackageDetailState extends State<PackageDetail> {
                 if (widget.package['snapshot'] != null &&
                     widget.package['snapshot'].length > 0)
                   Card(
-                    shape: RoundedRectangleBorder(
-                        side: const BorderSide(),
-                        borderRadius: BorderRadius.circular(18)),
+                    shape: StadiumBorder(
+                        side: BorderSide(
+                            color: Theme.of(context).colorScheme.primary)),
                     margin: const EdgeInsets.only(top: 20),
                     child: Padding(
                       padding: const EdgeInsets.all(10),
@@ -434,9 +434,9 @@ class PackageDetailState extends State<PackageDetail> {
                 ),
                 if (widget.package['changelog'] != "")
                   Card(
-                    shape: RoundedRectangleBorder(
-                        side: const BorderSide(),
-                        borderRadius: BorderRadius.circular(18)),
+                    shape: StadiumBorder(
+                        side: BorderSide(
+                            color: Theme.of(context).colorScheme.primary)),
                     margin: const EdgeInsets.only(top: 20),
                     child: Padding(
                       padding: const EdgeInsets.all(20),

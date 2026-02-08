@@ -2,7 +2,6 @@ import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:garden/constants/app_constants.dart';
-import 'package:garden/theme/app_colors.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 
 class AddPowerTask extends StatefulWidget {
@@ -80,9 +79,10 @@ class AddPowerTaskState extends State<AddPowerTask> {
                                   const Text("开机"),
                                   const Spacer(),
                                   if (task['type'] == "power_on")
-                                    const Icon(
+                                    Icon(
                                       CupertinoIcons.checkmark_alt,
-                                      color: AppColors.primaryAction,
+                                      color:
+                                          Theme.of(context).colorScheme.primary,
                                     ),
                                 ],
                               ),
@@ -112,9 +112,10 @@ class AddPowerTaskState extends State<AddPowerTask> {
                                   const Text("关机"),
                                   const Spacer(),
                                   if (task['type'] == "power_off")
-                                    const Icon(
+                                    Icon(
                                       CupertinoIcons.checkmark_alt,
-                                      color: AppColors.primaryAction,
+                                      color:
+                                          Theme.of(context).colorScheme.primary,
                                     ),
                                 ],
                               ),
@@ -176,9 +177,10 @@ class AddPowerTaskState extends State<AddPowerTask> {
                                   const Text("日"),
                                   const Spacer(),
                                   if (weekdays.contains("0"))
-                                    const Icon(
+                                    Icon(
                                       CupertinoIcons.checkmark_alt,
-                                      color: AppColors.primaryAction,
+                                      color:
+                                          Theme.of(context).colorScheme.primary,
                                     ),
                                 ],
                               ),
@@ -216,9 +218,10 @@ class AddPowerTaskState extends State<AddPowerTask> {
                                   const Text("一"),
                                   const Spacer(),
                                   if (weekdays.contains("1"))
-                                    const Icon(
+                                    Icon(
                                       CupertinoIcons.checkmark_alt,
-                                      color: AppColors.primaryAction,
+                                      color:
+                                          Theme.of(context).colorScheme.primary,
                                     ),
                                 ],
                               ),
@@ -256,9 +259,10 @@ class AddPowerTaskState extends State<AddPowerTask> {
                                   const Text("二"),
                                   const Spacer(),
                                   if (weekdays.contains("2"))
-                                    const Icon(
+                                    Icon(
                                       CupertinoIcons.checkmark_alt,
-                                      color: AppColors.primaryAction,
+                                      color:
+                                          Theme.of(context).colorScheme.primary,
                                     ),
                                 ],
                               ),
@@ -296,9 +300,10 @@ class AddPowerTaskState extends State<AddPowerTask> {
                                   const Text("三"),
                                   const Spacer(),
                                   if (weekdays.contains("3"))
-                                    const Icon(
+                                    Icon(
                                       CupertinoIcons.checkmark_alt,
-                                      color: AppColors.primaryAction,
+                                      color:
+                                          Theme.of(context).colorScheme.primary,
                                     ),
                                 ],
                               ),
@@ -340,9 +345,10 @@ class AddPowerTaskState extends State<AddPowerTask> {
                                   const Text("四"),
                                   const Spacer(),
                                   if (weekdays.contains("4"))
-                                    const Icon(
+                                    Icon(
                                       CupertinoIcons.checkmark_alt,
-                                      color: AppColors.primaryAction,
+                                      color:
+                                          Theme.of(context).colorScheme.primary,
                                     ),
                                 ],
                               ),
@@ -380,9 +386,10 @@ class AddPowerTaskState extends State<AddPowerTask> {
                                   const Text("五"),
                                   const Spacer(),
                                   if (weekdays.contains("5"))
-                                    const Icon(
+                                    Icon(
                                       CupertinoIcons.checkmark_alt,
-                                      color: AppColors.primaryAction,
+                                      color:
+                                          Theme.of(context).colorScheme.primary,
                                     ),
                                 ],
                               ),
@@ -420,9 +427,10 @@ class AddPowerTaskState extends State<AddPowerTask> {
                                   const Text("六"),
                                   const Spacer(),
                                   if (weekdays.contains("6"))
-                                    const Icon(
+                                    Icon(
                                       CupertinoIcons.checkmark_alt,
-                                      color: AppColors.primaryAction,
+                                      color:
+                                          Theme.of(context).colorScheme.primary,
                                     ),
                                 ],
                               ),
@@ -490,9 +498,10 @@ class AddPowerTaskState extends State<AddPowerTask> {
                                   Text(
                                       "${task['hour'].toString().padLeft(2, "0")}:${task['min'].toString().padLeft(2, "0")}"),
                                   const Spacer(),
-                                  const Icon(
+                                  Icon(
                                     CupertinoIcons.right_chevron,
-                                    color: AppColors.primaryAction,
+                                    color:
+                                        Theme.of(context).colorScheme.primary,
                                   ),
                                 ],
                               ),

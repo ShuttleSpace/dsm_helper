@@ -2,6 +2,7 @@ import 'package:garden/util/http_util.dart';
 import 'package:garden/util/log.dart';
 import 'package:garden/util/ui_util.dart';
 import 'package:garden/widgets/bubble_tab_indicator.dart';
+import 'package:garden/widgets/button_style.dart';
 import 'package:garden/widgets/control_panel/permission_item.dart';
 import 'package:garden/widgets/control_panel/quota_item.dart';
 import 'package:garden/widgets/control_panel/user_group_item.dart';
@@ -10,7 +11,6 @@ import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:garden/constants/app_constants.dart';
-import 'package:garden/theme/app_colors.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 
 class UserDetail extends StatefulWidget {
@@ -62,8 +62,7 @@ class UserDetailState extends State<UserDetail>
         });
       },
       child: Card(
-        shape: RoundedRectangleBorder(
-            side: const BorderSide(), borderRadius: BorderRadius.circular(18)),
+        shape: context.stadiumShapeBorder,
         child: Padding(
           padding: const EdgeInsets.all(20),
           child: Column(
@@ -333,9 +332,9 @@ class UserDetailState extends State<UserDetail>
                               const Text("不允许此用户修改密码"),
                               const Spacer(),
                               if (user?['cannot_chg_passwd'] ?? false)
-                                const Icon(
+                                Icon(
                                   CupertinoIcons.checkmark_alt,
-                                  color: AppColors.primaryAction,
+                                  color: Theme.of(context).colorScheme.primary,
                                 ),
                             ],
                           ),
@@ -363,9 +362,9 @@ class UserDetailState extends State<UserDetail>
                               const Text("密码始终有效"),
                               const Spacer(),
                               if (user?['passwd_never_expire'] ?? false)
-                                const Icon(
+                                Icon(
                                   CupertinoIcons.checkmark_alt,
-                                  color: AppColors.primaryAction,
+                                  color: Theme.of(context).colorScheme.primary,
                                 ),
                             ],
                           ),
@@ -401,9 +400,10 @@ class UserDetailState extends State<UserDetail>
                                   ),
                                   const Spacer(),
                                   if (user?['expired'] != "normal")
-                                    const Icon(
+                                    Icon(
                                       CupertinoIcons.checkmark_alt,
-                                      color: AppColors.primaryAction,
+                                      color:
+                                          Theme.of(context).colorScheme.primary,
                                     ),
                                 ],
                               ),

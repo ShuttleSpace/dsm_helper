@@ -120,9 +120,9 @@ class HelperSettingState extends State<HelperSetting> {
                         ),
                         const Spacer(),
                         if (settingsStore.vibrateOn.watch(context))
-                          const Icon(
+                          Icon(
                             CupertinoIcons.checkmark_alt,
-                            color: AppColors.primaryAction,
+                            color: Theme.of(context).colorScheme.primary,
                           ),
                       ],
                     ),
@@ -170,9 +170,11 @@ class HelperSettingState extends State<HelperSetting> {
                                         const Spacer(),
                                         if (settingsStore.vibrateNormal
                                             .watch(context))
-                                          const Icon(
+                                          Icon(
                                             CupertinoIcons.checkmark_alt,
-                                            color: AppColors.primaryAction,
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .primary,
                                           ),
                                       ],
                                     ),
@@ -216,9 +218,11 @@ class HelperSettingState extends State<HelperSetting> {
                                         const Spacer(),
                                         if (settingsStore.vibrateWarning
                                             .watch(context))
-                                          const Icon(
+                                          Icon(
                                             CupertinoIcons.checkmark_alt,
-                                            color: AppColors.primaryAction,
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .primary,
                                           ),
                                       ],
                                     ),
@@ -274,9 +278,9 @@ class HelperSettingState extends State<HelperSetting> {
                     ),
                     const Spacer(),
                     if (videoPlayer)
-                      const Icon(
+                      Icon(
                         CupertinoIcons.checkmark_alt,
-                        color: AppColors.primaryAction,
+                        color: Theme.of(context).colorScheme.primary,
                       ),
                   ],
                 ),
@@ -367,9 +371,9 @@ class HelperSettingState extends State<HelperSetting> {
                     ),
                     const Spacer(),
                     if (launchAccountPage)
-                      const Icon(
+                      Icon(
                         CupertinoIcons.checkmark_alt,
-                        color: AppColors.primaryAction,
+                        color: Theme.of(context).colorScheme.primary,
                       ),
                   ],
                 ),
@@ -409,9 +413,9 @@ class HelperSettingState extends State<HelperSetting> {
                         ),
                         const Spacer(),
                         if (launchAuth)
-                          const Icon(
+                          Icon(
                             CupertinoIcons.checkmark_alt,
-                            color: AppColors.primaryAction,
+                            color: Theme.of(context).colorScheme.primary,
                           ),
                       ],
                     ),
@@ -476,9 +480,11 @@ class HelperSettingState extends State<HelperSetting> {
                                             ),
                                             const Spacer(),
                                             if (password)
-                                              const Icon(
+                                              Icon(
                                                 CupertinoIcons.checkmark_alt,
-                                                color: AppColors.primaryAction,
+                                                color: Theme.of(context)
+                                                    .colorScheme
+                                                    .primary,
                                               ),
                                           ],
                                         ),
@@ -656,9 +662,9 @@ class HelperSettingState extends State<HelperSetting> {
                 ),
                 const Spacer(),
                 if (settingsStore.dashboardCardCollapseSwitch.watch(context))
-                  const Icon(
+                  Icon(
                     CupertinoIcons.checkmark_alt,
-                    color: AppColors.primaryAction,
+                    color: Theme.of(context).colorScheme.primary,
                   ),
               ],
             ),

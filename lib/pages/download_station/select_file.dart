@@ -1,12 +1,12 @@
 import 'package:garden/util/http_util.dart';
 import 'package:garden/util/file_type_util.dart';
 import 'package:garden/util/ui_util.dart';
+import 'package:garden/widgets/button_style.dart';
 import 'package:garden/widgets/file_icon.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:garden/constants/app_constants.dart';
-import 'package:garden/theme/app_colors.dart';
 
 class SelectFile extends StatefulWidget {
   final List listId;
@@ -59,8 +59,7 @@ class SelectFileState extends State<SelectFile> {
         }
       },
       child: Card(
-        shape: RoundedRectangleBorder(
-            side: const BorderSide(), borderRadius: BorderRadius.circular(18)),
+        shape: context.stadiumShapeBorder,
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 20),
           child: Row(
@@ -107,9 +106,9 @@ class SelectFileState extends State<SelectFile> {
                     width: 20,
                     height: 20,
                     child: selectedFiles.contains(file['index'])
-                        ? const Icon(
+                        ? Icon(
                             CupertinoIcons.checkmark_alt,
-                            color: AppColors.primaryAction,
+                            color: Theme.of(context).colorScheme.primary,
                           )
                         : null,
                   ),

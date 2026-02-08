@@ -1,9 +1,9 @@
+import 'package:garden/api/dsm_api.dart';
 import 'package:draggable_scrollbar/draggable_scrollbar.dart';
 import 'package:garden/stores/connection_store.dart';
 import 'package:garden/pages/common/image_preview.dart';
 import 'package:garden/theme/app_colors.dart';
 import 'package:garden/util/http_util.dart';
-import 'package:garden/util/moments_api.dart';
 import 'package:garden/widgets/cupertino_image.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:garden/widgets/transparent_router.dart';
@@ -34,16 +34,16 @@ class TimelineState extends State<Timeline> {
 
   getData() async {
     var res =
-        await MomentsApi.timeline(category: widget.category, type: widget.type);
-    if (res['success'] && mounted) {
+        await dsmFotoBrowseTimeline(category: widget.category, type: widget.type);
+    if (mounted) {
       setState(() {
         timeline = [];
         if (connectionStore.dsmVersion.watch(context) == 7) {
-          for (var section in res['data']['section']) {
+          for (var section in res['section']) {
             timeline.addAll(section['list']);
           }
         } else {
-          timeline = res['data']['list'];
+          timeline = res['list'];
         }
         for (int i = 0; i < timeline.length; i++) {
           int lines = (timeline[i]['item_count'] / 4).ceil();
@@ -59,9 +59,7 @@ class TimelineState extends State<Timeline> {
                 timeline[i]['position']['start'] + height;
           }
         }
-        setState(() {
-          loadingTimeline = false;
-        });
+        loadingTimeline = false;
       });
     }
   }
@@ -69,7 +67,7 @@ class TimelineState extends State<Timeline> {
   getLineInfo(line) async {
     if (line['items'] == null) {
       line['items'] = [];
-      MomentsApi.photos(
+      dsmFotoBrowsePhotoList(
               year: line['year'],
               month: line['month'],
               day: line['day'],
@@ -77,19 +75,19 @@ class TimelineState extends State<Timeline> {
               category:
                   widget.category == "Timeline" ? "Item" : widget.category)
           .then((res) {
-        if (res['success'] && mounted) {
+        if (mounted) {
           setState(() {
-            line['items'] = res['data']['list'];
+            line['items'] = res['list'];
           });
         }
       });
     }
     if (line['location'] == null) {
       line['location'] = {};
-      MomentsApi.location(line['year'], line['month'], line['day']).then((res) {
-        if (res['success'] && mounted) {
+      dsmFotoBrowseTimelineLocation(line['year'], line['month'], line['day']).then((res) {
+        if (mounted) {
           setState(() {
-            line['location'] = res['data'];
+            line['location'] = res;
           });
         }
       });
@@ -114,9 +112,9 @@ class TimelineState extends State<Timeline> {
       }
     }
     String thumbUrl =
-        '${connectionStore.baseUrl}/webapi/entry.cgi?id=${photo['additional']['thumbnail']['unit_id']}&cache_key="${photo['additional']['thumbnail']['cache_key']}"&type="unit"&size="sm"&api="SYNO.${connectionStore.dsmVersion.watch(context) >= 7 ? "Foto" : "Photo"}.Thumbnail"&method="get"&version=1&_sid=${connectionStore.sid}';
+        '${connectionStore.baseUri}/webapi/entry.cgi?id=${photo['additional']['thumbnail']['unit_id']}&cache_key="${photo['additional']['thumbnail']['cache_key']}"&type="unit"&size="sm"&api="SYNO.${connectionStore.dsmVersion.watch(context) >= 7 ? "Foto" : "Photo"}.Thumbnail"&method="get"&version=1&_sid=${connectionStore.sid}';
     String originalUrl =
-        '${connectionStore.baseUrl}/webapi/entry.cgi?id=${photo['additional']['thumbnail']['unit_id']}&cache_key="${photo['additional']['thumbnail']['cache_key']}"&type="unit"&size="xl"&api="SYNO.${connectionStore.dsmVersion.watch(context) >= 7 ? "Foto" : "Photo"}.Thumbnail"&method="get"&version=1&_sid=${connectionStore.sid}';
+        '${connectionStore.baseUri}/webapi/entry.cgi?id=${photo['additional']['thumbnail']['unit_id']}&cache_key="${photo['additional']['thumbnail']['cache_key']}"&type="unit"&size="xl"&api="SYNO.${connectionStore.dsmVersion.watch(context) >= 7 ? "Foto" : "Photo"}.Thumbnail"&method="get"&version=1&_sid=${connectionStore.sid}';
     return GestureDetector(
       onTap: () {
         Navigator.of(context).push(TransparentPageRoute(

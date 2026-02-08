@@ -4,6 +4,7 @@ import 'package:garden/extensions/color.dart';
 import 'package:garden/pages/control_panel/public_access/edit_ddns.dart';
 import 'package:garden/util/http_util.dart';
 import 'package:garden/widgets/bubble_tab_indicator.dart';
+import 'package:garden/widgets/button_style.dart';
 import 'package:garden/widgets/label.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
@@ -103,8 +104,7 @@ class PublicAccessState extends State<PublicAccess>
         });
       },
       child: Card(
-        shape: RoundedRectangleBorder(
-            side: const BorderSide(), borderRadius: BorderRadius.circular(18)),
+        shape: context.stadiumShapeBorder,
         margin: const EdgeInsets.only(top: 20, left: 20, right: 20),
         child: Padding(
           padding: const EdgeInsets.all(AppConstants.paddingSmall),

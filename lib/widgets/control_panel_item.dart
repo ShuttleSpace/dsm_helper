@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:garden/constants/app_constants.dart';
 import 'package:garden/util/navigation_helper.dart';
+import 'package:garden/widgets/button_style.dart';
 
 /// 控制面板入口卡片组件
 ///
@@ -59,12 +60,7 @@ class ControlPanelItem extends StatelessWidget {
         );
       },
       child: Card(
-        shape: RoundedRectangleBorder(
-          side: BorderSide(
-            color: theme.colorScheme.onSurface.withValues(alpha: .1),
-          ),
-          borderRadius: BorderRadius.circular(borderRadius),
-        ),
+        shape: context.stadiumShapeBorder,
         color: theme.colorScheme.surface,
         child: Padding(
           padding: const EdgeInsets.all(AppConstants.paddingSmall),

@@ -119,11 +119,11 @@ class PhotoModel {
   PhotoAdditional? additional;
 
   String videoUrl({bool isTeam = false}) {
-    return '${connectionStore.baseUrl}/webapi/entry.cgi?item_id=%5B$id%5D&api=%22SYNO.Foto${isTeam ? 'Team' : ''}.Download%22&method=%22download%22&version=1&_sid=${connectionStore.sid}';
+    return '${connectionStore.baseUri}/webapi/entry.cgi?item_id=%5B$id%5D&api=%22SYNO.Foto${isTeam ? 'Team' : ''}.Download%22&method=%22download%22&version=1&_sid=${connectionStore.sid}';
   }
 
   String thumbUrl({String size = 'sm', bool isTeam = false}) {
-    return '${connectionStore.baseUrl}/webapi/entry.cgi?id=${additional!.thumbnail?.unitId}&cache_key="${additional?.thumbnail?.cacheKey}"&type="unit"&size="$size"&api="SYNO.Foto${isTeam ? 'Team' : ''}.Thumbnail"&method="get"&version=1&_sid=${connectionStore.sid}';
+    return '${connectionStore.baseUri}/webapi/entry.cgi?id=${additional!.thumbnail?.unitId}&cache_key="${additional?.thumbnail?.cacheKey}"&type="unit"&size="$size"&api="SYNO.Foto${isTeam ? 'Team' : ''}.Thumbnail"&method="get"&version=1&_sid=${connectionStore.sid}';
   }
 
   PhotoModel copyWith({

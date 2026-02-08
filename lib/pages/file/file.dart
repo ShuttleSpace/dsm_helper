@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:garden/services/download.dart';
 import 'package:garden/stores/settings_store.dart';
 import 'package:garden/util/file_type_util.dart';
 import 'package:garden/util/ui_util.dart';
@@ -29,13 +30,13 @@ import 'package:garden/pages/file/upload.dart';
 import 'package:garden/theme/app_theme.dart';
 import 'package:garden/util/http_util.dart';
 import 'package:garden/widgets/animation_progress_bar.dart';
+import 'package:garden/widgets/button_style.dart';
 import 'package:garden/widgets/file_icon.dart';
 import 'package:garden/widgets/transparent_router.dart';
 import 'package:extended_text/extended_text.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:garden/constants/app_constants.dart';
-import 'package:garden/theme/app_colors.dart';
 import 'package:flutter_floating/floating/floating.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:signals_flutter/signals_flutter.dart';
@@ -561,14 +562,38 @@ class FilesState extends State<Files> {
 
     for (var file in files) {
       String url =
-          "${connectionStore.baseUrl}/webapi/entry.cgi?api=SYNO.FileStation.Download&version=2&method=download&path=${Uri.encodeComponent(file['path'])}&mode=download&_sid=${connectionStore.sid}";
+          "${connectionStore.baseUri}/webapi/entry.cgi?api=SYNO.FileStation.Download&version=2&method=download&path=${Uri.encodeComponent(file['path'])}&mode=download&_sid=${connectionStore.sid}";
       String filename = "";
       if (file['isdir']) {
         filename = file['name'] + ".zip";
       } else {
         filename = file['name'];
       }
-      await HttpUtil.instance.download(filename, url);
+      await enqueDownloadTask(url, filename, onPermissionDenied: () {
+        showCupertinoDialog(
+            context: context,
+            builder: (context) {
+              return CupertinoAlertDialog(
+                title: const Text("请求获取存储权限"),
+                content: const Text("没有权限访问存储，无法下载文件"),
+                actions: [
+                  CupertinoDialogAction(
+                    child: const Text("确定"),
+                    onPressed: () async {
+                      final status = await Permission.storage.request();
+                      if (!status.isGranted) {
+                        UiUtil.toast("请先授权APP访问存储权限, 方可下载");
+                      }
+                      if (context.mounted) {
+                        // ignore: use_build_context_synchronously
+                        Navigator.of(context).pop();
+                      }
+                    },
+                  ),
+                ],
+              );
+            });
+      });
     }
     UiUtil.toast(
         "已添加${files.length > 1 ? "${files.length}个" : ""}下载任务，请至下载页面查看");
@@ -717,7 +742,7 @@ class FilesState extends State<Files> {
       loading = true;
     });
     var res = await HttpUtil.instance.get(
-        "${connectionStore.baseUrl}/webapi/entry.cgi?api=SYNO.FileStation.Download&version=1&method=download&path=${Uri.encodeComponent(file['path'])}&mode=open&_sid=${connectionStore.sid}",
+        "${connectionStore.baseUri}/webapi/entry.cgi?api=SYNO.FileStation.Download&version=1&method=download&path=${Uri.encodeComponent(file['path'])}&mode=open&_sid=${connectionStore.sid}",
         decode: false);
     setState(() {
       loading = false;
@@ -737,8 +762,7 @@ class FilesState extends State<Files> {
     return Material(
       color: Colors.transparent,
       child: Card(
-        shape: RoundedRectangleBorder(
-            side: const BorderSide(), borderRadius: BorderRadius.circular(18)),
+        shape: context.stadiumShapeBorder,
         child: Padding(
           padding: const EdgeInsets.all(20),
           child: Column(
@@ -777,9 +801,11 @@ class FilesState extends State<Files> {
                                     width: 20,
                                     height: 20,
                                     child: sortBy == "name"
-                                        ? const Icon(
+                                        ? Icon(
                                             CupertinoIcons.checkmark_alt,
-                                            color: AppColors.primaryAction,
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .primary,
                                           )
                                         : null,
                                   ),
@@ -811,9 +837,11 @@ class FilesState extends State<Files> {
                                     width: 20,
                                     height: 20,
                                     child: sortBy == "size"
-                                        ? const Icon(
+                                        ? Icon(
                                             CupertinoIcons.checkmark_alt,
-                                            color: AppColors.primaryAction,
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .primary,
                                           )
                                         : null,
                                   ),
@@ -845,9 +873,11 @@ class FilesState extends State<Files> {
                                     width: 20,
                                     height: 20,
                                     child: sortBy == "type"
-                                        ? const Icon(
+                                        ? Icon(
                                             CupertinoIcons.checkmark_alt,
-                                            color: AppColors.primaryAction,
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .primary,
                                           )
                                         : null,
                                   ),
@@ -879,9 +909,11 @@ class FilesState extends State<Files> {
                                     width: 20,
                                     height: 20,
                                     child: sortBy == "mtime"
-                                        ? const Icon(
+                                        ? Icon(
                                             CupertinoIcons.checkmark_alt,
-                                            color: AppColors.primaryAction,
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .primary,
                                           )
                                         : null,
                                   ),
@@ -913,9 +945,11 @@ class FilesState extends State<Files> {
                                     width: 20,
                                     height: 20,
                                     child: sortBy == "crtime"
-                                        ? const Icon(
+                                        ? Icon(
                                             CupertinoIcons.checkmark_alt,
-                                            color: AppColors.primaryAction,
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .primary,
                                           )
                                         : null,
                                   ),
@@ -947,9 +981,11 @@ class FilesState extends State<Files> {
                                     width: 20,
                                     height: 20,
                                     child: sortBy == "atime"
-                                        ? const Icon(
+                                        ? Icon(
                                             CupertinoIcons.checkmark_alt,
-                                            color: AppColors.primaryAction,
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .primary,
                                           )
                                         : null,
                                   ),
@@ -981,9 +1017,11 @@ class FilesState extends State<Files> {
                                     width: 20,
                                     height: 20,
                                     child: sortBy == "posix"
-                                        ? const Icon(
+                                        ? Icon(
                                             CupertinoIcons.checkmark_alt,
-                                            color: AppColors.primaryAction,
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .primary,
                                           )
                                         : null,
                                   ),
@@ -1015,9 +1053,11 @@ class FilesState extends State<Files> {
                                     width: 20,
                                     height: 20,
                                     child: sortBy == "user"
-                                        ? const Icon(
+                                        ? Icon(
                                             CupertinoIcons.checkmark_alt,
-                                            color: AppColors.primaryAction,
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .primary,
                                           )
                                         : null,
                                   ),
@@ -1049,9 +1089,11 @@ class FilesState extends State<Files> {
                                     width: 20,
                                     height: 20,
                                     child: sortBy == "group"
-                                        ? const Icon(
+                                        ? Icon(
                                             CupertinoIcons.checkmark_alt,
-                                            color: AppColors.primaryAction,
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .primary,
                                           )
                                         : null,
                                   ),
@@ -1099,9 +1141,11 @@ class FilesState extends State<Files> {
                                   width: 20,
                                   height: 20,
                                   child: sortDirection == "ASC"
-                                      ? const Icon(
+                                      ? Icon(
                                           CupertinoIcons.checkmark_alt,
-                                          color: AppColors.primaryAction,
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .primary,
                                         )
                                       : null,
                                 ),
@@ -1133,9 +1177,11 @@ class FilesState extends State<Files> {
                                   width: 20,
                                   height: 20,
                                   child: sortDirection == "DESC"
-                                      ? const Icon(
+                                      ? Icon(
                                           CupertinoIcons.checkmark_alt,
-                                          color: AppColors.primaryAction,
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .primary,
                                         )
                                       : null,
                                 ),
@@ -1412,9 +1458,9 @@ class FilesState extends State<Files> {
                       FileTypeUtil.getFileType(files[i]['name'])) ==
                   FileTypeEnum.image) {
                 images.add(
-                    "${connectionStore.baseUrl}/webapi/entry.cgi?path=${Uri.encodeComponent(files[i]['path'])}&size=original&api=SYNO.FileStation.Thumb&method=get&version=2&_sid=${connectionStore.sid}&animate=true");
+                    "${connectionStore.baseUri}/webapi/entry.cgi?path=${Uri.encodeComponent(files[i]['path'])}&size=original&api=SYNO.FileStation.Thumb&method=get&version=2&_sid=${connectionStore.sid}&animate=true");
                 thumbs.add(
-                    "${connectionStore.baseUrl}/webapi/entry.cgi?path=${Uri.encodeComponent(files[i]['path'])}&size=small&api=SYNO.FileStation.Thumb&method=get&version=2&_sid=${connectionStore.sid}&animate=true");
+                    "${connectionStore.baseUri}/webapi/entry.cgi?path=${Uri.encodeComponent(files[i]['path'])}&size=small&api=SYNO.FileStation.Thumb&method=get&version=2&_sid=${connectionStore.sid}&animate=true");
                 names.add(files[i]['name']);
                 paths.add(files[i]['path']);
                 if (files[i]['name'] == file['name']) {
@@ -1441,7 +1487,7 @@ class FilesState extends State<Files> {
             bool useEmbeedVideoPlayer =
                 await StorageUtil.getBool("use_embeed_video_player") ?? true;
             String url =
-                "${connectionStore.baseUrl}/fbdownload/${Uri.encodeComponent(file['name'])}?dlink=%22${(file['path'] as String).utf8()}%22&_sid=%22${connectionStore.sid}%22&mode=open";
+                "${connectionStore.baseUri}/fbdownload/${Uri.encodeComponent(file['name'])}?dlink=%22${(file['path'] as String).utf8()}%22&_sid=%22${connectionStore.sid}%22&mode=open";
             // String url = HttpUtil.baseUrl + "/fbdownload/${file['name']}?dlink=%22${HttpUtil.utf8Encode(file['path'])}%22&_sid=%22${HttpUtil.sid}%22&mode=open";
             // Log.info(url);
             // 调用nplayer
@@ -1449,7 +1495,7 @@ class FilesState extends State<Files> {
             // 调用vlc player
             // launchUrlString("vlc://$url");
             // return;
-            if (useEmbeedVideoPlayer == '1') {
+            if (useEmbeedVideoPlayer) {
               AndroidIntent intent = AndroidIntent(
                 action: 'action_view',
                 data: url,
@@ -1515,7 +1561,7 @@ class FilesState extends State<Files> {
               audioPlayerFloating?.close();
             }
             String url =
-                "${connectionStore.baseUrl}/fbdownload/${file['name']}?dlink=%22${(file['path'] as String).utf8()}%22&_sid=%22${connectionStore.sid}%22&mode=open";
+                "${connectionStore.baseUri}/fbdownload/${file['name']}?dlink=%22${(file['path'] as String).utf8()}%22&_sid=%22${connectionStore.sid}%22&mode=open";
             Navigator.of(context).push(CupertinoPageRoute(builder: (context) {
               return AudioPlayer(
                 url: url,
@@ -1578,7 +1624,7 @@ class FilesState extends State<Files> {
           case FileTypeEnum.pdf:
             Navigator.of(context).push(CupertinoPageRoute(builder: (context) {
               return PdfViewer(
-                  "${connectionStore.baseUrl}/fbdownload/${file['name']}?dlink=%22${(file['path'] as String).utf8()}%22&_sid=%22${connectionStore.sid}%22&mode=open",
+                  "${connectionStore.baseUri}/fbdownload/${file['name']}?dlink=%22${(file['path'] as String).utf8()}%22&_sid=%22${connectionStore.sid}%22&mode=open",
                   file['name']);
             }));
             break;
@@ -1586,7 +1632,7 @@ class FilesState extends State<Files> {
             AndroidIntent intent = AndroidIntent(
               action: 'action_view',
               data:
-                  "${connectionStore.baseUrl}/fbdownload/${file['name']}?dlink=%22${(file['path'] as String).utf8()}%22&_sid=%22${connectionStore.sid}%22&mode=open",
+                  "${connectionStore.baseUri}/fbdownload/${file['name']}?dlink=%22${(file['path'] as String).utf8()}%22&_sid=%22${connectionStore.sid}%22&mode=open",
               arguments: {},
               // type: "application/vnd.ms-powerpoint|application/vnd.openxmlformats-officedocument.presentationml.presentation",
             );
@@ -2175,9 +2221,9 @@ class FilesState extends State<Files> {
               width: 20,
               height: 20,
               child: selectedFiles.contains(file)
-                  ? const Icon(
+                  ? Icon(
                       CupertinoIcons.checkmark_alt,
-                      color: AppColors.primaryAction,
+                      color: Theme.of(context).colorScheme.primary,
                     )
                   : null,
             ),
@@ -2228,7 +2274,7 @@ class FilesState extends State<Files> {
                     ),
                     Hero(
                       tag:
-                          "${connectionStore.baseUrl}/webapi/entry.cgi?path=${Uri.encodeComponent(path)}&size=original&api=SYNO.FileStation.Thumb&method=get&version=2&_sid=${connectionStore.sid}&animate=true",
+                          "${connectionStore.baseUri}/webapi/entry.cgi?path=${Uri.encodeComponent(path)}&size=original&api=SYNO.FileStation.Thumb&method=get&version=2&_sid=${connectionStore.sid}&animate=true",
                       child: FileIcon(
                         file['isdir'] ? FileTypeEnum.folder : fileType,
                         thumb: file['path'],
@@ -2327,7 +2373,7 @@ class FilesState extends State<Files> {
                         children: [
                           Hero(
                             tag:
-                                "${connectionStore.baseUrl}/webapi/entry.cgi?path=${Uri.encodeComponent(path)}&size=original&api=SYNO.FileStation.Thumb&method=get&version=2&_sid=${connectionStore.sid}&animate=true",
+                                "${connectionStore.baseUri}/webapi/entry.cgi?path=${Uri.encodeComponent(path)}&size=original&api=SYNO.FileStation.Thumb&method=get&version=2&_sid=${connectionStore.sid}&animate=true",
                             child: FileIcon(
                               file['isdir'] ? FileTypeEnum.folder : fileType,
                               thumb: file['path'],

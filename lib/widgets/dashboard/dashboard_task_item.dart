@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:garden/util/ui_util.dart';
 import 'package:flutter/material.dart';
-import 'package:garden/theme/app_colors.dart';
 import 'package:garden/util/http_util.dart';
 
 /// Dashboard 计划任务列表项
@@ -71,9 +70,9 @@ class _DashboardTaskItemState extends State<DashboardTaskItem> {
                 height: 20,
                 child: task['running']
                     ? const CupertinoActivityIndicator()
-                    : const Icon(
+                    : Icon(
                         CupertinoIcons.play_arrow_solid,
-                        color: AppColors.primaryAction,
+                        color: Theme.of(context).colorScheme.primary,
                         size: 16,
                       ),
               ),

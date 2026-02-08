@@ -1,6 +1,6 @@
+import 'package:garden/api/dsm_api.dart';
 import 'package:garden/stores/connection_store.dart';
 import 'package:garden/util/log.dart';
-import 'package:garden/util/moments_api.dart';
 import 'package:garden/widgets/moments/moments_content_tab.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/material.dart';
@@ -48,16 +48,16 @@ class MomentsState extends State<Moments> {
   }
 
   getData() async {
-    var res = await MomentsApi.timeline();
-    if (res['success'] && mounted) {
+    var res = await dsmFotoBrowseTimeline();
+    if (mounted) {
       setState(() {
         timeline = [];
         if (connectionStore.dsmVersion.watch(context) == 7) {
-          for (var section in res['data']['section']) {
+          for (var section in res['section']) {
             timeline.addAll(section['list']);
           }
         } else {
-          timeline = res['data']['list'];
+          timeline = res['list'];
         }
 
         for (int i = 0; i < timeline.length; i++) {
@@ -74,74 +74,72 @@ class MomentsState extends State<Moments> {
                 timeline[i]['position']['start'] + height;
           }
         }
-        setState(() {
-          loadingTimeline = false;
-        });
+        loadingTimeline = false;
       });
     }
   }
 
   getCategory() async {
-    var res = await MomentsApi.category();
-    if (res['success'] && mounted) {
+    var res = await dsmFotoBrowseCategory();
+    if (mounted) {
       setState(() {
-        category = res['data'];
+        category = res['list'] ?? [];
       });
     }
   }
 
   getAlbum() async {
-    var res = await MomentsApi.album();
-    if (res['success'] && mounted) {
+    var res = await dsmFotoBrowseAlbumListMoments();
+    if (mounted) {
       setState(() {
-        album = res['data']['list'];
+        album = res['list'];
         loadingAlbum = false;
       });
     }
   }
 
   getRecently() async {
-    var res = await MomentsApi.photos(category: "RecentlyAdded", limit: 4);
-    if (res['success'] && mounted) {
+    var res = await dsmFotoBrowsePhotoList(category: "RecentlyAdded", limit: 4);
+    if (mounted) {
       setState(() {
-        recentlyAdd = res['data']["list"];
+        recentlyAdd = res["list"];
       });
     }
   }
 
   getShares() async {
-    var res = await MomentsApi.album(shared: true, limit: 4);
-    if (res['success'] && mounted) {
+    var res = await dsmFotoBrowseAlbumListMoments(shared: true, limit: 4);
+    if (mounted) {
       setState(() {
-        shares = res['data']["list"];
+        shares = res["list"];
         loadingShares = false;
       });
     }
   }
 
   getGeocoding() async {
-    var res = await MomentsApi.geocoding(limit: 4);
-    if (res['success'] && mounted) {
+    var res = await dsmFotoBrowseGeocoding(limit: 4);
+    if (mounted) {
       setState(() {
-        geocoding = res['data']["list"];
+        geocoding = res["list"];
       });
     }
   }
 
   getGeneral({bool isTeam = false}) async {
-    var res = await MomentsApi.general(limit: 4, isTeam: isTeam);
-    if (res['success'] && mounted) {
+    var res = await dsmFotoBrowseGeneral(limit: 4, isTeam: isTeam);
+    if (mounted) {
       setState(() {
-        general = res['data']["list"];
+        general = res["list"];
       });
     }
   }
 
   getVideos() async {
-    var res = await MomentsApi.photos(type: "video", limit: 4);
-    if (res['success'] && mounted) {
+    var res = await dsmFotoBrowsePhotoList(type: "video", limit: 4);
+    if (mounted) {
       setState(() {
-        videos = res['data']["list"];
+        videos = res["list"];
       });
     }
   }

@@ -1,6 +1,7 @@
 import 'package:garden/constants/app_constants.dart';
 import 'package:garden/util/http_util.dart';
 import 'package:garden/widgets/animation_progress_bar.dart';
+import 'package:garden/widgets/button_style.dart';
 import 'package:garden/widgets/label.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -24,8 +25,7 @@ class ContainerItem extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Card(
-        shape: RoundedRectangleBorder(
-            side: const BorderSide(), borderRadius: BorderRadius.circular(18)),
+        shape: context.stadiumShapeBorder,
         margin: const EdgeInsets.only(bottom: 20),
         child: Padding(
           padding: const EdgeInsets.all(20),
@@ -109,8 +109,7 @@ class ContainerItem extends StatelessWidget {
     return GestureDetector(
       onTap: isLoading ? null : () => _showActionMenu(context),
       child: Card(
-        shape: RoundedRectangleBorder(
-            side: const BorderSide(), borderRadius: BorderRadius.circular(18)),
+        shape: context.stadiumShapeBorder,
         child: isLoading
             ? const CupertinoActivityIndicator()
             : Image.asset(

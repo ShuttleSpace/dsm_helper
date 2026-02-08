@@ -1,16 +1,12 @@
 import 'dart:convert';
-import 'package:garden/extensions/string.dart';
 import 'package:garden/stores/connection_store.dart';
 import 'dart:io';
 
-import 'package:background_downloader/background_downloader.dart';
 import 'package:dio/dio.dart';
 import 'package:dio/io.dart';
 import 'package:garden/util/log.dart';
 import 'package:garden/util/storage_util.dart';
-import 'package:garden/util/ui_util.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:permission_handler/permission_handler.dart';
 
 export 'package:garden/extensions/datetime.dart';
 export 'package:garden/extensions/int.dart';
@@ -44,13 +40,13 @@ class HttpUtil {
     headers['Cookie'] = cookie ?? connectionStore.cookie;
     headers["Accept-Language"] =
         "zh-CN,zh;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6,zh-TW;q=0.5";
-    headers['origin'] = host ?? connectionStore.baseUrl;
-    headers['referer'] = host ?? connectionStore.baseUrl;
+    headers['origin'] = host ?? connectionStore.baseUri;
+    headers['referer'] = host ?? connectionStore.baseUri;
     Dio dio = Dio(
       BaseOptions(
         baseUrl: url.startsWith("http")
             ? ""
-            : ("${host ?? connectionStore.baseUrl}/webapi/"),
+            : ("${host ?? connectionStore.baseUri}/webapi/"),
         headers: headers,
         connectTimeout: Duration(seconds: timeout),
       ),
@@ -69,7 +65,7 @@ class HttpUtil {
     Response response;
     try {
       Log.debug(
-          "curl: '${connectionStore.baseUrl}/$url' ${data?.entries.map((e) => '-d "${e.key}=${e.value}"').join(' ')}");
+          "curl: '${connectionStore.baseUri}/$url' ${data?.entries.map((e) => '-d "${e.key}=${e.value}"').join(' ')}");
       response =
           await dio.get(url, queryParameters: data, cancelToken: cancelToken);
       if (url == "auth.cgi") {
@@ -149,12 +145,12 @@ class HttpUtil {
     headers['Cookie'] = cookie ?? connectionStore.cookie;
     headers["Accept-Language"] =
         "zh-CN,zh;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6,zh-TW;q=0.5";
-    headers['origin'] = host ?? connectionStore.baseUrl;
-    headers['referer'] = host ?? connectionStore.baseUrl;
+    headers['origin'] = host ?? connectionStore.baseUri;
+    headers['referer'] = host ?? connectionStore.baseUri;
     Dio dio = Dio(
       BaseOptions(
         // connectTimeout: timeout,
-        baseUrl: "${host ?? connectionStore.baseUrl}/webapi/",
+        baseUrl: "${host ?? connectionStore.baseUri}/webapi/",
         contentType: "application/x-www-form-urlencoded",
         headers: headers,
       ),
@@ -181,7 +177,7 @@ class HttpUtil {
     Response response;
     try {
       Log.debug(
-          "curl: '${connectionStore.baseUrl}/$url' ${data?.entries.map((e) => '-d "${e.key}=${e.value}"').join(' ')}");
+          "curl: '${connectionStore.baseUri}/$url' ${data?.entries.map((e) => '-d "${e.key}=${e.value}"').join(' ')}");
       response = await dio.post(url, data: data, cancelToken: cancelToken);
       return response.data;
     } on DioException catch (error) {
@@ -218,7 +214,7 @@ class HttpUtil {
     // Log.info(headers);
     Dio dio = Dio(
       BaseOptions(
-        baseUrl: "${host ?? connectionStore.baseUrl}/webapi/",
+        baseUrl: "${host ?? connectionStore.baseUri}/webapi/",
         headers: headers,
       ),
     );
@@ -288,40 +284,5 @@ class HttpUtil {
     } catch (e) {
       Log.error("downloadPkg $url 出错:$e");
     }
-  }
-
-  Future<String?> download(String saveName, String url) async {
-    //检查权限
-    if (!await Permission.storage.request().isGranted) {
-      final status = await Permission.storage.request();
-      if (!status.isGranted) {
-        UiUtil.toast("请先授权APP访问存储权限, 方可下载");
-      }
-      return null;
-    }
-    String savePath = await downloadTargetDir();
-    Log.debug("savePath:$savePath");
-    Directory saveDir = Directory(savePath);
-    if (!saveDir.existsSync()) {
-      Log.debug("文件夹不存在");
-      Directory dir = await saveDir.create(recursive: true);
-      Log.info(dir);
-    } else {
-      Log.debug("文件夹已存在");
-    }
-
-    saveName = saveName.makeUniqueFileName(savePath);
-    Log.debug(saveName);
-    // xross platform
-    final task = DownloadTask(
-      url: url,
-      filename: saveName,
-      directory: savePath,
-    );
-    final enqueState = await FileDownloader().enqueue(task);
-    if (!enqueState) {
-      return Future.error("队列下载任务失败!");
-    }
-    return task.taskId;
   }
 }

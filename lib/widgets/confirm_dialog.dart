@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:garden/widgets/button_style.dart';
 
 /// 通用确认对话框组件
 ///
@@ -64,10 +65,7 @@ class ConfirmDialog extends StatelessWidget {
     return Material(
       color: Colors.transparent,
       child: Card(
-        shape: RoundedRectangleBorder(
-          side: const BorderSide(),
-          borderRadius: BorderRadius.circular(18),
-        ),
+        shape: context.stadiumShapeBorder,
         child: SafeArea(
           top: false,
           child: Padding(

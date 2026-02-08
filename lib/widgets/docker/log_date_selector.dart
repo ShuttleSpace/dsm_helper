@@ -1,5 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:garden/widgets/button_style.dart';
+import 'package:signals_flutter/signals_flutter.dart';
 
 class LogDateSelector extends StatelessWidget {
   final List logDates;
@@ -19,21 +21,22 @@ class LogDateSelector extends StatelessWidget {
       onTap: () {
         onDateSelected(date);
       },
-      child: Card(
-        shape: RoundedRectangleBorder(
-            side: const BorderSide(), borderRadius: BorderRadius.circular(18)),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-          child: Column(
-            children: [
-              Text(
-                str.substring(5),
-              ),
-              Text(
-                str.substring(0, 4),
-                style: const TextStyle(color: Colors.grey),
-              ),
-            ],
+      child: Watch(
+        (context) => Card(
+          shape: context.stadiumShapeBorder,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+            child: Column(
+              children: [
+                Text(
+                  str.substring(5),
+                ),
+                Text(
+                  str.substring(0, 4),
+                  style: const TextStyle(color: Colors.grey),
+                ),
+              ],
+            ),
           ),
         ),
       ),

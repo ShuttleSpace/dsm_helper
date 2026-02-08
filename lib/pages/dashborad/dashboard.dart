@@ -3,7 +3,6 @@ import 'package:garden/stores/settings_store.dart';
 import 'package:garden/stores/connection_store.dart';
 import 'dart:math';
 
-import 'package:garden/models/api_model.dart';
 import 'package:garden/models/shortcut_item_model.dart';
 import 'package:garden/models/wallpaper_model.dart';
 import 'package:garden/pages/control_panel/external_device/external_device.dart';
@@ -21,6 +20,7 @@ import 'package:garden/theme/app_theme.dart';
 import 'package:garden/util/http_util.dart';
 import 'package:garden/util/log.dart';
 import 'package:garden/widgets/animation_progress_bar.dart';
+import 'package:garden/widgets/button_style.dart';
 import 'package:garden/widgets/dashboard/dashboard_log_item.dart';
 import 'package:garden/widgets/dashboard/dashboard_task_item.dart';
 import 'package:garden/widgets/dashboard/dashboard_user_item.dart';
@@ -98,9 +98,6 @@ class DashboardState extends State<Dashboard> {
     // getGroups();
     networks = List.generate(20, (i) => {"tx": 0, "rx": 0});
     getNotifyStrings();
-    ApiModel.fetch().then((apis) {
-      DsmApi.apiList = apis;
-    });
     getInfo().then((_) {
       getData(init: true);
     });
@@ -331,9 +328,7 @@ class DashboardState extends State<Dashboard> {
           }
         },
         child: Card(
-          shape: RoundedRectangleBorder(
-              side: const BorderSide(),
-              borderRadius: BorderRadius.circular(18)),
+          shape: context.stadiumShapeBorder,
           margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
           child: Padding(
             padding: const EdgeInsets.all(AppConstants.paddingSmall),
@@ -348,7 +343,7 @@ class DashboardState extends State<Dashboard> {
                             (wallpaperModel!.customizeWallpaper == true ||
                                 wallpaperModel!.customizeBackground == true))
                           ExtendedImage.network(
-                            "${connectionStore.baseUrl}/webapi/entry.cgi?api=SYNO.Core.PersonalSettings&method=wallpaper&version=1&path=%22%22&retina=true&_sid=${connectionStore.sid}",
+                            "${connectionStore.baseUri}/webapi/entry.cgi?api=SYNO.Core.PersonalSettings&method=wallpaper&version=1&path=%22%22&retina=true&_sid=${connectionStore.sid}",
                             height: 170,
                             width: double.infinity,
                             fit: BoxFit.cover,
@@ -470,8 +465,7 @@ class DashboardState extends State<Dashboard> {
     } else if (widget == "SYNO.SDS.SystemInfoApp.ConnectionLogWidget" &&
         connectedUsers.isNotEmpty) {
       return Card(
-        shape: RoundedRectangleBorder(
-            side: const BorderSide(), borderRadius: BorderRadius.circular(18)),
+        shape: context.stadiumShapeBorder,
         margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
         child: Padding(
           padding: const EdgeInsets.all(AppConstants.paddingSmall),
@@ -523,9 +517,7 @@ class DashboardState extends State<Dashboard> {
           }));
         },
         child: Card(
-          shape: RoundedRectangleBorder(
-              side: const BorderSide(),
-              borderRadius: BorderRadius.circular(18)),
+          shape: context.stadiumShapeBorder,
           margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
           child: Padding(
             padding: const EdgeInsets.all(AppConstants.paddingSmall),
@@ -577,9 +569,10 @@ class DashboardState extends State<Dashboard> {
               settings: const RouteSettings(name: "log_center")));
         },
         child: Card(
-          shape: RoundedRectangleBorder(
-              side: const BorderSide(),
-              borderRadius: BorderRadius.circular(18)),
+          // TODO: use animation, this will cause hard fade.
+          shape: !_isCardItemCollapsed('RecentLog')
+              ? context.stadiumShapeBorder
+              : const RoundedRectangleBorder(),
           margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
           child: Padding(
             padding: const EdgeInsets.all(AppConstants.paddingSmall),
@@ -650,9 +643,7 @@ class DashboardState extends State<Dashboard> {
           }));
         },
         child: Card(
-          shape: RoundedRectangleBorder(
-              side: const BorderSide(),
-              borderRadius: BorderRadius.circular(18)),
+          shape: context.stadiumShapeBorder,
           margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
           child: Padding(
             padding: const EdgeInsets.all(AppConstants.paddingSmall),
@@ -961,9 +952,6 @@ class DashboardState extends State<Dashboard> {
               }));
             },
             child: Card(
-              shape: RoundedRectangleBorder(
-                  side: const BorderSide(),
-                  borderRadius: BorderRadius.circular(18)),
               margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
               child: Padding(
                 padding: const EdgeInsets.all(AppConstants.paddingSmall),
@@ -1055,8 +1043,7 @@ class DashboardState extends State<Dashboard> {
       );
     } else if (widget == "SYNO.SDS.SystemInfoApp.FileChangeLogWidget") {
       return Card(
-        shape: RoundedRectangleBorder(
-            side: const BorderSide(), borderRadius: BorderRadius.circular(18)),
+        shape: context.stadiumShapeBorder,
         margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
         child: Padding(
           padding: const EdgeInsets.all(AppConstants.paddingSmall),

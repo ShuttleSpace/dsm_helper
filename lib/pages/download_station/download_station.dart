@@ -6,6 +6,7 @@ import 'package:garden/pages/download_station/detail.dart';
 import 'package:garden/theme/app_colors.dart';
 import 'package:garden/theme/app_theme.dart';
 import 'package:garden/util/http_util.dart';
+import 'package:garden/widgets/button_style.dart';
 import 'package:garden/widgets/file_icon.dart';
 import 'package:garden/widgets/animation_progress_bar.dart';
 import 'package:garden/widgets/neu_back_button.dart';
@@ -93,8 +94,7 @@ class DownloadStationState extends State<DownloadStation> {
         });
       },
       child: Card(
-        shape: RoundedRectangleBorder(
-            side: const BorderSide(), borderRadius: BorderRadius.circular(18)),
+        shape: context.stadiumShapeBorder,
         child: Padding(
           padding: const EdgeInsets.all(20),
           child: Column(

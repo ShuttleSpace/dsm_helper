@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:garden/constants/app_constants.dart';
 import 'package:garden/extensions/int.dart';
+import 'package:garden/widgets/button_style.dart';
 import 'package:garden/widgets/label.dart';
 
 /// 用户配额项
@@ -19,8 +20,7 @@ class QuotaItem extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Card(
-        shape: RoundedRectangleBorder(
-            side: const BorderSide(), borderRadius: BorderRadius.circular(18)),
+        shape: context.stadiumShapeBorder,
         margin:
             const EdgeInsets.symmetric(vertical: AppConstants.paddingSmall + 2),
         child: Padding(

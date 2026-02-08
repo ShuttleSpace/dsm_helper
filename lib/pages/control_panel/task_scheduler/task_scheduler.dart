@@ -6,7 +6,6 @@ import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:garden/constants/app_constants.dart';
-import 'package:garden/theme/app_colors.dart';
 
 class TaskScheduler extends StatefulWidget {
   const TaskScheduler({super.key});
@@ -110,9 +109,9 @@ class TaskSchedulerState extends State<TaskScheduler> {
                     }
                   },
                   child: Card(
-                    shape: RoundedRectangleBorder(
-                        side: const BorderSide(),
-                        borderRadius: BorderRadius.circular(18)),
+                    shape: StadiumBorder(
+                        side: BorderSide(
+                            color: Theme.of(context).colorScheme.primary)),
                     child: Padding(
                       padding: const EdgeInsets.all(AppConstants.paddingSmall),
                       child: SizedBox(
@@ -121,9 +120,10 @@ class TaskSchedulerState extends State<TaskScheduler> {
                         child: task['set']
                             ? const CupertinoActivityIndicator()
                             : task['enable']
-                                ? const Icon(
+                                ? Icon(
                                     CupertinoIcons.checkmark_alt,
-                                    color: AppColors.primaryAction,
+                                    color:
+                                        Theme.of(context).colorScheme.primary,
                                   )
                                 : null,
                       ),
@@ -142,12 +142,12 @@ class TaskSchedulerState extends State<TaskScheduler> {
                           },
                           settings: const RouteSettings(name: "task_record")));
                     },
-                    child: const SizedBox(
+                    child: SizedBox(
                       width: 20,
                       height: 20,
                       child: Icon(
                         CupertinoIcons.list_bullet,
-                        color: AppColors.primaryAction,
+                        color: Theme.of(context).colorScheme.primary,
                         size: 16,
                       ),
                     ),
@@ -187,9 +187,9 @@ class TaskSchedulerState extends State<TaskScheduler> {
                     height: 20,
                     child: task['running']
                         ? const CupertinoActivityIndicator()
-                        : const Icon(
+                        : Icon(
                             CupertinoIcons.play_arrow_solid,
-                            color: AppColors.primaryAction,
+                            color: Theme.of(context).colorScheme.primary,
                             size: 16,
                           ),
                   ),

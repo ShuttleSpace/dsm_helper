@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:garden/theme/app_colors.dart';
+import 'package:garden/widgets/button_style.dart';
 
 /// 用户群组项
 class UserGroupItem extends StatelessWidget {
@@ -18,8 +18,7 @@ class UserGroupItem extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Card(
-        shape: RoundedRectangleBorder(
-            side: const BorderSide(), borderRadius: BorderRadius.circular(18)),
+        shape: context.stadiumShapeBorder,
         child: Padding(
           padding: const EdgeInsets.all(20),
           child: Row(
@@ -43,9 +42,9 @@ class UserGroupItem extends StatelessWidget {
                 ),
               ),
               if (group['is_member'])
-                const Icon(
+                Icon(
                   CupertinoIcons.checkmark_alt,
-                  color: AppColors.primaryAction,
+                  color: Theme.of(context).colorScheme.primary,
                 ),
             ],
           ),

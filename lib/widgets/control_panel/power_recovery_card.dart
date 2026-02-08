@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:garden/constants/app_constants.dart';
-import 'package:garden/theme/app_colors.dart';
 
 class PowerRecoveryCard extends StatelessWidget {
   final Map powerRecovery;
@@ -50,9 +49,9 @@ class PowerRecoveryCard extends StatelessWidget {
                           const Text("修复电源问题后自动重新启动"),
                           const Spacer(),
                           if (powerRecovery['rc_power_config'])
-                            const Icon(
+                            Icon(
                               CupertinoIcons.checkmark_alt,
-                              color: AppColors.primaryAction,
+                              color: Theme.of(context).colorScheme.primary,
                               size: 22,
                             ),
                         ],

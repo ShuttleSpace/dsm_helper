@@ -4,7 +4,6 @@ import 'package:garden/stores/connection_store.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:garden/constants/app_constants.dart';
-import 'package:garden/theme/app_colors.dart';
 import 'package:garden/theme/app_theme.dart';
 import 'package:garden/util/http_util.dart';
 import 'package:garden/widgets/file_icon.dart';
@@ -47,9 +46,9 @@ class FileListItem extends StatelessWidget {
               width: 20,
               height: 20,
               child: selected
-                  ? const Icon(
+                  ? Icon(
                       CupertinoIcons.checkmark_alt,
-                      color: AppColors.primaryAction,
+                      color: Theme.of(context).colorScheme.primary,
                     )
                   : null,
             ),
@@ -105,7 +104,7 @@ class FileListItem extends StatelessWidget {
                         children: [
                           Hero(
                             tag:
-                                "${connectionStore.baseUrl}/webapi/entry.cgi?path=${Uri.encodeComponent(path)}&size=original&api=SYNO.FileStation.Thumb&method=get&version=2&_sid=${connectionStore.sid}&animate=true",
+                                "${connectionStore.baseUri}/webapi/entry.cgi?path=${Uri.encodeComponent(path)}&size=original&api=SYNO.FileStation.Thumb&method=get&version=2&_sid=${connectionStore.sid}&animate=true",
                             child: FileIcon(
                               file['isdir'] ? FileTypeEnum.folder : fileType,
                               thumb: file['path'],
@@ -142,7 +141,7 @@ class FileListItem extends StatelessWidget {
                   ),
                   Hero(
                     tag:
-                        "${connectionStore.baseUrl}/webapi/entry.cgi?path=${Uri.encodeComponent(path)}&size=thumb&api=NEU_FILE_THUMB&method=get&version=1&_sid=${connectionStore.sid}&animate=true",
+                        "${connectionStore.baseUri}/webapi/entry.cgi?path=${Uri.encodeComponent(path)}&size=thumb&api=NEU_FILE_THUMB&method=get&version=1&_sid=${connectionStore.sid}&animate=true",
                     child: FileIcon(
                       file['isdir'] ? FileTypeEnum.folder : fileType,
                       thumb: file['path'],

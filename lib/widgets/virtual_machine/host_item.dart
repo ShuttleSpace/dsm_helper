@@ -50,9 +50,9 @@ class HostItem extends StatelessWidget {
                 ),
                 Expanded(
                   child: Card(
-                    shape: RoundedRectangleBorder(
-                        side: const BorderSide(),
-                        borderRadius: BorderRadius.circular(18)),
+                    shape: StadiumBorder(
+                        side: BorderSide(
+                            color: Theme.of(context).colorScheme.primary)),
                     child: Padding(
                       padding: const EdgeInsets.all(AppConstants.paddingSmall),
                       child: FAProgressBar(
@@ -79,9 +79,9 @@ class HostItem extends StatelessWidget {
                 ),
                 Expanded(
                   child: Card(
-                    shape: RoundedRectangleBorder(
-                        side: const BorderSide(),
-                        borderRadius: BorderRadius.circular(18)),
+                    shape: StadiumBorder(
+                        side: BorderSide(
+                            color: Theme.of(context).colorScheme.primary)),
                     child: Padding(
                       padding: const EdgeInsets.all(AppConstants.paddingSmall),
                       child: FAProgressBar(

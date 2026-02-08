@@ -5,7 +5,6 @@ import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:garden/constants/app_constants.dart';
-import 'package:garden/theme/app_colors.dart';
 
 class UserSetting extends StatefulWidget {
   const UserSetting({super.key});
@@ -113,9 +112,9 @@ class UserSettingState extends State<UserSetting> {
                     height: 20,
                   ),
                   Card(
-                    shape: RoundedRectangleBorder(
-                        side: const BorderSide(),
-                        borderRadius: BorderRadius.circular(18)),
+                    shape: StadiumBorder(
+                        side: BorderSide(
+                            color: Theme.of(context).colorScheme.primary)),
                     child: Padding(
                       padding: const EdgeInsets.all(AppConstants.paddingSmall),
                       child: TextField(
@@ -131,9 +130,9 @@ class UserSettingState extends State<UserSetting> {
                     height: 20,
                   ),
                   Card(
-                    shape: RoundedRectangleBorder(
-                        side: const BorderSide(),
-                        borderRadius: BorderRadius.circular(18)),
+                    shape: StadiumBorder(
+                        side: BorderSide(
+                            color: Theme.of(context).colorScheme.primary)),
                     child: Padding(
                       padding: const EdgeInsets.all(AppConstants.paddingSmall),
                       child: TextField(
@@ -149,9 +148,9 @@ class UserSettingState extends State<UserSetting> {
                     height: 20,
                   ),
                   Card(
-                    shape: RoundedRectangleBorder(
-                        side: const BorderSide(),
-                        borderRadius: BorderRadius.circular(18)),
+                    shape: StadiumBorder(
+                        side: BorderSide(
+                            color: Theme.of(context).colorScheme.primary)),
                     child: Padding(
                       padding: const EdgeInsets.all(AppConstants.paddingSmall),
                       child: TextField(
@@ -212,9 +211,9 @@ class UserSettingState extends State<UserSetting> {
                     }
                   },
                   child: Card(
-                    shape: RoundedRectangleBorder(
-                        side: const BorderSide(),
-                        borderRadius: BorderRadius.circular(18)),
+                    shape: StadiumBorder(
+                        side: BorderSide(
+                            color: Theme.of(context).colorScheme.primary)),
                     child: Padding(
                       padding: const EdgeInsets.all(AppConstants.paddingSmall),
                       child: Row(
@@ -222,9 +221,9 @@ class UserSettingState extends State<UserSetting> {
                           const Text("两步认证"),
                           const Spacer(),
                           if (normalUser['OTP_enable'])
-                            const Icon(
+                            Icon(
                               CupertinoIcons.checkmark_alt,
-                              color: AppColors.primaryAction,
+                              color: Theme.of(context).colorScheme.primary,
                             ),
                         ],
                       ),

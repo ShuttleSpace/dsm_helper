@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:garden/widgets/button_style.dart';
 
 typedef CallBack = Function(int);
 
@@ -26,8 +27,7 @@ class NeuPickerState extends State<NeuPicker> {
   Widget build(BuildContext context) {
     return Material(
       child: Card(
-        shape: RoundedRectangleBorder(
-            side: const BorderSide(), borderRadius: BorderRadius.circular(18)),
+        shape: context.stadiumShapeBorder,
         child: Column(
           children: [
             Padding(

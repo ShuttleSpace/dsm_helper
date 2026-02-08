@@ -2,7 +2,6 @@ import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:garden/constants/app_constants.dart';
-import 'package:garden/theme/app_colors.dart';
 
 class Search extends StatefulWidget {
   final String folder;
@@ -78,9 +77,9 @@ class SearchState extends State<Search> {
                         const Text("启用文件内容搜索"),
                         const Spacer(),
                         if (searchContent)
-                          const Icon(
+                          Icon(
                             CupertinoIcons.checkmark_alt,
-                            color: AppColors.primaryAction,
+                            color: Theme.of(context).colorScheme.primary,
                           ),
                       ],
                     ),
