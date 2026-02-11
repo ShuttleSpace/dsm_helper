@@ -162,6 +162,19 @@ Future<Map> dsmCoreShareDelete(
   return res['data'];
 }
 
+Future<Map> dsmCoreRecycleBinStart(
+    {required String id, CancelToken? cancelToken}) async {
+  final data = _dsmApiRequestData(
+      api: 'SYNO.Core.RecycleBin', method: 'start', version: 1)
+    ..addAll({id: id});
+  final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
+  Log.info("dsmCoreRecycleBinStart: $res");
+  if (res['success'] != true) {
+    throw DSMException.fromMap(res);
+  }
+  return res['data'];
+}
+
 /// {
 ///   "success": true,
 ///   "data": {

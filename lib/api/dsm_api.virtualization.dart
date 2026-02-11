@@ -328,6 +328,36 @@ Future<Map> dsmVirtualizationGuestShutdown(
   return res['data'];
 }
 
+Future<Map> dsmVirtualizationGuestActionCheckPoweron(
+    {required String guestId, CancelToken? cancelToken}) async {
+  final data = _dsmApiRequestData(
+      api: 'SYNO.Virtualization.Guest.Action',
+      method: 'check_poweron',
+      version: 1)
+    ..addAll({'guest_id': guestId});
+  final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
+  Log.info("dsmVirtualizationGuestActionCheckPoweron: $res");
+  if (res['success'] != true) {
+    throw DSMException.fromMap(res);
+  }
+  return res['data'];
+}
+
+Future<Map> dsmVirtualizationGuestActionPwrCtl(
+    {required String guestId,
+    required String action, // poweron, poweroff, reset, shutdown
+    CancelToken? cancelToken}) async {
+  final data = _dsmApiRequestData(
+      api: 'SYNO.Virtualization.Guest.Action', method: 'pwr_ctl', version: 1)
+    ..addAll({'guest_id': guestId, 'action': action});
+  final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
+  Log.info("dsmVirtualizationGuestActionPwrCtl: $res");
+  if (res['success'] != true) {
+    throw DSMException.fromMap(res);
+  }
+  return res['data'];
+}
+
 /// {
 ///   "success": true
 /// }

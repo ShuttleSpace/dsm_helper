@@ -250,3 +250,67 @@ Future<Map> dsmFileStationListGetinfo(
   }
   return res['data'];
 }
+
+Future<Map> dsmFileStationVirtualFolderList(
+    {required String node,
+    required String type,
+    String? sortBy,
+    String? additional,
+    CancelToken? cancelToken}) async {
+  final data = _dsmApiRequestData(
+      api: 'SYNO.FileStation.VirtualFolder', method: 'list', version: 2)
+    ..addAll({'node': node, 'type': type});
+  if (sortBy != null) {
+    data['sort_by'] = sortBy;
+  }
+  if (additional != null) {
+    data['additional'] = additional;
+  }
+  final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
+  Log.info("dsmFileStationVirtualFolderList: $res");
+  if (res['success'] != true) {
+    throw DSMException.fromMap(res);
+  }
+  return res['data'];
+}
+
+Future<Map> dsmFileStationVFSConnectionDelete(
+    {required String id, CancelToken? cancelToken}) async {
+  final data = _dsmApiRequestData(
+      api: 'SYNO.FileStation.VFS.Connection', method: 'delete', version: 1)
+    ..addAll({'id': id});
+  final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
+  Log.info("dsmFileStationVFSConnectionDelete: $res");
+  if (res['success'] != true) {
+    throw DSMException.fromMap(res);
+  }
+  return res['data'];
+}
+
+/// {
+///   "success": true,
+///   "data": {
+///     "result": true
+///   }
+/// }
+Future<Map> dsmFileStationCheckPermissionWrite(
+    String path, // Destination folder path
+    String filename, // Filename to check
+    {int? size,
+    bool? overwrite,
+    bool? createOnly, // File must not exist (default: false)
+    CancelToken? cancelToken}) async {
+  final data = _dsmApiRequestData(
+      api: 'SYNO.FileStation.CheckPermission', method: 'write', version: 3);
+  data['path'] = path;
+  data['filename'] = filename;
+  if (overwrite != null) data['overwrite'] = overwrite;
+  if (size != null) data['size'] = size;
+  if (createOnly != null) data['create_only'] = createOnly;
+  final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
+  Log.info("dsmFileStationCheckPermissionWrite: $res");
+  if (res['success'] != true) {
+    throw DSMException.fromMap(res);
+  }
+  return res['data'];
+}

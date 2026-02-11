@@ -33,17 +33,17 @@ part of 'dsm_api.dart';
 /// ---
 Future<Map> dsmCoreTaskSchedulerList(
     {String? sortBy, // Sort field (default: `next_trigger_time`)
-    String? sortDirection, // `asc` or `desc`
-    int? offset, // Starting index
-    int? limit, // Max results
+    String? sortDirection, // `ASC` or `DESC`
+    int? start = 0, // Starting index
+    int? limit = 50, // Max results
     CancelToken? cancelToken}) async {
   final data = _dsmApiRequestData(
-      api: 'SYNO.Core.TaskScheduler', method: 'List', version: 2);
+      api: 'SYNO.Core.TaskScheduler', method: 'list', version: 3);
   if (sortBy != null && sortBy.isNotEmpty) data['sort_by'] = sortBy;
   if (sortDirection != null && sortDirection.isNotEmpty) {
     data['sort_direction'] = sortDirection;
   }
-  if (offset != null) data['offset'] = offset;
+  if (start != null) data['offset'] = start;
   if (limit != null) data['limit'] = limit;
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);

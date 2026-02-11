@@ -25,7 +25,7 @@ Future<Map> dsmFotoBrowseFolderList(
         additional, // Additional fields (comma-separated): `thumbnail`, `sharing_info`
     CancelToken? cancelToken}) async {
   final data = _dsmApiRequestData(
-      api: 'SYNO.Foto.Browse.Folder', method: 'list', version: 1);
+      api: 'SYNO.${_fotoApiName()}Browse.Folder', method: 'list', version: 1);
   data['folder_id'] = folderId;
   if (offset != null) data['offset'] = offset;
   if (limit != null) data['limit'] = limit;
@@ -56,7 +56,7 @@ Future<Map> dsmFotoBrowseFolderGet(int id, // Folder ID
     {String? additional, // Additional fields
     CancelToken? cancelToken}) async {
   final data = _dsmApiRequestData(
-      api: 'SYNO.Foto.Browse.Folder', method: 'get', version: 1);
+      api: 'SYNO.${_fotoApiName()}Browse.Folder', method: 'get', version: 1);
   data['id'] = id;
   if (additional != null && additional.isNotEmpty) {
     data['additional'] = additional;
@@ -79,7 +79,7 @@ Future<Map> dsmFotoBrowseFolderGet(int id, // Folder ID
 Future<Map> dsmFotoBrowseFolderCount(int folderId, // Parent folder ID
     {CancelToken? cancelToken}) async {
   final data = _dsmApiRequestData(
-      api: 'SYNO.Foto.Browse.Folder', method: 'count', version: 1);
+      api: 'SYNO.${_fotoApiName()}Browse.Folder', method: 'count', version: 1);
   data['folder_id'] = folderId;
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);

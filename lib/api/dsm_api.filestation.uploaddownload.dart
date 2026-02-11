@@ -48,30 +48,3 @@ Future<dynamic> dsmFileStationDownload(
   }
   return res['data'];
 }
-
-/// {
-///   "success": true,
-///   "data": {
-///     "result": true
-///   }
-/// }
-Future<dynamic> dsmFileStationCheckPermissionWrite(
-    String path, // Destination folder path
-    String filename, // Filename to check
-    {bool? overwrite, // Check overwrite permission (default: false)
-    bool? createOnly, // File must not exist (default: false)
-    CancelToken? cancelToken}) async {
-  final data = _dsmApiRequestData(
-      api: 'SYNO.FileStation.CheckPermission', method: 'write', version: 3);
-  data['path'] = path;
-  data['filename'] = filename;
-  if (overwrite != null) data['overwrite'] = overwrite;
-  if (createOnly != null) data['create_only'] = createOnly;
-  final res = await _httpGet(_entryCGI,
-      queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmFileStationCheckPermission: $res");
-  if (res['success'] != true) {
-    throw DSMException.fromMap(res);
-  }
-  return res['data'];
-}

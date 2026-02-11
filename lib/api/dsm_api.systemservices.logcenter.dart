@@ -28,11 +28,24 @@ part of 'dsm_api.dart';
 ///
 /// ---
 Future<Map> dsmCoreSyslogClientLogList(
-    {int? offset, int? limit, CancelToken? cancelToken}) async {
+    {int? offset,
+    int? limit,
+    String? target, // LOCAL
+    String?
+        logtype, // String, comma separated, ftp,filestation,webdav,cifs,tftp,afp
+    String? sortBy,
+    String? sortDirection,
+    CancelToken? cancelToken}) async {
   final data = _dsmApiRequestData(
       api: 'SYNO.Core.SyslogClient.Log', method: 'List', version: 1);
   if (offset != null) data['offset'] = offset;
   if (limit != null) data['limit'] = limit;
+  if (target != null && target.isNotEmpty) data['target'] = target;
+  if (logtype != null && logtype.isNotEmpty) data['logtype'] = logtype;
+  if (sortBy != null && sortBy.isNotEmpty) data['sort_by'] = sortBy;
+  if (sortDirection != null && sortDirection.isNotEmpty) {
+    data['sort_direction'] = sortDirection;
+  }
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
   Log.info("dsmCoreSyslogClientLogList: $res");
@@ -83,6 +96,31 @@ Future<Map> dsmCoreSyslogClientStatusGetEPS({CancelToken? cancelToken}) async {
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
   Log.info("dsmCoreSyslogClientStatusGetEPS: $res");
+  if (res['success'] != true) {
+    throw DSMException.fromMap(res);
+  }
+  return res['data'];
+}
+
+Future<Map> dsmCoreSyslogClientStatusLatestLogGet(
+    {int? start = 0,
+    int? limit = 50,
+    bool? widget = true,
+    String? dir = '"desc"',
+    CancelToken? cancelToken}) async {
+  final data = _dsmApiRequestData(
+      api: 'SYNO.Core.SyslogClient.Status',
+      method: 'latestlog_get',
+      version: 1);
+  if (start != null) data['start'] = start;
+  if (limit != null) data['limit'] = limit;
+  if (widget != null) data['widget'] = widget;
+  if (dir != null && dir.isNotEmpty) {
+    data['dir'] = dir;
+  }
+  final res = await _httpGet(_entryCGI,
+      queryParameters: data, cancelToken: cancelToken);
+  Log.info("dsmCoreSyslogClientStatusLatestLogGet: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }

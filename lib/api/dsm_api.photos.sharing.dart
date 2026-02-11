@@ -125,7 +125,9 @@ part of 'dsm_api.dart';
 /// ---
 Future<Map> dsmFotoPublicSharingGetUiString({CancelToken? cancelToken}) async {
   final data = _dsmApiRequestData(
-      api: 'SYNO.Foto.PublicSharing', method: 'get_ui_string', version: 1);
+      api: 'SYNO.${_fotoApiName()}PublicSharing',
+      method: 'get_ui_string',
+      version: 1);
   final res = await _httpGet(_fotoEntryCGI,
       queryParameters: data, cancelToken: cancelToken);
   Log.info("dsmFotoPublicSharingGetUiString: $res");

@@ -54,7 +54,7 @@ Future<Map> dsmFotoBrowseItemList(
         additional, // Get additional information about items (JSON array format): `thumbnail`, `resolution`, `orientation`, `video_convert`, `video_meta`, `provider_user_id`, `exif`, `tag`, `description`, `gps`, `geocoding_id`, `address`, `person`
     CancelToken? cancelToken}) async {
   final data = _dsmApiRequestData(
-      api: 'SYNO.Foto.Browse.Item', method: 'list', version: 1);
+      api: 'SYNO.${_fotoApiName()}Browse.Item', method: 'list', version: 1);
   data['offset'] = offset;
   data['limit'] = limit;
   if (folderId != null) data['folder_id'] = folderId;

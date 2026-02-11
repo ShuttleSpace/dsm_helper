@@ -129,3 +129,84 @@ Future<Map> dsmDownloadStationScheduleSetconfig(
   }
   return res['data'];
 }
+
+Future<Map> dsmDownloadStation2SettingsLocationGet(
+    {CancelToken? cancelToken}) async {
+  final data = _dsmApiRequestData(
+      api: 'SYNO.DownloadStation2.Settings.Location',
+      method: 'get',
+      version: 1);
+  final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
+  Log.info("dsmDownloadStation2SettingsLocationGet: $res");
+  if (res['success'] != true) {
+    throw DSMException.fromMap(res);
+  }
+  return res['data'];
+}
+
+Future<Map> dsmDownloadStation2TaskBTTrackerList(
+    {required String taskId, CancelToken? cancelToken}) async {
+  final data = _dsmApiRequestData(
+      api: 'SYNO.DownloadStation2.Task.BT.Tracker', method: 'list', version: 2)
+    ..addAll({'task_id': taskId});
+  final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
+  Log.info("dsmDownloadStation2TaskBTTrackerList: $res");
+  if (res['success'] != true) {
+    throw DSMException.fromMap(res);
+  }
+  return res['data'];
+}
+
+Future<Map> dsmDownloadStation2TaskBTTrackerAdd(
+    {required String taskId,
+    required List<String> tracker,
+    CancelToken? cancelToken}) async {
+  final data = _dsmApiRequestData(
+      api: 'SYNO.DownloadStation2.Task.BT.Tracker', method: 'add', version: 2)
+    ..addAll({'task_id': taskId, 'tracker': jsonEncode(tracker)});
+  final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
+  Log.info("dsmDownloadStation2TaskBTTrackerAdd: $res");
+  if (res['success'] != true) {
+    throw DSMException.fromMap(res);
+  }
+  return res['data'];
+}
+
+Future<Map> dsmDownloadStation2TaskBTPeerList(
+    {required String taskId, CancelToken? cancelToken}) async {
+  final data = _dsmApiRequestData(
+      api: 'SYNO.DownloadStation2.Task.BT.Peer', method: 'list', version: 2)
+    ..addAll({'task_id': taskId});
+  final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
+  Log.info("dsmDownloadStation2TaskBTPeerList: $res");
+  if (res['success'] != true) {
+    throw DSMException.fromMap(res);
+  }
+  return res['data'];
+}
+
+Future<Map> dsmDownloadStation2TaskBTFileList(
+    {required String taskId,
+    int? offset = 0,
+    int? limit = 50,
+    String? sortBy = 'name',
+    String? order = 'ASC',
+    String? query,
+    CancelToken? cancelToken}) async {
+  final data = _dsmApiRequestData(
+      api: 'SYNO.DownloadStation2.Task.BT.File', method: 'list', version: 2)
+    ..addAll({
+      'task_id': taskId,
+      'offset': offset,
+      'limit': limit,
+      'sort_by': sortBy,
+      'order': order,
+      'query': query ?? ''
+    });
+  final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
+  Log.info("dsmDownloadStation2TaskBTFileList: $res");
+  if (res['success'] != true) {
+    throw DSMException.fromMap(res);
+  }
+  return res['data'];
+}

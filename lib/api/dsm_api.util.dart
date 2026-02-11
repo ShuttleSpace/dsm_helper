@@ -13,29 +13,28 @@ extension DioExtension on Dio {
   }
 }
 
-final _dio = Dio(BaseOptions())
+final _cookieJar = CookieJar();
+final _dio = Dio(BaseOptions(
+  baseUrl: '${connectionStore.baseUri.value}/',
+))
   ..interceptors.add(InterceptorsWrapper(
     onRequest: (options, handler) {
-      String endpoint = options.extra['endpoint'] ?? '';
-      if (endpoint.startsWith('http') || endpoint.startsWith('https')) {
-        options.baseUrl = endpoint;
-      } else {
-        options.baseUrl =
-            '${options.extra['host'] ?? connectionStore.baseUri}/$endpoint';
-      }
-
       int timeout = options.extra['timeout'] ?? 30;
       options.connectTimeout = Duration(seconds: timeout);
-
-      String cookie = options.extra['cookie'] ?? connectionStore.cookie.value;
       options
-        ..headers["Accept-Language"] =
-            "zh-CN,zh;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6,zh-TW;q=0.5"
-        ..headers['origin'] = options.extra['host'] ?? connectionStore.baseUri
-        ..headers['referer'] = options.extra['host'] ?? connectionStore.baseUri
-        ..headers['Cookie'] = cookie
-        ..headers['Content-Type'] =
-            options.extra['Content-Type'] ?? 'application/json';
+            ..headers["Accept-Language"] =
+                "zh-CN,zh;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6,zh-TW;q=0.5"
+            ..headers['Origin'] =
+                options.extra['host'] ?? connectionStore.baseUri
+            ..headers['Referer'] =
+                options.extra['host'] ?? connectionStore.baseUri
+            ..headers['Content-Type'] = options.extra['Content-Type'] ??
+                'application/json; charset="UTF-8'
+            ..headers['Accept-Encoding'] = 'gzip, deflate, br'
+            ..headers['Accept'] = '*/*'
+            ..headers['X-SYNO-TOKEN'] = connectionStore.synoToken.value
+          // ..headers['X-SYNO-HASH'] = connectionStore.cookie.value
+          ;
       handler.next(options);
     },
     onResponse: (response, handler) {
@@ -71,7 +70,18 @@ final _dio = Dio(BaseOptions())
       handler.next(e);
     },
   ))
-  ..interceptors.add(LogInterceptor(logPrint: Log.debug));
+  ..interceptors.add(CookieManager(_cookieJar))
+  ..interceptors.add(LogInterceptor(
+      request: true,
+      requestUrl: true,
+      requestBody: true,
+      requestHeader: true,
+      responseUrl: true,
+      responseBody: true,
+      responseHeader: true))
+  ..options.followRedirects = false
+  ..options.validateStatus =
+      (status) => (status != null && status >= 200 && status < 400);
 
 Future<dynamic> _httpRequest(
   String endpoint, {
@@ -106,7 +116,6 @@ Future<dynamic> _httpRequest(
           headers: headers ?? {},
           extra: {
             'host': host,
-            'endpoint': endpoint,
             'timeout': timeout,
             'checkSsl': checkSsl,
             'cookie': cookie
@@ -116,7 +125,7 @@ Future<dynamic> _httpRequest(
       try {
         return jsonDecode(response.data);
       } on Exception catch (e) {
-        Log.error('get: decode response as json failed: $e');
+        Log.error('_httpRequest: decode response as json failed: $e');
       }
     }
     if (response.data is Map) {
@@ -124,10 +133,10 @@ Future<dynamic> _httpRequest(
     }
     return response.data;
   } on DioException catch (e) {
-    Log.error("get DioException: $e");
+    Log.error("_httpRequest DioException: $e");
     rethrow;
   } catch (e) {
-    Log.error("get: $e");
+    Log.error("_httpRequest Exception: $e");
     rethrow;
   }
 }

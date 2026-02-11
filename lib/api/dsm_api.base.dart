@@ -21,61 +21,65 @@ Map<String, dynamic> _dsmApiRequestData(
   return data;
 }
 
-enum DsmErrorCode {
-  unknown(100),
-  noParameter(101),
-  // Invalid API or method name, verify api/method is corrected, api version is supported.
-  apiOrMethodNotFound(102),
-  // Insufficient permissions for this operation
-  insufficientPermission(103),
-  versionNotSupport(104),
-  loggedInSessionNoPermission(105),
-  sessionTimeout(106),
-  sessionInterruptedByDuplicated(107),
-  uploadFailed(108),
-  networkSystemBusy(109),
-  networkSystemBusy1(110),
-  networkSystemBusy2(111),
-  preserve(112),
-  preserve1(113),
-  lostParameter(114),
-  notAllowedUpload(115),
-  notAllowedPerform(116),
-  // Operation not allowed in current state
-  invalidOperation(117),
-  networkSystemBusy4(118),
-  invalidSession(119),
-  // Required parameter not provided
-  missingRequiredParameter(120),
-  // 120-149 preserved.
-  requestSourceIPNotMatchLoginIP(150),
-  // auth error
-  invalidCredentials(400), // invalid credentials, check usename and password
-  accountDisabled(401), // acoount disabled, enable the account int DSM
-  permissionDenied(402), // permission denies, use an admin account
-  twoFactorAuthRequired(
-      403), // one-time password required, disable 2FA or provider OTP
-  accountNotFound(404), // account doest not exist, verify username
-  twoFactorAuthForced(406), // 强制两步验证码
-  blockedIPSource(407), // IP 源被封锁
-  expiredPasswdCannotChange(408), // 过期密码无法更改
-  expiredPasswd(409), // 过期密码
-  passwdMustBeChanged(410), // 密码必须更改
-  // Parameter value is invalid
-  invalidParameterValue(1001),
-  // Parameter format is incorrect, Example: JSON string expected but plain string provided
-  invalidParameterFormat(1009),
-  //  Numeric parameter outside valid range. limit parameter too large
-  parameterOutOfRange(1010),
-  ;
-
-  const DsmErrorCode(this.code);
-  factory DsmErrorCode.valueOf(int code) {
-    return DsmErrorCode.values.firstWhere((element) => element.code == code,
-        orElse: () => throw Exception("Unknown error code $code"));
-  }
-  final int code;
-}
+/// (module, error code, error message, error description/solution)
+const Map<String, Map<int, (String, String?)>> _dsmApiErrorMap = {
+  "common": {
+    100: ("Unknown error", null),
+    101: ("Invalid parameter", "Check parameter value"),
+    102: ("Invalid API or method name", "Verify API or method"),
+    103: (
+      "Permission Denied",
+      "Insufficient permissions for this operation. Provider admin account or grant permission"
+    ),
+    104: ("Not supported version", "Verify API version"),
+    105: (
+      "Permission denied ",
+      "Use an admin account or Grant admin privileges or use an admin account"
+    ),
+    106: ("Session timeout", "Relogin or refresh session"),
+    108: ("uploadFailed", null),
+    109: ("networkSystemBusy", null),
+    110: ("networkSystemBusy1", null),
+    111: ("networkSystemBusy2", null),
+    112: ("preserve", null),
+    113: ("preserve1", null),
+    114: ("lostParameter", null),
+    115: ("notAllowedUpload", null),
+    116: ("notAllowedPerform", null),
+    117: (
+      "Invalid Operation",
+      "Operation not allowed in current state. Check resource state before operation or Wait for current operation to complete"
+    ),
+    118: ("networkSystemBusy4", null),
+    119: ("invalidSession", null),
+    120: ("Missing Required Parameter", "Check required parameters"),
+    150: ("requestSourceIPNotMatchLoginIP", null),
+    400: ("Invalid parameter", "Check parameter value"),
+    401: ("Unknown error", "Check parameter value"),
+  },
+  "core": {
+    107: ("Multiple login detected", "Check login IP"),
+    400: ("Invalid credentials", "Check username and password"),
+    401: ("Account disabled", "Enable the account in DSM"),
+    402: (
+      "Permission denied",
+      "Use an admin account or Grant admin privileges or use an admin account"
+    ),
+    403: ("One-time password required", "Disable 2FA or provide OTP"),
+    404: ("Account Not Found", "Verify the username exists in DSM"),
+    406: ("twoFactorAuthForced", null),
+    407: ("blockedIPSource", null),
+    408: ("expiredPasswdCannotChange", null),
+    409: ("expiredPasswd", null),
+    410: ("passwdMustBeChanged", null),
+    1001: (
+      "Invalid Parameter Value",
+      "Parameter value is invalid.Verify parameter value exists or Ensure value is correct type"
+    ),
+    1009: ("Invalid Parameter Format", "Parameter format is incorrect."),
+    1010: (" Parameter Out of Range", "Numeric parameter outside valid range"),
+  },
+};
 
 extension MapExtension on Map {
   /// 相应是否成功
@@ -91,35 +95,54 @@ extension MapExtension on Map {
     }
     return null;
   }
-
-  DsmErrorCode? errorCode() {
-    final code = errorCodeRaw();
-    if (code != null) {
-      return DsmErrorCode.valueOf(code);
-    }
-    return null;
-  }
 }
 
 class DSMException implements Exception {
   Object message;
   int code;
-  DSMException(this.message, this.code);
+  Object? descriptionOrSolution;
+  DSMException(this.message, this.code, {this.descriptionOrSolution});
   @override
   String toString() {
-    return "DSMException:code: $code, $message";
+    return "DSMException:code: $code, $message,$descriptionOrSolution";
   }
 
-  static DSMException fromMap(Map res) {
+  static DSMException fromMap(Map res, {String? module}) {
     if (!res.containsKey('error')) {
       return DSMException("Unknown error", -1);
     }
     final error = res['error'];
     if (error is Map) {
       final code = error['code'];
-      final message = error['message'];
-      return DSMException(message ?? "Unknown error", code);
+      (String, String?)? errorInfo;
+      if (module != null) {
+        errorInfo = _dsmApiErrorMap[module]?[code];
+      }
+      errorInfo ??= _dsmApiErrorMap['common']?[code];
+      if (errorInfo != null) {
+        return DSMException(errorInfo.$1, code,
+            descriptionOrSolution: errorInfo.$2);
+      }
     }
     return DSMException("Unknown error", -1);
   }
+}
+
+/// 同时发起多个请求
+Future<Map> _dsmApiCall(
+    String compound, // JSON Array,[{api, method, version, additional}]
+    {String endpoint = _entryCGI,
+    int? version,
+    String mod = 'sequential', // parallel or sequential
+    bool? stopWhenError,
+    CancelToken? cancelToken}) async {
+  final data = _dsmApiRequestData(
+      api: 'SYNO.Entry.Request', method: 'request', version: version ?? 1)
+    ..addAll({
+      'mod': mod, // FIXME: parallel???
+      'compound': compound,
+      'stop_when_error': stopWhenError ?? false,
+    });
+  return await _httpGet(endpoint,
+      queryParameters: data, cancelToken: cancelToken);
 }

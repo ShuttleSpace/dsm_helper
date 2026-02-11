@@ -22,6 +22,9 @@ Future<Map> dsmFileStationBackgroundTaskList(
     String? sortBy,
     String? sortDirection,
     String? apiFilter, // Filter by API (JSON array)
+    bool? isListSharemove,
+    bool? isVfs,
+    bool? bkgInfo,
     CancelToken? cancelToken}) async {
   final data = _dsmApiRequestData(
       api: 'SYNO.FileStation.BackgroundTask', method: 'list', version: 3);
@@ -34,8 +37,10 @@ Future<Map> dsmFileStationBackgroundTaskList(
   if (apiFilter != null && apiFilter.isNotEmpty) {
     data['api_filter'] = apiFilter;
   }
-  final res = await _httpGet(_entryCGI,
-      queryParameters: data, cancelToken: cancelToken);
+  if (isListSharemove != null) data['is_list_sharemove'] = isListSharemove;
+  if (isVfs != null) data['is_vfs'] = isVfs;
+  if (bkgInfo != null) data['bkg_info'] = bkgInfo;
+  final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
   Log.info("dsmFileStationBackgroundTaskList: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);

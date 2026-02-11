@@ -83,6 +83,25 @@ Future<Map> dsmAuthLogout({CancelToken? cancelToken}) async {
   return res['data'];
 }
 
+/// {"data":{"is_portal_port":false,"synotoken":"cXOLO.EgGjnHU"},"success":true}
+Future<Map> dsmAuthToken(
+    {bool? updateSynoToken, CancelToken? cancelToken}) async {
+  final data = _dsmApiRequestData(
+    api: "SYNO.API.Auth",
+    method: "token",
+    version: 6,
+  );
+  if (updateSynoToken != null) {
+    data["updateSynoToken"] = updateSynoToken;
+  }
+  final res = await _httpPost(_authCGI, data: data, cancelToken: cancelToken);
+  Log.info("dsmAuthUpdateSynoToken: $res");
+  if (res["success"] != true) {
+    throw DSMException.fromMap(res);
+  }
+  return res['data'];
+}
+
 /// {
 ///     "command": "get_server_info",
 ///     "env": {
@@ -293,26 +312,6 @@ Future<void> dsmPingpong({String? host, CancelToken? cancelToken}) async {
       host: host);
 }
 
-Future<List<DsmApiInfo>> dsmInfoQuery({CancelToken? cancelToken}) async {
-  final data = _dsmApiRequestData(
-    api: "SYNO.API.Info",
-    method: "query",
-    version: 1,
-  )..addAll({
-      "query": "all", // API names (comma-separated or all)
-    });
-  final res =
-      await _httpGet(_authCGI, queryParameters: data, cancelToken: cancelToken);
-  Log.info("query: $res");
-  if (res["success"] != true) {
-    throw DSMException.fromMap(res);
-  }
-  return (res["data"] as Map)
-      .entries
-      .map((e) => DsmApiInfo.fromJson(e.key, e.value))
-      .toList();
-}
-
 /// {
 ///   "success": true,
 ///   "data": {
@@ -330,6 +329,18 @@ Future<Map> dsmDesktopSessionDataGetjs({CancelToken? cancelToken}) async {
   final res =
       await _httpGet(_authCGI, queryParameters: data, cancelToken: cancelToken);
   Log.info("getjs: $res");
+  if (res["success"] != true) {
+    throw DSMException.fromMap(res);
+  }
+  return res['data'];
+}
+
+/// {"data":{"account":"dang8080@qq.com","activated":true,"auth_key":"erl602G5n_HfPS8wac1_vblS7-4","critical_version_domain":null,"is_logged_in":true},"success":true}
+Future<Map> dsmCoreMyDSCenter({CancelToken? cancelToken}) async {
+  final data = _dsmApiRequestData(
+      api: 'SYNO.Core.MyDSCenter', method: 'query', version: 2);
+  final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
+  Log.info("dsmCoreMyDSCenter: $res");
   if (res["success"] != true) {
     throw DSMException.fromMap(res);
   }

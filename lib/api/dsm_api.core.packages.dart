@@ -19,16 +19,19 @@ part of 'dsm_api.dart';
 /// }
 Future<Map> dsmCorePackageList(
     {String?
-        additional, // Additional fields (comma-separated): `description`, `dependent_packages`, `beta`, `distributor`, `maintainer`, `dsm_apps`, `install_type`, `autoupdate`
-
+        additional, // JSON Array, Additional fields (comma-separated): `description`, `dependent_packages`, `beta`, `distributor`, `maintainer`, `dsm_apps`, `install_type`, `autoupdate`, `status_sketch`, `dsm_apps`, `install_type` `status`,
+    // additional=["status","dsm_apps","install_type"]
+    bool? ignoreHidden,
     CancelToken? cancelToken}) async {
   final data =
       _dsmApiRequestData(api: 'SYNO.Core.Package', method: 'list', version: 2);
   if (additional != null && additional.isNotEmpty) {
     data['additional'] = additional;
   }
-  final res = await _httpGet(_entryCGI,
-      queryParameters: data, cancelToken: cancelToken);
+  if (ignoreHidden != null) {
+    data['ignore_hidden'] = ignoreHidden;
+  }
+  final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
   Log.info("dsmCorePackageList: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
@@ -59,8 +62,7 @@ Future<Map> dsmCorePackageGet(String id, // Package ID
   if (additional != null && additional.isNotEmpty) {
     data['additional'] = additional;
   }
-  final res = await _httpGet(_entryCGI,
-      queryParameters: data, cancelToken: cancelToken);
+  final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
   Log.info("dsmCorePackageGet: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
@@ -88,6 +90,25 @@ Future<Map> dsmCorePackageServerList({CancelToken? cancelToken}) async {
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
   Log.info("dsmCorePackageServerList: $res");
+  if (res['success'] != true) {
+    throw DSMException.fromMap(res);
+  }
+  return res['data'];
+}
+
+/// {"data":{"has_fail":false,"result":[{"api":"SYNO.Core.Upgrade.Server","data":{"available":false},"method":"check","success":true,"version":1},{"api":"SYNO.Core.Package.Server","data":{"action":"prepare","error":{"code":0},"stage":"prepare","success":true},"method":"check","success":true,"version":1}]},"success":true}
+Future<Map> dsmCoreUpgradeCheck({CancelToken? cancelToken}) async {
+  final compound = [
+    {
+      'api': 'SYNO.Core.Upgrade.Server',
+      'method': 'check',
+      'version': 1,
+      'need_auto_smallupdate': true
+    },
+    {'api': 'SYNO.Core.Package.Server', 'method': 'check', 'version': 1}
+  ];
+  final res = await _dsmApiCall(jsonEncode(compound), cancelToken: cancelToken);
+  Log.info("dsmCoreUpgradeCheck: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }

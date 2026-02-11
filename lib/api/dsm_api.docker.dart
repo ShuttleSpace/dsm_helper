@@ -149,6 +149,31 @@ Future<Map> dsmDockerContainerDelete(
   return res['data'];
 }
 
+Future<Map> dsmDockerContainerLogList(
+    {required String name,
+    String? method = 'list', // list, get
+    String? sortDir,
+    String? date,
+    int? limit,
+    int? offset,
+    CancelToken? cancelToken}) async {
+  final data = _dsmApiRequestData(
+      api: 'SYNO.Docker.Container.Log', method: method ?? 'list', version: 1)
+    ..addAll({'name': name});
+  if (method == 'get') {
+    data['sort_dir'] = sortDir ?? 'ASC';
+    data['date'] = date ?? '';
+    data['limit'] = limit ?? 1000;
+    data['offset'] = offset ?? 0;
+  }
+  final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
+  Log.info("dsmDockerContainerLogList: $res");
+  if (res['success'] != true) {
+    throw DSMException.fromMap(res);
+  }
+  return res['data'];
+}
+
 /// {
 ///   "success": true,
 ///   "data": {
