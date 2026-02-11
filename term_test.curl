@@ -30,3 +30,6 @@ curl 'http://192.168.8.40:5000/webapi/entry.cgi?api=SYNO.API.Info&version=1&meth
 curl 'http://192.168.8.40:5000/webapi/entry.cgi?api=SYNO.API.Auth&version=6&method=login&account=humphrey&passwd=LocalHost8080&enable_syno_token=yes&format=sid&otp_code=030375&enable_device_token=yes'
 
 curl -k -X POST 'http://192.168.8.40:5000/entry.cgi' -d "api=SYNO.FileStation.BackgroundTask" -d "method=list" -d "version=3" -d "_sid=bhAtxDTkFsH3S73nzEcD1apJSGI-gPTiNhyahUye_VwhKY3R_ppgp59fkCKDMCbmWO67ACf-ZgT09Q-x0lAIPY"
+
+
+curl -k -X POST 'http://192.168.8.40:5000/entry.cgi' -d "api=SYNO.Core.DSMNotify.Strings" -d "method=get" -d "version=1" -d "C2HwFWChPPt2AExtaXxoERcpYY4ofkjHaPug0MslhosVd2Z1s2iuPbqbbMx6aFZAWyUG_Hb9UBq6raNDc44wSA"
