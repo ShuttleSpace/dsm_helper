@@ -1,3 +1,4 @@
+import 'package:garden/api/dsm_api.dart';
 import 'package:garden/pages/security_scan/result_card.dart';
 import 'package:garden/stores/connection_store.dart';
 import 'package:garden/util/http_util.dart';
@@ -73,7 +74,7 @@ class SecurityScanState extends State<SecurityScan>
   }
 
   getData() async {
-    var rule = await DsmApi.securityRule();
+    var rule = await dsmCoreSecurityScanStatusRuleGet();
     if (rule['success']) {
       setState(() {
         ruleItems = rule['data']['items'];
@@ -105,7 +106,7 @@ class SecurityScanState extends State<SecurityScan>
         ruleUpdating = rule['data']['isUpdating'];
       });
     }
-    var system = await DsmApi.securitySystem();
+    var system = await dsmCoreSecurityScanStatusSystemGet();
     if (system['success']) {
       setState(() {
         loading = false;

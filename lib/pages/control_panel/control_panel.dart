@@ -21,17 +21,18 @@ import 'package:garden/pages/control_panel/info/info.dart';
 import 'package:flutter/material.dart' hide Badge;
 
 class ControlPanel extends StatefulWidget {
-  final Map system;
-  final List volumes;
-  final List disks;
-  final Map notify;
-  const ControlPanel(this.system, this.volumes, this.disks, this.notify,
+  const ControlPanel(
+      this.systemData, this.storageVolumes, this.storageDisks, this.appNotify,
       {super.key});
+  final ReadonlySignal<Map> systemData;
+  final ReadonlySignal<List> storageVolumes;
+  final ReadonlySignal<List> storageDisks;
+  final ReadonlySignal<Map> appNotify;
   @override
   ControlPanelState createState() => ControlPanelState();
 }
 
-class ControlPanelState extends State<ControlPanel> {
+class ControlPanelState extends State<ControlPanel> with SignalsMixin {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -338,8 +339,8 @@ class ControlPanelState extends State<ControlPanel> {
                           title: "信息中心",
                           iconPath:
                               "assets/control_panel/${connectionStore.dsmVersion}/info_center.png",
-                          targetPage: SystemInfo(
-                              0, widget.system, widget.volumes, widget.disks),
+                          targetPage: SystemInfo(0, widget.systemData,
+                              widget.storageDisks, widget.storageVolumes),
                           routeName: "system_info_all",
                         ),
                         // NeuCard(
@@ -457,18 +458,18 @@ class ControlPanelState extends State<ControlPanel> {
                               targetPage: const UpdateReset(),
                               routeName: "update_and_reset",
                             ),
-                            if (widget.notify[
+                            if (widget.appNotify[
                                         'SYNO.SDS.AdminCenter.Update_Reset.Main'] !=
                                     null &&
-                                widget.notify[
+                                widget.appNotify[
                                             'SYNO.SDS.AdminCenter.Update_Reset.Main']
                                         ['unread'] !=
                                     null)
                               Positioned(
                                 top: 8,
                                 right: 8,
-                                child: Badge(
-                                  widget.notify[
+                                child: Badger(
+                                  widget.appNotify[
                                           'SYNO.SDS.AdminCenter.Update_Reset.Main']
                                       ['unread'],
                                   size: 20,

@@ -1,3 +1,4 @@
+import 'package:garden/api/dsm_api.dart';
 import 'package:garden/util/http_util.dart';
 import 'package:garden/util/log.dart';
 import 'package:garden/widgets/bubble_tab_indicator.dart';
@@ -7,72 +8,61 @@ import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:garden/constants/app_constants.dart';
+import 'package:signals_flutter/signals_flutter.dart';
 
 class SystemInfo extends StatefulWidget {
-  final int index;
-  final Map system;
-  final List volumes;
-  final List disks;
-  const SystemInfo(this.index, this.system, this.volumes, this.disks,
+  const SystemInfo(
+      this.index, this.systemData, this.storageVolumes, this.storageDisks,
       {super.key});
+  final int index;
+  final ReadonlySignal<Map> systemData;
+  final ReadonlySignal<List> storageVolumes;
+  final ReadonlySignal<List> storageDisks;
   @override
   SystemInfoState createState() => SystemInfoState();
 }
 
 class SystemInfoState extends State<SystemInfo>
-    with SingleTickerProviderStateMixin {
-  late TabController _tabController;
-  List usbDev = [];
-  List nifs = [];
-  List volumes = [];
-  List disks = [];
-  Map network = {};
-  bool loadingDisks = false;
+    with SingleTickerProviderStateMixin, SignalsMixin {
+  late final TabController _tabController =
+      TabController(initialIndex: widget.index, length: 6, vsync: this);
+  late final usbDev = computed(() => widget.systemData['usb_dev'] ?? 0);
+  final nifs = listSignal([]);
+  late final volumes = futureSignal<List>(() async {
+    if (widget.storageVolumes.isNotEmpty) {
+      return Future.value(widget.storageVolumes.value);
+    }
+    final res = await dsmStorageCGIStorageLoadInfo();
+    final d = res['volumes'];
+    d.sort((a, b) {
+      return a['num_id'].compareTo(b['num_id']);
+    });
+    return Future.value(d);
+  });
+  late final disks = futureSignal<List>(() async {
+    if (widget.storageDisks.isNotEmpty) {
+      return Future.value(widget.storageDisks.value);
+    }
+    final res = await dsmStorageCGIStorageLoadInfo();
+    return Future.value(res['disks']);
+  });
+  late final network = createMapSignal({});
+  late final loadingDisks = createSignal(false);
   @override
   void initState() {
-    _tabController =
-        TabController(initialIndex: widget.index, length: 6, vsync: this);
-    setState(() {
-      usbDev = widget.system['usb_dev'];
+    effect(() {
+      getData();
     });
-
-    getData();
-    if (widget.volumes.isNotEmpty || widget.disks.isNotEmpty) {
-      setState(() {
-        volumes = widget.volumes;
-        disks = widget.disks;
-      });
-    } else {
-      setState(() {
-        loadingDisks = true;
-      });
-      getDisks();
-    }
     super.initState();
   }
 
   getData() async {
-    var res = await DsmApi.networkInfo();
-    if (res['success']) {
-      setState(() {
-        network = res['data'];
-        nifs = network['nif'];
-      });
-      Log.log("get networkInfo: $network");
-    }
-  }
-
-  getDisks() async {
-    var res = await DsmApi.storage();
-    if (res['success']) {
-      setState(() {
-        loadingDisks = false;
-        volumes = res['data']['volumes'];
-        volumes.sort((a, b) {
-          return a['num_id'].compareTo(b['num_id']);
-        });
-        disks = res['data']['disks'];
-      });
+    try {
+      final res = await dsmCoreNetworkGet();
+      network.set(res);
+      nifs.set(network['nif']);
+    } catch (e) {
+      Log.error('dsmCoreNetworkGet: $e');
     }
   }
 
@@ -284,6 +274,92 @@ class SystemInfoState extends State<SystemInfo>
     );
   }
 
+  Widget _buildVolume() {
+    return switch (volumes.value) {
+      AsyncData(:final value) => Card(
+          margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+          child: Padding(
+            padding: const EdgeInsets.all(AppConstants.paddingSmall),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Padding(
+                  padding: EdgeInsets.only(left: 20, top: 20),
+                  child: Text(
+                    "存储空间",
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+                  ),
+                ),
+                ...value.map((volume) => VolumeCard(volume: volume)),
+                const SizedBox(
+                  height: 20,
+                ),
+              ],
+            ),
+          ),
+        ),
+      AsyncError(:final error) => Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text('Oops! $error'),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: () => volumes.reload(),
+              child: const Text('Retry'),
+            ),
+          ],
+        ),
+      _ => const Center(
+          child: CupertinoActivityIndicator(
+            radius: 14,
+          ),
+        )
+    };
+  }
+
+  Widget _buildDisk() {
+    return switch (disks.value) {
+      AsyncData(:final value) => Card(
+          margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+          child: Padding(
+            padding: const EdgeInsets.all(AppConstants.paddingSmall),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Padding(
+                  padding: EdgeInsets.only(left: 20, top: 20),
+                  child: Text(
+                    "硬盘",
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+                  ),
+                ),
+                ...value.map(_buildDiskItem),
+                const SizedBox(
+                  height: 20,
+                ),
+              ],
+            ),
+          ),
+        ),
+      AsyncError(:final error) => Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text('Oops! $error'),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: () => disks.reload(),
+              child: const Text('Retry'),
+            ),
+          ],
+        ),
+      _ => const Center(
+          child: CupertinoActivityIndicator(
+            radius: 14,
+          ),
+        )
+    };
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -384,7 +460,7 @@ class SystemInfoState extends State<SystemInfo>
                                     Expanded(
                                       flex: 2,
                                       child: Text(
-                                        "${widget.system['serial']}",
+                                        "${widget.systemData['serial']}",
                                         overflow: TextOverflow.ellipsis,
                                       ),
                                     ),
@@ -412,7 +488,7 @@ class SystemInfoState extends State<SystemInfo>
                                     Expanded(
                                       flex: 2,
                                       child: Text(
-                                        "${widget.system['model']}",
+                                        "${widget.systemData['model']}",
                                         overflow: TextOverflow.ellipsis,
                                       ),
                                     ),
@@ -440,7 +516,7 @@ class SystemInfoState extends State<SystemInfo>
                                     Expanded(
                                       flex: 2,
                                       child: Text(
-                                        "${widget.system['cpu_vendor']} ${widget.system['cpu_family']} ${widget.system['cpu_series']}",
+                                        "${widget.systemData['cpu_vendor']} ${widget.systemData['cpu_family']} ${widget.systemData['cpu_series']}",
                                         overflow: TextOverflow.ellipsis,
                                       ),
                                     ),
@@ -468,7 +544,7 @@ class SystemInfoState extends State<SystemInfo>
                                     Expanded(
                                       flex: 2,
                                       child: Text(
-                                        "${widget.system['cpu_cores']}核 @ ${(widget.system['cpu_clock_speed'] / 1000).toStringAsFixed(2)}GHz",
+                                        "${widget.systemData['cpu_cores']}核 @ ${(widget.systemData['cpu_clock_speed'] / 1000).toStringAsFixed(2)}GHz",
                                         overflow: TextOverflow.ellipsis,
                                       ),
                                     ),
@@ -496,7 +572,7 @@ class SystemInfoState extends State<SystemInfo>
                                     Expanded(
                                       flex: 2,
                                       child: Text(
-                                        "${widget.system['ram_size']}MB",
+                                        "${widget.systemData['ram_size']}MB",
                                         overflow: TextOverflow.ellipsis,
                                       ),
                                     ),
@@ -524,7 +600,7 @@ class SystemInfoState extends State<SystemInfo>
                                     Expanded(
                                       flex: 2,
                                       child: Text(
-                                        "${widget.system['firmware_ver']}",
+                                        "${widget.systemData['firmware_ver']}",
                                         overflow: TextOverflow.ellipsis,
                                       ),
                                     ),
@@ -552,7 +628,7 @@ class SystemInfoState extends State<SystemInfo>
                                     Expanded(
                                       flex: 2,
                                       child: Text(
-                                        "${widget.system['time']}",
+                                        "${widget.systemData['time']}",
                                         overflow: TextOverflow.ellipsis,
                                       ),
                                     ),
@@ -580,7 +656,8 @@ class SystemInfoState extends State<SystemInfo>
                                     Expanded(
                                       flex: 2,
                                       child: Text(
-                                        parseOpTime(widget.system['up_time']),
+                                        parseOpTime(
+                                            widget.systemData['up_time']),
                                         overflow: TextOverflow.ellipsis,
                                       ),
                                     ),
@@ -588,7 +665,7 @@ class SystemInfoState extends State<SystemInfo>
                                 ),
                               ),
                             ),
-                            if (widget.system['sys_temp'] != null)
+                            if (widget.systemData['sys_temp'] != null)
                               Card(
                                 shape: RoundedRectangleBorder(
                                     side: const BorderSide(),
@@ -609,16 +686,17 @@ class SystemInfoState extends State<SystemInfo>
                                       Expanded(
                                         flex: 2,
                                         child: Text(
-                                          "${widget.system['sys_temp']}℃ ${widget.system['temperature_warning'] == null ? (widget.system['sys_temp'] > 80 ? "警告" : "正常") : (widget.system['temperature_warning'] ? "警告" : "正常")}",
+                                          "${widget.systemData['sys_temp']}℃ ${widget.systemData['temperature_warning'] == null ? (widget.systemData['sys_temp'] > 80 ? "警告" : "正常") : (widget.systemData['temperature_warning'] ? "警告" : "正常")}",
                                           style: TextStyle(
-                                              color: widget.system[
+                                              color: widget.systemData[
                                                           'temperature_warning'] ==
                                                       null
-                                                  ? (widget.system['sys_temp'] >
+                                                  ? (widget.systemData[
+                                                              'sys_temp'] >
                                                           80
                                                       ? Colors.red
                                                       : Colors.green)
-                                                  : (widget.system[
+                                                  : (widget.systemData[
                                                           'temperature_warning']
                                                       ? Colors.red
                                                       : Colors.green)),
@@ -676,7 +754,7 @@ class SystemInfoState extends State<SystemInfo>
                                     Expanded(
                                       flex: 2,
                                       child: Text(
-                                        "${widget.system['ntp_server']} ${widget.system['enabled_ntp'] ? "" : "(暂未启用)"}",
+                                        "${widget.systemData['ntp_server']} ${widget.systemData['enabled_ntp'] ? "" : "(暂未启用)"}",
                                         overflow: TextOverflow.ellipsis,
                                       ),
                                     ),
@@ -705,7 +783,7 @@ class SystemInfoState extends State<SystemInfo>
                                     Expanded(
                                       flex: 2,
                                       child: Text(
-                                        "${widget.system['time_zone_desc']}",
+                                        "${widget.systemData['time_zone_desc']}",
                                         overflow: TextOverflow.ellipsis,
                                       ),
                                     ),
@@ -720,7 +798,7 @@ class SystemInfoState extends State<SystemInfo>
                         ),
                       ),
                     ),
-                    if (usbDev.isNotEmpty)
+                    if (usbDev.value.isNotEmpty)
                       Card(
                         margin:
                             const EdgeInsets.only(top: 20, left: 20, right: 20),
@@ -739,7 +817,7 @@ class SystemInfoState extends State<SystemInfo>
                                       fontWeight: FontWeight.w600),
                                 ),
                               ),
-                              ...usbDev.map(_buildDevItem),
+                              ...usbDev.value.map(_buildDevItem),
                               const SizedBox(
                                 height: 20,
                               ),
@@ -881,69 +959,8 @@ class SystemInfoState extends State<SystemInfo>
                     ...nifs.map(_buildNifItem),
                   ],
                 ),
-                loadingDisks
-                    ? const Center(
-                        child: CupertinoActivityIndicator(
-                          radius: 14,
-                        ),
-                      )
-                    : ListView(
-                        children: [
-                          Card(
-                            margin: const EdgeInsets.symmetric(
-                                horizontal: 20, vertical: 15),
-                            child: Padding(
-                              padding: const EdgeInsets.all(
-                                  AppConstants.paddingSmall),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  const Padding(
-                                    padding: EdgeInsets.only(left: 20, top: 20),
-                                    child: Text(
-                                      "存储空间",
-                                      style: TextStyle(
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.w600),
-                                    ),
-                                  ),
-                                  ...volumes.map(
-                                      (volume) => VolumeCard(volume: volume)),
-                                  const SizedBox(
-                                    height: 20,
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                          Card(
-                            margin: const EdgeInsets.symmetric(
-                                horizontal: 20, vertical: 15),
-                            child: Padding(
-                              padding: const EdgeInsets.all(
-                                  AppConstants.paddingSmall),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  const Padding(
-                                    padding: EdgeInsets.only(left: 20, top: 20),
-                                    child: Text(
-                                      "硬盘",
-                                      style: TextStyle(
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.w600),
-                                    ),
-                                  ),
-                                  ...disks.map(_buildDiskItem),
-                                  const SizedBox(
-                                    height: 20,
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
+                Expanded(child: _buildVolume()),
+                Expanded(child: _buildDisk()),
                 const Center(
                   child: Text("待开发"),
                 ),

@@ -2,7 +2,6 @@ import 'dart:async';
 import 'package:garden/stores/settings_store.dart';
 import 'package:garden/util/log.dart';
 import 'package:garden/util/ui_util.dart';
-import 'package:garden/util/storage_util.dart';
 import 'package:garden/stores/connection_store.dart';
 import 'dart:io';
 
@@ -16,7 +15,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_sharing_intent/flutter_sharing_intent.dart';
 import 'package:flutter_sharing_intent/model/sharing_file.dart';
 import 'package:flutter_vibrate/flutter_vibrate.dart';
-import 'package:package_info_plus/package_info_plus.dart';
+import 'package:signals/signals_flutter.dart';
 
 import 'dashborad/dashboard.dart';
 import 'download_station/add_task.dart';
@@ -30,19 +29,14 @@ class Home extends StatefulWidget {
   HomeState createState() => HomeState();
 }
 
-class HomeState extends State<Home> with WidgetsBindingObserver {
-  int _currentIndex = 0;
-  DateTime lastPopTime = DateTime.now();
-  PackageInfo? packageInfo;
+class HomeState extends State<Home> with WidgetsBindingObserver, SignalsMixin {
   final GlobalKey<FilesState> _filesStateKey = GlobalKey<FilesState>();
   final GlobalKey<DashboardState> _dashboardStateKey =
       GlobalKey<DashboardState>();
-  //判断是否需要启动密码
-  bool launchAuth = false;
-  bool password = false;
-  bool biometrics = false;
-  bool authPage = false;
-  List<SharedFile> _sharedFiles = [];
+
+  late final _navIndex = createSignal(0);
+  DateTime lastPopTime = DateTime.now();
+
   @override
   void initState() {
     WidgetsBinding.instance.addObserver(this);
@@ -52,54 +46,24 @@ class HomeState extends State<Home> with WidgetsBindingObserver {
           .then((List<SharedFile> value) {
         Log.info(
             "Shared: getInitialMedia ${value.map((f) => f.value).join(",")}");
-        handleFiles(value);
+        _handleSharedFiles(value);
       });
       // For sharing images coming from outside the app while the app is in the memory
       FlutterSharingIntent.instance.getMediaStream().listen(
           (List<SharedFile> value) {
-        handleFiles(value);
+        _handleSharedFiles(value);
         Log.info(
             "Shared: getMediaStream ${value.map((f) => f.value).join(",")}");
       }, onError: (err) {
         Log.info("getIntentDataStream error: $err");
       });
     }
-
-    // For sharing images coming from outside the app while the app is in the memory
-    // ReceiveSharingIntent.getMediaStream().listen((List<SharedMediaFile> value) {
-    //   handleFiles(value);
-    // }, onError: (err) {
-    //   Log.debug("getIntentDataStream error: $err");
-    // });
-    //
-    // // For sharing images coming from outside the app while the app is closed
-    // ReceiveSharingIntent.getInitialMedia().then((List<SharedMediaFile> value) {
-    //   handleFiles(value);
-    // });
-    // // For sharing or opening urls/text coming from outside the app while the app is in the memory
-    // ReceiveSharingIntent.getTextStream().listen((String value) {
-    //   // HttpUtil.toast("getTextStream:$value");
-    //   if (value != null) {
-    //     handleTorrent(value);
-    //   }
-    // }, onError: (err) {
-    //   Log.debug("getLinkStream error: $err");
-    // });
-    //
-    // // For sharing or opening urls/text coming from outside the app while the app is closed
-    // ReceiveSharingIntent.getInitialText().then((String value) {
-    //   if (value != null) {
-    //     handleTorrent(value);
-    //   }
-    // });
     super.initState();
   }
 
-  handleFiles(List<SharedFile> files) async {
-    _sharedFiles = files;
-    if (_sharedFiles.isNotEmpty) {
-      if (_sharedFiles.length == 1 &&
-          _sharedFiles.first.value!.endsWith(".torrent")) {
+  _handleSharedFiles(List<SharedFile> files) async {
+    if (files.isNotEmpty) {
+      if (files.length == 1 && files.first.value!.endsWith(".torrent")) {
         String filePath = '';
         if (Platform.isAndroid) {
           filePath = (await FlutterSharingIntent().getMediaStream().first)
@@ -107,8 +71,9 @@ class HomeState extends State<Home> with WidgetsBindingObserver {
                   .value ??
               '';
         } else {
-          filePath = _sharedFiles.first.value ?? '';
+          filePath = files.first.value ?? '';
         }
+        UiUtil.toast("Shared: $filePath, ready to download 🐶");
         if (context.mounted) {
           // ignore: use_build_context_synchronously
           Navigator.of(context).push(CupertinoPageRoute(builder: (context) {
@@ -117,17 +82,13 @@ class HomeState extends State<Home> with WidgetsBindingObserver {
             );
           }));
         }
-        //   if (content.startsWith("content://") && content.endsWith(".torrent")) {
-        //     // final filePath = await FlutterSharingIntent.getAbsolutePath(content);
-        //
-        //     }));
-        //     // if (filePath.endsWith("torrent")) {}
-        //   }
       } else {
         Navigator.of(context).push(CupertinoPageRoute(builder: (context) {
+          UiUtil.toast(
+              "Shared: ${files.map((f) => f.value).join(",")}, ready to upload 💗");
           return Upload(
             "",
-            selectedFilesPath: _sharedFiles
+            selectedFilesPath: files
                 .takeWhile((t) => t.value != null)
                 .map((e) => e.value!)
                 .toList(),
@@ -136,18 +97,6 @@ class HomeState extends State<Home> with WidgetsBindingObserver {
       }
     }
   }
-
-  // handleTorrent(String content) async {
-  //   if (content.startsWith("content://") && content.endsWith(".torrent")) {
-  //     // final filePath = await FlutterSharingIntent.getAbsolutePath(content);
-  //     Navigator.of(context).push(CupertinoPageRoute(builder: (context) {
-  //       return AddDownloadTask(
-  //         torrentPath: ,
-  //       );
-  //     }));
-  //     // if (filePath.endsWith("torrent")) {}
-  //   }
-  // }
 
   @override
   void dispose() {
@@ -163,14 +112,8 @@ class HomeState extends State<Home> with WidgetsBindingObserver {
   }
 
   checkAuth() async {
-    // Log.info("是否需要启动密码")
-    launchAuth = await StorageUtil.getBool("launch_auth") ?? false;
-    password = await StorageUtil.getBool("launch_auth_password") ?? false;
-    biometrics = await StorageUtil.getBool("launch_auth_biometrics") ?? false;
-
-    authPage = launchAuth && (password || biometrics);
     if (await settingsStore.launchAccountPage.value == false &&
-        authPage &&
+        await settingsStore.authPage.value &&
         context.mounted) {
       // ignore: use_build_context_synchronously
       Navigator.of(context).push(CupertinoPageRoute(builder: (context) {
@@ -186,18 +129,18 @@ class HomeState extends State<Home> with WidgetsBindingObserver {
 
     UiUtil.vibrate(FeedbackType.light);
     Future<bool> value = Future.value(true);
-    if (_currentIndex == 0) {
-      if (_dashboardStateKey.currentState?.isDrawerOpen == true) {
+    if (_navIndex.value == 0) {
+      if (_dashboardStateKey.currentState?.isDrawerOpen.value == true) {
         _dashboardStateKey.currentState?.closeDrawer();
         return;
       }
-    } else if (_currentIndex == 1) {
+    } else if (_navIndex.value == 1) {
       if (_filesStateKey.currentState?.isDrawerOpen == true) {
         _filesStateKey.currentState?.closeDrawer();
         return;
       }
       value = _filesStateKey.currentState?.onWillPop() ?? Future.value(false);
-    } else if (_currentIndex == 2) {
+    } else if (_navIndex.value == 2) {
       value = DownloadStateInherited.of(context)?.notifier.onWillPop() ??
           Future.value(false);
     }
@@ -219,13 +162,15 @@ class HomeState extends State<Home> with WidgetsBindingObserver {
   @override
   Widget build(BuildContext context) {
     return PopScope(
+      // FIXME: with onPopInvokedWithResult notifier
+      canPop:
+          DateTime.now().difference(lastPopTime) > const Duration(seconds: 2),
       onPopInvokedWithResult: onWillPop,
       child: Scaffold(
-        appBar: null,
         body: DownloadStateInherited(
           notifier: DownloadStateNotifier(),
           child: IndexedStack(
-            index: _currentIndex,
+            index: _navIndex.value,
             children: [
               Dashboard(key: _dashboardStateKey),
               Files(key: _filesStateKey),
@@ -237,14 +182,12 @@ class HomeState extends State<Home> with WidgetsBindingObserver {
         bottomNavigationBar: BottomNavigationBar(
           backgroundColor: Theme.of(context).scaffoldBackgroundColor,
           type: BottomNavigationBarType.fixed,
-          selectedItemColor: Colors.blue,
+          selectedItemColor: Theme.of(context).colorScheme.primary,
           onTap: (v) {
             Log.info('[selected] $v');
-            setState(() {
-              _currentIndex = v;
-            });
+            _navIndex.value = v;
           },
-          currentIndex: _currentIndex,
+          currentIndex: _navIndex.watch(context),
           items: [
             BottomNavigationBarItem(
               label: "控制台",

@@ -1,4 +1,4 @@
-import 'package:garden/util/http_util.dart';
+import 'package:garden/api/dsm_api.dart';
 import 'package:garden/util/ui_util.dart';
 import 'package:garden/widgets/label.dart';
 import 'package:garden/widgets/neu_back_button.dart';
@@ -23,7 +23,7 @@ class TaskRecordState extends State<TaskRecord> {
   }
 
   getData() async {
-    var res = await DsmApi.taskRecord(widget.id);
+    var res = await dsmCoreTaskSchedulerResultGet(widget.id);
     if (res['success']) {
       setState(() {
         loading = false;

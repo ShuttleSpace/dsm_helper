@@ -1,6 +1,8 @@
+import 'package:dio/dio.dart';
+import 'package:garden/api/dsm_api.dart';
 import 'package:garden/theme/app_theme.dart';
+import 'package:garden/util/log.dart';
 import 'package:garden/util/ui_util.dart';
-import 'package:garden/util/http_util.dart';
 import 'package:garden/widgets/bubble_tab_indicator.dart';
 import 'package:garden/widgets/label.dart';
 import 'package:garden/widgets/neu_back_button.dart';
@@ -8,6 +10,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:garden/constants/app_constants.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
+import 'package:signals_flutter/signals_flutter.dart';
 
 class ExternalDevice extends StatefulWidget {
   const ExternalDevice({super.key});
@@ -17,11 +20,12 @@ class ExternalDevice extends StatefulWidget {
 }
 
 class ExternalDeviceState extends State<ExternalDevice>
-    with SingleTickerProviderStateMixin {
+    with SingleTickerProviderStateMixin, SignalsMixin {
   late TabController _tabController;
-  List esatas = [];
-  List usbs = [];
-  bool loading = true;
+  late final esatas = createListSignal([]);
+  late final usbs = createListSignal([]);
+  late final loading = createSignal(true);
+
   @override
   void initState() {
     _tabController = TabController(length: 2, vsync: this);
@@ -30,30 +34,30 @@ class ExternalDeviceState extends State<ExternalDevice>
   }
 
   getData() async {
-    var res = await DsmApi.externalDevice();
-    if (res['success']) {
-      setState(() {
-        loading = false;
-      });
+    try {
+      final res = await dsmCoreExternalDeviceList();
+      loading.value = false;
       List result = res['data']['result'];
       for (var item in result) {
         if (item['success'] == true) {
           switch (item['api']) {
             case "SYNO.Core.ExternalDevice.Storage.eSATA":
-              setState(() {
-                esatas = item['data']['devices'];
-              });
+              esatas.clear();
+              esatas.addAll(item['data']['devices']);
               break;
             case "SYNO.Core.ExternalDevice.Storage.USB":
-              setState(() {
-                usbs = item['data']['devices'];
-              });
+              usbs.clear();
+              usbs.addAll(item['data']['devices']);
               break;
           }
         }
       }
-    } else {
-      UiUtil.toast("获取外接设备失败，code${res['error']['code']}");
+    } on DioException catch (e) {
+      UiUtil.toast('获取外接设备失败, $e');
+      Log.error('获取外接设备失败, $e');
+    } on DSMException catch (e) {
+      UiUtil.toast("获取外接设备失败, $e}");
+      Log.error('获取外接设备失败, $e');
     }
   }
 
@@ -226,7 +230,8 @@ class ExternalDeviceState extends State<ExternalDevice>
                 const Spacer(),
                 OutlinedButton(
                   onPressed: () async {
-                    var res = await DsmApi.ejectEsata(esata['dev_id']);
+                    var res = await dsmCoreExternalDeviceEject(
+                        esata['dev_id'], esata['dev_type']);
                     if (res['success']) {
                       UiUtil.toast("设备已退出");
                       getData();
@@ -296,7 +301,7 @@ class ExternalDeviceState extends State<ExternalDevice>
             child: TabBarView(
               controller: _tabController,
               children: [
-                loading
+                loading.value
                     ? const Center(
                         child: CupertinoActivityIndicator(
                           radius: 14,

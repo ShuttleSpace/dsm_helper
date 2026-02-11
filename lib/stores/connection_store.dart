@@ -19,12 +19,14 @@ class ConnectionStore {
   final _baseUri = signal<String>('https://dang8080.quickconnect.to');
   final _hostname = signal<String>('');
   final _cookie = signal<String>('');
+  final _synoToken = signal<String>('');
   final _checkSsl = signal<bool>(true);
   final _dsmVersion = signal<int>(6);
   final _appName = signal<String>(AppConstants.appName);
   final _appUrl = signal<String>('https://dang8080.quickconnect.to');
+  // FIXME: desktop init data strings???
   final _strings = signal<Map>({});
-  final _notifyStrings = signal<Map>({});
+  final _notifies = signal<Map>({});
 
   ReadonlySignal<String> get sid => _sid;
   ReadonlySignal<String> get account => _account;
@@ -36,9 +38,10 @@ class ConnectionStore {
   ReadonlySignal<String> get appName => _appName;
   ReadonlySignal<String> get appUrl => _appUrl;
   ReadonlySignal<Map> get strings => _strings;
-  ReadonlySignal<Map> get notifyStrings => _notifyStrings;
-  ReadonlySignal<bool> get notReviewAccount =>
-      computed(() => _account.value != "jinx");
+  ReadonlySignal<Map> get notifyStrings => _notifies;
+  ReadonlySignal<bool> get notVisitorAccount =>
+      computed(() => _account.value != "__**__Visitor__**__");
+  ReadonlySignal<String> get synoToken => _synoToken;
 
   void setSid(String value) => _sid.value = value;
   void setAccount(String value) => _account.value = value;
@@ -50,6 +53,11 @@ class ConnectionStore {
     await StorageUtil.setString("smid", value);
   }
 
+  void setSynoToken(String value) async {
+    _synoToken.value = value;
+    await StorageUtil.setString("syno_token", value);
+  }
+
   void setCheckSsl(bool value) async {
     _checkSsl.value = value;
     await StorageUtil.setBool("check_ssl", value);
@@ -59,7 +67,7 @@ class ConnectionStore {
   void setAppName(String value) => _appName.value = value;
   void setAppUrl(String value) => _appUrl.value = value;
   void setStrings(Map value) => _strings.value = value;
-  void setNotifyStrings(Map value) => _notifyStrings.value = value;
+  void setNotifies(Map value) => _notifies.value = value;
 
   void clear() {
     batch(() {
@@ -85,7 +93,7 @@ class ConnectionStore {
     _appName.dispose();
     _appUrl.dispose();
     _strings.dispose();
-    _notifyStrings.dispose();
+    _notifies.dispose();
   }
 }
 

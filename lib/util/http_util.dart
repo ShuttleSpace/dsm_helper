@@ -64,8 +64,8 @@ class HttpUtil {
 
     Response response;
     try {
-      Log.debug(
-          "curl: '${connectionStore.baseUri}/$url' ${data?.entries.map((e) => '-d "${e.key}=${e.value}"').join(' ')}");
+      // Log.debug(
+      //     "curl: '${connectionStore.baseUri}/$url' ${data?.entries.map((e) => '-d "${e.key}=${e.value}"').join(' ')}");
       response =
           await dio.get(url, queryParameters: data, cancelToken: cancelToken);
       if (url == "auth.cgi") {
@@ -176,8 +176,8 @@ class HttpUtil {
     }
     Response response;
     try {
-      Log.debug(
-          "curl: '${connectionStore.baseUri}/$url' ${data?.entries.map((e) => '-d "${e.key}=${e.value}"').join(' ')}");
+      // Log.debug(
+      //     "curl: '${connectionStore.baseUri}/$url' ${data?.entries.map((e) => '-d "${e.key}=${e.value}"').join(' ')}");
       response = await dio.post(url, data: data, cancelToken: cancelToken);
       return response.data;
     } on DioException catch (error) {

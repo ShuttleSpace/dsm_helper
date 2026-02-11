@@ -1,4 +1,5 @@
 import 'package:garden/theme/app_theme.dart';
+import 'package:garden/api/dsm_api.dart';
 import 'package:garden/util/file_type_util.dart';
 import 'package:garden/util/log.dart';
 import 'package:garden/util/ui_util.dart';
@@ -63,7 +64,7 @@ class SelectFolderState extends State<SelectFolder> {
     setState(() {
       loading = true;
     });
-    var res = await DsmApi.fileList(path);
+    var res = await dsmFileStationListList(path);
     setState(() {
       success = res['success'];
     });

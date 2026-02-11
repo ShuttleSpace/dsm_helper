@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:garden/api/dsm_api.dart';
 import 'package:garden/stores/connection_store.dart';
 
 import 'package:garden/util/http_util.dart';
@@ -38,8 +39,8 @@ class TaskManagerState extends State<TaskManager>
   }
 
   getData() async {
-    var process = await DsmApi.process();
-    var group = await DsmApi.processGroup();
+    var process = await dsmCoreSystemProcess();
+    var group = await dsmCoreSystemProcessGroup();
     if (process['success']) {
       setState(() {
         loading = false;

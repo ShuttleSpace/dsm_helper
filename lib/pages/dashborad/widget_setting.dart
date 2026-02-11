@@ -7,18 +7,19 @@ import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:garden/constants/app_constants.dart';
+import 'package:signals_flutter/signals_flutter.dart';
 
 class WidgetSetting extends StatefulWidget {
-  final List widgets;
-  final Map restoreSizePos;
   const WidgetSetting(this.widgets, this.restoreSizePos, {super.key});
+  final ReadonlySignal<List> widgets;
+  final ReadonlySignal<Map> restoreSizePos;
   @override
   WidgetSettingState createState() => WidgetSettingState();
 }
 
-class WidgetSettingState extends State<WidgetSetting> {
-  bool showShortcut = true;
-  bool showWallpaper = true;
+class WidgetSettingState extends State<WidgetSetting> with SignalsMixin {
+  late final showShortcut = createSignal(true);
+  late final showWallpaper = createSignal(true);
   List<String> allWidgets = [
     // "SYNO.SDS.SystemInfoApp.FileChangeLogWidget",
     "SYNO.SDS.SystemInfoApp.SystemHealthWidget",
@@ -38,39 +39,17 @@ class WidgetSettingState extends State<WidgetSetting> {
     "SYNO.SDS.SystemInfoApp.StorageUsageWidget": "存储",
     "SYNO.SDS.ResourceMonitor.Widget": "资源监控",
   };
-  List showWidgets = [];
-  List selectedWidgets = [];
+  late final showWidgets = createListSignal([]);
+  late final selectedWidgets = createListSignal([]);
   @override
   void initState() {
-    StorageUtil.getBool("show_shortcut").then((showShortcutStr) {
-      setState(() {
-        if (showShortcutStr != null) {
-          showShortcut = showShortcutStr;
-        } else {
-          showShortcut = true;
-        }
-      });
+    effect(() async {
+      showWidgets
+          .set(<dynamic>{...widget.widgets.value, ...allWidgets}.toList());
+      selectedWidgets.set(widget.widgets.value);
+      showShortcut.value = await StorageUtil.getBool("show_shortcut") ?? true;
+      showWallpaper.value = await StorageUtil.getBool("show_wallpaper") ?? true;
     });
-    StorageUtil.getBool("show_wallpaper").then((showWallpaperStr) {
-      setState(() {
-        if (showWallpaperStr != null) {
-          showWallpaper = showWallpaperStr;
-        } else {
-          showWallpaper = true;
-        }
-      });
-    });
-    setState(() {
-      selectedWidgets.addAll(widget.widgets);
-      showWidgets.addAll(widget.widgets);
-    });
-    for (var widget in allWidgets) {
-      if (!showWidgets.contains(widget)) {
-        setState(() {
-          showWidgets.add(widget);
-        });
-      }
-    }
     super.initState();
   }
 
@@ -121,12 +100,8 @@ class WidgetSettingState extends State<WidgetSetting> {
             padding: const EdgeInsets.all(AppConstants.paddingLarge),
             child: GestureDetector(
               onTap: () {
-                setState(() {
-                  setState(() {
-                    showShortcut = !showShortcut;
-                    settingsStore.setShowShortcut(showShortcut);
-                  });
-                });
+                showShortcut.value = !showShortcut.value;
+                settingsStore.setShowShortcut(showShortcut.value);
               },
               child: Card(
                 shape: RoundedRectangleBorder(
@@ -150,7 +125,7 @@ class WidgetSettingState extends State<WidgetSetting> {
                             style: TextStyle(fontSize: 16),
                           ),
                           const Spacer(),
-                          if (showShortcut)
+                          if (showShortcut.value)
                             Icon(
                               CupertinoIcons.checkmark_alt,
                               color: Theme.of(context).colorScheme.primary,
@@ -167,12 +142,8 @@ class WidgetSettingState extends State<WidgetSetting> {
             padding: const EdgeInsets.symmetric(horizontal: 20.0),
             child: GestureDetector(
               onTap: () {
-                setState(() {
-                  setState(() {
-                    showWallpaper = !showWallpaper;
-                    settingsStore.setShowWallpaper(showWallpaper);
-                  });
-                });
+                showWallpaper.value = !showWallpaper.value;
+                settingsStore.setShowWallpaper(showWallpaper.value);
               },
               child: Card(
                 shape: RoundedRectangleBorder(
@@ -196,7 +167,7 @@ class WidgetSettingState extends State<WidgetSetting> {
                             style: TextStyle(fontSize: 16),
                           ),
                           const Spacer(),
-                          if (showWallpaper)
+                          if (showWallpaper.value)
                             Icon(
                               CupertinoIcons.checkmark_alt,
                               color: Theme.of(context).colorScheme.primary,

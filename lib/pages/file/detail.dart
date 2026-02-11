@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:garden/api/dsm_api.dart';
 import 'package:garden/util/log.dart';
 import 'package:garden/util/ui_util.dart';
 
@@ -35,10 +36,10 @@ class FileDetailState extends State<FileDetail> {
   }
 
   getDirSize() async {
-    var task = await DsmApi.dirSizeTask(widget.file['path']);
+    var task = await dsmFileStationDirSizeStart(widget.file['path']);
     if (task['success']) {
       timer = Timer.periodic(const Duration(seconds: 1), (timer) async {
-        var result = await DsmApi.dirSizeResult(task['data']['taskid']);
+        var result = await dsmFileStationDirSizeStatus(task['data']['taskid']);
         Log.info(result);
         if (result['success'] && result['data']['finished']) {
           timer.cancel();

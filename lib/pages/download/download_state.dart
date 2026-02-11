@@ -85,22 +85,17 @@ class DownloadStateNotifier {
     IsolateNameServer.removePortNameMapping('downloader_send_port');
   }
 
-  runLoop() async {
-    List<Task> downloadTasks = await FileDownloader().allTasks();
+  onRunLoopCallback(List<Task> downloadTasks) {
     tasks.value = downloadTasks
         .takeWhile((t) => t is DownloadTask)
         .map((e) => DownloadInfo.formTask(e as DownloadTask))
         .toList();
     loading.value = false;
-    Log.debug('runLoop: loading= ${loading.value}');
-    // 如果存在下载中任务，每秒刷新一次
-    if (tasks.value
-        .where((task) =>
-            task.status == TaskStatus.running ||
-            task.status == TaskStatus.enqueued ||
-            task.status == TaskStatus.notFound)
-        .isNotEmpty) {
-    } else {}
+  }
+
+  runLoop({ValueChanged<List<Task>>? callback}) async {
+    List<Task> downloadTasks = await FileDownloader().allTasks();
+    callback?.call(downloadTasks);
   }
 
   Future<bool> onWillPop() {

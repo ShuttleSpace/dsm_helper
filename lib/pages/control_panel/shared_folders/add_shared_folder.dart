@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'package:garden/api/dsm_api.dart';
 import 'package:garden/util/log.dart';
 import 'package:garden/util/ui_util.dart';
 
@@ -61,7 +62,7 @@ class AddSharedFoldersState extends State<AddSharedFolders> {
     setState(() {
       loading = true;
     });
-    var res = await DsmApi.shareDetail(folderName);
+    var res = await dsmCoreShareGet(folderName);
     if (res['success']) {
       var folder = res['data'];
       nameController.text = name = oldName = folder['name'];

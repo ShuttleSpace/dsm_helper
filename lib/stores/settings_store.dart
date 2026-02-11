@@ -129,8 +129,14 @@ class SettingsStore {
 
   void setDashboardCardCollapseSwitch(bool value) =>
       _dashboardCardCollapseSwitch.value = value;
-  void setDashboardCardCollapseState(Map<String, bool> value) =>
+  void setDashboardCardCollapseState(
+      {Map<String, bool>? value, (String, bool)? item}) {
+    if (value != null) {
       _dashboardCardCollapseState.value = value;
+    } else if (item != null) {
+      _dashboardCardCollapseState.update(item.$1, (ov) => item.$2);
+    }
+  }
 
   bool isCardItemCollapsed(String itemName) {
     return _dashboardCardCollapseState.value[itemName] ?? false;

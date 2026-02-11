@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:garden/api/dsm_api.dart';
 import 'package:garden/util/ui_util.dart';
 import 'package:garden/stores/connection_store.dart';
 
@@ -82,11 +83,12 @@ class OtpBindState extends State<OtpBind> {
                 setState(() {
                   emailSaving = true;
                 });
-                var res = await DsmApi.saveMail(email);
+                var res = await dsmCoreOTPSaveMail(mail: email);
 
                 if (res['success']) {
-                  var qrcode = await DsmApi.getQrCode(
-                      "${widget.username}@${connectionStore.hostname}");
+                  var qrcode = await dsmCoreOTPGetQrcode(
+                      account:
+                          "${widget.username}@${connectionStore.hostname}");
                   if (qrcode['success']) {
                     setState(() {
                       qrData =
@@ -229,7 +231,7 @@ class OtpBindState extends State<OtpBind> {
                 setState(() {
                   codeChecking = true;
                 });
-                var res = await DsmApi.authOtpCode(code);
+                var res = await dsmCoreOTPAuthTmpCode(code: code);
 
                 if (res['success']) {
                   setState(() {

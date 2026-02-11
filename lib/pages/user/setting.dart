@@ -1,6 +1,6 @@
+import 'package:garden/api/dsm_api.dart';
 import 'package:garden/pages/user/otp_bind.dart';
 import 'package:garden/util/ui_util.dart';
-import 'package:garden/util/http_util.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -35,7 +35,7 @@ class UserSettingState extends State<UserSetting> {
   }
 
   getNormalUser() async {
-    var res = await DsmApi.normalUser("get");
+    var res = await dsmCoreNormalUser("get");
     if (res['success']) {
       setState(() {
         loading = false;
@@ -266,7 +266,7 @@ class UserSettingState extends State<UserSetting> {
                         data[key] = value;
                       }
                     });
-                    var res = await DsmApi.normalUser("set", changedData: data);
+                    var res = await dsmCoreNormalUser("set", changedData: data);
                     if (res['success']) {
                       UiUtil.toast("保存成功");
                       if (context.mounted) {

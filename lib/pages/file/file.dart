@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:signals/signals_flutter.dart';
 import 'package:garden/services/download.dart';
 import 'package:garden/stores/settings_store.dart';
 import 'package:garden/util/file_type_util.dart';
@@ -30,7 +31,7 @@ import 'package:garden/pages/file/upload.dart';
 import 'package:garden/theme/app_theme.dart';
 import 'package:garden/util/http_util.dart';
 import 'package:garden/widgets/animation_progress_bar.dart';
-import 'package:garden/widgets/button_style.dart';
+import 'package:garden/extensions/context.dart';
 import 'package:garden/widgets/file_icon.dart';
 import 'package:garden/widgets/transparent_router.dart';
 import 'package:extended_text/extended_text.dart';
@@ -597,7 +598,7 @@ class FilesState extends State<Files> {
     }
     UiUtil.toast(
         "已添加${files.length > 1 ? "${files.length}个" : ""}下载任务，请至下载页面查看");
-    if (context.mounted) {
+    if (mounted) {
       // ignore: use_build_context_synchronously
       DownloadStateInherited.of(context)?.notifier.runLoop();
     }
@@ -712,7 +713,7 @@ class FilesState extends State<Files> {
       });
     } else {
       setState(() {
-        msg = res['msg'] ?? connectionStore.notReviewAccount
+        msg = res['msg'] ?? connectionStore.notVisitorAccount
             ? '暂无文件'
             : "加载失败，code:${res['error']['code']}";
       });
@@ -2712,7 +2713,7 @@ class FilesState extends State<Files> {
               ),
             ),
           ),
-          if (connectionStore.notReviewAccount.watch(context) &&
+          if (connectionStore.notVisitorAccount.watch(context) &&
               paths.isNotEmpty &&
               !multiSelect)
             Padding(

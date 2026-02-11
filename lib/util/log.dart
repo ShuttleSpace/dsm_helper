@@ -11,13 +11,13 @@ class Log {
   static final Logger _logger = Logger(
       printer: HybridPrinter(
         SimplePrinter(),
-        debug: PrettyPrinter(
-            methodCount: 2,
-            errorMethodCount: 8,
-            lineLength: 120,
-            colors: true,
-            printEmojis: true,
-            dateTimeFormat: DateTimeFormat.onlyTimeAndSinceStart),
+        // debug: PrettyPrinter(
+        //     methodCount: 2,
+        //     errorMethodCount: 8,
+        //     lineLength: 120,
+        //     colors: true,
+        //     printEmojis: false,
+        //     dateTimeFormat: DateTimeFormat.onlyTimeAndSinceStart),
       ),
       output: MultiOutput(
           [ConsoleOutput(), if (!kIsWeb || !kIsWasm) RotateLogOutput()]));

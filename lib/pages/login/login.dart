@@ -14,7 +14,7 @@ import 'package:garden/stores/connection_store.dart';
 import 'package:garden/util/http_util.dart';
 import 'package:garden/util/storage_util.dart';
 import 'package:garden/util/ui_util.dart';
-import 'package:garden/widgets/button_style.dart';
+import 'package:garden/extensions/context.dart';
 import 'package:signals_flutter/signals_flutter.dart';
 import 'package:wake_on_lan/wake_on_lan.dart';
 
@@ -37,28 +37,28 @@ class LoginState extends State<Login> with SignalsMixin {
   final TextEditingController _otpController = TextEditingController();
   CancelToken cancelToken = CancelToken();
 
-  final host = signal('');
-  final baseUrl = signal('');
-  final account = signal('');
-  final note = signal('');
-  final password = signal('');
-  final port = signal("5000");
-  final needOtp = signal(false);
-  final otpCode = signal('');
-  final sid = signal('');
-  final smid = signal('');
-  final https = signal(false);
-  final hasLogined = signal(false);
-  final rememberPassword = signal(true);
-  final autoLogin = signal(true);
-  final checkSsl = signal(true);
-  final rememberDevice = signal(true);
-  final passwordVisible = signal(false);
-  final servers = listSignal([]);
-  final qcAddresses = listSignal([]);
+  late final host = createSignal('');
+  late final baseUrl = createSignal('');
+  late final account = createSignal('');
+  late final note = createSignal('');
+  late final password = createSignal('');
+  late final port = createSignal("5000");
+  late final needOtp = createSignal(false);
+  late final otpCode = createSignal('');
+  late final sid = createSignal('');
+  late final smid = createSignal('');
+  late final https = createSignal(false);
+  late final hasLogined = createSignal(false);
+  late final rememberPassword = createSignal(true);
+  late final autoLogin = createSignal(true);
+  late final checkSsl = createSignal(true);
+  late final rememberDevice = createSignal(true);
+  late final passwordVisible = createSignal(false);
+  late final servers = createListSignal([]);
+  late final qcAddresses = createListSignal([]);
 
   @override
-  initState() async {
+  initState() {
     if (widget.server != null) {
       https.value = widget.server?['https'];
       host.value = widget.server?['host'];
@@ -98,8 +98,10 @@ class LoginState extends State<Login> with SignalsMixin {
       }
     } else {
       if (widget.type == "login") {
-        await readAccountInfo();
-        await checkAndLogin();
+        effect(() async {
+          await readAccountInfo();
+          await checkAndLogin();
+        });
       } else {
         _portController.value = TextEditingValue(text: port.value);
       }

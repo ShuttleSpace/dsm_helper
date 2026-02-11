@@ -12,7 +12,7 @@ import 'package:garden/util/http_util.dart';
 import 'package:garden/util/log.dart';
 import 'package:garden/util/storage_util.dart';
 import 'package:garden/util/ui_util.dart';
-import 'package:garden/widgets/button_style.dart';
+import 'package:garden/extensions/context.dart';
 import 'package:garden/widgets/label.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
@@ -55,13 +55,13 @@ class AccountsState extends State<Accounts> with SignalsMixin {
       getServerInfo();
     });
     final list = List.from(servers.value);
-    for (var server in list) {
+    for (final server in list) {
       server['loading'] = server['loading'] ?? true;
       server['is_login'] = server['is_login'] ?? false;
       server['base_url'] = server['base_url'] ??
           "${server['https'] ? "https" : "http"}://${server['host']}:${server['port']}/";
       if (server['is_login']) {
-        await refreshServerInfo(server);
+        await fetchServerInfo(server);
       } else {
         //仅首次重新登录
         if (server['loading']) {
@@ -74,7 +74,7 @@ class AccountsState extends State<Accounts> with SignalsMixin {
           if (checkLogin['success']) {
             server['is_login'] = true;
             //获取系统信息
-            await refreshServerInfo(server);
+            await fetchServerInfo(server);
           } else {
             //登录失败，尝试重新登录
             try {
@@ -87,8 +87,8 @@ class AccountsState extends State<Accounts> with SignalsMixin {
                   cookie: server['smid']);
               Log.info("accounts: login: $res");
               server['is_login'] = true;
-              server['sid'] = res['data']['sid'];
-              await refreshServerInfo(server);
+              server['sid'] = res['sid'];
+              await fetchServerInfo(server);
             } on DioException catch (e) {
               Log.error("getServerInfo failed: ${e.message}");
             } on DSMException catch (e) {
@@ -122,38 +122,38 @@ class AccountsState extends State<Accounts> with SignalsMixin {
         "sid": server['sid'],
       });
     }
-    StorageUtil.setString("servers", json.encode(accounts));
+    await StorageUtil.setString("servers", json.encode(accounts));
   }
 
-  refreshServerInfo(server) async {
-    var res = await DsmApi.utilization(
-        sid: server['sid'],
-        checkSsl: server['check_ssl'],
-        cookie: server['smid'],
-        host: "${server['base_url']}");
-    Log.info("accounts: serverInfo: $res");
-    if (res['success']) {
+  fetchServerInfo(server) async {
+    try {
+      final res = await dsmCoreSystemUtilization(
+          ["cpu", "memory", "network", "lun", "disk", "space"].join(','));
+      Log.info("accounts: serverInfo: $res");
       if (!mounted) {
         return;
       }
-      server['cpu'] =
-          (res['data']['cpu']['user_load'] + res['data']['cpu']['system_load']);
-      server['ram'] = res['data']['memory']['real_usage'];
-      if (res['data']['network'].length > 0) {
-        server['rx'] = res['data']['network'][0]['rx'];
-        server['tx'] = res['data']['network'][0]['tx'];
+      server['cpu'] = (res['cpu']['user_load'] + res['cpu']['system_load']);
+      server['ram'] = res['memory']['real_usage'];
+      if (res['network'].length > 0) {
+        server['rx'] = res['network'][0]['rx'];
+        server['tx'] = res['network'][0]['tx'];
       }
-      if (res['data']['disk']['total'] != null) {
-        server['read'] = res['data']['disk']['total']['read_byte'];
-        server['write'] = res['data']['disk']['total']['write_byte'];
+      if (res['disk']['total'] != null) {
+        server['read'] = res['disk']['total']['read_byte'];
+        server['write'] = res['disk']['total']['write_byte'];
       }
       server['loading'] = false;
-    } else if (res['error']['code'] == 105) {
+    } on DioException catch (e) {
+      Log.error("fetchServerInfo failed: ${e.message}");
+    } on DSMException catch (e) {
+      Log.error("fetchServerInfo failed: ${e.message}");
       server['loading'] = false;
-      server['error'] = "权限不足，无法获取资源监控信息";
-    } else {
-      server['loading'] = false;
-      server['error'] = '获取资源监控信息失败';
+      if (e.code == 105) {
+        server['error'] = "权限不足，无法获取资源监控信息";
+      } else {
+        server['error'] = '获取资源监控信息失败';
+      }
     }
   }
 

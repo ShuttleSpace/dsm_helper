@@ -1,4 +1,7 @@
 import 'dart:convert';
+import 'package:dio/dio.dart';
+import 'package:garden/api/dsm_api.dart';
+import 'package:signals/signals_flutter.dart';
 import 'package:garden/util/log.dart';
 import 'package:garden/util/ui_util.dart';
 import 'package:garden/stores/connection_store.dart';
@@ -189,13 +192,15 @@ class NotifyState extends State<Notify> {
                 Expanded(
                   child: OutlinedButton(
                     onPressed: () async {
-                      var res = await DsmApi.clearNotify();
-                      if (res['success']) {
+                      try {
+                        await dsmCoreDSMNotify('apply');
                         UiUtil.toast("清除成功");
-                        if (context.mounted) {
-                          // ignore: use_build_context_synchronously
-                          Navigator.of(context).pop();
-                        }
+                        // ignore: use_build_context_synchronously
+                        if (mounted) Navigator.of(context).pop();
+                      } on DSMException catch (e) {
+                        UiUtil.toast("清除失败：${e.message}");
+                      } on DioException catch (e) {
+                        UiUtil.toast("网络错误：${e.message}");
                       }
                     },
                     child: const Text("全部清除"),

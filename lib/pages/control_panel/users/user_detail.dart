@@ -1,8 +1,9 @@
+import 'package:garden/api/dsm_api.dart';
 import 'package:garden/util/http_util.dart';
 import 'package:garden/util/log.dart';
 import 'package:garden/util/ui_util.dart';
 import 'package:garden/widgets/bubble_tab_indicator.dart';
-import 'package:garden/widgets/button_style.dart';
+import 'package:garden/extensions/context.dart';
 import 'package:garden/widgets/control_panel/permission_item.dart';
 import 'package:garden/widgets/control_panel/quota_item.dart';
 import 'package:garden/widgets/control_panel/user_group_item.dart';
@@ -91,7 +92,7 @@ class UserDetailState extends State<UserDetail>
   }
 
   getGroup() async {
-    var res = await DsmApi.userGroup(user?['name']);
+    var res = await dsmCoreGroupMemberList(user?['name']);
     if (res['success']) {
       setState(() {
         groups = res['data']['groups'];

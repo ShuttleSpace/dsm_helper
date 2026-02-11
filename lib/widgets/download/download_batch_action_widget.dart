@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:garden/constants/app_constants.dart';
-import 'package:garden/widgets/button_style.dart';
+import 'package:garden/extensions/context.dart';
 
 /// 批量删除确认对话框
 class DownloadBatchDeleteDialog extends StatelessWidget {

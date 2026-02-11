@@ -15,33 +15,35 @@ import 'package:garden/constants/app_constants.dart';
 import 'package:garden/widgets/badge.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart' hide Badge;
+import 'package:signals_flutter/signals_flutter.dart';
 
 class ApplicationList extends StatelessWidget {
-  final List applications;
-  final Map system;
-  final List volumes;
-  final List disks;
-  final Map appNotify;
   const ApplicationList(
       this.applications, this.system, this.volumes, this.disks, this.appNotify,
       {super.key});
-
+  final ReadonlySignal<List> applications;
+  final ReadonlySignal<Map> system;
+  final ReadonlySignal<List> volumes;
+  final ReadonlySignal<List> disks;
+  final ReadonlySignal<Map> appNotify;
   @override
   Widget build(BuildContext context) {
     return Container(
       width: MediaQuery.sizeOf(context).width * 0.8,
       color: Theme.of(context).scaffoldBackgroundColor,
       child: SafeArea(
-        child: ListView(
-          padding:
-              const EdgeInsets.symmetric(horizontal: AppConstants.paddingLarge),
-          children: [
-            Wrap(
-              spacing: 20,
-              runSpacing: 20,
-              children: _buildApplicationList(context),
-            ),
-          ],
+        child: Watch(
+          (_) => ListView(
+            padding: const EdgeInsets.symmetric(
+                horizontal: AppConstants.paddingLarge),
+            children: [
+              Wrap(
+                spacing: 20,
+                runSpacing: 20,
+                children: _buildApplicationList(context),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -49,7 +51,7 @@ class ApplicationList extends StatelessWidget {
 
   List<Widget> _buildApplicationList(BuildContext context) {
     List<Widget> apps = [];
-    for (var application in applications) {
+    for (var application in applications.value) {
       switch (application) {
         case "SYNO.SDS.AdminCenter.Application":
           apps.add(
@@ -97,7 +99,7 @@ class ApplicationList extends StatelessWidget {
                       if (appNotify['SYNO.SDS.AdminCenter.Application'] != null)
                         Positioned(
                           right: 30,
-                          child: Badge(
+                          child: Badger(
                             appNotify['SYNO.SDS.AdminCenter.Application']
                                 ['unread'],
                             size: 20,
@@ -149,7 +151,7 @@ class ApplicationList extends StatelessWidget {
                       if (appNotify['SYNO.SDS.PkgManApp.Instance'] != null)
                         Positioned(
                           right: 30,
-                          child: Badge(
+                          child: Badger(
                             appNotify['SYNO.SDS.PkgManApp.Instance']['unread'],
                             size: 20,
                           ),
@@ -310,7 +312,7 @@ class ApplicationList extends StatelessWidget {
                       if (appNotify['SYNO.SDS.SecurityScan.Instance'] != null)
                         Positioned(
                           right: 30,
-                          child: Badge(
+                          child: Badger(
                             appNotify['SYNO.SDS.SecurityScan.Instance']
                                 ['unread'],
                             size: 20,

@@ -54,10 +54,7 @@ class MyApp extends StatefulWidget {
   MyAppState createState() => MyAppState();
 }
 
-class MyAppState extends State<MyApp> {
-  DateTime lastPopTime = DateTime.now();
-  // final _canPop = signal(false);
-
+class MyAppState extends State<MyApp> with SignalsMixin {
   @override
   Widget build(BuildContext context) {
     return OKToast(
@@ -86,28 +83,13 @@ class MyAppState extends State<MyApp> {
             supportedLocales: const [
               Locale('zh', 'CN'),
             ],
-            home: PopScope(
-                // canPop: _canPop.value,
-                onPopInvokedWithResult: (didPop, result) async {
-                  if (didPop) return;
-                  UiUtil.vibrate(FeedbackType.light);
-                  if (DateTime.now().difference(lastPopTime) >
-                      const Duration(seconds: 2)) {
-                    lastPopTime = DateTime.now();
-                    UiUtil.toast('再按一次退出${connectionStore.appName}');
-                  } else {
-                    lastPopTime = DateTime.now();
-                    // 退出app
-                    SystemNavigator.pop();
-                  }
-                },
-                child: widget.authPage
-                    ? AuthPage(
-                        launchAccountPage: widget.launchAccountPage,
-                      )
-                    : widget.launchAccountPage
-                        ? const Accounts()
-                        : const Login()),
+            home: widget.authPage
+                ? AuthPage(
+                    launchAccountPage: widget.launchAccountPage,
+                  )
+                : widget.launchAccountPage
+                    ? const Accounts()
+                    : const Login(),
             routes: {
               "/login": (BuildContext context) => const Login(),
               "/home": (BuildContext context) => const Home(),

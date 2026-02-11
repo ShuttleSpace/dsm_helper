@@ -642,7 +642,7 @@ class SettingState extends State<Setting> {
             spacing: 20,
             runSpacing: 20,
             children: [
-              if (connectionStore.notReviewAccount.watch(context)) ...[
+              if (connectionStore.notVisitorAccount.watch(context)) ...[
                 SettingButton(
                     name: "关机",
                     icon: "shutdown",

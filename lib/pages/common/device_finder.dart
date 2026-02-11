@@ -3,7 +3,7 @@ import 'package:garden/util/log.dart';
 import 'package:garden/util/ui_util.dart';
 
 import 'package:flutter/material.dart';
-import 'package:garden/widgets/button_style.dart';
+import 'package:garden/extensions/context.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 class DeviceFinder extends StatefulWidget {

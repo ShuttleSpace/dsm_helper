@@ -14,6 +14,7 @@ import 'package:garden/pages/virtual_machine/virtual_machine.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:garden/constants/app_constants.dart';
+import 'package:signals_flutter/signals_flutter.dart';
 
 import '../photos/photos.dart';
 
@@ -31,17 +32,15 @@ List supportedShortcuts = [
 ];
 
 class ShortcutList extends StatelessWidget {
-  final List<ShortcutItemModel> shortcutItems;
-  final BuildContext context;
-  final Map system;
-  final List volumes;
-  final List disks;
-  final Map appNotify;
-  final List? validAppViewOrder;
-  const ShortcutList(this.shortcutItems, this.system, this.volumes, this.disks,
-      this.appNotify, this.context,
+  const ShortcutList(this.shortcutItems, this.systemData, this.storageVolumes,
+      this.storageDisks, this.appNotify,
       {super.key, this.validAppViewOrder});
-
+  final ReadonlySignal<List<Map>> shortcutItems;
+  final ReadonlySignal<Map> systemData;
+  final ReadonlySignal<List> storageVolumes;
+  final ReadonlySignal<List> storageDisks;
+  final ReadonlySignal<Map> appNotify;
+  final ReadonlySignal<List>? validAppViewOrder;
   @override
   Widget build(BuildContext ctx) {
     return Card(
@@ -53,7 +52,7 @@ class ShortcutList extends StatelessWidget {
         child: ListView.builder(
           scrollDirection: Axis.horizontal,
           itemBuilder: (ctx, i) {
-            return _buildShortcutItem(context, shortcutItems[i]);
+            return _buildShortcutItem(ctx, shortcutItems[i]);
           },
           itemCount: shortcutItems.length,
         ),
@@ -61,7 +60,7 @@ class ShortcutList extends StatelessWidget {
     );
   }
 
-  Widget _buildShortcutItem(BuildContext context, ShortcutItemModel shortcut) {
+  Widget _buildShortcutItem(BuildContext context, Map shortcut) {
     String icon = "";
     String name = "";
     int unread = 0;
@@ -71,7 +70,7 @@ class ShortcutList extends StatelessWidget {
       ),
     );
     String routerName = '';
-    switch (shortcut.className) {
+    switch (shortcut['className']) {
       case "SYNO.SDS.PkgManApp.Instance":
         icon =
             "assets/applications/${connectionStore.dsmVersion}/package_center.png";
@@ -87,9 +86,9 @@ class ShortcutList extends StatelessWidget {
             "assets/applications/${connectionStore.dsmVersion}/control_panel.png";
         name = "控制面板";
         page = ControlPanel(
-            system,
-            volumes,
-            disks,
+            systemData,
+            storageVolumes,
+            storageDisks,
             appNotify['SYNO.SDS.AdminCenter.Application'] != null
                 ? appNotify['SYNO.SDS.AdminCenter.Application']['fn']
                 : null);
@@ -130,10 +129,10 @@ class ShortcutList extends StatelessWidget {
         } else {
           icon = "assets/applications/docker.png";
         }
-        name = "${shortcut.param?.data?.name}";
-        if (shortcut.type == 'url') {
+        name = "${shortcut['param']?['data']?['name']}";
+        if (shortcut['type'] == 'url') {
           page = Browser(
-            url: shortcut.url ?? '',
+            url: shortcut['url'] ?? '',
             title: name,
           );
           routerName = "browser";
@@ -197,69 +196,71 @@ class ShortcutList extends StatelessWidget {
         break;
     }
     if (icon != "") {
-      return Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 15),
-        child: GestureDetector(
-          onTap: () {
-            Navigator.of(context).push(CupertinoPageRoute(
-                builder: (context) {
-                  return page;
-                },
-                settings: RouteSettings(name: routerName)));
-          },
-          child: Card(
-            shape: RoundedRectangleBorder(
-                side: const BorderSide(),
-                borderRadius: BorderRadius.circular(18)),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8.0),
-              child: Stack(
-                children: [
-                  Align(
-                    alignment: Alignment.center,
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                          vertical: AppConstants.paddingSmall + 2),
-                      child: Column(
-                        children: [
-                          Image.asset(
-                            icon,
-                            width: 50,
-                          ),
-                          const SizedBox(
-                            height: 5,
-                          ),
-                          Text(
-                            name,
-                            textAlign: TextAlign.center,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(fontSize: 14),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  if (unread > 0)
-                    Positioned(
-                      right: 20,
-                      top: 10,
-                      child: Container(
-                        alignment: Alignment.center,
-                        height: 15,
-                        width: 15,
-                        decoration: BoxDecoration(
-                          color: Colors.red,
-                          shape: BoxShape.circle,
-                          boxShadow: [
-                            BoxShadow(
-                                color: Colors.black.withValues(alpha: .5),
-                                offset: const Offset(1, 1)),
+      return Watch(
+        (context) => Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 15),
+          child: GestureDetector(
+            onTap: () {
+              Navigator.of(context).push(CupertinoPageRoute(
+                  builder: (context) {
+                    return page;
+                  },
+                  settings: RouteSettings(name: routerName)));
+            },
+            child: Card(
+              shape: RoundedRectangleBorder(
+                  side: const BorderSide(),
+                  borderRadius: BorderRadius.circular(18)),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                child: Stack(
+                  children: [
+                    Align(
+                      alignment: Alignment.center,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                            vertical: AppConstants.paddingSmall + 2),
+                        child: Column(
+                          children: [
+                            Image.asset(
+                              icon,
+                              width: 50,
+                            ),
+                            const SizedBox(
+                              height: 5,
+                            ),
+                            Text(
+                              name,
+                              textAlign: TextAlign.center,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(fontSize: 14),
+                            ),
                           ],
                         ),
                       ),
                     ),
-                ],
+                    if (unread > 0)
+                      Positioned(
+                        right: 20,
+                        top: 10,
+                        child: Container(
+                          alignment: Alignment.center,
+                          height: 15,
+                          width: 15,
+                          decoration: BoxDecoration(
+                            color: Colors.red,
+                            shape: BoxShape.circle,
+                            boxShadow: [
+                              BoxShadow(
+                                  color: Colors.black.withValues(alpha: .5),
+                                  offset: const Offset(1, 1)),
+                            ],
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
               ),
             ),
           ),

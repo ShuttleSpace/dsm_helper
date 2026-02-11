@@ -1,9 +1,9 @@
+import 'package:garden/api/dsm_api.dart';
 import 'package:garden/pages/control_panel/users/user_detail.dart';
 import 'package:garden/util/ui_util.dart';
 import 'package:garden/stores/connection_store.dart';
-import 'package:garden/util/http_util.dart';
 import 'package:garden/widgets/bubble_tab_indicator.dart';
-import 'package:garden/widgets/button_style.dart';
+import 'package:garden/extensions/context.dart';
 import 'package:garden/widgets/label.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
@@ -31,7 +31,7 @@ class UsersState extends State<Users> with SingleTickerProviderStateMixin {
   }
 
   getData() async {
-    var res = await DsmApi.users();
+    var res = await dsmCoreUserList();
     if (res['success']) {
       setState(() {
         users = res['data']['users'];
@@ -43,7 +43,7 @@ class UsersState extends State<Users> with SingleTickerProviderStateMixin {
         Navigator.of(context).pop();
       }
     }
-    var group = await DsmApi.userGroups();
+    var group = await dsmCoreGroupList();
     if (group['success']) {
       setState(() {
         loading = false;

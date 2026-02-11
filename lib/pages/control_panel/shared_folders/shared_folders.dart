@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:garden/api/dsm_api.dart';
 import 'package:garden/util/log.dart';
 import 'package:garden/util/ui_util.dart';
 
@@ -43,7 +44,8 @@ class SharedFoldersState extends State<SharedFolders> {
     setState(() {
       loading = true;
     });
-    var res = await DsmApi.shareCore(additional: [
+    var res = await dsmCoreShareList(
+        additional: [
       "hidden",
       "encryption",
       "is_aclmode",
@@ -60,7 +62,7 @@ class SharedFoldersState extends State<SharedFolders> {
       "share_quota",
       "enable_share_compress",
       "enable_share_cow",
-    ]);
+    ].join(','));
     setState(() {
       loading = false;
       success = res['success'];
@@ -123,7 +125,7 @@ class SharedFoldersState extends State<SharedFolders> {
                         child: OutlinedButton(
                           onPressed: () async {
                             Navigator.of(context).pop();
-                            var res = await DsmApi.deleteSharedFolder([folder]);
+                            var res = await dsmCoreShareDelete(folder);
                             Log.info(res);
                             if (res['success']) {
                               UiUtil.toast("共享文件夹删除成功");
@@ -374,8 +376,8 @@ class SharedFoldersState extends State<SharedFolders> {
                                         OutlinedButton(
                                           onPressed: () async {
                                             Navigator.of(context).pop();
-                                            DsmApi.cleanRecycleBin(
-                                                    folder['name'])
+                                            dsmCoreRecycleBinStart(
+                                                    id: folder['name'])
                                                 .then((res) {
                                               if (res['success']) {
                                                 UiUtil.toast("请求已发送");

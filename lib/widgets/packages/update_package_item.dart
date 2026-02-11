@@ -1,6 +1,6 @@
 import 'package:garden/stores/connection_store.dart';
 import 'package:flutter/material.dart';
-import 'package:garden/widgets/button_style.dart';
+import 'package:garden/extensions/context.dart';
 import 'package:garden/widgets/cupertino_image.dart';
 import 'package:garden/widgets/packages/package_button.dart';
 import 'package:signals/signals_flutter.dart';
