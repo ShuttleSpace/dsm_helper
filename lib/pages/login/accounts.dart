@@ -78,11 +78,8 @@ class AccountsState extends State<Accounts> with SignalsMixin {
             //登录失败，尝试重新登录
             try {
               final res = await dsmAuthLogin(
-                  account: server['account'],
-                  passwd: server['password'],
-                  rememberDevice: false,
-                  cookie: server['smid'],
-                  host: server['base_url']);
+                  server['account'], server['password'],
+                  cookie: server['smid'], host: server['base_url']);
               Log.info("try login: $res");
               final m = await _fetchServerInfo();
               _mapToServer(m, server);
@@ -127,7 +124,7 @@ class AccountsState extends State<Accounts> with SignalsMixin {
   Future<Map?> _fetchServerInfo() async {
     try {
       final res = await dsmCoreSystemUtilization(
-          ["cpu", "memory", "network", "lun", "disk", "space"].join(','));
+          ["cpu", "memory", "network", "lun", "disk", "space"]);
       Log.info("accounts: serverInfo: $res");
       if (!mounted) {
         return null;

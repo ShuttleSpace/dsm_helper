@@ -100,7 +100,7 @@ class LoginState extends State<Login> with SignalsMixin {
       if (widget.type == "login") {
         (() async {
           await readAccountInfo();
-          await checkAndLogin();
+          await _tryLogin();
         })();
       } else {
         _portController.value = TextEditingValue(text: port.value);
@@ -156,7 +156,7 @@ class LoginState extends State<Login> with SignalsMixin {
     }
   }
 
-  checkAndLogin() async {
+  _tryLogin() async {
     connectionStore.setAccount(account.value);
     if (sid.value.isNotBlank && host.value.isNotBlank) {
       if (baseUrl.value.isNotBlank) {
@@ -292,10 +292,8 @@ class LoginState extends State<Login> with SignalsMixin {
 
   _accountLogin(String baseUri) async {
     try {
-      final res = await dsmAuthLogin(
+      final res = await dsmAuthLogin(account.value, password.value,
           host: baseUri,
-          account: account.value,
-          password: password.value,
           otpCode: otpCode.value,
           cancelToken: cancelToken,
           rememberDevice: rememberDevice.value);
@@ -397,12 +395,12 @@ class LoginState extends State<Login> with SignalsMixin {
       hasLogined.value = false;
       Log.error("login error: $e");
       UiUtil.vibrate(FeedbackType.warning);
-      if (e.code == ErrorCode.noAccountOrIncorrectPassword.code) {
+      if (e.code == 400) {
         UiUtil.toast("用户名/密码有误");
-      } else if (e.code == ErrorCode.twoFactorAuthRequired.code) {
+      } else if (e.code == 403) {
         UiUtil.toast("请输入二次验证代码");
         needOtp.value = true;
-      } else if (e.code == ErrorCode.twoFactorAuthFailed.code) {
+      } else if (e.code == 404) {
         _otpController.clear();
         UiUtil.toast("错误的验证代码。请再试一次。");
       } else {
