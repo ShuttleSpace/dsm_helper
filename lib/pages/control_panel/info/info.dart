@@ -58,7 +58,7 @@ class SystemInfoState extends State<SystemInfo>
     try {
       final res = await dsmCoreNetworkGet();
       network.set(res);
-      nifs.set(network['nif']);
+      nifs.set(network['nif'] ?? []);
     } catch (e) {
       Log.error('dsmCoreNetworkGet: $e');
     }
