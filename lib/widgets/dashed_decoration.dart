@@ -208,7 +208,7 @@ class DashedDecoration extends Decoration {
   /// non-null value. If one of the values is null, then the result is obtained
   /// by applying [scale] to the other value. If neither value is null and `t ==
   /// 0.0`, then `a` is returned unmodified; if `t == 1.0` then `b` is returned
-  /// unmodified. Otherwise, the values are computed by interpolating the
+  /// unmodified. Otherwise, the values are createComputed by interpolating the
   /// properties appropriately.
   ///
   /// {@macro dart.ui.shadow.lerp}

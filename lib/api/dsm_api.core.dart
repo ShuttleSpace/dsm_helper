@@ -314,7 +314,7 @@ Future<Map> dsmCoreDSMNotifyStringsGet(
   if (res['success'] != true) {
     throw DSMException.fromMap(res, module: 'Core.DSM.Notify');
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmCoreDSMNotify(String action, // apply, load

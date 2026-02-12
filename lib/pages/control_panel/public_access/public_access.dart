@@ -37,7 +37,7 @@ class PublicAccessState extends State<PublicAccess>
     _tabController = TabController(length: 1, vsync: this);
     getData();
     timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      getData();
+      // getData();
     });
     super.initState();
   }

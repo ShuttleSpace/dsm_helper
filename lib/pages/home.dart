@@ -170,7 +170,7 @@ class HomeState extends State<Home> with WidgetsBindingObserver, SignalsMixin {
         body: DownloadStateInherited(
           notifier: DownloadStateNotifier(),
           child: IndexedStack(
-            index: _navIndex.value,
+            index: _navIndex.watch(context),
             children: [
               Dashboard(key: _dashboardStateKey),
               Files(key: _filesStateKey),

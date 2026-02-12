@@ -24,12 +24,12 @@ class _DashboardAppbarTitleExternalDeviceState
     extends State<DashboardAppbarTitleExternalDevice> with SignalsMixin {
   late final esatas = createListSignal([]);
   late final usbs = createListSignal([]);
-  late final _externalDevices = computed(() => esatas.value + usbs.value);
+  late final _externalDevices = createComputed(() => esatas.value + usbs.value);
 
   @override
   void initState() {
     super.initState();
-    effect(() async {
+    (() async {
       try {
         final res = await dsmCoreExternalDeviceList();
         List result = res['result'];
@@ -42,14 +42,17 @@ class _DashboardAppbarTitleExternalDeviceState
             switch (item['api']) {
               case dsmCoreExternalDeviceStorageESATA:
                 if (item['success'] == true) {
-                  esatas.set(untracked(() => item['data']['devices'] ?? []));
+                  final devices = item['data']?['devices'];
+                  esatas.set(devices is List ? devices : []);
                 } else {
                   Log.error('$dsmCoreExternalDeviceStorageESATA list failed.');
                 }
                 break;
               case dsmCoreExternalDeviceStorageUSB:
                 if (item['success'] == true) {
-                  esatas.set(untracked(() => item['data']['devices'] ?? []));
+                  final devices = item['data']?['devices'];
+                  Log.error("typeof devices; ${devices.runtimeType}");
+                  usbs.set(devices is List ? devices : []);
                 } else {
                   Log.error('$dsmCoreExternalDeviceStorageUSB list failed.');
                 }
@@ -60,7 +63,7 @@ class _DashboardAppbarTitleExternalDeviceState
       } catch (e) {
         Log.error("getExternalDevice error: $e");
       }
-    });
+    })();
   }
 
   @override
@@ -199,7 +202,7 @@ class _DashboardAppbarTitleMediaConverterState
   fetchMediaIndexingMediaConverterStatus() async {
     try {
       final res = await dsmCoreMediaIndexingMediaConverter('status');
-      converter.set(untracked(() => res));
+      converter.set(res);
       final totalRemain = (converter['photo_remain'] ?? 0) +
           (converter['thumb_remain'] ?? 0) +
           (converter['video_remain'] ?? 0);
@@ -219,9 +222,7 @@ class _DashboardAppbarTitleMediaConverterState
 
   @override
   initState() {
-    effect(() {
-      fetchMediaIndexingMediaConverterStatus();
-    });
+    fetchMediaIndexingMediaConverterStatus();
     super.initState();
   }
 
@@ -292,16 +293,16 @@ class _DashboardAppbarTitleNotifierState
   @override
   void initState() {
     super.initState();
-    effect(() async {
+    (() async {
       var res = await fetchNotifyStrings();
-      notifies.set(untracked(() => res));
+      notifies.set(res);
       Log.info('notifies1: $res');
       if (notifies.isEmpty) {
         res = await fetchNotifies();
         Log.info('notifies2: $res');
-        notifies.set(untracked(() => res));
+        notifies.set(res);
       }
-    });
+    })();
   }
 
   fetchNotifies() async {

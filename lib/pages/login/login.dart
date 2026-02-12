@@ -98,10 +98,10 @@ class LoginState extends State<Login> with SignalsMixin {
       }
     } else {
       if (widget.type == "login") {
-        effect(() async {
+        (() async {
           await readAccountInfo();
           await checkAndLogin();
-        });
+        })();
       } else {
         _portController.value = TextEditingValue(text: port.value);
       }
@@ -174,7 +174,7 @@ class LoginState extends State<Login> with SignalsMixin {
         hasLogined.value = true;
         try {
           await dsmFileStationListListShare(
-              additional: 'perm,time,size',
+              additional: const ['perm', 'time', 'size'],
               limit: 1000,
               cancelToken: cancelToken);
           if (context.mounted) {

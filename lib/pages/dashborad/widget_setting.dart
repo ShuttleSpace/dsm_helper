@@ -43,13 +43,13 @@ class WidgetSettingState extends State<WidgetSetting> with SignalsMixin {
   late final selectedWidgets = createListSignal([]);
   @override
   void initState() {
-    effect(() async {
+    (() async {
       showWidgets
           .set(<dynamic>{...widget.widgets.value, ...allWidgets}.toList());
       selectedWidgets.set(widget.widgets.value);
       showShortcut.value = await StorageUtil.getBool("show_shortcut") ?? true;
       showWallpaper.value = await StorageUtil.getBool("show_wallpaper") ?? true;
-    });
+    })();
     super.initState();
   }
 

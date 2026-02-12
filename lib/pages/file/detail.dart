@@ -39,17 +39,17 @@ class FileDetailState extends State<FileDetail> {
     var task = await dsmFileStationDirSizeStart(widget.file['path']);
     if (task['success']) {
       timer = Timer.periodic(const Duration(seconds: 1), (timer) async {
-        var result = await dsmFileStationDirSizeStatus(task['data']['taskid']);
-        Log.info(result);
-        if (result['success'] && result['data']['finished']) {
-          timer.cancel();
-          setState(() {
-            loadingSize = false;
-            size = result['data']['total_size'];
-            folderCount = result['data']['num_dir'];
-            fileCount = result['data']['num_file'];
-          });
-        }
+        // var result = await dsmFileStationDirSizeStatus(task['data']['taskid']);
+        // Log.info(result);
+        // if (result['success'] && result['data']['finished']) {
+        //   timer.cancel();
+        //   setState(() {
+        //     loadingSize = false;
+        //     size = result['data']['total_size'];
+        //     folderCount = result['data']['num_dir'];
+        //     fileCount = result['data']['num_file'];
+        //   });
+        // }
       });
     }
   }

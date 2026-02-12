@@ -129,7 +129,7 @@ Future<Map> dsmFileStationListListShare(
         sortBy, // Sort field: `name`, `user`, `group`, `mtime`, `atime`, `ctime`, `crtime`, `posix`
     String? sortDirection, // `asc` or `desc`
     bool? onlywritable, // Only writable shares
-    String?
+    List<String>?
         additional, // Additional fields: `real_path`, `owner`, `time`, `perm`, `mount_point_type`, `volume_status`
     CancelToken? cancelToken}) async {
   final data = _dsmApiRequestData(
@@ -142,7 +142,7 @@ Future<Map> dsmFileStationListListShare(
   }
   if (onlywritable != null) data['onlywritable'] = onlywritable;
   if (additional != null && additional.isNotEmpty) {
-    data['additional'] = additional;
+    data['additional'] = jsonEncode(additional);
   }
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);

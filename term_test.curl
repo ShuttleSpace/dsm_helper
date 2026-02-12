@@ -6,7 +6,7 @@ curl "http://192.168.8.40:5000/webapi/auth.cgi" \
   -d "passwd=LocalHost8080" \
   -d "session=FileStation" \
   -d "format=sid" \
-  -d "otp=186453"
+  -d "otp=702157"
 
 
 curl -k -X POST 'http://192.168.8.40:5000/webapi/auth.cgi' \
@@ -17,7 +17,7 @@ curl -k -X POST 'http://192.168.8.40:5000/webapi/auth.cgi' \
   -d 'passwd=LocalHost8080' \
   -d 'session=FileStation' \
   -d 'format=sid' \
-  -d 'otp=607896'
+  -d 'otp=519348'
 
 curl 'http://192.168.8.40:5000/webapi/query.cgi?api=SYNO.API.Info&version=1&method=query&query=all'
 
@@ -27,9 +27,16 @@ curl 'http://192.168.8.40:5000/webapi/query.cgi?api=SYNO.FileStation.Info&versio
 
 curl 'http://192.168.8.40:5000/webapi/entry.cgi?api=SYNO.API.Info&version=1&method=query&query=SYNO.API.Auth'
 
-curl 'http://192.168.8.40:5000/webapi/entry.cgi?api=SYNO.API.Auth&version=6&method=login&account=humphrey&passwd=LocalHost8080&enable_syno_token=yes&format=sid&otp_code=030375&enable_device_token=yes'
+curl 'http://192.168.8.40:5000/webapi/entry.cgi?api=SYNO.API.Auth&version=6&method=login&account=humphrey&passwd=LocalHost8080&enable_syno_token=no&format=sid&otp_code=463752&enable_device_token=no'
 
 curl -k -X POST 'http://192.168.8.40:5000/entry.cgi' -d "api=SYNO.FileStation.BackgroundTask" -d "method=list" -d "version=3" -d "_sid=bhAtxDTkFsH3S73nzEcD1apJSGI-gPTiNhyahUye_VwhKY3R_ppgp59fkCKDMCbmWO67ACf-ZgT09Q-x0lAIPY"
 
 
 curl -k -X POST 'http://192.168.8.40:5000/entry.cgi' -d "api=SYNO.Core.DSMNotify.Strings" -d "method=get" -d "version=1" -d "C2HwFWChPPt2AExtaXxoERcpYY4ofkjHaPug0MslhosVd2Z1s2iuPbqbbMx6aFZAWyUG_Hb9UBq6raNDc44wSA"
+
+
+curl 'http://192.168.8.40:5000/webapi/query.cgi?api=SYNO.Core.System.Utilization&version=1&method=get&resource=["cpu","memory", "disk", "network", "lun", "space"]'
+
+curl 'http://192.168.8.40:5000/webapi/query.cgi' -d 'api=SYNO.Core.System.Utilization' -d 'version=1' -d 'method=get' -d 'resource=%5B%22cpu%22%2C%22memory%22%2C%20%22disk%22%2C%20%22network%22%2C%20%22lun%22%2C%20%22space%22%5D' -d '_sid=hIerbhbX9uKxtcXwBIK1Zk3le552Cg_Me5xtdHNfgwEZbD01h_bFnHyfTAJYdWZ0TuuWC2wZ0QzmvkakpgAglI'
+
+

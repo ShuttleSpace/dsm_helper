@@ -119,6 +119,7 @@ dependencies:
   lottie: ^3.3.2
   dio_cookie_manager: ^3.3.0
   cookie_jar: ^4.0.8
+  signals_hooks: ^0.4.0
 #  flutter_filereader: ^3.0.0
 #  x5_webview: ^0.2.4
 dev_dependencies:

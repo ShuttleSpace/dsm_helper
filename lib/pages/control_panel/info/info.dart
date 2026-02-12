@@ -26,7 +26,7 @@ class SystemInfoState extends State<SystemInfo>
     with SingleTickerProviderStateMixin, SignalsMixin {
   late final TabController _tabController =
       TabController(initialIndex: widget.index, length: 6, vsync: this);
-  late final usbDev = computed(() => widget.systemData['usb_dev'] ?? 0);
+  late final usbDev = createComputed(() => widget.systemData['usb_dev'] ?? 0);
   final nifs = listSignal([]);
   late final volumes = futureSignal<List>(() async {
     if (widget.storageVolumes.isNotEmpty) {
@@ -50,9 +50,7 @@ class SystemInfoState extends State<SystemInfo>
   late final loadingDisks = createSignal(false);
   @override
   void initState() {
-    effect(() {
-      getData();
-    });
+    getData();
     super.initState();
   }
 

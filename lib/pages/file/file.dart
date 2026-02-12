@@ -93,7 +93,7 @@ class FilesState extends State<Files> {
     getSftpFolder();
     getDavFolder();
     processingTimer = Timer.periodic(const Duration(seconds: 10), (timer) {
-      getBackgroundTask();
+      // getBackgroundTask();
     });
 
     _fileScrollController.addListener(() {
@@ -342,21 +342,21 @@ class FilesState extends State<Files> {
     }
     backgroundProcess[taskId]['timer'] =
         Timer.periodic(const Duration(seconds: 1), (_) async {
-      switch (backgroundProcess[taskId]['type']) {
-        case 'copy':
-        case 'move':
-          getCopyMoveTaskResult(taskId);
-          break;
-        case 'extract':
-          getExtractTaskResult(taskId);
-          break;
-        case 'delete':
-          getDeleteTaskResult(taskId);
-          break;
-        case 'compress':
-          getCompressTaskResult(taskId);
-          break;
-      }
+      // switch (backgroundProcess[taskId]['type']) {
+      //   case 'copy':
+      //   case 'move':
+      //     getCopyMoveTaskResult(taskId);
+      //     break;
+      //   case 'extract':
+      //     getExtractTaskResult(taskId);
+      //     break;
+      //   case 'delete':
+      //     getDeleteTaskResult(taskId);
+      //     break;
+      //   case 'compress':
+      //     getCompressTaskResult(taskId);
+      //     break;
+      // }
     });
   }
 
@@ -439,7 +439,7 @@ class FilesState extends State<Files> {
       if (r == false) {
         //搜索未结束
         searchTimer = Timer.periodic(const Duration(seconds: 2), (timer) {
-          result(res['data']['taskid']);
+          // result(res['data']['taskid']);
         });
       }
     } else {

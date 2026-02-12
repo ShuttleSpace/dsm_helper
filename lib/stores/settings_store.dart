@@ -134,7 +134,8 @@ class SettingsStore {
     if (value != null) {
       _dashboardCardCollapseState.value = value;
     } else if (item != null) {
-      _dashboardCardCollapseState.update(item.$1, (ov) => item.$2);
+      _dashboardCardCollapseState.update(item.$1, (ov) => item.$2,
+          ifAbsent: () => item.$2);
     }
   }
 

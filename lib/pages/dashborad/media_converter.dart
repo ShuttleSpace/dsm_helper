@@ -25,7 +25,7 @@ class MediaConverterState extends State<MediaConverter> {
       converter = widget.converter;
     });
     timer = Timer.periodic(const Duration(seconds: 5), (timer) {
-      getMediaConverter();
+      // getMediaConverter();
     });
     getMediaConverter();
     super.initState();

@@ -30,7 +30,7 @@ class DownloadStationState extends State<DownloadStation> {
   @override
   void initState() {
     timer = Timer.periodic(const Duration(seconds: 10), (timer) {
-      getData();
+      // getData();
     });
     getData();
     super.initState();

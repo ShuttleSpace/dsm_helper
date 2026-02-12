@@ -21,7 +21,7 @@ class MediaIndexState extends State<MediaIndex> {
   @override
   void initState() {
     timer = Timer.periodic(const Duration(seconds: 5), (timer) {
-      getData();
+      // getData();
     });
     getData();
     super.initState();
