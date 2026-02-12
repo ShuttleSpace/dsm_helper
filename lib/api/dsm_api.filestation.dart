@@ -66,7 +66,7 @@ Future<Map> dsmFileStationInfoGet({CancelToken? cancelToken}) async {
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -146,11 +146,11 @@ Future<Map> dsmFileStationListListShare(
   }
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmFileStationListListShare: $res");
+  // Log.info("dsmFileStationListListShare: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -209,7 +209,7 @@ Future<Map> dsmFileStationListList(String folderPath, // Folder path
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -248,7 +248,7 @@ Future<Map> dsmFileStationListGetinfo(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmFileStationVirtualFolderList(
@@ -271,7 +271,7 @@ Future<Map> dsmFileStationVirtualFolderList(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmFileStationVFSConnectionDelete(
@@ -284,7 +284,7 @@ Future<Map> dsmFileStationVFSConnectionDelete(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -312,5 +312,5 @@ Future<Map> dsmFileStationCheckPermissionWrite(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }

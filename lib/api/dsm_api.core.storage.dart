@@ -38,7 +38,7 @@ Future<Map> dsmCoreExternalDeviceEject(
   if (!res['success'] == true) {
     throw DSMException.fromMap(res);
   }
-  return res;
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmCoreStorageDiskGetSmartTestLog(
@@ -51,7 +51,7 @@ Future<Map> dsmCoreStorageDiskGetSmartTestLog(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmCoreStorageDiskDiskTestLogGet(
@@ -77,7 +77,7 @@ Future<Map> dsmCoreStorageDiskDiskTestLogGet(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmCoreStorageDiskDoSmartTest(
@@ -92,7 +92,7 @@ Future<Map> dsmCoreStorageDiskDoSmartTest(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmCoreStorageVolumeList({CancelToken? cancelToken}) async {
@@ -104,5 +104,5 @@ Future<Map> dsmCoreStorageVolumeList({CancelToken? cancelToken}) async {
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }

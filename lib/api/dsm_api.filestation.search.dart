@@ -51,7 +51,7 @@ Future<Map> dsmFileStationSearchStart(String folderPath, // Starting folder path
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -115,7 +115,7 @@ Future<Map> dsmFileStationSearchList(String taskid, // Task ID from start
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -137,7 +137,7 @@ Future<Map> dsmFileStationSearchStatus(String taskid, // Task ID
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -153,7 +153,7 @@ Future<Map> dsmFileStationSearchStop(String taskid, // Task ID
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -170,5 +170,5 @@ Future<Map> dsmFileStationSearchClean(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }

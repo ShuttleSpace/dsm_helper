@@ -19,7 +19,7 @@ Future<Map> dsmVPNCenterServerStatusLoad({CancelToken? cancelToken}) async {
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -57,7 +57,7 @@ Future<Map> dsmVPNCenterServerConnectionEnum(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -108,7 +108,7 @@ Future<Map> dsmVPNCenterServerLogLoad(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -137,7 +137,7 @@ Future<Map> dsmVPNCenterServerNetworkInterfaceLoad(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -169,7 +169,7 @@ Future<Map> dsmCoreSecurityAutoBlockGet({CancelToken? cancelToken}) async {
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -225,7 +225,7 @@ Future<Map> dsmVPNCenterServerPrivilegeLoad(String action, // enum
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -248,7 +248,7 @@ Future<Map> dsmVPNCenterServerPPTPLoad({CancelToken? cancelToken}) async {
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -272,7 +272,7 @@ Future<Map> dsmVPNCenterServerOpenVPNLoad({CancelToken? cancelToken}) async {
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// Binary ZIP file containing OpenVPN configuration files
@@ -295,7 +295,7 @@ Future<dynamic> dsmVPNCenterServerOpenVPNExportConfig(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -337,5 +337,5 @@ Future<Map> dsmVPNCenterServerL2TPLoad({CancelToken? cancelToken}) async {
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }

@@ -39,7 +39,7 @@ Future<Map> dsmFileStationFavoriteList(String taskid,
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -59,7 +59,7 @@ Future<Map> dsmFileStationFavoriteAdd(String path, // File/folder path
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -75,7 +75,7 @@ Future<Map> dsmFileStationFavoriteDelete(String path, // File/folder path
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -90,7 +90,7 @@ Future<Map> dsmFileStationFavoriteClearBroken(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -107,7 +107,7 @@ Future<Map> dsmFileStationFavoriteEdit(String path, String name,
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -126,5 +126,5 @@ Future<Map> dsmFileStationFavoriteReplaceAll(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }

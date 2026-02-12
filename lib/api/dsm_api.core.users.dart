@@ -49,7 +49,7 @@ Future<Map> dsmCoreUserList(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -80,7 +80,7 @@ Future<Map> dsmCoreUserGet(String name, // Username
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -115,7 +115,7 @@ Future<Map> dsmCoreUserCreate(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -151,7 +151,7 @@ Future<Map> dsmCoreUserSet(String name, // Username
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -168,7 +168,7 @@ Future<Map> dsmCoreUserDelete(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -189,7 +189,7 @@ Future<Map> dsmCoreUserPasswordPolicy({CancelToken? cancelToken}) async {
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -209,5 +209,5 @@ Future<Map> dsmCoreUserPasswordExpiry({CancelToken? cancelToken}) async {
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }

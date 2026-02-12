@@ -40,7 +40,7 @@ Future<Map> dsmCoreNetworkDHCPServerGet(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -82,7 +82,7 @@ Future<Map> dsmCoreNetworkDHCPServerClientListList(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -120,5 +120,5 @@ Future<Map> dsmCoreNetworkDHCPServerReservationList(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }

@@ -19,7 +19,7 @@ Future<Map> dsmActiveBackupInventoryCancelCheckJob(String session, // Session ID
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupInventoryCheckIdentity(
@@ -33,7 +33,7 @@ Future<Map> dsmActiveBackupInventoryCheckIdentity(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupInventoryCheckIscsi(
@@ -47,7 +47,7 @@ Future<Map> dsmActiveBackupInventoryCheckIscsi(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupInventoryCreate(String hostName, // Host name
@@ -60,7 +60,7 @@ Future<Map> dsmActiveBackupInventoryCreate(String hostName, // Host name
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupInventoryCreateCheckJob(String session, // Session ID
@@ -75,7 +75,7 @@ Future<Map> dsmActiveBackupInventoryCreateCheckJob(String session, // Session ID
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupInventoryGetCheckStatus(String session, // Session ID
@@ -91,7 +91,7 @@ Future<Map> dsmActiveBackupInventoryGetCheckStatus(String session, // Session ID
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupInventoryGetHostInterface(
@@ -108,7 +108,7 @@ Future<Map> dsmActiveBackupInventoryGetHostInterface(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupInventoryGetNodeInfos(
@@ -123,7 +123,7 @@ Future<Map> dsmActiveBackupInventoryGetNodeInfos(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupInventoryGetNodePath(
@@ -138,7 +138,7 @@ Future<Map> dsmActiveBackupInventoryGetNodePath(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupInventoryGetServerCache(
@@ -155,7 +155,7 @@ Future<Map> dsmActiveBackupInventoryGetServerCache(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupInventoryGetServerInfo(
@@ -172,7 +172,7 @@ Future<Map> dsmActiveBackupInventoryGetServerInfo(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupInventoryList({CancelToken? cancelToken}) async {
@@ -184,7 +184,7 @@ Future<Map> dsmActiveBackupInventoryList({CancelToken? cancelToken}) async {
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupInventoryListClusterSharedVolume(
@@ -201,7 +201,7 @@ Future<Map> dsmActiveBackupInventoryListClusterSharedVolume(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupInventoryListGuestNode(
@@ -218,7 +218,7 @@ Future<Map> dsmActiveBackupInventoryListGuestNode(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupInventoryListNode(String parentId, // Parent ID
@@ -232,7 +232,7 @@ Future<Map> dsmActiveBackupInventoryListNode(String parentId, // Parent ID
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupInventoryMergeAutoBackupRule(
@@ -248,7 +248,7 @@ Future<Map> dsmActiveBackupInventoryMergeAutoBackupRule(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupInventoryRemove({CancelToken? cancelToken}) async {
@@ -260,7 +260,7 @@ Future<Map> dsmActiveBackupInventoryRemove({CancelToken? cancelToken}) async {
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupInventoryUpdate(String authUser, // Auth user
@@ -273,7 +273,7 @@ Future<Map> dsmActiveBackupInventoryUpdate(String authUser, // Auth user
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupInventoryUpdateCache(
@@ -287,7 +287,7 @@ Future<Map> dsmActiveBackupInventoryUpdateCache(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupRestoreVMAbeCancel(
@@ -300,7 +300,7 @@ Future<Map> dsmActiveBackupRestoreVMAbeCancel(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupRestoreVMAbeVerify(
@@ -313,7 +313,7 @@ Future<Map> dsmActiveBackupRestoreVMAbeVerify(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupRestoreVMCheckSpec(
@@ -327,7 +327,7 @@ Future<Map> dsmActiveBackupRestoreVMCheckSpec(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupRestoreVMCheckSupportTcmu(
@@ -342,7 +342,7 @@ Future<Map> dsmActiveBackupRestoreVMCheckSupportTcmu(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupRestoreVMCheckVmm({CancelToken? cancelToken}) async {
@@ -354,7 +354,7 @@ Future<Map> dsmActiveBackupRestoreVMCheckVmm({CancelToken? cancelToken}) async {
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupRestoreVMCloneEncCmpImage(
@@ -370,7 +370,7 @@ Future<Map> dsmActiveBackupRestoreVMCloneEncCmpImage(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupRestoreVMCreateImage(String taskId, // Task ID
@@ -383,7 +383,7 @@ Future<Map> dsmActiveBackupRestoreVMCreateImage(String taskId, // Task ID
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupRestoreVMGetAvailableMem(
@@ -398,7 +398,7 @@ Future<Map> dsmActiveBackupRestoreVMGetAvailableMem(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupRestoreVMGetVmmMeta(
@@ -411,7 +411,7 @@ Future<Map> dsmActiveBackupRestoreVMGetVmmMeta(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupRestoreVMJobCheck({CancelToken? cancelToken}) async {
@@ -423,7 +423,7 @@ Future<Map> dsmActiveBackupRestoreVMJobCheck({CancelToken? cancelToken}) async {
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupRestoreVMListLatestVersion(
@@ -440,7 +440,7 @@ Future<Map> dsmActiveBackupRestoreVMListLatestVersion(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupRestoreVMListSpec(
@@ -455,7 +455,7 @@ Future<Map> dsmActiveBackupRestoreVMListSpec(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupRestoreVMMigrate(
@@ -469,7 +469,7 @@ Future<Map> dsmActiveBackupRestoreVMMigrate(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupRestoreVMRemoveImage(String taskId, // Task ID
@@ -482,7 +482,7 @@ Future<Map> dsmActiveBackupRestoreVMRemoveImage(String taskId, // Task ID
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupRestoreVMRemoveVmmMeta(
@@ -497,7 +497,7 @@ Future<Map> dsmActiveBackupRestoreVMRemoveVmmMeta(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupRestoreVMRestore(
@@ -511,7 +511,7 @@ Future<Map> dsmActiveBackupRestoreVMRestore(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupRestoreVMSetVmmMeta(
@@ -524,7 +524,7 @@ Future<Map> dsmActiveBackupRestoreVMSetVmmMeta(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupRestoreVMStatusImage(String serialId, // Serial ID
@@ -538,5 +538,5 @@ Future<Map> dsmActiveBackupRestoreVMStatusImage(String serialId, // Serial ID
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }

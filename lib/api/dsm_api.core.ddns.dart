@@ -12,19 +12,19 @@ Future<Map> dsmCoreDDNSRecordSet(
     required String ipv6,
     required bool heartbeat,
     CancelToken? cancelToken}) async {
-  final data =
-      _dsmApiRequestData(api: 'SYNO.Core.DDNS.Record', method: 'set', version: 1)
-        ..addAll({
-          'id': id.replaceAll('USER_', '*'),
-          'enable': enable,
-          'provider': provider,
-          'hostname': hostname,
-          'username': username,
-          'net': net,
-          'ip': ip,
-          'ipv6': ipv6,
-          'heartbeat': heartbeat
-        });
+  final data = _dsmApiRequestData(
+      api: 'SYNO.Core.DDNS.Record', method: 'set', version: 1)
+    ..addAll({
+      'id': id.replaceAll('USER_', '*'),
+      'enable': enable,
+      'provider': provider,
+      'hostname': hostname,
+      'username': username,
+      'net': net,
+      'ip': ip,
+      'ipv6': ipv6,
+      'heartbeat': heartbeat
+    });
   if (passwd != null) {
     data['passwd'] = passwd;
   }
@@ -33,7 +33,7 @@ Future<Map> dsmCoreDDNSRecordSet(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmCoreDDNSRecordUpdateIpAddress(
@@ -46,7 +46,7 @@ Future<Map> dsmCoreDDNSRecordUpdateIpAddress(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmCoreDDNSRecordDelete(
@@ -59,7 +59,7 @@ Future<Map> dsmCoreDDNSRecordDelete(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmCoreDDNSRecordTest(
@@ -72,18 +72,18 @@ Future<Map> dsmCoreDDNSRecordTest(
     required String ipv6,
     required bool heartbeat,
     CancelToken? cancelToken}) async {
-  final data =
-      _dsmApiRequestData(api: 'SYNO.Core.DDNS.Record', method: 'test', version: 1)
-        ..addAll({
-          'enable': true,
-          'provider': provider.replaceAll('*', 'USER_'),
-          'hostname': hostname,
-          'username': username,
-          'net': net,
-          'ip': ip,
-          'ipv6': ipv6,
-          'heartbeat': heartbeat
-        });
+  final data = _dsmApiRequestData(
+      api: 'SYNO.Core.DDNS.Record', method: 'test', version: 1)
+    ..addAll({
+      'enable': true,
+      'provider': provider.replaceAll('*', 'USER_'),
+      'hostname': hostname,
+      'username': username,
+      'net': net,
+      'ip': ip,
+      'ipv6': ipv6,
+      'heartbeat': heartbeat
+    });
   if (passwd != null) {
     data['passwd'] = passwd;
   }
@@ -92,5 +92,5 @@ Future<Map> dsmCoreDDNSRecordTest(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }

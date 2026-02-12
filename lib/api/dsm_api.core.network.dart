@@ -8,5 +8,5 @@ Future<Map> dsmCoreNetworkGet({CancelToken? cancelToken}) async {
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }

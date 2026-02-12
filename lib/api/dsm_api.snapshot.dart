@@ -45,7 +45,7 @@ Future<Map> dsmCoreISCSILUNList(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -99,7 +99,7 @@ Future<Map> dsmCoreISCSILUNSnapshotList(String srcLunUuid, // Source LUN UUID
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -124,7 +124,7 @@ Future<Map> dsmCoreISCSILUNSnapshotCreate(String lunId, // LUN ID
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -149,7 +149,7 @@ Future<Map> dsmCoreISCSILUNSnapshotDelete(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -204,7 +204,7 @@ Future<Map> dsmCoreShareReplicationList(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -231,7 +231,7 @@ Future<Map> dsmCoreShareReplicationSync(String planId, // Replication plan ID
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -270,5 +270,5 @@ Future<Map> dsmCoreShareReplicationTaskStatus(String taskId, // Task ID
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }

@@ -31,7 +31,7 @@ Future<Map> dsmBackupTaskList({CancelToken? cancelToken}) async {
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -60,7 +60,7 @@ Future<Map> dsmBackupTaskGet(String taskId, // Task ID
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -84,7 +84,7 @@ Future<Map> dsmBackupTaskGetStatus(String taskId, // Task ID
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -104,7 +104,7 @@ Future<Map> dsmBackupTaskRun(String taskId, // Task ID
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -120,7 +120,7 @@ Future<Map> dsmBackupTaskCancel(String taskId, // Task ID
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -141,7 +141,7 @@ Future<Map> dsmBackupTaskSuspend(String taskId, // Task ID
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -161,5 +161,5 @@ Future<Map> dsmBackupTaskResume(String taskId, // Task ID
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }

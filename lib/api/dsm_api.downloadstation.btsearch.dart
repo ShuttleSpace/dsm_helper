@@ -18,7 +18,7 @@ Future<Map> dsmDownloadStationBTSearchStart(String keyword, // Search keyword
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -71,7 +71,7 @@ Future<Map> dsmDownloadStationBTSearchList(String taskid, // Search task ID
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -99,7 +99,7 @@ Future<Map> dsmDownloadStationBTSearchGetCategory(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -127,7 +127,7 @@ Future<Map> dsmDownloadStationBTSearchGetModule(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -144,5 +144,5 @@ Future<Map> dsmDownloadStationBTSearchClean(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }

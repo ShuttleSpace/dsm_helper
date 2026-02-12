@@ -17,7 +17,7 @@ Future<Map> dsmAudioStationInfoGetinfo({CancelToken? cancelToken}) async {
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -52,7 +52,7 @@ Future<Map> dsmAudioStationPlaylistList(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -81,7 +81,7 @@ Future<Map> dsmAudioStationPinList({CancelToken? cancelToken}) async {
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -118,7 +118,7 @@ Future<Map> dsmAudioStationRemotePlayerList(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -144,7 +144,7 @@ Future<Map> dsmAudioStationRemotePlayerGetplaylist(String id, // Player ID
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -168,5 +168,5 @@ Future<Map> dsmAudioStationRemotePlayerControl(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }

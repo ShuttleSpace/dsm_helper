@@ -8,7 +8,7 @@ Future<Map> dsmCoreTerminalGet({CancelToken? cancelToken}) async {
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmCoreTerminalSet(
@@ -28,5 +28,5 @@ Future<Map> dsmCoreTerminalSet(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }

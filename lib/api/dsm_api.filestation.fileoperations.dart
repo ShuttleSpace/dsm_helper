@@ -33,7 +33,7 @@ Future<Map> dsmFileStationCreateFolder(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -69,7 +69,7 @@ Future<Map> dsmFileStationRename(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -107,7 +107,7 @@ Future<Map> dsmFileStationCopyMoveStart(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -131,7 +131,7 @@ Future<Map> dsmFileStationCopyMoveStatus(String taskid, // Task ID
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -148,7 +148,7 @@ Future<Map> dsmFileStationCopyMoveStop(String taskid, // Task ID
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -180,7 +180,7 @@ Future<Map> dsmFileStationDeleteStart(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -203,7 +203,7 @@ Future<Map> dsmFileStationDeleteStatus(String taskid, // Task ID
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -219,5 +219,5 @@ Future<Map> dsmFileStationDeleteStop(String taskid, // Task ID
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }

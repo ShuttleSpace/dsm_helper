@@ -8,7 +8,7 @@ Future<Map> dsmFotoTeamBackgroundTaskFile({CancelToken? cancelToken}) async {
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmFotoTeamBrowseConcept({CancelToken? cancelToken}) async {
@@ -19,7 +19,7 @@ Future<Map> dsmFotoTeamBrowseConcept({CancelToken? cancelToken}) async {
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmFotoTeamBrowseDiff({CancelToken? cancelToken}) async {
@@ -30,7 +30,7 @@ Future<Map> dsmFotoTeamBrowseDiff({CancelToken? cancelToken}) async {
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmFotoTeamBrowseFolder({CancelToken? cancelToken}) async {
@@ -41,7 +41,7 @@ Future<Map> dsmFotoTeamBrowseFolder({CancelToken? cancelToken}) async {
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmFotoTeamBrowseGeneralTag({CancelToken? cancelToken}) async {
@@ -52,7 +52,7 @@ Future<Map> dsmFotoTeamBrowseGeneralTag({CancelToken? cancelToken}) async {
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmFotoTeamBrowseGeocoding({CancelToken? cancelToken}) async {
@@ -63,7 +63,7 @@ Future<Map> dsmFotoTeamBrowseGeocoding({CancelToken? cancelToken}) async {
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmFotoTeamBrowseItem({CancelToken? cancelToken}) async {
@@ -74,7 +74,7 @@ Future<Map> dsmFotoTeamBrowseItem({CancelToken? cancelToken}) async {
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmFotoTeamBrowsePerson({CancelToken? cancelToken}) async {
@@ -85,7 +85,7 @@ Future<Map> dsmFotoTeamBrowsePerson({CancelToken? cancelToken}) async {
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmFotoTeamBrowseRecentlyAdded({CancelToken? cancelToken}) async {
@@ -96,7 +96,7 @@ Future<Map> dsmFotoTeamBrowseRecentlyAdded({CancelToken? cancelToken}) async {
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmFotoTeamBrowseSimilar({CancelToken? cancelToken}) async {
@@ -107,7 +107,7 @@ Future<Map> dsmFotoTeamBrowseSimilar({CancelToken? cancelToken}) async {
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmFotoTeamBrowseSimilarItem({CancelToken? cancelToken}) async {
@@ -118,7 +118,7 @@ Future<Map> dsmFotoTeamBrowseSimilarItem({CancelToken? cancelToken}) async {
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmFotoTeamBrowseSimilarTimeline({CancelToken? cancelToken}) async {
@@ -129,7 +129,7 @@ Future<Map> dsmFotoTeamBrowseSimilarTimeline({CancelToken? cancelToken}) async {
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmFotoTeamBrowseTimeline({CancelToken? cancelToken}) async {
@@ -140,7 +140,7 @@ Future<Map> dsmFotoTeamBrowseTimeline({CancelToken? cancelToken}) async {
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmFotoTeamBrowseUnit({CancelToken? cancelToken}) async {
@@ -151,7 +151,7 @@ Future<Map> dsmFotoTeamBrowseUnit({CancelToken? cancelToken}) async {
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmFotoTeamDownload({CancelToken? cancelToken}) async {
@@ -162,7 +162,7 @@ Future<Map> dsmFotoTeamDownload({CancelToken? cancelToken}) async {
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmFotoTeamIndex({CancelToken? cancelToken}) async {
@@ -173,7 +173,7 @@ Future<Map> dsmFotoTeamIndex({CancelToken? cancelToken}) async {
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmFotoTeamRegeneratePreview({CancelToken? cancelToken}) async {
@@ -184,7 +184,7 @@ Future<Map> dsmFotoTeamRegeneratePreview({CancelToken? cancelToken}) async {
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmFotoTeamSearchFilter({CancelToken? cancelToken}) async {
@@ -195,7 +195,7 @@ Future<Map> dsmFotoTeamSearchFilter({CancelToken? cancelToken}) async {
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmFotoTeamSearchSearch({CancelToken? cancelToken}) async {
@@ -206,7 +206,7 @@ Future<Map> dsmFotoTeamSearchSearch({CancelToken? cancelToken}) async {
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmFotoTeamSharingFolderBatchPermission(
@@ -220,7 +220,7 @@ Future<Map> dsmFotoTeamSharingFolderBatchPermission(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmFotoTeamSharingFolderPermission(
@@ -232,7 +232,7 @@ Future<Map> dsmFotoTeamSharingFolderPermission(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmFotoTeamSharingPassphrase({CancelToken? cancelToken}) async {
@@ -243,7 +243,7 @@ Future<Map> dsmFotoTeamSharingPassphrase({CancelToken? cancelToken}) async {
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmFotoTeamStreaming({CancelToken? cancelToken}) async {
@@ -254,7 +254,7 @@ Future<Map> dsmFotoTeamStreaming({CancelToken? cancelToken}) async {
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmFotoTeamThumbnail({CancelToken? cancelToken}) async {
@@ -265,7 +265,7 @@ Future<Map> dsmFotoTeamThumbnail({CancelToken? cancelToken}) async {
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmFotoTeamUploadConvertedFile({CancelToken? cancelToken}) async {
@@ -276,7 +276,7 @@ Future<Map> dsmFotoTeamUploadConvertedFile({CancelToken? cancelToken}) async {
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmFotoTeamUploadFace({CancelToken? cancelToken}) async {
@@ -287,7 +287,7 @@ Future<Map> dsmFotoTeamUploadFace({CancelToken? cancelToken}) async {
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmFotoTeamUploadItem({CancelToken? cancelToken}) async {
@@ -298,5 +298,5 @@ Future<Map> dsmFotoTeamUploadItem({CancelToken? cancelToken}) async {
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }

@@ -23,7 +23,7 @@ Future<Map> dsmDockerVolumeList({CancelToken? cancelToken}) async {
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -44,7 +44,7 @@ Future<Map> dsmDockerVolumeCreate(String name, // Volume name
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -62,5 +62,5 @@ Future<Map> dsmDockerVolumeDelete(String name, // Volume name
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }

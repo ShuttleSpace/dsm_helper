@@ -31,7 +31,7 @@ Future<Map> dsmDockerNetworkList({CancelToken? cancelToken}) async {
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -58,7 +58,7 @@ Future<Map> dsmDockerNetworkCreate(String name, // Network name
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -74,5 +74,5 @@ Future<Map> dsmDockerNetworkDelete(String name, // Network name
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }

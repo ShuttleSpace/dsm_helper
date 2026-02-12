@@ -38,7 +38,7 @@ Future<Map> dsmFotoBrowseFolderList(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -67,7 +67,7 @@ Future<Map> dsmFotoBrowseFolderGet(int id, // Folder ID
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -87,7 +87,7 @@ Future<Map> dsmFotoBrowseFolderCount(int folderId, // Parent folder ID
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -130,5 +130,5 @@ Future<Map> dsmFotoTeamBrowseFolderList(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }

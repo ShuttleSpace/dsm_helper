@@ -31,7 +31,7 @@ Future<Map> dsmSynologyDriveInfoGetStatus({CancelToken? cancelToken}) async {
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -52,7 +52,7 @@ Future<Map> dsmSynologyDriveInfoGetConfig({CancelToken? cancelToken}) async {
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -73,7 +73,7 @@ Future<Map> dsmSynologyDriveSettingsGet({CancelToken? cancelToken}) async {
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -110,7 +110,7 @@ Future<Map> dsmSynologyDriveDBGetUsage({CancelToken? cancelToken}) async {
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -132,7 +132,7 @@ Future<Map> dsmSynologyDriveConnectionsGetSummary(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -171,7 +171,7 @@ Future<Map> dsmSynologyDriveConnectionsList({CancelToken? cancelToken}) async {
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -209,7 +209,7 @@ Future<Map> dsmSynologyDriveShareSyncListConnections(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -265,7 +265,7 @@ Future<Map> dsmSynologyDriveLogList(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -292,7 +292,7 @@ Future<Map> dsmSynologyDriveShareListActive({CancelToken? cancelToken}) async {
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -346,7 +346,7 @@ Future<Map> dsmSynologyDriveDeletionGetStatus(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -378,5 +378,5 @@ Future<Map> dsmSynologyDriveUserProfileGet(String user, // Username
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }

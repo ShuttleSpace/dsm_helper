@@ -1,10 +1,20 @@
 part of "dsm_api.dart";
 
 extension DioExtension on Dio {
-  _badCertificateCallback(BadCertificateCallback callback) {
+  /// proxy  "PROXY host:port; PROXY host2:port2; DIRECT"
+  /// browser PAC (proxy auto-config) scripts.
+  _createHttpClient({BadCertificateCallback? callback, String? proxy}) {
     if (httpClientAdapter is IOHttpClientAdapter) {
       (httpClientAdapter as IOHttpClientAdapter).createHttpClient = () {
-        return HttpClient()..badCertificateCallback = callback;
+        if (callback != null) {
+          _httpClient.badCertificateCallback = callback;
+        }
+        if (proxy != null) {
+          _httpClient.findProxy = (uri) {
+            return proxy;
+          };
+        }
+        return _httpClient;
       };
     } else {
       Log.warn(
@@ -13,6 +23,7 @@ extension DioExtension on Dio {
   }
 }
 
+final _httpClient = HttpClient();
 final _cookieJar = CookieJar();
 final _dio = Dio(BaseOptions(
   baseUrl: '${connectionStore.baseUri.value}/',
@@ -77,7 +88,7 @@ final _dio = Dio(BaseOptions(
       requestBody: true,
       requestHeader: true,
       responseUrl: true,
-      responseBody: true,
+      responseBody: false,
       responseHeader: true))
   ..options.followRedirects = false
   ..options.validateStatus =
@@ -102,9 +113,11 @@ Future<dynamic> _httpRequest(
   Response response;
   // TODO: retry
   try {
-    if (!(checkSsl ?? connectionStore.checkSsl.value)) {
-      _dio._badCertificateCallback((cert, host, port) => true);
-    }
+    _dio._createHttpClient(
+        callback: (cert, host, port) {
+          return !(checkSsl ?? connectionStore.checkSsl.value);
+        },
+        proxy: 'PROXY 192.168.8.77:8899; PROXY 127.0.0.1:8899; DIRECT');
     response = await _dio.request(endpoint,
         data: data,
         queryParameters: queryParameters,

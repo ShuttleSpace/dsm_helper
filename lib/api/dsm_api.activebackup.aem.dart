@@ -18,7 +18,7 @@ Future<Map> dsmActiveBackupAEMActivityBackupStatus(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupAEMActivityWriteVmmLog(String guestId, // Guest ID
@@ -33,7 +33,7 @@ Future<Map> dsmActiveBackupAEMActivityWriteVmmLog(String guestId, // Guest ID
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupAEMCheckKey(String key, // Key
@@ -46,7 +46,7 @@ Future<Map> dsmActiveBackupAEMCheckKey(String key, // Key
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupAEMCheckLeaderAddress(
@@ -60,7 +60,7 @@ Future<Map> dsmActiveBackupAEMCheckLeaderAddress(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupAEMEditConnection(String hostname, // Hostname
@@ -73,7 +73,7 @@ Future<Map> dsmActiveBackupAEMEditConnection(String hostname, // Hostname
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupAEMGetInfo({CancelToken? cancelToken}) async {
@@ -85,7 +85,7 @@ Future<Map> dsmActiveBackupAEMGetInfo({CancelToken? cancelToken}) async {
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupAEMNFSApplyState(
@@ -99,7 +99,7 @@ Future<Map> dsmActiveBackupAEMNFSApplyState(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupAEMNFSCheckState(
@@ -113,7 +113,7 @@ Future<Map> dsmActiveBackupAEMNFSCheckState(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupAEMScriptDelete(String scriptId, // Script ID
@@ -126,7 +126,7 @@ Future<Map> dsmActiveBackupAEMScriptDelete(String scriptId, // Script ID
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupAEMScriptPrepareFileForJoin(
@@ -142,7 +142,7 @@ Future<Map> dsmActiveBackupAEMScriptPrepareFileForJoin(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupAEMScriptUpdate(String scriptId, // Script ID
@@ -155,7 +155,7 @@ Future<Map> dsmActiveBackupAEMScriptUpdate(String scriptId, // Script ID
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupAEMTaskListAutoBackupRule(
@@ -170,7 +170,7 @@ Future<Map> dsmActiveBackupAEMTaskListAutoBackupRule(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupAEMTaskListWithDevice(
@@ -185,7 +185,7 @@ Future<Map> dsmActiveBackupAEMTaskListWithDevice(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupAEMVersionList(String taskId, // Task ID
@@ -199,5 +199,5 @@ Future<Map> dsmActiveBackupAEMVersionList(String taskId, // Task ID
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }

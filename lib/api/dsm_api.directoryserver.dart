@@ -27,7 +27,7 @@ Future<Map> dsmDirectoryServerDomainGetInfo({CancelToken? cancelToken}) async {
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -59,7 +59,7 @@ Future<Map> dsmDirectoryServerDomainList(String basedn, // Base DN to search
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -103,7 +103,7 @@ Future<Map> dsmDirectoryServerUserCreate(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -130,7 +130,7 @@ Future<Map> dsmDirectoryServerUserModify(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -152,7 +152,7 @@ Future<Map> dsmDirectoryServerUserDelete(String dn, // User Distinguished Name
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -176,7 +176,7 @@ Future<Map> dsmDirectoryServerUserResetPassword(String username, // Username
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -195,7 +195,7 @@ Future<Map> dsmDirectoryServerUserChangePassword(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -230,7 +230,7 @@ Future<Map> dsmDirectoryServerGroupCreate(String name, // Group name
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -254,7 +254,7 @@ Future<Map> dsmDirectoryServerGroupAddMember(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -273,7 +273,7 @@ Future<Map> dsmDirectoryServerGroupRemoveMember(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -296,7 +296,7 @@ Future<Map> dsmDirectoryServerGroupDelete(String dn, // Group Distinguished Name
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -321,7 +321,7 @@ Future<Map> dsmDirectoryServerSyncUpdateDomain(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -352,5 +352,5 @@ Future<Map> dsmDirectoryServerSyncGetTaskStatus(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }

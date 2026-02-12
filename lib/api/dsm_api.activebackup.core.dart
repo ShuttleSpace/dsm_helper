@@ -21,7 +21,7 @@ Future<Map> dsmActiveBackupDeviceList({CancelToken? cancelToken}) async {
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// **Notes:**
@@ -41,7 +41,7 @@ Future<Map> dsmActiveBackupDeviceListRestorableVersion(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// **Notes:**
@@ -60,7 +60,7 @@ Future<Map> dsmActiveBackupDeviceListTasks(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// **Notes:**
@@ -77,7 +77,7 @@ Future<Map> dsmActiveBackupDeviceRemove(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// **Notes:**
@@ -94,7 +94,7 @@ Future<Map> dsmActiveBackupDeviceSetCredential(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// **Notes:**
@@ -111,7 +111,7 @@ Future<Map> dsmActiveBackupRestoreClear(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupRestoreList({CancelToken? cancelToken}) async {
@@ -123,7 +123,7 @@ Future<Map> dsmActiveBackupRestoreList({CancelToken? cancelToken}) async {
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupRestorePause(
@@ -137,7 +137,7 @@ Future<Map> dsmActiveBackupRestorePause(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupRestoreResume(
@@ -151,7 +151,7 @@ Future<Map> dsmActiveBackupRestoreResume(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupRestoreStatus(String jobId, // Job ID
@@ -165,7 +165,7 @@ Future<Map> dsmActiveBackupRestoreStatus(String jobId, // Job ID
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupRestoreStop({CancelToken? cancelToken}) async {
@@ -177,7 +177,7 @@ Future<Map> dsmActiveBackupRestoreStop({CancelToken? cancelToken}) async {
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupSettingGetPhysMemsize(
@@ -190,7 +190,7 @@ Future<Map> dsmActiveBackupSettingGetPhysMemsize(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupSettingList({CancelToken? cancelToken}) async {
@@ -202,7 +202,7 @@ Future<Map> dsmActiveBackupSettingList({CancelToken? cancelToken}) async {
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupSettingSet(String settings, // Settings (JSON)
@@ -215,7 +215,7 @@ Future<Map> dsmActiveBackupSettingSet(String settings, // Settings (JSON)
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupTaskBackup(
@@ -229,7 +229,7 @@ Future<Map> dsmActiveBackupTaskBackup(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupTaskCancel(
@@ -243,7 +243,7 @@ Future<Map> dsmActiveBackupTaskCancel(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupTaskCancelWaitingBackup(
@@ -258,7 +258,7 @@ Future<Map> dsmActiveBackupTaskCancelWaitingBackup(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupTaskCreateVmCheck({CancelToken? cancelToken}) async {
@@ -270,7 +270,7 @@ Future<Map> dsmActiveBackupTaskCreateVmCheck({CancelToken? cancelToken}) async {
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupTaskGetDefaultTaskName(
@@ -287,7 +287,7 @@ Future<Map> dsmActiveBackupTaskGetDefaultTaskName(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupTaskList({CancelToken? cancelToken}) async {
@@ -299,7 +299,7 @@ Future<Map> dsmActiveBackupTaskList({CancelToken? cancelToken}) async {
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupTaskListVmCheck({CancelToken? cancelToken}) async {
@@ -311,7 +311,7 @@ Future<Map> dsmActiveBackupTaskListVmCheck({CancelToken? cancelToken}) async {
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupTaskListWithDevice(
@@ -324,7 +324,7 @@ Future<Map> dsmActiveBackupTaskListWithDevice(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupTaskRemove(
@@ -338,7 +338,7 @@ Future<Map> dsmActiveBackupTaskRemove(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupTaskVmCheckCancel({CancelToken? cancelToken}) async {
@@ -350,7 +350,7 @@ Future<Map> dsmActiveBackupTaskVmCheckCancel({CancelToken? cancelToken}) async {
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupVersionDelete(String taskId, // Task ID
@@ -363,7 +363,7 @@ Future<Map> dsmActiveBackupVersionDelete(String taskId, // Task ID
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<dynamic> dsmActiveBackupVersionDownload(
@@ -388,7 +388,7 @@ Future<Map> dsmActiveBackupVersionList(String taskId, // Task ID
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupVersionListNode(String deviceId, // Device ID
@@ -402,7 +402,7 @@ Future<Map> dsmActiveBackupVersionListNode(String deviceId, // Device ID
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupVersionLock(String taskId, // Task ID
@@ -415,7 +415,7 @@ Future<Map> dsmActiveBackupVersionLock(String taskId, // Task ID
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupVersionRestore(String deviceId, // Device ID
@@ -428,5 +428,5 @@ Future<Map> dsmActiveBackupVersionRestore(String deviceId, // Device ID
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }

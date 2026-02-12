@@ -36,7 +36,7 @@ Future<Map> dsmDockerContainerList(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -77,7 +77,7 @@ Future<Map> dsmDockerContainerGet(String name, // Container name
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -93,7 +93,7 @@ Future<Map> dsmDockerContainerStart(String name, // Container name
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -111,7 +111,7 @@ Future<Map> dsmDockerContainerStop(String name, // Container name
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -127,7 +127,7 @@ Future<Map> dsmDockerContainerRestart(String name, // Container name
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -146,7 +146,7 @@ Future<Map> dsmDockerContainerDelete(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmDockerContainerLogList(
@@ -171,7 +171,7 @@ Future<Map> dsmDockerContainerLogList(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -198,5 +198,5 @@ Future<Map> dsmDockerContainerResourceGet({CancelToken? cancelToken}) async {
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }

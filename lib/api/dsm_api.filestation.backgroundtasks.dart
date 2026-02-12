@@ -45,7 +45,7 @@ Future<Map> dsmFileStationBackgroundTaskList(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -65,7 +65,7 @@ Future<Map> dsmFileStationDirSizeStart(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -88,7 +88,7 @@ Future<Map> dsmFileStationDirSizeStatus(String taskid,
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -104,7 +104,7 @@ Future<Map> dsmFileStationDirSizeStop(String taskid,
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -123,7 +123,7 @@ Future<Map> dsmFileStationMD5Start(String filePath, // File path
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -144,7 +144,7 @@ Future<Map> dsmFileStationMD5Status(String taskid,
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -160,5 +160,5 @@ Future<Map> dsmFileStationMD5Stop(String taskid,
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }

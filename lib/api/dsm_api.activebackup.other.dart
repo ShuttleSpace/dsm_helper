@@ -16,7 +16,7 @@ Future<Map> dsmActiveBackupIntegrationWrapperDomainGet(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupIntegrationWrapperDomainGetDomainList(
@@ -31,7 +31,7 @@ Future<Map> dsmActiveBackupIntegrationWrapperDomainGetDomainList(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupIntegrationWrapperDomainTestDc(
@@ -45,7 +45,7 @@ Future<Map> dsmActiveBackupIntegrationWrapperDomainTestDc(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupIntegrationWrapperLdapGet(
@@ -58,7 +58,7 @@ Future<Map> dsmActiveBackupIntegrationWrapperLdapGet(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupIntegrationWrapperNfsGet(
@@ -71,7 +71,7 @@ Future<Map> dsmActiveBackupIntegrationWrapperNfsGet(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupIntegrationWrapperNfsSet(
@@ -85,7 +85,7 @@ Future<Map> dsmActiveBackupIntegrationWrapperNfsSet(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupIntegrationWrapperNfsPrivilegeLoad(
@@ -100,7 +100,7 @@ Future<Map> dsmActiveBackupIntegrationWrapperNfsPrivilegeLoad(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupIntegrationWrapperNfsPrivilegeSave(
@@ -116,7 +116,7 @@ Future<Map> dsmActiveBackupIntegrationWrapperNfsPrivilegeSave(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupOtherDelegationCreateOrUpdate(
@@ -132,7 +132,7 @@ Future<Map> dsmActiveBackupOtherDelegationCreateOrUpdate(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupOtherDelegationDelete(
@@ -146,7 +146,7 @@ Future<Map> dsmActiveBackupOtherDelegationDelete(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupOtherDelegationList(
@@ -159,7 +159,7 @@ Future<Map> dsmActiveBackupOtherDelegationList(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupOtherTaskTemplateCreate(
@@ -173,7 +173,7 @@ Future<Map> dsmActiveBackupOtherTaskTemplateCreate(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupOtherTaskTemplateList(
@@ -186,7 +186,7 @@ Future<Map> dsmActiveBackupOtherTaskTemplateList(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupOtherTaskTemplateRemove(
@@ -200,7 +200,7 @@ Future<Map> dsmActiveBackupOtherTaskTemplateRemove(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupOtherTaskTemplateSet(
@@ -214,7 +214,7 @@ Future<Map> dsmActiveBackupOtherTaskTemplateSet(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupOtherTaskTemplateSetPriority(
@@ -230,7 +230,7 @@ Future<Map> dsmActiveBackupOtherTaskTemplateSetPriority(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupOtherTaskTemplateTranslateTargetId(
@@ -247,7 +247,7 @@ Future<Map> dsmActiveBackupOtherTaskTemplateTranslateTargetId(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupOtherWorkloadBackup(
@@ -261,7 +261,7 @@ Future<Map> dsmActiveBackupOtherWorkloadBackup(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupOtherWorkloadCancel(
@@ -275,7 +275,7 @@ Future<Map> dsmActiveBackupOtherWorkloadCancel(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupOtherWorkloadCancelByActivityUid(
@@ -291,7 +291,7 @@ Future<Map> dsmActiveBackupOtherWorkloadCancelByActivityUid(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupOtherWorkloadCancelThenDelete(
@@ -307,7 +307,7 @@ Future<Map> dsmActiveBackupOtherWorkloadCancelThenDelete(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupOtherWorkloadCreate(
@@ -321,7 +321,7 @@ Future<Map> dsmActiveBackupOtherWorkloadCreate(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupOtherWorkloadDelete(
@@ -335,7 +335,7 @@ Future<Map> dsmActiveBackupOtherWorkloadDelete(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupOtherWorkloadDeleteWithoutDedup(
@@ -351,7 +351,7 @@ Future<Map> dsmActiveBackupOtherWorkloadDeleteWithoutDedup(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupOtherWorkloadGetPlan(
@@ -366,7 +366,7 @@ Future<Map> dsmActiveBackupOtherWorkloadGetPlan(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupOtherWorkloadGetStatus(
@@ -381,7 +381,7 @@ Future<Map> dsmActiveBackupOtherWorkloadGetStatus(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupOtherWorkloadUpdate(
@@ -395,5 +395,5 @@ Future<Map> dsmActiveBackupOtherWorkloadUpdate(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }

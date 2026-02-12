@@ -26,7 +26,7 @@ Future<Map> dsmFileStationUpload(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// **Response:**
@@ -46,5 +46,5 @@ Future<dynamic> dsmFileStationDownload(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }

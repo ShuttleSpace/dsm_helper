@@ -113,12 +113,13 @@ class DSMException implements Exception {
     }
     final error = res['error'];
     if (error is Map) {
-      final code = error['code'];
+      int code = error['code'];
       (String, String?)? errorInfo;
       if (module != null) {
         errorInfo = _dsmApiErrorMap[module]?[code];
       }
-      errorInfo ??= _dsmApiErrorMap['common']?[code];
+      errorInfo ??=
+          _dsmApiErrorMap['common']?[code] ?? _dsmApiErrorMap['core']?[code];
       if (errorInfo != null) {
         return DSMException(errorInfo.$1, code,
             descriptionOrSolution: errorInfo.$2);

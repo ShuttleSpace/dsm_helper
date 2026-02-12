@@ -19,11 +19,8 @@ part of 'dsm_api.dart';
 /// - Sessions expire after 30 minutes of inactivity
 /// - Each API call resets the inactivity timer
 /// - Maximum session lifetime is typically 24 hours
-Future<Map> dsmAuthLogin(
+Future<Map> dsmAuthLogin(String account, String passwd,
     {String? host, // DSM host address
-    String? account, // Username
-    String? passwd, // Password
-    String? password, // Password (alias for passwd)
     String? otpCode, // 2FA code (if enabled)
     CancelToken? cancelToken,
     bool? rememberDevice, // Remember device
@@ -38,16 +35,22 @@ Future<Map> dsmAuthLogin(
     version: 6,
   )..addAll({
       "account": account,
-      "passwd": passwd ?? password,
-      "otp_code": otpCode,
-      "session": session,
-      "enable_device_token": rememberDevice == true ? 'yes' : 'no',
+      "passwd": passwd,
       "format": "sid", // sid or cookie(default)
     });
-  if (deviceName != null) {
+  if (otpCode != null && otpCode.isNotEmpty) {
+    data["otp_code"] = otpCode;
+  }
+  if (session != null && session.isNotEmpty) {
+    data["session"] = session;
+  }
+  if (rememberDevice != null) {
+    data["enable_device_token"] = rememberDevice == true ? 'yes' : 'no';
+  }
+  if (deviceName != null && deviceName.isNotEmpty) {
     data["device_name"] = deviceName;
   }
-  if (deviceId != null) {
+  if (deviceId != null && deviceId.isNotEmpty) {
     data["device_id"] = deviceId;
   }
 
@@ -80,7 +83,7 @@ Future<Map> dsmAuthLogout({CancelToken? cancelToken}) async {
   if (res["success"] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {"data":{"is_portal_port":false,"synotoken":"cXOLO.EgGjnHU"},"success":true}
@@ -99,7 +102,7 @@ Future<Map> dsmAuthToken(
   if (res["success"] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -194,7 +197,7 @@ Future<Map> dsmAuthQuickConnectLogin(String quickConnectID,
   if (res["success"] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -301,7 +304,7 @@ Future<Map> dsmAuthControlHostRequestTunnel(
   if (res["success"] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// 通过以上两步可以获取到包括内网地址，外网地址以及代理地址，通过此接口是否超时判断地址是否可用，程序中按自定义的优先级使用即可。
@@ -332,7 +335,7 @@ Future<Map> dsmDesktopSessionDataGetjs({CancelToken? cancelToken}) async {
   if (res["success"] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {"data":{"account":"dang8080@qq.com","activated":true,"auth_key":"erl602G5n_HfPS8wac1_vblS7-4","critical_version_domain":null,"is_logged_in":true},"success":true}
@@ -344,5 +347,5 @@ Future<Map> dsmCoreMyDSCenter({CancelToken? cancelToken}) async {
   if (res["success"] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }

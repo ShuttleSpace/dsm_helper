@@ -43,7 +43,7 @@ Future<Map> dsmNoteStationNoteList(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -69,7 +69,7 @@ Future<Map> dsmNoteStationNoteGet(String noteId, // Note ID
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -95,7 +95,7 @@ Future<Map> dsmNoteStationNotebookList({CancelToken? cancelToken}) async {
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -131,5 +131,5 @@ Future<Map> dsmNoteStationTagList({CancelToken? cancelToken}) async {
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }

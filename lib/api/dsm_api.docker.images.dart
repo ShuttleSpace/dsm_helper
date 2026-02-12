@@ -32,7 +32,7 @@ Future<Map> dsmDockerImageList(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -61,7 +61,7 @@ Future<Map> dsmDockerImageGet(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -84,7 +84,7 @@ Future<Map> dsmDockerImagePull(String repository, // Image repository
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -105,7 +105,7 @@ Future<Map> dsmDockerImageDelete(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -135,7 +135,7 @@ Future<Map> dsmDockerImageSearch(String query, // Search query
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -164,7 +164,7 @@ Future<Map> dsmDockerImageRegistryList({CancelToken? cancelToken}) async {
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -187,5 +187,5 @@ Future<Map> dsmDockerImageRegistryAdd(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }

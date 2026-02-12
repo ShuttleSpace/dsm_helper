@@ -39,7 +39,7 @@ Future<Map> dsmVirtualizationImageList(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -63,7 +63,7 @@ Future<Map> dsmVirtualizationImageCreate(String imageName, // Image filename
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -79,7 +79,7 @@ Future<Map> dsmVirtualizationImageDelete(String imageId, // Image ID
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// **Notes:**
@@ -107,7 +107,7 @@ Future<Map> dsmVirtualizationTaskList({CancelToken? cancelToken}) async {
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -141,7 +141,7 @@ Future<Map> dsmVirtualizationTaskGet(String taskid, // Task ID
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -157,7 +157,7 @@ Future<Map> dsmVirtualizationTaskClear(String taskid, // Task ID
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -205,7 +205,7 @@ Future<Map> dsmVirtualizationGuestList(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -250,7 +250,7 @@ Future<Map> dsmVirtualizationGuestGet(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -272,7 +272,7 @@ Future<Map> dsmVirtualizationGuestPowerOn(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -296,7 +296,7 @@ Future<Map> dsmVirtualizationGuestPowerOff(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -325,7 +325,7 @@ Future<Map> dsmVirtualizationGuestShutdown(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmVirtualizationGuestActionCheckPoweron(
@@ -340,7 +340,7 @@ Future<Map> dsmVirtualizationGuestActionCheckPoweron(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmVirtualizationGuestActionPwrCtl(
@@ -355,7 +355,7 @@ Future<Map> dsmVirtualizationGuestActionPwrCtl(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -374,7 +374,7 @@ Future<Map> dsmVirtualizationGuestDelete(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -404,5 +404,5 @@ Future<Map> dsmVirtualizationGuestSet(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }

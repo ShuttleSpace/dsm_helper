@@ -23,7 +23,7 @@ Future<Map> dsmFotoBrowseAlbum(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {"data":{"album_display_type":"all_album"},"success":true}
@@ -104,7 +104,7 @@ Future<Map> dsmFotoBrowseAlbumCreate(String name, // Album name
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -121,7 +121,7 @@ Future<Map> dsmFotoBrowseAlbumDelete(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// ----------------------------------------------------------------------------
@@ -153,7 +153,7 @@ Future<Map> dsmFotoSharingPassphraseCreate(String id, // Album or folder ID
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// Timeline API - 获取时间线数据
@@ -182,7 +182,7 @@ Future<Map> dsmFotoBrowseTimeline({
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// Photos API - 获取照片列表
@@ -223,7 +223,7 @@ Future<Map> dsmFotoBrowsePhotoList({
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// Category API - 获取分类数据
@@ -242,7 +242,7 @@ Future<Map> dsmFotoBrowseCategory({
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// Album API - 获取相册列表
@@ -275,7 +275,7 @@ Future<Map> dsmFotoBrowseAlbumListMoments({
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// Geocoding API - 获取地理编码数据
@@ -299,7 +299,7 @@ Future<Map> dsmFotoBrowseGeocoding({
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// General Tag API - 获取通用标签
@@ -324,7 +324,7 @@ Future<Map> dsmFotoBrowseGeneral({
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// Location API - 获取特定日期的地理位置数据
@@ -351,7 +351,7 @@ Future<Map> dsmFotoBrowseTimelineLocation(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// Recently Added API - 获取最近添加的项目
@@ -376,7 +376,7 @@ Future<Map> dsmFotoBrowseRecentlyAdded({
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// Recently Timeline API - 获取最近添加的时间线
@@ -399,7 +399,7 @@ Future<Map> dsmFotoBrowseRecentlyTimeline({
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// Recently Photos API - 获取最近添加的照片
@@ -436,7 +436,7 @@ Future<Map> dsmFotoBrowseRecentlyPhotos({
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 // {"data":{"list":[]},"success":true}
@@ -451,7 +451,7 @@ Future<Map> dsmFotoBackgroundTaskInfo(String method, // list_user_task
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {"data":{"task_info":{"completion":0,"create_time":1770795606143,"error":0,"extra_info":"","id":2,"operation":"delete","overwrite":0,"skip":0,"status":"waiting","total":1}},"success":true}
@@ -473,5 +473,5 @@ Future<Map> dsmFotoBackgroundTaskFile(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }

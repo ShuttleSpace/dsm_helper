@@ -15,7 +15,7 @@ Future<Map> dsmCoreNormalUser(String method, // get, set
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmCorePersonalSettingsQuota({CancelToken? cancelToken}) async {
@@ -26,7 +26,7 @@ Future<Map> dsmCorePersonalSettingsQuota({CancelToken? cancelToken}) async {
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmCoreUserSettingsApply(
@@ -40,5 +40,5 @@ Future<Map> dsmCoreUserSettingsApply(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }

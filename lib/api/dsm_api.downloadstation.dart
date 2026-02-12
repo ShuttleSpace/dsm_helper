@@ -17,7 +17,7 @@ Future<Map> dsmDownloadStationInfoGetinfo({CancelToken? cancelToken}) async {
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -45,7 +45,7 @@ Future<Map> dsmDownloadStationInfoGetconfig({CancelToken? cancelToken}) async {
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -88,7 +88,7 @@ Future<Map> dsmDownloadStationInfoSetconfig(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -108,7 +108,7 @@ Future<Map> dsmDownloadStationScheduleGetconfig(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -127,7 +127,7 @@ Future<Map> dsmDownloadStationScheduleSetconfig(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmDownloadStation2SettingsLocationGet(
@@ -141,7 +141,7 @@ Future<Map> dsmDownloadStation2SettingsLocationGet(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmDownloadStation2TaskBTTrackerList(
@@ -154,7 +154,7 @@ Future<Map> dsmDownloadStation2TaskBTTrackerList(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmDownloadStation2TaskBTTrackerAdd(
@@ -169,7 +169,7 @@ Future<Map> dsmDownloadStation2TaskBTTrackerAdd(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmDownloadStation2TaskBTPeerList(
@@ -182,7 +182,7 @@ Future<Map> dsmDownloadStation2TaskBTPeerList(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmDownloadStation2TaskBTFileList(
@@ -208,5 +208,5 @@ Future<Map> dsmDownloadStation2TaskBTFileList(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }

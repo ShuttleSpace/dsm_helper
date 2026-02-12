@@ -8,7 +8,7 @@ Future<Map> dsmStorageCGIStorageLoadInfo({CancelToken? cancelToken}) async {
   if (res['success'] != true) {
     throw DSMException.fromMap(res, module: 'SYNO.Storage.CGI.Storage');
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmStorageCGISmartGetHealthInfo(String device,
@@ -21,5 +21,5 @@ Future<Map> dsmStorageCGISmartGetHealthInfo(String device,
   if (res['success'] != true) {
     throw DSMException.fromMap(res, module: 'SYNO.Storage.CGI.Storage');
   }
-  return res['data'];
+  return res['data'] ?? {};
 }

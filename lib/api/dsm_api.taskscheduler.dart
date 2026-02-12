@@ -47,11 +47,11 @@ Future<Map> dsmCoreTaskSchedulerList(
   if (limit != null) data['limit'] = limit;
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmCoreTaskSchedulerList: $res");
+  // Log.info("dsmCoreTaskSchedulerList: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -80,7 +80,7 @@ Future<Map> dsmCoreTaskSchedulerGet(int taskId, // Task ID
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -99,7 +99,7 @@ Future<Map> dsmCoreTaskSchedulerSetEnable(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -121,7 +121,7 @@ Future<Map> dsmCoreTaskSchedulerRun(int taskId, // Task ID
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -137,7 +137,7 @@ Future<Map> dsmCoreTaskSchedulerDelete(int taskId, // Task ID
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -170,7 +170,7 @@ Future<Map> dsmCoreTaskSchedulerResultGet(int taskId, // Task ID
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// **Daily Backup Script:**
@@ -270,7 +270,7 @@ Future<Map> dsmCoreTaskSchedulerScriptCreate(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -301,7 +301,7 @@ Future<Map> dsmCoreTaskSchedulerScriptModify(int taskId, // Task ID
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// ## Example Service Tasks
@@ -392,7 +392,7 @@ Future<Map> dsmCoreTaskSchedulerServiceCreate(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -428,5 +428,5 @@ Future<Map> dsmCoreTaskSchedulerServiceModify(int taskId, // Task ID
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }

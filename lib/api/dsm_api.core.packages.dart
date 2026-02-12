@@ -36,7 +36,7 @@ Future<Map> dsmCorePackageList(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -67,7 +67,7 @@ Future<Map> dsmCorePackageGet(String id, // Package ID
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -93,7 +93,7 @@ Future<Map> dsmCorePackageServerList({CancelToken? cancelToken}) async {
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {"data":{"has_fail":false,"result":[{"api":"SYNO.Core.Upgrade.Server","data":{"available":false},"method":"check","success":true,"version":1},{"api":"SYNO.Core.Package.Server","data":{"action":"prepare","error":{"code":0},"stage":"prepare","success":true},"method":"check","success":true,"version":1}]},"success":true}
@@ -112,7 +112,7 @@ Future<Map> dsmCoreUpgradeCheck({CancelToken? cancelToken}) async {
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -135,7 +135,7 @@ Future<Map> dsmCorePackageServerInstallation(String id, // Package ID
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -151,7 +151,7 @@ Future<Map> dsmCorePackageServerUnInstallation(String id, // Package ID
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -167,7 +167,7 @@ Future<Map> dsmCorePackageControlStart(String id, // Package ID
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -183,7 +183,7 @@ Future<Map> dsmCorePackageControlStop(String id, // Package ID
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -199,5 +199,5 @@ Future<Map> dsmCorePackageControlRestart(String id, // Package ID
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }

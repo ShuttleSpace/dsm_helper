@@ -35,7 +35,7 @@ Future<Map> dsmCoreGroupList(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -59,7 +59,7 @@ Future<Map> dsmCoreGroupGet(String name, // Group name
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -80,7 +80,7 @@ Future<Map> dsmCoreGroupCreate(String name, // Group name
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -105,7 +105,7 @@ Future<Map> dsmCoreGroupSet(String name, // Group name
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -123,7 +123,7 @@ Future<Map> dsmCoreGroupDelete(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -144,7 +144,7 @@ Future<Map> dsmCoreGroupMemberList(String group, // Group name
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -164,7 +164,7 @@ Future<Map> dsmCoreGroupMemberAdd(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -184,5 +184,5 @@ Future<Map> dsmCoreGroupMemberRemove(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }

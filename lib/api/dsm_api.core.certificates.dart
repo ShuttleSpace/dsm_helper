@@ -38,7 +38,7 @@ Future<Map> dsmCoreCertificateList({CancelToken? cancelToken}) async {
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -65,7 +65,7 @@ Future<Map> dsmCoreCertificateGet(String id, {CancelToken? cancelToken}) async {
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -102,7 +102,7 @@ Future<Map> dsmCoreCertificateCRTImport(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// - Returns a ZIP file containing certificate files
@@ -118,7 +118,7 @@ Future<dynamic> dsmCoreCertificateCRTGet(String id,
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -144,7 +144,7 @@ Future<dynamic> dsmCoreCertificateLetsEncryptCreate(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -167,7 +167,7 @@ Future<dynamic> dsmCoreCertificateLetsEncryptRenew(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -193,5 +193,5 @@ Future<dynamic> dsmCoreCertificateServiceGet({CancelToken? cancelToken}) async {
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }

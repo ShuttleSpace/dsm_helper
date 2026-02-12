@@ -27,7 +27,7 @@ Future<Map> dsmFileStationCompressStart(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -50,7 +50,7 @@ Future<Map> dsmFileStationCompressStatus(String taskid,
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -66,7 +66,7 @@ Future<Map> dsmFileStationCompressStop(String taskid,
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -100,7 +100,7 @@ Future<Map> dsmFileStationExtractStart(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -123,7 +123,7 @@ Future<Map> dsmFileStationExtractStatus(String taskid,
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -139,5 +139,5 @@ Future<Map> dsmFileStationExtractStop(String taskid,
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }

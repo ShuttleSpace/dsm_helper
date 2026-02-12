@@ -28,7 +28,7 @@ Future<Map> dsmDownloadStationRSSSiteList(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -44,7 +44,7 @@ Future<Map> dsmDownloadStationRSSSiteRefresh(String id, // RSS site ID
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -78,5 +78,5 @@ Future<Map> dsmDownloadStationRSSFeedList(String id, // RSS site ID
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }

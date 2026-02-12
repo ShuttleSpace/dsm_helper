@@ -37,7 +37,7 @@ Future<Map> dsmCoreShareList(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -67,7 +67,7 @@ Future<Map> dsmCoreShareGet(String name, // Share name
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -106,7 +106,7 @@ Future<Map> dsmCoreShareCreate(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -142,7 +142,7 @@ Future<Map> dsmCoreShareSet(String name, // Share name
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -159,7 +159,7 @@ Future<Map> dsmCoreShareDelete(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmCoreRecycleBinStart(
@@ -172,7 +172,7 @@ Future<Map> dsmCoreRecycleBinStart(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -203,7 +203,7 @@ Future<Map> dsmCoreSharePermissionGet(String name, // Share name
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -222,5 +222,5 @@ Future<Map> dsmCoreSharePermissionSet(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }

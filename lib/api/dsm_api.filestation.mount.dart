@@ -25,7 +25,7 @@ Future<Map> dsmFileStationMountMountRemote(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmFileStationMountUnmount(
@@ -44,5 +44,5 @@ Future<Map> dsmFileStationMountUnmount(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }

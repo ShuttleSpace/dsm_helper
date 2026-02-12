@@ -18,7 +18,7 @@ Future<Map> dsmCoreSecurityScanConfGet({CancelToken? cancelToken}) async {
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -64,7 +64,7 @@ Future<Map> dsmCoreSecurityScanStatusCheckList(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -88,7 +88,7 @@ Future<Map> dsmCoreSecurityScanOperationScan({CancelToken? cancelToken}) async {
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -136,5 +136,5 @@ Future<Map> dsmCoreSecurityScanLoginActivityList(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }

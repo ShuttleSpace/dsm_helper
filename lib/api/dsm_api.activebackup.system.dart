@@ -17,7 +17,7 @@ Future<Map> dsmActiveBackupSystemActivationGet(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupSystemActivationSet(
@@ -31,7 +31,7 @@ Future<Map> dsmActiveBackupSystemActivationSet(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupSystemGeneralFsync(
@@ -44,7 +44,7 @@ Future<Map> dsmActiveBackupSystemGeneralFsync(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupSystemGeneralGetSysMemInfo(
@@ -57,7 +57,7 @@ Future<Map> dsmActiveBackupSystemGeneralGetSysMemInfo(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupSystemGeneralIsSynoInternal(
@@ -70,7 +70,7 @@ Future<Map> dsmActiveBackupSystemGeneralIsSynoInternal(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupSystemLogCancelDownload(
@@ -83,7 +83,7 @@ Future<Map> dsmActiveBackupSystemLogCancelDownload(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupSystemLogCheckProgress(
@@ -96,7 +96,7 @@ Future<Map> dsmActiveBackupSystemLogCheckProgress(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupSystemLogClear(String logType, // Log type
@@ -109,7 +109,7 @@ Future<Map> dsmActiveBackupSystemLogClear(String logType, // Log type
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<dynamic> dsmActiveBackupSystemLogDownload(
@@ -132,7 +132,7 @@ Future<Map> dsmActiveBackupSystemLogGetInfo({CancelToken? cancelToken}) async {
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupSystemLogListLog(String logType, // Log type
@@ -146,7 +146,7 @@ Future<Map> dsmActiveBackupSystemLogListLog(String logType, // Log type
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupSystemLogListResult(
@@ -159,7 +159,7 @@ Future<Map> dsmActiveBackupSystemLogListResult(
   if (res['success'] != true) {
     throw DSMException.fromMap({});
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupSystemLogListResultDetail(
@@ -174,7 +174,7 @@ Future<Map> dsmActiveBackupSystemLogListResultDetail(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupSystemLogSendTestLog(
@@ -186,7 +186,7 @@ Future<Map> dsmActiveBackupSystemLogSendTestLog(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupSystemLogSetInfo(String settings, // Settings (JSON)
@@ -199,7 +199,7 @@ Future<Map> dsmActiveBackupSystemLogSetInfo(String settings, // Settings (JSON)
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupSystemLogSetSendLogSetting(
@@ -213,7 +213,7 @@ Future<Map> dsmActiveBackupSystemLogSetSendLogSetting(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupSystemLogUploadCert(
@@ -227,7 +227,7 @@ Future<Map> dsmActiveBackupSystemLogUploadCert(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupSystemOverviewListActivity(
@@ -240,7 +240,7 @@ Future<Map> dsmActiveBackupSystemOverviewListActivity(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupSystemOverviewListDeviceLastBackup(
@@ -255,7 +255,7 @@ Future<Map> dsmActiveBackupSystemOverviewListDeviceLastBackup(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupSystemOverviewListDeviceTransferSize(
@@ -270,7 +270,7 @@ Future<Map> dsmActiveBackupSystemOverviewListDeviceTransferSize(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupSystemOverviewListResultStatusSummary(
@@ -285,7 +285,7 @@ Future<Map> dsmActiveBackupSystemOverviewListResultStatusSummary(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupSystemOverviewListTypeTransferSize(
@@ -300,7 +300,7 @@ Future<Map> dsmActiveBackupSystemOverviewListTypeTransferSize(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupSystemPlanCreate(String planName, // Plan name
@@ -313,7 +313,7 @@ Future<Map> dsmActiveBackupSystemPlanCreate(String planName, // Plan name
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupSystemPlanDelete(String planId, // Plan ID
@@ -326,7 +326,7 @@ Future<Map> dsmActiveBackupSystemPlanDelete(String planId, // Plan ID
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupSystemPlanGet(String planId, // Plan ID
@@ -340,7 +340,7 @@ Future<Map> dsmActiveBackupSystemPlanGet(String planId, // Plan ID
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupSystemPlanList({CancelToken? cancelToken}) async {
@@ -352,7 +352,7 @@ Future<Map> dsmActiveBackupSystemPlanList({CancelToken? cancelToken}) async {
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupSystemPlanUpdate(String planId, // Plan ID
@@ -365,7 +365,7 @@ Future<Map> dsmActiveBackupSystemPlanUpdate(String planId, // Plan ID
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupSystemReportCreate(String reportName, // Report name
@@ -378,7 +378,7 @@ Future<Map> dsmActiveBackupSystemReportCreate(String reportName, // Report name
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupSystemReportDelete(String reportId, // Report ID
@@ -391,7 +391,7 @@ Future<Map> dsmActiveBackupSystemReportDelete(String reportId, // Report ID
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupSystemReportList({CancelToken? cancelToken}) async {
@@ -403,7 +403,7 @@ Future<Map> dsmActiveBackupSystemReportList({CancelToken? cancelToken}) async {
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupSystemReportConfigGet(
@@ -416,7 +416,7 @@ Future<Map> dsmActiveBackupSystemReportConfigGet(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupSystemReportConfigSet(String config, // Config (JSON)
@@ -429,7 +429,7 @@ Future<Map> dsmActiveBackupSystemReportConfigSet(String config, // Config (JSON)
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupSystemShareCheckFile(String filePath, // File path
@@ -443,7 +443,7 @@ Future<Map> dsmActiveBackupSystemShareCheckFile(String filePath, // File path
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupSystemShareCreateFsDir(
@@ -457,7 +457,7 @@ Future<Map> dsmActiveBackupSystemShareCreateFsDir(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupSystemShareList({CancelToken? cancelToken}) async {
@@ -469,7 +469,7 @@ Future<Map> dsmActiveBackupSystemShareList({CancelToken? cancelToken}) async {
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupSystemShareListEncrypted(
@@ -482,7 +482,7 @@ Future<Map> dsmActiveBackupSystemShareListEncrypted(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupSystemShareListFile(String dirPath, // Directory path
@@ -496,7 +496,7 @@ Future<Map> dsmActiveBackupSystemShareListFile(String dirPath, // Directory path
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupSystemShareListStorage(
@@ -509,7 +509,7 @@ Future<Map> dsmActiveBackupSystemShareListStorage(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupSystemShareListVolume(
@@ -522,7 +522,7 @@ Future<Map> dsmActiveBackupSystemShareListVolume(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupSystemShareRelink(String shareName, // Share name
@@ -535,7 +535,7 @@ Future<Map> dsmActiveBackupSystemShareRelink(String shareName, // Share name
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupSystemShareRemove(String shareName, // Share name
@@ -548,7 +548,7 @@ Future<Map> dsmActiveBackupSystemShareRemove(String shareName, // Share name
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupSystemStorageAutomountGet(
@@ -561,7 +561,7 @@ Future<Map> dsmActiveBackupSystemStorageAutomountGet(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupSystemStorageAutomountListLocation(
@@ -576,7 +576,7 @@ Future<Map> dsmActiveBackupSystemStorageAutomountListLocation(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupSystemStorageCheckDsmShareMount(
@@ -593,7 +593,7 @@ Future<Map> dsmActiveBackupSystemStorageCheckDsmShareMount(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupSystemStorageCheckMount(
@@ -608,7 +608,7 @@ Future<Map> dsmActiveBackupSystemStorageCheckMount(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<dynamic> dsmActiveBackupSystemStorageDownloadPrivateKey(
@@ -634,7 +634,7 @@ Future<Map> dsmActiveBackupSystemStorageListDsmShare(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupSystemStorageMountDsmEncShare(
@@ -650,7 +650,7 @@ Future<Map> dsmActiveBackupSystemStorageMountDsmEncShare(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupSystemStorageUmountDsmEncShare(
@@ -666,7 +666,7 @@ Future<Map> dsmActiveBackupSystemStorageUmountDsmEncShare(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupSystemStorageUnmount(String mountPath, // Mount path
@@ -679,7 +679,7 @@ Future<Map> dsmActiveBackupSystemStorageUnmount(String mountPath, // Mount path
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupSystemStorageUploadPrivateKey(
@@ -695,7 +695,7 @@ Future<Map> dsmActiveBackupSystemStorageUploadPrivateKey(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupSystemStorageVerify(String storageId, // Storage ID
@@ -708,7 +708,7 @@ Future<Map> dsmActiveBackupSystemStorageVerify(String storageId, // Storage ID
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupSystemUserGroupList(
@@ -721,7 +721,7 @@ Future<Map> dsmActiveBackupSystemUserGroupList(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupSystemUserGroupListAdmin(
@@ -734,5 +734,5 @@ Future<Map> dsmActiveBackupSystemUserGroupListAdmin(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }

@@ -31,7 +31,7 @@ Future<dynamic> dsmFileStationSharingGetinfo(String id, // Shared link ID
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -77,7 +77,7 @@ Future<dynamic> dsmFileStationSharingList(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -117,7 +117,7 @@ Future<dynamic> dsmFileStationSharingCreate(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -134,7 +134,7 @@ Future<dynamic> dsmFileStationSharingDelete(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -149,7 +149,7 @@ Future<dynamic> dsmFileStationSharingClearInvalid(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -186,5 +186,5 @@ Future<dynamic> dsmFileStationSharingEdit(String id, // Session ID
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }

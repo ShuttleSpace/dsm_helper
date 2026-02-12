@@ -59,7 +59,7 @@ Future<Map> dsmCoreSystemInfo(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -98,18 +98,18 @@ Future<Map> dsmCoreSystemInfo(
 ///   }
 /// }
 Future<Map> dsmCoreSystemUtilization(
-    String resource, // Resource type (`cpu`, `memory`, `disk`, `network`)
+    List<String> resource, // Resource type (`cpu`, `memory`, `disk`, `network`)
     {CancelToken? cancelToken}) async {
   final data = _dsmApiRequestData(
       api: 'SYNO.Core.System.Utilization', method: 'get', version: 1)
-    ..addAll({"resource": resource});
+    ..addAll({"resource": jsonEncode(resource)});
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmCoreSystemUtilization: $res");
+  // Log.info("dsmCoreSystemUtilization: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -132,7 +132,7 @@ Future<Map> dsmCoreSystemHealth({CancelToken? cancelToken}) async {
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -153,7 +153,7 @@ Future<Map> dsmCoreFileServSMB({CancelToken? cancelToken}) async {
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -172,7 +172,7 @@ Future<Map> dsmCoreFileServAFP({CancelToken? cancelToken}) async {
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -191,7 +191,7 @@ Future<Map> dsmCoreFileServNFS({CancelToken? cancelToken}) async {
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<String> pingpong(String host, {CancelToken? cancelToken}) async {
@@ -231,11 +231,11 @@ Future<Map> dsmCoreDesktopInitdata(
 
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmCoreDesktopInitdata: $res");
+  // Log.info("dsmCoreDesktopInitdata: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res, module: 'Core.Desktop');
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmCoreDesktopInitdataGetUserService(
@@ -245,11 +245,11 @@ Future<Map> dsmCoreDesktopInitdataGetUserService(
     ..addAll({'launch_app': 'null'});
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmCoreDesktopInitdata: $res");
+  // Log.info("dsmCoreDesktopInitdata: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res, module: 'Core.Desktop');
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmCoreDesktopInitdataGetUiConfig(
@@ -263,11 +263,11 @@ Future<Map> dsmCoreDesktopInitdataGetUiConfig(
     });
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmCoreDesktopInitdata: $res");
+  // Log.info("dsmCoreDesktopInitdata: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res, module: 'Core.Desktop');
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 // {"data":{"need_update":false},"success":true}
@@ -281,7 +281,7 @@ Future<Map> dsmCoreDesktopPersonalUpdater({CancelToken? cancelToken}) async {
   if (res['success'] != true) {
     throw DSMException.fromMap(res, module: 'Core.Desktop');
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmCoreMediaIndexingMediaConverter(
@@ -296,7 +296,7 @@ Future<Map> dsmCoreMediaIndexingMediaConverter(
   if (res['success'] != true) {
     throw DSMException.fromMap(res, module: 'Core.Media.Indexing');
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmCoreDSMNotifyStringsGet(
@@ -341,7 +341,7 @@ Future<Map> dsmCoreDSMNotify(String action, // apply, load
   if (res['success'] != true) {
     throw DSMException.fromMap(res, module: 'Core.DSM.Notify');
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmCoreCurrentConnectionList(
@@ -357,11 +357,11 @@ Future<Map> dsmCoreCurrentConnectionList(
     data['sort_direction'] = sortDirection;
   }
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmCoreCurrentConnectionList: $res");
+  // Log.info("dsmCoreCurrentConnectionList: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmCoreCurrentConnectionGet(String action, // enum
@@ -394,7 +394,7 @@ Future<Map> dsmCoreCurrentConnectionGet(String action, // enum
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmCoreCurrentConnectionKickConnection(Map connection,
@@ -413,7 +413,7 @@ Future<Map> dsmCoreCurrentConnectionKickConnection(Map connection,
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmCoreSystemProcess({CancelToken? cancelToken}) async {
@@ -424,7 +424,7 @@ Future<Map> dsmCoreSystemProcess({CancelToken? cancelToken}) async {
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmCoreSystemProcessGroup({CancelToken? cancelToken}) async {
@@ -440,7 +440,7 @@ Future<Map> dsmCoreSystemProcessGroup({CancelToken? cancelToken}) async {
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmSDSWidgetModuleListDetail(List widgets,
@@ -524,12 +524,12 @@ Future<Map> dsmSDSWidgetModuleListDetail(List widgets,
     "version": 1,
   });
   final res = await _dsmApiCall(jsonEncode(apis),
-      mod: 'parallel', cancelToken: cancelToken);
-  Log.info("dsmSDSWidgetModuleListDetail: $res");
+      mod: '"parallel"', cancelToken: cancelToken);
+  // Log.info("dsmSDSWidgetModuleListDetail: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {"data":{"admin_configured":true,"ew20_website_url":"https://account.synology.com/","first_admin_login":true,"privacy_agreement":"skip","promote_ew":false,"udc_check_state":"","udc_enabled":"no","welcome_hide":true,"welcome_upgrade_step":false},"success":true}
@@ -545,7 +545,7 @@ Future<Map> dsmCoreQuickStartInfo(String method, // load_ds_info
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// response 见 mock/dsm/api=SYNO.Core.BackgroundTask&method=get&query=all.curl
@@ -558,7 +558,7 @@ Future<Map> dsmCoreBackgroundTask(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {"success":true}
@@ -580,7 +580,7 @@ Future<Map> dsmCorePromotionPreInstall(String method, // get_never_show
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {"data":{"background_color":"#FFFFFF","background_position":"fill","background_seq":2,"enable_background_customize":true,"enable_logo_customize":false,"from_dsm":true,"login_footer_enable_html":false,"login_footer_msg":"","login_title":"HumphreyIO","login_version_logo":false,"login_welcome_msg":"My Hero!","login_welcome_title":"Welcome Home","logo_position":"center","logo_seq":0,"only_background_color":false,"weather_info":"display"},"success":true}
@@ -595,7 +595,7 @@ Future<Map> dsmCoreThemeAppPortalLogin(String app,
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmCoreThemeAppPortalLoginBatch(List<String> apps,
@@ -611,5 +611,5 @@ Future<Map> dsmCoreThemeAppPortalLoginBatch(List<String> apps,
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }

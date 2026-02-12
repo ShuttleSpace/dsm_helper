@@ -20,7 +20,7 @@ Future<Map> dsmMomentsTimeline(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmMomentsPhotots(
@@ -73,7 +73,7 @@ Future<Map> dsmMomentsPhotots(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmMomentsAlbum(
@@ -112,7 +112,7 @@ Future<Map> dsmMomentsAlbum(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmMomentsGeocodingList(
@@ -135,5 +135,5 @@ Future<Map> dsmMomentsGeocodingList(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }

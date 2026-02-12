@@ -33,7 +33,7 @@ Future<Map> dsmCloudSyncConnectionList({CancelToken? cancelToken}) async {
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -59,7 +59,7 @@ Future<Map> dsmCloudSyncConnectionGet(int connId, // Connection ID
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -79,7 +79,7 @@ Future<Map> dsmCloudSyncConnectionPause(int connId, // Connection ID
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -95,7 +95,7 @@ Future<Map> dsmCloudSyncConnectionResume(int connId, // Connection ID
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -136,7 +136,7 @@ Future<Map> dsmCloudSyncConnectionLogList(int connId, // Connection ID
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -179,7 +179,7 @@ Future<Map> dsmCloudSyncTaskList(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -209,7 +209,7 @@ Future<Map> dsmCloudSyncTaskGet(int taskId, // Task ID
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -225,7 +225,7 @@ Future<Map> dsmCloudSyncTaskPause(int taskId, // Task ID
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -241,7 +241,7 @@ Future<Map> dsmCloudSyncTaskResume(int taskId, // Task ID
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -280,5 +280,5 @@ Future<Map> dsmCloudSyncTaskFilterGet(int taskId, // Task ID
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }

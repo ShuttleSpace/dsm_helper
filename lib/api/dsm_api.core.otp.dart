@@ -10,20 +10,20 @@ Future<Map> dsmCoreOTPSaveMail(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmCoreOTPGetQrcode(
     {required String account, CancelToken? cancelToken}) async {
-  final data = _dsmApiRequestData(
-      api: 'SYNO.Core.OTP', method: 'get_qrcode', version: 2)
-    ..addAll({'account': account});
+  final data =
+      _dsmApiRequestData(api: 'SYNO.Core.OTP', method: 'get_qrcode', version: 2)
+        ..addAll({'account': account});
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
   Log.info("dsmCoreOTPGetQrcode: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmCoreOTPAuthTmpCode(
@@ -36,5 +36,5 @@ Future<Map> dsmCoreOTPAuthTmpCode(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }

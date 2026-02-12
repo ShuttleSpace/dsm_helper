@@ -44,7 +44,7 @@ Future<Map> dsmCoreShareSnapshotList(String shareName, // Shared folder name
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -69,7 +69,7 @@ Future<Map> dsmCoreShareSnapshotCreate(String shareName, // Shared folder name
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -88,7 +88,7 @@ Future<Map> dsmCoreShareSnapshotDelete(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -113,5 +113,5 @@ Future<Map> dsmCoreShareSnapshotSetAttr(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }

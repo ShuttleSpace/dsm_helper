@@ -11,7 +11,7 @@ Future<Map> dsmCoreSystemPower(String method, // shutdown, reboot
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmCoreHardwarePowerScheduleSave(
@@ -29,7 +29,7 @@ Future<Map> dsmCoreHardwarePowerScheduleSave(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmCoreHardwareHibernationSet(
@@ -56,5 +56,5 @@ Future<Map> dsmCoreHardwareHibernationSet(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }

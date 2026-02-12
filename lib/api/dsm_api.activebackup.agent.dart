@@ -19,7 +19,7 @@ Future<Map> dsmActiveBackupAgentDeviceDuplicateWorkload(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupAgentDeviceListNodes(String deviceId, // Device ID
@@ -33,7 +33,7 @@ Future<Map> dsmActiveBackupAgentDeviceListNodes(String deviceId, // Device ID
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupAgentDeviceSetUpdatePolicy(
@@ -49,7 +49,7 @@ Future<Map> dsmActiveBackupAgentDeviceSetUpdatePolicy(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupAgentDeviceUpdateAgent(
@@ -64,7 +64,7 @@ Future<Map> dsmActiveBackupAgentDeviceUpdateAgent(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupAgentDeviceUpgrade(
@@ -78,7 +78,7 @@ Future<Map> dsmActiveBackupAgentDeviceUpgrade(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupAgentlessCreateDevice(
@@ -92,7 +92,7 @@ Future<Map> dsmActiveBackupAgentlessCreateDevice(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupAgentlessGetDatapathOnStorage(
@@ -109,7 +109,7 @@ Future<Map> dsmActiveBackupAgentlessGetDatapathOnStorage(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupAgentlessGetTaskSetting(String taskId, // Task ID
@@ -125,7 +125,7 @@ Future<Map> dsmActiveBackupAgentlessGetTaskSetting(String taskId, // Task ID
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupAgentlessListDeviceFolder(
@@ -142,7 +142,7 @@ Future<Map> dsmActiveBackupAgentlessListDeviceFolder(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupAgentlessRemoveSshKeyTmpFile(
@@ -158,7 +158,7 @@ Future<Map> dsmActiveBackupAgentlessRemoveSshKeyTmpFile(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupAgentlessSetDevice(
@@ -172,7 +172,7 @@ Future<Map> dsmActiveBackupAgentlessSetDevice(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupAgentlessSmbListRemoteFolder(
@@ -189,7 +189,7 @@ Future<Map> dsmActiveBackupAgentlessSmbListRemoteFolder(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupAgentlessTestConnection(
@@ -205,7 +205,7 @@ Future<Map> dsmActiveBackupAgentlessTestConnection(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupAgentlessTestRsyncModuleConnection(
@@ -221,7 +221,7 @@ Future<Map> dsmActiveBackupAgentlessTestRsyncModuleConnection(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupAgentlessTestSshKey(
@@ -235,7 +235,7 @@ Future<Map> dsmActiveBackupAgentlessTestSshKey(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 Future<Map> dsmActiveBackupAgentlessTestTaskSettings(
@@ -250,5 +250,5 @@ Future<Map> dsmActiveBackupAgentlessTestTaskSettings(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }

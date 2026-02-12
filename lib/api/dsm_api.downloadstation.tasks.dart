@@ -48,7 +48,7 @@ Future<Map> dsmDownloadStationTaskList(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -81,7 +81,7 @@ Future<Map> dsmDownloadStationTaskGetinfo(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -108,7 +108,7 @@ Future<Map> dsmDownloadStationTaskCreate(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -127,7 +127,7 @@ Future<Map> dsmDownloadStationTaskDelete(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -144,7 +144,7 @@ Future<Map> dsmDownloadStationTaskPause(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -161,7 +161,7 @@ Future<Map> dsmDownloadStationTaskResume(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -182,5 +182,5 @@ Future<Map> dsmDownloadStationTaskEdit(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }

@@ -19,7 +19,7 @@ Future<Map> dsmSurveillanceStationInfoGetInfo(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -77,7 +77,7 @@ Future<Map> dsmSurveillanceStationCameraList(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -113,7 +113,7 @@ Future<Map> dsmSurveillanceStationCameraGetInfo(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -129,7 +129,7 @@ Future<Map> dsmSurveillanceStationCameraEnable(int id, // Camera ID
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -145,7 +145,7 @@ Future<Map> dsmSurveillanceStationCameraDisable(int id, // Camera ID
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// Binary JPEG image data
@@ -175,7 +175,7 @@ Future<dynamic> dsmSurveillanceStationCameraGetSnapshot(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -250,7 +250,7 @@ Future<Map> dsmSurveillanceStationCameraGetLiveViewPath(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -279,7 +279,7 @@ Future<Map> dsmSurveillanceStationVideoStreamStream(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -318,7 +318,7 @@ Future<Map> dsmSurveillanceStationCameraGroupEnum(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -376,7 +376,7 @@ Future<Map> dsmSurveillanceStationEventQuery(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -401,7 +401,7 @@ Future<Map> dsmSurveillanceStationEventDelete(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -424,7 +424,7 @@ Future<Map> dsmSurveillanceStationEventLock(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -441,7 +441,7 @@ Future<Map> dsmSurveillanceStationEventUnlock(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -477,7 +477,7 @@ Future<Map> dsmSurveillanceStationEventDetectionMotionEnum(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -507,7 +507,7 @@ Future<Map> dsmSurveillanceStationPTZMove(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -526,7 +526,7 @@ Future<Map> dsmSurveillanceStationPTZZoom(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -545,7 +545,7 @@ Future<Map> dsmSurveillanceStationPTZFocus(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -582,7 +582,7 @@ Future<Map> dsmSurveillanceStationPTZPresetList(int cameraId, // Camera ID
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -606,7 +606,7 @@ Future<Map> dsmSurveillanceStationPTZGotoPreset(int cameraId, // Camera ID
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -639,7 +639,7 @@ Future<Map> dsmSurveillanceStationPTZPatrolList(int cameraId, // Camera ID
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -660,7 +660,7 @@ Future<Map> dsmSurveillanceStationPTZPatrolRunPatrol(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -714,7 +714,7 @@ Future<Map> dsmSurveillanceStationRecordingQuery(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -731,7 +731,7 @@ Future<Map> dsmSurveillanceStationRecordingDelete(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -748,7 +748,7 @@ Future<Map> dsmSurveillanceStationRecordingLock(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -765,7 +765,7 @@ Future<Map> dsmSurveillanceStationRecordingUnlock(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -793,7 +793,7 @@ Future<Map> dsmSurveillanceStationRecordingDownload(String id, // Recording ID
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -828,7 +828,7 @@ Future<Map> dsmSurveillanceStationRecordingExportSave(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -853,7 +853,7 @@ Future<Map> dsmSurveillanceStationRecordingGetConfig(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -871,7 +871,7 @@ Future<Map> dsmSurveillanceStationRecordingStart(int cameraId, // Camera ID
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -887,7 +887,7 @@ Future<Map> dsmSurveillanceStationRecordingStop(int cameraId, // Camera ID
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -903,7 +903,7 @@ Future<Map> dsmSurveillanceStationRecordingPause(int cameraId, // Camera ID
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
 
 /// {
@@ -919,5 +919,5 @@ Future<Map> dsmSurveillanceStationRecordingResume(int cameraId, // Camera ID
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'];
+  return res['data'] ?? {};
 }
