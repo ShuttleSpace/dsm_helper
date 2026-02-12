@@ -66,7 +66,7 @@ class SmartState extends State<Smart> with SingleTickerProviderStateMixin {
     if (res['success']) {
       getSmartLog();
       timer = Timer.periodic(const Duration(seconds: 4), (timer) {
-        getSmartLog();
+        // getSmartLog();
       });
     } else {
       UiUtil.toast("执行检测失败，代码${res['error']['code']}");

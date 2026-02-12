@@ -33,7 +33,7 @@ class TaskManagerState extends State<TaskManager>
     _tabController = TabController(length: 2, vsync: this);
     getData();
     timer = Timer.periodic(const Duration(seconds: 5), (timer) {
-      getData();
+      // getData();
     });
     super.initState();
   }

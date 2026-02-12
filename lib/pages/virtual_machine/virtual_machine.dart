@@ -37,7 +37,7 @@ class VirtualMachineState extends State<VirtualMachine> {
   void initState() {
     getData();
     timer = Timer.periodic(const Duration(seconds: 5), (timer) {
-      getData();
+      // getData();
     });
     super.initState();
   }

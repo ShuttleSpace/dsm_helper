@@ -71,7 +71,7 @@ class PerformanceState extends State<Performance>
     timer = Timer.periodic(
         Duration(seconds: settingsStore.refreshDuration.watch(context)),
         (timer) {
-      getData();
+      // getData();
     });
     super.initState();
   }
