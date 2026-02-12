@@ -57,8 +57,8 @@ class SystemInfoState extends State<SystemInfo>
   getData() async {
     try {
       final res = await dsmCoreNetworkGet();
-      network.set(res);
-      nifs.set(network['nif'] ?? []);
+      network.value = res;
+      nifs.value = network['nif'] ?? [];
     } catch (e) {
       Log.error('dsmCoreNetworkGet: $e');
     }

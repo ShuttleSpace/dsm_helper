@@ -9,20 +9,13 @@ extension UpdateAtListSignal<T> on ListSignal<T> {
       return;
     }
     replaceRange(index, index + 1, [onUpdate(oldValue)]);
-    set(value);
   }
 }
 
 extension UpdateAtSetSignal<T> on SetSignal<T> {
   update1(T oldValue, T Function(T oldValue) onUpdate) {
-    final list = toList();
-    final index = list.indexOf(oldValue);
-    if (index == -1) {
-      Log.debug('UpdateAtSignal: $oldValue not found in set');
-      return;
-    }
-    list.replaceRange(index, index + 1, [onUpdate(oldValue)]);
-    set(list.toSet());
+    value.remove(oldValue);
+    value.add(onUpdate(oldValue));
   }
 }
 
@@ -33,6 +26,5 @@ extension UpdateAtMapSignal<K, V> on MapSignal<K, V> {
       Log.debug('UpdateAtSignal: $key not found in map');
     }
     value[key] = onUpdate(v);
-    set(value);
   }
 }

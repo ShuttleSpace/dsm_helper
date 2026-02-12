@@ -52,7 +52,7 @@ class LoginState extends State<Login> with SignalsMixin {
   late final rememberPassword = createSignal(true);
   late final autoLogin = createSignal(true);
   late final checkSsl = createSignal(true);
-  late final rememberDevice = createSignal(true);
+  late final rememberDevice = createSignal(false);
   late final passwordVisible = createSignal(false);
   late final servers = createListSignal([]);
   late final qcAddresses = createListSignal([]);
