@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:device_info_plus/device_info_plus.dart';
+import 'package:garden/extensions/signal.dart';
 import 'package:garden/extensions/string.dart';
 import 'package:garden/util/storage_util.dart';
 import 'package:media_kit/media_kit.dart';
@@ -120,7 +121,7 @@ class SettingsStore {
   // ==================== Dashboard 设置 ====================
 
   final _dashboardCardCollapseSwitch = signal<bool>(true);
-  final _dashboardCardCollapseState = signal<Map<String, bool>>({});
+  final _dashboardCardCollapseState = mapSignal<String, bool>({});
 
   ReadonlySignal<bool> get dashboardCardCollapseSwitch =>
       _dashboardCardCollapseSwitch;
@@ -134,8 +135,7 @@ class SettingsStore {
     if (value != null) {
       _dashboardCardCollapseState.value = value;
     } else if (item != null) {
-      _dashboardCardCollapseState.update(item.$1, (ov) => item.$2,
-          ifAbsent: () => item.$2);
+      _dashboardCardCollapseState[item.$1] = item.$2;
     }
   }
 

@@ -169,59 +169,63 @@ class HomeState extends State<Home> with WidgetsBindingObserver, SignalsMixin {
       child: Scaffold(
         body: DownloadStateInherited(
           notifier: DownloadStateNotifier(),
-          child: IndexedStack(
-            index: _navIndex.watch(context),
-            children: [
-              Dashboard(key: _dashboardStateKey),
-              Files(key: _filesStateKey),
-              Download(key: UniqueKey()),
-              const Setting(),
-            ],
+          child: Watch(
+            (context) => IndexedStack(
+              index: _navIndex.value,
+              children: [
+                Dashboard(key: _dashboardStateKey),
+                Files(key: _filesStateKey),
+                Download(key: UniqueKey()),
+                const Setting(),
+              ],
+            ),
           ),
         ),
-        bottomNavigationBar: BottomNavigationBar(
-          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-          type: BottomNavigationBarType.fixed,
-          selectedItemColor: Theme.of(context).colorScheme.primary,
-          onTap: (v) {
-            Log.info('[selected] $v');
-            _navIndex.value = v;
-          },
-          currentIndex: _navIndex.watch(context),
-          items: [
-            BottomNavigationBarItem(
-              label: "控制台",
-              icon: Image.asset(
-                "assets/tabbar/meter.png",
-                width: 30,
-                height: 30,
+        bottomNavigationBar: Watch(
+          (context) => BottomNavigationBar(
+            backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+            type: BottomNavigationBarType.fixed,
+            selectedItemColor: Theme.of(context).colorScheme.primary,
+            onTap: (v) {
+              Log.info('[selected] $v');
+              _navIndex.value = v;
+            },
+            currentIndex: _navIndex.value,
+            items: [
+              BottomNavigationBarItem(
+                label: "控制台",
+                icon: Image.asset(
+                  "assets/tabbar/meter.png",
+                  width: 30,
+                  height: 30,
+                ),
               ),
-            ),
-            BottomNavigationBarItem(
-              icon: Image.asset(
-                "assets/tabbar/folder.png",
-                width: 30,
-                height: 30,
+              BottomNavigationBarItem(
+                icon: Image.asset(
+                  "assets/tabbar/folder.png",
+                  width: 30,
+                  height: 30,
+                ),
+                label: "文件",
               ),
-              label: "文件",
-            ),
-            BottomNavigationBarItem(
-              icon: Image.asset(
-                "assets/tabbar/save.png",
-                width: 30,
-                height: 30,
+              BottomNavigationBarItem(
+                icon: Image.asset(
+                  "assets/tabbar/save.png",
+                  width: 30,
+                  height: 30,
+                ),
+                label: '下载',
               ),
-              label: '下载',
-            ),
-            BottomNavigationBarItem(
-              icon: Image.asset(
-                "assets/tabbar/setting.png",
-                width: 30,
-                height: 30,
+              BottomNavigationBarItem(
+                icon: Image.asset(
+                  "assets/tabbar/setting.png",
+                  width: 30,
+                  height: 30,
+                ),
+                label: '设置',
               ),
-              label: '设置',
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

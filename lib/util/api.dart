@@ -1446,7 +1446,7 @@ class DsmApi {
   }
 
   static Future<Map> reward() async {
-    return await HttpUtil.instance.get("${connectionStore.appUrl}/reward");
+    return await HttpUtil.instance.get("${connectionStore.baseUri}/reward");
   }
 
   static Future<Map> downloadStationInfo() async {
@@ -2545,47 +2545,4 @@ class DsmApi {
     });
     return result;
   }
-}
-
-enum ErrorCode {
-  unknown(100),
-  noParameter(101),
-  apiNotExist(102),
-  methodNotExist(103),
-  versionNotSupport(104),
-  loggedInSessionNoPermission(105),
-  sessionTimeout(106),
-  sessionInterruptedByDuplicated(107),
-  uploadFailed(108),
-  networkSystemBusy(109),
-  networkSystemBusy1(110),
-  networkSystemBusy2(111),
-  preserve(112),
-  preserve1(113),
-  lostParameter(114),
-  notAllowedUpload(115),
-  notAllowedPerform(116),
-  networkSystemBusy3(117),
-  networkSystemBusy4(118),
-  invalidSession(119),
-  // 120-149 preserved.
-  requestSourceIPNotMatchLoginIP(150),
-  noAccountOrIncorrectPassword(400),
-  disabledAccount(401),
-  deniedPermission(402), // 账号已停用
-  twoFactorAuthRequired(403), // 要求两步验证码
-  twoFactorAuthFailed(404), // 未能认证两步（双因素）认证码
-  forceTwoFactorAuth(406), // 强制两步验证码
-  blockedIPSource(407), // IP 源被封锁
-  expiredPasswdCannotChange(408), // 过期密码无法更改
-  expiredPasswd(409), // 过期密码
-  passwdMustBeChanged(410), // 密码必须更改
-  ;
-
-  const ErrorCode(this.code);
-  factory ErrorCode.valueOf(int code) {
-    return ErrorCode.values.firstWhere((element) => element.code == code,
-        orElse: () => throw Exception("Unknown error code $code"));
-  }
-  final int code;
 }

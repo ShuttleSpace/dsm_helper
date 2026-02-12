@@ -16,14 +16,13 @@ class ConnectionStore {
 
   final _sid = signal<String>('');
   final _account = signal<String>('');
-  final _baseUri = signal<String>('https://dang8080.quickconnect.to');
+  final _baseUri = signal<String>('http://192.168.8.40:5000/');
   final _hostname = signal<String>('');
   final _cookie = signal<String>('');
   final _synoToken = signal<String>('');
   final _checkSsl = signal<bool>(true);
   final _dsmVersion = signal<int>(6);
   final _appName = signal<String>(AppConstants.appName);
-  final _appUrl = signal<String>('https://dang8080.quickconnect.to');
   // FIXME: desktop init data strings???
   final _strings = signal<Map>({});
   final _notifies = signal<Map>({});
@@ -36,7 +35,6 @@ class ConnectionStore {
   ReadonlySignal<bool> get checkSsl => _checkSsl;
   ReadonlySignal<int> get dsmVersion => _dsmVersion;
   ReadonlySignal<String> get appName => _appName;
-  ReadonlySignal<String> get appUrl => _appUrl;
   ReadonlySignal<Map> get strings => _strings;
   ReadonlySignal<Map> get notifyStrings => _notifies;
   ReadonlySignal<bool> get notVisitorAccount =>
@@ -65,7 +63,6 @@ class ConnectionStore {
 
   void setVersion(int value) => _dsmVersion.value = value;
   void setAppName(String value) => _appName.value = value;
-  void setAppUrl(String value) => _appUrl.value = value;
   void setStrings(Map value) => _strings.value = value;
   void setNotifies(Map value) => _notifies.value = value;
 
@@ -91,7 +88,6 @@ class ConnectionStore {
     _checkSsl.dispose();
     _dsmVersion.dispose();
     _appName.dispose();
-    _appUrl.dispose();
     _strings.dispose();
     _notifies.dispose();
   }

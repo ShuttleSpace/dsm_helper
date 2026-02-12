@@ -32,10 +32,9 @@ class _DashboardAppbarTitleExternalDeviceState
     (() async {
       try {
         final res = await dsmCoreExternalDeviceList();
-        List result = res['result'];
-        bool hasFail = res['has_fail'];
-        if (hasFail) {
-          Log.error('dsmCoreExternalDeviceList has_fail: $hasFail');
+        List result = res['result'] as List? ?? [];
+        if (res['has_fail'] == true) {
+          Log.error('dsmCoreExternalDeviceList has_fail: ${res['has_fail']}');
         }
         for (final item in result) {
           if (item['success'] == true) {
@@ -43,7 +42,7 @@ class _DashboardAppbarTitleExternalDeviceState
               case dsmCoreExternalDeviceStorageESATA:
                 if (item['success'] == true) {
                   final devices = item['data']?['devices'];
-                  esatas.set(devices is List ? devices : []);
+                  esatas.value = devices is List ? devices : [];
                 } else {
                   Log.error('$dsmCoreExternalDeviceStorageESATA list failed.');
                 }
@@ -51,8 +50,7 @@ class _DashboardAppbarTitleExternalDeviceState
               case dsmCoreExternalDeviceStorageUSB:
                 if (item['success'] == true) {
                   final devices = item['data']?['devices'];
-                  Log.error("typeof devices; ${devices.runtimeType}");
-                  usbs.set(devices is List ? devices : []);
+                  usbs.value = devices is List ? devices : [];
                 } else {
                   Log.error('$dsmCoreExternalDeviceStorageUSB list failed.');
                 }
@@ -202,7 +200,7 @@ class _DashboardAppbarTitleMediaConverterState
   fetchMediaIndexingMediaConverterStatus() async {
     try {
       final res = await dsmCoreMediaIndexingMediaConverter('status');
-      converter.set(res);
+      converter.value = res;
       final totalRemain = (converter['photo_remain'] ?? 0) +
           (converter['thumb_remain'] ?? 0) +
           (converter['video_remain'] ?? 0);
@@ -294,14 +292,9 @@ class _DashboardAppbarTitleNotifierState
   void initState() {
     super.initState();
     (() async {
-      var res = await fetchNotifyStrings();
-      notifies.set(res);
+      final res = await fetchNotifies();
+      notifies.value = res;
       Log.info('notifies1: $res');
-      if (notifies.isEmpty) {
-        res = await fetchNotifies();
-        Log.info('notifies2: $res');
-        notifies.set(res);
-      }
     })();
   }
 
@@ -311,16 +304,6 @@ class _DashboardAppbarTitleNotifierState
       return res['items'];
     } catch (e) {
       Log.error('fetchNotifies error: $e');
-      return [];
-    }
-  }
-
-  fetchNotifyStrings() async {
-    try {
-      final res = await dsmCoreDSMNotifyStringsGet();
-      connectionStore.setNotifies(res);
-    } catch (e) {
-      Log.error('fetchNotifyStrings error: $e');
       return [];
     }
   }
