@@ -15,7 +15,15 @@ extension StadiumStyleExtension on BuildContext {
         ),
       );
   ShapeBorder get stadiumShapeBorder => StadiumBorder(
-        side: BorderSide(color: Theme.of(this).colorScheme.primary),
+        side: BorderSide(
+            color: Theme.of(this).colorScheme.primary.withValues(alpha: 0.2)),
+      );
+
+  ShapeBorder get roundRectShapeBorder => RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(18),
+        side: BorderSide(
+          color: Theme.of(this).colorScheme.primary.withValues(alpha: 0.1),
+        ),
       );
 }
 
