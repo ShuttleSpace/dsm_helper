@@ -120,8 +120,10 @@ class SettingsStore {
 
   // ==================== Dashboard 设置 ====================
 
-  final _dashboardCardCollapseSwitch = signal<bool>(true);
-  final _dashboardCardCollapseState = mapSignal<String, bool>({});
+  final _dashboardCardCollapseSwitch =
+      signal<bool>(true, debugLabel: "_dashboardCardCollapseSwitch");
+  final _dashboardCardCollapseState =
+      mapSignal<String, bool>({}, debugLabel: "_dashboardCardCollapseState");
 
   ReadonlySignal<bool> get dashboardCardCollapseSwitch =>
       _dashboardCardCollapseSwitch;
@@ -135,7 +137,9 @@ class SettingsStore {
     if (value != null) {
       _dashboardCardCollapseState.value = value;
     } else if (item != null) {
-      _dashboardCardCollapseState[item.$1] = item.$2;
+      _dashboardCardCollapseState.update1(item.$1, (ov) {
+        return item.$2;
+      });
     }
   }
 
@@ -144,9 +148,9 @@ class SettingsStore {
   }
 
   void toggleCardItemCollapse(String itemName) {
-    final newState = Map<String, bool>.from(_dashboardCardCollapseState.value);
-    newState[itemName] = !(newState[itemName] ?? false);
-    _dashboardCardCollapseState.value = newState;
+    _dashboardCardCollapseState.update1(itemName, (ov) {
+      return !(ov ?? false);
+    });
   }
 
   // ==================== 下载设置 ====================
