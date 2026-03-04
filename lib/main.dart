@@ -31,6 +31,7 @@ import 'package:signals_flutter/signals_flutter.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   MediaKit.ensureInitialized();
+  SignalsObserver.instance = LoggingSignalsObserver();
 
   await settingsStore.initialize();
   await connectionStore.initialize();
