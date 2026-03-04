@@ -294,7 +294,7 @@ class _DashboardAppbarTitleNotifierState
     (() async {
       final res = await fetchNotifies();
       notifies.value = res;
-      Log.info('notifies1: $res');
+      // Log.info('notifies1: $res');
     })();
   }
 

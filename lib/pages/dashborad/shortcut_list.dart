@@ -89,9 +89,7 @@ class ShortcutList extends StatelessWidget {
             systemData,
             storageVolumes,
             storageDisks,
-            appNotify['SYNO.SDS.AdminCenter.Application'] != null
-                ? appNotify['SYNO.SDS.AdminCenter.Application']['fn']
-                : null);
+            appNotify);
         routerName = "control_panel";
         if (appNotify['SYNO.SDS.AdminCenter.Application'] != null) {
           unread = appNotify['SYNO.SDS.AdminCenter.Application']['unread'];

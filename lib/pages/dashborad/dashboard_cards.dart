@@ -3,8 +3,8 @@ import 'dart:math';
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:garden/api/dsm_api.dart';
+import 'package:garden/constants/app_constants.dart';
 import 'package:garden/extensions/context.dart';
 import 'package:garden/extensions/int.dart';
 import 'package:garden/extensions/signal.dart';
@@ -23,7 +23,7 @@ import 'package:garden/widgets/label.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:signals_flutter/signals_flutter.dart';
 
-class DashboardSystemHealthCard extends HookWidget {
+class DashboardSystemHealthCard extends StatefulWidget {
   DashboardSystemHealthCard(
       {super.key,
       required this.storageVolumes,
@@ -44,18 +44,21 @@ class DashboardSystemHealthCard extends HookWidget {
 
   late final heatDissipation = computed(() =>
       "${systemData['sys_temp']}℃ ${systemData['temperature_warning'] == null ? (systemData['sys_temp'] > 80 ? "警告" : "正常") : (systemData['temperature_warning'] ? "警告" : "正常")}");
+
+  @override
+  State<StatefulWidget> createState() => DashboardSystemHealthCardState();
+}
+
+class DashboardSystemHealthCardState extends State<DashboardSystemHealthCard>
+    with SignalsMixin {
   @override
   Widget build(BuildContext context) {
-    useEffect(() {
-      return () {
-        heatDissipation.dispose();
-      };
-    }, []);
     return GestureDetector(
       onTap: () {
         if (connectionStore.notVisitorAccount.value) {
           Navigator.of(context).push(CupertinoPageRoute(builder: (context) {
-            return SystemInfo(0, systemData, storageVolumes, storageDisks);
+            return SystemInfo(0, widget.systemData, widget.storageVolumes,
+                widget.storageDisks);
           }));
         }
       },
@@ -69,12 +72,12 @@ class DashboardSystemHealthCard extends HookWidget {
             children: [
               /* wallpaper */
               Watch((context) {
-                final customize = wallpaper.select((v) =>
+                final customize = widget.wallpaper.select((v) =>
                     v['customizeWallpaper'] == true ||
                     v['customizeBackground'] == true);
                 if (settingsStore.showWallpaper.value && customize.value) {
                   return ExtendedImage.network(
-                    "${connectionStore.baseUri}/webapi/entry.cgi?api=SYNO.Core.PersonalSettings&method=wallpaper&version=1&path=%22%22&retina=true&_sid=${connectionStore.sid}",
+                    AppConstants.wallpaper,
                     height: 170,
                     width: double.infinity,
                     fit: BoxFit.cover,
@@ -85,16 +88,20 @@ class DashboardSystemHealthCard extends HookWidget {
                 return const SizedBox.shrink();
               }),
               /* dark theme */
-              if (Theme.brightnessOf(context) == Brightness.dark)
-                Container(
-                  height: 170,
-                  decoration: BoxDecoration(
-                    color: Theme.of(context)
-                        .scaffoldBackgroundColor
-                        .withValues(alpha: .1),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                ),
+              Builder(builder: (context) {
+                if (Theme.brightnessOf(context) == Brightness.dark) {
+                  return Container(
+                    height: 170,
+                    decoration: BoxDecoration(
+                      color: Theme.of(context)
+                          .scaffoldBackgroundColor
+                          .withValues(alpha: .1),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                  );
+                }
+                return const SizedBox.shrink();
+              }),
               ClipRRect(
                 borderRadius: BorderRadius.circular(20),
                 child: Padding(
@@ -127,7 +134,8 @@ class DashboardSystemHealthCard extends HookWidget {
                         ),
                         // product model
                         Watch<Widget>((context) {
-                          final model = systemData.select((v) => v['model']);
+                          final model =
+                              widget.systemData.select((v) => v['model']);
                           if (model.value != null) {
                             Padding(
                               padding: const EdgeInsets.only(top: 5),
@@ -148,15 +156,15 @@ class DashboardSystemHealthCard extends HookWidget {
                           (context) => Row(
                             children: [
                               const Text("系统名称："),
-                              Text(sessionHostname.value),
+                              Text(widget.sessionHostname.value),
                             ],
                           ),
                         ),
                         // 散热
                         Watch<Widget>((context) {
                           final sysTemp =
-                              systemData.select((v) => v['sys_temp']);
-                          final temperatureWarning = systemData
+                              widget.systemData.select((v) => v['sys_temp']);
+                          final temperatureWarning = widget.systemData
                               .select((v) => v['temperature_warning']);
                           if (sysTemp.value != null) {
                             return Padding(
@@ -165,7 +173,7 @@ class DashboardSystemHealthCard extends HookWidget {
                                 children: [
                                   const Text("散热状态："),
                                   Text(
-                                    heatDissipation.value,
+                                    widget.heatDissipation.value,
                                     style: TextStyle(
                                         color: sysTemp.value == null
                                             ? (sysTemp.value > 80
@@ -185,7 +193,8 @@ class DashboardSystemHealthCard extends HookWidget {
                         }),
                         // 运行时间
                         Watch<Widget>((context) {
-                          final upTime = systemData.select((v) => v['up_time']);
+                          final upTime =
+                              widget.systemData.select((v) => v['up_time']);
                           if (upTime.value != null && upTime.value.isNotEmpty) {
                             return Padding(
                               padding: const EdgeInsets.only(top: 5),
@@ -213,27 +222,35 @@ class DashboardSystemHealthCard extends HookWidget {
   }
 }
 
-class DashboardConnectionLogCard extends HookWidget {
-  final connectedUsers = listSignal([]);
-  final error = signal('');
+class DashboardConnectionLogCard extends StatefulWidget {
+  const DashboardConnectionLogCard({super.key});
 
-  DashboardConnectionLogCard({super.key});
+  @override
+  State<StatefulWidget> createState() => DashboardConnectionLogCardState();
+}
+
+class DashboardConnectionLogCardState extends State<DashboardConnectionLogCard>
+    with SignalsMixin {
+  late final connectedUsers = createListSignal([]);
+  late final error = createSignal('');
+
+  @override
+  initState() {
+    _fetchData();
+    super.initState();
+  }
+
+  _fetchData() {
+    dsmCoreCurrentConnectionList().then((res) {
+      connectedUsers.value = res['items'] as List;
+      debugPrint('✍️🌹 ${connectedUsers.length}');
+    }).catchError((e) {
+      error.value = e.toString();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    useEffect(() {
-      dsmCoreCurrentConnectionList().then((res) {
-        connectedUsers.value = res['items'] as List;
-        debugPrint('✍️🌹 ${connectedUsers.length}');
-      }).catchError((e) {
-        error.value = e.toString();
-      });
-      return () {
-        connectedUsers.dispose();
-        error.dispose();
-        debugPrint('🪵🪵');
-      };
-    }, []);
     return Card(
       shape: RoundedRectangleBorder(
           side: const BorderSide(), borderRadius: BorderRadius.circular(18)),
@@ -241,6 +258,7 @@ class DashboardConnectionLogCard extends HookWidget {
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
             const SizedBox(
               height: 20,
@@ -266,8 +284,8 @@ class DashboardConnectionLogCard extends HookWidget {
                 ],
               ),
             ),
-            Watch<Widget>((context) {
-              if (connectedUsers.isEmpty) {
+            Builder(builder: (context) {
+              if (connectedUsers.watch(context).isEmpty) {
                 return TextButton(
                     onPressed: () {},
                     child: Text.rich(TextSpan(
@@ -276,34 +294,21 @@ class DashboardConnectionLogCard extends HookWidget {
                           TextSpan(
                               text: "\t\t点击重试", style: _retryTextStyle(context))
                         ])));
-              }
-              if (context.isCardItemCollapsed('ConnectionLog')) {
+              } else if (context.isCardItemCollapsed('ConnectionLog')) {
                 return Flexible(
                     child: Column(
                   children: connectedUsers
                       .map((e) => _DashboardConnectionLogItem(
-                            user: e,
+                            user: (e as Map).toSignal(),
                             onKickout: () {
-                              Navigator.of(context).pop();
-                              // TODO: set running = true, update user in list
-                              connectedUsers.update1(
-                                  e, (ov) => {ov['running'] = true, ov});
-                              dsmCoreCurrentConnectionKickConnection(
-                                      {"who": e['who'], "from": e['from']})
-                                  .then((_) {
-                                UiUtil.toast("连接已终止");
-                                // TODO: set running = true, update user in list
-                                connectedUsers.update1(
-                                    e, (ov) => {ov['running'] = false, ov});
-                              }).catchError((e) {
-                                UiUtil.toast("连接终止失败：${e.toString()}");
-                              });
+                              _onKickout(e);
                             },
                           ))
                       .toList(),
                 ));
+              } else {
+                return const SizedBox.shrink();
               }
-              return const SizedBox.shrink();
             }),
             const SizedBox(
               height: 20,
@@ -312,6 +317,23 @@ class DashboardConnectionLogCard extends HookWidget {
         ),
       ),
     );
+  }
+
+  _onKickout(Map e) async {
+    // TODO: set running = true, update user in list
+    connectedUsers.update1(e, (ov) => {ov['running'] = true, ov});
+    try {
+      await dsmCoreCurrentConnectionKickConnection(
+          {"who": e['who'], "from": e['from']});
+      UiUtil.toast("连接已终止");
+      // TODO: set running = true, update user in list
+      connectedUsers.update1(e, (ov) => {ov['running'] = false, ov});
+    } on Exception catch (e) {
+      UiUtil.toast("连接终止失败：${e.toString()}");
+    }
+    if (mounted) {
+      Navigator.of(context).pop();
+    }
   }
 }
 
@@ -335,6 +357,7 @@ class _DashboardConnectionLogItem extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.all(10),
         child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
             Flexible(
               child: Text(
@@ -360,7 +383,7 @@ class _DashboardConnectionLogItem extends StatelessWidget {
             ),
             OutlinedButton(
               onPressed: () async {
-                if (user['running'].value == true) {
+                if (user['running'] == true) {
                   return;
                 }
                 onDisconnectAlert(context);
@@ -368,7 +391,7 @@ class _DashboardConnectionLogItem extends StatelessWidget {
               child: SizedBox(
                 width: 20,
                 height: 20,
-                child: user.select((v) => v['running']).watch(context)
+                child: user.select((v) => v['running']).watch(context) != false
                     ? const CupertinoActivityIndicator()
                     : const Icon(
                         Icons.remove_circle_outline,
@@ -463,29 +486,38 @@ class _DashboardConnectionLogItem extends StatelessWidget {
   }
 }
 
-class DashboardTaskSchedulerCard extends HookWidget {
-  final schedulerTasks = listSignal([]);
-  final error = signal('');
+class DashboardTaskSchedulerCard extends StatefulWidget {
+  const DashboardTaskSchedulerCard({super.key});
 
-  DashboardTaskSchedulerCard({super.key});
+  @override
+  State<StatefulWidget> createState() => DashboardTaskSchedulerCardState();
+}
+
+class DashboardTaskSchedulerCardState extends State<DashboardTaskSchedulerCard>
+    with SignalsMixin {
+  late final schedulerTasks = createListSignal([]);
+  late final error = createSignal('');
+
+  @override
+  initState() {
+    _fetchData();
+    super.initState();
+  }
+
+  _fetchData() {
+    dsmCoreTaskSchedulerList(
+      sortBy: 'next_trigger_time',
+      sortDirection: 'ASC',
+    ).then((res) {
+      schedulerTasks.value = res['tasks'] as List;
+      debugPrint("哇咔咔🎊🎊🎊");
+    }).catchError((e) {
+      error.value = e.toString();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    useEffect(() {
-      dsmCoreTaskSchedulerList(
-        sortBy: 'next_trigger_time',
-        sortDirection: 'ASC',
-      ).then((res) {
-        schedulerTasks.value = res['tasks'] as List;
-        debugPrint("哇咔咔🎊🎊🎊");
-      }).catchError((e) {
-        error.value = e.toString();
-      });
-      return () {
-        schedulerTasks.dispose();
-        error.dispose();
-      };
-    }, []);
     return GestureDetector(
       onTap: () {
         Navigator.of(context).push(CupertinoPageRoute(builder: (context) {
@@ -525,8 +557,8 @@ class DashboardTaskSchedulerCard extends HookWidget {
                   ],
                 ),
               ),
-              Watch((context) {
-                if (schedulerTasks.isEmpty) {
+              Builder(builder: (context) {
+                if (schedulerTasks.watch(context).isEmpty) {
                   return Text.rich(TextSpan(
                       text: error.isNotEmpty ? error.value : '暂无任务',
                       children: [
@@ -618,11 +650,23 @@ class _DashboardTashSchedulerItem extends StatelessWidget {
   }
 }
 
-class DashboardRecentLogCard extends HookWidget {
-  final recentLogs = listSignal([]);
-  final error = signal('');
+class DashboardRecentLogCard extends StatefulWidget {
+  const DashboardRecentLogCard({super.key});
 
-  DashboardRecentLogCard({super.key});
+  @override
+  State<StatefulWidget> createState() => DashboardRecentLogCardState();
+}
+
+class DashboardRecentLogCardState extends State<DashboardRecentLogCard>
+    with SignalsMixin {
+  late final recentLogs = createListSignal([]);
+  late final error = createSignal('');
+
+  @override
+  initState() {
+    _fetchData();
+    super.initState();
+  }
 
   _fetchData() {
     dsmCoreSyslogClientLogList(
@@ -640,13 +684,6 @@ class DashboardRecentLogCard extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    useEffect(() {
-      _fetchData();
-      return () {
-        recentLogs.dispose();
-        error.dispose();
-      };
-    }, []);
     return GestureDetector(
       onTap: () {
         Navigator.of(context).push(CupertinoPageRoute(
@@ -691,8 +728,8 @@ class DashboardRecentLogCard extends HookWidget {
               const SizedBox(
                 height: 10,
               ),
-              Watch((context) {
-                if (recentLogs.isEmpty) {
+              Builder(builder: (context) {
+                if (recentLogs.watch(context).isEmpty) {
                   return TextButton(
                       onPressed: _fetchData,
                       child: Text.rich(TextSpan(
@@ -717,15 +754,11 @@ class DashboardRecentLogCard extends HookWidget {
                               horizontal: 20, vertical: 10),
                           child: Padding(
                             padding: const EdgeInsets.all(10.0),
-                            child: Watch((context) {
-                              final msg =
-                                  recentLogs.select((v) => v[i]?['msg'] ?? '');
-                              return Text(
-                                maxLines: 3,
-                                "${msg.value}",
-                                overflow: TextOverflow.ellipsis,
-                              );
-                            }),
+                            child: Text(
+                              maxLines: 3,
+                              "${recentLogs.value[i]?['msg'] ?? ''}",
+                              overflow: TextOverflow.ellipsis,
+                            ),
                           ),
                         );
                       },
@@ -745,11 +778,17 @@ class DashboardRecentLogCard extends HookWidget {
   }
 }
 
-class DashboardResourceMonitorCard extends HookWidget {
-  final monitoredResources = mapSignal({});
-  final error = signal('');
+class DashboardResourceMonitorCard extends StatefulWidget {
+  const DashboardResourceMonitorCard({super.key});
 
-  DashboardResourceMonitorCard({super.key});
+  @override
+  State<StatefulWidget> createState() => DashboardResourceMonitorCardState();
+}
+
+class DashboardResourceMonitorCardState
+    extends State<DashboardResourceMonitorCard> with SignalsMixin {
+  late final monitoredResources = createMapSignal({});
+  late final error = createSignal('');
 
   final networks = List.generate(20, (i) => {"tx": 0, "rx": 0});
   int get maxNetworkSpeed {
@@ -761,6 +800,12 @@ class DashboardResourceMonitorCard extends HookWidget {
       }
     }
     return maxSpeed;
+  }
+
+  @override
+  initState() {
+    _fetchData();
+    super.initState();
   }
 
   _fetchData() {
@@ -783,13 +828,6 @@ class DashboardResourceMonitorCard extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    useEffect(() {
-      _fetchData();
-      return () {
-        monitoredResources.dispose();
-        error.dispose();
-      };
-    }, []);
     return GestureDetector(
       onTap: () {
         Navigator.of(context).push(CupertinoPageRoute(builder: (context) {
@@ -829,10 +867,8 @@ class DashboardResourceMonitorCard extends HookWidget {
                   ],
                 ),
               ),
-              if (monitoredResources.watch(context).isNotEmpty)
-                const Text('no emtpy'),
-              Watch((context) {
-                if (monitoredResources.isEmpty) {
+              Builder(builder: (context) {
+                if (monitoredResources.watch(context).isEmpty) {
                   return TextButton(
                       onPressed: _fetchData,
                       child: Text.rich(TextSpan(
@@ -844,8 +880,8 @@ class DashboardResourceMonitorCard extends HookWidget {
                           ])));
                 }
                 if (context.isCardItemCollapsed('ResourceMonitor')) {
-                  return Flexible(
-                      child: Column(
+                  return Column(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
                       const SizedBox(
                         height: 10,
@@ -868,7 +904,7 @@ class DashboardResourceMonitorCard extends HookWidget {
                       PerformanceNetworkChartWidget(
                           networks: networks, maxNetworkSpeed: maxNetworkSpeed)
                     ],
-                  ));
+                  );
                 }
                 return const SizedBox.shrink();
               }),
@@ -914,6 +950,7 @@ class DashboardStorageUsageCard extends StatelessWidget {
             child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: Column(
+                mainAxisSize: MainAxisSize.min,
                 children: [
                   const SizedBox(
                     height: 20,
@@ -940,8 +977,8 @@ class DashboardStorageUsageCard extends StatelessWidget {
                       ],
                     ),
                   ),
-                  Watch((context) {
-                    if (storageVolumes.isEmpty) {
+                  Builder(builder: (context) {
+                    if (storageVolumes.watch(context).isEmpty) {
                       return const Text.rich(TextSpan(
                         text: '暂无存储数据',
                       ));
@@ -950,7 +987,8 @@ class DashboardStorageUsageCard extends StatelessWidget {
                       return Flexible(
                         child: Column(
                           children: storageVolumes
-                              .map((e) => _DashboardStorageVolumeItem(e))
+                              .map((e) => _DashboardStorageVolumeItem(
+                                  (e as Map).toSignal()))
                               .toList(),
                         ),
                       );
@@ -965,7 +1003,7 @@ class DashboardStorageUsageCard extends StatelessWidget {
             ),
           ),
         ),
-        if (storageSsdCaches.isNotEmpty)
+        if (storageSsdCaches.watch(context).isNotEmpty)
           Card(
             shape: RoundedRectangleBorder(
                 side: const BorderSide(),
@@ -1000,8 +1038,8 @@ class DashboardStorageUsageCard extends StatelessWidget {
                       ],
                     ),
                   ),
-                  Watch((context) {
-                    if (storageSsdCaches.isEmpty) {
+                  Builder(builder: (context) {
+                    if (storageSsdCaches.watch(context).isEmpty) {
                       return const Text.rich(TextSpan(
                         text: '暂无缓存数据',
                       ));
@@ -1098,9 +1136,9 @@ class _DashboardStorageVolumeItem extends StatelessWidget {
                       const SizedBox(
                         width: 5,
                       ),
-                      Watch((context) {
+                      Builder(builder: (context) {
                         final status = volume.select((v) => v['status']);
-                        return status.value == "normal"
+                        return status.watch(context) == "normal"
                             ? const Label(
                                 "正常",
                                 Colors.green,
@@ -1134,20 +1172,20 @@ class _DashboardStorageVolumeItem extends StatelessWidget {
                   const SizedBox(
                     height: 5,
                   ),
-                  Watch((context) {
+                  Builder(builder: (context) {
                     final total =
                         volume.select((v) => v['size']?['total'] ?? '0');
                     final used =
                         volume.select((v) => v['size']?['used'] ?? '0');
                     return Text(
-                      "可用：${(int.parse(total.value) - int.parse(used.value)).formatSize()}",
+                      "可用：${(int.parse(total.watch(context)) - int.parse(used.watch(context))).formatSize()}",
                     );
                   }),
                   const SizedBox(
                     height: 5,
                   ),
                   Text(
-                      "容量：${int.parse(volume.select((v) => v['size']?['total'] ?? '0').value).formatSize()}"),
+                      "容量：${int.parse(volume.select((v) => v['size']?['total'] ?? '0').watch(context)).formatSize()}"),
                 ],
               ),
             )
@@ -1221,28 +1259,28 @@ class _DashboardStorageSsdCacheItem extends StatelessWidget {
                       const SizedBox(
                         width: 5,
                       ),
-                      Watch((context) {
+                      Builder(builder: (context) {
                         final status = ssd.select((v) => v['status']);
-                        return status.value == "normal"
+                        return status.watch(context) == "normal"
                             ? const Label(
                                 "正常",
                                 Colors.green,
                                 fill: true,
                               )
-                            : status.value == "background"
+                            : status.watch(context) == "background"
                                 ? const Label(
                                     "正在检查硬盘",
                                     Colors.lightBlueAccent,
                                     fill: true,
                                   )
-                                : status.value == "attention"
+                                : status.watch(context) == "attention"
                                     ? const Label(
                                         "注意",
                                         Colors.orangeAccent,
                                         fill: true,
                                       )
                                     : Label(
-                                        status.value,
+                                        status.watch(context),
                                         Colors.red,
                                         fill: true,
                                       );
@@ -1284,24 +1322,34 @@ class _DashboardStorageSsdCacheItem extends StatelessWidget {
   }
 }
 
-class DashboardFileChangeLogCard extends HookWidget {
-  final fileChangeLogs = listSignal([]);
-  final error = signal('');
-  DashboardFileChangeLogCard({super.key});
+class DashboardFileChangeLogCard extends StatefulWidget {
+  const DashboardFileChangeLogCard({super.key});
+
+  @override
+  State<StatefulWidget> createState() => DashboardFileChangeLogCardState();
+}
+
+class DashboardFileChangeLogCardState extends State<DashboardFileChangeLogCard>
+    with SignalsMixin {
+  late final fileChangeLogs = createListSignal([]);
+  late final error = createSignal('');
+
+  @override
+  initState() {
+    super.initState();
+    _fetchData();
+  }
+
+  _fetchData() {
+    dsmCoreSyslogClientLogList()
+        .then((res) => {fileChangeLogs.value = res['items']})
+        .catchError((e) {
+      error.value = e.toString();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    useEffect(() {
-      dsmCoreSyslogClientLogList()
-          .then((res) => {fileChangeLogs.value = res['items']})
-          .catchError((e) {
-        error.value = e.toString();
-      });
-      return () {
-        fileChangeLogs.dispose();
-        error.dispose();
-      };
-    }, []);
     return Card(
       shape: RoundedRectangleBorder(
           side: const BorderSide(), borderRadius: BorderRadius.circular(18)),
@@ -1337,8 +1385,8 @@ class DashboardFileChangeLogCard extends HookWidget {
             const SizedBox(
               height: 10,
             ),
-            Watch((context) {
-              if (fileChangeLogs.isEmpty) {
+            Builder(builder: (context) {
+              if (fileChangeLogs.watch(context).isEmpty) {
                 return Text(error.isNotEmpty ? error.value : '暂无文件更新日志');
               }
               if (context.isCardItemCollapsed('FileChangeLog')) {
@@ -1415,7 +1463,7 @@ extension CardItemCollapsed on BuildContext {
     if (!mounted) return false;
     return settingsStore.dashboardCardCollapseState
             .select((v) => v[item])
-            .watch(this) ==
+            .watch(this, debugLabel: "$item - CardItemCollapsed") ==
         true;
   }
 }
@@ -1426,25 +1474,16 @@ class _CardItemCollapse extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Watch((context) {
-      return IconButton(
-          onPressed: () {
-            if (!context.mounted) {
-              Log.debug("context is not mounted");
-              return;
-            }
-            final prevState =
-                settingsStore.dashboardCardCollapseState[item] == true;
-            settingsStore
-                .setDashboardCardCollapseState(item: (item, !prevState));
-          },
-          icon: Icon(settingsStore.dashboardCardCollapseState
-                      .select((v) => v[item])
-                      .value ==
-                  true
-              ? Icons.unfold_less
-              : Icons.unfold_more));
-    });
+    return IconButton(
+        onPressed: () {
+          batch(() => settingsStore.toggleCardItemCollapse(item));
+        },
+        icon: Icon(settingsStore.dashboardCardCollapseState
+                    .select((v) => v[item])
+                    .watch(context) ==
+                true
+            ? Icons.unfold_less
+            : Icons.unfold_more));
   }
 }
 

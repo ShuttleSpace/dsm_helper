@@ -1,7 +1,6 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:garden/constants/app_constants.dart';
 import 'package:garden/extensions/context.dart';
 import 'package:garden/extensions/int.dart';
@@ -171,11 +170,11 @@ class PerformanceNetowrkWidget extends StatelessWidget {
               Icons.upload_sharp,
               color: context.uploadColor,
             ),
-            Watch((context) {
+            Builder(builder: (context) {
               final tx = monitoredResources
                   .select((v) => v['network']?[0]?['tx'] ?? 0);
               return Text(
-                "${tx.value.formatSize()}/S",
+                "${(tx.watch(context) as int).formatSize()}/S",
                 style: TextStyle(color: context.uploadColor),
               );
             }),
@@ -186,11 +185,11 @@ class PerformanceNetowrkWidget extends StatelessWidget {
               Icons.download_sharp,
               color: context.downloadColor,
             ),
-            Watch((context) {
+            Builder(builder: (context) {
               final rx = monitoredResources
                   .select((v) => v['network']?[0]?['rx'] ?? 0);
               return Text(
-                "${rx.value.formatSize()}/S",
+                "${(rx.watch(context) as int).formatSize()}/S",
                 style: TextStyle(color: context.downloadColor),
               );
             })
@@ -222,7 +221,7 @@ class PerformanceRamWidget extends StatelessWidget {
         child: Row(children: [
           const SizedBox(width: 60, child: Text("RAM：")),
           Expanded(
-            child: Watch((context) {
+            child: Builder(builder: (context) {
               final realUsage = monitoredResources
                   .select((v) => v['memory']?['real_usage'] ?? 0);
               return FAProgressBar(
@@ -232,7 +231,7 @@ class PerformanceRamWidget extends StatelessWidget {
                 progressColor: context.infoColor,
                 displayTextStyle: TextStyle(
                     color: AppTheme.of(context).progressColor, fontSize: 12),
-                currentValue: realUsage.value,
+                currentValue: realUsage.watch(context),
                 displayText: '%',
               );
             }),

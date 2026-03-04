@@ -172,18 +172,18 @@ class DashboardState extends State<Dashboard> with SignalsMixin {
               sessionHostname: sessionHostname),
         if (sdsWidgetModuleList
             .contains('SYNO.SDS.SystemInfoApp.ConnectionLogWidget'))
-          DashboardConnectionLogCard(),
+          const DashboardConnectionLogCard(),
         if (sdsWidgetModuleList
             .contains('SYNO.SDS.SystemInfoApp.TaskSchedulerWidget'))
-          DashboardTaskSchedulerCard(),
+          const DashboardTaskSchedulerCard(),
         if (sdsWidgetModuleList
             .contains('SYNO.SDS.SystemInfoApp.RecentLogWidget'))
-          DashboardRecentLogCard(),
+          const DashboardRecentLogCard(),
         if (sdsWidgetModuleList.contains('SYNO.SDS.ResourceMonitor.Widget'))
-          DashboardResourceMonitorCard(),
+          const DashboardResourceMonitorCard(),
         if (sdsWidgetModuleList
             .contains('SYNO.SDS.SystemInfoApp.FileChangeLogWidget'))
-          DashboardFileChangeLogCard(),
+          const DashboardFileChangeLogCard(),
         if (sdsWidgetModuleList
             .contains('SYNO.SDS.SystemInfoApp.StorageUsageWidget'))
           DashboardStorageUsageCard(
