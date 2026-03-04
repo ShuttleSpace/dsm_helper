@@ -13,18 +13,15 @@ extension UpdateAtListSignal<T> on ListSignal<T> {
 }
 
 extension UpdateAtSetSignal<T> on SetSignal<T> {
-  update1(T oldValue, T Function(T oldValue) onUpdate) {
-    value.remove(oldValue);
-    value.add(onUpdate(oldValue));
+  update1(T oldValue, T Function() onUpdate) {
+    final ov = this;
+    value = {...ov, onUpdate()};
   }
 }
 
 extension UpdateAtMapSignal<K, V> on MapSignal<K, V> {
-  update1(K key, V Function(V? oldValue) onUpdate) {
-    final v = this[key];
-    if (v == null) {
-      Log.debug('UpdateAtSignal: $key not found in map');
-    }
-    value[key] = onUpdate(v);
+  update1(K key, V Function(V?) onUpdate) {
+    final ov = this;
+    value = {...ov, key: onUpdate(ov[key])};
   }
 }
