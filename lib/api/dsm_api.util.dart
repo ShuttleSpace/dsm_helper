@@ -83,13 +83,13 @@ final _dio = Dio(BaseOptions(
   ))
   ..interceptors.add(CookieManager(_cookieJar))
   ..interceptors.add(LogInterceptor(
-      request: true,
-      requestUrl: true,
-      requestBody: true,
-      requestHeader: true,
-      responseUrl: true,
+      request: false,
+      requestUrl: false,
+      requestBody: false,
+      requestHeader: false,
+      responseUrl: false,
       responseBody: false,
-      responseHeader: true))
+      responseHeader: false))
   ..options.followRedirects = false
   ..options.validateStatus =
       (status) => (status != null && status >= 200 && status < 400);
@@ -114,10 +114,10 @@ Future<dynamic> _httpRequest(
   // TODO: retry
   try {
     _dio._createHttpClient(
-        callback: (cert, host, port) {
-          return !(checkSsl ?? connectionStore.checkSsl.value);
-        },
-        proxy: 'PROXY 192.168.8.77:8899; PROXY 127.0.0.1:8899; DIRECT');
+      callback: (cert, host, port) {
+        return !(checkSsl ?? connectionStore.checkSsl.value);
+      }, /*  proxy: 'PROXY 192.168.8.77:8899; PROXY 127.0.0.1:8899; DIRECT' */
+    );
     response = await _dio.request(endpoint,
         data: data,
         queryParameters: queryParameters,
