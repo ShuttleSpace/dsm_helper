@@ -1,3 +1,5 @@
+import 'package:garden/stores/connection_store.dart';
+
 /// 应用常量
 ///
 /// 统一管理应用中使用的各种常量
@@ -247,4 +249,7 @@ class AppConstants {
 
   /// 最大支持的 DSM 版本
   static const int maxDsmVersion = 7;
+
+  static final String wallpaper =
+      "${connectionStore.baseUri}/webapi/entry.cgi?api=SYNO.Core.PersonalSettings&method=wallpaper&version=1&path=%22%22&retina=true&_sid=${connectionStore.sid}";
 }
