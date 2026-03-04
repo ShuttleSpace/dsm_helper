@@ -354,15 +354,14 @@ Page resource error:
             future: _webviewController.canGoForward(),
             builder: (context, shot) {
               bool canGoForward = shot.data ?? false;
-              return OutlinedButton(
-                style: context.stadiumButtonStyle,
+              return IconButton(
                 onPressed: canGoForward
                     ? () async {
                         await _webviewController.goForward();
                         setState(() {});
                       }
                     : null,
-                child: Icon(
+                icon: Icon(
                   Icons.arrow_forward_ios,
                   size: 22,
                   color: canGoForward ? Colors.black : Colors.grey,
