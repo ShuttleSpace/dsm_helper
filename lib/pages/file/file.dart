@@ -2273,8 +2273,9 @@ class FilesState extends State<Files> {
                                 children: [
                                   if (!file['isdir'])
                                     TextSpan(
-                                        text: (int.parse(
-                                                file['additional']['size']))
+                                        text: (int.parse(file['additional']
+                                                    ?['size'] ??
+                                                0))
                                             .formatSize()),
                                   if (file['additional'] != null &&
                                       file['additional']['time'] != null &&

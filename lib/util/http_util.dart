@@ -19,6 +19,30 @@ export 'package:garden/util/api.dart';
 
 export 'file_types.dart';
 
+final _httpClient = HttpClient();
+
+extension DioExtension on Dio {
+  /// proxy  "PROXY host:port; PROXY host2:port2; DIRECT"
+  /// browser PAC (proxy auto-config) scripts.
+  _createHttpClient({BadCertificateCallback? callback, String? proxy}) {
+    if (httpClientAdapter is IOHttpClientAdapter) {
+      (httpClientAdapter as IOHttpClientAdapter).createHttpClient = () {
+        if (callback != null) {
+          _httpClient.badCertificateCallback = callback;
+        }
+        if (proxy != null) {
+          _httpClient.findProxy = (uri) {
+            return proxy;
+          };
+        }
+        return _httpClient;
+      };
+    } else {
+      Log.warn(
+          "DioExtension.badCertificateCallback: httpClientAdapter is not IOHttpClientAdapter");
+    }
+  }
+}
 // FileTypeEnum 和 UploadStatus 已移至 file_types.dart
 
 /// HTTP 请求工具类
@@ -55,16 +79,11 @@ class HttpUtil {
         connectTimeout: Duration(seconds: timeout),
       ),
     );
-    //忽略Https校验
-    // TODO: support proxy
-    if (!(checkSsl ?? connectionStore.checkSsl.value)) {
-      (dio.httpClientAdapter as IOHttpClientAdapter).createHttpClient = () {
-        return HttpClient()
-          ..badCertificateCallback = (cert, host, port) {
-            return true;
-          };
-      };
-    }
+    dio._createHttpClient(
+        callback: (cert, host, port) {
+          return !(checkSsl ?? connectionStore.checkSsl.value);
+        },
+        proxy: 'PROXY 192.168.1.73:8899; PROXY 127.0.0.1:8899; DIRECT');
 
     Response response;
     try {
@@ -170,14 +189,11 @@ class HttpUtil {
       responseHeader: false,
       logPrint: Log.debug,
     ));
-    if (!(checkSsl ?? connectionStore.checkSsl.value)) {
-      (dio.httpClientAdapter as IOHttpClientAdapter).createHttpClient = () {
-        return HttpClient()
-          ..badCertificateCallback = (cert, host, port) {
-            return true;
-          };
-      };
-    }
+    dio._createHttpClient(
+        callback: (cert, host, port) {
+          return !(checkSsl ?? connectionStore.checkSsl.value);
+        },
+        proxy: 'PROXY 192.168.1.73:8899; PROXY 127.0.0.1:8899; DIRECT');
     Response response;
     try {
       Log.debug(
@@ -223,15 +239,11 @@ class HttpUtil {
       ),
     );
     // TODO: support proxy
-    //忽略Https校验
-    if (!connectionStore.checkSsl.value) {
-      (dio.httpClientAdapter as IOHttpClientAdapter).createHttpClient = () {
-        return HttpClient()
-          ..badCertificateCallback = (cert, host, port) {
-            return true;
-          };
-      };
-    }
+    dio._createHttpClient(
+        callback: (cert, host, port) {
+          return !(connectionStore.checkSsl.value);
+        },
+        proxy: 'PROXY 192.168.1.73:8899; PROXY 127.0.0.1:8899; DIRECT');
     FormData formData = FormData.fromMap(data);
     Response response;
     try {
@@ -268,6 +280,11 @@ class HttpUtil {
     Response response;
 
     try {
+      dio._createHttpClient(
+          callback: (cert, host, port) {
+            return !(connectionStore.checkSsl.value);
+          },
+          proxy: 'PROXY 192.168.1.73:8899; PROXY 127.0.0.1:8899; DIRECT');
       response = await dio.download(
           url, tempPath + Platform.pathSeparator + saveName,
           deleteOnError: true,

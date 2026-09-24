@@ -4,38 +4,42 @@ import 'package:garden/util/api.dart';
 /// minVersion : 1
 /// path : "auth.cgi"
 
-class ApiModel {
-  ApiModel({
+class SynoApiInfo {
+  SynoApiInfo({
     this.maxVersion,
     this.minVersion,
     this.path,
+    this.requestFormat,
   });
-  static Future<Map<String, ApiModel>> fetch() async {
-    Map<String, ApiModel> apis = {};
+  static Future<Map<String, SynoApiInfo>> fetch() async {
+    Map<String, SynoApiInfo> apis = {};
     Map? res = await DsmApi.api();
     if (res?['success']) {
       res?['data'].forEach((key, value) {
-        apis[key] = ApiModel.fromJson(value);
+        apis[key] = SynoApiInfo.fromJson(value);
       });
     }
 
     return apis;
   }
 
-  ApiModel.fromJson(dynamic json) {
+  SynoApiInfo.fromJson(dynamic json) {
     maxVersion = json['maxVersion'];
     minVersion = json['minVersion'];
     path = json['path'];
+    requestFormat = json['requestFormat'];
   }
   num? maxVersion;
   num? minVersion;
   String? path;
+  String? requestFormat;
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
     map['maxVersion'] = maxVersion;
     map['minVersion'] = minVersion;
     map['path'] = path;
+    map['requestFormat'] = requestFormat;
     return map;
   }
 }

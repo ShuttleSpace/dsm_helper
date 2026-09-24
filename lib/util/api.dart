@@ -13,7 +13,7 @@ import 'package:http_parser/http_parser.dart';
 import 'http_util.dart';
 
 class DsmApi {
-  static Map<String, ApiModel> apiList = {};
+  static Map<String, SynoApiInfo> apiList = {};
   static Future<Map?> api() async {
     var res = await HttpUtil.instance.post("query.cgi", data: {
       "query": "all",

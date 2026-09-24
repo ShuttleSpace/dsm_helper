@@ -98,7 +98,7 @@ class DashboardState extends State<Dashboard> {
     // getGroups();
     networks = List.generate(20, (i) => {"tx": 0, "rx": 0});
     getNotifyStrings();
-    ApiModel.fetch().then((apis) {
+    SynoApiInfo.fetch().then((apis) {
       DsmApi.apiList = apis;
     });
     getInfo().then((_) {
