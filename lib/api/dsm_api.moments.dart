@@ -16,7 +16,7 @@ Future<Map> dsmMomentsTimeline(
     data['type'] = type;
   }
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmFotoBrowseItemList: $res");
+//Log.info("dsmFotoBrowseItemList: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -69,7 +69,7 @@ Future<Map> dsmMomentsPhotots(
     data['offset'] = offset;
   }
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmMomentsPhotots: $res");
+//Log.info("dsmMomentsPhotots: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -108,7 +108,7 @@ Future<Map> dsmMomentsAlbum(
     data['shared'] = shared;
   }
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmMomentsPhotots: $res");
+//Log.info("dsmMomentsPhotots: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -131,7 +131,7 @@ Future<Map> dsmMomentsGeocodingList(
     data['type'] = type;
   }
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmFotoBrowseItemList: $res");
+//Log.info("dsmFotoBrowseItemList: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }

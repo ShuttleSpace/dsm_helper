@@ -1,6 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:garden/extensions/context.dart';
 import 'package:garden/widgets/neu_button.dart';
 
 /// 通用操作对话框组件
@@ -113,7 +112,12 @@ class ActionDialog extends StatelessWidget {
     return Material(
       color: Colors.transparent,
       child: Card(
-        shape: context.stadiumShapeBorder,
+        shape: RoundedRectangleBorder(
+          side: BorderSide(
+            color: theme.colorScheme.onSurface.withValues(alpha: .1),
+          ),
+          borderRadius: BorderRadius.circular(18),
+        ),
         color: theme.colorScheme.surface,
         child: SafeArea(
           top: false,

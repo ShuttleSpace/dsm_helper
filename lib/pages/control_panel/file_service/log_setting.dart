@@ -5,6 +5,7 @@ import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:garden/constants/app_constants.dart';
+import 'package:garden/theme/app_colors.dart';
 import 'package:flutter_vibrate/flutter_vibrate.dart';
 
 class LogSetting extends StatefulWidget {
@@ -81,10 +82,9 @@ class LogSettingState extends State<LogSetting> {
                                 ),
                                 const Spacer(),
                                 if (setting['create'] == "1")
-                                  Icon(
+                                  const Icon(
                                     CupertinoIcons.checkmark_alt,
-                                    color:
-                                        Theme.of(context).colorScheme.primary,
+                                    color: AppColors.primaryAction,
                                   ),
                               ],
                             ),
@@ -116,10 +116,9 @@ class LogSettingState extends State<LogSetting> {
                                 ),
                                 const Spacer(),
                                 if (setting['write'] == "1")
-                                  Icon(
+                                  const Icon(
                                     CupertinoIcons.checkmark_alt,
-                                    color:
-                                        Theme.of(context).colorScheme.primary,
+                                    color: AppColors.primaryAction,
                                   ),
                               ],
                             ),
@@ -151,10 +150,9 @@ class LogSettingState extends State<LogSetting> {
                                 ),
                                 const Spacer(),
                                 if (setting['move'] == "1")
-                                  Icon(
+                                  const Icon(
                                     CupertinoIcons.checkmark_alt,
-                                    color:
-                                        Theme.of(context).colorScheme.primary,
+                                    color: AppColors.primaryAction,
                                   ),
                               ],
                             ),
@@ -186,10 +184,9 @@ class LogSettingState extends State<LogSetting> {
                                 ),
                                 const Spacer(),
                                 if (setting['delete'] == "1")
-                                  Icon(
+                                  const Icon(
                                     CupertinoIcons.checkmark_alt,
-                                    color:
-                                        Theme.of(context).colorScheme.primary,
+                                    color: AppColors.primaryAction,
                                   ),
                               ],
                             ),
@@ -221,10 +218,9 @@ class LogSettingState extends State<LogSetting> {
                                 ),
                                 const Spacer(),
                                 if (setting['read'] == "1")
-                                  Icon(
+                                  const Icon(
                                     CupertinoIcons.checkmark_alt,
-                                    color:
-                                        Theme.of(context).colorScheme.primary,
+                                    color: AppColors.primaryAction,
                                   ),
                               ],
                             ),
@@ -256,10 +252,9 @@ class LogSettingState extends State<LogSetting> {
                                 ),
                                 const Spacer(),
                                 if (setting['rename'] == "1")
-                                  Icon(
+                                  const Icon(
                                     CupertinoIcons.checkmark_alt,
-                                    color:
-                                        Theme.of(context).colorScheme.primary,
+                                    color: AppColors.primaryAction,
                                   ),
                               ],
                             ),

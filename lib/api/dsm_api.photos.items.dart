@@ -72,7 +72,7 @@ Future<Map> dsmFotoBrowseItemList(
   }
   final res = await _httpGet(_fotoEntryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmFotoBrowseItemList: $res");
+//Log.info("dsmFotoBrowseItemList: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }

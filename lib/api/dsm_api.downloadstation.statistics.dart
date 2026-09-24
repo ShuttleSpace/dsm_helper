@@ -28,7 +28,7 @@ Future<Map> dsmDownloadStationStatisticGetinfo(
       api: 'SYNO.DownloadStation.Statistic', method: 'getinfo', version: 1);
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmDownloadStationStatisticGetinfo: $res");
+//Log.info("dsmDownloadStationStatisticGetinfo: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }

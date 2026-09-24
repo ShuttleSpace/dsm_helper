@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:garden/api/dsm_api.dart';
 import 'package:garden/util/log.dart';
 import 'package:garden/util/ui_util.dart';
 
@@ -61,12 +60,11 @@ class SmartState extends State<Smart> with SingleTickerProviderStateMixin {
     if (timer != null) {
       return;
     }
-    var res = await dsmCoreStorageDiskDoSmartTest(
-        device: widget.disk['device'], type: type);
+    var res = await DsmApi.doSmartTest(widget.disk['device'], type);
     if (res['success']) {
       getSmartLog();
       timer = Timer.periodic(const Duration(seconds: 4), (timer) {
-        // getSmartLog();
+        getSmartLog();
       });
     } else {
       UiUtil.toast("执行检测失败，代码${res['error']['code']}");
@@ -77,8 +75,7 @@ class SmartState extends State<Smart> with SingleTickerProviderStateMixin {
   }
 
   getLog() async {
-    var res =
-        await dsmCoreStorageDiskDiskTestLogGet(device: widget.disk['device']);
+    var res = await DsmApi.diskTestLog(widget.disk['device']);
     if (res['success']) {
       setState(() {
         logLoading = false;
@@ -88,7 +85,7 @@ class SmartState extends State<Smart> with SingleTickerProviderStateMixin {
   }
 
   getData() async {
-    var res = await dsmStorageCGISmartGetHealthInfo(widget.disk['device']);
+    var res = await DsmApi.smart(widget.disk['device']);
     if (res['success']) {
       setState(() {
         loading = false;
@@ -102,8 +99,7 @@ class SmartState extends State<Smart> with SingleTickerProviderStateMixin {
   }
 
   getSmartLog() async {
-    var res =
-        await dsmCoreStorageDiskGetSmartTestLog(device: widget.disk['device']);
+    var res = await DsmApi.smartTestLog(widget.disk['device']);
     Log.info(res);
     if (res['success']) {
       setState(() {

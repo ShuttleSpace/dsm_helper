@@ -45,7 +45,7 @@ Future<Map> dsmCoreUserList(
   }
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmCoreUserList: $res");
+//Log.info("dsmCoreUserList: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -76,7 +76,7 @@ Future<Map> dsmCoreUserGet(String name, // Username
   }
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmCoreUserGet: $res");
+//Log.info("dsmCoreUserGet: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -111,7 +111,7 @@ Future<Map> dsmCoreUserCreate(
     data['groups'] = groups;
   }
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmCoreUserCreate: $res");
+//Log.info("dsmCoreUserCreate: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -147,7 +147,7 @@ Future<Map> dsmCoreUserSet(String name, // Username
   //   data['groups'] = groups;
   // }
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmCoreUserSet: $res");
+//Log.info("dsmCoreUserSet: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -164,7 +164,7 @@ Future<Map> dsmCoreUserDelete(
       _dsmApiRequestData(api: 'SYNO.Core.User', method: 'delete', version: 1);
   data['name'] = name;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmCoreUserDelete: $res");
+//Log.info("dsmCoreUserDelete: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -185,7 +185,7 @@ Future<Map> dsmCoreUserPasswordPolicy({CancelToken? cancelToken}) async {
       api: 'SYNO.Core.User.PasswordPolicy', method: 'get', version: 1);
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmCoreUserPasswordPolicy: $res");
+//Log.info("dsmCoreUserPasswordPolicy: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -205,7 +205,7 @@ Future<Map> dsmCoreUserPasswordExpiry({CancelToken? cancelToken}) async {
       api: 'SYNO.Core.User.PasswordExpiry', method: 'get', version: 1);
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmCoreUserPasswordPolicy: $res");
+//Log.info("dsmCoreUserPasswordPolicy: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }

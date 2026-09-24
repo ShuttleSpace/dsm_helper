@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:garden/extensions/context.dart';
 import 'package:garden/util/log.dart';
 import 'package:garden/util/ui_util.dart';
 import 'package:garden/stores/connection_store.dart';
@@ -378,9 +379,7 @@ class PackageDetailState extends State<PackageDetail> {
                 if (widget.package['snapshot'] != null &&
                     widget.package['snapshot'].length > 0)
                   Card(
-                    shape: StadiumBorder(
-                        side: BorderSide(
-                            color: Theme.of(context).colorScheme.primary)),
+                    shape: context.roundRectShapeBorder,
                     margin: const EdgeInsets.only(top: 20),
                     child: Padding(
                       padding: const EdgeInsets.all(10),
@@ -434,9 +433,7 @@ class PackageDetailState extends State<PackageDetail> {
                 ),
                 if (widget.package['changelog'] != "")
                   Card(
-                    shape: StadiumBorder(
-                        side: BorderSide(
-                            color: Theme.of(context).colorScheme.primary)),
+                    shape: context.roundRectShapeBorder,
                     margin: const EdgeInsets.only(top: 20),
                     child: Padding(
                       padding: const EdgeInsets.all(20),

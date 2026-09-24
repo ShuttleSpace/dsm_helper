@@ -19,7 +19,7 @@ Future<Map> dsmDockerVolumeList({CancelToken? cancelToken}) async {
       _dsmApiRequestData(api: 'SYNO.Docker.Volume', method: 'list', version: 1);
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmDockerVolumeList: $res");
+//Log.info("dsmDockerVolumeList: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -40,7 +40,7 @@ Future<Map> dsmDockerVolumeCreate(String name, // Volume name
   data['name'] = name;
   if (driver != null && driver.isNotEmpty) data['driver'] = driver;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmDockerVolumeCreate: $res");
+//Log.info("dsmDockerVolumeCreate: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -58,7 +58,7 @@ Future<Map> dsmDockerVolumeDelete(String name, // Volume name
   data['name'] = name;
   if (force != null) data['force'] = force;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmDockerVolumeDelete: $res");
+//Log.info("dsmDockerVolumeDelete: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }

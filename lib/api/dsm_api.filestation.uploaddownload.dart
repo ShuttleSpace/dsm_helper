@@ -22,7 +22,7 @@ Future<Map> dsmFileStationUpload(
   if (crtime != null) data['crtime'] = crtime;
   if (atime != null) data['atime'] = atime;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmFileStationUpload: $res");
+//Log.info("dsmFileStationUpload: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -42,7 +42,7 @@ Future<dynamic> dsmFileStationDownload(
   if (mode != null) data['mode'] = mode;
   final res = await _httpDownload(_entryCGI,
       savePath: destPath, queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmFileStationDownload: $res");
+//Log.info("dsmFileStationDownload: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }

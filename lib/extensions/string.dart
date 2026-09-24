@@ -73,7 +73,9 @@ int versionCompare(String v1, String v2) {
     buildNumber2 = version2[1];
   }
   // 对比 build
-  return int.parse(buildNumber1).compareTo(int.parse(buildNumber2));
+  int b1 = int.tryParse(buildNumber1) ?? 0;
+  int b2 = int.tryParse(buildNumber2) ?? 0;
+  return b1.compareTo(b2);
 }
 
 /// 解析运行时间

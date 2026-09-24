@@ -40,7 +40,7 @@ Future<Map> dsmCoreShareSnapshotList(String shareName, // Shared folder name
   if (limit != null) data['limit'] = limit;
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmCoreShareSnapshotList: $res");
+//Log.info("dsmCoreShareSnapshotList: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -65,7 +65,7 @@ Future<Map> dsmCoreShareSnapshotCreate(String shareName, // Shared folder name
   }
   if (isLocked != null) data['is_locked'] = isLocked;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmCoreShareSnapshotCreate: $res");
+//Log.info("dsmCoreShareSnapshotCreate: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -84,7 +84,7 @@ Future<Map> dsmCoreShareSnapshotDelete(
   data['share_name'] = shareName;
   data['snapshot_ids'] = snapshotIds;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmCoreShareSnapshotDelete: $res");
+//Log.info("dsmCoreShareSnapshotDelete: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -109,7 +109,7 @@ Future<Map> dsmCoreShareSnapshotSetAttr(
   }
   if (isLocked != null) data['is_locked'] = isLocked;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmCoreShareSnapshotSetAttr: $res");
+//Log.info("dsmCoreShareSnapshotSetAttr: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }

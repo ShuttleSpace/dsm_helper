@@ -34,7 +34,7 @@ Future<Map> dsmFotoBrowseFolderList(
   }
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmFotoBrowseFolderList: $res");
+//Log.info("dsmFotoBrowseFolderList: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -63,7 +63,7 @@ Future<Map> dsmFotoBrowseFolderGet(int id, // Folder ID
   }
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmFotoBrowseFolderGet: $res");
+//Log.info("dsmFotoBrowseFolderGet: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -83,7 +83,7 @@ Future<Map> dsmFotoBrowseFolderCount(int folderId, // Parent folder ID
   data['folder_id'] = folderId;
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmFotoBrowseFolderCount: $res");
+//Log.info("dsmFotoBrowseFolderCount: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -126,7 +126,7 @@ Future<Map> dsmFotoTeamBrowseFolderList(
   }
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmFotoTeamBrowseFolderList: $res");
+//Log.info("dsmFotoTeamBrowseFolderList: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }

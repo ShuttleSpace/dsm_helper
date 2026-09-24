@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:garden/constants/app_constants.dart';
-import 'package:garden/extensions/context.dart';
 
 /// 套件操作按钮组件
 class PackageButton extends StatelessWidget {
@@ -28,7 +27,8 @@ class PackageButton extends StatelessWidget {
 
     if (package['can_update'] == null || package['installed'] == null) {
       button = Card(
-        shape: context.stadiumShapeBorder,
+        shape: RoundedRectangleBorder(
+            side: const BorderSide(), borderRadius: BorderRadius.circular(18)),
         child: const Text("获取中"),
       );
     } else if (package['can_update']) {
@@ -96,16 +96,16 @@ class PackageButton extends StatelessWidget {
                   children: <Widget>[
                     const Text(
                       "停用套件",
-                      style:
-                          TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
+                      style: TextStyle(
+                          fontSize: 20, fontWeight: FontWeight.w500),
                     ),
                     const SizedBox(
                       height: 12,
                     ),
                     const Text(
                       "确认要停用此套件？",
-                      style:
-                          TextStyle(fontSize: 20, fontWeight: FontWeight.w400),
+                      style: TextStyle(
+                          fontSize: 20, fontWeight: FontWeight.w400),
                     ),
                     const SizedBox(
                       height: 22,
@@ -121,7 +121,8 @@ class PackageButton extends StatelessWidget {
                             child: const Text(
                               "停用",
                               style: TextStyle(
-                                  fontSize: 18, color: Colors.redAccent),
+                                  fontSize: 18,
+                                  color: Colors.redAccent),
                             ),
                           ),
                         ),

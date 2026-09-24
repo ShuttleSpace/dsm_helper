@@ -19,7 +19,7 @@ Future<Map> dsmFotoBrowseAlbum(
   if (extra != null) data.addAll(extra);
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmFotoBrowseAlbumList: $res");
+//Log.info("dsmFotoBrowseAlbumList: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -100,7 +100,7 @@ Future<Map> dsmFotoBrowseAlbumCreate(String name, // Album name
   data['name'] = name;
   if (condition != null && condition.isNotEmpty) data['condition'] = condition;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmFotoBrowseAlbumCreate: $res");
+//Log.info("dsmFotoBrowseAlbumCreate: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -117,7 +117,7 @@ Future<Map> dsmFotoBrowseAlbumDelete(
       api: 'SYNO.${_fotoApiName()}Browse.Album', method: 'delete', version: 1);
   data['id'] = id;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmFotoBrowseAlbumDelete: $res");
+//Log.info("dsmFotoBrowseAlbumDelete: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -149,7 +149,7 @@ Future<Map> dsmFotoSharingPassphraseCreate(String id, // Album or folder ID
   }
   if (expiration != null) data['expiration'] = expiration;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmFotoSharingPassphraseCreate: $res");
+//Log.info("dsmFotoSharingPassphraseCreate: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -178,7 +178,7 @@ Future<Map> dsmFotoBrowseTimeline({
   if (type != null) data['type'] = type;
 
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmFotoBrowseTimeline: $res");
+//Log.info("dsmFotoBrowseTimeline: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -219,7 +219,7 @@ Future<Map> dsmFotoBrowsePhotoList({
   if (albumId != null) data['album_id'] = albumId;
 
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmFotoBrowsePhotoList: $res");
+//Log.info("dsmFotoBrowsePhotoList: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -238,7 +238,7 @@ Future<Map> dsmFotoBrowseCategory({
   );
 
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmFotoBrowseCategory: $res");
+//Log.info("dsmFotoBrowseCategory: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -271,7 +271,7 @@ Future<Map> dsmFotoBrowseAlbumListMoments({
   data['sort_direction'] = sortDirection;
 
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmFotoBrowseAlbumListMoments: $res");
+//Log.info("dsmFotoBrowseAlbumListMoments: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -295,7 +295,7 @@ Future<Map> dsmFotoBrowseGeocoding({
   data['additional'] = '["thumbnail"]';
 
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmFotoBrowseGeocoding: $res");
+//Log.info("dsmFotoBrowseGeocoding: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -320,7 +320,7 @@ Future<Map> dsmFotoBrowseGeneral({
   data['additional'] = '["thumbnail"]';
 
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmFotoBrowseGeneral: $res");
+//Log.info("dsmFotoBrowseGeneral: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -347,7 +347,7 @@ Future<Map> dsmFotoBrowseTimelineLocation(
   data['end_time'] = end;
 
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmFotoBrowseTimelineLocation: $res");
+//Log.info("dsmFotoBrowseTimelineLocation: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -372,7 +372,7 @@ Future<Map> dsmFotoBrowseRecentlyAdded({
   data['additional'] = '["thumbnail"]';
 
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmFotoBrowseRecentlyAdded: $res");
+//Log.info("dsmFotoBrowseRecentlyAdded: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -395,7 +395,7 @@ Future<Map> dsmFotoBrowseRecentlyTimeline({
   data['timeline_group_unit'] = 'day';
 
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmFotoBrowseRecentlyTimeline: $res");
+//Log.info("dsmFotoBrowseRecentlyTimeline: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -432,7 +432,7 @@ Future<Map> dsmFotoBrowseRecentlyPhotos({
   if (albumId != null) data['album_id'] = albumId;
 
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmFotoBrowseRecentlyPhotos: $res");
+//Log.info("dsmFotoBrowseRecentlyPhotos: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -447,7 +447,7 @@ Future<Map> dsmFotoBackgroundTaskInfo(String method, // list_user_task
       method: method,
       version: 1);
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmFotoBackgroundTaskInfo: $res");
+//Log.info("dsmFotoBackgroundTaskInfo: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -469,7 +469,7 @@ Future<Map> dsmFotoBackgroundTaskFile(
       'folder_id': folderId,
     });
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmFotoBackgroundTaskFile: $res");
+//Log.info("dsmFotoBackgroundTaskFile: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }

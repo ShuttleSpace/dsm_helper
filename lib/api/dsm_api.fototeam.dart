@@ -4,7 +4,7 @@ Future<Map> dsmFotoTeamBackgroundTaskFile({CancelToken? cancelToken}) async {
   final data = _dsmApiRequestData(
       api: 'SYNO.FotoTeam.BackgroundTask.File', method: '', version: 1);
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.debug('dsmFotoTeamBackgroundTaskFile: $res');
+//Log.debug('dsmFotoTeamBackgroundTaskFile: $res');
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -15,7 +15,7 @@ Future<Map> dsmFotoTeamBrowseConcept({CancelToken? cancelToken}) async {
   final data = _dsmApiRequestData(
       api: 'SYNO.FotoTeam.Browse.Concept', method: '', version: 2);
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.debug('dsmFotoTeamBrowseConcept: $res');
+//Log.debug('dsmFotoTeamBrowseConcept: $res');
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -26,7 +26,7 @@ Future<Map> dsmFotoTeamBrowseDiff({CancelToken? cancelToken}) async {
   final data = _dsmApiRequestData(
       api: 'SYNO.FotoTeam.Browse.Diff', method: '', version: 6);
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.debug('dsmFotoTeamBrowseDiff: $res');
+//Log.debug('dsmFotoTeamBrowseDiff: $res');
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -37,7 +37,7 @@ Future<Map> dsmFotoTeamBrowseFolder({CancelToken? cancelToken}) async {
   final data = _dsmApiRequestData(
       api: 'SYNO.FotoTeam.Browse.Folder', method: '', version: 2);
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.debug('dsmFotoTeamBrowseFolder: $res');
+//Log.debug('dsmFotoTeamBrowseFolder: $res');
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -48,7 +48,7 @@ Future<Map> dsmFotoTeamBrowseGeneralTag({CancelToken? cancelToken}) async {
   final data = _dsmApiRequestData(
       api: 'SYNO.FotoTeam.Browse.GeneralTag', method: '', version: 1);
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.debug('dsmFotoTeamBrowseGeneralTag: $res');
+//Log.debug('dsmFotoTeamBrowseGeneralTag: $res');
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -59,7 +59,7 @@ Future<Map> dsmFotoTeamBrowseGeocoding({CancelToken? cancelToken}) async {
   final data = _dsmApiRequestData(
       api: 'SYNO.FotoTeam.Browse.Geocoding', method: '', version: 1);
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.debug('dsmFotoTeamBrowseGeocoding: $res');
+//Log.debug('dsmFotoTeamBrowseGeocoding: $res');
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -70,7 +70,7 @@ Future<Map> dsmFotoTeamBrowseItem({CancelToken? cancelToken}) async {
   final data = _dsmApiRequestData(
       api: 'SYNO.FotoTeam.Browse.Item', method: '', version: 6);
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.debug('dsmFotoTeamBrowseItem: $res');
+//Log.debug('dsmFotoTeamBrowseItem: $res');
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -81,7 +81,7 @@ Future<Map> dsmFotoTeamBrowsePerson({CancelToken? cancelToken}) async {
   final data = _dsmApiRequestData(
       api: 'SYNO.FotoTeam.Browse.Person', method: '', version: 3);
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.debug('dsmFotoTeamBrowsePerson: $res');
+//Log.debug('dsmFotoTeamBrowsePerson: $res');
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -92,7 +92,7 @@ Future<Map> dsmFotoTeamBrowseRecentlyAdded({CancelToken? cancelToken}) async {
   final data = _dsmApiRequestData(
       api: 'SYNO.FotoTeam.Browse.RecentlyAdded', method: '', version: 5);
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.debug('dsmFotoTeamBrowseRecentlyAdded: $res');
+//Log.debug('dsmFotoTeamBrowseRecentlyAdded: $res');
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -103,7 +103,7 @@ Future<Map> dsmFotoTeamBrowseSimilar({CancelToken? cancelToken}) async {
   final data = _dsmApiRequestData(
       api: 'SYNO.FotoTeam.Browse.Similar', method: '', version: 1);
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.debug('dsmFotoTeamBrowseSimilar: $res');
+//Log.debug('dsmFotoTeamBrowseSimilar: $res');
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -114,7 +114,7 @@ Future<Map> dsmFotoTeamBrowseSimilarItem({CancelToken? cancelToken}) async {
   final data = _dsmApiRequestData(
       api: 'SYNO.FotoTeam.Browse.SimilarItem', method: '', version: 1);
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.debug('dsmFotoTeamBrowseSimilarItem: $res');
+//Log.debug('dsmFotoTeamBrowseSimilarItem: $res');
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -125,7 +125,7 @@ Future<Map> dsmFotoTeamBrowseSimilarTimeline({CancelToken? cancelToken}) async {
   final data = _dsmApiRequestData(
       api: 'SYNO.FotoTeam.Browse.SimilarTimeline', method: '', version: 1);
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.debug('dsmFotoTeamBrowseSimilarTimeline: $res');
+//Log.debug('dsmFotoTeamBrowseSimilarTimeline: $res');
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -136,7 +136,7 @@ Future<Map> dsmFotoTeamBrowseTimeline({CancelToken? cancelToken}) async {
   final data = _dsmApiRequestData(
       api: 'SYNO.FotoTeam.Browse.Timeline', method: '', version: 1);
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.debug('dsmFotoTeamBrowseTimeline: $res');
+//Log.debug('dsmFotoTeamBrowseTimeline: $res');
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -147,7 +147,7 @@ Future<Map> dsmFotoTeamBrowseUnit({CancelToken? cancelToken}) async {
   final data = _dsmApiRequestData(
       api: 'SYNO.FotoTeam.Browse.Unit', method: '', version: 3);
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.debug('dsmFotoTeamBrowseUnit: $res');
+//Log.debug('dsmFotoTeamBrowseUnit: $res');
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -158,7 +158,7 @@ Future<Map> dsmFotoTeamDownload({CancelToken? cancelToken}) async {
   final data =
       _dsmApiRequestData(api: 'SYNO.FotoTeam.Download', method: '', version: 2);
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.debug('dsmFotoTeamDownload: $res');
+//Log.debug('dsmFotoTeamDownload: $res');
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -169,7 +169,7 @@ Future<Map> dsmFotoTeamIndex({CancelToken? cancelToken}) async {
   final data =
       _dsmApiRequestData(api: 'SYNO.FotoTeam.Index', method: '', version: 1);
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.debug('dsmFotoTeamIndex: $res');
+//Log.debug('dsmFotoTeamIndex: $res');
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -180,7 +180,7 @@ Future<Map> dsmFotoTeamRegeneratePreview({CancelToken? cancelToken}) async {
   final data = _dsmApiRequestData(
       api: 'SYNO.FotoTeam.RegeneratePreview', method: '', version: 1);
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.debug('dsmFotoTeamRegeneratePreview: $res');
+//Log.debug('dsmFotoTeamRegeneratePreview: $res');
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -191,7 +191,7 @@ Future<Map> dsmFotoTeamSearchFilter({CancelToken? cancelToken}) async {
   final data = _dsmApiRequestData(
       api: 'SYNO.FotoTeam.Search.Filter', method: '', version: 3);
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.debug('dsmFotoTeamSearchFilter $res');
+//Log.debug('dsmFotoTeamSearchFilter $res');
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -202,7 +202,7 @@ Future<Map> dsmFotoTeamSearchSearch({CancelToken? cancelToken}) async {
   final data = _dsmApiRequestData(
       api: 'SYNO.FotoTeam.Search.Search', method: '', version: 6);
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.debug('dsmFotoTeamSearchSearch $res');
+//Log.debug('dsmFotoTeamSearchSearch $res');
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -216,7 +216,7 @@ Future<Map> dsmFotoTeamSharingFolderBatchPermission(
       method: '',
       version: 1);
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.debug('dsmFotoTeamSharingFolderBatchPermission $res');
+//Log.debug('dsmFotoTeamSharingFolderBatchPermission $res');
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -228,7 +228,7 @@ Future<Map> dsmFotoTeamSharingFolderPermission(
   final data = _dsmApiRequestData(
       api: 'SYNO.FotoTeam.Sharing.FolderPermission', method: '', version: 1);
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.debug('dsmFotoTeamSharingFolderPermission $res');
+//Log.debug('dsmFotoTeamSharingFolderPermission $res');
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -239,7 +239,7 @@ Future<Map> dsmFotoTeamSharingPassphrase({CancelToken? cancelToken}) async {
   final data = _dsmApiRequestData(
       api: 'SYNO.FotoTeam.Sharing.Passphrase', method: '', version: 1);
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.debug('dsmFotoTeamSharingPassphrase $res');
+//Log.debug('dsmFotoTeamSharingPassphrase $res');
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -250,7 +250,7 @@ Future<Map> dsmFotoTeamStreaming({CancelToken? cancelToken}) async {
   final data = _dsmApiRequestData(
       api: 'SYNO.FotoTeam.Streaming', method: '', version: 2);
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.debug('dsmFotoTeamStreaming $res');
+//Log.debug('dsmFotoTeamStreaming $res');
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -261,7 +261,7 @@ Future<Map> dsmFotoTeamThumbnail({CancelToken? cancelToken}) async {
   final data = _dsmApiRequestData(
       api: 'SYNO.FotoTeam.Thumbnail', method: '', version: 2);
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.debug('dsmFotoTeamThumbnail $res');
+//Log.debug('dsmFotoTeamThumbnail $res');
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -272,7 +272,7 @@ Future<Map> dsmFotoTeamUploadConvertedFile({CancelToken? cancelToken}) async {
   final data = _dsmApiRequestData(
       api: 'SYNO.FotoTeam.Upload.ConvertedFile', method: '', version: 5);
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.debug('dsmFotoTeamUploadConvertedFile $res');
+//Log.debug('dsmFotoTeamUploadConvertedFile $res');
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -283,7 +283,7 @@ Future<Map> dsmFotoTeamUploadFace({CancelToken? cancelToken}) async {
   final data = _dsmApiRequestData(
       api: 'SYNO.FotoTeam.Upload.Face', method: '', version: 1);
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.debug('dsmFotoTeamUploadFace $res');
+//Log.debug('dsmFotoTeamUploadFace $res');
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -294,7 +294,7 @@ Future<Map> dsmFotoTeamUploadItem({CancelToken? cancelToken}) async {
   final data = _dsmApiRequestData(
       api: 'SYNO.FotoTeam.Upload.Item', method: '', version: 7);
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.debug('dsmFotoTeamUploadItem $res');
+//Log.debug('dsmFotoTeamUploadItem $res');
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }

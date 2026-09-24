@@ -14,7 +14,7 @@ Future<Map> dsmActiveBackupAEMActivityBackupStatus(
       version: 1);
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmActiveBackupAEMActivityBackupStatus: $res");
+//Log.info("dsmActiveBackupAEMActivityBackupStatus: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -29,7 +29,7 @@ Future<Map> dsmActiveBackupAEMActivityWriteVmmLog(String guestId, // Guest ID
       version: 1);
   data['guest_id'] = guestId;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmActiveBackupAEMActivityWriteVmmLog: $res");
+//Log.info("dsmActiveBackupAEMActivityWriteVmmLog: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -42,7 +42,7 @@ Future<Map> dsmActiveBackupAEMCheckKey(String key, // Key
       api: 'SYNO.ActiveBackup.AEM', method: 'check_key', version: 1);
   data['key'] = key;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmActiveBackupAEMCheckKey: $res");
+//Log.info("dsmActiveBackupAEMCheckKey: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -56,7 +56,7 @@ Future<Map> dsmActiveBackupAEMCheckLeaderAddress(
       api: 'SYNO.ActiveBackup.AEM', method: 'check_leader_address', version: 1);
   data['leader_addr'] = leaderAddr;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmActiveBackupAEMCheckLeaderAddress: $res");
+//Log.info("dsmActiveBackupAEMCheckLeaderAddress: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -69,7 +69,7 @@ Future<Map> dsmActiveBackupAEMEditConnection(String hostname, // Hostname
       api: 'SYNO.ActiveBackup.AEM', method: 'edit_connection', version: 1);
   data['hostname'] = hostname;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmActiveBackupAEMEditConnection: $res");
+//Log.info("dsmActiveBackupAEMEditConnection: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -81,7 +81,7 @@ Future<Map> dsmActiveBackupAEMGetInfo({CancelToken? cancelToken}) async {
       api: 'SYNO.ActiveBackup.AEM', method: 'get_info', version: 1);
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmActiveBackupAEMGetInfo: $res");
+//Log.info("dsmActiveBackupAEMGetInfo: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -95,7 +95,7 @@ Future<Map> dsmActiveBackupAEMNFSApplyState(
       api: 'SYNO.ActiveBackup.AEM.NFS', method: 'apply_state', version: 1);
   data['interfaces'] = interfaces;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmActiveBackupAEMNFSApplyState: $res");
+//Log.info("dsmActiveBackupAEMNFSApplyState: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -109,7 +109,7 @@ Future<Map> dsmActiveBackupAEMNFSCheckState(
       api: 'SYNO.ActiveBackup.AEM.NFS', method: 'check_state', version: 1);
   data['interfaces'] = interfaces;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmActiveBackupAEMNFSCheckState: $res");
+//Log.info("dsmActiveBackupAEMNFSCheckState: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -122,7 +122,7 @@ Future<Map> dsmActiveBackupAEMScriptDelete(String scriptId, // Script ID
       api: 'SYNO.ActiveBackup.AEM.Script', method: 'delete', version: 1);
   data['script_id'] = scriptId;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmActiveBackupAEMScriptDelete: $res");
+//Log.info("dsmActiveBackupAEMScriptDelete: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -138,7 +138,7 @@ Future<Map> dsmActiveBackupAEMScriptPrepareFileForJoin(
       version: 1);
   data['file_name'] = fileName;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmActiveBackupAEMScriptPrepareFileForJoin: $res");
+//Log.info("dsmActiveBackupAEMScriptPrepareFileForJoin: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -151,7 +151,7 @@ Future<Map> dsmActiveBackupAEMScriptUpdate(String scriptId, // Script ID
       api: 'SYNO.ActiveBackup.AEM.Script', method: 'update', version: 1);
   data['script_id'] = scriptId;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmActiveBackupAEMScriptUpdate: $res");
+//Log.info("dsmActiveBackupAEMScriptUpdate: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -166,7 +166,7 @@ Future<Map> dsmActiveBackupAEMTaskListAutoBackupRule(
       version: 1);
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmActiveBackupAEMTaskListAutoBackupRule: $res");
+//Log.info("dsmActiveBackupAEMTaskListAutoBackupRule: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -181,7 +181,7 @@ Future<Map> dsmActiveBackupAEMTaskListWithDevice(
       version: 1);
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmActiveBackupAEMTaskListWithDevice: $res");
+//Log.info("dsmActiveBackupAEMTaskListWithDevice: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -195,7 +195,7 @@ Future<Map> dsmActiveBackupAEMVersionList(String taskId, // Task ID
   data['task_id'] = taskId;
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmActiveBackupAEMVersionList: $res");
+//Log.info("dsmActiveBackupAEMVersionList: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }

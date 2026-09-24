@@ -13,7 +13,7 @@ Future<Map> dsmDownloadStationInfoGetinfo({CancelToken? cancelToken}) async {
       api: 'SYNO.DownloadStation.Info', method: 'getinfo', version: 2);
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmDownloadStationInfoGetinfo: $res");
+//Log.info("dsmDownloadStationInfoGetinfo: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -41,7 +41,7 @@ Future<Map> dsmDownloadStationInfoGetconfig({CancelToken? cancelToken}) async {
       api: 'SYNO.DownloadStation.Info', method: 'getconfig', version: 2);
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmDownloadStationInfoGetconfig: $res");
+//Log.info("dsmDownloadStationInfoGetconfig: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -84,7 +84,7 @@ Future<Map> dsmDownloadStationInfoSetconfig(
     data['emule_default_destination'] = emuleDefaultDestination;
   }
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmDownloadStationInfoSetconfig: $res");
+//Log.info("dsmDownloadStationInfoSetconfig: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -104,7 +104,7 @@ Future<Map> dsmDownloadStationScheduleGetconfig(
       api: 'SYNO.DownloadStation.Schedule', method: 'getconfig', version: 1);
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmDownloadStationScheduleGetconfig: $res");
+//Log.info("dsmDownloadStationScheduleGetconfig: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -123,7 +123,7 @@ Future<Map> dsmDownloadStationScheduleSetconfig(
   data['enabled'] = enabled;
   data['emule_enabled'] = emuleEnabled;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmDownloadStationScheduleSetconfig: $res");
+//Log.info("dsmDownloadStationScheduleSetconfig: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -137,7 +137,7 @@ Future<Map> dsmDownloadStation2SettingsLocationGet(
       method: 'get',
       version: 1);
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmDownloadStation2SettingsLocationGet: $res");
+//Log.info("dsmDownloadStation2SettingsLocationGet: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -150,7 +150,7 @@ Future<Map> dsmDownloadStation2TaskBTTrackerList(
       api: 'SYNO.DownloadStation2.Task.BT.Tracker', method: 'list', version: 2)
     ..addAll({'task_id': taskId});
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmDownloadStation2TaskBTTrackerList: $res");
+//Log.info("dsmDownloadStation2TaskBTTrackerList: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -165,7 +165,7 @@ Future<Map> dsmDownloadStation2TaskBTTrackerAdd(
       api: 'SYNO.DownloadStation2.Task.BT.Tracker', method: 'add', version: 2)
     ..addAll({'task_id': taskId, 'tracker': jsonEncode(tracker)});
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmDownloadStation2TaskBTTrackerAdd: $res");
+//Log.info("dsmDownloadStation2TaskBTTrackerAdd: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -178,7 +178,7 @@ Future<Map> dsmDownloadStation2TaskBTPeerList(
       api: 'SYNO.DownloadStation2.Task.BT.Peer', method: 'list', version: 2)
     ..addAll({'task_id': taskId});
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmDownloadStation2TaskBTPeerList: $res");
+//Log.info("dsmDownloadStation2TaskBTPeerList: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -204,7 +204,7 @@ Future<Map> dsmDownloadStation2TaskBTFileList(
       'query': query ?? ''
     });
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmDownloadStation2TaskBTFileList: $res");
+//Log.info("dsmDownloadStation2TaskBTFileList: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }

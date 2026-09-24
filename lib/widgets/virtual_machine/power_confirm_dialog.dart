@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:garden/constants/app_constants.dart';
-import 'package:garden/extensions/context.dart';
 
 class PowerConfirmDialog extends StatelessWidget {
   final String action;
@@ -17,7 +16,8 @@ class PowerConfirmDialog extends StatelessWidget {
     return Material(
       color: Colors.transparent,
       child: Card(
-        shape: context.stadiumShapeBorder,
+        shape: RoundedRectangleBorder(
+            side: const BorderSide(), borderRadius: BorderRadius.circular(18)),
         child: SafeArea(
           child: Padding(
             padding: const EdgeInsets.all(AppConstants.paddingSmall),

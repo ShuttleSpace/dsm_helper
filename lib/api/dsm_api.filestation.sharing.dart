@@ -27,7 +27,7 @@ Future<dynamic> dsmFileStationSharingGetinfo(String id, // Shared link ID
   data['id'] = id;
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmFileStationSharingGetinfo: $res");
+//Log.info("dsmFileStationSharingGetinfo: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -73,7 +73,7 @@ Future<dynamic> dsmFileStationSharingList(
   if (forceClean != null) data['force_clean'] = forceClean;
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmFileStationSharingList: $res");
+//Log.info("dsmFileStationSharingList: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -113,7 +113,7 @@ Future<dynamic> dsmFileStationSharingCreate(
   if (dateAvailable != null) data['date_available'] = dateAvailable;
   if (expireTimes != null) data['expire_times'] = expireTimes;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmFileStationSharingCreate: $res");
+//Log.info("dsmFileStationSharingCreate: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -130,7 +130,7 @@ Future<dynamic> dsmFileStationSharingDelete(
       api: 'SYNO.FileStation.Sharing', method: 'delete', version: 3);
   data['id'] = id;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmFileStationSharingDelete: $res");
+//Log.info("dsmFileStationSharingDelete: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -145,7 +145,7 @@ Future<dynamic> dsmFileStationSharingClearInvalid(
   final data = _dsmApiRequestData(
       api: 'SYNO.FileStation.Sharing', method: 'clear_invalid', version: 3);
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmFileStationSharingClearInvalid: $res");
+//Log.info("dsmFileStationSharingClearInvalid: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -182,7 +182,7 @@ Future<dynamic> dsmFileStationSharingEdit(String id, // Session ID
   if (dateAvailable != null) data['date_available'] = dateAvailable;
   if (expireTimes != null) data['expire_times'] = expireTimes;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmFileStationSharingEdit: $res");
+//Log.info("dsmFileStationSharingEdit: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }

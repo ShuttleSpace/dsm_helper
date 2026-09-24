@@ -35,7 +35,7 @@ Future<Map> dsmFileStationFavoriteList(String taskid,
   }
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmFileStationFavoriteList: $res");
+//Log.info("dsmFileStationFavoriteList: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -55,7 +55,7 @@ Future<Map> dsmFileStationFavoriteAdd(String path, // File/folder path
   if (name != null && name.isNotEmpty) data['name'] = name;
   if (index != null && index.isNotEmpty) data['index'] = index;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmFileStationFavoriteAdd: $res");
+//Log.info("dsmFileStationFavoriteAdd: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -71,7 +71,7 @@ Future<Map> dsmFileStationFavoriteDelete(String path, // File/folder path
       api: 'SYNO.FileStation.Favorite', method: 'delete', version: 2);
   data['path'] = path;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmFileStationFavoriteDelete: $res");
+//Log.info("dsmFileStationFavoriteDelete: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -86,7 +86,7 @@ Future<Map> dsmFileStationFavoriteClearBroken(
   final data = _dsmApiRequestData(
       api: 'SYNO.FileStation.Favorite', method: 'clear_broken', version: 2);
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmFileStationFavoriteClearBroken: $res");
+//Log.info("dsmFileStationFavoriteClearBroken: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -103,7 +103,7 @@ Future<Map> dsmFileStationFavoriteEdit(String path, String name,
   data['path'] = path;
   data['name'] = name;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmFileStationFavoriteEdit: $res");
+//Log.info("dsmFileStationFavoriteEdit: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -122,7 +122,7 @@ Future<Map> dsmFileStationFavoriteReplaceAll(
   data['path'] = path;
   data['name'] = name;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmFileStationFavoriteReplaceAll: $res");
+//Log.info("dsmFileStationFavoriteReplaceAll: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }

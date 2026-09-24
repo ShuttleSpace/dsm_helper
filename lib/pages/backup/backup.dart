@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:garden/pages/file/upload.dart';
 import 'package:garden/util/log.dart';
 import 'package:garden/util/ui_util.dart';
 import 'package:garden/util/storage_util.dart';
@@ -16,6 +17,7 @@ import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:garden/constants/app_constants.dart';
+import 'package:garden/theme/app_colors.dart';
 import 'package:flutter_vibrate/flutter_vibrate.dart';
 import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 
@@ -28,27 +30,6 @@ class Backup extends StatefulWidget {
   BackupState createState() => BackupState();
 }
 
-class UploadItem {
-  File? file;
-  int? fileSize;
-  int? uploadSize;
-  UploadStatus? status;
-  AssetType? type;
-  DateTime? modifyTime;
-
-  late CancelToken cancelToken;
-  UploadItem(this.file, this.modifyTime, this.type,
-      {this.fileSize = 0,
-      this.uploadSize = 0,
-      this.status = UploadStatus.wait}) {
-    cancelToken = CancelToken();
-  }
-
-  @override
-  String toString() {
-    return 'UploadItem{modifyTime: $modifyTime}';
-  }
-}
 
 class BackupState extends State<Backup> {
   List<AssetEntity> uploads = [];
@@ -374,9 +355,9 @@ class BackupState extends State<Backup> {
                       ),
                     ),
                     if (continueBackup)
-                      Icon(
+                      const Icon(
                         CupertinoIcons.checkmark_alt,
-                        color: Theme.of(context).colorScheme.primary,
+                        color: AppColors.primaryAction,
                       ),
                   ],
                 ),
@@ -417,9 +398,9 @@ class BackupState extends State<Backup> {
                       ),
                     ),
                     if (!continueBackup)
-                      Icon(
+                      const Icon(
                         CupertinoIcons.checkmark_alt,
-                        color: Theme.of(context).colorScheme.primary,
+                        color: AppColors.primaryAction,
                       ),
                   ],
                 ),
@@ -461,7 +442,7 @@ class BackupState extends State<Backup> {
                       width: 20,
                       // child: Icon(
                       //   CupertinoIcons.checkmark_alt,
-                      //   color: Theme.of(context).colorScheme.primary,
+                      //   color: AppColors.primaryAction,
                       // ),
                     ),
                   ],

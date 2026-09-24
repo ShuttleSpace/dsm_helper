@@ -29,7 +29,7 @@ Future<Map> dsmCloudSyncConnectionList({CancelToken? cancelToken}) async {
       api: 'SYNO.CloudSync.Connection', method: 'List', version: 1);
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmCloudSyncConnectionList: $res");
+//Log.info("dsmCloudSyncConnectionList: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -55,7 +55,7 @@ Future<Map> dsmCloudSyncConnectionGet(int connId, // Connection ID
   data['conn_id'] = connId;
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmCloudSyncConnectionGet: $res");
+//Log.info("dsmCloudSyncConnectionGet: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -75,7 +75,7 @@ Future<Map> dsmCloudSyncConnectionPause(int connId, // Connection ID
       api: 'SYNO.CloudSync.Connection', method: 'Pause', version: 1);
   data['conn_id'] = connId;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmCloudSyncConnectionPause: $res");
+//Log.info("dsmCloudSyncConnectionPause: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -91,7 +91,7 @@ Future<Map> dsmCloudSyncConnectionResume(int connId, // Connection ID
       api: 'SYNO.CloudSync.Connection', method: 'Resume', version: 1);
   data['conn_id'] = connId;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmCloudSyncConnectionResume: $res");
+//Log.info("dsmCloudSyncConnectionResume: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -132,7 +132,7 @@ Future<Map> dsmCloudSyncConnectionLogList(int connId, // Connection ID
   if (limit != null) data['limit'] = limit;
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmCloudSyncConnectionLogList: $res");
+//Log.info("dsmCloudSyncConnectionLogList: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -175,7 +175,7 @@ Future<Map> dsmCloudSyncTaskList(
   if (connId != null) data['conn_id'] = connId;
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmCloudSyncTaskList: $res");
+//Log.info("dsmCloudSyncTaskList: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -205,7 +205,7 @@ Future<Map> dsmCloudSyncTaskGet(int taskId, // Task ID
   data['task_id'] = taskId;
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmCloudSyncTaskGet: $res");
+//Log.info("dsmCloudSyncTaskGet: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -221,7 +221,7 @@ Future<Map> dsmCloudSyncTaskPause(int taskId, // Task ID
       api: 'SYNO.CloudSync.Task', method: 'Pause', version: 1);
   data['task_id'] = taskId;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmCloudSyncTaskPause: $res");
+//Log.info("dsmCloudSyncTaskPause: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -237,7 +237,7 @@ Future<Map> dsmCloudSyncTaskResume(int taskId, // Task ID
       api: 'SYNO.CloudSync.Task', method: 'Resume', version: 1);
   data['task_id'] = taskId;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmCloudSyncTaskResume: $res");
+//Log.info("dsmCloudSyncTaskResume: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -276,7 +276,7 @@ Future<Map> dsmCloudSyncTaskFilterGet(int taskId, // Task ID
   data['task_id'] = taskId;
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmCloudSyncTaskFilterGet: $res");
+//Log.info("dsmCloudSyncTaskFilterGet: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }

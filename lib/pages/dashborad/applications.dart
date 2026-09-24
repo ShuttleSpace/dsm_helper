@@ -99,7 +99,7 @@ class ApplicationList extends StatelessWidget {
                       if (appNotify['SYNO.SDS.AdminCenter.Application'] != null)
                         Positioned(
                           right: 30,
-                          child: Badger(
+                          child: Badge(
                             appNotify['SYNO.SDS.AdminCenter.Application']
                                 ['unread'],
                             size: 20,
@@ -151,7 +151,7 @@ class ApplicationList extends StatelessWidget {
                       if (appNotify['SYNO.SDS.PkgManApp.Instance'] != null)
                         Positioned(
                           right: 30,
-                          child: Badger(
+                          child: Badge(
                             appNotify['SYNO.SDS.PkgManApp.Instance']['unread'],
                             size: 20,
                           ),
@@ -312,7 +312,7 @@ class ApplicationList extends StatelessWidget {
                       if (appNotify['SYNO.SDS.SecurityScan.Instance'] != null)
                         Positioned(
                           right: 30,
-                          child: Badger(
+                          child: Badge(
                             appNotify['SYNO.SDS.SecurityScan.Instance']
                                 ['unread'],
                             size: 20,

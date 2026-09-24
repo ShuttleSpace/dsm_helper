@@ -29,7 +29,7 @@ Future<Map> dsmFileStationCreateFolder(
     data['additional'] = additionial;
   }
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmFileStationCreateFolder: $res");
+//Log.info("dsmFileStationCreateFolder: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -65,7 +65,7 @@ Future<Map> dsmFileStationRename(
     data['additional'] = additionial;
   }
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmFileStationRename: $res");
+//Log.info("dsmFileStationRename: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -103,7 +103,7 @@ Future<Map> dsmFileStationCopyMoveStart(
     data['accurate_progress'] = accurateProgress;
   }
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmFileStationCopyMoveStart: $res");
+//Log.info("dsmFileStationCopyMoveStart: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -127,7 +127,7 @@ Future<Map> dsmFileStationCopyMoveStatus(String taskid, // Task ID
   data['taskid'] = taskid;
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmFileStationCopyMoveStatus: $res");
+//Log.info("dsmFileStationCopyMoveStatus: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -144,7 +144,7 @@ Future<Map> dsmFileStationCopyMoveStop(String taskid, // Task ID
   data['taskid'] = taskid;
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmFileStationCopyMoveStop: $res");
+//Log.info("dsmFileStationCopyMoveStop: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -176,7 +176,7 @@ Future<Map> dsmFileStationDeleteStart(
     data['recursive'] = recursive;
   }
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmFileStationDeleteStart: $res");
+//Log.info("dsmFileStationDeleteStart: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -199,7 +199,7 @@ Future<Map> dsmFileStationDeleteStatus(String taskid, // Task ID
   data['taskid'] = taskid;
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmFileStationDeleteStatus: $res");
+//Log.info("dsmFileStationDeleteStatus: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -215,7 +215,7 @@ Future<Map> dsmFileStationDeleteStop(String taskid, // Task ID
       api: 'SYNO.FileStation.Delete', method: 'stop', version: 2);
   data['taskid'] = taskid;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmFileStationDeleteStop: $res");
+//Log.info("dsmFileStationDeleteStop: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }

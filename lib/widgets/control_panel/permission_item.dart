@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:garden/extensions/context.dart';
 import 'package:garden/widgets/label.dart';
 
 /// 用户权限项
@@ -18,7 +17,8 @@ class PermissionItem extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Card(
-        shape: context.stadiumShapeBorder,
+        shape: RoundedRectangleBorder(
+            side: const BorderSide(), borderRadius: BorderRadius.circular(18)),
         child: Padding(
           padding: const EdgeInsets.all(20),
           child: Row(

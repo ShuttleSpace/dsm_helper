@@ -81,7 +81,7 @@ class DsmApi {
       host: host,
       checkSsl: checkSsl,
     );
-    Log.info("sharedList: $data");
+    // Log.info("sharedList: $data");
     return data;
   }
 

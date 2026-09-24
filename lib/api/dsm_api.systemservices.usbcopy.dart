@@ -13,7 +13,7 @@ Future<Map> dsmUSBCopyGetSettings({CancelToken? cancelToken}) async {
       api: 'SYNO.USBCopy', method: 'GetSettings', version: 1);
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmUSBCopyGetSettings: $res");
+//Log.info("dsmUSBCopyGetSettings: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -52,7 +52,7 @@ Future<Map> dsmUSBCopyTaskList({CancelToken? cancelToken}) async {
       _dsmApiRequestData(api: 'SYNO.USBCopy.Task', method: 'List', version: 1);
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmUSBCopyTaskList: $res");
+//Log.info("dsmUSBCopyTaskList: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -78,7 +78,7 @@ Future<Map> dsmUSBCopyTaskGet(int taskId, // Task ID
   data['task_id'] = taskId;
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmUSBCopyTaskGet: $res");
+//Log.info("dsmUSBCopyTaskGet: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -97,7 +97,7 @@ Future<Map> dsmUSBCopyTaskEnable(
   data['task_id'] = taskId;
   data['enable'] = enable;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmUSBCopyTaskEnable: $res");
+//Log.info("dsmUSBCopyTaskEnable: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -148,7 +148,7 @@ Future<Map> dsmUSBCopyLogList(
   if (limit != null) data['limit'] = limit;
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmUSBCopyLogList: $res");
+//Log.info("dsmUSBCopyLogList: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }

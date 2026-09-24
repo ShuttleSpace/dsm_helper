@@ -7,6 +7,7 @@ import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:garden/constants/app_constants.dart';
+import 'package:garden/theme/app_colors.dart';
 import 'package:flutter_vibrate/flutter_vibrate.dart';
 
 class RemoteFolder extends StatefulWidget {
@@ -199,9 +200,9 @@ class RemoteFolderState extends State<RemoteFolder>
                               const Text("开机时自动装载"),
                               const Spacer(),
                               if (autoMount)
-                                Icon(
+                                const Icon(
                                   CupertinoIcons.checkmark_alt,
-                                  color: Theme.of(context).colorScheme.primary,
+                                  color: AppColors.primaryAction,
                                 ),
                             ],
                           ),

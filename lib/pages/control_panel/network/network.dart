@@ -7,6 +7,7 @@ import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:garden/constants/app_constants.dart';
+import 'package:garden/theme/app_colors.dart';
 
 class Network extends StatefulWidget {
   const Network({super.key});
@@ -240,11 +241,9 @@ class NetworkState extends State<Network> with SingleTickerProviderStateMixin {
                                             const Text("手动配置DNS服务器"),
                                             const Spacer(),
                                             if (network['dns_manual'])
-                                              Icon(
+                                              const Icon(
                                                 CupertinoIcons.checkmark_alt,
-                                                color: Theme.of(context)
-                                                    .colorScheme
-                                                    .primary,
+                                                color: AppColors.primaryAction,
                                                 size: 22,
                                               ),
                                           ],
@@ -346,11 +345,9 @@ class NetworkState extends State<Network> with SingleTickerProviderStateMixin {
                                             const Text("手动配置DNS服务器"),
                                             const Spacer(),
                                             if (proxy['enable'])
-                                              Icon(
+                                              const Icon(
                                                 CupertinoIcons.checkmark_alt,
-                                                color: Theme.of(context)
-                                                    .colorScheme
-                                                    .primary,
+                                                color: AppColors.primaryAction,
                                                 size: 22,
                                               ),
                                           ],

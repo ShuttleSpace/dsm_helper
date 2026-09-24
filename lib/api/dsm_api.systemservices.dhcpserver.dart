@@ -36,7 +36,7 @@ Future<Map> dsmCoreNetworkDHCPServerGet(
   if (ifname != null && ifname.isNotEmpty) data['ifname'] = ifname;
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmCoreNetworkDHCPServerGet: $res");
+//Log.info("dsmCoreNetworkDHCPServerGet: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -78,7 +78,7 @@ Future<Map> dsmCoreNetworkDHCPServerClientListList(
   if (ifname != null && ifname.isNotEmpty) data['ifname'] = ifname;
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmCoreNetworkDHCPServerClientListList: $res");
+//Log.info("dsmCoreNetworkDHCPServerClientListList: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -116,7 +116,7 @@ Future<Map> dsmCoreNetworkDHCPServerReservationList(
   if (ifname != null && ifname.isNotEmpty) data['ifname'] = ifname;
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmCoreNetworkDHCPServerReservationList: $res");
+//Log.info("dsmCoreNetworkDHCPServerReservationList: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }

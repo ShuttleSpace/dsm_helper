@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:garden/constants/app_constants.dart';
+import 'package:garden/theme/app_colors.dart';
 
 class MemoryCompressionCard extends StatelessWidget {
   final bool enableZram;
@@ -46,9 +47,9 @@ class MemoryCompressionCard extends StatelessWidget {
                           const Text("启用内存压缩可提高系统响应性能"),
                           const Spacer(),
                           if (enableZram)
-                            Icon(
+                            const Icon(
                               CupertinoIcons.checkmark_alt,
-                              color: Theme.of(context).colorScheme.primary,
+                              color: AppColors.primaryAction,
                               size: 22,
                             ),
                         ],

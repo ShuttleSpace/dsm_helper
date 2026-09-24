@@ -33,7 +33,7 @@ Future<Map> dsmCoreShareList(
   }
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmCoreShareList: $res");
+//Log.info("dsmCoreShareList: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -63,7 +63,7 @@ Future<Map> dsmCoreShareGet(String name, // Share name
   }
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmCoreShareGet: $res");
+//Log.info("dsmCoreShareGet: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -102,7 +102,7 @@ Future<Map> dsmCoreShareCreate(
     data['recyclebin'] = recyclebin;
   }
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmCoreShareCreate: $res");
+//Log.info("dsmCoreShareCreate: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -138,7 +138,7 @@ Future<Map> dsmCoreShareSet(String name, // Share name
     data['recyclebin'] = recyclebin;
   }
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmCoreShareSet: $res");
+//Log.info("dsmCoreShareSet: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -155,7 +155,7 @@ Future<Map> dsmCoreShareDelete(
       _dsmApiRequestData(api: 'SYNO.Core.Share', method: 'delete', version: 1);
   data['name'] = name;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmCoreShareDelete: $res");
+//Log.info("dsmCoreShareDelete: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -168,7 +168,7 @@ Future<Map> dsmCoreRecycleBinStart(
       api: 'SYNO.Core.RecycleBin', method: 'start', version: 1)
     ..addAll({id: id});
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmCoreRecycleBinStart: $res");
+//Log.info("dsmCoreRecycleBinStart: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -199,7 +199,7 @@ Future<Map> dsmCoreSharePermissionGet(String name, // Share name
   data['name'] = name;
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmCoreSharePermissionGet: $res");
+//Log.info("dsmCoreSharePermissionGet: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -218,7 +218,7 @@ Future<Map> dsmCoreSharePermissionSet(
   data['name'] = name;
   data['permissions'] = permissions;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmCoreSharePermissionSet: $res");
+//Log.info("dsmCoreSharePermissionSet: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }

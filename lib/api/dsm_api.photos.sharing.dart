@@ -130,7 +130,7 @@ Future<Map> dsmFotoPublicSharingGetUiString({CancelToken? cancelToken}) async {
       version: 1);
   final res = await _httpGet(_fotoEntryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmFotoPublicSharingGetUiString: $res");
+//Log.info("dsmFotoPublicSharingGetUiString: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }

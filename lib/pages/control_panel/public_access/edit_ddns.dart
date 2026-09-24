@@ -206,9 +206,9 @@ class EditDdnsState extends State<EditDdns> {
                             const Text("启用支持DDNS"),
                             const Spacer(),
                             if (ddns['enable'])
-                              Icon(
+                              const Icon(
                                 CupertinoIcons.checkmark_alt,
-                                color: Theme.of(context).colorScheme.primary,
+                                color: AppColors.primaryAction,
                                 size: 22,
                               ),
                           ],
@@ -226,9 +226,9 @@ class EditDdnsState extends State<EditDdns> {
                     return;
                   },
                   child: Card(
-                    shape: StadiumBorder(
-                        side: BorderSide(
-                            color: Theme.of(context).colorScheme.primary)),
+                    shape: RoundedRectangleBorder(
+                        side: const BorderSide(),
+                        borderRadius: BorderRadius.circular(18)),
                     child: Padding(
                       padding: const EdgeInsets.all(AppConstants.paddingSmall),
                       child: Row(

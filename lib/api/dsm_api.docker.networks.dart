@@ -27,7 +27,7 @@ Future<Map> dsmDockerNetworkList({CancelToken? cancelToken}) async {
       api: 'SYNO.Docker.Network', method: 'list', version: 1);
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmDockerNetworkList: $res");
+//Log.info("dsmDockerNetworkList: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -54,7 +54,7 @@ Future<Map> dsmDockerNetworkCreate(String name, // Network name
   if (gateway != null && gateway.isNotEmpty) data['gateway'] = gateway;
   if (ipRange != null && ipRange.isNotEmpty) data['ip_range'] = ipRange;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmDockerNetworkCreate: $res");
+//Log.info("dsmDockerNetworkCreate: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -70,7 +70,7 @@ Future<Map> dsmDockerNetworkDelete(String name, // Network name
       api: 'SYNO.Docker.Network', method: 'delete', version: 1);
   data['name'] = name;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmDockerNetworkDelete: $res");
+//Log.info("dsmDockerNetworkDelete: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }

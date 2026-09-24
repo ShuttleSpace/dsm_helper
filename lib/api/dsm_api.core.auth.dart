@@ -59,7 +59,7 @@ Future<Map> dsmAuthLogin(String account, String passwd,
       host: host,
       cancelToken: cancelToken,
       cookie: cookie);
-  Log.info("login: $res");
+//Log.info("login: $res");
   if (res["success"] == true) {
     final sid = res["data"]["sid"];
     connectionStore.setSid(sid);
@@ -79,7 +79,7 @@ Future<Map> dsmAuthLogout({CancelToken? cancelToken}) async {
     });
   final res =
       await _httpGet(_authCGI, queryParameters: data, cancelToken: cancelToken);
-  Log.info("logout: $res");
+//Log.info("logout: $res");
   if (res["success"] != true) {
     throw DSMException.fromMap(res);
   }
@@ -98,7 +98,7 @@ Future<Map> dsmAuthToken(
     data["updateSynoToken"] = updateSynoToken;
   }
   final res = await _httpPost(_authCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmAuthUpdateSynoToken: $res");
+//Log.info("dsmAuthUpdateSynoToken: $res");
   if (res["success"] != true) {
     throw DSMException.fromMap(res);
   }
@@ -193,7 +193,7 @@ Future<Map> dsmAuthQuickConnectLogin(String quickConnectID,
       cancelToken: cancelToken,
       // FIXME: text/plain???
       headers: {'Content-Type': 'application/json'});
-  Log.info("dsmAuthQuickConnectLogin: $res");
+//Log.info("dsmAuthQuickConnectLogin: $res");
   if (res["success"] != true) {
     throw DSMException.fromMap(res);
   }
@@ -300,7 +300,7 @@ Future<Map> dsmAuthControlHostRequestTunnel(
       data: data,
       headers: {'Content-Type': 'application/json'},
       cancelToken: cancelToken);
-  Log.info("dsmAuthQuickConnectLogin: $res");
+//Log.info("dsmAuthQuickConnectLogin: $res");
   if (res["success"] != true) {
     throw DSMException.fromMap(res);
   }
@@ -331,7 +331,7 @@ Future<Map> dsmDesktopSessionDataGetjs({CancelToken? cancelToken}) async {
   );
   final res =
       await _httpGet(_authCGI, queryParameters: data, cancelToken: cancelToken);
-  Log.info("getjs: $res");
+//Log.info("getjs: $res");
   if (res["success"] != true) {
     throw DSMException.fromMap(res);
   }
@@ -343,7 +343,7 @@ Future<Map> dsmCoreMyDSCenter({CancelToken? cancelToken}) async {
   final data = _dsmApiRequestData(
       api: 'SYNO.Core.MyDSCenter', method: 'query', version: 2);
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmCoreMyDSCenter: $res");
+//Log.info("dsmCoreMyDSCenter: $res");
   if (res["success"] != true) {
     throw DSMException.fromMap(res);
   }

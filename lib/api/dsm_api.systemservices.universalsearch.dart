@@ -51,7 +51,7 @@ Future<Map> dsmFinderFileIndexingSearch(String keyword, // Search keyword
   if (limit != null) data['limit'] = limit;
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmFinderFileIndexingSearch: $res");
+//Log.info("dsmFinderFileIndexingSearch: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }

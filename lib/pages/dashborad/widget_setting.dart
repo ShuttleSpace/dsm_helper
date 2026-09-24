@@ -7,6 +7,7 @@ import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:garden/constants/app_constants.dart';
+import 'package:garden/theme/app_colors.dart';
 import 'package:signals_flutter/signals_flutter.dart';
 
 class WidgetSetting extends StatefulWidget {
@@ -55,6 +56,10 @@ class WidgetSettingState extends State<WidgetSetting> with SignalsMixin {
 
   @override
   Widget build(BuildContext context) {
+    final showWidgetsValue = showWidgets.watch(context);
+    final selectedWidgetsValue = selectedWidgets.watch(context);
+    final showShortcutValue = showShortcut.watch(context);
+    final showWallpaperValue = showWallpaper.watch(context);
     return Scaffold(
       appBar: AppBar(
         leading: AppBackButton(context),
@@ -65,8 +70,8 @@ class WidgetSettingState extends State<WidgetSetting> with SignalsMixin {
             child: OutlinedButton(
               onPressed: () async {
                 List saveWidgets = [];
-                for (var widget in showWidgets) {
-                  if (selectedWidgets.contains(widget)) {
+                for (var widget in showWidgetsValue) {
+                  if (selectedWidgetsValue.contains(widget)) {
                     saveWidgets.add(widget);
                   }
                 }
@@ -125,10 +130,10 @@ class WidgetSettingState extends State<WidgetSetting> with SignalsMixin {
                             style: TextStyle(fontSize: 16),
                           ),
                           const Spacer(),
-                          if (showShortcut.value)
-                            Icon(
+                          if (showShortcutValue)
+                            const Icon(
                               CupertinoIcons.checkmark_alt,
-                              color: Theme.of(context).colorScheme.primary,
+                              color: AppColors.primaryAction,
                             ),
                         ],
                       ),
@@ -167,10 +172,10 @@ class WidgetSettingState extends State<WidgetSetting> with SignalsMixin {
                             style: TextStyle(fontSize: 16),
                           ),
                           const Spacer(),
-                          if (showWallpaper.value)
-                            Icon(
+                          if (showWallpaperValue)
+                            const Icon(
                               CupertinoIcons.checkmark_alt,
-                              color: Theme.of(context).colorScheme.primary,
+                              color: AppColors.primaryAction,
                             ),
                         ],
                       ),
@@ -185,23 +190,23 @@ class WidgetSettingState extends State<WidgetSetting> with SignalsMixin {
           ),
           Expanded(
             child: ReorderableListView(
-              children: showWidgets.map((widget) {
+              children: showWidgetsValue.map((widget) {
                 return GestureDetector(
                   key: ValueKey(widget),
                   onTap: () {
                     setState(() {
-                      if (selectedWidgets.contains(widget)) {
+                      if (selectedWidgetsValue.contains(widget)) {
                         selectedWidgets.remove(widget);
                       } else {
                         selectedWidgets.add(widget);
                       }
-                      Log.info(showWidgets);
+                      Log.info(showWidgetsValue);
                     });
                   },
                   child: Card(
-                    shape: StadiumBorder(
-                        side: BorderSide(
-                            color: Theme.of(context).colorScheme.primary)),
+                    shape: RoundedRectangleBorder(
+                        side: const BorderSide(),
+                        borderRadius: BorderRadius.circular(18)),
                     margin: const EdgeInsets.symmetric(
                         vertical: 10, horizontal: 20),
                     child: Padding(
@@ -221,11 +226,10 @@ class WidgetSettingState extends State<WidgetSetting> with SignalsMixin {
                             child: SizedBox(
                               width: 20,
                               height: 20,
-                              child: selectedWidgets.contains(widget)
-                                  ? Icon(
+                              child: selectedWidgetsValue.contains(widget)
+                                  ? const Icon(
                                       CupertinoIcons.checkmark_alt,
-                                      color:
-                                          Theme.of(context).colorScheme.primary,
+                                      color: AppColors.primaryAction,
                                     )
                                   : null,
                             ),

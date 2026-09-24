@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:garden/constants/app_constants.dart';
+import 'package:garden/theme/app_colors.dart';
 import 'package:garden/util/file_types.dart';
 import 'package:garden/util/file_type_util.dart';
 import 'package:garden/util/http_util.dart';
@@ -164,9 +165,9 @@ class SelectLocalFolderState extends State<SelectLocalFolder> {
                   width: 20,
                   height: 20,
                   child: selectedFiles.contains(file)
-                      ? Icon(
+                      ? const Icon(
                           CupertinoIcons.checkmark_alt,
-                          color: Theme.of(context).colorScheme.primary,
+                          color: AppColors.primaryAction,
                         )
                       : null,
                 ),

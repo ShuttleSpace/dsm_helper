@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:garden/api/dsm_api.dart';
 import 'package:garden/util/log.dart';
 import 'package:garden/util/ui_util.dart';
 
@@ -8,6 +7,7 @@ import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:garden/constants/app_constants.dart';
+import 'package:garden/theme/app_colors.dart';
 import 'package:flutter/services.dart';
 
 class FileDetail extends StatefulWidget {
@@ -36,20 +36,20 @@ class FileDetailState extends State<FileDetail> {
   }
 
   getDirSize() async {
-    var task = await dsmFileStationDirSizeStart(widget.file['path']);
+    var task = await DsmApi.dirSizeTask(widget.file['path']);
     if (task['success']) {
       timer = Timer.periodic(const Duration(seconds: 1), (timer) async {
-        // var result = await dsmFileStationDirSizeStatus(task['data']['taskid']);
-        // Log.info(result);
-        // if (result['success'] && result['data']['finished']) {
-        //   timer.cancel();
-        //   setState(() {
-        //     loadingSize = false;
-        //     size = result['data']['total_size'];
-        //     folderCount = result['data']['num_dir'];
-        //     fileCount = result['data']['num_file'];
-        //   });
-        // }
+        var result = await DsmApi.dirSizeResult(task['data']['taskid']);
+        Log.info(result);
+        if (result['success'] && result['data']['finished']) {
+          timer.cancel();
+          setState(() {
+            loadingSize = false;
+            size = result['data']['total_size'];
+            folderCount = result['data']['num_dir'];
+            fileCount = result['data']['num_file'];
+          });
+        }
       });
     }
   }
@@ -107,12 +107,12 @@ class FileDetailState extends State<FileDetail> {
                       Clipboard.setData(data);
                       UiUtil.toast("已复制到剪贴板");
                     },
-                    child: SizedBox(
+                    child: const SizedBox(
                       width: 20,
                       height: 20,
                       child: Icon(
                         Icons.copy,
-                        color: Theme.of(context).colorScheme.primary,
+                        color: AppColors.primaryAction,
                         size: 16,
                       ),
                     ),
@@ -143,12 +143,12 @@ class FileDetailState extends State<FileDetail> {
                       Clipboard.setData(data);
                       UiUtil.toast("已复制到剪贴板");
                     },
-                    child: SizedBox(
+                    child: const SizedBox(
                       width: 20,
                       height: 20,
                       child: Icon(
                         Icons.copy,
-                        color: Theme.of(context).colorScheme.primary,
+                        color: AppColors.primaryAction,
                         size: 16,
                       ),
                     ),

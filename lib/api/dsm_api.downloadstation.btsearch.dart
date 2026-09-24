@@ -14,7 +14,7 @@ Future<Map> dsmDownloadStationBTSearchStart(String keyword, // Search keyword
   data['keyword'] = keyword;
   if (module != null && module.isNotEmpty) data['module'] = module;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmDownloadStationBTSearchStart: $res");
+//Log.info("dsmDownloadStationBTSearchStart: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -67,7 +67,7 @@ Future<Map> dsmDownloadStationBTSearchList(String taskid, // Search task ID
   }
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmDownloadStationBTSearchList: $res");
+//Log.info("dsmDownloadStationBTSearchList: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -95,7 +95,7 @@ Future<Map> dsmDownloadStationBTSearchGetCategory(
       api: 'SYNO.DownloadStation.BTSearch', method: 'getCategory', version: 1);
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmDownloadStationBTSearchGetCategory: $res");
+//Log.info("dsmDownloadStationBTSearchGetCategory: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -123,7 +123,7 @@ Future<Map> dsmDownloadStationBTSearchGetModule(
       api: 'SYNO.DownloadStation.BTSearch', method: 'getModule', version: 1);
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmDownloadStationBTSearchGetModule: $res");
+//Log.info("dsmDownloadStationBTSearchGetModule: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -140,7 +140,7 @@ Future<Map> dsmDownloadStationBTSearchClean(
       api: 'SYNO.DownloadStation.BTSearch', method: 'clean', version: 1);
   data['taskid'] = taskid;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmDownloadStationBTSearchClean: $res");
+//Log.info("dsmDownloadStationBTSearchClean: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }

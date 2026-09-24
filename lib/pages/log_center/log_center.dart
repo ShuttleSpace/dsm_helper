@@ -1,4 +1,3 @@
-import 'package:garden/api/dsm_api.dart';
 import 'package:garden/extensions/color.dart';
 import 'package:garden/util/http_util.dart';
 import 'package:garden/widgets/bubble_tab_indicator.dart';
@@ -49,7 +48,7 @@ class LogCenterState extends State<LogCenter>
   }
 
   getData({int start = 0, int limit = 50}) async {
-    var res = await dsmCoreSyslogClientLogList(offset: start, limit: limit);
+    var res = await DsmApi.lastLog(start, limit);
     if (res['success']) {
       setState(() {
         loadingRecent = false;
@@ -59,7 +58,7 @@ class LogCenterState extends State<LogCenter>
   }
 
   getLogs() async {
-    var res = await dsmCoreSyslogClientLogList(offset: 0, limit: 1000);
+    var res = await DsmApi.log(0, 1000);
     if (res['success']) {
       setState(() {
         loadingLogs = false;

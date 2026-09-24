@@ -1,5 +1,5 @@
-import 'package:garden/api/dsm_api.dart';
 import 'package:garden/pages/common/browser.dart';
+import 'package:garden/util/http_util.dart';
 import 'package:garden/util/log.dart';
 import 'package:garden/widgets/bubble_tab_indicator.dart';
 import 'package:garden/widgets/neu_back_button.dart';
@@ -39,7 +39,7 @@ class UpdateResetState extends State<UpdateReset>
   }
 
   getData() async {
-    var res = await dsmCoreSystemInfoFirmware();
+    var res = await DsmApi.firmwareVersion();
     if (res['success']) {
       setState(() {
         firmwareDate = res['data']['firmware_date'];
@@ -50,7 +50,7 @@ class UpdateResetState extends State<UpdateReset>
   }
 
   checkUpdate() async {
-    var res = await dsmCoreUpgradeServerCheck();
+    var res = await DsmApi.firmwareUpgrade();
     setState(() {
       checking = false;
     });

@@ -4,7 +4,7 @@ Future<Map> dsmCoreTerminalGet({CancelToken? cancelToken}) async {
   final data =
       _dsmApiRequestData(api: 'SYNO.Core.Terminal', method: 'get', version: 3);
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmCoreTerminalGet: $res");
+//Log.info("dsmCoreTerminalGet: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -24,7 +24,7 @@ Future<Map> dsmCoreTerminalSet(
           'ssh_port': sshPort
         });
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmCoreTerminalSet: $res");
+//Log.info("dsmCoreTerminalSet: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }

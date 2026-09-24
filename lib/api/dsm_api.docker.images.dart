@@ -28,7 +28,7 @@ Future<Map> dsmDockerImageList(
   if (showDsm != null) data['show_dsm'] = showDsm;
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmDockerImageList: $res");
+//Log.info("dsmDockerImageList: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -57,7 +57,7 @@ Future<Map> dsmDockerImageGet(
   data['tag'] = tag;
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmDockerImageGet: $res");
+//Log.info("dsmDockerImageGet: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -80,7 +80,7 @@ Future<Map> dsmDockerImagePull(String repository, // Image repository
   if (tag != null && tag.isNotEmpty) data['tag'] = tag;
   if (registry != null && registry.isNotEmpty) data['registry'] = registry;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmDockerImagePull: $res");
+//Log.info("dsmDockerImagePull: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -101,7 +101,7 @@ Future<Map> dsmDockerImageDelete(
   data['tag'] = tag;
   if (force != null) data['force'] = force;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmDockerImageDelete: $res");
+//Log.info("dsmDockerImageDelete: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -131,7 +131,7 @@ Future<Map> dsmDockerImageSearch(String query, // Search query
   if (registry != null && registry.isNotEmpty) data['registry'] = registry;
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmDockerImageSearch: $res");
+//Log.info("dsmDockerImageSearch: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -160,7 +160,7 @@ Future<Map> dsmDockerImageRegistryList({CancelToken? cancelToken}) async {
       api: 'SYNO.Docker.Image.Registry', method: 'list', version: 1);
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmDockerImageRegistryList: $res");
+//Log.info("dsmDockerImageRegistryList: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -183,7 +183,7 @@ Future<Map> dsmDockerImageRegistryAdd(
   if (username != null && username.isNotEmpty) data['username'] = username;
   if (password != null && password.isNotEmpty) data['password'] = password;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmDockerImageRegistryAdd: $res");
+//Log.info("dsmDockerImageRegistryAdd: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }

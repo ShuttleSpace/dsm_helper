@@ -231,7 +231,7 @@ class DashboardConnectionLogCard extends StatefulWidget {
 
 class DashboardConnectionLogCardState extends State<DashboardConnectionLogCard>
     with SignalsMixin {
-  late final connectedUsers = createListSignal([]);
+  late final connectedUsers = createListSignal<Map>([]);
   late final error = createSignal('');
 
   @override
@@ -242,7 +242,11 @@ class DashboardConnectionLogCardState extends State<DashboardConnectionLogCard>
 
   _fetchData() {
     dsmCoreCurrentConnectionList().then((res) {
-      connectedUsers.value = res['items'] as List;
+      final data = (res['items'] as List).map((e) {
+        e['running'] = true;
+        return e as Map;
+      }).toList();
+      connectedUsers.value = data;
       debugPrint('✍️🌹 ${connectedUsers.length}');
     }).catchError((e) {
       error.value = e.toString();
@@ -299,7 +303,7 @@ class DashboardConnectionLogCardState extends State<DashboardConnectionLogCard>
                     child: Column(
                   children: connectedUsers
                       .map((e) => _DashboardConnectionLogItem(
-                            user: (e as Map).toSignal(),
+                            user: (e).toSignal(),
                             onKickout: () {
                               _onKickout(e);
                             },
@@ -321,13 +325,19 @@ class DashboardConnectionLogCardState extends State<DashboardConnectionLogCard>
 
   _onKickout(Map e) async {
     // TODO: set running = true, update user in list
-    connectedUsers.update1(e, (ov) => {ov['running'] = true, ov});
+    connectedUsers.update1(e, (ov) {
+      ov['running'] = true;
+      return ov;
+    });
     try {
       await dsmCoreCurrentConnectionKickConnection(
           {"who": e['who'], "from": e['from']});
       UiUtil.toast("连接已终止");
       // TODO: set running = true, update user in list
-      connectedUsers.update1(e, (ov) => {ov['running'] = false, ov});
+      connectedUsers.update1(e, (ov) {
+        ov['running'] = false;
+        return ov;
+      });
     } on Exception catch (e) {
       UiUtil.toast("连接终止失败：${e.toString()}");
     }
@@ -340,7 +350,24 @@ class DashboardConnectionLogCardState extends State<DashboardConnectionLogCard>
 class _DashboardConnectionLogItem extends StatelessWidget {
   const _DashboardConnectionLogItem(
       {required this.user, required this.onKickout});
-
+  /* {
+    "can_be_kicked": true,
+    "descr": "File Station",
+    "did": "xAc77ylaoHQ",
+    "first_login_time": "2026/03/03 11:31:46",
+    "from": "192.168.8.76",
+    "is_amfa": false,
+    "is_current_connected": false,
+    "is_otp_trusted": false,
+    "location": "",
+    "pid": 1,
+    "protocol": "HTTP/HTTPS",
+    "time": "2026/03/03 11:31:46",
+    "type": "HTTP/HTTPS",
+    "user_agent": "",
+    "user_can_be_disabled": true,
+    "who": "humphrey"
+  } */
   final ReadonlySignal<Map> user;
   final VoidCallback onKickout;
 
@@ -383,7 +410,12 @@ class _DashboardConnectionLogItem extends StatelessWidget {
             ),
             OutlinedButton(
               onPressed: () async {
+                if (!user['can_be_kicked']) {
+                  UiUtil.toast("当前用户无法被踢出!");
+                  return;
+                }
                 if (user['running'] == true) {
+                  UiUtil.toast("当前用户正在运行中!");
                   return;
                 }
                 onDisconnectAlert(context);
@@ -391,7 +423,7 @@ class _DashboardConnectionLogItem extends StatelessWidget {
               child: SizedBox(
                 width: 20,
                 height: 20,
-                child: user.select((v) => v['running']).watch(context) != false
+                child: user.select((v) => v['running']).watch(context) != true
                     ? const CupertinoActivityIndicator()
                     : const Icon(
                         Icons.remove_circle_outline,

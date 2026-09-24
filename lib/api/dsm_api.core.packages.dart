@@ -22,17 +22,22 @@ Future<Map> dsmCorePackageList(
         additional, // JSON Array, Additional fields (comma-separated): `description`, `dependent_packages`, `beta`, `distributor`, `maintainer`, `dsm_apps`, `install_type`, `autoupdate`, `status_sketch`, `dsm_apps`, `install_type` `status`,
     // additional=["status","dsm_apps","install_type"]
     bool? ignoreHidden,
+    int? version,
+    int? pollingInterval,
     CancelToken? cancelToken}) async {
-  final data =
-      _dsmApiRequestData(api: 'SYNO.Core.Package', method: 'list', version: 2);
+  final data = _dsmApiRequestData(
+      api: 'SYNO.Core.Package', method: 'list', version: version ?? 2);
   if (additional != null && additional.isNotEmpty) {
     data['additional'] = additional;
+  }
+  if (pollingInterval != null) {
+    data['polling_interval'] = pollingInterval;
   }
   if (ignoreHidden != null) {
     data['ignore_hidden'] = ignoreHidden;
   }
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmCorePackageList: $res");
+//Log.info("dsmCorePackageList: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -63,7 +68,7 @@ Future<Map> dsmCorePackageGet(String id, // Package ID
     data['additional'] = additional;
   }
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmCorePackageGet: $res");
+//Log.info("dsmCorePackageGet: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -84,12 +89,26 @@ Future<Map> dsmCorePackageGet(String id, // Package ID
 ///     ]
 ///   }
 /// }
-Future<Map> dsmCorePackageServerList({CancelToken? cancelToken}) async {
+Future<Map> dsmCorePackageServerList(
+    {CancelToken? cancelToken,
+    int? version,
+    bool? updateSrpite,
+    bool? blforcereload,
+    bool? blloadothers = false}) async {
   final data = _dsmApiRequestData(
-      api: 'SYNO.Core.Package.Server', method: 'list', version: 1);
+      api: 'SYNO.Core.Package.Server', method: 'list', version: version ?? 1);
+  if (updateSrpite != null) {
+    data['updateSrpite'] = true;
+  }
+  if (blforcereload != null) {
+    data['blforcereload'] = true;
+  }
+  if (blloadothers != null) {
+    data['blloadothers'] = true;
+  }
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmCorePackageServerList: $res");
+  // Log.info("dsmCorePackageServerList: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -108,7 +127,7 @@ Future<Map> dsmCoreUpgradeCheck({CancelToken? cancelToken}) async {
     {'api': 'SYNO.Core.Package.Server', 'method': 'check', 'version': 1}
   ];
   final res = await _dsmApiCall(jsonEncode(compound), cancelToken: cancelToken);
-  Log.info("dsmCoreUpgradeCheck: $res");
+//Log.info("dsmCoreUpgradeCheck: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -131,7 +150,7 @@ Future<Map> dsmCorePackageServerInstallation(String id, // Package ID
     data['volume'] = volume;
   }
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmCorePackageServerInstallation: $res");
+//Log.info("dsmCorePackageServerInstallation: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -147,7 +166,7 @@ Future<Map> dsmCorePackageServerUnInstallation(String id, // Package ID
       api: 'SYNO.Core.Package.Installation', method: 'uninstall', version: 1);
   data['id'] = id;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmCorePackageServerUnInstallation: $res");
+//Log.info("dsmCorePackageServerUnInstallation: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -157,13 +176,16 @@ Future<Map> dsmCorePackageServerUnInstallation(String id, // Package ID
 /// {
 ///   "success": true
 /// }
-Future<Map> dsmCorePackageControlStart(String id, // Package ID
+Future<Map> dsmCorePackageControlStart(
+    String id, // Package ID
+    String dsmApps, // json Encoded
     {CancelToken? cancelToken}) async {
   final data = _dsmApiRequestData(
       api: 'SYNO.Core.Package.Control', method: 'start', version: 1);
   data['id'] = id;
+  data['dsm_apps'] = dsmApps;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmCorePackageControlStart: $res");
+//Log.info("dsmCorePackageControlStart: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -179,7 +201,7 @@ Future<Map> dsmCorePackageControlStop(String id, // Package ID
       api: 'SYNO.Core.Package.Control', method: 'stop', version: 1);
   data['id'] = id;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmCorePackageControlStop: $res");
+//Log.info("dsmCorePackageControlStop: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -195,7 +217,21 @@ Future<Map> dsmCorePackageControlRestart(String id, // Package ID
       api: 'SYNO.Core.Package.Control', method: 'restart', version: 1);
   data['id'] = id;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmCorePackageControlRestart: $res");
+//Log.info("dsmCorePackageControlRestart: $res");
+  if (res['success'] != true) {
+    throw DSMException.fromMap(res);
+  }
+  return res['data'] ?? {};
+}
+
+/// get running app
+Future<Map> dsmCorePollingData({CancelToken? cancelToken}) async {
+  final data = _dsmApiRequestData(
+      api: 'SYNO.Core.Polling.Data', method: 'get', version: 1);
+  data['action'] = 'load';
+  data['load_disabled_port'] = true;
+  final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
+//Log.info("dsmCorePollingData: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }

@@ -4,7 +4,6 @@ import 'package:garden/extensions/color.dart';
 import 'package:garden/pages/control_panel/public_access/edit_ddns.dart';
 import 'package:garden/util/http_util.dart';
 import 'package:garden/widgets/bubble_tab_indicator.dart';
-import 'package:garden/extensions/context.dart';
 import 'package:garden/widgets/label.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
@@ -37,7 +36,7 @@ class PublicAccessState extends State<PublicAccess>
     _tabController = TabController(length: 1, vsync: this);
     getData();
     timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      // getData();
+      getData();
     });
     super.initState();
   }
@@ -104,7 +103,8 @@ class PublicAccessState extends State<PublicAccess>
         });
       },
       child: Card(
-        shape: context.stadiumShapeBorder,
+        shape: RoundedRectangleBorder(
+            side: const BorderSide(), borderRadius: BorderRadius.circular(18)),
         margin: const EdgeInsets.only(top: 20, left: 20, right: 20),
         child: Padding(
           padding: const EdgeInsets.all(AppConstants.paddingSmall),

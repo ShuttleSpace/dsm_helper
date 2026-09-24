@@ -27,7 +27,7 @@ Future<Map> dsmBackupTaskList({CancelToken? cancelToken}) async {
       _dsmApiRequestData(api: 'SYNO.Backup.Task', method: 'List', version: 1);
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmBackupTaskList: $res");
+//Log.info("dsmBackupTaskList: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -56,7 +56,7 @@ Future<Map> dsmBackupTaskGet(String taskId, // Task ID
   data['task_id'] = taskId;
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmBackupTaskGet: $res");
+//Log.info("dsmBackupTaskGet: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -80,7 +80,7 @@ Future<Map> dsmBackupTaskGetStatus(String taskId, // Task ID
   data['task_id'] = taskId;
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmBackupTaskGetStatus: $res");
+//Log.info("dsmBackupTaskGetStatus: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -100,7 +100,7 @@ Future<Map> dsmBackupTaskRun(String taskId, // Task ID
       _dsmApiRequestData(api: 'SYNO.Backup.Task', method: 'Run', version: 1);
   data['task_id'] = taskId;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmBackupTaskRun: $res");
+//Log.info("dsmBackupTaskRun: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -116,7 +116,7 @@ Future<Map> dsmBackupTaskCancel(String taskId, // Task ID
       _dsmApiRequestData(api: 'SYNO.Backup.Task', method: 'Cancel', version: 1);
   data['task_id'] = taskId;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmBackupTaskCancel: $res");
+//Log.info("dsmBackupTaskCancel: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -137,7 +137,7 @@ Future<Map> dsmBackupTaskSuspend(String taskId, // Task ID
       api: 'SYNO.Backup.Task', method: 'Suspend', version: 1);
   data['task_id'] = taskId;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmBackupTaskSuspend: $res");
+//Log.info("dsmBackupTaskSuspend: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -157,7 +157,7 @@ Future<Map> dsmBackupTaskResume(String taskId, // Task ID
       _dsmApiRequestData(api: 'SYNO.Backup.Task', method: 'Resume', version: 1);
   data['task_id'] = taskId;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmBackupTaskResume: $res");
+//Log.info("dsmBackupTaskResume: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }

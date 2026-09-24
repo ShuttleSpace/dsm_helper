@@ -14,7 +14,7 @@ Future<Map> dsmCoreSecurityScanConfGet({CancelToken? cancelToken}) async {
       api: 'SYNO.Core.SecurityScan.Conf', method: 'Get', version: 1);
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmCoreSecurityScanConfGet: $res");
+//Log.info("dsmCoreSecurityScanConfGet: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -60,7 +60,7 @@ Future<Map> dsmCoreSecurityScanStatusCheckList(
       api: 'SYNO.Core.SecurityScan.Status', method: 'CheckList', version: 1);
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmCoreSecurityScanStatusCheckList: $res");
+//Log.info("dsmCoreSecurityScanStatusCheckList: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -84,7 +84,7 @@ Future<Map> dsmCoreSecurityScanOperationScan({CancelToken? cancelToken}) async {
   final data = _dsmApiRequestData(
       api: 'SYNO.Core.SecurityScan.Operation', method: 'Scan', version: 1);
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmCoreSecurityScanOperationScan: $res");
+//Log.info("dsmCoreSecurityScanOperationScan: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -132,7 +132,7 @@ Future<Map> dsmCoreSecurityScanLoginActivityList(
   if (limit != null) data['limit'] = limit;
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmCoreSecurityScanLoginActivityList: $res");
+//Log.info("dsmCoreSecurityScanLoginActivityList: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }

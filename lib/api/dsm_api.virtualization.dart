@@ -35,7 +35,7 @@ Future<Map> dsmVirtualizationImageList(
   if (limit != null) data['limit'] = limit;
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmVirtualizationImageList: $res");
+//Log.info("dsmVirtualizationImageList: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -59,7 +59,7 @@ Future<Map> dsmVirtualizationImageCreate(String imageName, // Image filename
   if (autoCleanTask != null) data['auto_clean_task'] = autoCleanTask;
   if (guestId != null && guestId.isNotEmpty) data['guest_id'] = guestId;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmVirtualizationImageCreate: $res");
+//Log.info("dsmVirtualizationImageCreate: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -75,7 +75,7 @@ Future<Map> dsmVirtualizationImageDelete(String imageId, // Image ID
       api: 'SYNO.Virtualization.Image', method: 'Delete', version: 1);
   data['image_id'] = imageId;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmVirtualizationImageDelete: $res");
+//Log.info("dsmVirtualizationImageDelete: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -103,7 +103,7 @@ Future<Map> dsmVirtualizationTaskList({CancelToken? cancelToken}) async {
       api: 'SYNO.Virtualization.Task', method: 'List', version: 1);
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmVirtualizationTaskList: $res");
+//Log.info("dsmVirtualizationTaskList: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -137,7 +137,7 @@ Future<Map> dsmVirtualizationTaskGet(String taskid, // Task ID
   data['taskid'] = taskid;
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmVirtualizationTaskGet: $res");
+//Log.info("dsmVirtualizationTaskGet: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -153,7 +153,7 @@ Future<Map> dsmVirtualizationTaskClear(String taskid, // Task ID
       api: 'SYNO.Virtualization.Task', method: 'Clear', version: 1);
   data['taskid'] = taskid;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmVirtualizationTaskClear: $res");
+//Log.info("dsmVirtualizationTaskClear: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -201,7 +201,7 @@ Future<Map> dsmVirtualizationGuestList(
   if (limit != null) data['limit'] = limit;
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmVirtualizationGuestList: $res");
+//Log.info("dsmVirtualizationGuestList: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -246,7 +246,7 @@ Future<Map> dsmVirtualizationGuestGet(
   }
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmVirtualizationGuestGet: $res");
+//Log.info("dsmVirtualizationGuestGet: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -268,7 +268,7 @@ Future<Map> dsmVirtualizationGuestPowerOn(
   if (guestId != null && guestId.isNotEmpty) data['guest_id'] = guestId;
   if (guestName != null && guestName.isNotEmpty) data['guest_name'] = guestName;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmVirtualizationGuestPowerOn: $res");
+//Log.info("dsmVirtualizationGuestPowerOn: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -292,7 +292,7 @@ Future<Map> dsmVirtualizationGuestPowerOff(
   if (guestName != null && guestName.isNotEmpty) data['guest_name'] = guestName;
   if (force != null) data['force'] = force;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmVirtualizationGuestPowerOff: $res");
+//Log.info("dsmVirtualizationGuestPowerOff: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -321,7 +321,7 @@ Future<Map> dsmVirtualizationGuestShutdown(
   if (guestId != null && guestId.isNotEmpty) data['guest_id'] = guestId;
   if (guestName != null && guestName.isNotEmpty) data['guest_name'] = guestName;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmVirtualizationGuestShutdown: $res");
+//Log.info("dsmVirtualizationGuestShutdown: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -336,7 +336,7 @@ Future<Map> dsmVirtualizationGuestActionCheckPoweron(
       version: 1)
     ..addAll({'guest_id': guestId});
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmVirtualizationGuestActionCheckPoweron: $res");
+//Log.info("dsmVirtualizationGuestActionCheckPoweron: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -351,7 +351,7 @@ Future<Map> dsmVirtualizationGuestActionPwrCtl(
       api: 'SYNO.Virtualization.Guest.Action', method: 'pwr_ctl', version: 1)
     ..addAll({'guest_id': guestId, 'action': action});
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmVirtualizationGuestActionPwrCtl: $res");
+//Log.info("dsmVirtualizationGuestActionPwrCtl: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -370,7 +370,7 @@ Future<Map> dsmVirtualizationGuestDelete(
   if (guestId != null && guestId.isNotEmpty) data['guest_id'] = guestId;
   if (guestName != null && guestName.isNotEmpty) data['guest_name'] = guestName;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmVirtualizationGuestDelete: $res");
+//Log.info("dsmVirtualizationGuestDelete: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -400,7 +400,7 @@ Future<Map> dsmVirtualizationGuestSet(
   if (vramSize != null) data['vram_size'] = vramSize;
   if (autorun != null) data['autorun'] = autorun;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmVirtualizationGuestSet: $res");
+//Log.info("dsmVirtualizationGuestSet: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }

@@ -62,7 +62,7 @@ Future<Map> dsmFileStationInfoGet({CancelToken? cancelToken}) async {
       api: 'SYNO.FileStation.Info', method: 'get', version: 2);
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmFileStationInfoGet: $res");
+//Log.info("dsmFileStationInfoGet: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -205,7 +205,7 @@ Future<Map> dsmFileStationListList(String folderPath, // Folder path
   }
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmFileStationListList: $res");
+//Log.info("dsmFileStationListList: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -244,7 +244,7 @@ Future<Map> dsmFileStationListGetinfo(
     data['additional'] = additional;
   }
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmFileStationListGetinfo: $res");
+//Log.info("dsmFileStationListGetinfo: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -267,7 +267,7 @@ Future<Map> dsmFileStationVirtualFolderList(
     data['additional'] = additional;
   }
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmFileStationVirtualFolderList: $res");
+//Log.info("dsmFileStationVirtualFolderList: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -280,7 +280,7 @@ Future<Map> dsmFileStationVFSConnectionDelete(
       api: 'SYNO.FileStation.VFS.Connection', method: 'delete', version: 1)
     ..addAll({'id': id});
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmFileStationVFSConnectionDelete: $res");
+//Log.info("dsmFileStationVFSConnectionDelete: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -308,7 +308,7 @@ Future<Map> dsmFileStationCheckPermissionWrite(
   if (size != null) data['size'] = size;
   if (createOnly != null) data['create_only'] = createOnly;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmFileStationCheckPermissionWrite: $res");
+//Log.info("dsmFileStationCheckPermissionWrite: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }

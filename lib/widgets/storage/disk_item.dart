@@ -1,6 +1,5 @@
 import 'package:garden/constants/app_constants.dart';
 import 'package:garden/extensions/int.dart';
-import 'package:garden/extensions/context.dart';
 import 'package:garden/widgets/label.dart';
 import 'package:flutter/material.dart';
 
@@ -27,7 +26,8 @@ class DiskItem extends StatelessWidget {
             }
           : null,
       child: Card(
-        shape: context.stadiumShapeBorder,
+        shape: RoundedRectangleBorder(
+            side: const BorderSide(), borderRadius: BorderRadius.circular(18)),
         margin: const EdgeInsets.only(top: 10),
         child: Padding(
           padding: const EdgeInsets.all(AppConstants.paddingSmall),

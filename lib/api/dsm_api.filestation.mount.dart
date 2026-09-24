@@ -21,7 +21,7 @@ Future<Map> dsmFileStationMountMountRemote(
       'passwd': passwd
     });
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmFileStationMountMountRemote: $res");
+//Log.info("dsmFileStationMountMountRemote: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -40,7 +40,7 @@ Future<Map> dsmFileStationMountUnmount(
       'mount_type': mountType
     });
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmFileStationMountUnmount: $res");
+//Log.info("dsmFileStationMountUnmount: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }

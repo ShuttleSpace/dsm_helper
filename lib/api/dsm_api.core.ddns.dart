@@ -29,7 +29,7 @@ Future<Map> dsmCoreDDNSRecordSet(
     data['passwd'] = passwd;
   }
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmCoreDDNSRecordSet: $res");
+//Log.info("dsmCoreDDNSRecordSet: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -42,7 +42,7 @@ Future<Map> dsmCoreDDNSRecordUpdateIpAddress(
       api: 'SYNO.Core.DDNS.Record', method: 'update_ip_address', version: 1)
     ..addAll({'id': id});
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmCoreDDNSRecordUpdateIpAddress: $res");
+//Log.info("dsmCoreDDNSRecordUpdateIpAddress: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -55,7 +55,7 @@ Future<Map> dsmCoreDDNSRecordDelete(
       api: 'SYNO.Core.DDNS.Record', method: 'delete', version: 1)
     ..addAll({'id': jsonEncode(id)});
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmCoreDDNSRecordDelete: $res");
+//Log.info("dsmCoreDDNSRecordDelete: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -88,7 +88,7 @@ Future<Map> dsmCoreDDNSRecordTest(
     data['passwd'] = passwd;
   }
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmCoreDDNSRecordTest: $res");
+//Log.info("dsmCoreDDNSRecordTest: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }

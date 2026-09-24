@@ -11,6 +11,7 @@ list(APPEND FLUTTER_PLUGIN_LIST
   media_kit_video
   open_share_plus
   permission_handler_windows
+  share_plus
   syncfusion_pdfviewer_windows
   url_launcher_windows
 )

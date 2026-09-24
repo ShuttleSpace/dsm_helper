@@ -12,7 +12,7 @@ Future<Map> dsmActiveBackupIntegrationWrapperDomainGet(
       api: 'SYNO.ActiveBackup.Wrapper.Domain', method: 'get', version: 1);
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmActiveBackupIntegrationWrapperDomainGet: $res");
+//Log.info("dsmActiveBackupIntegrationWrapperDomainGet: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -27,7 +27,7 @@ Future<Map> dsmActiveBackupIntegrationWrapperDomainGetDomainList(
       version: 1);
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmActiveBackupIntegrationWrapperDomainGetDomainList: $res");
+//Log.info("dsmActiveBackupIntegrationWrapperDomainGetDomainList: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -41,7 +41,7 @@ Future<Map> dsmActiveBackupIntegrationWrapperDomainTestDc(
       api: 'SYNO.ActiveBackup.Wrapper.Domain', method: 'test_dc', version: 1);
   data['dc_address'] = dcAddress;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmActiveBackupIntegrationWrapperDomainTestDc: $res");
+//Log.info("dsmActiveBackupIntegrationWrapperDomainTestDc: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -54,7 +54,7 @@ Future<Map> dsmActiveBackupIntegrationWrapperLdapGet(
       api: 'SYNO.ActiveBackup.Wrapper.LDAP', method: 'get', version: 1);
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmActiveBackupIntegrationWrapperLdapGet: $res");
+//Log.info("dsmActiveBackupIntegrationWrapperLdapGet: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -67,7 +67,7 @@ Future<Map> dsmActiveBackupIntegrationWrapperNfsGet(
       api: 'SYNO.ActiveBackup.Wrapper.NFS', method: 'get', version: 1);
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmActiveBackupIntegrationWrapperNfsGet: $res");
+//Log.info("dsmActiveBackupIntegrationWrapperNfsGet: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -81,7 +81,7 @@ Future<Map> dsmActiveBackupIntegrationWrapperNfsSet(
       api: 'SYNO.ActiveBackup.Wrapper.NFS', method: 'set', version: 1);
   data['settings'] = settings;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmActiveBackupIntegrationWrapperNfsSet: $res");
+//Log.info("dsmActiveBackupIntegrationWrapperNfsSet: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -96,7 +96,7 @@ Future<Map> dsmActiveBackupIntegrationWrapperNfsPrivilegeLoad(
       version: 1);
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmActiveBackupIntegrationWrapperNfsPrivilegeLoad: $res");
+//Log.info("dsmActiveBackupIntegrationWrapperNfsPrivilegeLoad: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -112,7 +112,7 @@ Future<Map> dsmActiveBackupIntegrationWrapperNfsPrivilegeSave(
       version: 1);
   data['privileges'] = privileges;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmActiveBackupIntegrationWrapperNfsPrivilegeSave: $res");
+//Log.info("dsmActiveBackupIntegrationWrapperNfsPrivilegeSave: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -128,7 +128,7 @@ Future<Map> dsmActiveBackupOtherDelegationCreateOrUpdate(
       version: 1);
   data['delegation'] = delegation;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmActiveBackupOtherDelegationCreateOrUpdate: $res");
+//Log.info("dsmActiveBackupOtherDelegationCreateOrUpdate: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -142,7 +142,7 @@ Future<Map> dsmActiveBackupOtherDelegationDelete(
       api: 'SYNO.ActiveBackup.Delegation', method: 'delete', version: 1);
   data['delegation_id'] = delegationId;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmActiveBackupOtherDelegationDelete: $res");
+//Log.info("dsmActiveBackupOtherDelegationDelete: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -155,7 +155,7 @@ Future<Map> dsmActiveBackupOtherDelegationList(
       api: 'SYNO.ActiveBackup.Delegation', method: 'list', version: 1);
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmActiveBackupOtherDelegationList: $res");
+//Log.info("dsmActiveBackupOtherDelegationList: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -169,7 +169,7 @@ Future<Map> dsmActiveBackupOtherTaskTemplateCreate(
       api: 'SYNO.ActiveBackup.TaskTemplate', method: 'create', version: 1);
   data['template_name'] = templateName;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmActiveBackupOtherTaskTemplateCreate: $res");
+//Log.info("dsmActiveBackupOtherTaskTemplateCreate: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -182,7 +182,7 @@ Future<Map> dsmActiveBackupOtherTaskTemplateList(
       api: 'SYNO.ActiveBackup.TaskTemplate', method: 'list', version: 1);
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmActiveBackupOtherTaskTemplateList: $res");
+//Log.info("dsmActiveBackupOtherTaskTemplateList: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -196,7 +196,7 @@ Future<Map> dsmActiveBackupOtherTaskTemplateRemove(
       api: 'SYNO.ActiveBackup.TaskTemplate', method: 'remove', version: 1);
   data['template_id'] = templateId;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmActiveBackupOtherTaskTemplateRemove: $res");
+//Log.info("dsmActiveBackupOtherTaskTemplateRemove: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -210,7 +210,7 @@ Future<Map> dsmActiveBackupOtherTaskTemplateSet(
       api: 'SYNO.ActiveBackup.TaskTemplate', method: 'set', version: 1);
   data['template_id'] = templateId;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmActiveBackupOtherTaskTemplateSet: $res");
+//Log.info("dsmActiveBackupOtherTaskTemplateSet: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -226,7 +226,7 @@ Future<Map> dsmActiveBackupOtherTaskTemplateSetPriority(
       version: 1);
   data['template_id'] = templateId;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmActiveBackupOtherTaskTemplateSetPriority: $res");
+//Log.info("dsmActiveBackupOtherTaskTemplateSetPriority: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -243,7 +243,7 @@ Future<Map> dsmActiveBackupOtherTaskTemplateTranslateTargetId(
   data['target_id'] = targetId;
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmActiveBackupOtherTaskTemplateTranslateTargetId: $res");
+//Log.info("dsmActiveBackupOtherTaskTemplateTranslateTargetId: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -257,7 +257,7 @@ Future<Map> dsmActiveBackupOtherWorkloadBackup(
       api: 'SYNO.ActiveBackup.Workload', method: 'backup', version: 1);
   data['workload_uuid'] = workloadUuid;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmActiveBackupOtherWorkloadBackup: $res");
+//Log.info("dsmActiveBackupOtherWorkloadBackup: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -271,7 +271,7 @@ Future<Map> dsmActiveBackupOtherWorkloadCancel(
       api: 'SYNO.ActiveBackup.Workload', method: 'cancel', version: 1);
   data['workload_uuid'] = workloadUuid;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmActiveBackupOtherWorkloadCancel: $res");
+//Log.info("dsmActiveBackupOtherWorkloadCancel: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -287,7 +287,7 @@ Future<Map> dsmActiveBackupOtherWorkloadCancelByActivityUid(
       version: 1);
   data['activity_uid'] = activityUid;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmActiveBackupOtherWorkloadCancelByActivityUid: $res");
+//Log.info("dsmActiveBackupOtherWorkloadCancelByActivityUid: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -303,7 +303,7 @@ Future<Map> dsmActiveBackupOtherWorkloadCancelThenDelete(
       version: 1);
   data['workload_uuid'] = workloadUuid;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmActiveBackupOtherWorkloadCancelThenDelete: $res");
+//Log.info("dsmActiveBackupOtherWorkloadCancelThenDelete: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -317,7 +317,7 @@ Future<Map> dsmActiveBackupOtherWorkloadCreate(
       api: 'SYNO.ActiveBackup.Workload', method: 'create', version: 1);
   data['workload_name'] = workloadName;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmActiveBackupOtherWorkloadCreate: $res");
+//Log.info("dsmActiveBackupOtherWorkloadCreate: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -331,7 +331,7 @@ Future<Map> dsmActiveBackupOtherWorkloadDelete(
       api: 'SYNO.ActiveBackup.Workload', method: 'delete', version: 1);
   data['workload_uuid'] = workloadUuid;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmActiveBackupOtherWorkloadDelete: $res");
+//Log.info("dsmActiveBackupOtherWorkloadDelete: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -347,7 +347,7 @@ Future<Map> dsmActiveBackupOtherWorkloadDeleteWithoutDedup(
       version: 1);
   data['workload_uuid'] = workloadUuid;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmActiveBackupOtherWorkloadDeleteWithoutDedup: $res");
+//Log.info("dsmActiveBackupOtherWorkloadDeleteWithoutDedup: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -362,7 +362,7 @@ Future<Map> dsmActiveBackupOtherWorkloadGetPlan(
   data['workload_uuid'] = workloadUuid;
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmActiveBackupOtherWorkloadGetPlan: $res");
+//Log.info("dsmActiveBackupOtherWorkloadGetPlan: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -377,7 +377,7 @@ Future<Map> dsmActiveBackupOtherWorkloadGetStatus(
   data['workload_uuid'] = workloadUuid;
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmActiveBackupOtherWorkloadGetStatus: $res");
+//Log.info("dsmActiveBackupOtherWorkloadGetStatus: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -391,7 +391,7 @@ Future<Map> dsmActiveBackupOtherWorkloadUpdate(
       api: 'SYNO.ActiveBackup.Workload', method: 'update', version: 1);
   data['workload_uuid'] = workloadUuid;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmActiveBackupOtherWorkloadUpdate: $res");
+//Log.info("dsmActiveBackupOtherWorkloadUpdate: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }

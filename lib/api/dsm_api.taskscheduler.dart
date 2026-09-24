@@ -76,7 +76,7 @@ Future<Map> dsmCoreTaskSchedulerGet(int taskId, // Task ID
   data['task_id'] = taskId;
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmCoreTaskSchedulerGet: $res");
+//Log.info("dsmCoreTaskSchedulerGet: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -95,7 +95,7 @@ Future<Map> dsmCoreTaskSchedulerSetEnable(
   data['task_id'] = taskId;
   data['enable'] = enable;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmCoreTaskSchedulerSetEnable: $res");
+//Log.info("dsmCoreTaskSchedulerSetEnable: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -117,7 +117,7 @@ Future<Map> dsmCoreTaskSchedulerRun(int taskId, // Task ID
       api: 'SYNO.Core.TaskScheduler', method: 'Run', version: 2);
   data['task_id'] = taskId;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmCoreTaskSchedulerRun: $res");
+//Log.info("dsmCoreTaskSchedulerRun: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -133,7 +133,7 @@ Future<Map> dsmCoreTaskSchedulerDelete(int taskId, // Task ID
       api: 'SYNO.Core.TaskScheduler', method: 'Delete', version: 2);
   data['task_id'] = taskId;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmCoreTaskSchedulerDelete: $res");
+//Log.info("dsmCoreTaskSchedulerDelete: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -166,7 +166,7 @@ Future<Map> dsmCoreTaskSchedulerResultGet(int taskId, // Task ID
   data['task_id'] = taskId;
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmCoreTaskSchedulerResultGet: $res");
+//Log.info("dsmCoreTaskSchedulerResultGet: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -266,7 +266,7 @@ Future<Map> dsmCoreTaskSchedulerScriptCreate(
     data['notify_mail'] = notifyMail;
   }
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmCoreTaskSchedulerScriptCreate: $res");
+//Log.info("dsmCoreTaskSchedulerScriptCreate: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -297,7 +297,7 @@ Future<Map> dsmCoreTaskSchedulerScriptModify(int taskId, // Task ID
   if (schedule != null) data['schedule'] = schedule;
   if (enabled != null) data['enabled'] = enabled;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmCoreTaskSchedulerScriptModify: $res");
+//Log.info("dsmCoreTaskSchedulerScriptModify: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -388,7 +388,7 @@ Future<Map> dsmCoreTaskSchedulerServiceCreate(
   data['schedule'] = schedule;
   if (enabled != null) data['enabled'] = enabled;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmCoreTaskSchedulerServiceCreate: $res");
+//Log.info("dsmCoreTaskSchedulerServiceCreate: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -424,7 +424,7 @@ Future<Map> dsmCoreTaskSchedulerServiceModify(int taskId, // Task ID
   if (schedule != null) data['schedule'] = schedule;
   if (enabled != null) data['enabled'] = enabled;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmCoreTaskSchedulerServiceModify: $res");
+//Log.info("dsmCoreTaskSchedulerServiceModify: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }

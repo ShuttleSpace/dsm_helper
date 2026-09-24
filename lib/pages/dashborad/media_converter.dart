@@ -7,7 +7,7 @@ import 'package:garden/widgets/animation_progress_bar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:garden/constants/app_constants.dart';
-import 'package:garden/extensions/context.dart';
+import 'package:garden/theme/app_colors.dart';
 
 class MediaConverter extends StatefulWidget {
   final Map converter;
@@ -25,7 +25,7 @@ class MediaConverterState extends State<MediaConverter> {
       converter = widget.converter;
     });
     timer = Timer.periodic(const Duration(seconds: 5), (timer) {
-      // getMediaConverter();
+      getMediaConverter();
     });
     getMediaConverter();
     super.initState();
@@ -53,7 +53,8 @@ class MediaConverterState extends State<MediaConverter> {
     return Material(
       color: Colors.transparent,
       child: Card(
-        shape: context.stadiumShapeBorder,
+        shape: RoundedRectangleBorder(
+            side: const BorderSide(), borderRadius: BorderRadius.circular(18)),
         child: SafeArea(
           top: false,
           child: Padding(
@@ -337,7 +338,7 @@ class MediaConverterState extends State<MediaConverter> {
                               converter['status'] == "paused"
                                   ? CupertinoIcons.play_arrow_solid
                                   : CupertinoIcons.pause_fill,
-                              color: Theme.of(context).colorScheme.primary,
+                              color: AppColors.primaryAction,
                               size: 16,
                             ),
                           ),

@@ -15,7 +15,7 @@ Future<Map> dsmActiveBackupAgentDeviceDuplicateWorkload(
       version: 1);
   data['workload_uuid'] = workloadUuid;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmActiveBackupAgentDeviceDuplicateWorkload: $res");
+//Log.info("dsmActiveBackupAgentDeviceDuplicateWorkload: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -29,7 +29,7 @@ Future<Map> dsmActiveBackupAgentDeviceListNodes(String deviceId, // Device ID
   data['device_id'] = deviceId;
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmActiveBackupAgentDeviceListNodes: $res");
+//Log.info("dsmActiveBackupAgentDeviceListNodes: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -45,7 +45,7 @@ Future<Map> dsmActiveBackupAgentDeviceSetUpdatePolicy(
       version: 1);
   data['auto_update'] = autoUpdate;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmActiveBackupAgentDeviceSetUpdatePolicy: $res");
+//Log.info("dsmActiveBackupAgentDeviceSetUpdatePolicy: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -60,7 +60,7 @@ Future<Map> dsmActiveBackupAgentDeviceUpdateAgent(
       version: 1);
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmActiveBackupAgentDeviceUpdateAgent: $res");
+//Log.info("dsmActiveBackupAgentDeviceUpdateAgent: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -74,7 +74,7 @@ Future<Map> dsmActiveBackupAgentDeviceUpgrade(
       api: 'SYNO.ActiveBackup.Agent.Device', method: 'upgrade', version: 1);
   data['device_ids'] = deviceIds;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmActiveBackupAgentDeviceUpgrade: $res");
+//Log.info("dsmActiveBackupAgentDeviceUpgrade: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -88,7 +88,7 @@ Future<Map> dsmActiveBackupAgentlessCreateDevice(
       api: 'SYNO.ActiveBackup.Agentless', method: 'create_device', version: 1);
   data['remote_connection_info'] = remoteConnectionInfo;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmActiveBackupAgentlessCreateDevice: $res");
+//Log.info("dsmActiveBackupAgentlessCreateDevice: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -105,7 +105,7 @@ Future<Map> dsmActiveBackupAgentlessGetDatapathOnStorage(
   data['share_name'] = shareName;
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmActiveBackupAgentlessGetDatapathOnStorage: $res");
+//Log.info("dsmActiveBackupAgentlessGetDatapathOnStorage: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -121,7 +121,7 @@ Future<Map> dsmActiveBackupAgentlessGetTaskSetting(String taskId, // Task ID
   data['task_id'] = taskId;
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmActiveBackupAgentlessGetTaskSetting: $res");
+//Log.info("dsmActiveBackupAgentlessGetTaskSetting: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -138,7 +138,7 @@ Future<Map> dsmActiveBackupAgentlessListDeviceFolder(
   data['remote_connection_info'] = remoteConnectionInfo;
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmActiveBackupAgentlessListDeviceFolder: $res");
+//Log.info("dsmActiveBackupAgentlessListDeviceFolder: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -154,7 +154,7 @@ Future<Map> dsmActiveBackupAgentlessRemoveSshKeyTmpFile(
       version: 1);
   data['ssh_key_file'] = sshKeyFile;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmActiveBackupAgentlessRemoveSshKeyTmpFile: $res");
+//Log.info("dsmActiveBackupAgentlessRemoveSshKeyTmpFile: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -168,7 +168,7 @@ Future<Map> dsmActiveBackupAgentlessSetDevice(
       api: 'SYNO.ActiveBackup.Agentless', method: 'set_device', version: 1);
   data['remote_connection_info'] = remoteConnectionInfo;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmActiveBackupAgentlessSetDevice: $res");
+//Log.info("dsmActiveBackupAgentlessSetDevice: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -185,7 +185,7 @@ Future<Map> dsmActiveBackupAgentlessSmbListRemoteFolder(
   data['host_ip'] = hostIp;
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmActiveBackupAgentlessSmbListRemoteFolder: $res");
+//Log.info("dsmActiveBackupAgentlessSmbListRemoteFolder: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -201,7 +201,7 @@ Future<Map> dsmActiveBackupAgentlessTestConnection(
       version: 1);
   data['remote_connection_info'] = remoteConnectionInfo;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmActiveBackupAgentlessTestConnection: $res");
+//Log.info("dsmActiveBackupAgentlessTestConnection: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -217,7 +217,7 @@ Future<Map> dsmActiveBackupAgentlessTestRsyncModuleConnection(
       version: 1);
   data['remote_connection_info'] = remoteConnectionInfo;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmActiveBackupAgentlessTestRsyncModuleConnection: $res");
+//Log.info("dsmActiveBackupAgentlessTestRsyncModuleConnection: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -231,7 +231,7 @@ Future<Map> dsmActiveBackupAgentlessTestSshKey(
       api: 'SYNO.ActiveBackup.Agentless', method: 'test_ssh_key', version: 1);
   data['ssh_key_file_path'] = sshKeyFilePath;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmActiveBackupAgentlessTestSshKey: $res");
+//Log.info("dsmActiveBackupAgentlessTestSshKey: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -246,7 +246,7 @@ Future<Map> dsmActiveBackupAgentlessTestTaskSettings(
       version: 1);
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmActiveBackupAgentlessTestTaskSettings: $res");
+//Log.info("dsmActiveBackupAgentlessTestTaskSettings: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }

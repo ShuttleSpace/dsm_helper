@@ -47,7 +47,7 @@ Future<Map> dsmFileStationSearchStart(String folderPath, // Starting folder path
   if (owener != null && owener.isNotEmpty) data['owener'] = owener;
   if (group != null && group.isNotEmpty) data['group'] = group;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmFileStationSearchStart: $res");
+//Log.info("dsmFileStationSearchStart: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -111,7 +111,7 @@ Future<Map> dsmFileStationSearchList(String taskid, // Task ID from start
   }
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmFileStationSearchList: $res");
+//Log.info("dsmFileStationSearchList: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -133,7 +133,7 @@ Future<Map> dsmFileStationSearchStatus(String taskid, // Task ID
   data['taskid'] = taskid;
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmFileStationSearchStatus: $res");
+//Log.info("dsmFileStationSearchStatus: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -149,7 +149,7 @@ Future<Map> dsmFileStationSearchStop(String taskid, // Task ID
       api: 'SYNO.FileStation.Search', method: 'stop', version: 2);
   data['taskid'] = taskid;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmFileStationSearchStop: $res");
+//Log.info("dsmFileStationSearchStop: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -166,7 +166,7 @@ Future<Map> dsmFileStationSearchClean(
       api: 'SYNO.FileStation.Search', method: 'clean', version: 2);
   data['taskid'] = taskid;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmFileStationSearchClean: $res");
+//Log.info("dsmFileStationSearchClean: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }

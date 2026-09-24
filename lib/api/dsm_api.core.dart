@@ -10,7 +10,7 @@ Future<List<DsmApiInfo>> dsmInfoQuery({CancelToken? cancelToken}) async {
     });
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("query: $res");
+//Log.info("query: $res");
   if (res["success"] != true) {
     throw DSMException.fromMap(res);
   }
@@ -55,7 +55,7 @@ Future<Map> dsmCoreSystemInfo(
   }
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmCoreSystemInfo: $res");
+//Log.info("dsmCoreSystemInfo: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -128,7 +128,7 @@ Future<Map> dsmCoreSystemHealth({CancelToken? cancelToken}) async {
   final data = _dsmApiRequestData(
       api: 'SYNO.Core.System.SystemHealth', method: 'get', version: 1);
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmCoreSystemHealth: $res");
+//Log.info("dsmCoreSystemHealth: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -149,7 +149,7 @@ Future<Map> dsmCoreFileServSMB({CancelToken? cancelToken}) async {
       api: 'SYNO.Core.FileServ.SMB', method: 'get', version: 1);
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmCoreFileServSMB: $res");
+//Log.info("dsmCoreFileServSMB: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -168,7 +168,7 @@ Future<Map> dsmCoreFileServAFP({CancelToken? cancelToken}) async {
       api: 'SYNO.Core.FileServ.AFP', method: 'get', version: 1);
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmCoreFileServAFP: $res");
+//Log.info("dsmCoreFileServAFP: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -187,7 +187,7 @@ Future<Map> dsmCoreFileServNFS({CancelToken? cancelToken}) async {
       api: 'SYNO.Core.FileServ.NFS', method: 'get', version: 1);
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmCoreFileServNFS: $res");
+//Log.info("dsmCoreFileServNFS: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -196,7 +196,7 @@ Future<Map> dsmCoreFileServNFS({CancelToken? cancelToken}) async {
 
 Future<String> pingpong(String host, {CancelToken? cancelToken}) async {
   final res = await _httpGet("$host/webman/pingpong.cgi");
-  Log.info("pingpong: $res");
+//Log.info("pingpong: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -277,7 +277,7 @@ Future<Map> dsmCoreDesktopPersonalUpdater({CancelToken? cancelToken}) async {
       method: 'need_update',
       version: 1);
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmCoreDesktopPersonalUpdater: $res");
+//Log.info("dsmCoreDesktopPersonalUpdater: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res, module: 'Core.Desktop');
   }
@@ -292,7 +292,7 @@ Future<Map> dsmCoreMediaIndexingMediaConverter(
       api: 'SYNO.Core.MediaIndexing.MediaConverter', method: method, version: 1)
     ..addAll({'delay_hours': delayHours ?? ''});
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmCoreMediaIndexingMediaConverter: $res");
+//Log.info("dsmCoreMediaIndexingMediaConverter: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res, module: 'Core.Media.Indexing');
   }
@@ -310,7 +310,7 @@ Future<Map> dsmCoreDSMNotifyStringsGet(
     data['pkgname'] = '"$pkgname"';
   }
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmCoreDSMNotifyStringsGet: $res");
+//Log.info("dsmCoreDSMNotifyStringsGet: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res, module: 'Core.DSM.Notify');
   }
@@ -337,7 +337,7 @@ Future<Map> dsmCoreDSMNotify(String action, // apply, load
     }
   }
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmCoreDSMNotify: $res");
+//Log.info("dsmCoreDSMNotify: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res, module: 'Core.DSM.Notify');
   }
@@ -390,7 +390,7 @@ Future<Map> dsmCoreCurrentConnectionGet(String action, // enum
     data['start'] = start;
   }
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmCoreCurrentConnectionGet: $res");
+//Log.info("dsmCoreCurrentConnectionGet: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -409,7 +409,7 @@ Future<Map> dsmCoreCurrentConnectionKickConnection(Map connection,
     data['service_conn'] = serviceConn;
   }
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmCoreCurrentConnectionKickConnection: $res");
+//Log.info("dsmCoreCurrentConnectionKickConnection: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -420,7 +420,7 @@ Future<Map> dsmCoreSystemProcess({CancelToken? cancelToken}) async {
   final data = _dsmApiRequestData(
       api: 'SYNO.Core.System.Process', method: 'list', version: 1);
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmCoreSystemProcess: $res");
+//Log.info("dsmCoreSystemProcess: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -436,7 +436,7 @@ Future<Map> dsmCoreSystemProcessGroup({CancelToken? cancelToken}) async {
     data['node'] = 'xnode-2572';
   }
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmCoreSystemProcessGroup: $res");
+//Log.info("dsmCoreSystemProcessGroup: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -541,7 +541,7 @@ Future<Map> dsmCoreQuickStartInfo(String method, // load_ds_info
     version: 3,
   );
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmCoreQuickStartInfo: $res");
+//Log.info("dsmCoreQuickStartInfo: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -554,7 +554,7 @@ Future<Map> dsmCoreBackgroundTask(
   final data = _dsmApiRequestData(
       api: 'SYNO.Core.BackgroundTask', method: method ?? 'get', version: 1);
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmCoreBackgroundTask: $res");
+//Log.info("dsmCoreBackgroundTask: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -566,7 +566,7 @@ Future<bool> dsmCoreDesktopTimeoutCheck({CancelToken? cancelToken}) async {
   final data = _dsmApiRequestData(
       api: 'SYNO.Core.Desktop.Timeout', method: 'Check', version: 1);
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmCoreDesktopTimeoutCheck: $res");
+//Log.info("dsmCoreDesktopTimeoutCheck: $res");
   return res['success'] == true;
 }
 
@@ -576,7 +576,7 @@ Future<Map> dsmCorePromotionPreInstall(String method, // get_never_show
   final data = _dsmApiRequestData(
       api: 'SYNO.Core.Promotion.PreInstall', method: method, version: 1);
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmCorePromotionPreInstall: $res");
+//Log.info("dsmCorePromotionPreInstall: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -591,7 +591,7 @@ Future<Map> dsmCoreThemeAppPortalLogin(String app,
       api: 'SYNO.Core.Theme.AppPortalLogin', method: 'get', version: 1);
   data['app'] = '"$app"';
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmCoreThemeAppPortalLogin: $res");
+//Log.info("dsmCoreThemeAppPortalLogin: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -607,7 +607,7 @@ Future<Map> dsmCoreThemeAppPortalLoginBatch(List<String> apps,
         'app': '"$e"',
       });
   final res = await _dsmApiCall(jsonEncode(compound), cancelToken: cancelToken);
-  Log.info("dsmCoreThemeAppPortalLoginBatch: $res");
+//Log.info("dsmCoreThemeAppPortalLoginBatch: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }

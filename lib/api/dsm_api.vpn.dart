@@ -15,7 +15,7 @@ Future<Map> dsmVPNCenterServerStatusLoad({CancelToken? cancelToken}) async {
       api: 'SYNO.VPNCenter.Server.Status', method: 'status_load', version: 1);
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmVPNCenterServerStatusLoad: $res");
+//Log.info("dsmVPNCenterServerStatusLoad: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -53,7 +53,7 @@ Future<Map> dsmVPNCenterServerConnectionEnum(
   if (limit != null) data['limit'] = limit;
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmVPNCenterServerConnectionEnum: $res");
+//Log.info("dsmVPNCenterServerConnectionEnum: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -104,7 +104,7 @@ Future<Map> dsmVPNCenterServerLogLoad(
   if (prtltype != null) data['prtltype'] = prtltype;
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmVPNCenterServerLogLoad: $res");
+//Log.info("dsmVPNCenterServerLogLoad: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -133,7 +133,7 @@ Future<Map> dsmVPNCenterServerNetworkInterfaceLoad(
       version: 1);
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmVPNCenterServerNetworkInterfaceLoad: $res");
+//Log.info("dsmVPNCenterServerNetworkInterfaceLoad: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -165,7 +165,7 @@ Future<Map> dsmCoreSecurityAutoBlockGet({CancelToken? cancelToken}) async {
       api: 'SYNO.Core.SecurityAutoBlock', method: 'get', version: 1);
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmCoreSecurityAutoBlockGet: $res");
+//Log.info("dsmCoreSecurityAutoBlockGet: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -221,7 +221,7 @@ Future<Map> dsmVPNCenterServerPrivilegeLoad(String action, // enum
   if (limit != null) data['limit'] = limit;
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmVPNCenterServerPrivilegeLoad: $res");
+//Log.info("dsmVPNCenterServerPrivilegeLoad: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -244,7 +244,7 @@ Future<Map> dsmVPNCenterServerPPTPLoad({CancelToken? cancelToken}) async {
   data['serv_type'] = 'pptp';
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmVPNCenterServerPPTPLoad: $res");
+//Log.info("dsmVPNCenterServerPPTPLoad: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -268,7 +268,7 @@ Future<Map> dsmVPNCenterServerOpenVPNLoad({CancelToken? cancelToken}) async {
   data['serv_type'] = 'openvpn';
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmVPNCenterServerOpenVPNLoad: $res");
+//Log.info("dsmVPNCenterServerOpenVPNLoad: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -291,7 +291,7 @@ Future<dynamic> dsmVPNCenterServerOpenVPNExportConfig(
       version: 1);
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmVPNCenterServerOpenVPNExportConfig: $res");
+//Log.info("dsmVPNCenterServerOpenVPNExportConfig: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -333,7 +333,7 @@ Future<Map> dsmVPNCenterServerL2TPLoad({CancelToken? cancelToken}) async {
   data['serv_type'] = 'l2tp';
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmVPNCenterServerL2TPLoad: $res");
+//Log.info("dsmVPNCenterServerL2TPLoad: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }

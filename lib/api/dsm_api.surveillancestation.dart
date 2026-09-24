@@ -15,7 +15,7 @@ Future<Map> dsmSurveillanceStationInfoGetInfo(
       api: 'SYNO.SurveillanceStation.Info', method: 'GetInfo', version: 1);
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmSurveillanceStationInfoGetInfo: $res");
+//Log.info("dsmSurveillanceStationInfoGetInfo: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -73,7 +73,7 @@ Future<Map> dsmSurveillanceStationCameraList(
   }
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmSurveillanceStationCameraList: $res");
+//Log.info("dsmSurveillanceStationCameraList: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -109,7 +109,7 @@ Future<Map> dsmSurveillanceStationCameraGetInfo(
   if (optimize != null) data['optimize'] = optimize;
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmSurveillanceStationCameraGetInfo: $res");
+//Log.info("dsmSurveillanceStationCameraGetInfo: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -125,7 +125,7 @@ Future<Map> dsmSurveillanceStationCameraEnable(int id, // Camera ID
       api: 'SYNO.SurveillanceStation.Camera', method: 'Enable', version: 9);
   data['id'] = id;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmSurveillanceStationCameraEnable: $res");
+//Log.info("dsmSurveillanceStationCameraEnable: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -141,7 +141,7 @@ Future<Map> dsmSurveillanceStationCameraDisable(int id, // Camera ID
       api: 'SYNO.SurveillanceStation.Camera', method: 'Disable', version: 9);
   data['id'] = id;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmSurveillanceStationCameraDisable: $res");
+//Log.info("dsmSurveillanceStationCameraDisable: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -171,7 +171,7 @@ Future<dynamic> dsmSurveillanceStationCameraGetSnapshot(
   if (profileType != null) data['profileType'] = profileType;
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmSurveillanceStationCameraGetSnapshot: $res");
+//Log.info("dsmSurveillanceStationCameraGetSnapshot: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -246,7 +246,7 @@ Future<Map> dsmSurveillanceStationCameraGetLiveViewPath(
   data['idList'] = idList;
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmSurveillanceStationCameraGetLiveViewPath: $res");
+//Log.info("dsmSurveillanceStationCameraGetLiveViewPath: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -275,7 +275,7 @@ Future<Map> dsmSurveillanceStationVideoStreamStream(
   data['format'] = format;
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmSurveillanceStationVideoStreamStream: $res");
+//Log.info("dsmSurveillanceStationVideoStreamStream: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -314,7 +314,7 @@ Future<Map> dsmSurveillanceStationCameraGroupEnum(
   if (privCamType != null) data['privCamType'] = privCamType;
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmSurveillanceStationCameraGroupEnum: $res");
+//Log.info("dsmSurveillanceStationCameraGroupEnum: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -372,7 +372,7 @@ Future<Map> dsmSurveillanceStationEventQuery(
   if (limit != null) data['limit'] = limit;
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmSurveillanceStationEventQuery: $res");
+//Log.info("dsmSurveillanceStationEventQuery: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -397,7 +397,7 @@ Future<Map> dsmSurveillanceStationEventDelete(
   if (toTime != null) data['toTime'] = toTime;
   if (locked != null) data['locked'] = locked;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmSurveillanceStationEventDelete: $res");
+//Log.info("dsmSurveillanceStationEventDelete: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -420,7 +420,7 @@ Future<Map> dsmSurveillanceStationEventLock(
   if (fromTime != null) data['fromTime'] = fromTime;
   if (toTime != null) data['toTime'] = toTime;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmSurveillanceStationEventLock: $res");
+//Log.info("dsmSurveillanceStationEventLock: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -437,7 +437,7 @@ Future<Map> dsmSurveillanceStationEventUnlock(
       api: 'SYNO.SurveillanceStation.Event', method: 'Unlock', version: 4);
   data['idList'] = idList;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmSurveillanceStationEventUnlock: $res");
+//Log.info("dsmSurveillanceStationEventUnlock: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -473,7 +473,7 @@ Future<Map> dsmSurveillanceStationEventDetectionMotionEnum(
   data['camId'] = camId;
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmSurveillanceStationEventDetectionMotionEnum: $res");
+//Log.info("dsmSurveillanceStationEventDetectionMotionEnum: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -503,7 +503,7 @@ Future<Map> dsmSurveillanceStationPTZMove(
   data['direction'] = direction;
   if (speed != null) data['speed'] = speed;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmSurveillanceStationPTZMove: $res");
+//Log.info("dsmSurveillanceStationPTZMove: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -522,7 +522,7 @@ Future<Map> dsmSurveillanceStationPTZZoom(
   data['cameraId'] = cameraId;
   data['control'] = control;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmSurveillanceStationPTZZoom: $res");
+//Log.info("dsmSurveillanceStationPTZZoom: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -541,7 +541,7 @@ Future<Map> dsmSurveillanceStationPTZFocus(
   data['cameraId'] = cameraId;
   data['control'] = control;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmSurveillanceStationPTZFocus: $res");
+//Log.info("dsmSurveillanceStationPTZFocus: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -578,7 +578,7 @@ Future<Map> dsmSurveillanceStationPTZPresetList(int cameraId, // Camera ID
   data['cameraId'] = cameraId;
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmSurveillanceStationPTZPresetList: $res");
+//Log.info("dsmSurveillanceStationPTZPresetList: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -602,7 +602,7 @@ Future<Map> dsmSurveillanceStationPTZGotoPreset(int cameraId, // Camera ID
   if (position != null) data['position'] = position;
   if (speed != null) data['speed'] = speed;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmSurveillanceStationPTZGotoPreset: $res");
+//Log.info("dsmSurveillanceStationPTZGotoPreset: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -635,7 +635,7 @@ Future<Map> dsmSurveillanceStationPTZPatrolList(int cameraId, // Camera ID
   data['cameraId'] = cameraId;
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmSurveillanceStationPTZPatrolList: $res");
+//Log.info("dsmSurveillanceStationPTZPatrolList: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -656,7 +656,7 @@ Future<Map> dsmSurveillanceStationPTZPatrolRunPatrol(
   data['cameraId'] = cameraId;
   data['patrolId'] = patrolId;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmSurveillanceStationPTZPatrolRunPatrol: $res");
+//Log.info("dsmSurveillanceStationPTZPatrolRunPatrol: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -710,7 +710,7 @@ Future<Map> dsmSurveillanceStationRecordingQuery(
   if (limit != null) data['limit'] = limit;
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmSurveillanceStationRecordingQuery: $res");
+//Log.info("dsmSurveillanceStationRecordingQuery: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -727,7 +727,7 @@ Future<Map> dsmSurveillanceStationRecordingDelete(
       api: 'SYNO.SurveillanceStation.Recording', method: 'Delete', version: 5);
   data['idList'] = idList;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmSurveillanceStationRecordingDelete: $res");
+//Log.info("dsmSurveillanceStationRecordingDelete: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -744,7 +744,7 @@ Future<Map> dsmSurveillanceStationRecordingLock(
       api: 'SYNO.SurveillanceStation.Recording', method: 'Lock', version: 5);
   data['idList'] = idList;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmSurveillanceStationRecordingLock: $res");
+//Log.info("dsmSurveillanceStationRecordingLock: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -761,7 +761,7 @@ Future<Map> dsmSurveillanceStationRecordingUnlock(
       api: 'SYNO.SurveillanceStation.Recording', method: 'Unlock', version: 5);
   data['idList'] = idList;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmSurveillanceStationRecordingUnlock: $res");
+//Log.info("dsmSurveillanceStationRecordingUnlock: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -789,7 +789,7 @@ Future<Map> dsmSurveillanceStationRecordingDownload(String id, // Recording ID
   if (mountId != null && mountId.isNotEmpty) data['mountId'] = mountId;
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmSurveillanceStationRecordingDownload: $res");
+//Log.info("dsmSurveillanceStationRecordingDownload: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -824,7 +824,7 @@ Future<Map> dsmSurveillanceStationRecordingExportSave(
   data['toTime'] = toTime;
   if (fileName != null && fileName.isNotEmpty) data['fileName'] = fileName;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmSurveillanceStationRecordingExportSave: $res");
+//Log.info("dsmSurveillanceStationRecordingExportSave: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -849,7 +849,7 @@ Future<Map> dsmSurveillanceStationRecordingGetConfig(
       version: 5);
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmSurveillanceStationRecordingGetConfig: $res");
+//Log.info("dsmSurveillanceStationRecordingGetConfig: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -867,7 +867,7 @@ Future<Map> dsmSurveillanceStationRecordingStart(int cameraId, // Camera ID
   data['cameraId'] = cameraId;
   if (type != null && type.isNotEmpty) data['type'] = type;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmSurveillanceStationRecordingStart: $res");
+//Log.info("dsmSurveillanceStationRecordingStart: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -883,7 +883,7 @@ Future<Map> dsmSurveillanceStationRecordingStop(int cameraId, // Camera ID
       api: 'SYNO.SurveillanceStation.Recording', method: 'Stop', version: 5);
   data['cameraId'] = cameraId;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmSurveillanceStationRecordingStop: $res");
+//Log.info("dsmSurveillanceStationRecordingStop: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -899,7 +899,7 @@ Future<Map> dsmSurveillanceStationRecordingPause(int cameraId, // Camera ID
       api: 'SYNO.SurveillanceStation.Recording', method: 'Pause', version: 5);
   data['cameraId'] = cameraId;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmSurveillanceStationRecordingPause: $res");
+//Log.info("dsmSurveillanceStationRecordingPause: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -915,7 +915,7 @@ Future<Map> dsmSurveillanceStationRecordingResume(int cameraId, // Camera ID
       api: 'SYNO.SurveillanceStation.Recording', method: 'Resume', version: 5);
   data['cameraId'] = cameraId;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmSurveillanceStationRecordingResume: $res");
+//Log.info("dsmSurveillanceStationRecordingResume: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }

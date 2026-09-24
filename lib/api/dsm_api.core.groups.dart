@@ -31,7 +31,7 @@ Future<Map> dsmCoreGroupList(
   if (nameOnly != null) data['name_only'] = nameOnly;
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmCoreGroupList: $res");
+//Log.info("dsmCoreGroupList: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -55,7 +55,7 @@ Future<Map> dsmCoreGroupGet(String name, // Group name
   data['name'] = name;
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmCoreGroupGet: $res");
+//Log.info("dsmCoreGroupGet: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -76,7 +76,7 @@ Future<Map> dsmCoreGroupCreate(String name, // Group name
   }
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmCoreGroupCreate: $res");
+//Log.info("dsmCoreGroupCreate: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -101,7 +101,7 @@ Future<Map> dsmCoreGroupSet(String name, // Group name
   }
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmCoreGroupSet: $res");
+//Log.info("dsmCoreGroupSet: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -119,7 +119,7 @@ Future<Map> dsmCoreGroupDelete(
   data['name'] = name;
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmCoreGroupSet: $res");
+//Log.info("dsmCoreGroupSet: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -140,7 +140,7 @@ Future<Map> dsmCoreGroupMemberList(String group, // Group name
   data['group'] = group;
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmCoreGroupMemberList: $res");
+//Log.info("dsmCoreGroupMemberList: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -160,7 +160,7 @@ Future<Map> dsmCoreGroupMemberAdd(
   data['users'] = users;
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmCoreGroupMemberAdd: $res");
+//Log.info("dsmCoreGroupMemberAdd: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -180,7 +180,7 @@ Future<Map> dsmCoreGroupMemberRemove(
   data['users'] = users;
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmCoreGroupMemberRemove: $res");
+//Log.info("dsmCoreGroupMemberRemove: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }

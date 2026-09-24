@@ -47,7 +47,7 @@ Future<Map> dsmCoreStorageDiskGetSmartTestLog(
       api: 'SYNO.Core.Storage.Disk', method: 'get_smart_test_log', version: 1)
     ..addAll({'device': device});
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmCoreStorageDiskGetSmartTestLog: $res");
+//Log.info("dsmCoreStorageDiskGetSmartTestLog: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -73,7 +73,7 @@ Future<Map> dsmCoreStorageDiskDiskTestLogGet(
       'type': type
     });
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmCoreStorageDiskDiskTestLogGet: $res");
+//Log.info("dsmCoreStorageDiskDiskTestLogGet: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -88,7 +88,7 @@ Future<Map> dsmCoreStorageDiskDoSmartTest(
       api: 'SYNO.Core.Storage.Disk', method: 'do_smart_test', version: 1)
     ..addAll({'device': device, 'type': type});
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmCoreStorageDiskDoSmartTest: $res");
+//Log.info("dsmCoreStorageDiskDoSmartTest: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -98,9 +98,9 @@ Future<Map> dsmCoreStorageDiskDoSmartTest(
 Future<Map> dsmCoreStorageVolumeList({CancelToken? cancelToken}) async {
   final data = _dsmApiRequestData(
       api: 'SYNO.Core.Storage.Volume', method: 'list', version: 1)
-    ..addAll({'limit': -1, 'offset': 0, 'location': 'internal'});
+    ..addAll({'limit': -1, 'offset': 0, 'location': '"internal"'});
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmCoreStorageVolumeList: $res");
+  // Log.info("dsmCoreStorageVolumeList: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }

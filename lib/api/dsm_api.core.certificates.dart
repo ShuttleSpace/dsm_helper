@@ -34,7 +34,7 @@ Future<Map> dsmCoreCertificateList({CancelToken? cancelToken}) async {
       api: 'SYNO.Core.Certificate', method: 'list', version: 1);
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmCoreCertificateList: $res");
+//Log.info("dsmCoreCertificateList: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -61,7 +61,7 @@ Future<Map> dsmCoreCertificateGet(String id, {CancelToken? cancelToken}) async {
       api: 'SYNO.Core.Certificate', method: 'get', version: 1);
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmCoreCertificateGet: $res");
+//Log.info("dsmCoreCertificateGet: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -98,7 +98,7 @@ Future<Map> dsmCoreCertificateCRTImport(
   }
   final map = FormData.fromMap(data);
   final res = await _httpPost(_entryCGI, data: map, cancelToken: cancelToken);
-  Log.info("dsmCoreCertificateCRTImport: $res");
+//Log.info("dsmCoreCertificateCRTImport: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -114,7 +114,7 @@ Future<dynamic> dsmCoreCertificateCRTGet(String id,
   data['id'] = id;
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmCoreCertificateCRTGet: $res");
+//Log.info("dsmCoreCertificateCRTGet: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -140,7 +140,7 @@ Future<dynamic> dsmCoreCertificateLetsEncryptCreate(
     data['as_default'] = asDefault;
   }
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmCoreCertificateLetsEncryptCreate: $res");
+//Log.info("dsmCoreCertificateLetsEncryptCreate: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -163,7 +163,7 @@ Future<dynamic> dsmCoreCertificateLetsEncryptRenew(
   data['id'] = id;
   data['email'] = email;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmCoreCertificateLetsEncryptRenew: $res");
+//Log.info("dsmCoreCertificateLetsEncryptRenew: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -189,7 +189,7 @@ Future<dynamic> dsmCoreCertificateServiceGet({CancelToken? cancelToken}) async {
   final data = _dsmApiRequestData(
       api: 'SYNO.Core.Certificate.Service', method: 'get', version: 1);
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmCoreCertificateServiceGet: $res");
+//Log.info("dsmCoreCertificateServiceGet: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }

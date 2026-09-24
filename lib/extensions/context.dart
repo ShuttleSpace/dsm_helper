@@ -22,7 +22,7 @@ extension StadiumStyleExtension on BuildContext {
   ShapeBorder get roundRectShapeBorder => RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(18),
         side: BorderSide(
-          color: Theme.of(this).colorScheme.primary.withValues(alpha: 0.1),
+          color: Theme.of(this).colorScheme.primary.withValues(alpha: 0.6),
         ),
       );
 }

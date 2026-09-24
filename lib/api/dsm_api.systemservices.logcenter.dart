@@ -48,7 +48,7 @@ Future<Map> dsmCoreSyslogClientLogList(
   }
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmCoreSyslogClientLogList: $res");
+//Log.info("dsmCoreSyslogClientLogList: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -70,7 +70,7 @@ Future<Map> dsmCoreSyslogClientStatusGetCount(
       api: 'SYNO.Core.SyslogClient.Status', method: 'GetCount', version: 1);
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmCoreSyslogClientStatusGetCount: $res");
+//Log.info("dsmCoreSyslogClientStatusGetCount: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -95,7 +95,7 @@ Future<Map> dsmCoreSyslogClientStatusGetEPS({CancelToken? cancelToken}) async {
       api: 'SYNO.Core.SyslogClient.Status', method: 'GetEPS', version: 1);
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmCoreSyslogClientStatusGetEPS: $res");
+//Log.info("dsmCoreSyslogClientStatusGetEPS: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -120,7 +120,7 @@ Future<Map> dsmCoreSyslogClientStatusLatestLogGet(
   }
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmCoreSyslogClientStatusLatestLogGet: $res");
+//Log.info("dsmCoreSyslogClientStatusLatestLogGet: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -152,7 +152,7 @@ Future<Map> dsmCoreSyslogClientSettingStorageList(
       version: 1);
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmCoreSyslogClientSettingStorageList: $res");
+//Log.info("dsmCoreSyslogClientSettingStorageList: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }

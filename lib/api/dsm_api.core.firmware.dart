@@ -6,7 +6,7 @@ Future<Map> dsmCoreSystemInfoFirmware({CancelToken? cancelToken}) async {
         ..addAll({'type': 'firmware'});
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmCoreSystemInfoFirmware: $res");
+//Log.info("dsmCoreSystemInfoFirmware: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -22,7 +22,7 @@ Future<Map> dsmCoreUpgradeServerCheck({CancelToken? cancelToken}) async {
       'need_promotion': true
     });
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmCoreUpgradeServerCheck: $res");
+//Log.info("dsmCoreUpgradeServerCheck: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }

@@ -32,7 +32,7 @@ Future<Map> dsmDockerContainerList(
   if (type != null && type.isNotEmpty) data['type'] = type;
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmDockerContainerList: $res");
+//Log.info("dsmDockerContainerList: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -73,7 +73,7 @@ Future<Map> dsmDockerContainerGet(String name, // Container name
   data['name'] = name;
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmDockerContainerGet: $res");
+//Log.info("dsmDockerContainerGet: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -89,7 +89,7 @@ Future<Map> dsmDockerContainerStart(String name, // Container name
       api: 'SYNO.Docker.Container', method: 'start', version: 1);
   data['name'] = name;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmDockerContainerStart: $res");
+//Log.info("dsmDockerContainerStart: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -107,7 +107,7 @@ Future<Map> dsmDockerContainerStop(String name, // Container name
   data['name'] = name;
   if (timeout != null) data['timeout'] = timeout;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmDockerContainerStop: $res");
+//Log.info("dsmDockerContainerStop: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -123,7 +123,7 @@ Future<Map> dsmDockerContainerRestart(String name, // Container name
       api: 'SYNO.Docker.Container', method: 'restart', version: 1);
   data['name'] = name;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmDockerContainerRestart: $res");
+//Log.info("dsmDockerContainerRestart: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -142,7 +142,7 @@ Future<Map> dsmDockerContainerDelete(
   data['name'] = name;
   if (force != null) data['force'] = force;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmDockerContainerDelete: $res");
+//Log.info("dsmDockerContainerDelete: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -167,7 +167,7 @@ Future<Map> dsmDockerContainerLogList(
     data['offset'] = offset ?? 0;
   }
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmDockerContainerLogList: $res");
+//Log.info("dsmDockerContainerLogList: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -194,7 +194,7 @@ Future<Map> dsmDockerContainerResourceGet({CancelToken? cancelToken}) async {
       api: 'SYNO.Docker.Container.Resource', method: 'get', version: 1);
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmDockerContainerResourceGet: $res");
+//Log.info("dsmDockerContainerResourceGet: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }

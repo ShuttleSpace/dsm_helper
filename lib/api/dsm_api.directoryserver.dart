@@ -23,7 +23,7 @@ Future<Map> dsmDirectoryServerDomainGetInfo({CancelToken? cancelToken}) async {
       api: 'SYNO.DirectoryServer.Domain', method: 'GetInfo', version: 1);
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmDirectoryServerDomainGetInfo: $res");
+//Log.info("dsmDirectoryServerDomainGetInfo: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -55,7 +55,7 @@ Future<Map> dsmDirectoryServerDomainList(String basedn, // Base DN to search
   if (limit != null) data['limit'] = limit;
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmDirectoryServerDomainList: $res");
+//Log.info("dsmDirectoryServerDomainList: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -99,7 +99,7 @@ Future<Map> dsmDirectoryServerUserCreate(
   if (email != null && email.isNotEmpty) data['email'] = email;
   if (ou != null && ou.isNotEmpty) data['ou'] = ou;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmDirectoryServerUserCreate: $res");
+//Log.info("dsmDirectoryServerUserCreate: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -126,7 +126,7 @@ Future<Map> dsmDirectoryServerUserModify(
     data['description'] = description;
   }
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmDirectoryServerUserModify: $res");
+//Log.info("dsmDirectoryServerUserModify: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -148,7 +148,7 @@ Future<Map> dsmDirectoryServerUserDelete(String dn, // User Distinguished Name
       api: 'SYNO.DirectoryServer.User', method: 'Delete', version: 1);
   data['dn'] = dn;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmDirectoryServerUserDelete: $res");
+//Log.info("dsmDirectoryServerUserDelete: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -172,7 +172,7 @@ Future<Map> dsmDirectoryServerUserResetPassword(String username, // Username
       api: 'SYNO.DirectoryServer.User', method: 'ResetPassword', version: 1);
   data['username'] = username;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmDirectoryServerUserResetPassword: $res");
+//Log.info("dsmDirectoryServerUserResetPassword: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -191,7 +191,7 @@ Future<Map> dsmDirectoryServerUserChangePassword(
   data['user_dn'] = userDn;
   data['password'] = password;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmDirectoryServerUserChangePassword: $res");
+//Log.info("dsmDirectoryServerUserChangePassword: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -226,7 +226,7 @@ Future<Map> dsmDirectoryServerGroupCreate(String name, // Group name
   }
   if (ou != null && ou.isNotEmpty) data['ou'] = ou;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmDirectoryServerGroupCreate: $res");
+//Log.info("dsmDirectoryServerGroupCreate: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -250,7 +250,7 @@ Future<Map> dsmDirectoryServerGroupAddMember(
   data['user_dn'] = userDn;
   data['group_dn'] = groupDn;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmDirectoryServerGroupAddMember: $res");
+//Log.info("dsmDirectoryServerGroupAddMember: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -269,7 +269,7 @@ Future<Map> dsmDirectoryServerGroupRemoveMember(
   data['user_dn'] = userDn;
   data['group_dn'] = groupDn;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmDirectoryServerGroupRemoveMember: $res");
+//Log.info("dsmDirectoryServerGroupRemoveMember: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -292,7 +292,7 @@ Future<Map> dsmDirectoryServerGroupDelete(String dn, // Group Distinguished Name
       api: 'SYNO.DirectoryServer.Group', method: 'Delete', version: 1);
   data['dn'] = dn;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmDirectoryServerGroupDelete: $res");
+//Log.info("dsmDirectoryServerGroupDelete: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -317,7 +317,7 @@ Future<Map> dsmDirectoryServerSyncUpdateDomain(
   final data = _dsmApiRequestData(
       api: 'SYNO.DirectoryServer.Sync', method: 'UpdateDomain', version: 1);
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmDirectoryServerSyncUpdateDomain: $res");
+//Log.info("dsmDirectoryServerSyncUpdateDomain: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -348,7 +348,7 @@ Future<Map> dsmDirectoryServerSyncGetTaskStatus(
   data['task_id'] = taskId;
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmDirectoryServerSyncGetTaskStatus: $res");
+//Log.info("dsmDirectoryServerSyncGetTaskStatus: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }

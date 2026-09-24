@@ -7,7 +7,7 @@ Future<Map> dsmCoreSystemPower(String method, // shutdown, reboot
       _dsmApiRequestData(api: 'SYNO.Core.System', method: method, version: 1)
         ..addAll({'force': force, 'local': true});
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmCoreSystemPower: $res");
+//Log.info("dsmCoreSystemPower: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -25,7 +25,7 @@ Future<Map> dsmCoreHardwarePowerScheduleSave(
       'poweroff_tasks': jsonEncode(poweroffTasks)
     });
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmCoreHardwarePowerScheduleSave: $res");
+//Log.info("dsmCoreHardwarePowerScheduleSave: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -52,7 +52,7 @@ Future<Map> dsmCoreHardwareHibernationSet(
       'auto_poweroff_time': autoPoweroffTime
     });
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmCoreHardwareHibernationSet: $res");
+//Log.info("dsmCoreHardwareHibernationSet: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }

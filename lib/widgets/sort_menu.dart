@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:garden/constants/app_constants.dart';
-import 'package:garden/extensions/context.dart';
+import 'package:garden/theme/app_colors.dart';
 
 /// 排序菜单组件
 ///
@@ -40,7 +40,8 @@ class _SortMenuState extends State<SortMenu> {
     return Material(
       color: Colors.transparent,
       child: Card(
-        shape: context.stadiumShapeBorder,
+        shape: RoundedRectangleBorder(
+            side: const BorderSide(), borderRadius: BorderRadius.circular(18)),
         child: Padding(
           padding: const EdgeInsets.all(20),
           child: Column(
@@ -143,9 +144,9 @@ class _SortMenuState extends State<SortMenu> {
                 width: 20,
                 height: 20,
                 child: _sortBy == value
-                    ? Icon(
+                    ? const Icon(
                         CupertinoIcons.checkmark_alt,
-                        color: Theme.of(context).colorScheme.primary,
+                        color: AppColors.primaryAction,
                       )
                     : null,
               ),
@@ -179,9 +180,9 @@ class _SortMenuState extends State<SortMenu> {
                 width: 20,
                 height: 20,
                 child: _sortDirection == value
-                    ? Icon(
+                    ? const Icon(
                         CupertinoIcons.checkmark_alt,
-                        color: Theme.of(context).colorScheme.primary,
+                        color: AppColors.primaryAction,
                       )
                     : null,
               ),

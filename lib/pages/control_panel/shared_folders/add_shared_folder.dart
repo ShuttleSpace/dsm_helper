@@ -1,5 +1,4 @@
 import 'dart:math';
-import 'package:garden/api/dsm_api.dart';
 import 'package:garden/util/log.dart';
 import 'package:garden/util/ui_util.dart';
 
@@ -8,6 +7,7 @@ import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:garden/constants/app_constants.dart';
+import 'package:garden/theme/app_colors.dart';
 import 'package:flutter/services.dart';
 
 class AddSharedFolders extends StatefulWidget {
@@ -62,7 +62,7 @@ class AddSharedFoldersState extends State<AddSharedFolders> {
     setState(() {
       loading = true;
     });
-    var res = await dsmCoreShareGet(folderName);
+    var res = await DsmApi.shareDetail(folderName);
     if (res['success']) {
       var folder = res['data'];
       nameController.text = name = oldName = folder['name'];
@@ -208,9 +208,9 @@ class AddSharedFoldersState extends State<AddSharedFolders> {
                     height: 20,
                   ),
                   Card(
-                    shape: StadiumBorder(
-                        side: BorderSide(
-                            color: Theme.of(context).colorScheme.primary)),
+                    shape: RoundedRectangleBorder(
+                        side: const BorderSide(),
+                        borderRadius: BorderRadius.circular(18)),
                     child: Padding(
                       padding: const EdgeInsets.all(AppConstants.paddingSmall),
                       child: TextField(
@@ -227,9 +227,9 @@ class AddSharedFoldersState extends State<AddSharedFolders> {
                     height: 20,
                   ),
                   Card(
-                    shape: StadiumBorder(
-                        side: BorderSide(
-                            color: Theme.of(context).colorScheme.primary)),
+                    shape: RoundedRectangleBorder(
+                        side: const BorderSide(),
+                        borderRadius: BorderRadius.circular(18)),
                     child: Padding(
                       padding: const EdgeInsets.all(AppConstants.paddingSmall),
                       child: TextField(
@@ -375,9 +375,9 @@ class AddSharedFoldersState extends State<AddSharedFolders> {
                             const Text("在“网上邻居”隐藏此共享文件夹"),
                             const Spacer(),
                             if (hidden)
-                              Icon(
+                              const Icon(
                                 CupertinoIcons.checkmark_alt,
-                                color: Theme.of(context).colorScheme.primary,
+                                color: AppColors.primaryAction,
                               ),
                           ],
                         ),
@@ -406,9 +406,9 @@ class AddSharedFoldersState extends State<AddSharedFolders> {
                             const Text("对没有权限的用户隐藏子文件夹和文件"),
                             const Spacer(),
                             if (hideUnreadable)
-                              Icon(
+                              const Icon(
                                 CupertinoIcons.checkmark_alt,
-                                color: Theme.of(context).colorScheme.primary,
+                                color: AppColors.primaryAction,
                               ),
                           ],
                         ),
@@ -446,10 +446,9 @@ class AddSharedFoldersState extends State<AddSharedFolders> {
                                     ),
                                   ),
                                   if (recycleBin)
-                                    Icon(
+                                    const Icon(
                                       CupertinoIcons.checkmark_alt,
-                                      color:
-                                          Theme.of(context).colorScheme.primary,
+                                      color: AppColors.primaryAction,
                                     ),
                                 ],
                               ),
@@ -488,10 +487,9 @@ class AddSharedFoldersState extends State<AddSharedFolders> {
                                     ),
                                   ),
                                   if (recycleBinAdminOnly)
-                                    Icon(
+                                    const Icon(
                                       CupertinoIcons.checkmark_alt,
-                                      color:
-                                          Theme.of(context).colorScheme.primary,
+                                      color: AppColors.primaryAction,
                                     ),
                                 ],
                               ),
@@ -523,9 +521,9 @@ class AddSharedFoldersState extends State<AddSharedFolders> {
                             const Text("加密共享此文件夹"),
                             const Spacer(),
                             if (encryption)
-                              Icon(
+                              const Icon(
                                 CupertinoIcons.checkmark_alt,
-                                color: Theme.of(context).colorScheme.primary,
+                                color: AppColors.primaryAction,
                               ),
                           ],
                         ),
@@ -609,9 +607,9 @@ class AddSharedFoldersState extends State<AddSharedFolders> {
                             const Text("启用数据总和检查码以实现高级数据完整性"),
                             const Spacer(),
                             if (enableShareCow)
-                              Icon(
+                              const Icon(
                                 CupertinoIcons.checkmark_alt,
-                                color: Theme.of(context).colorScheme.primary,
+                                color: AppColors.primaryAction,
                               ),
                           ],
                         ),
@@ -643,9 +641,9 @@ class AddSharedFoldersState extends State<AddSharedFolders> {
                             const Text("启用文件压缩"),
                             const Spacer(),
                             if (enableShareCompress)
-                              Icon(
+                              const Icon(
                                 CupertinoIcons.checkmark_alt,
-                                color: Theme.of(context).colorScheme.primary,
+                                color: AppColors.primaryAction,
                               ),
                           ],
                         ),
@@ -681,9 +679,9 @@ class AddSharedFoldersState extends State<AddSharedFolders> {
                             ),
                             const Spacer(),
                             if (enableShareQuota)
-                              Icon(
+                              const Icon(
                                 CupertinoIcons.checkmark_alt,
-                                color: Theme.of(context).colorScheme.primary,
+                                color: AppColors.primaryAction,
                               ),
                           ],
                         ),

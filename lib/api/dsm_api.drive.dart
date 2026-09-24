@@ -27,7 +27,7 @@ Future<Map> dsmSynologyDriveInfoGetStatus({CancelToken? cancelToken}) async {
       api: 'SYNO.SynologyDrive.Info', method: 'GetStatus', version: 1);
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmSynologyDriveInfoGetStatus: $res");
+//Log.info("dsmSynologyDriveInfoGetStatus: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -48,7 +48,7 @@ Future<Map> dsmSynologyDriveInfoGetConfig({CancelToken? cancelToken}) async {
       api: 'SYNO.SynologyDrive.Info', method: 'GetConfig', version: 1);
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmSynologyDriveInfoGetConfig: $res");
+//Log.info("dsmSynologyDriveInfoGetConfig: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -69,7 +69,7 @@ Future<Map> dsmSynologyDriveSettingsGet({CancelToken? cancelToken}) async {
       api: 'SYNO.SynologyDrive.Settings', method: 'Get', version: 1);
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmSynologyDriveSettingsGet: $res");
+//Log.info("dsmSynologyDriveSettingsGet: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -106,7 +106,7 @@ Future<Map> dsmSynologyDriveDBGetUsage({CancelToken? cancelToken}) async {
       api: 'SYNO.SynologyDrive.DB', method: 'GetUsage', version: 1);
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmSynologyDriveDBGetUsage: $res");
+//Log.info("dsmSynologyDriveDBGetUsage: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -128,7 +128,7 @@ Future<Map> dsmSynologyDriveConnectionsGetSummary(
       api: 'SYNO.SynologyDrive.Connections', method: 'GetSummary', version: 1);
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmSynologyDriveConnectionsGetSummary: $res");
+//Log.info("dsmSynologyDriveConnectionsGetSummary: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -167,7 +167,7 @@ Future<Map> dsmSynologyDriveConnectionsList({CancelToken? cancelToken}) async {
       api: 'SYNO.SynologyDrive.Connections', method: 'List', version: 1);
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmSynologyDriveConnectionsList: $res");
+//Log.info("dsmSynologyDriveConnectionsList: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -205,7 +205,7 @@ Future<Map> dsmSynologyDriveShareSyncListConnections(
       version: 1);
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmSynologyDriveShareSyncListConnections: $res");
+//Log.info("dsmSynologyDriveShareSyncListConnections: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -261,7 +261,7 @@ Future<Map> dsmSynologyDriveLogList(
   if (limit != null) data['limit'] = limit;
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmSynologyDriveLogList: $res");
+//Log.info("dsmSynologyDriveLogList: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -288,7 +288,7 @@ Future<Map> dsmSynologyDriveShareListActive({CancelToken? cancelToken}) async {
       api: 'SYNO.SynologyDrive.Share', method: 'ListActive', version: 1);
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmSynologyDriveShareListActive: $res");
+//Log.info("dsmSynologyDriveShareListActive: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -342,7 +342,7 @@ Future<Map> dsmSynologyDriveDeletionGetStatus(
       api: 'SYNO.SynologyDrive.Deletion', method: 'GetStatus', version: 1);
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmSynologyDriveDeletionGetStatus: $res");
+//Log.info("dsmSynologyDriveDeletionGetStatus: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -374,7 +374,7 @@ Future<Map> dsmSynologyDriveUserProfileGet(String user, // Username
   data['user'] = user;
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmSynologyDriveUserProfileGet: $res");
+//Log.info("dsmSynologyDriveUserProfileGet: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }

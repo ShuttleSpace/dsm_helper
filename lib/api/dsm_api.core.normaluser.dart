@@ -11,7 +11,7 @@ Future<Map> dsmCoreNormalUser(String method, // get, set
     data.addAll(changedData);
   }
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmCoreNormalUser: $res");
+//Log.info("dsmCoreNormalUser: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -22,7 +22,7 @@ Future<Map> dsmCorePersonalSettingsQuota({CancelToken? cancelToken}) async {
   final data = _dsmApiRequestData(
       api: 'SYNO.Core.PersonalSettings', method: 'quota', version: 1);
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmCorePersonalSettingsQuota: $res");
+//Log.info("dsmCorePersonalSettingsQuota: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -36,7 +36,7 @@ Future<Map> dsmCoreUserSettingsApply(
     ..addAll({'data': jsonEncode(jsonEncode(data))});
   final res =
       await _httpPost(_entryCGI, data: requestData, cancelToken: cancelToken);
-  Log.info("dsmCoreUserSettingsApply: $res");
+//Log.info("dsmCoreUserSettingsApply: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }

@@ -41,7 +41,7 @@ Future<Map> dsmCoreISCSILUNList(
   if (limit != null) data['limit'] = limit;
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmCoreISCSILUNList: $res");
+//Log.info("dsmCoreISCSILUNList: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -95,7 +95,7 @@ Future<Map> dsmCoreISCSILUNSnapshotList(String srcLunUuid, // Source LUN UUID
   if (limit != null) data['limit'] = limit;
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmCoreISCSILUNSnapshotList: $res");
+//Log.info("dsmCoreISCSILUNSnapshotList: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -120,7 +120,7 @@ Future<Map> dsmCoreISCSILUNSnapshotCreate(String lunId, // LUN ID
   }
   if (isLocked != null) data['is_locked'] = isLocked;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmCoreISCSILUNSnapshotCreate: $res");
+//Log.info("dsmCoreISCSILUNSnapshotCreate: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -145,7 +145,7 @@ Future<Map> dsmCoreISCSILUNSnapshotDelete(
       api: 'SYNO.Core.ISCSI.LUN.Snapshot', method: 'Delete', version: 1);
   data['snapshot_uuids'] = snapshotUuids;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmCoreISCSILUNSnapshotDelete: $res");
+//Log.info("dsmCoreISCSILUNSnapshotDelete: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -200,7 +200,7 @@ Future<Map> dsmCoreShareReplicationList(
   if (limit != null) data['limit'] = limit;
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmCoreShareReplicationList: $res");
+//Log.info("dsmCoreShareReplicationList: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -227,7 +227,7 @@ Future<Map> dsmCoreShareReplicationSync(String planId, // Replication plan ID
       api: 'SYNO.Core.Share.Replication', method: 'Sync', version: 1);
   data['plan_id'] = planId;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmCoreShareReplicationSync: $res");
+//Log.info("dsmCoreShareReplicationSync: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -266,7 +266,7 @@ Future<Map> dsmCoreShareReplicationTaskStatus(String taskId, // Task ID
   data['task_id'] = taskId;
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmCoreShareReplicationTaskStatus: $res");
+//Log.info("dsmCoreShareReplicationTaskStatus: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }

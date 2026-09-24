@@ -24,6 +24,9 @@ class DashboardState extends State<Dashboard> with SignalsMixin {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   late final isDrawerOpen =
       createComputed(() => _scaffoldKey.currentState?.isDrawerOpen ?? false);
+  final loading = signal<bool>(true);
+  final success = signal<bool>(true);
+  final msg = signal<String>('');
   // sds data
   late final storageVolumes = createListSignal([]);
   late final storageDisks = createListSignal([]);
@@ -66,7 +69,13 @@ class DashboardState extends State<Dashboard> with SignalsMixin {
   @override
   void initState() {
     super.initState();
-    _fetchDesktopInitdata().then((_) => _fetchWidgetModuleList());
+    (() async {
+      loading.value = true;
+      success.value = true;
+      await _fetchDesktopInitdata();
+      await _fetchWidgetModuleList();
+      loading.value = false;
+    })();
   }
 
   _fetchDesktopInitdata() async {
@@ -103,6 +112,8 @@ class DashboardState extends State<Dashboard> with SignalsMixin {
     } catch (e) {
       Log.error('fetchDesktopInitdata error: $e');
       UiUtil.toast('fetchDesktopInitdata error: $e');
+      success.value = false;
+      msg.value = 'fetchDesktopInitdata error: $e';
     }
   }
 
@@ -149,6 +160,8 @@ class DashboardState extends State<Dashboard> with SignalsMixin {
       });
     } catch (e) {
       Log.error('dsmSDSWidgetModuleListDetail error: $e');
+      success.value = false;
+      msg.value = 'dsmSDSWidgetModuleListDetail error: $e';
     }
   }
 
@@ -158,47 +171,46 @@ class DashboardState extends State<Dashboard> with SignalsMixin {
     }
   }
 
-  Widget _buildWidgetModule() {
-    return Column(
-      children: [
-        if (sdsWidgetModuleList
-            .contains('SYNO.SDS.SystemInfoApp.SystemHealthWidget'))
-          DashboardSystemHealthCard(
-              storageVolumes: storageVolumes,
-              storageDisks: storageDisks,
-              storageSsdCaches: storageSsdCaches,
-              systemData: systemData,
-              wallpaper: desktopWallpaper,
-              sessionHostname: sessionHostname),
-        if (sdsWidgetModuleList
-            .contains('SYNO.SDS.SystemInfoApp.ConnectionLogWidget'))
-          const DashboardConnectionLogCard(),
-        if (sdsWidgetModuleList
-            .contains('SYNO.SDS.SystemInfoApp.TaskSchedulerWidget'))
-          const DashboardTaskSchedulerCard(),
-        if (sdsWidgetModuleList
-            .contains('SYNO.SDS.SystemInfoApp.RecentLogWidget'))
-          const DashboardRecentLogCard(),
-        if (sdsWidgetModuleList.contains('SYNO.SDS.ResourceMonitor.Widget'))
-          const DashboardResourceMonitorCard(),
-        if (sdsWidgetModuleList
-            .contains('SYNO.SDS.SystemInfoApp.FileChangeLogWidget'))
-          const DashboardFileChangeLogCard(),
-        if (sdsWidgetModuleList
-            .contains('SYNO.SDS.SystemInfoApp.StorageUsageWidget'))
-          DashboardStorageUsageCard(
-              sdsWidgetModuleList: sdsWidgetModuleList,
-              systemData: systemData,
-              appNotify: appNotify,
-              storageVolumes: storageVolumes,
-              storageDisks: storageDisks,
-              storageSsdCaches: storageSsdCaches)
-      ],
-    );
+  Widget _buildWidgetItem(String widget) {
+    switch (widget) {
+      case 'SYNO.SDS.SystemInfoApp.SystemHealthWidget':
+        return DashboardSystemHealthCard(
+            storageVolumes: storageVolumes,
+            storageDisks: storageDisks,
+            storageSsdCaches: storageSsdCaches,
+            systemData: systemData,
+            wallpaper: desktopWallpaper,
+            sessionHostname: sessionHostname);
+      case 'SYNO.SDS.SystemInfoApp.ConnectionLogWidget':
+        return const DashboardConnectionLogCard();
+      case 'SYNO.SDS.TaskScheduler.TaskSchedulerWidget':
+        return const DashboardTaskSchedulerCard();
+      case 'SYNO.SDS.SystemInfoApp.RecentLogWidget':
+        return const DashboardRecentLogCard();
+      case 'SYNO.SDS.ResourceMonitor.Widget':
+        return const DashboardResourceMonitorCard();
+      case 'SYNO.SDS.SystemInfoApp.FileChangeLogWidget':
+        return const DashboardFileChangeLogCard();
+      case 'SYNO.SDS.SystemInfoApp.StorageUsageWidget':
+        return DashboardStorageUsageCard(
+            sdsWidgetModuleList: sdsWidgetModuleList,
+            systemData: systemData,
+            appNotify: appNotify,
+            storageVolumes: storageVolumes,
+            storageDisks: storageDisks,
+            storageSsdCaches: storageSsdCaches);
+      default:
+        return const SizedBox.shrink();
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    refreshDuration = settingsStore.refreshDuration.watch(context);
+    final loadingValue = loading.watch(context);
+    final successValue = success.watch(context);
+    final msgValue = msg.watch(context);
+    final widgetList = sdsWidgetModuleList.watch(context);
     return Scaffold(
       key: _scaffoldKey,
       appBar: AppBar(
@@ -229,71 +241,107 @@ class DashboardState extends State<Dashboard> with SignalsMixin {
                 }),
                 const DashboardAppbarTitleNotifier(),
               ],
-            )
+            ),
+            const Text("控制台")
           ],
         ),
         automaticallyImplyLeading: false,
       ),
-      body: ListView(
-        padding: const EdgeInsets.symmetric(vertical: 20),
-        children: [
-          if (desktopShortcutItems
-                  .watch(context)
-                  .where((element) =>
-                      supportedShortcuts.contains(element['className']))
-                  .isNotEmpty &&
-              connectionStore.notVisitorAccount.value &&
-              settingsStore.showShortcut.value)
-            ShortcutList(
-              desktopShortcutItems,
-              systemData,
-              storageVolumes,
-              storageDisks,
-              appNotify,
-              validAppViewOrder: desktopValidAppViewOrder,
-            ),
-          Watch((context) {
-            if (sdsWidgetModuleList.isNotEmpty) {
-              return _buildWidgetModule();
-            } else {
-              return Center(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
+      body: loadingValue
+          ? const Center(
+              child: CupertinoActivityIndicator(
+                radius: 14,
+              ),
+            )
+          : successValue
+              ? ListView(
+                  padding: const EdgeInsets.symmetric(vertical: 20),
                   children: [
-                    const Text(
-                      "未添加小组件",
-                    ),
-                    const SizedBox(
-                      height: 20,
-                    ),
-                    SizedBox(
-                      width: 200,
-                      child: OutlinedButton(
-                        onPressed: () {
-                          Navigator.of(context)
-                              .push(CupertinoPageRoute(builder: (context) {
-                            return WidgetSetting(
-                                sdsWidgetModuleList, sdsWidgetRestoreSizePos);
-                          })).then((res) {
-                            if (res != null) {
-                              sdsWidgetModuleList.value = res;
-                              _fetchWidgetModuleList();
-                            }
-                          });
-                        },
-                        child: const Text(
-                          ' 添加 ',
-                          style: TextStyle(fontSize: 18),
+                    if (desktopShortcutItems
+                            .watch(context)
+                            .where((element) => supportedShortcuts
+                                .contains(element['className']))
+                            .isNotEmpty &&
+                        connectionStore.notVisitorAccount.watch(context) &&
+                        settingsStore.showShortcut.watch(context))
+                      ShortcutList(
+                        desktopShortcutItems,
+                        systemData,
+                        storageVolumes,
+                        storageDisks,
+                        appNotify,
+                        validAppViewOrder: desktopValidAppViewOrder,
+                      ),
+                    if (widgetList.isNotEmpty)
+                      ...widgetList.map((widget) {
+                        return _buildWidgetItem(widget);
+                      })
+                    else
+                      Center(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Text(
+                              "未添加小组件",
+                            ),
+                            const SizedBox(
+                              height: 20,
+                            ),
+                            SizedBox(
+                              width: 200,
+                              child: OutlinedButton(
+                                onPressed: () {
+                                  Navigator.of(context).push(
+                                      CupertinoPageRoute(builder: (context) {
+                                    return WidgetSetting(sdsWidgetModuleList,
+                                        sdsWidgetRestoreSizePos);
+                                  })).then((res) {
+                                    if (res != null) {
+                                      sdsWidgetModuleList.value = res;
+                                      _fetchWidgetModuleList();
+                                    }
+                                  });
+                                },
+                                child: const Text(
+                                  ' 添加 ',
+                                  style: TextStyle(fontSize: 18),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      )
+                  ],
+                )
+              : Center(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(msgValue),
+                      const SizedBox(
+                        height: 20,
+                      ),
+                      SizedBox(
+                        width: 200,
+                        child: OutlinedButton(
+                          onPressed: () {
+                            loading.value = true;
+                            success.value = true;
+                            _fetchDesktopInitdata().then((_) {
+                              _fetchWidgetModuleList().then((_) {
+                                loading.value = false;
+                              });
+                            });
+                          },
+                          child: const Text(
+                            ' 刷新 ',
+                            style: TextStyle(fontSize: 18),
+                          ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              );
-            }
-          }),
-        ],
-      ),
       drawer: desktopAppViewOrder.isNotEmpty
           ? ApplicationList(desktopAppViewOrder, systemData, storageVolumes,
               storageDisks, appNotify)

@@ -23,7 +23,7 @@ Future<Map> dsmFileStationCompressStart(
   if (format != null && format.isNotEmpty) data['format'] = format;
   if (password != null && password.isNotEmpty) data['_password'] = password;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmFileStationCompressStart: $res");
+//Log.info("dsmFileStationCompressStart: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -46,7 +46,7 @@ Future<Map> dsmFileStationCompressStatus(String taskid,
   data['taskid'] = taskid;
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmFileStationCompressStatus: $res");
+//Log.info("dsmFileStationCompressStatus: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -62,7 +62,7 @@ Future<Map> dsmFileStationCompressStop(String taskid,
       api: 'SYNO.FileStation.Compress', method: 'stop', version: 3);
   data['taskid'] = taskid;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmFileStationCompressStop: $res");
+//Log.info("dsmFileStationCompressStop: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -96,7 +96,7 @@ Future<Map> dsmFileStationExtractStart(
   if (password != null && password.isNotEmpty) data['password'] = password;
   if (itemId != null && itemId.isNotEmpty) data['item_id'] = itemId;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmFileStationExtractStart: $res");
+//Log.info("dsmFileStationExtractStart: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -119,7 +119,7 @@ Future<Map> dsmFileStationExtractStatus(String taskid,
   data['taskid'] = taskid;
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmFileStationExtractStatus: $res");
+//Log.info("dsmFileStationExtractStatus: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -135,7 +135,7 @@ Future<Map> dsmFileStationExtractStop(String taskid,
       api: 'SYNO.FileStation.Extract', method: 'stop', version: 2);
   data['taskid'] = taskid;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmFileStationExtractStop: $res");
+//Log.info("dsmFileStationExtractStop: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }

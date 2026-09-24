@@ -254,11 +254,9 @@ class FileServiceState extends State<FileService>
                                               ),
                                             ),
                                             if (smb['enable_samba'])
-                                              Icon(
+                                              const Icon(
                                                 CupertinoIcons.checkmark_alt,
-                                                color: Theme.of(context)
-                                                    .colorScheme
-                                                    .primary,
+                                                color: AppColors.primaryAction,
                                               ),
                                           ],
                                         ),
@@ -457,11 +455,9 @@ class FileServiceState extends State<FileService>
                                               ),
                                             ),
                                             if (afp['enable_afp'])
-                                              Icon(
+                                              const Icon(
                                                 CupertinoIcons.checkmark_alt,
-                                                color: Theme.of(context)
-                                                    .colorScheme
-                                                    .primary,
+                                                color: AppColors.primaryAction,
                                               ),
                                           ],
                                         ),
@@ -554,11 +550,9 @@ class FileServiceState extends State<FileService>
                                               ),
                                             ),
                                             if (nfs['enable_nfs'])
-                                              Icon(
+                                              const Icon(
                                                 CupertinoIcons.checkmark_alt,
-                                                color: Theme.of(context)
-                                                    .colorScheme
-                                                    .primary,
+                                                color: AppColors.primaryAction,
                                               ),
                                           ],
                                         ),
@@ -681,11 +675,9 @@ class FileServiceState extends State<FileService>
                                               ),
                                             ),
                                             if (ftp['enable_ftp'])
-                                              Icon(
+                                              const Icon(
                                                 CupertinoIcons.checkmark_alt,
-                                                color: Theme.of(context)
-                                                    .colorScheme
-                                                    .primary,
+                                                color: AppColors.primaryAction,
                                               ),
                                           ],
                                         ),
@@ -718,11 +710,9 @@ class FileServiceState extends State<FileService>
                                               ),
                                             ),
                                             if (ftp['enable_ftps'])
-                                              Icon(
+                                              const Icon(
                                                 CupertinoIcons.checkmark_alt,
-                                                color: Theme.of(context)
-                                                    .colorScheme
-                                                    .primary,
+                                                color: AppColors.primaryAction,
                                               ),
                                           ],
                                         ),
@@ -992,11 +982,9 @@ class FileServiceState extends State<FileService>
                                               ),
                                             ),
                                             if (sftp['enable'])
-                                              Icon(
+                                              const Icon(
                                                 CupertinoIcons.checkmark_alt,
-                                                color: Theme.of(context)
-                                                    .colorScheme
-                                                    .primary,
+                                                color: AppColors.primaryAction,
                                               ),
                                           ],
                                         ),

@@ -41,7 +41,7 @@ Future<Map> dsmFileStationBackgroundTaskList(
   if (isVfs != null) data['is_vfs'] = isVfs;
   if (bkgInfo != null) data['bkg_info'] = bkgInfo;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmFileStationBackgroundTaskList: $res");
+//Log.info("dsmFileStationBackgroundTaskList: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -61,7 +61,7 @@ Future<Map> dsmFileStationDirSizeStart(
       api: 'SYNO.FileStation.DirSize', method: 'start', version: 2);
   data['path'] = path;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmFileStationDirSizeStart: $res");
+//Log.info("dsmFileStationDirSizeStart: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -84,7 +84,7 @@ Future<Map> dsmFileStationDirSizeStatus(String taskid,
   data['taskid'] = taskid;
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmFileStationDirSizeStatus: $res");
+//Log.info("dsmFileStationDirSizeStatus: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -100,7 +100,7 @@ Future<Map> dsmFileStationDirSizeStop(String taskid,
       api: 'SYNO.FileStation.DirSize', method: 'stop', version: 2);
   data['taskid'] = taskid;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmFileStationDirSizeStop: $res");
+//Log.info("dsmFileStationDirSizeStop: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -119,7 +119,7 @@ Future<Map> dsmFileStationMD5Start(String filePath, // File path
       api: 'SYNO.FileStation.MD5', method: 'start', version: 2);
   data['file_path'] = filePath;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmFileStationMD5Start: $res");
+//Log.info("dsmFileStationMD5Start: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -140,7 +140,7 @@ Future<Map> dsmFileStationMD5Status(String taskid,
   data['taskid'] = taskid;
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmFileStationMD5Status: $res");
+//Log.info("dsmFileStationMD5Status: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -156,7 +156,7 @@ Future<Map> dsmFileStationMD5Stop(String taskid,
       api: 'SYNO.FileStation.MD5', method: 'stop', version: 2);
   data['taskid'] = taskid;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmFileStationMD5Stop: $res");
+//Log.info("dsmFileStationMD5Stop: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }

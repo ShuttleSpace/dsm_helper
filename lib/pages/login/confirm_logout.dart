@@ -3,7 +3,7 @@ import 'package:garden/util/storage_util.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:garden/constants/app_constants.dart';
-import 'package:garden/extensions/context.dart';
+import 'package:garden/theme/app_colors.dart';
 
 class ConfirmLogout extends StatefulWidget {
   final bool otpEnable;
@@ -19,7 +19,8 @@ class ConfirmLogoutState extends State<ConfirmLogout> {
     return Material(
       color: Colors.transparent,
       child: Card(
-        shape: context.stadiumShapeBorder,
+        shape: RoundedRectangleBorder(
+            side: const BorderSide(), borderRadius: BorderRadius.circular(18)),
         child: SafeArea(
           top: false,
           child: Padding(
@@ -60,9 +61,9 @@ class ConfirmLogoutState extends State<ConfirmLogout> {
                             const Text("取消记住本设备"),
                             const Spacer(),
                             if (forget)
-                              Icon(
+                              const Icon(
                                 CupertinoIcons.checkmark_alt,
-                                color: Theme.of(context).colorScheme.primary,
+                                color: AppColors.primaryAction,
                               ),
                           ],
                         ),

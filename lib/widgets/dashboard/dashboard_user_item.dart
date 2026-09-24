@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:garden/util/ui_util.dart';
 import 'package:flutter/material.dart';
+import 'package:garden/theme/app_colors.dart';
 import 'package:garden/util/http_util.dart';
 
 /// Dashboard 登录用户列表项
@@ -145,9 +146,9 @@ class DashboardUserItem extends StatelessWidget {
                 height: 20,
                 child: user['running']
                     ? const CupertinoActivityIndicator()
-                    : Icon(
+                    : const Icon(
                         CupertinoIcons.clear,
-                        color: Theme.of(context).colorScheme.primary,
+                        color: AppColors.primaryAction,
                         size: 16,
                       ),
               ),

@@ -44,7 +44,7 @@ Future<Map> dsmDownloadStationTaskList(
   }
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmDownloadStationTaskList: $res");
+//Log.info("dsmDownloadStationTaskList: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -77,7 +77,7 @@ Future<Map> dsmDownloadStationTaskGetinfo(
   }
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmDownloadStationTaskGetinfo: $res");
+//Log.info("dsmDownloadStationTaskGetinfo: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -104,7 +104,7 @@ Future<Map> dsmDownloadStationTaskCreate(
     data['destination'] = destination;
   }
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmDownloadStationTaskCreate: $res");
+//Log.info("dsmDownloadStationTaskCreate: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -123,7 +123,7 @@ Future<Map> dsmDownloadStationTaskDelete(
   data['id'] = id;
   if (forceComplete != null) data['force_complete'] = forceComplete;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmDownloadStationTaskDelete: $res");
+//Log.info("dsmDownloadStationTaskDelete: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -140,7 +140,7 @@ Future<Map> dsmDownloadStationTaskPause(
       api: 'SYNO.DownloadStation.Task', method: 'pause', version: 1);
   data['id'] = id;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmDownloadStationTaskPause: $res");
+//Log.info("dsmDownloadStationTaskPause: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -157,7 +157,7 @@ Future<Map> dsmDownloadStationTaskResume(
       api: 'SYNO.DownloadStation.Task', method: 'resume', version: 1);
   data['id'] = id;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmDownloadStationTaskResume: $res");
+//Log.info("dsmDownloadStationTaskResume: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -178,7 +178,7 @@ Future<Map> dsmDownloadStationTaskEdit(
     data['destination'] = destination;
   }
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmDownloadStationTaskEdit: $res");
+//Log.info("dsmDownloadStationTaskEdit: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }

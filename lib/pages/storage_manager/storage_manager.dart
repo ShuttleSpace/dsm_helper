@@ -1,6 +1,6 @@
-import 'package:garden/api/dsm_api.dart';
 import 'package:garden/pages/storage_manager/smart.dart';
 import 'package:garden/util/ui_util.dart';
+import 'package:garden/util/http_util.dart';
 import 'package:garden/widgets/bubble_tab_indicator.dart';
 import 'package:garden/widgets/dashed_decoration.dart';
 import 'package:garden/widgets/neu_back_button.dart';
@@ -39,7 +39,7 @@ class StorageManagerState extends State<StorageManager>
   }
 
   getData() async {
-    var res = await dsmStorageCGIStorageLoadInfo();
+    var res = await DsmApi.storage();
     if (res['success']) {
       setState(() {
         loading = false;

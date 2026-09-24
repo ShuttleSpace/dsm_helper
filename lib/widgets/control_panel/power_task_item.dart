@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:garden/extensions/context.dart';
+import 'package:garden/theme/app_colors.dart';
 import 'package:garden/widgets/label.dart';
 
 class PowerTaskItem extends StatelessWidget {
@@ -47,7 +47,8 @@ class PowerTaskItem extends StatelessWidget {
     return GestureDetector(
       onTap: () => onEnabledChanged(task),
       child: Card(
-        shape: context.stadiumShapeBorder,
+        shape: RoundedRectangleBorder(
+            side: const BorderSide(), borderRadius: BorderRadius.circular(18)),
         margin: const EdgeInsets.only(top: 20, left: 20, right: 20),
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
@@ -56,9 +57,9 @@ class PowerTaskItem extends StatelessWidget {
               SizedBox(
                 width: 22,
                 child: task['enabled']
-                    ? Icon(
+                    ? const Icon(
                         CupertinoIcons.checkmark_alt,
-                        color: Theme.of(context).colorScheme.primary,
+                        color: AppColors.primaryAction,
                         size: 22,
                       )
                     : null,

@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'package:garden/api/dsm_api.dart';
 import 'package:garden/util/ui_util.dart';
 import 'package:garden/stores/connection_store.dart';
 
@@ -8,6 +7,7 @@ import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:garden/constants/app_constants.dart';
+import 'package:garden/theme/app_colors.dart';
 import 'package:flutter/services.dart';
 
 class OtpBind extends StatefulWidget {
@@ -83,12 +83,11 @@ class OtpBindState extends State<OtpBind> {
                 setState(() {
                   emailSaving = true;
                 });
-                var res = await dsmCoreOTPSaveMail(mail: email);
+                var res = await DsmApi.saveMail(email);
 
                 if (res['success']) {
-                  var qrcode = await dsmCoreOTPGetQrcode(
-                      account:
-                          "${widget.username}@${connectionStore.hostname}");
+                  var qrcode = await DsmApi.getQrCode(
+                      "${widget.username}@${connectionStore.hostname}");
                   if (qrcode['success']) {
                     setState(() {
                       qrData =
@@ -148,12 +147,12 @@ class OtpBindState extends State<OtpBind> {
                         Clipboard.setData(data);
                         UiUtil.toast("已复制到剪贴板");
                       },
-                      child: SizedBox(
+                      child: const SizedBox(
                         width: 20,
                         height: 20,
                         child: Icon(
                           Icons.copy,
-                          color: Theme.of(context).colorScheme.primary,
+                          color: AppColors.primaryAction,
                           size: 16,
                         ),
                       ),
@@ -184,12 +183,12 @@ class OtpBindState extends State<OtpBind> {
                         Clipboard.setData(data);
                         UiUtil.toast("已复制到剪贴板");
                       },
-                      child: SizedBox(
+                      child: const SizedBox(
                         width: 20,
                         height: 20,
                         child: Icon(
                           Icons.copy,
-                          color: Theme.of(context).colorScheme.primary,
+                          color: AppColors.primaryAction,
                           size: 16,
                         ),
                       ),
@@ -231,7 +230,7 @@ class OtpBindState extends State<OtpBind> {
                 setState(() {
                   codeChecking = true;
                 });
-                var res = await dsmCoreOTPAuthTmpCode(code: code);
+                var res = await DsmApi.authOtpCode(code);
 
                 if (res['success']) {
                   setState(() {

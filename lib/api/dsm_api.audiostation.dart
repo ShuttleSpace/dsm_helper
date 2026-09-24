@@ -13,7 +13,7 @@ Future<Map> dsmAudioStationInfoGetinfo({CancelToken? cancelToken}) async {
       api: 'SYNO.AudioStation.Info', method: 'getinfo', version: 1);
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmAudioStationInfoGetinfo: $res");
+//Log.info("dsmAudioStationInfoGetinfo: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -48,7 +48,7 @@ Future<Map> dsmAudioStationPlaylistList(
   if (limit != null) data['limit'] = limit;
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmAudioStationPlaylistList: $res");
+//Log.info("dsmAudioStationPlaylistList: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -77,7 +77,7 @@ Future<Map> dsmAudioStationPinList({CancelToken? cancelToken}) async {
       api: 'SYNO.AudioStation.Pin', method: 'list', version: 1);
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmAudioStationPinList: $res");
+//Log.info("dsmAudioStationPinList: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -114,7 +114,7 @@ Future<Map> dsmAudioStationRemotePlayerList(
   }
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmAudioStationRemotePlayerList: $res");
+//Log.info("dsmAudioStationRemotePlayerList: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -140,7 +140,7 @@ Future<Map> dsmAudioStationRemotePlayerGetplaylist(String id, // Player ID
   data['id'] = id;
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmAudioStationRemotePlayerGetplaylist: $res");
+//Log.info("dsmAudioStationRemotePlayerGetplaylist: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -164,7 +164,7 @@ Future<Map> dsmAudioStationRemotePlayerControl(
   data['id'] = id;
   data['action'] = action;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmAudioStationRemotePlayerControl: $res");
+//Log.info("dsmAudioStationRemotePlayerControl: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }

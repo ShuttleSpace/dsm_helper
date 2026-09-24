@@ -4,6 +4,7 @@ import 'package:garden/stores/connection_store.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:garden/constants/app_constants.dart';
+import 'package:garden/theme/app_colors.dart';
 import 'package:garden/theme/app_theme.dart';
 import 'package:garden/util/http_util.dart';
 import 'package:garden/widgets/file_icon.dart';
@@ -46,9 +47,9 @@ class FileListItem extends StatelessWidget {
               width: 20,
               height: 20,
               child: selected
-                  ? Icon(
+                  ? const Icon(
                       CupertinoIcons.checkmark_alt,
-                      color: Theme.of(context).colorScheme.primary,
+                      color: AppColors.primaryAction,
                     )
                   : null,
             ),

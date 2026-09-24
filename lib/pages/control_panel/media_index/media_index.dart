@@ -3,6 +3,7 @@ import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:garden/constants/app_constants.dart';
+import 'package:garden/theme/app_colors.dart';
 import 'dart:async';
 
 class MediaIndex extends StatefulWidget {
@@ -21,7 +22,7 @@ class MediaIndexState extends State<MediaIndex> {
   @override
   void initState() {
     timer = Timer.periodic(const Duration(seconds: 5), (timer) {
-      // getData();
+      getData();
     });
     getData();
     super.initState();
@@ -198,11 +199,9 @@ class MediaIndexState extends State<MediaIndex> {
                                       const Text("一般品质"),
                                       const Spacer(),
                                       if (thumbnailQuality == "normal")
-                                        Icon(
+                                        const Icon(
                                           CupertinoIcons.checkmark_alt,
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .primary,
+                                          color: AppColors.primaryAction,
                                         ),
                                     ],
                                   ),
@@ -235,11 +234,9 @@ class MediaIndexState extends State<MediaIndex> {
                                       const Text("高品质"),
                                       const Spacer(),
                                       if (thumbnailQuality == "high")
-                                        Icon(
+                                        const Icon(
                                           CupertinoIcons.checkmark_alt,
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .primary,
+                                          color: AppColors.primaryAction,
                                         ),
                                     ],
                                   ),
@@ -305,10 +302,9 @@ class MediaIndexState extends State<MediaIndex> {
                                 const Text("启用移动设备视频转换"),
                                 const Spacer(),
                                 if (mobileEnabled)
-                                  Icon(
+                                  const Icon(
                                     CupertinoIcons.checkmark_alt,
-                                    color:
-                                        Theme.of(context).colorScheme.primary,
+                                    color: AppColors.primaryAction,
                                   ),
                               ],
                             ),

@@ -1,4 +1,4 @@
-import 'package:garden/api/dsm_api.dart';
+import 'package:garden/util/http_util.dart';
 import 'package:garden/util/log.dart';
 import 'package:garden/util/ui_util.dart';
 import 'package:garden/widgets/neu_back_button.dart';
@@ -22,7 +22,7 @@ class UsersState extends State<Users> {
   }
 
   getData() async {
-    var res = await dsmCoreCurrentConnectionGet("enum");
+    var res = await DsmApi.currentConnect();
     Log.info(res);
     if (res['success']) {
       setState(() {
@@ -165,7 +165,7 @@ class UsersState extends State<Users> {
                                             user['running'] = true;
                                           });
                                           var res =
-                                              await dsmCoreCurrentConnectionKickConnection({
+                                              await DsmApi.kickConnection({
                                             "who": user['who'],
                                             "from": user['from']
                                           });

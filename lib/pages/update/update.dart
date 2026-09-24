@@ -81,9 +81,9 @@ class UpdateState extends State<Update> {
                 ),
                 Center(
                   child: Card(
-                    shape: StadiumBorder(
-                        side: BorderSide(
-                            color: Theme.of(context).colorScheme.primary)),
+                    shape: RoundedRectangleBorder(
+                        side: const BorderSide(),
+                        borderRadius: BorderRadius.circular(18)),
                     child: const CircleAvatar(
                       backgroundImage: AssetImage(
                         "assets/logo.png",

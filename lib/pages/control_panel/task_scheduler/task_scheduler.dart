@@ -1,12 +1,12 @@
-import 'package:flutter/material.dart';
-import 'package:garden/api/dsm_api.dart';
 import 'package:garden/pages/control_panel/task_scheduler/task_record.dart';
 import 'package:garden/util/ui_util.dart';
 import 'package:garden/util/http_util.dart';
 import 'package:garden/widgets/label.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:garden/constants/app_constants.dart';
+import 'package:garden/theme/app_colors.dart';
 
 class TaskScheduler extends StatefulWidget {
   const TaskScheduler({super.key});
@@ -25,7 +25,7 @@ class TaskSchedulerState extends State<TaskScheduler> {
   }
 
   getData() async {
-    var res = await dsmCoreTaskSchedulerList();
+    var res = await DsmApi.taskScheduler();
     if (res['success']) {
       setState(() {
         loading = false;
@@ -96,8 +96,8 @@ class TaskSchedulerState extends State<TaskScheduler> {
                     setState(() {
                       task['set'] = true;
                     });
-                    var res = await dsmCoreTaskSchedulerSetEnable(
-                        task['id'], !task['enable']);
+                    var res =
+                        await DsmApi.taskEnable(task['id'], !task['enable']);
                     setState(() {
                       task['set'] = false;
                     });
@@ -110,9 +110,9 @@ class TaskSchedulerState extends State<TaskScheduler> {
                     }
                   },
                   child: Card(
-                    shape: StadiumBorder(
-                        side: BorderSide(
-                            color: Theme.of(context).colorScheme.primary)),
+                    shape: RoundedRectangleBorder(
+                        side: const BorderSide(),
+                        borderRadius: BorderRadius.circular(18)),
                     child: Padding(
                       padding: const EdgeInsets.all(AppConstants.paddingSmall),
                       child: SizedBox(
@@ -121,10 +121,9 @@ class TaskSchedulerState extends State<TaskScheduler> {
                         child: task['set']
                             ? const CupertinoActivityIndicator()
                             : task['enable']
-                                ? Icon(
+                                ? const Icon(
                                     CupertinoIcons.checkmark_alt,
-                                    color:
-                                        Theme.of(context).colorScheme.primary,
+                                    color: AppColors.primaryAction,
                                   )
                                 : null,
                       ),
@@ -143,12 +142,12 @@ class TaskSchedulerState extends State<TaskScheduler> {
                           },
                           settings: const RouteSettings(name: "task_record")));
                     },
-                    child: SizedBox(
+                    child: const SizedBox(
                       width: 20,
                       height: 20,
                       child: Icon(
                         CupertinoIcons.list_bullet,
-                        color: Theme.of(context).colorScheme.primary,
+                        color: AppColors.primaryAction,
                         size: 16,
                       ),
                     ),
@@ -166,12 +165,21 @@ class TaskSchedulerState extends State<TaskScheduler> {
                     });
                     Map<dynamic, dynamic> res;
                     if (task['type'] == 'script') {
-                      res = await dsmCoreTaskSchedulerRun(task['id']);
+                      res = await DsmApi.taskRun([task['id']]);
                     } else if (task['type'] == 'event_script') {
                       res = await DsmApi.eventRun([task['name']]);
                     } else {
                       UiUtil.toast("暂不支持此类型任务");
                       return;
+                    }
+
+                    setState(() {
+                      task['running'] = false;
+                    });
+                    if (res['success']) {
+                      UiUtil.toast("任务计划执行成功");
+                    } else {
+                      UiUtil.toast("任务计划执行失败，code：${res['error']['code']}");
                     }
                   },
                   child: SizedBox(
@@ -179,9 +187,9 @@ class TaskSchedulerState extends State<TaskScheduler> {
                     height: 20,
                     child: task['running']
                         ? const CupertinoActivityIndicator()
-                        : Icon(
+                        : const Icon(
                             CupertinoIcons.play_arrow_solid,
-                            color: Theme.of(context).colorScheme.primary,
+                            color: AppColors.primaryAction,
                             size: 16,
                           ),
                   ),

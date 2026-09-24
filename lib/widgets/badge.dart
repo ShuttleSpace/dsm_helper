@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:garden/theme/app_theme.dart';
 
-class Badger extends StatelessWidget {
+class Badge extends StatelessWidget {
   final dynamic badge;
   final double size;
-  const Badger(this.badge, {super.key, this.size = 44});
+  const Badge(this.badge, {super.key, this.size = 44});
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);

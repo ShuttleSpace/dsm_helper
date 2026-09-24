@@ -17,8 +17,8 @@ extension DioExtension on Dio {
         return _httpClient;
       };
     } else {
-      Log.warn(
-          "DioExtension.badCertificateCallback: httpClientAdapter is not IOHttpClientAdapter");
+//Log.warn(
+//"DioExtension.badCertificateCallback: httpClientAdapter is not IOHttpClientAdapter");
     }
   }
 }
@@ -82,14 +82,14 @@ final _dio = Dio(BaseOptions(
     },
   ))
   ..interceptors.add(CookieManager(_cookieJar))
-  ..interceptors.add(LogInterceptor(
-      request: false,
-      requestUrl: false,
-      requestBody: false,
-      requestHeader: false,
-      responseUrl: false,
-      responseBody: false,
-      responseHeader: false))
+  // ..interceptors.add(LogInterceptor(
+  //     request: false,
+  //     requestUrl: false,
+  //     requestBody: false,
+  //     requestHeader: false,
+  //     responseUrl: false,
+  //     responseBody: false,
+  //     responseHeader: false))
   ..options.followRedirects = false
   ..options.validateStatus =
       (status) => (status != null && status >= 200 && status < 400);
@@ -106,18 +106,52 @@ Future<dynamic> _httpRequest(
   String? cookie,
   int timeout = 30,
   int maxRetry = 3,
-  int retryDelay = 1, // seconds
+  int retryDelay = 0, // seconds
+  Function(int, int)? onSendProgress,
+  Function(int, int)? onReceiveProgress,
+}) async {
+  dynamic response;
+  do {
+    maxRetry--;
+    response = await Future.delayed(Duration(seconds: retryDelay), () async {
+      return await _doHttpRequest(endpoint,
+          method: method,
+          host: host,
+          headers: headers,
+          data: data,
+          queryParameters: queryParameters,
+          cancelToken: cancelToken,
+          checkSsl: checkSsl,
+          cookie: cookie,
+          timeout: timeout,
+          onReceiveProgress: onReceiveProgress,
+          onSendProgress: onSendProgress);
+    });
+  } while (response != null && maxRetry > 0);
+  return response;
+}
+
+Future<dynamic> _doHttpRequest(
+  String endpoint, {
+  String method = 'GET',
+  String? host,
+  Map<String, dynamic>? headers,
+  Object? data,
+  Map<String, dynamic>? queryParameters,
+  CancelToken? cancelToken,
+  bool? checkSsl,
+  String? cookie,
+  int timeout = 30,
   Function(int, int)? onSendProgress,
   Function(int, int)? onReceiveProgress,
 }) async {
   Response response;
-  // TODO: retry
   try {
     _dio._createHttpClient(
-      callback: (cert, host, port) {
-        return !(checkSsl ?? connectionStore.checkSsl.value);
-      }, /*  proxy: 'PROXY 192.168.8.77:8899; PROXY 127.0.0.1:8899; DIRECT' */
-    );
+        callback: (cert, host, port) {
+          return !(checkSsl ?? connectionStore.checkSsl.value);
+        },
+        proxy: 'PROXY 192.168.8.76:8899; PROXY 127.0.0.1:8899; DIRECT');
     response = await _dio.request(endpoint,
         data: data,
         queryParameters: queryParameters,
@@ -138,7 +172,7 @@ Future<dynamic> _httpRequest(
       try {
         return jsonDecode(response.data);
       } on Exception catch (e) {
-        Log.error('_httpRequest: decode response as json failed: $e');
+        //Log.error('_httpRequest: decode response as json failed: $e');
       }
     }
     if (response.data is Map) {
@@ -146,10 +180,10 @@ Future<dynamic> _httpRequest(
     }
     return response.data;
   } on DioException catch (e) {
-    Log.error("_httpRequest DioException: $e");
+    //Log.error("_httpRequest DioException: $e");
     rethrow;
   } catch (e) {
-    Log.error("_httpRequest Exception: $e");
+    //Log.error("_httpRequest Exception: $e");
     rethrow;
   }
 }
@@ -255,10 +289,10 @@ Future<dynamic> _httpDownload(String endpoint,
         ));
     return response.data;
   } on DioException catch (e) {
-    Log.error("download DioException: $e");
+//Log.error("download DioException: $e");
     rethrow;
   } catch (e) {
-    Log.error("download: $e");
+//Log.error("download: $e");
     rethrow;
   }
 }

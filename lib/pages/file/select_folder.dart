@@ -1,5 +1,4 @@
 import 'package:garden/theme/app_theme.dart';
-import 'package:garden/api/dsm_api.dart';
 import 'package:garden/util/file_type_util.dart';
 import 'package:garden/util/log.dart';
 import 'package:garden/util/ui_util.dart';
@@ -9,6 +8,7 @@ import 'package:garden/widgets/file_icon.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:garden/constants/app_constants.dart';
+import 'package:garden/theme/app_colors.dart';
 
 class SelectFolder extends StatefulWidget {
   final bool multi;
@@ -64,7 +64,7 @@ class SelectFolderState extends State<SelectFolder> {
     setState(() {
       loading = true;
     });
-    var res = await dsmFileStationListList(path);
+    var res = await DsmApi.fileList(path);
     setState(() {
       success = res['success'];
     });
@@ -219,9 +219,9 @@ class SelectFolderState extends State<SelectFolder> {
                 },
                 child: SizedBox(
                   child: selectedFiles.contains(file['path'])
-                      ? Icon(
+                      ? const Icon(
                           CupertinoIcons.checkmark_alt,
-                          color: Theme.of(context).colorScheme.primary,
+                          color: AppColors.primaryAction,
                         )
                       : null,
                 ),

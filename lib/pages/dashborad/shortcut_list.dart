@@ -43,6 +43,12 @@ class ShortcutList extends StatelessWidget {
   final ReadonlySignal<List>? validAppViewOrder;
   @override
   Widget build(BuildContext ctx) {
+    final shortcutItemsValue = shortcutItems.watch(ctx);
+    final appNotifyValue = appNotify.watch(ctx);
+    final systemValue = systemData.watch(ctx);
+    final storageVolumesValue = storageVolumes.watch(ctx);
+    final storageDisksValue = storageDisks.watch(ctx);
+    final validAppViewOrderValue = validAppViewOrder?.watch(ctx);
     return Card(
       shape: RoundedRectangleBorder(
           side: const BorderSide(), borderRadius: BorderRadius.circular(18)),
@@ -52,15 +58,29 @@ class ShortcutList extends StatelessWidget {
         child: ListView.builder(
           scrollDirection: Axis.horizontal,
           itemBuilder: (ctx, i) {
-            return _buildShortcutItem(ctx, shortcutItems[i]);
+            return _buildShortcutItem(
+                ctx,
+                shortcutItemsValue[i],
+                systemValue,
+                storageVolumesValue,
+                storageDisksValue,
+                appNotifyValue,
+                validAppViewOrderValue);
           },
-          itemCount: shortcutItems.length,
+          itemCount: shortcutItemsValue.length,
         ),
       ),
     );
   }
 
-  Widget _buildShortcutItem(BuildContext context, Map shortcut) {
+  Widget _buildShortcutItem(
+      BuildContext context,
+      Map shortcut,
+      Map systemValue,
+      List storageVolumesValue,
+      List storageDisksValue,
+      Map appNotifyValue,
+      List? validAppViewOrderValue) {
     String icon = "";
     String name = "";
     int unread = 0;
@@ -77,8 +97,8 @@ class ShortcutList extends StatelessWidget {
         name = "套件中心";
         page = Packages('DSM ${connectionStore.dsmVersion}.0-10049');
         routerName = "packages";
-        if (appNotify['SYNO.SDS.PkgManApp.Instance'] != null) {
-          unread = appNotify['SYNO.SDS.PkgManApp.Instance']['unread'];
+        if (appNotifyValue['SYNO.SDS.PkgManApp.Instance'] != null) {
+          unread = appNotifyValue['SYNO.SDS.PkgManApp.Instance']['unread'];
         }
         break;
       case "SYNO.SDS.AdminCenter.Application":
@@ -86,13 +106,13 @@ class ShortcutList extends StatelessWidget {
             "assets/applications/${connectionStore.dsmVersion}/control_panel.png";
         name = "控制面板";
         page = ControlPanel(
-            systemData,
-            storageVolumes,
-            storageDisks,
-            appNotify);
+            systemValue.toSignal(),
+            storageVolumesValue.toSignal(),
+            storageDisksValue.toSignal(),
+            appNotifyValue.toSignal());
         routerName = "control_panel";
-        if (appNotify['SYNO.SDS.AdminCenter.Application'] != null) {
-          unread = appNotify['SYNO.SDS.AdminCenter.Application']['unread'];
+        if (appNotifyValue['SYNO.SDS.AdminCenter.Application'] != null) {
+          unread = appNotifyValue['SYNO.SDS.AdminCenter.Application']['unread'];
         }
         break;
       case "SYNO.SDS.StorageManager.Instance":
@@ -103,7 +123,7 @@ class ShortcutList extends StatelessWidget {
         routerName = "storage_manager";
         break;
       case "SYNO.SDS.Docker.Application":
-        if (validAppViewOrder
+        if (validAppViewOrderValue
                 ?.contains("SYNO.SDS.ContainerManager.Application") ==
             true) {
           icon = "assets/applications/container_manager.png";
@@ -120,7 +140,7 @@ class ShortcutList extends StatelessWidget {
         routerName = "docker";
         break;
       case "SYNO.SDS.Docker.ContainerDetail.Instance":
-        if (validAppViewOrder
+        if (validAppViewOrderValue
                 ?.contains("SYNO.SDS.ContainerManager.Application") ==
             true) {
           icon = "assets/applications/container_manager.png";
@@ -194,71 +214,69 @@ class ShortcutList extends StatelessWidget {
         break;
     }
     if (icon != "") {
-      return Watch(
-        (context) => Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 15),
-          child: GestureDetector(
-            onTap: () {
-              Navigator.of(context).push(CupertinoPageRoute(
-                  builder: (context) {
-                    return page;
-                  },
-                  settings: RouteSettings(name: routerName)));
-            },
-            child: Card(
-              shape: RoundedRectangleBorder(
-                  side: const BorderSide(),
-                  borderRadius: BorderRadius.circular(18)),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                child: Stack(
-                  children: [
-                    Align(
-                      alignment: Alignment.center,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                            vertical: AppConstants.paddingSmall + 2),
-                        child: Column(
-                          children: [
-                            Image.asset(
-                              icon,
-                              width: 50,
-                            ),
-                            const SizedBox(
-                              height: 5,
-                            ),
-                            Text(
-                              name,
-                              textAlign: TextAlign.center,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(fontSize: 14),
-                            ),
+      return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 15),
+        child: GestureDetector(
+          onTap: () {
+            Navigator.of(context).push(CupertinoPageRoute(
+                builder: (context) {
+                  return page;
+                },
+                settings: RouteSettings(name: routerName)));
+          },
+          child: Card(
+            shape: RoundedRectangleBorder(
+                side: const BorderSide(),
+                borderRadius: BorderRadius.circular(18)),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+              child: Stack(
+                children: [
+                  Align(
+                    alignment: Alignment.center,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: AppConstants.paddingSmall + 2),
+                      child: Column(
+                        children: [
+                          Image.asset(
+                            icon,
+                            width: 50,
+                          ),
+                          const SizedBox(
+                            height: 5,
+                          ),
+                          Text(
+                            name,
+                            textAlign: TextAlign.center,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(fontSize: 14),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  if (unread > 0)
+                    Positioned(
+                      right: 20,
+                      top: 10,
+                      child: Container(
+                        alignment: Alignment.center,
+                        height: 15,
+                        width: 15,
+                        decoration: BoxDecoration(
+                          color: Colors.red,
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                                color: Colors.black.withValues(alpha: .5),
+                                offset: const Offset(1, 1)),
                           ],
                         ),
                       ),
                     ),
-                    if (unread > 0)
-                      Positioned(
-                        right: 20,
-                        top: 10,
-                        child: Container(
-                          alignment: Alignment.center,
-                          height: 15,
-                          width: 15,
-                          decoration: BoxDecoration(
-                            color: Colors.red,
-                            shape: BoxShape.circle,
-                            boxShadow: [
-                              BoxShadow(
-                                  color: Colors.black.withValues(alpha: .5),
-                                  offset: const Offset(1, 1)),
-                            ],
-                          ),
-                        ),
-                      ),
-                  ],
-                ),
+                ],
               ),
             ),
           ),

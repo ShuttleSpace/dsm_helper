@@ -13,7 +13,7 @@ Future<Map> dsmActiveBackupSystemActivationGet(
       api: 'SYNO.ActiveBackup.Activation', method: 'get', version: 1);
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmActiveBackupSystemActivationGet: $res");
+//Log.info("dsmActiveBackupSystemActivationGet: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -27,7 +27,7 @@ Future<Map> dsmActiveBackupSystemActivationSet(
       api: 'SYNO.ActiveBackup.Activation', method: 'set', version: 1);
   data['activation_code'] = activationCode;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmActiveBackupSystemActivationSet: $res");
+//Log.info("dsmActiveBackupSystemActivationSet: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -40,7 +40,7 @@ Future<Map> dsmActiveBackupSystemGeneralFsync(
       api: 'SYNO.ActiveBackup.General', method: 'fsync', version: 1);
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmActiveBackupSystemGeneralFsync: $res");
+//Log.info("dsmActiveBackupSystemGeneralFsync: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -53,7 +53,7 @@ Future<Map> dsmActiveBackupSystemGeneralGetSysMemInfo(
       api: 'SYNO.ActiveBackup.General', method: 'get_sys_mem_info', version: 1);
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmActiveBackupSystemGeneralGetSysMemInfo: $res");
+//Log.info("dsmActiveBackupSystemGeneralGetSysMemInfo: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -66,7 +66,7 @@ Future<Map> dsmActiveBackupSystemGeneralIsSynoInternal(
       api: 'SYNO.ActiveBackup.General', method: 'is_syno_internal', version: 1);
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmActiveBackupSystemGeneralIsSynoInternal: $res");
+//Log.info("dsmActiveBackupSystemGeneralIsSynoInternal: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -79,7 +79,7 @@ Future<Map> dsmActiveBackupSystemLogCancelDownload(
       api: 'SYNO.ActiveBackup.Log', method: 'cancel_download', version: 1);
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmActiveBackupSystemLogCancelDownload: $res");
+//Log.info("dsmActiveBackupSystemLogCancelDownload: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -92,7 +92,7 @@ Future<Map> dsmActiveBackupSystemLogCheckProgress(
       api: 'SYNO.ActiveBackup.Log', method: 'check_progress', version: 1);
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmActiveBackupSystemLogCheckProgress: $res");
+//Log.info("dsmActiveBackupSystemLogCheckProgress: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -105,7 +105,7 @@ Future<Map> dsmActiveBackupSystemLogClear(String logType, // Log type
       api: 'SYNO.ActiveBackup.Log', method: 'clear', version: 1);
   data['log_type'] = logType;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmActiveBackupSystemLogClear: $res");
+//Log.info("dsmActiveBackupSystemLogClear: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -128,7 +128,7 @@ Future<Map> dsmActiveBackupSystemLogGetInfo({CancelToken? cancelToken}) async {
       api: 'SYNO.ActiveBackup.Log', method: 'get_info', version: 1);
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmActiveBackupSystemLogGetInfo: $res");
+//Log.info("dsmActiveBackupSystemLogGetInfo: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -142,7 +142,7 @@ Future<Map> dsmActiveBackupSystemLogListLog(String logType, // Log type
   data['log_type'] = logType;
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmActiveBackupSystemLogListLog: $res");
+//Log.info("dsmActiveBackupSystemLogListLog: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -155,7 +155,7 @@ Future<Map> dsmActiveBackupSystemLogListResult(
       queryParameters: _dsmApiRequestData(
           api: 'SYNO.ActiveBackup.Log', method: 'list_result', version: 1),
       cancelToken: cancelToken);
-  Log.info("dsmActiveBackupSystemLogListResult: $res");
+//Log.info("dsmActiveBackupSystemLogListResult: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap({});
   }
@@ -170,7 +170,7 @@ Future<Map> dsmActiveBackupSystemLogListResultDetail(
   data['result_id'] = resultId;
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmActiveBackupSystemLogListResultDetail: $res");
+//Log.info("dsmActiveBackupSystemLogListResultDetail: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -182,7 +182,7 @@ Future<Map> dsmActiveBackupSystemLogSendTestLog(
   final data = _dsmApiRequestData(
       api: 'SYNO.ActiveBackup.Log', method: 'send_test_log', version: 1);
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmActiveBackupSystemLogSendTestLog: $res");
+//Log.info("dsmActiveBackupSystemLogSendTestLog: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -195,7 +195,7 @@ Future<Map> dsmActiveBackupSystemLogSetInfo(String settings, // Settings (JSON)
       api: 'SYNO.ActiveBackup.Log', method: 'set_info', version: 1);
   data['settings'] = settings;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmActiveBackupSystemLogSetInfo: $res");
+//Log.info("dsmActiveBackupSystemLogSetInfo: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -209,7 +209,7 @@ Future<Map> dsmActiveBackupSystemLogSetSendLogSetting(
       api: 'SYNO.ActiveBackup.Log', method: 'set_send_log_setting', version: 1);
   data['settings'] = settings;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmActiveBackupSystemLogSetSendLogSetting: $res");
+//Log.info("dsmActiveBackupSystemLogSetSendLogSetting: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -223,7 +223,7 @@ Future<Map> dsmActiveBackupSystemLogUploadCert(
       api: 'SYNO.ActiveBackup.Log', method: 'upload_cert', version: 1);
   data['cert_file'] = certFile;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmActiveBackupSystemLogUploadCert: $res");
+//Log.info("dsmActiveBackupSystemLogUploadCert: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -236,7 +236,7 @@ Future<Map> dsmActiveBackupSystemOverviewListActivity(
       api: 'SYNO.ActiveBackup.Overview', method: 'list_activity', version: 1);
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmActiveBackupSystemOverviewListActivity: $res");
+//Log.info("dsmActiveBackupSystemOverviewListActivity: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -251,7 +251,7 @@ Future<Map> dsmActiveBackupSystemOverviewListDeviceLastBackup(
       version: 1);
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmActiveBackupSystemOverviewListDeviceLastBackup: $res");
+//Log.info("dsmActiveBackupSystemOverviewListDeviceLastBackup: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -266,7 +266,7 @@ Future<Map> dsmActiveBackupSystemOverviewListDeviceTransferSize(
       version: 1);
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmActiveBackupSystemOverviewListDeviceTransferSize: $res");
+//Log.info("dsmActiveBackupSystemOverviewListDeviceTransferSize: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -281,7 +281,7 @@ Future<Map> dsmActiveBackupSystemOverviewListResultStatusSummary(
       version: 1);
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmActiveBackupSystemOverviewListResultStatusSummary: $res");
+//Log.info("dsmActiveBackupSystemOverviewListResultStatusSummary: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -296,7 +296,7 @@ Future<Map> dsmActiveBackupSystemOverviewListTypeTransferSize(
       version: 1);
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmActiveBackupSystemOverviewListTypeTransferSize: $res");
+//Log.info("dsmActiveBackupSystemOverviewListTypeTransferSize: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -309,7 +309,7 @@ Future<Map> dsmActiveBackupSystemPlanCreate(String planName, // Plan name
       api: 'SYNO.ActiveBackup.Plan', method: 'create', version: 1);
   data['plan_name'] = planName;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmActiveBackupSystemPlanCreate: $res");
+//Log.info("dsmActiveBackupSystemPlanCreate: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -322,7 +322,7 @@ Future<Map> dsmActiveBackupSystemPlanDelete(String planId, // Plan ID
       api: 'SYNO.ActiveBackup.Plan', method: 'delete', version: 1);
   data['plan_id'] = planId;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmActiveBackupSystemPlanDelete: $res");
+//Log.info("dsmActiveBackupSystemPlanDelete: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -336,7 +336,7 @@ Future<Map> dsmActiveBackupSystemPlanGet(String planId, // Plan ID
   data['plan_id'] = planId;
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmActiveBackupSystemPlanGet: $res");
+//Log.info("dsmActiveBackupSystemPlanGet: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -348,7 +348,7 @@ Future<Map> dsmActiveBackupSystemPlanList({CancelToken? cancelToken}) async {
       api: 'SYNO.ActiveBackup.Plan', method: 'list', version: 1);
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmActiveBackupSystemPlanList: $res");
+//Log.info("dsmActiveBackupSystemPlanList: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -361,7 +361,7 @@ Future<Map> dsmActiveBackupSystemPlanUpdate(String planId, // Plan ID
       api: 'SYNO.ActiveBackup.Plan', method: 'update', version: 1);
   data['plan_id'] = planId;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmActiveBackupSystemPlanUpdate: $res");
+//Log.info("dsmActiveBackupSystemPlanUpdate: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -374,7 +374,7 @@ Future<Map> dsmActiveBackupSystemReportCreate(String reportName, // Report name
       api: 'SYNO.ActiveBackup.Report', method: 'create', version: 1);
   data['report_name'] = reportName;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmActiveBackupSystemReportCreate: $res");
+//Log.info("dsmActiveBackupSystemReportCreate: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -387,7 +387,7 @@ Future<Map> dsmActiveBackupSystemReportDelete(String reportId, // Report ID
       api: 'SYNO.ActiveBackup.Report', method: 'delete', version: 1);
   data['report_id'] = reportId;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmActiveBackupSystemReportDelete: $res");
+//Log.info("dsmActiveBackupSystemReportDelete: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -399,7 +399,7 @@ Future<Map> dsmActiveBackupSystemReportList({CancelToken? cancelToken}) async {
       api: 'SYNO.ActiveBackup.Report', method: 'list', version: 1);
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmActiveBackupSystemReportList: $res");
+//Log.info("dsmActiveBackupSystemReportList: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -412,7 +412,7 @@ Future<Map> dsmActiveBackupSystemReportConfigGet(
       api: 'SYNO.ActiveBackup.ReportConfig', method: 'get', version: 1);
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmActiveBackupSystemReportConfigGet: $res");
+//Log.info("dsmActiveBackupSystemReportConfigGet: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -425,7 +425,7 @@ Future<Map> dsmActiveBackupSystemReportConfigSet(String config, // Config (JSON)
       api: 'SYNO.ActiveBackup.ReportConfig', method: 'set', version: 1);
   data['config'] = config;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmActiveBackupSystemReportConfigSet: $res");
+//Log.info("dsmActiveBackupSystemReportConfigSet: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -439,7 +439,7 @@ Future<Map> dsmActiveBackupSystemShareCheckFile(String filePath, // File path
   data['file_path'] = filePath;
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmActiveBackupSystemShareCheckFile: $res");
+//Log.info("dsmActiveBackupSystemShareCheckFile: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -453,7 +453,7 @@ Future<Map> dsmActiveBackupSystemShareCreateFsDir(
       api: 'SYNO.ActiveBackup.Share', method: 'create_fs_dir', version: 1);
   data['dir_path'] = dirPath;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmActiveBackupSystemShareCreateFsDir: $res");
+//Log.info("dsmActiveBackupSystemShareCreateFsDir: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -465,7 +465,7 @@ Future<Map> dsmActiveBackupSystemShareList({CancelToken? cancelToken}) async {
       api: 'SYNO.ActiveBackup.Share', method: 'list', version: 1);
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmActiveBackupSystemShareList: $res");
+//Log.info("dsmActiveBackupSystemShareList: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -478,7 +478,7 @@ Future<Map> dsmActiveBackupSystemShareListEncrypted(
       api: 'SYNO.ActiveBackup.Share', method: 'list_encrypted', version: 1);
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmActiveBackupSystemShareListEncrypted: $res");
+//Log.info("dsmActiveBackupSystemShareListEncrypted: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -492,7 +492,7 @@ Future<Map> dsmActiveBackupSystemShareListFile(String dirPath, // Directory path
   data['dir_path'] = dirPath;
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmActiveBackupSystemShareListFile: $res");
+//Log.info("dsmActiveBackupSystemShareListFile: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -505,7 +505,7 @@ Future<Map> dsmActiveBackupSystemShareListStorage(
       api: 'SYNO.ActiveBackup.Share', method: 'list_storage', version: 1);
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmActiveBackupSystemShareListStorage: $res");
+//Log.info("dsmActiveBackupSystemShareListStorage: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -518,7 +518,7 @@ Future<Map> dsmActiveBackupSystemShareListVolume(
       api: 'SYNO.ActiveBackup.Share', method: 'list_volume', version: 1);
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmActiveBackupSystemShareListVolume: $res");
+//Log.info("dsmActiveBackupSystemShareListVolume: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -531,7 +531,7 @@ Future<Map> dsmActiveBackupSystemShareRelink(String shareName, // Share name
       api: 'SYNO.ActiveBackup.Share', method: 'relink', version: 1);
   data['share_name'] = shareName;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmActiveBackupSystemShareRelink: $res");
+//Log.info("dsmActiveBackupSystemShareRelink: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -544,7 +544,7 @@ Future<Map> dsmActiveBackupSystemShareRemove(String shareName, // Share name
       api: 'SYNO.ActiveBackup.Share', method: 'remove', version: 1);
   data['share_name'] = shareName;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmActiveBackupSystemShareRemove: $res");
+//Log.info("dsmActiveBackupSystemShareRemove: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -557,7 +557,7 @@ Future<Map> dsmActiveBackupSystemStorageAutomountGet(
       api: 'SYNO.ActiveBackup.Storage', method: 'automount_get', version: 1);
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmActiveBackupSystemStorageAutomountGet: $res");
+//Log.info("dsmActiveBackupSystemStorageAutomountGet: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -572,7 +572,7 @@ Future<Map> dsmActiveBackupSystemStorageAutomountListLocation(
       version: 1);
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmActiveBackupSystemStorageAutomountListLocation: $res");
+//Log.info("dsmActiveBackupSystemStorageAutomountListLocation: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -589,7 +589,7 @@ Future<Map> dsmActiveBackupSystemStorageCheckDsmShareMount(
   data['share_name'] = shareName;
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmActiveBackupSystemStorageCheckDsmShareMount: $res");
+//Log.info("dsmActiveBackupSystemStorageCheckDsmShareMount: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -604,7 +604,7 @@ Future<Map> dsmActiveBackupSystemStorageCheckMount(
   data['mount_path'] = mountPath;
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmActiveBackupSystemStorageCheckMount: $res");
+//Log.info("dsmActiveBackupSystemStorageCheckMount: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -630,7 +630,7 @@ Future<Map> dsmActiveBackupSystemStorageListDsmShare(
       api: 'SYNO.ActiveBackup.Storage', method: 'list_dsm_share', version: 1);
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmActiveBackupSystemStorageListDsmShare: $res");
+//Log.info("dsmActiveBackupSystemStorageListDsmShare: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -646,7 +646,7 @@ Future<Map> dsmActiveBackupSystemStorageMountDsmEncShare(
       version: 1);
   data['share_name'] = shareName;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmActiveBackupSystemStorageMountDsmEncShare: $res");
+//Log.info("dsmActiveBackupSystemStorageMountDsmEncShare: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -662,7 +662,7 @@ Future<Map> dsmActiveBackupSystemStorageUmountDsmEncShare(
       version: 1);
   data['share_name'] = shareName;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmActiveBackupSystemStorageUmountDsmEncShare: $res");
+//Log.info("dsmActiveBackupSystemStorageUmountDsmEncShare: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -675,7 +675,7 @@ Future<Map> dsmActiveBackupSystemStorageUnmount(String mountPath, // Mount path
       api: 'SYNO.ActiveBackup.Storage', method: 'unmount', version: 1);
   data['mount_path'] = mountPath;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmActiveBackupSystemStorageUnmount: $res");
+//Log.info("dsmActiveBackupSystemStorageUnmount: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -691,7 +691,7 @@ Future<Map> dsmActiveBackupSystemStorageUploadPrivateKey(
       version: 1);
   data['key_file'] = keyFile;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmActiveBackupSystemStorageUploadPrivateKey: $res");
+//Log.info("dsmActiveBackupSystemStorageUploadPrivateKey: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -704,7 +704,7 @@ Future<Map> dsmActiveBackupSystemStorageVerify(String storageId, // Storage ID
       api: 'SYNO.ActiveBackup.Storage', method: 'verify', version: 1);
   data['storage_id'] = storageId;
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
-  Log.info("dsmActiveBackupSystemStorageVerify: $res");
+//Log.info("dsmActiveBackupSystemStorageVerify: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -717,7 +717,7 @@ Future<Map> dsmActiveBackupSystemUserGroupList(
       api: 'SYNO.ActiveBackup.UserGroup', method: 'list', version: 1);
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmActiveBackupSystemUserGroupList: $res");
+//Log.info("dsmActiveBackupSystemUserGroupList: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
@@ -730,7 +730,7 @@ Future<Map> dsmActiveBackupSystemUserGroupListAdmin(
       api: 'SYNO.ActiveBackup.UserGroup', method: 'list_admin', version: 1);
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
-  Log.info("dsmActiveBackupSystemUserGroupListAdmin: $res");
+//Log.info("dsmActiveBackupSystemUserGroupListAdmin: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
