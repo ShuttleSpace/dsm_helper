@@ -10,99 +10,90 @@ import 'package:garden/theme/app_colors.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_vibrate/flutter_vibrate.dart';
 import 'add_tracker.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:signals_hooks/signals_hooks.dart';
 
-class DownloadDetail extends StatefulWidget {
+class DownloadDetail extends HookWidget {
   final String id;
   const DownloadDetail(this.id, {super.key});
+
   @override
-  DownloadDetailState createState() => DownloadDetailState();
-}
+  Widget build(BuildContext context) {
+    final tickerProvider = useSingleTickerProvider();
+    final loading = useSignal(true);
+    final loadingTrackers = useSignal(true);
+    final loadingPeers = useSignal(true);
+    final loadingFiles = useSignal(true);
+    final trackers = useSignal<List>([]);
+    final peers = useSignal<List>([]);
+    final files = useSignal<List>([]);
+    final showAddTrackerButton = useSignal(false);
+    final task = useSignal<dynamic>(null);
 
-class DownloadDetailState extends State<DownloadDetail>
-    with TickerProviderStateMixin {
-  late TabController _tabController;
-  bool loading = true;
-  bool loadingTrackers = true;
-  bool loadingPeers = true;
-  bool loadingFiles = true;
-  List trackers = [];
-  List peers = [];
-  List files = [];
+    // The tab count depends on the task type, which is only known after the
+    // first fetch: a running torrent gets 6 tabs, anything else 2. The
+    // controller is recreated (and the old one disposed) when that changes,
+    // like the original setState did.
+    final isRunningTorrent = task.value != null &&
+        task.value['type'] == "bt" &&
+        task.value['status'] == 2;
+    final tabController = useMemoized(
+      () => TabController(
+        length: isRunningTorrent ? 6 : 2,
+        vsync: tickerProvider,
+      ),
+      [isRunningTorrent],
+    );
 
-  bool showAddTrackerButton = false;
-  dynamic task;
-  @override
-  void initState() {
-    getData();
-    super.initState();
-  }
-
-  getTrackers() async {
-    var res = await DsmApi.downloadTracker(widget.id);
-    if (res['success']) {
-      setState(() {
-        loadingTrackers = false;
-        trackers = res['data']['items'];
-      });
-    }
-  }
-
-  getPeers() async {
-    var res = await DsmApi.downloadPeer(widget.id);
-    if (res['success']) {
-      setState(() {
-        loadingPeers = false;
-        peers = res['data']['items'];
-      });
-    }
-  }
-
-  getFiles() async {
-    var res = await DsmApi.downloadFile(widget.id);
-    if (res['success']) {
-      setState(() {
-        loadingFiles = false;
-        files = res['data']['items'];
-      });
-    }
-  }
-
-  handleTab() {
-    if (_tabController.index == 2) {
-      setState(() {
-        showAddTrackerButton = true;
-      });
-      getTrackers();
-    } else {
-      setState(() {
-        showAddTrackerButton = false;
-      });
-    }
-    if (_tabController.index == 3) {
-      getPeers();
-    }
-    if (_tabController.index == 4) {
-      getFiles();
-    }
-  }
-
-  getData() async {
-    var res = await DsmApi.downloadDetail(widget.id);
-    setState(() {
-      loading = false;
+    getTrackers() async {
+      var res = await DsmApi.downloadTracker(id);
       if (res['success']) {
-        task = res['data']['task'][0];
-        if (task['type'] == "bt" && task['status'] == 2) {
-          _tabController = TabController(length: 6, vsync: this);
-          _tabController.addListener(handleTab);
-        } else {
-          _tabController = TabController(length: 2, vsync: this);
-        }
+        loadingTrackers.value = false;
+        trackers.value = res['data']['items'];
       }
-    });
-  }
+    }
 
-  Widget _buildFileItem(file) {
+    getPeers() async {
+      var res = await DsmApi.downloadPeer(id);
+      if (res['success']) {
+        loadingPeers.value = false;
+        peers.value = res['data']['items'];
+      }
+    }
+
+    getFiles() async {
+      var res = await DsmApi.downloadFile(id);
+      if (res['success']) {
+        loadingFiles.value = false;
+        files.value = res['data']['items'];
+      }
+    }
+
+    handleTab() {
+      if (tabController.index == 2) {
+        showAddTrackerButton.value = true;
+        getTrackers();
+      } else {
+        showAddTrackerButton.value = false;
+      }
+      if (tabController.index == 3) {
+        getPeers();
+      }
+      if (tabController.index == 4) {
+        getFiles();
+      }
+    }
+
+    getData() async {
+      var res = await DsmApi.downloadDetail(id);
+      if (res['success']) {
+        task.value = res['data']['task'][0];
+      }
+      // Set last so the first post-loading build already has the task.
+      loading.value = false;
+    }
+
+  Widget buildFileItem(file) {
     return Card(
       shape: RoundedRectangleBorder(
           side: const BorderSide(), borderRadius: BorderRadius.circular(18)),
@@ -150,7 +141,7 @@ class DownloadDetailState extends State<DownloadDetail>
     );
   }
 
-  Widget _buildPeerItem(peer) {
+  Widget buildPeerItem(peer) {
     return Card(
       shape: RoundedRectangleBorder(
           side: const BorderSide(), borderRadius: BorderRadius.circular(18)),
@@ -201,7 +192,7 @@ class DownloadDetailState extends State<DownloadDetail>
     );
   }
 
-  Widget _buildTrackerItem(tracker) {
+  Widget buildTrackerItem(tracker) {
     return Card(
       shape: RoundedRectangleBorder(
           side: const BorderSide(), borderRadius: BorderRadius.circular(18)),
@@ -247,8 +238,19 @@ class DownloadDetailState extends State<DownloadDetail>
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
+    useEffect(() {
+      getData();
+      return null;
+    }, const []);
+
+    useEffect(() {
+      tabController.addListener(handleTab);
+      return () {
+        tabController.removeListener(handleTab);
+        tabController.dispose();
+      };
+    }, [tabController]);
+
     return Scaffold(
       appBar: AppBar(
         leading: AppBackButton(context),
@@ -302,7 +304,7 @@ class DownloadDetailState extends State<DownloadDetail>
                                           Navigator.of(context).pop();
                                           var res =
                                               await DsmApi.downloadTaskAction(
-                                                  [task['id']], "delete");
+                                                  [task.value['id']], "delete");
                                           if (res['success']) {
                                             UiUtil.toast("任务删除成功");
                                             if (context.mounted) {
@@ -359,7 +361,7 @@ class DownloadDetailState extends State<DownloadDetail>
           ),
         ],
       ),
-      body: loading
+      body: loading.value
           ? const Center(
               child: CupertinoActivityIndicator(
                 radius: 14,
@@ -376,7 +378,7 @@ class DownloadDetailState extends State<DownloadDetail>
                   child: TabBar(
                     dividerHeight: 0,
                     isScrollable: true,
-                    controller: _tabController,
+                    controller: tabController,
                     indicatorSize: TabBarIndicatorSize.label,
                     labelColor: Theme.brightnessOf(context) == Brightness.dark
                         ? Colors.white
@@ -394,7 +396,7 @@ class DownloadDetailState extends State<DownloadDetail>
                             EdgeInsets.symmetric(vertical: 10, horizontal: 5),
                         child: Text("传输信息"),
                       ),
-                      if (task['type'] == "bt" && task['status'] == 2) ...[
+                      if (task.value['type'] == "bt" && task.value['status'] == 2) ...[
                         const Padding(
                           padding:
                               EdgeInsets.symmetric(vertical: 10, horizontal: 5),
@@ -421,7 +423,7 @@ class DownloadDetailState extends State<DownloadDetail>
                 ),
                 Expanded(
                   child: TabBarView(
-                    controller: _tabController,
+                    controller: tabController,
                     children: [
                       ListView(
                         children: [
@@ -439,7 +441,7 @@ class DownloadDetailState extends State<DownloadDetail>
                                 children: [
                                   const Text("文件名："),
                                   Expanded(
-                                    child: Text(task['title']),
+                                    child: Text(task.value['title']),
                                   ),
                                 ],
                               ),
@@ -459,7 +461,7 @@ class DownloadDetailState extends State<DownloadDetail>
                                   const Text("保存位置："),
                                   Expanded(
                                     child: Text(
-                                      task['additional']['detail']
+                                      task.value['additional']['detail']
                                           ['destination'],
                                     ),
                                   ),
@@ -481,8 +483,8 @@ class DownloadDetailState extends State<DownloadDetail>
                                   const Text("文件大小："),
                                   Expanded(
                                     child: Text(
-                                      task['size'] > 0
-                                          ? task['size'].formatSize()
+                                      task.value['size'] > 0
+                                          ? task.value['size'].formatSize()
                                           : "未取得",
                                     ),
                                   ),
@@ -502,7 +504,7 @@ class DownloadDetailState extends State<DownloadDetail>
                               child: Row(
                                 children: [
                                   const Text("用户名："),
-                                  Text("${task['username']}"),
+                                  Text("${task.value['username']}"),
                                 ],
                               ),
                             ),
@@ -522,11 +524,11 @@ class DownloadDetailState extends State<DownloadDetail>
                                   const Text("网址："),
                                   Expanded(
                                       child: Text(
-                                          "${task['additional']['detail']['uri']}")),
+                                          "${task.value['additional']['detail']['uri']}")),
                                   OutlinedButton(
                                     onPressed: () async {
                                       ClipboardData data = ClipboardData(
-                                          text: task['additional']['detail']
+                                          text: task.value['additional']['detail']
                                               ['uri']);
                                       Clipboard.setData(data);
                                       UiUtil.toast("已复制到剪贴板");
@@ -558,7 +560,7 @@ class DownloadDetailState extends State<DownloadDetail>
                                 children: [
                                   const Text("创建时间："),
                                   Text(DateTime.fromMillisecondsSinceEpoch(
-                                          task['additional']['detail']
+                                          task.value['additional']['detail']
                                                   ['created_time'] *
                                               1000)
                                       .format("Y-m-d H:i:s")),
@@ -578,11 +580,11 @@ class DownloadDetailState extends State<DownloadDetail>
                               child: Row(
                                 children: [
                                   const Text("完成时间："),
-                                  Text(task['additional']['detail']
+                                  Text(task.value['additional']['detail']
                                               ['completed_time'] >
                                           0
                                       ? DateTime.fromMillisecondsSinceEpoch(
-                                              task['additional']['detail']
+                                              task.value['additional']['detail']
                                                       ['completed_time'] *
                                                   1000)
                                           .format("Y-m-d H:i:s")
@@ -603,10 +605,10 @@ class DownloadDetailState extends State<DownloadDetail>
                               child: Row(
                                 children: [
                                   const Text("预计等待时间："),
-                                  Text(task['additional']['detail']
+                                  Text(task.value['additional']['detail']
                                               ['waiting_seconds'] >
                                           0
-                                      ? (int.parse(task['additional']['detail']
+                                      ? (int.parse(task.value['additional']['detail']
                                               ['waiting_seconds']))
                                           .timeRemaining()
                                       : "无法取得"),
@@ -632,47 +634,47 @@ class DownloadDetailState extends State<DownloadDetail>
                                 children: [
                                   const Text("状态："),
                                   Expanded(
-                                    child: task['status'] == 1
+                                    child: task.value['status'] == 1
                                         ? const Text(
                                             "等待中",
                                             style:
                                                 TextStyle(color: Colors.grey),
                                           )
-                                        : task['status'] == 2
+                                        : task.value['status'] == 2
                                             ? Text(
-                                                "${task['additional']['transfer']['speed_download'].formatSize()}/s",
+                                                "${task.value['additional']['transfer']['speed_download'].formatSize()}/s",
                                                 style: const TextStyle(
                                                     color:
                                                         Colors.lightBlueAccent),
                                               )
-                                            : task['status'] == 3
+                                            : task.value['status'] == 3
                                                 ? const Text(
                                                     "已暂停",
                                                     style: TextStyle(
                                                         color: Colors.grey),
                                                   )
-                                                : task['status'] == 5
+                                                : task.value['status'] == 5
                                                     ? const Text(
                                                         "已完成",
                                                         style: TextStyle(
                                                             color:
                                                                 Colors.green),
                                                       )
-                                                    : task['status'] == 6
+                                                    : task.value['status'] == 6
                                                         ? const Text(
                                                             "检查中",
                                                             style: TextStyle(
                                                                 color: Colors
                                                                     .grey),
                                                           )
-                                                        : task['status'] == 101
+                                                        : task.value['status'] == 101
                                                             ? const Text(
                                                                 "错误",
                                                                 style: TextStyle(
                                                                     color: Colors
                                                                         .red),
                                                               )
-                                                            : task['status'] ==
+                                                            : task.value['status'] ==
                                                                     105
                                                                 ? const Text(
                                                                     "空间不足",
@@ -680,7 +682,7 @@ class DownloadDetailState extends State<DownloadDetail>
                                                                         color: Colors
                                                                             .red),
                                                                   )
-                                                                : task['status'] ==
+                                                                : task.value['status'] ==
                                                                         113
                                                                     ? const Text(
                                                                         "重复的任务",
@@ -689,7 +691,7 @@ class DownloadDetailState extends State<DownloadDetail>
                                                                                 Colors.red),
                                                                       )
                                                                     : Text(
-                                                                        "代码：${task['status']}",
+                                                                        "代码：${task.value['status']}",
                                                                         style: const TextStyle(
                                                                             color:
                                                                                 Colors.red),
@@ -713,7 +715,7 @@ class DownloadDetailState extends State<DownloadDetail>
                                   const Text("已下载："),
                                   Expanded(
                                     child: Text(
-                                      task['additional']['transfer']
+                                      task.value['additional']['transfer']
                                               ['size_downloaded']
                                           .formatSize(),
                                     ),
@@ -736,7 +738,7 @@ class DownloadDetailState extends State<DownloadDetail>
                                   const Text("已上传："),
                                   Expanded(
                                     child: Text(
-                                      "${task['additional']['transfer']['size_uploaded'].formatSize()} （${task['additional']['transfer']['size_downloaded'] > 0 ? (task['additional']['transfer']['size_uploaded'] / task['additional']['transfer']['size_downloaded'] * 100).toStringAsFixed(2) : "0"}%)",
+                                      "${task.value['additional']['transfer']['size_uploaded'].formatSize()} （${task.value['additional']['transfer']['size_downloaded'] > 0 ? (task.value['additional']['transfer']['size_uploaded'] / task.value['additional']['transfer']['size_downloaded'] * 100).toStringAsFixed(2) : "0"}%)",
                                     ),
                                   ),
                                 ],
@@ -757,7 +759,7 @@ class DownloadDetailState extends State<DownloadDetail>
                                   const Text("进度："),
                                   Expanded(
                                     child: Text(
-                                      "${task['size'] > 0 ? (task['additional']['transfer']['size_downloaded'] / task['size'] * 100).toStringAsFixed(2) : "0"}%",
+                                      "${task.value['size'] > 0 ? (task.value['additional']['transfer']['size_downloaded'] / task.value['size'] * 100).toStringAsFixed(2) : "0"}%",
                                     ),
                                   ),
                                 ],
@@ -776,10 +778,10 @@ class DownloadDetailState extends State<DownloadDetail>
                               child: Row(
                                 children: [
                                   const Text("速度："),
-                                  Text(task['additional']['transfer']
+                                  Text(task.value['additional']['transfer']
                                               ['speed_download'] >
                                           0
-                                      ? task['additional']['transfer']
+                                      ? task.value['additional']['transfer']
                                               ['speed_download']
                                           .formatSize()
                                       : "无法取得"),
@@ -802,7 +804,7 @@ class DownloadDetailState extends State<DownloadDetail>
                                   const Text("Peer数："),
                                   Expanded(
                                       child: Text(
-                                          "${task['additional']['detail']['total_peers'] > 0 ? task['additional']['detail']['total_peers'] : "无法取得"}")),
+                                          "${task.value['additional']['detail']['total_peers'] > 0 ? task.value['additional']['detail']['total_peers'] : "无法取得"}")),
                                 ],
                               ),
                             ),
@@ -821,7 +823,7 @@ class DownloadDetailState extends State<DownloadDetail>
                                   const Text("分块总数："),
                                   Expanded(
                                       child: Text(
-                                          "${task['additional']['detail']['total_pieces'] > 0 ? task['additional']['detail']['total_pieces'] : "无法取得"}")),
+                                          "${task.value['additional']['detail']['total_pieces'] > 0 ? task.value['additional']['detail']['total_pieces'] : "无法取得"}")),
                                 ],
                               ),
                             ),
@@ -839,7 +841,7 @@ class DownloadDetailState extends State<DownloadDetail>
                                 children: [
                                   const Text("已下载分块数："),
                                   Text(
-                                      "${task['additional']['transfer']['downloaded_pieces']}"),
+                                      "${task.value['additional']['transfer']['downloaded_pieces']}"),
                                 ],
                               ),
                             ),
@@ -856,7 +858,7 @@ class DownloadDetailState extends State<DownloadDetail>
                               child: Row(
                                 children: [
                                   const Text("已做种时间："),
-                                  Text((int.parse(task['additional']['detail']
+                                  Text((int.parse(task.value['additional']['detail']
                                           ['seed_elapsed']))
                                       .timeRemaining()),
                                 ],
@@ -876,7 +878,7 @@ class DownloadDetailState extends State<DownloadDetail>
                                 children: [
                                   const Text("开始时间："),
                                   Text(DateTime.fromMillisecondsSinceEpoch(
-                                          task['additional']['detail']
+                                          task.value['additional']['detail']
                                                   ['started_time'] *
                                               1000)
                                       .format("Y-m-d H:i:s")),
@@ -896,14 +898,14 @@ class DownloadDetailState extends State<DownloadDetail>
                               child: Row(
                                 children: [
                                   const Text("剩余时间："),
-                                  Text(task['additional']['transfer']
+                                  Text(task.value['additional']['transfer']
                                               ['speed_download'] >
                                           0
-                                      ? (int.parse(((task['size'] -
-                                                      task['additional']
+                                      ? (int.parse(((task.value['size'] -
+                                                      task.value['additional']
                                                               ['transfer']
                                                           ['size_downloaded']) /
-                                                  task['additional']['transfer']
+                                                  task.value['additional']['transfer']
                                                       ['speed_download'])
                                               .ceil()))
                                           .timeRemaining()
@@ -914,70 +916,70 @@ class DownloadDetailState extends State<DownloadDetail>
                           ),
                         ],
                       ),
-                      if (task['type'] == "bt" && task['status'] == 2) ...[
-                        loadingTrackers
+                      if (task.value['type'] == "bt" && task.value['status'] == 2) ...[
+                        loadingTrackers.value
                             ? const Center(
                                 child: CupertinoActivityIndicator(
                                   radius: 14,
                                 ),
                               )
-                            : trackers.isEmpty
+                            : trackers.value.isEmpty
                                 ? const Center(
                                     child: Text("无Tracker"),
                                   )
                                 : ListView.separated(
                                     padding: const EdgeInsets.all(20),
                                     itemBuilder: (context, i) {
-                                      return _buildTrackerItem(trackers[i]);
+                                      return buildTrackerItem(trackers.value[i]);
                                     },
                                     separatorBuilder: (context, i) {
                                       return const SizedBox(
                                         height: 20,
                                       );
                                     },
-                                    itemCount: trackers.length),
-                        loadingPeers
+                                    itemCount: trackers.value.length),
+                        loadingPeers.value
                             ? const Center(
                                 child: CupertinoActivityIndicator(
                                   radius: 14,
                                 ),
                               )
-                            : peers.isEmpty
+                            : peers.value.isEmpty
                                 ? const Center(
                                     child: Text("无Peer"),
                                   )
                                 : ListView.separated(
                                     padding: const EdgeInsets.all(20),
                                     itemBuilder: (context, i) {
-                                      return _buildPeerItem(peers[i]);
+                                      return buildPeerItem(peers.value[i]);
                                     },
                                     separatorBuilder: (context, i) {
                                       return const SizedBox(
                                         height: 20,
                                       );
                                     },
-                                    itemCount: peers.length),
-                        loadingFiles
+                                    itemCount: peers.value.length),
+                        loadingFiles.value
                             ? const Center(
                                 child: CupertinoActivityIndicator(
                                   radius: 14,
                                 ),
                               )
-                            : files.isEmpty
+                            : files.value.isEmpty
                                 ? const Center(
                                     child: Text("无文件"),
                                   )
                                 : ListView.separated(
                                     padding: const EdgeInsets.all(20),
                                     itemBuilder: (context, i) {
-                                      return _buildFileItem(files[i]);
+                                      return buildFileItem(files.value[i]);
                                     },
                                     separatorBuilder: (context, i) {
                                       return const SizedBox(
                                         height: 20,
                                       );
                                     },
-                                    itemCount: files.length),
+                                    itemCount: files.value.length),
                         const Center(
                           child: Text("暂不支持预览"),
                         ),
@@ -987,14 +989,14 @@ class DownloadDetailState extends State<DownloadDetail>
                 ),
               ],
             ),
-      floatingActionButton: showAddTrackerButton
+      floatingActionButton: showAddTrackerButton.value
           ? FloatingActionButton(
               child: const Icon(Icons.add),
               onPressed: () {
                 Navigator.of(context)
                     .push(CupertinoPageRoute(
                         builder: (context) {
-                          return AddTracker(widget.id);
+                          return AddTracker(id);
                         },
                         settings: const RouteSettings(name: "add_tracker")))
                     .then((res) {

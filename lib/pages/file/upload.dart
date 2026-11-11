@@ -20,14 +20,8 @@ import 'package:flutter_vibrate/flutter_vibrate.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:wechat_assets_picker/wechat_assets_picker.dart';
-
-class Upload extends StatefulWidget {
-  final String path;
-  final List<String>? selectedFilesPath;
-  const Upload(this.path, {super.key, this.selectedFilesPath});
-  @override
-  UploadState createState() => UploadState();
-}
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:signals_hooks/signals_hooks.dart';
 
 class UploadItem {
   String path;
@@ -46,28 +40,33 @@ class UploadItem {
   }
 }
 
-class UploadState extends State<Upload> {
-  String savePath = "";
-  List<UploadItem> uploads = [];
-  @override
-  void initState() {
-    setState(() {
-      savePath = widget.path;
-    });
-    uploads = widget.selectedFilesPath?.map((filePath) {
-          File file = File(filePath);
-          return UploadItem(
-            filePath,
-            filePath.split("/").last,
-            fileSize: file.lengthSync(),
-          );
-        }).toList() ??
-        [];
-    setState(() {});
-    super.initState();
-  }
+class Upload extends HookWidget {
+  final String path;
+  final List<String>? selectedFilesPath;
+  const Upload(this.path, {super.key, this.selectedFilesPath});
 
-  Widget _buildUploadStatus(UploadItem upload) {
+  @override
+  Widget build(BuildContext context) {
+    final savePath = useSignal(path);
+    final uploads = useSignal<List<UploadItem>>(
+      selectedFilesPath?.map((filePath) {
+        File file = File(filePath);
+        return UploadItem(
+          filePath,
+          filePath.split("/").last,
+          fileSize: file.lengthSync(),
+        );
+      }).toList() ??
+          [],
+    );
+
+    // Upload items are mutated in place (status, progress); writing a new
+    // list notifies the signal so the page rebuilds.
+    void notifyUploads() {
+      uploads.value = List.of(uploads.value);
+    }
+
+  Widget buildUploadStatus(UploadItem upload) {
     if (upload.status == UploadStatus.complete) {
       return const Label(
         "上传完成",
@@ -113,7 +112,7 @@ class UploadState extends State<Upload> {
     }
   }
 
-  Widget _buildUploadItem(UploadItem upload) {
+  Widget buildUploadItem(UploadItem upload) {
     FileTypeEnum fileType =
         FileTypeUtil.toFileTypeEnum(FileTypeUtil.getFileType(upload.path));
     // String path = file['path'];
@@ -159,7 +158,7 @@ class UploadState extends State<Upload> {
                   const SizedBox(
                     height: 5,
                   ),
-                  _buildUploadStatus(upload),
+                  buildUploadStatus(upload),
                 ],
               ),
             ),
@@ -200,9 +199,8 @@ class UploadState extends State<Upload> {
                                     ),
                                     OutlinedButton(
                                       onPressed: () async {
-                                        setState(() {
-                                          upload.status = UploadStatus.wait;
-                                        });
+                                        upload.status = UploadStatus.wait;
+                                        notifyUploads();
                                         Navigator.of(context).pop();
                                       },
                                       child: const Text(
@@ -216,9 +214,8 @@ class UploadState extends State<Upload> {
                                   ),
                                   OutlinedButton(
                                     onPressed: () async {
-                                      setState(() {
-                                        uploads.remove(upload);
-                                      });
+                                      uploads.value =
+                                          List.of(uploads.value)..remove(upload);
                                       Navigator.of(context).pop();
                                     },
                                     child: const Text(
@@ -267,8 +264,6 @@ class UploadState extends State<Upload> {
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         leading: AppBackButton(context),
@@ -291,9 +286,7 @@ class UploadState extends State<Upload> {
                   },
                 ).then((res) {
                   if (res != null && res.length == 1) {
-                    setState(() {
-                      savePath = res[0];
-                    });
+                    savePath.value = res[0];
                   }
                 });
               },
@@ -307,7 +300,7 @@ class UploadState extends State<Upload> {
                       style: TextStyle(fontSize: 12),
                     ),
                     Text(
-                      savePath == "" ? "请选择上传位置" : savePath,
+                      savePath.value == "" ? "请选择上传位置" : savePath.value,
                       style: const TextStyle(fontSize: 16, color: Colors.grey),
                     ),
                   ],
@@ -316,12 +309,12 @@ class UploadState extends State<Upload> {
             ),
           ),
           Expanded(
-            child: uploads.isNotEmpty
+            child: uploads.value.isNotEmpty
                 ? ListView.builder(
                     itemBuilder: (context, i) {
-                      return _buildUploadItem(uploads[i]);
+                      return buildUploadItem(uploads.value[i]);
                     },
-                    itemCount: uploads.length,
+                    itemCount: uploads.value.length,
                   )
                 : Center(
                     child: Text(
@@ -381,13 +374,11 @@ class UploadState extends State<Upload> {
                                                   if (file == null) {
                                                     return;
                                                   }
-                                                  setState(() {
-                                                    uploads.add(UploadItem(
-                                                        file.path,
-                                                        file.path
-                                                            .split("/")
-                                                            .last));
-                                                  });
+                                                  uploads.value = [
+                                                    ...uploads.value,
+                                                    UploadItem(file.path,
+                                                        file.path.split("/").last)
+                                                  ];
                                                 });
                                               }
                                             } else {
@@ -449,16 +440,13 @@ class UploadState extends State<Upload> {
                                                       if (FileSystemEntity
                                                           .isFileSync(
                                                               entry.path)) {
-                                                        setState(() {
-                                                          uploads.add(
-                                                              UploadItem(
-                                                                  entry.path,
-                                                                  entry
-                                                                      .path
-                                                                      .split(
-                                                                          "/")
-                                                                      .last));
-                                                        });
+                                                        uploads.value = [
+                                                          ...uploads.value,
+                                                          UploadItem(entry.path,
+                                                              entry.path
+                                                                  .split("/")
+                                                                  .last)
+                                                        ];
                                                       } else {
                                                         Directory directory =
                                                             Directory(
@@ -484,19 +472,17 @@ class UploadState extends State<Upload> {
                                                                           "")
                                                                       .split(
                                                                           "/");
-                                                              setState(() {
-                                                                uploads.add(UploadItem(
-                                                                    element
-                                                                        .path,
+                                                              uploads.value = [
+                                                                ...uploads.value,
+                                                                UploadItem(
+                                                                    element.path,
                                                                     slice.last,
                                                                     subPath: slice
-                                                                        .getRange(
-                                                                            0,
+                                                                        .getRange(0,
                                                                             slice.length -
                                                                                 1)
-                                                                        .join(
-                                                                            "/")));
-                                                              });
+                                                                        .join("/"))
+                                                              ];
                                                             }
                                                           }
                                                         });
@@ -521,16 +507,17 @@ class UploadState extends State<Upload> {
                                                 UiUtil.toast('选择文件为空!');
                                                 return;
                                               }
-                                              setState(() {
-                                                uploads.addAll(result.files
-                                                    .takeWhile(
-                                                        (t) => t.path != null)
+                                              uploads.value = [
+                                                ...uploads.value,
+                                                ...result.files
+                                                    .takeWhile((t) =>
+                                                        t.path != null)
                                                     .map((file) {
-                                                  return UploadItem(
-                                                      file.path!, file.name,
+                                                  return UploadItem(file.path!,
+                                                      file.name,
                                                       fileSize: file.size);
-                                                }).toList());
-                                              });
+                                                })
+                                              ];
                                             }
                                           },
                                           child: const Text(
@@ -571,41 +558,36 @@ class UploadState extends State<Upload> {
                   Expanded(
                     child: OutlinedButton(
                       onPressed: () async {
-                        if (savePath.isBlank) {
+                        if (savePath.value.isBlank) {
                           UiUtil.vibrate(FeedbackType.warning);
                           UiUtil.toast("请选择上传位置");
                           return;
                         }
                         // return;
-                        for (int i = 0; i < uploads.length; i++) {
-                          UploadItem upload = uploads[i];
+                        for (int i = 0; i < uploads.value.length; i++) {
+                          UploadItem upload = uploads.value[i];
                           if (upload.status != UploadStatus.wait) {
                             continue;
                           }
                           //上传文件
-                          setState(() {
-                            upload.status = UploadStatus.running;
-                          });
+                          upload.status = UploadStatus.running;
+                          notifyUploads();
                           // Log.info("上传路径：$savePath${upload.subPath.isNotBlank ? "/${upload.subPath}" : ""}");
                           var res = await DsmApi.upload(
-                              "$savePath${upload.subPath.isNotBlank ? "/${upload.subPath}" : ""}",
+                              "${savePath.value}${upload.subPath.isNotBlank ? "/${upload.subPath}" : ""}",
                               upload.path,
                               upload.cancelToken, (progress, total) {
-                            setState(() {
-                              upload.uploadSize = progress;
-                              upload.fileSize = total;
-                            });
+                            upload.uploadSize = progress;
+                            upload.fileSize = total;
+                            notifyUploads();
                           });
                           Log.info(res);
                           if (res['success']) {
-                            setState(() {
-                              upload.status = UploadStatus.complete;
-                            });
+                            upload.status = UploadStatus.complete;
                           } else {
-                            setState(() {
-                              upload.status = UploadStatus.failed;
-                            });
+                            upload.status = UploadStatus.failed;
                           }
+                          notifyUploads();
                         }
                       },
                       child: const Text("开始上传"),

@@ -6,39 +6,33 @@ import 'package:garden/widgets/file_icon.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_vibrate/flutter_vibrate.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:signals_hooks/signals_hooks.dart';
 
-class Favorite extends StatefulWidget {
+class Favorite extends HookWidget {
   final Function callback;
   const Favorite(this.callback, {super.key});
-  @override
-  FavoriteState createState() => FavoriteState();
-}
 
-class FavoriteState extends State<Favorite> {
-  bool favoriteLoading = true;
-  List favorites = [];
   @override
-  void initState() {
-    getData();
-    super.initState();
-  }
+  Widget build(BuildContext context) {
+    final favoriteLoading = useSignal(true);
+    final favorites = useSignal<List>([]);
 
-  getData() async {
-    setState(() {
-      favoriteLoading = true;
-    });
-    var res = await DsmApi.favoriteList();
-    setState(() {
-      favoriteLoading = false;
-    });
-    if (res['success']) {
-      setState(() {
-        favorites = res['data']['favorites'];
-      });
+    getData() async {
+      favoriteLoading.value = true;
+      var res = await DsmApi.favoriteList();
+      favoriteLoading.value = false;
+      if (res['success']) {
+        favorites.value = res['data']['favorites'];
+      }
     }
-  }
 
-  Widget _buildFavoriteItem(favorite) {
+    useEffect(() {
+      getData();
+      return null;
+    }, const []);
+
+  Widget buildFavoriteItem(favorite) {
     return Padding(
       padding: const EdgeInsets.only(top: 20.0),
       child: OutlinedButton(
@@ -47,7 +41,7 @@ class FavoriteState extends State<Favorite> {
             UiUtil.toast("文件或目录不存在");
           } else {
             Navigator.of(context).pop(favorite['path']);
-            widget.callback(favorite['path']);
+            callback(favorite['path']);
           }
         },
         child: Padding(
@@ -447,13 +441,11 @@ class FavoriteState extends State<Favorite> {
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
     return Container(
       width: MediaQuery.sizeOf(context).width * 0.7,
       height: MediaQuery.sizeOf(context).height,
       color: Theme.of(context).scaffoldBackgroundColor,
-      child: favoriteLoading
+      child: favoriteLoading.value
           ? const Center(
               child: CupertinoActivityIndicator(
                 radius: 14,
@@ -463,16 +455,16 @@ class FavoriteState extends State<Favorite> {
               height: double.infinity,
               color: Theme.of(context).scaffoldBackgroundColor,
               width: MediaQuery.sizeOf(context).width * 0.7,
-              child: favorites.isNotEmpty
+              child: favorites.value.isNotEmpty
                   ? ListView.builder(
                       padding: EdgeInsets.only(
                           left: 20,
                           right: 20,
                           top: MediaQuery.of(context).padding.top),
                       itemBuilder: (context, i) {
-                        return _buildFavoriteItem(favorites[i]);
+                        return buildFavoriteItem(favorites.value[i]);
                       },
-                      itemCount: favorites.length,
+                      itemCount: favorites.value.length,
                     )
                   : Center(
                       child: Text(

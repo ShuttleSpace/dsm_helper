@@ -3,32 +3,20 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:garden/constants/app_constants.dart';
 import 'package:garden/theme/app_colors.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:signals_hooks/signals_hooks.dart';
 
-class Search extends StatefulWidget {
+class Search extends HookWidget {
   final String folder;
   const Search(this.folder, {super.key});
-  @override
-  SearchState createState() => SearchState();
-}
-
-class SearchState extends State<Search> {
-  TextEditingController folderController = TextEditingController();
-  List<String> folders = [];
-  String pattern = "";
-  bool recursive = true;
-  bool searchContent = false;
-
-  @override
-  void initState() {
-    setState(() {
-      folders.add(widget.folder);
-      folderController.value = TextEditingValue(text: widget.folder);
-    });
-    super.initState();
-  }
 
   @override
   Widget build(BuildContext context) {
+    final folderController = useTextEditingController(text: folder);
+    final folders = useListSignal<String>([folder]);
+    final pattern = useSignal("");
+    final searchContent = useSignal(false);
+
     return Scaffold(
       appBar: AppBar(
         leading: AppBackButton(context),
@@ -48,7 +36,7 @@ class SearchState extends State<Search> {
               child: Padding(
                 padding: const EdgeInsets.all(AppConstants.paddingSmall),
                 child: TextField(
-                  onChanged: (v) => pattern = v,
+                  onChanged: (v) => pattern.value = v,
                   decoration: const InputDecoration(
                     border: InputBorder.none,
                     labelText: '关键字',
@@ -63,9 +51,7 @@ class SearchState extends State<Search> {
               padding: const EdgeInsets.only(bottom: 20),
               child: GestureDetector(
                 onTap: () {
-                  setState(() {
-                    searchContent = !searchContent;
-                  });
+                  searchContent.value = !searchContent.value;
                 },
                 child: Card(
                   shape: RoundedRectangleBorder(
@@ -77,7 +63,7 @@ class SearchState extends State<Search> {
                       children: [
                         const Text("启用文件内容搜索"),
                         const Spacer(),
-                        if (searchContent)
+                        if (searchContent.value)
                           const Icon(
                             CupertinoIcons.checkmark_alt,
                             color: AppColors.primaryAction,
@@ -110,9 +96,9 @@ class SearchState extends State<Search> {
             OutlinedButton(
               onPressed: () {
                 Navigator.of(context).pop({
-                  "folders": folders,
-                  "pattern": pattern,
-                  "search_content": searchContent
+                  "folders": folders.value,
+                  "pattern": pattern.value,
+                  "search_content": searchContent.value
                 });
                 // Navigator.of(context).push(CupertinoPageRoute(
                 //     builder: (context) {

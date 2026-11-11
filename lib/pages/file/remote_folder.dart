@@ -9,30 +9,27 @@ import 'package:flutter/material.dart';
 import 'package:garden/constants/app_constants.dart';
 import 'package:garden/theme/app_colors.dart';
 import 'package:flutter_vibrate/flutter_vibrate.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:signals_hooks/signals_hooks.dart';
 
-class RemoteFolder extends StatefulWidget {
+class RemoteFolder extends HookWidget {
   const RemoteFolder({super.key});
 
   @override
-  RemoteFolderState createState() => RemoteFolderState();
-}
-
-class RemoteFolderState extends State<RemoteFolder>
-    with SingleTickerProviderStateMixin {
-  late TabController _tabController;
-  String serverIp = "";
-  String mountPoint = "";
-  bool autoMount = false;
-  String account = "";
-  String passwd = "";
-  @override
-  void initState() {
-    _tabController = TabController(length: 2, vsync: this);
-    super.initState();
-  }
-
-  @override
   Widget build(BuildContext context) {
+    final tickerProvider = useSingleTickerProvider();
+    final tabController = useMemoized(
+      () => TabController(length: 2, vsync: tickerProvider),
+      const [],
+    );
+    final serverIp = useSignal("");
+    final mountPoint = useSignal("");
+    final autoMount = useSignal(false);
+    final account = useSignal("");
+    final passwd = useSignal("");
+
+    useEffect(() => tabController.dispose, const []);
+
     return Scaffold(
       appBar: AppBar(
         leading: AppBackButton(context),
@@ -47,7 +44,7 @@ class RemoteFolderState extends State<RemoteFolder>
             margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
             child: TabBar(
               dividerHeight: 0,
-              controller: _tabController,
+              controller: tabController,
               indicatorSize: TabBarIndicatorSize.label,
               labelColor: Theme.brightnessOf(context) == Brightness.dark
                   ? Colors.white
@@ -72,7 +69,7 @@ class RemoteFolderState extends State<RemoteFolder>
           ),
           Expanded(
             child: TabBarView(
-              controller: _tabController,
+              controller: tabController,
               children: [
                 ListView(
                   padding: const EdgeInsets.all(20),
@@ -85,7 +82,7 @@ class RemoteFolderState extends State<RemoteFolder>
                         padding:
                             const EdgeInsets.all(AppConstants.paddingSmall),
                         child: TextField(
-                          onChanged: (v) => serverIp = v,
+                          onChanged: (v) => serverIp.value = v,
                           decoration: const InputDecoration(
                               border: InputBorder.none,
                               labelText: '远程文件夹',
@@ -104,7 +101,7 @@ class RemoteFolderState extends State<RemoteFolder>
                         padding:
                             const EdgeInsets.all(AppConstants.paddingSmall),
                         child: TextField(
-                          onChanged: (v) => account = v,
+                          onChanged: (v) => account.value = v,
                           decoration: const InputDecoration(
                             border: InputBorder.none,
                             labelText: '账号',
@@ -123,7 +120,7 @@ class RemoteFolderState extends State<RemoteFolder>
                         padding:
                             const EdgeInsets.all(AppConstants.paddingSmall),
                         child: TextField(
-                          onChanged: (v) => passwd = v,
+                          onChanged: (v) => passwd.value = v,
                           decoration: const InputDecoration(
                             border: InputBorder.none,
                             labelText: '密码',
@@ -146,9 +143,7 @@ class RemoteFolderState extends State<RemoteFolder>
                           },
                         ).then((res) {
                           if (res != null && res.length == 1) {
-                            setState(() {
-                              mountPoint = res[0];
-                            });
+                            mountPoint.value = res[0];
                           }
                         });
                       },
@@ -165,10 +160,12 @@ class RemoteFolderState extends State<RemoteFolder>
                                 SizedBox(
                                   height: 20,
                                   child: Text(
-                                    mountPoint == "" ? "选择装载到文件夹" : mountPoint,
+                                    mountPoint.value == ""
+                                        ? "选择装载到文件夹"
+                                        : mountPoint.value,
                                     style: TextStyle(
                                         fontSize: 16,
-                                        color: mountPoint == ""
+                                        color: mountPoint.value == ""
                                             ? Colors.grey
                                             : null),
                                   ),
@@ -184,9 +181,7 @@ class RemoteFolderState extends State<RemoteFolder>
                     ),
                     GestureDetector(
                       onTap: () {
-                        setState(() {
-                          autoMount = !autoMount;
-                        });
+                        autoMount.value = !autoMount.value;
                       },
                       child: Card(
                         shape: RoundedRectangleBorder(
@@ -199,7 +194,7 @@ class RemoteFolderState extends State<RemoteFolder>
                             children: [
                               const Text("开机时自动装载"),
                               const Spacer(),
-                              if (autoMount)
+                              if (autoMount.value)
                                 const Icon(
                                   CupertinoIcons.checkmark_alt,
                                   color: AppColors.primaryAction,
@@ -214,17 +209,18 @@ class RemoteFolderState extends State<RemoteFolder>
                     ),
                     OutlinedButton(
                       onPressed: () async {
-                        if (mountPoint == "") {
+                        if (mountPoint.value == "") {
                           UiUtil.toast("请选择保存位置");
                           UiUtil.vibrate(FeedbackType.impact);
                           return;
                         }
-                        if (serverIp.trim() == "") {
+                        if (serverIp.value.trim() == "") {
                           UiUtil.toast("请输入远程文件夹地址");
                           return;
                         }
-                        var res = await DsmApi.mountFolder(
-                            serverIp, account, passwd, mountPoint, autoMount);
+                        var res = await DsmApi.mountFolder(serverIp.value,
+                            account.value, passwd.value, mountPoint.value,
+                            autoMount.value);
                         if (res['success']) {
                           UiUtil.toast("装载成功");
                           UiUtil.vibrate(FeedbackType.light);

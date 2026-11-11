@@ -9,76 +9,60 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:garden/constants/app_constants.dart';
 import 'package:garden/theme/app_colors.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:signals_hooks/signals_hooks.dart';
 
-class SelectFolder extends StatefulWidget {
+class SelectFolder extends HookWidget {
   final bool multi;
   final bool folder;
   const SelectFolder({super.key, this.multi = false, this.folder = true});
-  @override
-  SelectFolderState createState() => SelectFolderState();
-}
 
-class SelectFolderState extends State<SelectFolder> {
-  final ScrollController _scrollController = ScrollController();
-  List paths = ["/"];
-  List files = [];
-  List selectedFiles = [];
-  bool loading = true;
-  bool success = true;
-  String msg = "";
   @override
-  void initState() {
-    getShareList();
-    super.initState();
+  Widget build(BuildContext context) {
+    final scrollController = useScrollController();
+    final paths = useListSignal<String>(["/"]);
+    final files = useSignal<List>([]);
+    final selectedFiles = useListSignal([]);
+    final loading = useSignal(true);
+    final success = useSignal(true);
+    final msg = useSignal("");
+
+  setPaths(String path) {
+    if (path == "/") {
+      paths.value = ["/"];
+    } else {
+      List<String> items = path.split("/");
+      items[0] = "/";
+      paths.value = items;
+    }
   }
 
   getShareList() async {
-    setState(() {
-      loading = true;
-    });
+    loading.value = true;
     var res = await DsmApi.shareList();
-    setState(() {
-      success = res['success'];
-    });
+    success.value = res['success'];
     if (res['success']) {
-      setState(() {
-        loading = false;
-        files = res['data']['shares'];
-      });
+      loading.value = false;
+      files.value = res['data']['shares'];
     } else {
-      if (loading) {
-        setState(() {
-          loading = false;
-          msg = res['msg'] ?? "加载失败，code:${res['error']['code']}";
-        });
+      if (loading.value) {
+        loading.value = false;
+        msg.value = res['msg'] ?? "加载失败，code:${res['error']['code']}";
       }
     }
   }
 
-  refresh() {
-    String path = paths.join("/").substring(1);
-    goPath(path);
-  }
-
   getFileList(String path) async {
-    setState(() {
-      loading = true;
-    });
+    loading.value = true;
     var res = await DsmApi.fileList(path);
-    setState(() {
-      success = res['success'];
-    });
+    success.value = res['success'];
     if (res['success']) {
-      setState(() {
-        loading = false;
-        files = res['data']['files'];
-      });
+      loading.value = false;
+      files.value = res['data']['files'];
     } else {
-      if (loading) {
-        setState(() {
-          loading = false;
-          msg = res['msg'] ?? "加载失败，code:${res['error']['code']}";
-        });
+      if (loading.value) {
+        loading.value = false;
+        msg.value = res['msg'] ?? "加载失败，code:${res['error']['code']}";
       }
     }
   }
@@ -90,26 +74,17 @@ class SelectFolderState extends State<SelectFolder> {
     } else {
       await getFileList(path);
     }
-    double offset = _scrollController.position.maxScrollExtent;
-    _scrollController.animateTo(offset,
+    double offset = scrollController.position.maxScrollExtent;
+    scrollController.animateTo(offset,
         duration: const Duration(milliseconds: 200), curve: Curves.ease);
   }
 
-  setPaths(String path) {
-    if (path == "/") {
-      setState(() {
-        paths = ["/"];
-      });
-    } else {
-      List<String> items = path.split("/");
-      items[0] = "/";
-      setState(() {
-        paths = items;
-      });
-    }
+  refresh() {
+    String path = paths.value.join("/").substring(1);
+    goPath(path);
   }
 
-  Widget _buildPathItem(BuildContext context, int index) {
+  Widget buildPathItem(BuildContext context, int index) {
     return Container(
       margin: index == 0 ? const EdgeInsets.only(left: 20) : null,
       padding:
@@ -121,7 +96,7 @@ class SelectFolderState extends State<SelectFolder> {
           if (index == 0) {
             path = "/";
           } else {
-            items = paths.getRange(1, index + 1).toList().cast();
+            items = paths.value.getRange(1, index + 1).toList().cast();
             path = "/${items.join("/")}";
           }
           goPath(path);
@@ -132,14 +107,14 @@ class SelectFolderState extends State<SelectFolder> {
                 size: 16,
               )
             : Text(
-                paths[index],
+                paths.value[index],
                 style: const TextStyle(fontSize: 12),
               ),
       ),
     );
   }
 
-  Widget _buildFileItem(file) {
+  Widget buildFileItem(file) {
     FileTypeEnum fileType =
         FileTypeUtil.toFileTypeEnum(FileTypeUtil.getFileType(file['name']));
     String path = file['path'];
@@ -149,7 +124,7 @@ class SelectFolderState extends State<SelectFolder> {
         opacity: 1,
         child: OutlinedButton(
           onPressed: () async {
-            if (widget.multi) {
+            if (multi) {
             } else {
               if (file['isdir']) {
                 goPath(file['path']);
@@ -205,17 +180,15 @@ class SelectFolderState extends State<SelectFolder> {
               ),
               OutlinedButton(
                 onPressed: () {
-                  setState(() {
-                    if (widget.multi) {
-                      if (selectedFiles.contains(file['path'])) {
-                        selectedFiles.remove(file['path']);
-                      } else {
-                        selectedFiles.add(file['path']);
-                      }
+                  if (multi) {
+                    if (selectedFiles.contains(file['path'])) {
+                      selectedFiles.remove(file['path']);
                     } else {
-                      selectedFiles = [file['path']];
+                      selectedFiles.add(file['path']);
                     }
-                  });
+                  } else {
+                    selectedFiles.value = [file['path']];
+                  }
                 },
                 child: SizedBox(
                   child: selectedFiles.contains(file['path'])
@@ -234,17 +207,15 @@ class SelectFolderState extends State<SelectFolder> {
   }
 
   Future<bool> onWillPop(i, r) {
-    setState(() {
-      selectedFiles = [];
-    });
-    if (paths.length > 1) {
-      paths.removeLast();
+    selectedFiles.clear();
+    if (paths.value.length > 1) {
+      paths.value.removeLast();
       String path = "";
 
-      if (paths.length == 1) {
+      if (paths.value.length == 1) {
         path = "/";
       } else {
-        path = paths.join("/").substring(1);
+        path = paths.value.join("/").substring(1);
       }
       Log.debug(path);
       goPath(path);
@@ -254,8 +225,11 @@ class SelectFolderState extends State<SelectFolder> {
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
+  useEffect(() {
+    getShareList();
+    return null;
+  }, const []);
+
     return PopScope(
       onPopInvokedWithResult: onWillPop,
       child: Material(
@@ -274,9 +248,9 @@ class SelectFolderState extends State<SelectFolder> {
                     children: [
                       Expanded(
                         child: ListView.separated(
-                          controller: _scrollController,
-                          itemBuilder: _buildPathItem,
-                          itemCount: paths.length,
+                          controller: scrollController,
+                          itemBuilder: buildPathItem,
+                          itemCount: paths.value.length,
                           scrollDirection: Axis.horizontal,
                           separatorBuilder: (context, i) {
                             return Container(
@@ -289,7 +263,7 @@ class SelectFolderState extends State<SelectFolder> {
                           },
                         ),
                       ),
-                      if (paths.length > 1)
+                      if (paths.value.length > 1)
                         Container(
                           padding: const EdgeInsets.symmetric(
                               vertical: AppConstants.paddingSmall + 2),
@@ -368,6 +342,7 @@ class SelectFolderState extends State<SelectFolder> {
                                                                     context)
                                                                 .pop();
                                                             String path = paths
+                                                                .value
                                                                 .join("/")
                                                                 .substring(1);
                                                             var res = await DsmApi
@@ -449,11 +424,11 @@ class SelectFolderState extends State<SelectFolder> {
                         child: OutlinedButton(
                           onPressed: () {
                             if (selectedFiles.isNotEmpty) {
-                              Navigator.of(context).pop(selectedFiles);
+                              Navigator.of(context).pop(selectedFiles.value);
                             } else {
-                              if (paths.length > 1) {
+                              if (paths.value.length > 1) {
                                 Navigator.of(context)
-                                    .pop([paths.join("/").substring(1)]);
+                                    .pop([paths.value.join("/").substring(1)]);
                               } else {
                                 UiUtil.toast("无法选择根目录");
                               }
@@ -472,26 +447,28 @@ class SelectFolderState extends State<SelectFolder> {
                   ),
                 ),
                 Expanded(
-                  child: loading
+                  child: loading.value
                       ? const Center(
                           child: CupertinoActivityIndicator(
                             radius: 14,
                           ),
                         )
-                      : success
+                      : success.value
                           ? ListView(
                               padding: EdgeInsets.only(
-                                  bottom: selectedFiles.isNotEmpty ? 140 : 20),
-                              children: files
+                                  bottom: selectedFiles.value.isNotEmpty
+                                      ? 140
+                                      : 20),
+                              children: files.value
                                   .where((file) => file['isdir'])
-                                  .map(_buildFileItem)
+                                  .map(buildFileItem)
                                   .toList(),
                             )
                           : Center(
                               child: Column(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  Text(msg),
+                                  Text(msg.value),
                                   const SizedBox(
                                     height: 20,
                                   ),
@@ -500,7 +477,7 @@ class SelectFolderState extends State<SelectFolder> {
                                     child: OutlinedButton(
                                       onPressed: () {
                                         String path =
-                                            paths.join("/").substring(1);
+                                            paths.value.join("/").substring(1);
                                         goPath(path);
                                       },
                                       child: const Text(

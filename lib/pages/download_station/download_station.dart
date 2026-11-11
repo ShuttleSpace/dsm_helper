@@ -11,67 +11,53 @@ import 'package:garden/widgets/animation_progress_bar.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:signals_hooks/signals_hooks.dart';
 
-class DownloadStation extends StatefulWidget {
+class DownloadStation extends HookWidget {
   const DownloadStation({super.key});
 
   @override
-  DownloadStationState createState() => DownloadStationState();
-}
+  Widget build(BuildContext context) {
+    final loading = useSignal(true);
+    final tasks = useSignal<List>([]);
+    final downloadRate = useSignal(0);
+    final uploadRate = useSignal(0);
+    final pauseLoading = useMapSignal<String, bool>({});
 
-class DownloadStationState extends State<DownloadStation> {
-  bool loading = true;
-  late Timer timer;
-  List tasks = [];
-  int downloadRate = 0;
-  int uploadRate = 0;
-  Map<String, bool> pauseLoading = {};
-  @override
-  void initState() {
-    timer = Timer.periodic(const Duration(seconds: 10), (timer) {
-      getData();
-    });
-    getData();
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    timer.cancel();
-    super.dispose();
-  }
-
-  getData() async {
-    var res = await DsmApi.downloadStationInfo();
-    if (!mounted) {
-      return;
-    }
-    setState(() {
-      loading = false;
-    });
-    if (res['success']) {
-      List result = res['data']['result'];
-      for (var item in result) {
-        if (item['success'] == true) {
-          switch (item['api']) {
-            case "SYNO.DownloadStation2.Task":
-              setState(() {
-                tasks = item['data']['task'];
-              });
-              break;
-            case "SYNO.DownloadStation2.Task.Statistic":
-              setState(() {
-                downloadRate = item['data']['download_rate'];
-                uploadRate = item['data']['upload_rate'];
-              });
-              break;
+    getData() async {
+      var res = await DsmApi.downloadStationInfo();
+      if (!context.mounted) {
+        return;
+      }
+      loading.value = false;
+      if (res['success']) {
+        List result = res['data']['result'];
+        for (var item in result) {
+          if (item['success'] == true) {
+            switch (item['api']) {
+              case "SYNO.DownloadStation2.Task":
+                tasks.value = item['data']['task'];
+                break;
+              case "SYNO.DownloadStation2.Task.Statistic":
+                downloadRate.value = item['data']['download_rate'];
+                uploadRate.value = item['data']['upload_rate'];
+                break;
+            }
           }
         }
       }
     }
-  }
 
-  Widget _buildDownloadItem(download) {
+    useEffect(() {
+      final timer = Timer.periodic(const Duration(seconds: 10), (timer) {
+        getData();
+      });
+      getData();
+      return timer.cancel;
+    }, const []);
+
+  Widget buildDownloadItem(download) {
     pauseLoading[download['id']] = pauseLoading[download['id']] ?? false;
     FileTypeEnum fileType = FileTypeUtil.toFileTypeEnum(
         FileTypeUtil.getFileType(download['title']));
@@ -122,15 +108,11 @@ class DownloadStationState extends State<DownloadStation> {
                             download['status'] > 100
                         ? GestureDetector(
                             onTap: () async {
-                              setState(() {
-                                pauseLoading[download['id']] = true;
-                              });
+                              pauseLoading[download['id']] = true;
                               var res = await DsmApi.downloadTaskAction(
                                   [download['id']],
                                   download['status'] == 2 ? "pause" : "resume");
-                              setState(() {
-                                pauseLoading[download['id']] = false;
-                              });
+                              pauseLoading[download['id']] = false;
                               if (res['success']) {
                                 getData();
                               }
@@ -335,12 +317,10 @@ class DownloadStationState extends State<DownloadStation> {
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         leading: AppBackButton(context),
-        title: downloadRate > 0 || uploadRate > 0
+        title: downloadRate.value > 0 || uploadRate.value > 0
             ? Row(
                 // mainAxisAlignment: MainAxisAlignment.center,
                 mainAxisSize: MainAxisSize.min,
@@ -351,7 +331,7 @@ class DownloadStationState extends State<DownloadStation> {
                     color: Colors.lightBlueAccent,
                   ),
                   Text(
-                    downloadRate.formatSize(),
+                    downloadRate.value.formatSize(),
                     style: const TextStyle(
                       color: Colors.lightBlueAccent,
                     ),
@@ -365,7 +345,7 @@ class DownloadStationState extends State<DownloadStation> {
                     color: Colors.orange,
                   ),
                   Text(
-                    uploadRate.formatSize(),
+                    uploadRate.value.formatSize(),
                     style: const TextStyle(
                       color: Colors.orange,
                     ),
@@ -396,22 +376,22 @@ class DownloadStationState extends State<DownloadStation> {
           ),
         ],
       ),
-      body: loading
+      body: loading.value
           ? const Center(
               child: CupertinoActivityIndicator(
                 radius: 14,
               ),
             )
-          : tasks.isNotEmpty
+          : tasks.value.isNotEmpty
               ? Column(
                   children: [
                     Expanded(
                       child: ListView.separated(
                         padding: const EdgeInsets.all(20),
                         itemBuilder: (context, i) {
-                          return _buildDownloadItem(tasks[i]);
+                          return buildDownloadItem(tasks.value[i]);
                         },
-                        itemCount: tasks.length,
+                        itemCount: tasks.value.length,
                         separatorBuilder: (context, i) {
                           return const SizedBox(
                             height: 20,

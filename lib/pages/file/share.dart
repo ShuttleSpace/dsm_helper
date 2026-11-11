@@ -10,71 +10,56 @@ import 'package:garden/constants/app_constants.dart';
 import 'package:garden/theme/app_colors.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:signals_hooks/signals_hooks.dart';
 
-class Share extends StatefulWidget {
+class Share extends HookWidget {
   final List<String>? paths;
   final Map? link;
   final bool? fileRequest;
   const Share({super.key, this.paths, this.link, this.fileRequest = false});
-  @override
-  ShareState createState() => ShareState();
-}
-
-class ShareState extends State<Share> {
-  bool loading = true;
-  Map link = {};
-  DateTime? startTime;
-  DateTime? endTime;
-  String times = "0";
-  String requestName = "";
-  String requestInfo = "";
-  late TextEditingController timesController;
-  late TextEditingController endTimeController;
-  late TextEditingController startTimeController;
-  late TextEditingController requestNameController;
-  late TextEditingController requestInfoController;
 
   @override
-  void initState() {
-    if (widget.paths != null) {
-      getData();
-    } else {
-      setState(() {
-        loading = false;
-        link = widget.link ?? {};
-        times =
-            link['expire_times'] == 0 ? "" : link['expire_times'].toString();
-        if (link['date_expired'] != "") {
-          endTime = DateTime.parse(link['date_expired']);
-        }
-        if (link['date_available'] != "") {
-          startTime = DateTime.parse(link['date_available']);
-        }
-        String endTimeStr = endTime == null ? "" : endTime!.format("Y-m-d H:i");
-        String startTimeStr =
-            startTime == null ? "" : startTime!.format("Y-m-d H:i");
-        timesController =
-            TextEditingController.fromValue(TextEditingValue(text: times));
-        endTimeController =
-            TextEditingController.fromValue(TextEditingValue(text: endTimeStr));
-        startTimeController = TextEditingController.fromValue(
-            TextEditingValue(text: startTimeStr));
-        if (link['enable_upload']) {
-          requestName = link['request_name'];
-          requestNameController = TextEditingController.fromValue(
-              TextEditingValue(text: requestName));
-          requestInfo = link['request_info'];
-          requestInfoController = TextEditingController.fromValue(
-              TextEditingValue(text: requestInfo));
-        }
-      });
-    }
+  Widget build(BuildContext context) {
+    final loading = useSignal(true);
+    // Creating a new share starts with an empty link, editing starts from
+    // the link that was passed in.
+    final initialLink = paths != null ? <String, dynamic>{} : (link ?? {});
+    final initialEndTime = initialLink['date_expired'] != ""
+        ? DateTime.parse(initialLink['date_expired'])
+        : null;
+    final initialStartTime = initialLink['date_available'] != ""
+        ? DateTime.parse(initialLink['date_available'])
+        : null;
+    final initialTimes = initialLink['expire_times'] == 0
+        ? ""
+        : initialLink['expire_times'].toString();
+    // Dynamic value: keep the original truthiness test.
+    final hasUpload = initialLink['enable_upload'];
 
-    super.initState();
-  }
+    final linkInfo = useSignal<Map>(initialLink);
+    final startTime = useSignal<DateTime?>(initialStartTime);
+    final endTime = useSignal<DateTime?>(initialEndTime);
+    final times = useSignal(initialTimes);
+    // In edit mode the request fields come from the existing link; in create
+    // mode they are filled in by getData() before the share is created.
+    final requestName =
+        useSignal(hasUpload ? (initialLink['request_name'] ?? "") : "");
+    final requestInfo =
+        useSignal(hasUpload ? (initialLink['request_info'] ?? "") : "");
+
+    final timesController = useTextEditingController(text: initialTimes);
+    final endTimeController = useTextEditingController(
+        text: initialEndTime?.format("Y-m-d H:i") ?? "");
+    final startTimeController = useTextEditingController(
+        text: initialStartTime?.format("Y-m-d H:i") ?? "");
+    final requestNameController = useTextEditingController(
+        text: hasUpload ? (initialLink['request_name'] ?? "") : "");
+    final requestInfoController = useTextEditingController(
+        text: hasUpload ? (initialLink['request_info'] ?? "") : "");
 
   deleteShare() async {
-    var res = await DsmApi.deleteShare([link['id']]);
+    var res = await DsmApi.deleteShare([linkInfo.value['id']]);
     if (res['success']) {
       UiUtil.toast("取消共享成功");
       if (context.mounted) {
@@ -85,51 +70,46 @@ class ShareState extends State<Share> {
   }
 
   getData() async {
-    if (widget.fileRequest == true) {
-      requestName = await StorageUtil.getString("account") ?? '';
-      requestInfo = "嗨，我的朋友！请将文件上传到此处。";
+    if (fileRequest == true) {
+      requestName.value = await StorageUtil.getString("account") ?? '';
+      requestInfo.value = "嗨，我的朋友！请将文件上传到此处。";
     }
-    if (widget.paths == null || widget.paths!.isEmpty) {
+    if (paths == null || paths!.isEmpty) {
       return;
     }
-    var res = await DsmApi.createShare(widget.paths!,
-        fileRequest: widget.fileRequest ?? false,
-        requestName: requestName,
-        requestInfo: requestInfo);
+    var res = await DsmApi.createShare(paths!,
+        fileRequest: fileRequest ?? false,
+        requestName: requestName.value,
+        requestInfo: requestInfo.value);
     if (res['success']) {
-      setState(() {
-        loading = false;
-        link = res['data']['links'][0];
-        times = res['data']['links'][0]['expire_times'] == 0
-            ? ""
-            : res['data']['links'][0]['expire_times'].toString();
-        if (link['date_expired'] != "") {
-          endTime = DateTime.parse(link['date_expired']);
-        }
-        if (link['date_available'] != "") {
-          startTime = DateTime.parse(link['date_available']);
-        }
-        String endTimeStr = endTime?.format("Y-m-d H:i") ?? "";
-        String startTimeStr = startTime?.format("Y-m-d H:i") ?? "";
-        timesController =
-            TextEditingController.fromValue(TextEditingValue(text: times));
-        endTimeController =
-            TextEditingController.fromValue(TextEditingValue(text: endTimeStr));
-        startTimeController = TextEditingController.fromValue(
-            TextEditingValue(text: startTimeStr));
-        if (link['enable_upload']) {
-          requestName = link['request_name'];
-          requestNameController = TextEditingController.fromValue(
-              TextEditingValue(text: requestName));
-          requestInfo = link['request_info'];
-          requestInfoController = TextEditingController.fromValue(
-              TextEditingValue(text: requestInfo));
-        }
-      });
+      loading.value = false;
+      linkInfo.value = res['data']['links'][0];
+      times.value = res['data']['links'][0]['expire_times'] == 0
+          ? ""
+          : res['data']['links'][0]['expire_times'].toString();
+      if (linkInfo.value['date_expired'] != "") {
+        endTime.value = DateTime.parse(linkInfo.value['date_expired']);
+      }
+      if (linkInfo.value['date_available'] != "") {
+        startTime.value = DateTime.parse(linkInfo.value['date_available']);
+      }
+      String endTimeStr = endTime.value?.format("Y-m-d H:i") ?? "";
+      String startTimeStr = startTime.value?.format("Y-m-d H:i") ?? "";
+      timesController.value = TextEditingValue(text: times.value);
+      endTimeController.value = TextEditingValue(text: endTimeStr);
+      startTimeController.value = TextEditingValue(text: startTimeStr);
+      if (linkInfo.value['enable_upload']) {
+        requestName.value = linkInfo.value['request_name'];
+        requestNameController.value =
+            TextEditingValue(text: requestName.value);
+        requestInfo.value = linkInfo.value['request_info'];
+        requestInfoController.value =
+            TextEditingValue(text: requestInfo.value);
+      }
     }
   }
 
-  Widget _buildLinkItem(link) {
+  Widget buildLinkItem(link) {
     return Container(
       padding: const EdgeInsets.all(20),
       child: Column(
@@ -208,12 +188,11 @@ class ShareState extends State<Share> {
                 context,
                 showTitleActions: true,
                 onConfirm: (date) {
-                  setState(() {
-                    endTime = date;
-                  });
-                  endTimeController.text = endTime?.format("Y-m-d H:i") ?? '';
+                  endTime.value = date;
+                  endTimeController.text =
+                      endTime.value?.format("Y-m-d H:i") ?? '';
                 },
-                currentTime: endTime ?? DateTime.now(),
+                currentTime: endTime.value ?? DateTime.now(),
                 locale: LocaleType.zh,
               );
             },
@@ -244,13 +223,11 @@ class ShareState extends State<Share> {
                 context,
                 showTitleActions: true,
                 onConfirm: (date) {
-                  setState(() {
-                    startTime = date;
-                  });
+                  startTime.value = date;
                   startTimeController.text =
-                      startTime?.format("Y-m-d H:i") ?? '';
+                      startTime.value?.format("Y-m-d H:i") ?? '';
                 },
-                currentTime: startTime ?? DateTime.now(),
+                currentTime: startTime.value ?? DateTime.now(),
                 locale: LocaleType.zh,
               );
             },
@@ -283,7 +260,7 @@ class ShareState extends State<Share> {
               child: TextField(
                 controller: timesController,
                 keyboardType: TextInputType.number,
-                onChanged: (v) => times = v,
+                onChanged: (v) => times.value = v,
                 decoration: const InputDecoration(
                   border: InputBorder.none,
                   labelText: '允许访问的数量',
@@ -303,7 +280,7 @@ class ShareState extends State<Share> {
                 padding: const EdgeInsets.all(AppConstants.paddingSmall),
                 child: TextField(
                   controller: requestNameController,
-                  onChanged: (v) => requestName = v,
+                  onChanged: (v) => requestName.value = v,
                   decoration: const InputDecoration(
                     border: InputBorder.none,
                     labelText: '您的姓名',
@@ -322,7 +299,7 @@ class ShareState extends State<Share> {
                 padding: const EdgeInsets.all(AppConstants.paddingSmall),
                 child: TextField(
                   controller: requestInfoController,
-                  onChanged: (v) => requestInfo = v,
+                  onChanged: (v) => requestInfo.value = v,
                   decoration: const InputDecoration(
                     border: InputBorder.none,
                     labelText: '信息',
@@ -336,8 +313,15 @@ class ShareState extends State<Share> {
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
+  useEffect(() {
+    if (paths != null) {
+      getData();
+    } else {
+      loading.value = false;
+    }
+    return null;
+  }, const []);
+
     return Scaffold(
       appBar: AppBar(
         leading: AppBackButton(context),
@@ -349,7 +333,7 @@ class ShareState extends State<Share> {
         onTap: () {
           FocusScope.of(context).unfocus();
         },
-        child: loading
+        child: loading.value
             ? const Center(
                 child: CupertinoActivityIndicator(
                   radius: 14,
@@ -360,7 +344,7 @@ class ShareState extends State<Share> {
                   Expanded(
                     child: ListView(
                       children: [
-                        _buildLinkItem(link),
+                        buildLinkItem(linkInfo.value),
                       ],
                     ),
                   ),
@@ -373,13 +357,14 @@ class ShareState extends State<Share> {
                             onPressed: () async {
                               List<String> id = [];
                               List<String> url = [];
-                              id.add(link['id']);
-                              url.add(link['url']);
-                              var res = await DsmApi.editShare(link['path'], id,
-                                  url, endTime, startTime, times,
-                                  fileRequest: link['enable_upload'],
-                                  requestName: requestName,
-                                  requestInfo: requestInfo);
+                              id.add(linkInfo.value['id']);
+                              url.add(linkInfo.value['url']);
+                              var res = await DsmApi.editShare(
+                                  linkInfo.value['path'], id, url,
+                                  endTime.value, startTime.value, times.value,
+                                  fileRequest: linkInfo.value['enable_upload'],
+                                  requestName: requestName.value,
+                                  requestInfo: requestInfo.value);
                               if (res['success']) {
                                 UiUtil.toast("保存成功");
                               }

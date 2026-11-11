@@ -7,55 +7,49 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:garden/constants/app_constants.dart';
 import 'package:garden/theme/app_colors.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:signals_hooks/signals_hooks.dart';
 
-class SelectFile extends StatefulWidget {
+class SelectFile extends HookWidget {
   final List listId;
   final String destination;
   const SelectFile(this.listId, this.destination, {super.key});
-  @override
-  SelectFileState createState() => SelectFileState();
-}
 
-class SelectFileState extends State<SelectFile> {
-  String title = "";
-  List files = [];
-  List selectedFiles = [];
-  int size = 0;
   @override
-  void initState() {
-    getData();
-    super.initState();
-  }
+  Widget build(BuildContext context) {
+    final title = useSignal("");
+    final files = useSignal<List>([]);
+    final selectedFiles = useListSignal([]);
+    final size = useSignal(0);
 
-  getData() async {
-    var res = await DsmApi.downloadFileList(widget.listId[0]);
-    if (res['success']) {
-      setState(() {
-        title = res['data']['title'];
-        files = res['data']['files'];
-        for (var element in files) {
+    getData() async {
+      var res = await DsmApi.downloadFileList(listId[0]);
+      if (res['success']) {
+        title.value = res['data']['title'];
+        files.value = res['data']['files'];
+        for (var element in files.value) {
           selectedFiles.add(element['index']);
         }
-        size = res['data']['size'];
-      });
-    } else {
-      UiUtil.toast("获取文件列表失败，代码${res['error']['code']}");
+        size.value = res['data']['size'];
+      } else {
+        UiUtil.toast("获取文件列表失败，代码${res['error']['code']}");
+      }
     }
-  }
 
-  Widget _buildFileItem(file) {
+    useEffect(() {
+      getData();
+      return null;
+    }, const []);
+
+  Widget buildFileItem(file) {
     FileTypeEnum fileType =
         FileTypeUtil.toFileTypeEnum(FileTypeUtil.getFileType(file['name']));
     return GestureDetector(
       onTap: () {
         if (selectedFiles.contains(file['index'])) {
-          setState(() {
-            selectedFiles.remove(file['index']);
-          });
+          selectedFiles.remove(file['index']);
         } else {
-          setState(() {
-            selectedFiles.add(file['index']);
-          });
+          selectedFiles.add(file['index']);
         }
       },
       child: Card(
@@ -125,8 +119,6 @@ class SelectFileState extends State<SelectFile> {
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         leading: AppBackButton(context),
@@ -148,12 +140,12 @@ class SelectFileState extends State<SelectFile> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(title),
+                  Text(title.value),
                   const SizedBox(
                     height: 10,
                   ),
                   Text(
-                    size.formatSize(),
+                    size.value.formatSize(),
                     style: const TextStyle(fontSize: 12, color: Colors.grey),
                   ),
                 ],
@@ -217,9 +209,9 @@ class SelectFileState extends State<SelectFile> {
               padding: const EdgeInsets.symmetric(
                   horizontal: AppConstants.paddingLarge),
               itemBuilder: (context, i) {
-                return _buildFileItem(files[i]);
+                return buildFileItem(files.value[i]);
               },
-              itemCount: files.length,
+              itemCount: files.value.length,
               separatorBuilder: (context, i) {
                 return const SizedBox(
                   height: 20,
@@ -233,7 +225,7 @@ class SelectFileState extends State<SelectFile> {
               onPressed: () async {
                 if (selectedFiles.isNotEmpty) {
                   var res = await DsmApi.downloadCreate(
-                      widget.listId[0], widget.destination, selectedFiles);
+                      listId[0], destination, selectedFiles.value);
                   if (res['success']) {
                     UiUtil.toast("下载任务创建成功");
                     if (context.mounted) {
