@@ -490,7 +490,7 @@ class Upload extends HookWidget {
                                                     }
                                                   }
                                                   // if (res != null && res.length == 1) {
-                                                  //   setState(() {
+                                                  //   updateState(() {
                                                   //     downloadPath = res[0];
                                                   //     HttpUtil.downloadSavePath = res[0];
                                                   //     HttpUtil.setStorage("download_save_path", res[0]);

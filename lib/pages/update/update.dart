@@ -37,7 +37,7 @@ class Update extends HookWidget {
         //   fileDirectory: "apk",
         //   fileName: fileName,
         //   onDownloadingListener: (progress) {
-        //     setState(() {
+        //     updateState(() {
         //       this.progress = progress / 100;
         //     });
         //   },

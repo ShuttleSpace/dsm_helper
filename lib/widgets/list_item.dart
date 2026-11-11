@@ -155,7 +155,7 @@ class ListItem extends StatelessWidget {
 ///   subtitle: "接收推送通知",
 ///   value: _enabled,
 ///   onChanged: (value) {
-///     setState(() {
+///     updateState(() {
 ///       _enabled = value;
 ///     });
 ///   },
@@ -213,7 +213,7 @@ class ListItemSwitch extends StatelessWidget {
 ///   title: "选择此项",
 ///   value: _selected,
 ///   onChanged: (value) {
-///     setState(() {
+///     updateState(() {
 ///       _selected = value;
 ///     });
 ///   },

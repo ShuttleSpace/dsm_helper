@@ -477,7 +477,7 @@ class ImagePreview extends HookWidget {
         if (newShowSwiper != showSwiper.value) {
           // do not setState directly here, the image state will change,
           // you should only notify the widgets which are needed to change
-          // setState(() {
+          // updateState(() {
           // showSwiper.value = newShowSwiper;
           // });
 

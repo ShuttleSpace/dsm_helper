@@ -83,7 +83,7 @@ getData() async {
   //
   //   lastBackupTime = last.isNotBlank ? DateTime.fromMillisecondsSinceEpoch(int.parse(last)) : null;
   //   backupFolder = await HttpUtil.getStorage("backup_folder") ?? "";
-  //   setState(() {});
+  //   updateState(() {});
   //   Directory directory = Directory(backupSource);
   //   List<FileSystemEntity> list = directory.listSync();
   //   // print(await list.length);
@@ -95,7 +95,7 @@ getData() async {
   //           String ext = event.path.split("/").last.split(".").last;
   //           if (!["back", "tmp"].contains(ext)) {
   //             DateTime lastModify = event.lastModifiedSync();
-  //             setState(() {
+  //             updateState(() {
   //               if (lastBackupTime != null) {
   //                 if (lastModify.isAfter(lastBackupTime)) {
   //                   uploads.add(UploadItem(event, ext == "mp4" ? UploadFileType.video : UploadFileType.picture, lastModify, fileSize: event.lengthSync()));

@@ -494,7 +494,7 @@ class Files extends HookWidget {
         }));
       }
     }
-    Widget buildSortMenu(BuildContext context, StateSetter setState) {
+    Widget buildSortMenu(BuildContext context) {
       return Material(
         color: Colors.transparent,
         child: Card(
@@ -517,9 +517,7 @@ class Files extends HookWidget {
                         children: [
                           GestureDetector(
                             onTap: () {
-                              setState(() {
-                                sortBy.value = "name";
-                              });
+                              sortBy.value = "name";
                             },
                             child: Row(
                               children: [
@@ -553,9 +551,7 @@ class Files extends HookWidget {
                           const SizedBox(height: 5),
                           GestureDetector(
                             onTap: () {
-                              setState(() {
-                                sortBy.value = "size";
-                              });
+                              sortBy.value = "size";
                             },
                             child: Row(
                               children: [
@@ -589,9 +585,7 @@ class Files extends HookWidget {
                           const SizedBox(height: 5),
                           GestureDetector(
                             onTap: () {
-                              setState(() {
-                                sortBy.value = "type";
-                              });
+                              sortBy.value = "type";
                             },
                             child: Row(
                               children: [
@@ -625,9 +619,7 @@ class Files extends HookWidget {
                           const SizedBox(height: 5),
                           GestureDetector(
                             onTap: () {
-                              setState(() {
-                                sortBy.value = "mtime";
-                              });
+                              sortBy.value = "mtime";
                             },
                             child: Row(
                               children: [
@@ -661,9 +653,7 @@ class Files extends HookWidget {
                           const SizedBox(height: 5),
                           GestureDetector(
                             onTap: () {
-                              setState(() {
-                                sortBy.value = "crtime";
-                              });
+                              sortBy.value = "crtime";
                             },
                             child: Row(
                               children: [
@@ -697,9 +687,7 @@ class Files extends HookWidget {
                           const SizedBox(height: 5),
                           GestureDetector(
                             onTap: () {
-                              setState(() {
-                                sortBy.value = "atime";
-                              });
+                              sortBy.value = "atime";
                             },
                             child: Row(
                               children: [
@@ -733,9 +721,7 @@ class Files extends HookWidget {
                           const SizedBox(height: 5),
                           GestureDetector(
                             onTap: () {
-                              setState(() {
-                                sortBy.value = "posix";
-                              });
+                              sortBy.value = "posix";
                             },
                             child: Row(
                               children: [
@@ -769,9 +755,7 @@ class Files extends HookWidget {
                           const SizedBox(height: 5),
                           GestureDetector(
                             onTap: () {
-                              setState(() {
-                                sortBy.value = "user";
-                              });
+                              sortBy.value = "user";
                             },
                             child: Row(
                               children: [
@@ -805,9 +789,7 @@ class Files extends HookWidget {
                           const SizedBox(height: 5),
                           GestureDetector(
                             onTap: () {
-                              setState(() {
-                                sortBy.value = "group";
-                              });
+                              sortBy.value = "group";
                             },
                             child: Row(
                               children: [
@@ -857,9 +839,7 @@ class Files extends HookWidget {
                       children: [
                         GestureDetector(
                           onTap: () {
-                            setState(() {
-                              sortDirection.value = "ASC";
-                            });
+                            sortDirection.value = "ASC";
                           },
                           child: Row(
                             children: [
@@ -893,9 +873,7 @@ class Files extends HookWidget {
                         const SizedBox(height: 5),
                         GestureDetector(
                           onTap: () {
-                            setState(() {
-                              sortDirection.value = "DESC";
-                            });
+                            sortDirection.value = "DESC";
                           },
                           child: Row(
                             children: [
@@ -2541,9 +2519,7 @@ class Files extends HookWidget {
                     showCupertinoModalPopup(
                       context: context,
                       builder: (context) {
-                        return StatefulBuilder(
-                          builder: buildSortMenu,
-                        );
+                        return Watch((context) => buildSortMenu(context));
                       },
                     ).then((value) {
                       refresh();
