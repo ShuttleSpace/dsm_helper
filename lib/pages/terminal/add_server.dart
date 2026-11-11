@@ -4,76 +4,66 @@ import 'package:garden/util/ui_util.dart';
 import 'package:garden/util/storage_util.dart';
 
 import 'package:flutter/cupertino.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:garden/pages/common/device_finder.dart';
 import 'package:garden/util/http_util.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/material.dart';
 import 'package:garden/constants/app_constants.dart';
+import 'package:signals_hooks/signals_hooks.dart';
 
-class AddServer extends StatefulWidget {
+class AddServer extends HookWidget {
   final int index;
   const AddServer({super.key, this.index = 0});
-  @override
-  AddServerState createState() => AddServerState();
-}
-
-class AddServerState extends State<AddServer> {
-  List servers = [];
-
-  String host = "";
-  String account = "";
-  String password = "";
-  String port = "22";
-
-  final TextEditingController _hostController = TextEditingController();
-  final TextEditingController _accountController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _portController =
-      TextEditingController(text: "22");
-
-  @override
-  void initState() {
-    getData();
-    super.initState();
-  }
-
-  getData() async {
-    String str = await StorageUtil.getString("terminal_servers") ?? '';
-    setState(() {
-      if (str.isNotBlank) {
-        servers = json.decode(str);
-        host = servers[widget.index]['host'];
-        _hostController.text = host;
-        account = servers[widget.index]['account'];
-        _accountController.text = account;
-        password = servers[widget.index]['password'];
-        _passwordController.text = password;
-        port = servers[widget.index]['port'];
-        _portController.text = port;
-      } else {
-        servers = [];
-      }
-    });
-    // print(servers);
-  }
-
-  _save() async {
-    Map server = {
-      "host": host,
-      "port": port,
-      "account": account,
-      "password": password,
-    };
-    //添加服务器记录
-    servers[widget.index] = server;
-
-    // print(servers);
-    StorageUtil.setString("terminal_servers", jsonEncode(servers));
-    Navigator.of(context).pop();
-  }
 
   @override
   Widget build(BuildContext context) {
+    final servers = useSignal<List>([]);
+    final host = useSignal("");
+    final account = useSignal("");
+    final password = useSignal("");
+    final port = useSignal("22");
+    final hostController = useTextEditingController();
+    final accountController = useTextEditingController();
+    final passwordController = useTextEditingController();
+    final portController = useTextEditingController(text: "22");
+
+    getData() async {
+      String str = await StorageUtil.getString("terminal_servers") ?? '';
+      if (str.isNotBlank) {
+        servers.value = json.decode(str);
+        host.value = servers.value[index]['host'];
+        hostController.text = host.value;
+        account.value = servers.value[index]['account'];
+        accountController.text = account.value;
+        password.value = servers.value[index]['password'];
+        passwordController.text = password.value;
+        port.value = servers.value[index]['port'];
+        portController.text = port.value;
+      } else {
+        servers.value = [];
+      }
+    }
+
+    save() async {
+      Map server = {
+        "host": host.value,
+        "port": port.value,
+        "account": account.value,
+        "password": password.value,
+      };
+      //添加服务器记录
+      servers.value[index] = server;
+
+      StorageUtil.setString("terminal_servers", jsonEncode(servers.value));
+      Navigator.of(context).pop();
+    }
+
+    useEffect(() {
+      getData();
+      return null;
+    }, const []);
+
     return Scaffold(
       appBar: AppBar(
         leading: AppBackButton(context),
@@ -104,13 +94,12 @@ class AddServerState extends State<AddServer> {
                   try {
                     final data = jsonDecode(result) as Map<String, dynamic>;
                     // 用户选择的设备信息
-                    setState(() {
-                      host = data['host'] ?? '';
-                      // port = data['port'] ?? (https ? '5001' : '5000');
-                      _hostController.value = TextEditingValue(text: host);
-                      _portController.value = TextEditingValue(text: port);
-                    });
-                    UiUtil.toast("已选择设备: ${data['name'] ?? host}");
+                    host.value = data['host'] ?? '';
+                    // port = data['port'] ?? (https ? '5001' : '5000');
+                    hostController.value = TextEditingValue(text: host.value);
+                    portController.value =
+                        TextEditingValue(text: port.value);
+                    UiUtil.toast("已选择设备: ${data['name'] ?? host.value}");
                   } catch (e) {
                     Log.debug("Error parsing device info: $e");
                     UiUtil.toast("解析设备信息失败");
@@ -146,8 +135,8 @@ class AddServerState extends State<AddServer> {
                     Expanded(
                       flex: 4,
                       child: TextField(
-                        controller: _hostController,
-                        onChanged: (v) => host = v,
+                        controller: hostController,
+                        onChanged: (v) => host.value = v,
                         autocorrect: false,
                         decoration: const InputDecoration(
                           border: InputBorder.none,
@@ -158,8 +147,8 @@ class AddServerState extends State<AddServer> {
                     Expanded(
                       flex: 1,
                       child: TextField(
-                        onChanged: (v) => port = v,
-                        controller: _portController,
+                        onChanged: (v) => port.value = v,
+                        controller: portController,
                         decoration: const InputDecoration(
                           border: InputBorder.none,
                           labelText: '端口',
@@ -180,8 +169,8 @@ class AddServerState extends State<AddServer> {
               child: Padding(
                 padding: const EdgeInsets.all(AppConstants.paddingSmall),
                 child: TextField(
-                  controller: _accountController,
-                  onChanged: (v) => account = v,
+                  controller: accountController,
+                  onChanged: (v) => account.value = v,
                   decoration: const InputDecoration(
                     border: InputBorder.none,
                     labelText: '账号',
@@ -199,8 +188,8 @@ class AddServerState extends State<AddServer> {
               child: Padding(
                 padding: const EdgeInsets.all(AppConstants.paddingSmall),
                 child: TextField(
-                  controller: _passwordController,
-                  onChanged: (v) => password = v,
+                  controller: passwordController,
+                  onChanged: (v) => password.value = v,
                   obscureText: true,
                   decoration: const InputDecoration(
                     border: InputBorder.none,
@@ -216,7 +205,7 @@ class AddServerState extends State<AddServer> {
             //   height: 20,
             // ),
             OutlinedButton(
-              onPressed: _save,
+              onPressed: save,
               child: const Text(
                 ' 保存 ',
                 style: TextStyle(fontSize: 18),

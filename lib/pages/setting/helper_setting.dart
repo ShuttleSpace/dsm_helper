@@ -18,65 +18,62 @@ import 'package:garden/widgets/neu_picker.dart';
 import 'package:local_auth/error_codes.dart' as auth_error;
 import 'package:local_auth/local_auth.dart';
 import 'package:local_auth_android/local_auth_android.dart';
-import 'package:signals_flutter/signals_flutter.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:signals_hooks/signals_hooks.dart';
 import 'package:local_auth_darwin/local_auth_darwin.dart';
 
-class HelperSetting extends StatefulWidget {
+
+class HelperSetting extends HookWidget {
   const HelperSetting({super.key});
 
   @override
-  HelperSettingState createState() => HelperSettingState();
-}
+  Widget build(BuildContext context) {
+    final auth = useMemoized(() => LocalAuthentication(), const []);
+    final launchAuth = useSignal(false);
+    final password = useSignal(false);
+    final biometrics = useSignal(false);
+    final canCheckBiometrics = useSignal(false);
+    final videoPlayer = useSignal(false);
+    final launchAccountPage = useSignal(false);
+    final biometricsType = useSignal(BiometricType.fingerprint);
 
-class HelperSettingState extends State<HelperSetting> {
-  final LocalAuthentication auth = LocalAuthentication();
-  bool launchAuth = false;
-  bool password = false;
-  bool biometrics = false;
-  bool canCheckBiometrics = false;
-  bool videoPlayer = false;
-  bool launchAccountPage = false;
-  BiometricType biometricsType = BiometricType.fingerprint;
+    final Map<BiometricType, String> biometricTypeName = {
+      BiometricType.face: "FaceId",
+      BiometricType.fingerprint: "指纹",
+      BiometricType.iris: "人脸",
+    };
 
-  Map<BiometricType, String> biometricTypeName = {
-    BiometricType.face: "FaceId",
-    BiometricType.fingerprint: "指纹",
-    BiometricType.iris: "人脸",
-  };
-  @override
-  void initState() {
-    initAuth();
-    super.initState();
-  }
-
-  initAuth() async {
-    launchAuth = await StorageUtil.getBool("launch_auth") ?? false;
-    password = await StorageUtil.getBool("launch_auth_password") ?? false;
-    biometrics = await StorageUtil.getBool("launch_auth_biometrics") ?? false;
-    videoPlayer = await StorageUtil.getBool("use_embeed_video_player") ?? false;
-    launchAccountPage =
-        await StorageUtil.getBool('launch_account_page') ?? false;
-    canCheckBiometrics = await auth.canCheckBiometrics;
-    setState(() {});
-    if (canCheckBiometrics) {
-      List<BiometricType> availableBiometrics =
-          await auth.getAvailableBiometrics();
-      if (Platform.isIOS) {
-        setState(() {
+    initAuth() async {
+      launchAuth.value = await StorageUtil.getBool("launch_auth") ?? false;
+      password.value = await StorageUtil.getBool("launch_auth_password") ?? false;
+      biometrics.value = await StorageUtil.getBool("launch_auth_biometrics") ?? false;
+      videoPlayer.value = await StorageUtil.getBool("use_embeed_video_player") ?? false;
+      launchAccountPage.value =
+          await StorageUtil.getBool('launch_account_page') ?? false;
+      canCheckBiometrics.value = await auth.canCheckBiometrics;
+    
+      if (canCheckBiometrics.value) {
+        List<BiometricType> availableBiometrics =
+            await auth.getAvailableBiometrics();
+        if (Platform.isIOS) {
+        
           if (availableBiometrics.contains(BiometricType.face)) {
-            biometricsType = BiometricType.face;
+            biometricsType.value = BiometricType.face;
           } else if (availableBiometrics.contains(BiometricType.fingerprint)) {
-            biometricsType = BiometricType.fingerprint;
+            biometricsType.value = BiometricType.fingerprint;
           } else if (availableBiometrics.contains(BiometricType.iris)) {
-            biometricsType = BiometricType.iris;
+            biometricsType.value = BiometricType.iris;
           }
-        });
+      
+        }
       }
     }
-  }
 
-  @override
-  Widget build(BuildContext context) {
+    useEffect(() {
+      initAuth();
+      return null;
+    }, const []);
+
     return Scaffold(
       appBar: AppBar(
         leading: AppBackButton(context),
@@ -87,15 +84,15 @@ class HelperSettingState extends State<HelperSetting> {
         children: [
           GestureDetector(
             onTap: () {
-              setState(() {
-                settingsStore
-                    .setVibrateOn(!settingsStore.vibrateOn.watch(context));
-                StorageUtil.setBool(
-                    "vibrate_on", settingsStore.vibrateOn.watch(context));
-                if (settingsStore.vibrateOn.watch(context)) {
-                  UiUtil.vibrate(FeedbackType.light);
-                }
-              });
+              
+              settingsStore
+                  .setVibrateOn(!settingsStore.vibrateOn.watch(context));
+              StorageUtil.setBool(
+                  "vibrate_on", settingsStore.vibrateOn.watch(context));
+              if (settingsStore.vibrateOn.watch(context)) {
+                UiUtil.vibrate(FeedbackType.light);
+              }
+            
             },
             child: Card(
               shape: RoundedRectangleBorder(
@@ -138,19 +135,19 @@ class HelperSettingState extends State<HelperSetting> {
                             children: [
                               GestureDetector(
                                 onTap: () {
-                                  setState(() {
-                                    settingsStore.setVibrateNormal(
-                                        !settingsStore.vibrateNormal
-                                            .watch(context));
-                                    StorageUtil.setBool(
-                                        "vibrate_warning",
-                                        settingsStore.vibrateNormal
-                                            .watch(context));
-                                    if (settingsStore.vibrateNormal
-                                        .watch(context)) {
-                                      UiUtil.vibrate(FeedbackType.light);
-                                    }
-                                  });
+                                  
+                                  settingsStore.setVibrateNormal(
+                                      !settingsStore.vibrateNormal
+                                          .watch(context));
+                                  StorageUtil.setBool(
+                                      "vibrate_warning",
+                                      settingsStore.vibrateNormal
+                                          .watch(context));
+                                  if (settingsStore.vibrateNormal
+                                      .watch(context)) {
+                                    UiUtil.vibrate(FeedbackType.light);
+                                  }
+                                
                                 },
                                 child: Card(
                                   shape: RoundedRectangleBorder(
@@ -186,19 +183,19 @@ class HelperSettingState extends State<HelperSetting> {
                               ),
                               GestureDetector(
                                 onTap: () {
-                                  setState(() {
-                                    settingsStore.setVibrateWarning(
-                                        !settingsStore.vibrateWarning
-                                            .watch(context));
-                                    StorageUtil.setBool(
-                                        "vibrate_warning",
-                                        settingsStore.vibrateWarning
-                                            .watch(context));
-                                    if (settingsStore.vibrateWarning
-                                        .watch(context)) {
-                                      UiUtil.vibrate(FeedbackType.warning);
-                                    }
-                                  });
+                                  
+                                  settingsStore.setVibrateWarning(
+                                      !settingsStore.vibrateWarning
+                                          .watch(context));
+                                  StorageUtil.setBool(
+                                      "vibrate_warning",
+                                      settingsStore.vibrateWarning
+                                          .watch(context));
+                                  if (settingsStore.vibrateWarning
+                                      .watch(context)) {
+                                    UiUtil.vibrate(FeedbackType.warning);
+                                  }
+                                
                                 },
                                 child: Card(
                                   shape: RoundedRectangleBorder(
@@ -251,10 +248,10 @@ class HelperSettingState extends State<HelperSetting> {
                   settings: const RouteSettings(name: "player_setting"),
                 ),
               );
-              setState(() {
-                videoPlayer = !videoPlayer;
-                StorageUtil.setBool("use_embeed_video_player", videoPlayer);
-              });
+              
+              videoPlayer.value = !videoPlayer.value;
+              StorageUtil.setBool("use_embeed_video_player", videoPlayer.value);
+            
             },
             child: Card(
               shape: RoundedRectangleBorder(
@@ -277,7 +274,7 @@ class HelperSettingState extends State<HelperSetting> {
                       style: TextStyle(fontSize: 16, height: 1.6),
                     ),
                     const Spacer(),
-                    if (videoPlayer)
+                    if (videoPlayer.value)
                       Icon(
                         CupertinoIcons.checkmark_alt,
                         color: Theme.of(context).colorScheme.primary,
@@ -344,10 +341,10 @@ class HelperSettingState extends State<HelperSetting> {
           ),
           GestureDetector(
             onTap: () {
-              setState(() {
-                launchAccountPage = !launchAccountPage;
-                StorageUtil.setBool("launch_account_page", launchAccountPage);
-              });
+              
+              launchAccountPage.value = !launchAccountPage.value;
+              StorageUtil.setBool("launch_account_page", launchAccountPage.value);
+            
             },
             child: Card(
               shape: RoundedRectangleBorder(
@@ -370,7 +367,7 @@ class HelperSettingState extends State<HelperSetting> {
                       style: TextStyle(fontSize: 16, height: 1.6),
                     ),
                     const Spacer(),
-                    if (launchAccountPage)
+                    if (launchAccountPage.value)
                       Icon(
                         CupertinoIcons.checkmark_alt,
                         color: Theme.of(context).colorScheme.primary,
@@ -385,10 +382,10 @@ class HelperSettingState extends State<HelperSetting> {
           ),
           GestureDetector(
             onTap: () {
-              setState(() {
-                launchAuth = !launchAuth;
-                StorageUtil.setBool("launch_auth", launchAuth);
-              });
+              
+              launchAuth.value = !launchAuth.value;
+              StorageUtil.setBool("launch_auth", launchAuth.value);
+            
             },
             child: Card(
               shape: RoundedRectangleBorder(
@@ -412,14 +409,14 @@ class HelperSettingState extends State<HelperSetting> {
                           style: TextStyle(fontSize: 16),
                         ),
                         const Spacer(),
-                        if (launchAuth)
+                        if (launchAuth.value)
                           Icon(
                             CupertinoIcons.checkmark_alt,
                             color: Theme.of(context).colorScheme.primary,
                           ),
                       ],
                     ),
-                    if (launchAuth)
+                    if (launchAuth.value)
                       Card(
                         shape: RoundedRectangleBorder(
                             side: const BorderSide(),
@@ -431,35 +428,31 @@ class HelperSettingState extends State<HelperSetting> {
                             children: [
                               GestureDetector(
                                 onTap: () {
-                                  setState(() {
-                                    if (password) {
-                                      setState(() {
-                                        password = false;
+                                  
+                                  if (password.value) {
+                                    password.value = false;
+                                    StorageUtil.setBool(
+                                        "launch_auth_password", false);
+                                    biometrics.value = false;
+                                    StorageUtil.setBool(
+                                        "launch_auth_biometrics", false);
+                                  } else {
+                                    Navigator.of(context).push(
+                                        CupertinoPageRoute(
+                                            builder: (context) {
+                                      return const GesturePasswordPage();
+                                    })).then((res) {
+                                      if (res != null && res) {
+                                        password.value = true;
                                         StorageUtil.setBool(
-                                            "launch_auth_password", false);
-                                        biometrics = false;
-                                        StorageUtil.setBool(
-                                            "launch_auth_biometrics", false);
-                                      });
-                                    } else {
-                                      Navigator.of(context).push(
-                                          CupertinoPageRoute(
-                                              builder: (context) {
-                                        return const GesturePasswordPage();
-                                      })).then((res) {
-                                        if (res != null && res) {
-                                          setState(() {
-                                            password = true;
-                                            StorageUtil.setBool(
-                                                "launch_auth_password",
-                                                password);
-                                          });
-                                        }
-                                      });
-                                    }
-                                    // password = !password;
-                                    // HttpUtil.setStorage("launch_password", password ? "1" : "0");
-                                  });
+                                            "launch_auth_password",
+                                            password.value);
+                                      }
+                                    });
+                                  }
+                                  // password.value = !password.value;
+                                  // HttpUtil.setStorage("launch_password", password.value ? "1" : "0");
+                                
                                 },
                                 child: Card(
                                   shape: RoundedRectangleBorder(
@@ -479,7 +472,7 @@ class HelperSettingState extends State<HelperSetting> {
                                                   fontSize: 16, height: 1.6),
                                             ),
                                             const Spacer(),
-                                            if (password)
+                                            if (password.value)
                                               Icon(
                                                 CupertinoIcons.checkmark_alt,
                                                 color: Theme.of(context)
@@ -493,14 +486,14 @@ class HelperSettingState extends State<HelperSetting> {
                                   ),
                                 ),
                               ),
-                              if (canCheckBiometrics) ...[
+                              if (canCheckBiometrics.value) ...[
                                 const SizedBox(
                                   height: 20,
                                 ),
                                 GestureDetector(
                                   onTap: () async {
-                                    if (biometrics == false) {
-                                      if (password == false) {
+                                    if (biometrics.value == false) {
+                                      if (password.value == false) {
                                         UiUtil.vibrate(FeedbackType.warning);
                                         UiUtil.toast("请先开启图形密码后再开启指纹");
                                         return;
@@ -517,7 +510,7 @@ class HelperSettingState extends State<HelperSetting> {
                                               lockOut: "认证失败次数过多，请稍后再试",
                                               goToSettingsButton: "设置",
                                               goToSettingsDescription:
-                                                  "系统未设置${biometricTypeName[biometricsType]}，点击设置按钮前往系统设置页面",
+                                                  "系统未设置${biometricTypeName[biometricsType.value]}，点击设置按钮前往系统设置页面",
                                               cancelButton: "取消",
                                             ),
                                             const AndroidAuthMessages(
@@ -537,12 +530,12 @@ class HelperSettingState extends State<HelperSetting> {
                                           localizedReason: '请触摸指纹传感器',
                                         );
                                         auth.stopAuthentication();
-                                        setState(() {
-                                          biometrics = didAuthenticate;
-                                          StorageUtil.setBool(
-                                              "launch_auth_biometrics",
-                                              biometrics);
-                                        });
+                                        
+                                        biometrics.value = didAuthenticate;
+                                        StorageUtil.setBool(
+                                            "launch_auth_biometrics",
+                                            biometrics.value);
+                                      
                                       } on PlatformException catch (e) {
                                         if (e.code == auth_error.notAvailable) {
                                           UiUtil.toast("生物验证不可用");
@@ -557,18 +550,18 @@ class HelperSettingState extends State<HelperSetting> {
                                         }
                                       }
                                     } else {
-                                      setState(() {
-                                        biometrics = false;
-                                        StorageUtil.setBool(
-                                            "launch_auth_biometrics",
-                                            biometrics);
-                                      });
+                                      
+                                      biometrics.value = false;
+                                      StorageUtil.setBool(
+                                          "launch_auth_biometrics",
+                                          biometrics.value);
+                                    
                                     }
 
-                                    // setState(() {
-                                    //   biometrics = !biometrics;
-                                    //   HttpUtil.setStorage("launch_biometrics", biometrics ? "1" : "0");
-                                    // });
+                                    // 
+                                  //   biometrics.value = !biometrics.value;
+                                  //   HttpUtil.setStorage("launch_biometrics", biometrics.value ? "1" : "0");
+                                  // 
                                   },
                                   child: Card(
                                     shape: RoundedRectangleBorder(
@@ -584,12 +577,12 @@ class HelperSettingState extends State<HelperSetting> {
                                           Row(
                                             children: [
                                               Text(
-                                                "${biometricTypeName[biometricsType]}验证",
+                                                "${biometricTypeName[biometricsType.value]}验证",
                                                 style: const TextStyle(
                                                     fontSize: 16, height: 1.6),
                                               ),
                                               const Spacer(),
-                                              if (biometrics)
+                                              if (biometrics.value)
                                                 const Icon(
                                                   CupertinoIcons.checkmark_alt,
                                                   color:
@@ -644,10 +637,10 @@ class HelperSettingState extends State<HelperSetting> {
           ),
           OutlinedButton(
             onPressed: () {
-              setState(() {
-                settingsStore.setDashboardCardCollapseSwitch(
-                    !settingsStore.dashboardCardCollapseSwitch.watch(context));
-              });
+              
+              settingsStore.setDashboardCardCollapseSwitch(
+                  !settingsStore.dashboardCardCollapseSwitch.watch(context));
+            
             },
             // margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
             child: Row(

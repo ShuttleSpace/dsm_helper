@@ -1,14 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 
-class PlayerSettingPage extends StatefulWidget {
+class PlayerSettingPage extends StatelessWidget {
   const PlayerSettingPage({super.key});
 
-  @override
-  State<PlayerSettingPage> createState() => _PlayerSettingPageState();
-}
-
-class _PlayerSettingPageState extends State<PlayerSettingPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(

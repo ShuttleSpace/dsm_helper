@@ -5,8 +5,8 @@ import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 class BackupState {
   static const lastBackupTimeKey = 'last_backup_time';
 
-  final _uploads = listSignal<AssetEntity>([]);
-  final _albums = listSignal<AssetEntity>([]);
+  final _uploads = signal<List<AssetEntity>>([]);
+  final _albums = signal<List<AssetEntity>>([]);
 
   final _backupFolder = signal('');
   final _lastBackupTime = signal(DateTime.now());

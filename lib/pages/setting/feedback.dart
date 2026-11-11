@@ -1,19 +1,17 @@
 import 'package:garden/util/ui_util.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:garden/constants/app_constants.dart';
+import 'package:signals_hooks/signals_hooks.dart';
 
-class Feedback extends StatefulWidget {
+class Feedback extends HookWidget {
   const Feedback({super.key});
 
   @override
-  FeedbackState createState() => FeedbackState();
-}
-
-class FeedbackState extends State<Feedback> {
-  String content = "";
-  @override
   Widget build(BuildContext context) {
+    final content = useSignal("");
+
     return Scaffold(
       appBar: AppBar(
         leading: AppBackButton(context),
@@ -29,7 +27,7 @@ class FeedbackState extends State<Feedback> {
             child: Padding(
               padding: const EdgeInsets.all(AppConstants.paddingSmall),
               child: TextField(
-                onChanged: (v) => content = v,
+                onChanged: (v) => content.value = v,
                 maxLines: 5,
                 decoration: const InputDecoration(
                   border: InputBorder.none,

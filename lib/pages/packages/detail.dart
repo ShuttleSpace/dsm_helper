@@ -15,325 +15,315 @@ import 'package:flutter/material.dart';
 import 'package:garden/constants/app_constants.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_swiper_null_safety/flutter_swiper_null_safety.dart';
-import 'package:signals/signals_flutter.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:signals_hooks/signals_hooks.dart';
 
-class PackageDetail extends StatefulWidget {
+
+class PackageDetail extends HookWidget {
   final Map package;
   final bool beta;
   final String? method;
   const PackageDetail(this.package,
       {super.key, this.beta = false, this.method});
-  @override
-  PackageDetailState createState() => PackageDetailState();
-}
-
-class PackageDetailState extends State<PackageDetail> {
-  String thumbnailUrl = "";
-  String installVolume = "";
-  String installPath = "";
-  List volumes = [];
-  double installProgress = 0;
-  bool installing = false;
-  Timer? timer;
-  String taskId = "";
-  String installButtonText = "安装";
-  @override
-  void initState() {
-    if (widget.package['installed'] && widget.package['additional'] != null) {
-      setState(() {
-        installPath = widget.package['additional']['installed_info']['path']
-            .split("/@appstore")[0];
-        if (widget.package['additional']['installed_info']['path']
-            .contains("volume")) {
-          List paths =
-              widget.package['additional']['installed_info']['path'].split("/");
-          installVolume = paths[1];
-        } else {
-          installVolume = "系统分区";
-        }
-      });
-    }
-    if (widget.package['can_update']) {
-      setState(() {
-        installButtonText = "更新";
-      });
-    }
-    thumbnailUrl = widget.package['thumbnail'].last;
-    if (!thumbnailUrl.startsWith("http")) {
-      thumbnailUrl = connectionStore.baseUri.watch(context) + thumbnailUrl;
-    }
-    getVolumes();
-    super.initState();
-  }
-
-  getVolumes() async {
-    var res = await DsmApi.volumes();
-    if (res['success']) {
-      setState(() {
-        volumes = res['data']['volumes'];
-      });
-      if (widget.method == "install") {
-        selectVolume();
-      } else if (widget.method == "update") {
-        update();
-      }
-    }
-  }
-
-  Widget _buildSwiperItem(String url) {
-    if (!url.startsWith("http")) {
-      url = connectionStore.baseUri + url;
-    }
-    return CupertinoExtendedImage(
-      url,
-      height: 210,
-      fit: BoxFit.contain,
-    );
-  }
-
-  selectVolume() {
-    showCupertinoModalPopup(
-      context: context,
-      builder: (context) {
-        return Material(
-          color: Colors.transparent,
-          child: Card(
-            shape: RoundedRectangleBorder(
-                side: const BorderSide(),
-                borderRadius: BorderRadius.circular(18)),
-            child: SafeArea(
-              top: false,
-              child: Padding(
-                padding: const EdgeInsets.all(20),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: <Widget>[
-                    const Text(
-                      "选择套件安装位置",
-                      style:
-                          TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
-                    ),
-                    const SizedBox(
-                      height: 12,
-                    ),
-                    ...volumes.map((volume) {
-                      return Padding(
-                        padding: const EdgeInsets.only(bottom: 20),
-                        child: OutlinedButton(
-                          onPressed: () async {
-                            install(volume['volume_path']);
-                            Navigator.of(context).pop();
-                          },
-                          child: Container(
-                            padding: const EdgeInsets.only(left: 20),
-                            width: double.infinity,
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                    "${volume['display_name']}(可用容量：${int.parse(volume['size_free_byte']).formatSize()}) - ${volume['fs_type']}"),
-                                const SizedBox(
-                                  height: 5,
-                                ),
-                                Text(
-                                  "${volume['description']}",
-                                  style: const TextStyle(color: Colors.grey),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      );
-                    }),
-                    OutlinedButton(
-                      onPressed: () async {
-                        Navigator.of(context).pop();
-                      },
-                      child: const Text(
-                        "取消",
-                        style: TextStyle(fontSize: 18),
-                      ),
-                    ),
-                    const SizedBox(
-                      height: 8,
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-  getLaunchedPackages() async {
-    widget.package['launched'] = true;
-    widget.package['can_update'] = false;
-  }
-
-  update() async {
-    setState(() {
-      installButtonText = "请稍后";
-    });
-    var res = await DsmApi.installPackageQueue(
-        widget.package['id'], widget.package['version'],
-        beta: widget.beta);
-    if (res['success']) {
-      if (res['data']['paused_pkgs'].length > 0 && context.mounted) {
-        showCupertinoModalPopup(
-          // ignore: use_build_context_synchronously
-          context: context,
-          builder: (context) {
-            return Material(
-              color: Colors.transparent,
-              child: Card(
-                shape: RoundedRectangleBorder(
-                    side: const BorderSide(),
-                    borderRadius: BorderRadius.circular(18)),
-                child: SafeArea(
-                  top: false,
-                  child: Padding(
-                    padding: const EdgeInsets.all(20),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: <Widget>[
-                        const Text(
-                          "确认更新",
-                          style: TextStyle(
-                              fontSize: 20, fontWeight: FontWeight.w500),
-                        ),
-                        const SizedBox(
-                          height: 12,
-                        ),
-                        Text(
-                          '更新${res['data']['cause_pausing_pkgs'].join(",")}时，${res['data']['paused_pkgs'].join("，")}将被停用。',
-                          style: const TextStyle(
-                              fontSize: 20, fontWeight: FontWeight.w400),
-                        ),
-                        const SizedBox(
-                          height: 22,
-                        ),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: OutlinedButton(
-                                onPressed: () async {
-                                  install(installPath);
-                                  Navigator.of(context).pop();
-                                },
-                                child: const Text(
-                                  "继续更新",
-                                  style: TextStyle(
-                                      fontSize: 18, color: Colors.redAccent),
-                                ),
-                              ),
-                            ),
-                            const SizedBox(
-                              width: 16,
-                            ),
-                            Expanded(
-                              child: OutlinedButton(
-                                onPressed: () async {
-                                  Navigator.of(context).pop();
-                                },
-                                child: const Text(
-                                  "取消",
-                                  style: TextStyle(fontSize: 18),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(
-                          height: 8,
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            );
-          },
-        ).then((value) {
-          setState(() {
-            installButtonText = "更新";
-          });
-        });
-      } else {
-        install(installPath);
-      }
-    }
-  }
-
-  uninstallPackage() async {
-    var res = await DsmApi.uninstallPackageTask(widget.package['id']);
-    if (res['success']) {
-      UiUtil.toast("卸载成功");
-      if (context.mounted) {
-        // ignore: use_build_context_synchronously
-        Navigator.of(context).pop();
-      }
-    } else {
-      UiUtil.toast("套件卸载失败，错误代码：${res['error']['code']}");
-    }
-  }
-
-  install(path) async {
-    var res = await DsmApi.installPackageTask(widget.package['id'], path);
-    Log.info(res);
-    if (res['success']) {
-      UiUtil.toast("已开始安装");
-      setState(() {
-        installing = true;
-        installButtonText = "准备安装…";
-        installProgress = double.parse(res['data']['progress']);
-      });
-      //进度
-      timer = Timer.periodic(const Duration(seconds: 5), (timer) {
-        DsmApi.installPackageStatus(res['data']['taskid']).then((value) {
-          Log.info(value);
-          setState(() {
-            installing = !value['data']['finished'];
-            if (value['data']['finished']) {
-              widget.package['installed'] = true;
-              getLaunchedPackages();
-              timer.cancel();
-            } else if (value['data']['progress'] != null) {
-              if (value['data']['progress'] is double) {
-                installProgress = value['data']['progress'];
-              } else {
-                installProgress = double.parse(value['data']['progress']);
-              }
-              installButtonText = "下载中:${installProgress.toStringAsFixed(2)}%";
-            } else if (value['data']['status'] == "installing") {
-              installButtonText = "安装中…";
-            } else if (value['data']['status'] == 'upgrading') {
-              installButtonText = "更新中…";
-            }
-          });
-        });
-      });
-    } else if (res['error']['code'] == 4501) {
-      UiUtil.toast("此套件需配置信息，当前暂不支持，请在WEB端安装");
-    } else {
-      UiUtil.toast("安装套件失败，代码${res['error']['code']}");
-    }
-  }
-
-  @override
-  void dispose() {
-    timer?.cancel();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
+    final thumbnailUrl = useSignal("");
+    final installVolume = useSignal("");
+    final installPath = useSignal("");
+    final volumes = useSignal<List>([]);
+    final installProgress = useSignal(0.0);
+    final installing = useSignal(false);
+    final timer = useRef<Timer?>(null);
+    final installButtonText = useSignal("安装");
+
+    getLaunchedPackages() async {
+      package['launched'] = true;
+      package['can_update'] = false;
+    }
+
+    install(path) async {
+      var res = await DsmApi.installPackageTask(package['id'], path);
+      Log.info(res);
+      if (res['success']) {
+        UiUtil.toast("已开始安装");
+      
+        installing.value = true;
+        installButtonText.value = "准备安装…";
+        installProgress.value = double.parse(res['data']['progress']);
+    
+        //进度
+        timer.value = Timer.periodic(const Duration(seconds: 5), (unusedTimer) {
+          DsmApi.installPackageStatus(res['data']['taskid']).then((value) {
+            Log.info(value);
+          
+            installing.value = !value['data']['finished'];
+            if (value['data']['finished']) {
+              package['installed'] = true;
+              getLaunchedPackages();
+              timer.value?.cancel();
+            } else if (value['data']['progress'] != null) {
+              if (value['data']['progress'] is double) {
+                installProgress.value = value['data']['progress'];
+              } else {
+                installProgress.value = double.parse(value['data']['progress']);
+              }
+              installButtonText.value = "下载中:${installProgress.value.toStringAsFixed(2)}%";
+            } else if (value['data']['status'] == "installing") {
+              installButtonText.value = "安装中…";
+            } else if (value['data']['status'] == 'upgrading') {
+              installButtonText.value = "更新中…";
+            }
+        
+          });
+        });
+      } else if (res['error']['code'] == 4501) {
+        UiUtil.toast("此套件需配置信息，当前暂不支持，请在WEB端安装");
+      } else {
+        UiUtil.toast("安装套件失败，代码${res['error']['code']}");
+      }
+    }
+
+    selectVolume() {
+      showCupertinoModalPopup(
+        context: context,
+        builder: (context) {
+          return Material(
+            color: Colors.transparent,
+            child: Card(
+              shape: RoundedRectangleBorder(
+                  side: const BorderSide(),
+                  borderRadius: BorderRadius.circular(18)),
+              child: SafeArea(
+                top: false,
+                child: Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      const Text(
+                        "选择套件安装位置",
+                        style:
+                            TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
+                      ),
+                      const SizedBox(
+                        height: 12,
+                      ),
+                      ...volumes.map((volume) {
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 20),
+                          child: OutlinedButton(
+                            onPressed: () async {
+                              install(volume['volume_path']);
+                              Navigator.of(context).pop();
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.only(left: 20),
+                              width: double.infinity,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                      "${volume['display_name']}(可用容量：${int.parse(volume['size_free_byte']).formatSize()}) - ${volume['fs_type']}"),
+                                  const SizedBox(
+                                    height: 5,
+                                  ),
+                                  Text(
+                                    "${volume['description']}",
+                                    style: const TextStyle(color: Colors.grey),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        );
+                      }),
+                      OutlinedButton(
+                        onPressed: () async {
+                          Navigator.of(context).pop();
+                        },
+                        child: const Text(
+                          "取消",
+                          style: TextStyle(fontSize: 18),
+                        ),
+                      ),
+                      const SizedBox(
+                        height: 8,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          );
+        },
+      );
+    }
+
+    update() async {
+    
+      installButtonText.value = "请稍后";
+  
+      var res = await DsmApi.installPackageQueue(
+          package['id'], package['version'],
+          beta: beta);
+      if (res['success']) {
+        if (res['data']['paused_pkgs'].length > 0 && context.mounted) {
+          showCupertinoModalPopup(
+            // ignore: use_build_context_synchronously
+            context: context,
+            builder: (context) {
+              return Material(
+                color: Colors.transparent,
+                child: Card(
+                  shape: RoundedRectangleBorder(
+                      side: const BorderSide(),
+                      borderRadius: BorderRadius.circular(18)),
+                  child: SafeArea(
+                    top: false,
+                    child: Padding(
+                      padding: const EdgeInsets.all(20),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: <Widget>[
+                          const Text(
+                            "确认更新",
+                            style: TextStyle(
+                                fontSize: 20, fontWeight: FontWeight.w500),
+                          ),
+                          const SizedBox(
+                            height: 12,
+                          ),
+                          Text(
+                            '更新${res['data']['cause_pausing_pkgs'].join(",")}时，${res['data']['paused_pkgs'].join("，")}将被停用。',
+                            style: const TextStyle(
+                                fontSize: 20, fontWeight: FontWeight.w400),
+                          ),
+                          const SizedBox(
+                            height: 22,
+                          ),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: OutlinedButton(
+                                  onPressed: () async {
+                                    install(installPath.value);
+                                    Navigator.of(context).pop();
+                                  },
+                                  child: const Text(
+                                    "继续更新",
+                                    style: TextStyle(
+                                        fontSize: 18, color: Colors.redAccent),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(
+                                width: 16,
+                              ),
+                              Expanded(
+                                child: OutlinedButton(
+                                  onPressed: () async {
+                                    Navigator.of(context).pop();
+                                  },
+                                  child: const Text(
+                                    "取消",
+                                    style: TextStyle(fontSize: 18),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(
+                            height: 8,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              );
+            },
+          ).then((value) {
+          
+            installButtonText.value = "更新";
+        
+          });
+        } else {
+          install(installPath.value);
+        }
+      }
+    }
+
+    uninstallPackage() async {
+      var res = await DsmApi.uninstallPackageTask(package['id']);
+      if (res['success']) {
+        UiUtil.toast("卸载成功");
+        if (context.mounted) {
+          // ignore: use_build_context_synchronously
+          Navigator.of(context).pop();
+        }
+      } else {
+        UiUtil.toast("套件卸载失败，错误代码：${res['error']['code']}");
+      }
+    }
+
+    getVolumes() async {
+      var res = await DsmApi.volumes();
+      if (res['success']) {
+      
+        volumes.value = res['data']['volumes'];
+    
+        if (method == "install") {
+          selectVolume();
+        } else if (method == "update") {
+          update();
+        }
+      }
+    }
+
+    Widget buildSwiperItem(String url) {
+      if (!url.startsWith("http")) {
+        url = connectionStore.baseUri + url;
+      }
+      return CupertinoExtendedImage(
+        url,
+        height: 210,
+        fit: BoxFit.contain,
+      );
+    }
+
+    useEffect(() {
+      if (package['installed'] && package['additional'] != null) {
+        installPath.value = package['additional']['installed_info']['path']
+            .split("/@appstore")[0];
+        if (package['additional']['installed_info']['path']
+            .contains("volume")) {
+          List paths =
+              package['additional']['installed_info']['path'].split("/");
+          installVolume.value = paths[1];
+        } else {
+          installVolume.value = "系统分区";
+        }
+      }
+      if (package['can_update']) {
+        installButtonText.value = "更新";
+      }
+      thumbnailUrl.value = package['thumbnail'].last;
+      if (!thumbnailUrl.value.startsWith("http")) {
+        thumbnailUrl.value =
+            connectionStore.baseUri.value + thumbnailUrl.value;
+      }
+      getVolumes();
+      return () {
+        timer.value?.cancel();
+      };
+    }, const []);
+
     return Scaffold(
       appBar: AppBar(
         leading: AppBackButton(context),
         title: Text(
-          "${widget.package['dname']}",
+          "${package['dname']}",
         ),
       ),
       body: Column(
@@ -351,7 +341,7 @@ class PackageDetailState extends State<PackageDetail> {
                     child: Row(
                       children: [
                         CupertinoExtendedImage(
-                          thumbnailUrl,
+                          thumbnailUrl.value,
                           width: 60,
                         ),
                         const SizedBox(
@@ -361,11 +351,11 @@ class PackageDetailState extends State<PackageDetail> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text("${widget.package['dname']}"),
-                              if (widget.package['installed'])
+                              Text("${package['dname']}"),
+                              if (package['installed'])
                                 Padding(
                                   padding: const EdgeInsets.only(top: 10),
-                                  child: widget.package['launched']
+                                  child: package['launched']
                                       ? const Label("已启动", Colors.green)
                                       : const Label("已停用", Colors.red),
                                 ),
@@ -376,8 +366,8 @@ class PackageDetailState extends State<PackageDetail> {
                     ),
                   ),
                 ),
-                if (widget.package['snapshot'] != null &&
-                    widget.package['snapshot'].length > 0)
+                if (package['snapshot'] != null &&
+                    package['snapshot'].length > 0)
                   Card(
                     shape: context.roundRectShapeBorder,
                     margin: const EdgeInsets.only(top: 20),
@@ -397,10 +387,10 @@ class PackageDetailState extends State<PackageDetail> {
                                       activeColor: Colors.lightBlueAccent,
                                       size: 7,
                                       activeSize: 7)),
-                              itemCount: widget.package['snapshot'].length,
+                              itemCount: package['snapshot'].length,
                               itemBuilder: (context, i) {
-                                return _buildSwiperItem(
-                                    widget.package['snapshot'][i]);
+                                return buildSwiperItem(
+                                    package['snapshot'][i]);
                               },
                             ),
                           ),
@@ -426,12 +416,12 @@ class PackageDetailState extends State<PackageDetail> {
                         const SizedBox(
                           height: 20,
                         ),
-                        Text("${widget.package['desc']}"),
+                        Text("${package['desc']}"),
                       ],
                     ),
                   ),
                 ),
-                if (widget.package['changelog'] != "")
+                if (package['changelog'] != "")
                   Card(
                     shape: context.roundRectShapeBorder,
                     margin: const EdgeInsets.only(top: 20),
@@ -441,7 +431,7 @@ class PackageDetailState extends State<PackageDetail> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            "${widget.package['version']}新增功能",
+                            "${package['version']}新增功能",
                             style: const TextStyle(
                                 fontSize: 18, fontWeight: FontWeight.w600),
                           ),
@@ -449,7 +439,7 @@ class PackageDetailState extends State<PackageDetail> {
                           //   height: 20,
                           // ),
                           Html(
-                            data: widget.package['changelog'],
+                            data: package['changelog'],
                             onLinkTap: (link, _, __) {
                               AndroidIntent intent = AndroidIntent(
                                 action: 'action_view',
@@ -506,20 +496,19 @@ class PackageDetailState extends State<PackageDetail> {
                                     const SizedBox(
                                       height: 5,
                                     ),
-                                    if (widget.package['maintainer_url'] !=
+                                    if (package['maintainer_url'] !=
                                             null &&
-                                        widget.package['maintainer_url'] != "")
+                                        package['maintainer_url'] != "")
                                       GestureDetector(
                                         child: Text(
-                                          "${widget.package['maintainer']}",
+                                          "${package['maintainer']}",
                                           style: const TextStyle(
                                               color: Colors.blue),
                                         ),
                                         onTap: () {
                                           AndroidIntent intent = AndroidIntent(
                                             action: 'action_view',
-                                            data: widget
-                                                .package['maintainer_url'],
+                                            data: package['maintainer_url'],
                                             arguments: {},
                                           );
                                           intent.launch();
@@ -527,14 +516,14 @@ class PackageDetailState extends State<PackageDetail> {
                                       )
                                     else
                                       Text(
-                                        "${widget.package['maintainer']}",
+                                        "${package['maintainer']}",
                                       ),
                                   ],
                                 ),
                               ),
                             ),
-                            if (widget.package['distributor'] != null &&
-                                widget.package['distributor'] != "")
+                            if (package['distributor'] != null &&
+                                package['distributor'] != "")
                               Card(
                                 shape: RoundedRectangleBorder(
                                     side: const BorderSide(),
@@ -550,13 +539,13 @@ class PackageDetailState extends State<PackageDetail> {
                                       const SizedBox(
                                         height: 5,
                                       ),
-                                      if (widget.package['distributor_url'] !=
+                                      if (package['distributor_url'] !=
                                               null &&
-                                          widget.package['distributor_url'] !=
+                                          package['distributor_url'] !=
                                               "")
                                         GestureDetector(
                                           child: Text(
-                                            "${widget.package['distributor']}",
+                                            "${package['distributor']}",
                                             style: const TextStyle(
                                                 color: Colors.blue),
                                           ),
@@ -564,8 +553,7 @@ class PackageDetailState extends State<PackageDetail> {
                                             AndroidIntent intent =
                                                 AndroidIntent(
                                               action: 'action_view',
-                                              data: widget
-                                                  .package['distributor_url'],
+                                              data: package['distributor_url'],
                                               arguments: {},
                                             );
                                             intent.launch();
@@ -573,7 +561,7 @@ class PackageDetailState extends State<PackageDetail> {
                                         )
                                       else
                                         Text(
-                                          "${widget.package['distributor']}",
+                                          "${package['distributor']}",
                                         ),
                                     ],
                                   ),
@@ -593,12 +581,12 @@ class PackageDetailState extends State<PackageDetail> {
                                     const SizedBox(
                                       height: 5,
                                     ),
-                                    Text("${widget.package['download_count']}"),
+                                    Text("${package['download_count']}"),
                                   ],
                                 ),
                               ),
                             ),
-                            if (widget.package['installed'])
+                            if (package['installed'])
                               Card(
                                 shape: RoundedRectangleBorder(
                                     side: const BorderSide(),
@@ -615,12 +603,12 @@ class PackageDetailState extends State<PackageDetail> {
                                         height: 5,
                                       ),
                                       Text(
-                                          "${widget.package['installed_version']}"),
+                                          "${package['installed_version']}"),
                                     ],
                                   ),
                                 ),
                               ),
-                            if (widget.package['installed'])
+                            if (package['installed'])
                               Card(
                                 shape: RoundedRectangleBorder(
                                     side: const BorderSide(),
@@ -636,7 +624,7 @@ class PackageDetailState extends State<PackageDetail> {
                                       const SizedBox(
                                         height: 5,
                                       ),
-                                      Text(installVolume.replaceAll(
+                                      Text(installVolume.value.replaceAll(
                                           "volume", "存储空间 ")),
                                     ],
                                   ),
@@ -656,7 +644,7 @@ class PackageDetailState extends State<PackageDetail> {
                                     const SizedBox(
                                       height: 5,
                                     ),
-                                    Text("${widget.package['version']}"),
+                                    Text("${package['version']}"),
                                   ],
                                 ),
                               ),
@@ -674,17 +662,17 @@ class PackageDetailState extends State<PackageDetail> {
             padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 10),
             child: Row(
               children: [
-                if (widget.package['installed']) ...[
+                if (package['installed']) ...[
                   Expanded(
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 10),
                       child: OutlinedButton(
                         onPressed: () async {
-                          if (widget.package['additional']
+                          if (package['additional']
                               ['is_uninstall_pages']) {
                             Navigator.of(context).push(CupertinoPageRoute(
                                 builder: (context) {
-                                  return UninstallPackage(widget.package);
+                                  return UninstallPackage(package);
                                 },
                                 settings: const RouteSettings(
                                     name: "uninstall_package")));
@@ -781,13 +769,13 @@ class PackageDetailState extends State<PackageDetail> {
                       ),
                     ),
                   ),
-                  if (widget.package['launched'] &&
-                      widget.package['additional'] != null &&
-                      widget.package['additional']['startable'])
+                  if (package['launched'] &&
+                      package['additional'] != null &&
+                      package['additional']['startable'])
                     Expanded(
                       child: Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 10),
-                        child: widget.package['launched']
+                        child: package['launched']
                             ? OutlinedButton(
                                 onPressed: () {
                                   showCupertinoModalPopup(
@@ -838,20 +826,20 @@ class PackageDetailState extends State<PackageDetail> {
                                                                 .pop();
                                                             var res = await DsmApi
                                                                 .launchPackage(
-                                                                    widget.package[
+                                                                    package[
                                                                         'id'],
-                                                                    widget.package[
+                                                                    package[
                                                                         'dsm_apps'],
                                                                     "stop");
                                                             if (res[
                                                                 'success']) {
                                                               UiUtil.toast(
                                                                   "已停用");
-                                                              setState(() {
-                                                                widget.package[
-                                                                        'launched'] =
-                                                                    false;
-                                                              });
+                                                              
+                                                              package[
+                                                                      'launched'] =
+                                                                  false;
+                                                            
                                                             }
                                                           },
                                                           child: const Text(
@@ -899,15 +887,15 @@ class PackageDetailState extends State<PackageDetail> {
                             : OutlinedButton(
                                 onPressed: () async {
                                   var res = await DsmApi.launchPackage(
-                                      widget.package['id'],
-                                      widget.package['dsm_apps'],
+                                      package['id'],
+                                      package['dsm_apps'],
                                       "start");
                                   Log.info(res);
                                   if (res['success']) {
                                     UiUtil.toast("已启动");
-                                    setState(() {
-                                      widget.package['launched'] = true;
-                                    });
+                                    
+                                    package['launched'] = true;
+                                  
                                   }
                                 },
                                 child: const Text("启动"),
@@ -922,11 +910,11 @@ class PackageDetailState extends State<PackageDetail> {
                         onPressed: () {
                           selectVolume();
                         },
-                        child: Text(installButtonText),
+                        child: Text(installButtonText.value),
                       ),
                     ),
                   ),
-                if (widget.package['can_update'])
+                if (package['can_update'])
                   Expanded(
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 10),
@@ -935,7 +923,7 @@ class PackageDetailState extends State<PackageDetail> {
                           update();
                           // install(volume['volume_path']);
                         },
-                        child: Text(installButtonText),
+                        child: Text(installButtonText.value),
                       ),
                     ),
                   ),

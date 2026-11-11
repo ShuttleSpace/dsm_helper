@@ -6,134 +6,131 @@ import 'package:garden/util/http_util.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:garden/constants/app_constants.dart';
 import 'package:garden/theme/app_colors.dart';
+import 'package:signals_hooks/signals_hooks.dart';
 
-class UninstallPackage extends StatefulWidget {
+class UninstallPackage extends HookWidget {
   final Map package;
   const UninstallPackage(this.package, {super.key});
-  @override
-  UninstallPackageState createState() => UninstallPackageState();
-}
 
-class UninstallPackageState extends State<UninstallPackage> {
-  bool loading = true;
-  bool uninstalling = false;
-  List pageData = [];
   @override
-  void initState() {
-    getData();
-    super.initState();
-  }
+  Widget build(BuildContext context) {
+    final loading = useSignal(true);
+    final uninstalling = useSignal(false);
+    final pageData = useSignal<List>([]);
+    final rebuild = useSignal(0);
 
-  getData() async {
-    var res = await DsmApi.uninstallPackageInfo(widget.package['id']);
-    if (res['success']) {
-      setState(() {
-        loading = false;
-        pageData = jsonDecode(
-            Uri.decodeComponent(res['data']['additional']['uninstall_pages']));
-        Log.info(pageData);
-      });
-    } else {
-      UiUtil.toast("获取卸载信息失败，代码${res['error']['code']}");
+    getData() async {
+      var res = await DsmApi.uninstallPackageInfo(package['id']);
+      if (res['success']) {
+        loading.value = false;
+        pageData.value = jsonDecode(Uri.decodeComponent(
+            res['data']['additional']['uninstall_pages']));
+        Log.info(pageData.value);
+      } else {
+        UiUtil.toast("获取卸载信息失败，代码${res['error']['code']}");
+      }
     }
-  }
 
-  Widget _buildSubItem(item) {
-    item['checked'] = item['checked'] ?? false;
-    return GestureDetector(
-      onTap: () {
-        setState(() {
+    Widget buildSubItem(item) {
+      item['checked'] = item['checked'] ?? false;
+      return GestureDetector(
+        onTap: () {
           item['checked'] = !item['checked'];
-        });
-      },
-      child: Card(
+          rebuild.value++;
+        },
+        child: Card(
+          shape: RoundedRectangleBorder(
+              side: const BorderSide(),
+              borderRadius: BorderRadius.circular(18)),
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Text(item['desc']),
+                ),
+                Card(
+                  shape: RoundedRectangleBorder(
+                      side: const BorderSide(),
+                      borderRadius: BorderRadius.circular(18)),
+                  child: Padding(
+                    padding: const EdgeInsets.all(AppConstants.paddingSmall),
+                    child: SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: item['checked']
+                          ? const Icon(
+                              CupertinoIcons.checkmark_alt,
+                              color: AppColors.primaryAction,
+                            )
+                          : null,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+
+    Widget buildItem(item) {
+      List subItems = item['subitems'];
+      return Card(
         shape: RoundedRectangleBorder(
             side: const BorderSide(), borderRadius: BorderRadius.circular(18)),
         child: Padding(
           padding: const EdgeInsets.all(20),
-          child: Row(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Expanded(
-                child: Text(item['desc']),
+              Text(item['desc']),
+              const SizedBox(
+                height: 20,
               ),
-              Card(
-                shape: RoundedRectangleBorder(
-                    side: const BorderSide(),
-                    borderRadius: BorderRadius.circular(18)),
-                child: Padding(
-                  padding: const EdgeInsets.all(AppConstants.paddingSmall),
-                  child: SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: item['checked']
-                        ? const Icon(
-                            CupertinoIcons.checkmark_alt,
-                            color: AppColors.primaryAction,
-                          )
-                        : null,
-                  ),
-                ),
-              ),
+              ...subItems.map(buildSubItem),
             ],
           ),
         ),
-      ),
-    );
-  }
+      );
+    }
 
-  Widget _buildItem(item) {
-    List subItems = item['subitems'];
-    return Card(
-      shape: RoundedRectangleBorder(
-          side: const BorderSide(), borderRadius: BorderRadius.circular(18)),
-      child: Padding(
+    Widget buildData(data) {
+      List items = data['items'];
+      return Padding(
         padding: const EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(item['desc']),
+            Text(
+              data['step_title'],
+              style: const TextStyle(fontSize: 24),
+            ),
             const SizedBox(
               height: 20,
             ),
-            ...subItems.map(_buildSubItem),
+            ...items.map(buildItem),
           ],
         ),
-      ),
-    );
-  }
+      );
+    }
 
-  Widget _buildData(data) {
-    List items = data['items'];
-    return Padding(
-      padding: const EdgeInsets.all(20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            data['step_title'],
-            style: const TextStyle(fontSize: 24),
-          ),
-          const SizedBox(
-            height: 20,
-          ),
-          ...items.map(_buildItem),
-        ],
-      ),
-    );
-  }
+    useEffect(() {
+      getData();
+      return null;
+    }, const []);
 
-  @override
-  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         leading: AppBackButton(context),
         title: Text(
-          "卸载${widget.package['dname']}",
+          "卸载${package['dname']}",
         ),
       ),
-      body: loading
+      body: loading.value
           ? const Center(
               child: CupertinoActivityIndicator(
                 radius: 14,
@@ -146,9 +143,9 @@ class UninstallPackageState extends State<UninstallPackage> {
                     Expanded(
                       child: ListView.builder(
                         itemBuilder: (context, i) {
-                          return _buildData(pageData[i]);
+                          return buildData(pageData.value[i]);
                         },
-                        itemCount: pageData.length,
+                        itemCount: pageData.value.length,
                       ),
                     ),
                     Padding(
@@ -158,30 +155,27 @@ class UninstallPackageState extends State<UninstallPackage> {
                         onPressed: () async {
                           //获取额外参数
                           Map extra = {};
-                          for (int i = 0; i < pageData.length; i++) {
+                          for (int i = 0; i < pageData.value.length; i++) {
                             for (int j = 0;
-                                j < pageData[i]['items'].length;
+                                j < pageData.value[i]['items'].length;
                                 j++) {
                               for (int k = 0;
                                   k <
-                                      pageData[i]['items'][j]['subitems']
+                                      pageData.value[i]['items'][j]['subitems']
                                           .length;
                                   k++) {
-                                if (pageData[i]['items'][j]['subitems'][k]
+                                if (pageData.value[i]['items'][j]['subitems'][k]
                                     ['checked']) {
-                                  extra[pageData[i]['items'][j]['subitems'][i]
-                                          ['key']] =
-                                      pageData[i]['items'][j]['subitems'][i]
-                                          ['checked'];
+                                  extra[pageData.value[i]['items'][j]
+                                          ['subitems'][i]['key']] =
+                                      pageData.value[i]['items'][j]
+                                          ['subitems'][i]['checked'];
                                 }
                               }
                             }
                           }
-                          setState(() {
-                            uninstalling = true;
-                          });
-                          await DsmApi.uninstallPackageTask(
-                              widget.package['id'],
+                          uninstalling.value = true;
+                          await DsmApi.uninstallPackageTask(package['id'],
                               extra: extra);
                           UiUtil.toast("卸载成功");
                           if (context.mounted) {
@@ -202,7 +196,7 @@ class UninstallPackageState extends State<UninstallPackage> {
                     ),
                   ],
                 ),
-                if (uninstalling)
+                if (uninstalling.value)
                   const Center(
                     child: CupertinoActivityIndicator(
                       radius: 14,

@@ -4,15 +4,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:garden/constants/app_constants.dart';
 
-class OpenSource extends StatefulWidget {
+class OpenSource extends StatelessWidget {
   const OpenSource({super.key});
 
-  @override
-  OpenSourceState createState() => OpenSourceState();
-}
-
-class OpenSourceState extends State<OpenSource> {
-  List list = [
+  static const List list = [
     {
       "name": "cupertino_icons",
       "url": "",

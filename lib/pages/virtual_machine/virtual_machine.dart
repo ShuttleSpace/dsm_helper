@@ -7,185 +7,164 @@ import 'package:garden/util/http_util.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:garden/widgets/virtual_machine/host_item.dart';
 import 'package:garden/widgets/virtual_machine/guest_item.dart';
 import 'package:garden/widgets/virtual_machine/repo_item.dart';
 import 'package:garden/widgets/virtual_machine/cluster_summary_card.dart';
 import 'package:garden/widgets/virtual_machine/power_confirm_dialog.dart';
+import 'package:signals_hooks/signals_hooks.dart';
 
-class VirtualMachine extends StatefulWidget {
+class VirtualMachine extends HookWidget {
   const VirtualMachine({super.key});
 
   @override
-  VirtualMachineState createState() => VirtualMachineState();
-}
+  Widget build(BuildContext context) {
+    final loading = useSignal(true);
+    final hostLoading = useSignal(true);
+    final guestLoading = useSignal(true);
+    final repoLoading = useSignal(true);
+    final powerLoading = useSignal<Map<String, bool>>({});
+    final cluster = useSignal<dynamic>(null);
+    final hosts = useSignal<List>([]);
+    final guests = useSignal<List>([]);
+    final repos = useSignal<List>([]);
+    final currentIndex = useSignal(0);
 
-class VirtualMachineState extends State<VirtualMachine> {
-  late Timer timer;
-  bool loading = true;
-  bool hostLoading = true;
-  bool guestLoading = true;
-  bool repoLoading = true;
-  Map<String, bool> powerLoading = {};
-  dynamic cluster;
-  List hosts = [];
-  List guests = [];
-  List repos = [];
-  int _currentIndex = 0;
+    getHosts() async {
+      var res = await DsmApi.cluster("get_host");
+      if (res['success']) {
+        if (context.mounted) {
+          hosts.value = res['data']['hosts'];
+          hosts.value.sort((a, b) {
+            return a['name'].compareTo(b['name']);
+          });
+          hostLoading.value = false;
+        }
+      }
+    }
 
-  @override
-  void initState() {
-    getData();
-    timer = Timer.periodic(const Duration(seconds: 5), (timer) {
-      getData();
-    });
-    super.initState();
-  }
+    getGuests() async {
+      var res = await DsmApi.cluster("get_guest");
+      if (res['success']) {
+        if (context.mounted) {
+          guests.value = res['data']['guests'];
+          guests.value.sort((a, b) {
+            return a['name'].compareTo(b['name']);
+          });
+          guestLoading.value = false;
+        }
+      }
+    }
 
-  @override
-  void dispose() {
-    timer.cancel();
-    super.dispose();
-  }
+    getRepos() async {
+      var res = await DsmApi.cluster("get_repo");
+      if (res['success']) {
+        if (context.mounted) {
+          repos.value = res['data']['repos'];
+          repos.value.sort((a, b) {
+            return a['name'].compareTo(b['name']);
+          });
+          repoLoading.value = false;
+        }
+      }
+    }
 
-  power(guest, String action) async {
-    showCupertinoModalPopup(
-      context: context,
-      builder: (context) {
-        return PowerConfirmDialog(
-          action: action,
-          onConfirm: () async {
-            setState(() {
-              powerLoading[guest['id']] = true;
-            });
-            var res = await DsmApi.vmmPower(guest['id'], action);
+    power(guest, String action) async {
+      showCupertinoModalPopup(
+        context: context,
+        builder: (context) {
+          return PowerConfirmDialog(
+            action: action,
+            onConfirm: () async {
+              powerLoading.value = Map<String, bool>.of(powerLoading.value)
+                ..[guest['id']] = true;
+              var res = await DsmApi.vmmPower(guest['id'], action);
+              if (res['success']) {
+                UiUtil.toast("请求发送成功");
+                getGuests();
+              } else {
+                UiUtil.toast("请求发送失败，代码：${res['error']['code']}");
+              }
+              powerLoading.value = Map<String, bool>.of(powerLoading.value)
+                ..[guest['id']] = false;
+            },
+          );
+        },
+      );
+    }
+
+    getData() async {
+      var res = await DsmApi.cluster("get");
+      if (res['success']) {
+        if (context.mounted) {
+          cluster.value = res['data'];
+          loading.value = false;
+        }
+        if (currentIndex.value == 0) {
+          getHosts();
+        } else if (currentIndex.value == 1) {
+          getGuests();
+        } else if (currentIndex.value == 2) {
+          getRepos();
+        }
+      }
+    }
+
+    Widget buildHostItem(host) {
+      return HostItem(host: host);
+    }
+
+    Widget buildGuestItem(guest) {
+      if (powerLoading.value[guest['id']] == null) {
+        powerLoading.value[guest['id']] = false;
+      }
+      return GuestItem(
+        guest: guest,
+        powerLoading: powerLoading.value,
+        onPowerAction: (action) => power(guest, action),
+        onPowerOn: () async {
+          powerLoading.value = Map<String, bool>.of(powerLoading.value)
+            ..[guest['id']] = true;
+          var check = await DsmApi.checkPowerOn(guest['id']);
+          Log.info(check);
+          if (check['success']) {
+            var res = await DsmApi.vmmPower(guest['id'], "poweron");
             if (res['success']) {
-              UiUtil.toast("请求发送成功");
+              UiUtil.toast("开机请求发送成功");
               getGuests();
             } else {
-              UiUtil.toast("请求发送失败，代码：${res['error']['code']}");
+              UiUtil.toast("开机请求发送失败，代码：${res['error']['code']}");
             }
-            setState(() {
-              powerLoading[guest['id']] = false;
-            });
-          },
-        );
-      },
-    );
-  }
-
-  getData() async {
-    var res = await DsmApi.cluster("get");
-    if (res['success']) {
-      if (mounted) {
-        setState(() {
-          cluster = res['data'];
-          loading = false;
-        });
-      }
-      if (_currentIndex == 0) {
-        getHosts();
-      } else if (_currentIndex == 1) {
-        getGuests();
-      } else if (_currentIndex == 2) {
-        getRepos();
-      }
-    }
-  }
-
-  getHosts() async {
-    var res = await DsmApi.cluster("get_host");
-    if (res['success']) {
-      if (mounted) {
-        setState(() {
-          hosts = res['data']['hosts'];
-          hosts.sort((a, b) {
-            return a['name'].compareTo(b['name']);
-          });
-          hostLoading = false;
-        });
-      }
-    }
-  }
-
-  getGuests() async {
-    var res = await DsmApi.cluster("get_guest");
-    if (res['success']) {
-      if (mounted) {
-        setState(() {
-          guests = res['data']['guests'];
-          guests.sort((a, b) {
-            return a['name'].compareTo(b['name']);
-          });
-          guestLoading = false;
-        });
-      }
-    }
-  }
-
-  getRepos() async {
-    var res = await DsmApi.cluster("get_repo");
-    if (res['success']) {
-      if (mounted) {
-        setState(() {
-          repos = res['data']['repos'];
-          repos.sort((a, b) {
-            return a['name'].compareTo(b['name']);
-          });
-          repoLoading = false;
-        });
-      }
-    }
-  }
-
-  Widget _buildHostItem(host) {
-    return HostItem(host: host);
-  }
-
-  Widget _buildGuestItem(guest) {
-    if (powerLoading[guest['id']] == null) {
-      powerLoading[guest['id']] = false;
-    }
-    return GuestItem(
-      guest: guest,
-      powerLoading: powerLoading,
-      onPowerAction: (action) => power(guest, action),
-      onPowerOn: () async {
-        setState(() {
-          powerLoading[guest['id']] = true;
-        });
-        var check = await DsmApi.checkPowerOn(guest['id']);
-        Log.info(check);
-        if (check['success']) {
-          var res = await DsmApi.vmmPower(guest['id'], "poweron");
-          if (res['success']) {
-            UiUtil.toast("开机请求发送成功");
-            getGuests();
           } else {
-            UiUtil.toast("开机请求发送失败，代码：${res['error']['code']}");
+            UiUtil.toast("无法开机");
           }
-        } else {
-          UiUtil.toast("无法开机");
-        }
-        setState(() {
-          powerLoading[guest['id']] = false;
-        });
-      },
-    );
-  }
+          powerLoading.value = Map<String, bool>.of(powerLoading.value)
+            ..[guest['id']] = false;
+        },
+      );
+    }
 
-  Widget _buildRepoItem(repo) {
-    return RepoItem(repo: repo);
-  }
+    Widget buildRepoItem(repo) {
+      return RepoItem(repo: repo);
+    }
 
-  @override
-  Widget build(BuildContext context) {
+    useEffect(() {
+      getData();
+      final timer = Timer.periodic(const Duration(seconds: 5), (timer) {
+        getData();
+      });
+      return () {
+        timer.cancel();
+      };
+    }, const []);
+
     return Scaffold(
       appBar: AppBar(
         leading: AppBackButton(context),
         title: const Text("Virtual Machine Manager"),
       ),
-      body: loading
+      body: loading.value
           ? const Center(
               child: CupertinoActivityIndicator(
                 radius: 14,
@@ -205,16 +184,14 @@ class VirtualMachineState extends State<VirtualMachine> {
                         Expanded(
                           child: ClusterSummaryCard(
                             title: "主机",
-                            totalCount: cluster['host_summ']['error'] +
-                                cluster['host_summ']['healthy'] +
-                                cluster['host_summ']['warning'],
-                            errorCount: cluster['host_summ']['error'],
-                            warningCount: cluster['host_summ']['warning'],
-                            healthyCount: cluster['host_summ']['healthy'],
+                            totalCount: cluster.value['host_summ']['error'] +
+                                cluster.value['host_summ']['healthy'] +
+                                cluster.value['host_summ']['warning'],
+                            errorCount: cluster.value['host_summ']['error'],
+                            warningCount: cluster.value['host_summ']['warning'],
+                            healthyCount: cluster.value['host_summ']['healthy'],
                             onTap: () {
-                              setState(() {
-                                _currentIndex = 0;
-                              });
+                              currentIndex.value = 0;
                               getHosts();
                             },
                           ),
@@ -223,16 +200,16 @@ class VirtualMachineState extends State<VirtualMachine> {
                         Expanded(
                           child: ClusterSummaryCard(
                             title: "虚拟机",
-                            totalCount: cluster['guest_summ']['error'] +
-                                cluster['guest_summ']['healthy'] +
-                                cluster['guest_summ']['warning'],
-                            errorCount: cluster['guest_summ']['error'],
-                            warningCount: cluster['guest_summ']['warning'],
-                            healthyCount: cluster['guest_summ']['healthy'],
+                            totalCount: cluster.value['guest_summ']['error'] +
+                                cluster.value['guest_summ']['healthy'] +
+                                cluster.value['guest_summ']['warning'],
+                            errorCount: cluster.value['guest_summ']['error'],
+                            warningCount:
+                                cluster.value['guest_summ']['warning'],
+                            healthyCount:
+                                cluster.value['guest_summ']['healthy'],
                             onTap: () {
-                              setState(() {
-                                _currentIndex = 1;
-                              });
+                              currentIndex.value = 1;
                               getGuests();
                             },
                           ),
@@ -241,16 +218,14 @@ class VirtualMachineState extends State<VirtualMachine> {
                         Expanded(
                           child: ClusterSummaryCard(
                             title: "存储",
-                            totalCount: cluster['repo_summ']['error'] +
-                                cluster['repo_summ']['healthy'] +
-                                cluster['repo_summ']['warning'],
-                            errorCount: cluster['repo_summ']['error'],
-                            warningCount: cluster['repo_summ']['warning'],
-                            healthyCount: cluster['repo_summ']['healthy'],
+                            totalCount: cluster.value['repo_summ']['error'] +
+                                cluster.value['repo_summ']['healthy'] +
+                                cluster.value['repo_summ']['warning'],
+                            errorCount: cluster.value['repo_summ']['error'],
+                            warningCount: cluster.value['repo_summ']['warning'],
+                            healthyCount: cluster.value['repo_summ']['healthy'],
                             onTap: () {
-                              setState(() {
-                                _currentIndex = 2;
-                              });
+                              currentIndex.value = 2;
                               getRepos();
                             },
                           ),
@@ -261,9 +236,9 @@ class VirtualMachineState extends State<VirtualMachine> {
                 ),
                 Expanded(
                   child: IndexedStack(
-                    index: _currentIndex,
+                    index: currentIndex.value,
                     children: [
-                      hostLoading
+                      hostLoading.value
                           ? const Center(
                               child: CupertinoActivityIndicator(
                                 radius: 14,
@@ -272,11 +247,11 @@ class VirtualMachineState extends State<VirtualMachine> {
                           : ListView.builder(
                               padding: const EdgeInsets.all(20),
                               itemBuilder: (context, i) {
-                                return _buildHostItem(hosts[i]);
+                                return buildHostItem(hosts.value[i]);
                               },
-                              itemCount: hosts.length,
+                              itemCount: hosts.value.length,
                             ),
-                      guestLoading
+                      guestLoading.value
                           ? const Center(
                               child: CupertinoActivityIndicator(
                                 radius: 14,
@@ -285,11 +260,11 @@ class VirtualMachineState extends State<VirtualMachine> {
                           : ListView.builder(
                               padding: const EdgeInsets.all(20),
                               itemBuilder: (context, i) {
-                                return _buildGuestItem(guests[i]);
+                                return buildGuestItem(guests.value[i]);
                               },
-                              itemCount: guests.length,
+                              itemCount: guests.value.length,
                             ),
-                      repoLoading
+                      repoLoading.value
                           ? const Center(
                               child: CupertinoActivityIndicator(
                                 radius: 14,
@@ -298,9 +273,9 @@ class VirtualMachineState extends State<VirtualMachine> {
                           : ListView.builder(
                               padding: const EdgeInsets.all(20),
                               itemBuilder: (context, i) {
-                                return _buildRepoItem(repos[i]);
+                                return buildRepoItem(repos.value[i]);
                               },
-                              itemCount: repos.length,
+                              itemCount: repos.value.length,
                             ),
                     ],
                   ),

@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:extended_image/extended_image.dart';
 
 /// make hero better when slide out
-class HeroWidget extends StatefulWidget {
+class HeroWidget extends HookWidget {
   const HeroWidget({
     super.key,
     required this.child,
@@ -14,19 +15,15 @@ class HeroWidget extends StatefulWidget {
   final SlideType slideType;
   final Object tag;
   final GlobalKey<ExtendedImageSlidePageState> slidePagekey;
-  @override
-  HeroWidgetState createState() => HeroWidgetState();
-}
 
-class HeroWidgetState extends State<HeroWidget> {
-  RectTween? _rectTween;
   @override
   Widget build(BuildContext context) {
+    final rectTween = useRef<RectTween?>(null);
     return Hero(
-      tag: widget.tag,
+      tag: tag,
       createRectTween: (Rect? begin, Rect? end) {
-        _rectTween = RectTween(begin: begin, end: end);
-        return _rectTween as Tween<Rect?>;
+        rectTween.value = RectTween(begin: begin, end: end);
+        return rectTween.value as Tween<Rect?>;
       },
       // make hero better when slide out
       flightShuttleBuilder: (BuildContext flightContext,
@@ -39,9 +36,9 @@ class HeroWidgetState extends State<HeroWidget> {
             ? fromHeroContext.widget
             : toHeroContext.widget) as Hero;
         if (flightDirection == HeroFlightDirection.pop) {
-          final bool fixTransform = widget.slideType == SlideType.onlyImage &&
-              (widget.slidePagekey.currentState?.offset != Offset.zero ||
-                  widget.slidePagekey.currentState?.scale != 1.0);
+          final bool fixTransform = slideType == SlideType.onlyImage &&
+              (slidePagekey.currentState?.offset != Offset.zero ||
+                  slidePagekey.currentState?.scale != 1.0);
 
           final Widget toHeroWidget = (toHeroContext.widget as Hero).child;
           return AnimatedBuilder(
@@ -58,8 +55,8 @@ class HeroWidgetState extends State<HeroWidget> {
                     opacity: 1 - animation.value,
                     child: UnconstrainedBox(
                       child: SizedBox(
-                        width: _rectTween?.begin?.width,
-                        height: _rectTween?.begin?.height,
+                        width: rectTween.value?.begin?.width,
+                        height: rectTween.value?.begin?.height,
                         child: toHeroWidget,
                       ),
                     ),
@@ -75,10 +72,10 @@ class HeroWidgetState extends State<HeroWidget> {
               if (fixTransform) {
                 final Tween<Offset> offsetTween = Tween<Offset>(
                     begin: Offset.zero,
-                    end: widget.slidePagekey.currentState?.offset);
+                    end: slidePagekey.currentState?.offset);
 
                 final Tween<double> scaleTween = Tween<double>(
-                    begin: 1.0, end: widget.slidePagekey.currentState?.scale);
+                    begin: 1.0, end: slidePagekey.currentState?.scale);
                 animatedBuilderChild = Transform.translate(
                   offset: offsetTween.evaluate(animation),
                   child: Transform.scale(
@@ -94,7 +91,7 @@ class HeroWidgetState extends State<HeroWidget> {
         }
         return hero.child;
       },
-      child: widget.child,
+      child: child,
     );
   }
 }

@@ -1,9 +1,11 @@
 import 'package:garden/util/moments_api.dart';
 import 'package:garden/widgets/moments/photo_item_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:garden/constants/app_constants.dart';
+import 'package:signals_hooks/signals_hooks.dart';
 
-class TimelineItemWidget extends StatefulWidget {
+class TimelineItemWidget extends HookWidget {
   final Map line;
   final double photoWidth;
 
@@ -14,69 +16,60 @@ class TimelineItemWidget extends StatefulWidget {
   });
 
   @override
-  TimelineItemWidgetState createState() => TimelineItemWidgetState();
-}
-
-class TimelineItemWidgetState extends State<TimelineItemWidget> {
-  @override
-  void initState() {
-    super.initState();
-    _getLineInfo();
-  }
-
-  void _getLineInfo() {
-    if (widget.line['items'] == null) {
-      widget.line['items'] = [];
-      MomentsApi.photos(
-              year: widget.line['year'],
-              month: widget.line['month'],
-              day: widget.line['day'])
-          .then((res) {
-        if (res['success'] && mounted) {
-          setState(() {
-            widget.line['items'] = res['data']['list'];
-          });
-        }
-      });
-    }
-    if (widget.line['location'] == null) {
-      widget.line['location'] = {};
-      MomentsApi.location(
-              widget.line['year'], widget.line['month'], widget.line['day'])
-          .then((res) {
-        if (res['success'] && mounted) {
-          setState(() {
-            widget.line['location'] = res['data'];
-          });
-        }
-      });
-    }
-  }
-
-  @override
   Widget build(BuildContext context) {
-    List items = widget.line['items'] ?? [];
+    final rebuild = useSignal(0);
+
+    getLineInfo() {
+      if (line['items'] == null) {
+        line['items'] = [];
+        MomentsApi.photos(
+                year: line['year'], month: line['month'], day: line['day'])
+            .then((res) {
+          if (res['success'] && context.mounted) {
+            line['items'] = res['data']['list'];
+            rebuild.value++;
+          }
+        });
+      }
+      if (line['location'] == null) {
+        line['location'] = {};
+        MomentsApi.location(line['year'], line['month'], line['day'])
+            .then((res) {
+          if (res['success'] && context.mounted) {
+            line['location'] = res['data'];
+            rebuild.value++;
+          }
+        });
+      }
+    }
+
+    useEffect(() {
+      getLineInfo();
+      return null;
+    }, const []);
+
+    List items = line['items'] ?? [];
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Container(
           alignment: Alignment.centerLeft,
           height: 40,
-          padding:
-              const EdgeInsets.symmetric(horizontal: AppConstants.paddingLarge),
+          padding: const EdgeInsets.symmetric(
+              horizontal: AppConstants.paddingLarge),
           child: Row(
             children: [
               Text(
-                "${widget.line['year']}-${widget.line['month'].toString().padLeft(2, "0")}-${widget.line['day'].toString().padLeft(2, "0")}",
+                "${line['year']}-${line['month'].toString().padLeft(2, "0")}-${line['day'].toString().padLeft(2, "0")}",
               ),
-              if (widget.line['location'] != null &&
-                  ((widget.line['location']['first_level'] != null &&
-                      widget.line['location']['first_level'] != "")))
-                Text("   ${widget.line['location']['first_level']}"),
-              if (widget.line['location'] != null &&
-                  ((widget.line['location']['second_level'] != null &&
-                      widget.line['location']['second_level'].length > 0)))
-                Text("${widget.line['location']['second_level'].join(",")}"),
+              if (line['location'] != null &&
+                  ((line['location']['first_level'] != null &&
+                      line['location']['first_level'] != "")))
+                Text("   ${line['location']['first_level']}"),
+              if (line['location'] != null &&
+                  ((line['location']['second_level'] != null &&
+                      line['location']['second_level'].length > 0)))
+                Text("${line['location']['second_level'].join(",")}"),
             ],
           ),
         ),
@@ -84,18 +77,18 @@ class TimelineItemWidgetState extends State<TimelineItemWidget> {
           spacing: 2,
           runSpacing: 2,
           children: items.isEmpty
-              ? List.generate(widget.line['item_count'], (index) {
+              ? List.generate(line['item_count'], (index) {
                   return Container(
                     color: Colors.grey,
-                    width: widget.photoWidth,
-                    height: widget.photoWidth,
+                    width: photoWidth,
+                    height: photoWidth,
                   );
                 })
               : items.map((item) {
                   return PhotoItemWidget(
                     photo: item,
                     photos: items,
-                    photoWidth: widget.photoWidth,
+                    photoWidth: photoWidth,
                   );
                 }).toList(),
         ),

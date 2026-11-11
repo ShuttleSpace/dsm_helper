@@ -1,11 +1,13 @@
 import 'package:flutter/cupertino.dart';
 import 'package:garden/util/ui_util.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:garden/theme/app_colors.dart';
 import 'package:garden/util/http_util.dart';
+import 'package:signals_hooks/signals_hooks.dart';
 
 /// Dashboard 计划任务列表项
-class DashboardTaskItem extends StatefulWidget {
+class DashboardTaskItem extends HookWidget {
   final Map task;
 
   const DashboardTaskItem({
@@ -14,13 +16,8 @@ class DashboardTaskItem extends StatefulWidget {
   });
 
   @override
-  State<DashboardTaskItem> createState() => _DashboardTaskItemState();
-}
-
-class _DashboardTaskItemState extends State<DashboardTaskItem> {
-  @override
   Widget build(BuildContext context) {
-    Map task = widget.task;
+    final rebuild = useSignal(0);
     task['running'] = task['running'] ?? false;
     return Card(
       shape: RoundedRectangleBorder(
@@ -53,13 +50,11 @@ class _DashboardTaskItemState extends State<DashboardTaskItem> {
                 if (task['running']) {
                   return;
                 }
-                setState(() {
-                  task['running'] = true;
-                });
+                task['running'] = true;
+                rebuild.value++;
                 var res = await DsmApi.taskRun([task['id']]);
-                setState(() {
-                  task['running'] = false;
-                });
+                task['running'] = false;
+                rebuild.value++;
                 if (res['success']) {
                   UiUtil.toast("任务计划执行成功");
                 } else {

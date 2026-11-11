@@ -1,14 +1,9 @@
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/material.dart';
 
-class UniversalSearch extends StatefulWidget {
+class UniversalSearch extends StatelessWidget {
   const UniversalSearch({super.key});
 
-  @override
-  UniversalSearchState createState() => UniversalSearchState();
-}
-
-class UniversalSearchState extends State<UniversalSearch> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
