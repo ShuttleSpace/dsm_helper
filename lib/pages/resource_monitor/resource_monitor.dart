@@ -5,15 +5,10 @@ import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-class ResourceMonitor extends StatefulWidget {
+class ResourceMonitor extends StatelessWidget {
   const ResourceMonitor({super.key, this.tabIndex = 0});
   final int tabIndex;
-  @override
-  ResourceMonitorState createState() => ResourceMonitorState();
-}
 
-class ResourceMonitorState extends State<ResourceMonitor>
-    with SingleTickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     return Scaffold(

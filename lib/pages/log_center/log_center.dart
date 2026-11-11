@@ -6,85 +6,82 @@ import 'package:garden/widgets/log_center/log_level_filter.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:garden/constants/app_constants.dart';
+import 'package:signals_hooks/signals_hooks.dart';
 
-class LogCenter extends StatefulWidget {
+class LogCenter extends HookWidget {
   const LogCenter({super.key});
 
   @override
-  LogCenterState createState() => LogCenterState();
-}
+  Widget build(BuildContext context) {
+    final tickerProvider = useSingleTickerProvider();
+    final tabController = useMemoized(
+      () => TabController(length: 7, vsync: tickerProvider),
+      const [],
+    );
+    final lastLogs = useSignal<List>([]);
+    final logs = useSignal<List>([]);
+    final logsDisplay = useSignal<List>([]);
+    final logsDisplayLevel = useSignal(''); // null, info, warn, error
+    final histories = useSignal<List>([]);
+    final loadingRecent = useSignal(true);
+    final loadingLogs = useSignal(true);
+    final loadingHistory = useSignal(true);
+    final errorCount = useSignal(0);
+    final warnCount = useSignal(0);
+    final infoCount = useSignal(0);
+    final totalCount = useSignal(0);
 
-class LogCenterState extends State<LogCenter>
-    with SingleTickerProviderStateMixin {
-  late TabController _tabController;
-  List lastLogs = [];
-  List logs = [];
-  List logsDisplay = [];
-  String logsDisplayLevel = ''; // null, info, warn, error
-  List histories = [];
-  bool loadingRecent = true;
-  bool loadingLogs = true;
-  bool loadingHistory = true;
-  int errorCount = 0;
-  int warnCount = 0;
-  int infoCount = 0;
-  int totalCount = 0;
-  @override
-  void initState() {
-    _tabController = TabController(length: 7, vsync: this);
-    _tabController.addListener(() {
-      if (!_tabController.indexIsChanging) {
-        if (_tabController.index == 1 && loadingLogs) {
-          getLogs();
-        }
-        if (_tabController.index == 2 && loadingHistory) {
-          getHistories();
+    getData({int start = 0, int limit = 50}) async {
+      var res = await DsmApi.lastLog(start, limit);
+      if (res['success']) {
+        loadingRecent.value = false;
+        lastLogs.value = res['data']['logs'];
+      }
+    }
+
+    getLogs() async {
+      var res = await DsmApi.log(0, 1000);
+      if (res['success']) {
+        loadingLogs.value = false;
+        logs.value = res['data']['items'];
+        logsDisplay.value = List.of(logs.value);
+        errorCount.value = res['data']['errorCount'];
+        warnCount.value = res['data']['warnCount'];
+        infoCount.value = res['data']['infoCount'];
+        totalCount.value = res['data']['total'];
+      }
+    }
+
+    getHistories() async {
+      var res = await DsmApi.logHistory();
+      if (res['success']) {
+        loadingHistory.value = false;
+        histories.value = res['data']['items'];
+      }
+    }
+
+    useEffect(() {
+      void listener() {
+        if (!tabController.indexIsChanging) {
+          if (tabController.index == 1 && loadingLogs.value) {
+            getLogs();
+          }
+          if (tabController.index == 2 && loadingHistory.value) {
+            getHistories();
+          }
         }
       }
-    });
-    getData();
-    super.initState();
-  }
 
-  getData({int start = 0, int limit = 50}) async {
-    var res = await DsmApi.lastLog(start, limit);
-    if (res['success']) {
-      setState(() {
-        loadingRecent = false;
-        lastLogs = res['data']['logs'];
-      });
-    }
-  }
+      tabController.addListener(listener);
+      getData();
+      return () {
+        tabController.removeListener(listener);
+        tabController.dispose();
+      };
+    }, const []);
 
-  getLogs() async {
-    var res = await DsmApi.log(0, 1000);
-    if (res['success']) {
-      setState(() {
-        loadingLogs = false;
-        logs = res['data']['items'];
-        logsDisplay.clear();
-        logsDisplay.addAll(logs);
-        errorCount = res['data']['errorCount'];
-        warnCount = res['data']['warnCount'];
-        infoCount = res['data']['infoCount'];
-        totalCount = res['data']['total'];
-      });
-    }
-  }
-
-  getHistories() async {
-    var res = await DsmApi.logHistory();
-    if (res['success']) {
-      setState(() {
-        loadingHistory = false;
-        histories = res['data']['items'];
-      });
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         leading: AppBackButton(context),
@@ -102,7 +99,7 @@ class LogCenterState extends State<LogCenter>
               child: TabBar(
                 dividerHeight: 0,
                 isScrollable: true,
-                controller: _tabController,
+                controller: tabController,
                 indicatorSize: TabBarIndicatorSize.label,
                 labelColor: Theme.brightnessOf(context) == Brightness.dark
                     ? Colors.white
@@ -148,9 +145,9 @@ class LogCenterState extends State<LogCenter>
           ),
           Expanded(
             child: TabBarView(
-              controller: _tabController,
+              controller: tabController,
               children: [
-                loadingRecent
+                loadingRecent.value
                     ? const Center(
                         child: CupertinoActivityIndicator(
                           radius: 14,
@@ -164,16 +161,16 @@ class LogCenterState extends State<LogCenter>
                           Expanded(
                             child: RefreshIndicator(
                               onRefresh: () {
-                                return getData(start: lastLogs.length);
+                                return getData(start: lastLogs.value.length);
                               },
                               child: ListView.separated(
                                 padding: const EdgeInsets.symmetric(
                                     horizontal: AppConstants.paddingLarge),
                                 itemBuilder: (context, i) {
                                   return LogItem(
-                                      log: lastLogs[i], logType: 'recent');
+                                      log: lastLogs.value[i], logType: 'recent');
                                 },
-                                itemCount: lastLogs.length,
+                                itemCount: lastLogs.value.length,
                                 separatorBuilder: (context, i) {
                                   return const SizedBox(
                                     height: 20,
@@ -184,7 +181,7 @@ class LogCenterState extends State<LogCenter>
                           ),
                         ],
                       ),
-                loadingLogs
+                loadingLogs.value
                     ? const Center(
                         child: CupertinoActivityIndicator(
                           radius: 14,
@@ -207,63 +204,56 @@ class LogCenterState extends State<LogCenter>
                               child: Row(
                                 children: [
                                   LogLevelFilter(
-                                    count: infoCount,
+                                    count: infoCount.value,
                                     type: 'info',
                                     iconData: Icons.info,
                                     color: Colors.lightBlueAccent,
-                                    isActive: logsDisplayLevel == 'info',
+                                    isActive: logsDisplayLevel.value == 'info',
                                     onTap: () {
-                                      setState(() {
-                                        if (logsDisplayLevel == 'info') {
-                                          logsDisplayLevel = '';
-                                        } else {
-                                          logsDisplayLevel = 'info';
-                                        }
-                                        logsDisplay
-                                          ..clear()
-                                          ..addAll(logs.takeWhile(
-                                              (t) => t['level'] == 'info'));
-                                      });
+                                      if (logsDisplayLevel.value == 'info') {
+                                        logsDisplayLevel.value = '';
+                                      } else {
+                                        logsDisplayLevel.value = 'info';
+                                      }
+                                      logsDisplay.value = logs.value
+                                          .takeWhile((t) => t['level'] == 'info')
+                                          .toList();
                                     },
                                   ),
                                   LogLevelFilter(
-                                    count: warnCount,
+                                    count: warnCount.value,
                                     type: 'warning',
                                     iconData: Icons.warning,
                                     color: Colors.orange,
-                                    isActive: logsDisplayLevel == 'warning',
+                                    isActive:
+                                        logsDisplayLevel.value == 'warning',
                                     onTap: () {
-                                      setState(() {
-                                        if (logsDisplayLevel == 'warning') {
-                                          logsDisplayLevel = '';
-                                        } else {
-                                          logsDisplayLevel = 'warning';
-                                        }
-                                        logsDisplay
-                                          ..clear()
-                                          ..addAll(logs.takeWhile(
-                                              (t) => t['level'] == 'warning'));
-                                      });
+                                      if (logsDisplayLevel.value == 'warning') {
+                                        logsDisplayLevel.value = '';
+                                      } else {
+                                        logsDisplayLevel.value = 'warning';
+                                      }
+                                      logsDisplay.value = logs.value
+                                          .takeWhile(
+                                              (t) => t['level'] == 'warning')
+                                          .toList();
                                     },
                                   ),
                                   LogLevelFilter(
-                                    count: errorCount,
+                                    count: errorCount.value,
                                     type: 'error',
                                     iconData: Icons.cancel,
                                     color: Colors.red,
-                                    isActive: logsDisplayLevel == 'error',
+                                    isActive: logsDisplayLevel.value == 'error',
                                     onTap: () {
-                                      setState(() {
-                                        if (logsDisplayLevel == 'error') {
-                                          logsDisplayLevel = '';
-                                        } else {
-                                          logsDisplayLevel = 'error';
-                                        }
-                                        logsDisplay
-                                          ..clear()
-                                          ..addAll(logs.takeWhile(
-                                              (t) => t['level'] == 'error'));
-                                      });
+                                      if (logsDisplayLevel.value == 'error') {
+                                        logsDisplayLevel.value = '';
+                                      } else {
+                                        logsDisplayLevel.value = 'error';
+                                      }
+                                      logsDisplay.value = logs.value
+                                          .takeWhile((t) => t['level'] == 'error')
+                                          .toList();
                                     },
                                   ),
                                   Expanded(
@@ -275,12 +265,10 @@ class LogCenterState extends State<LogCenter>
                                         fontSize: 12,
                                       ),
                                       onChanged: (value) {
-                                        setState(() {
-                                          logsDisplay
-                                            ..clear()
-                                            ..addAll(logs.takeWhile((t) =>
-                                                t['descr'].contains(value)));
-                                        });
+                                        logsDisplay.value = logs.value
+                                            .takeWhile((t) =>
+                                                t['descr'].contains(value))
+                                            .toList();
                                       },
                                       decoration: const InputDecoration(
                                           contentPadding:
@@ -290,7 +278,7 @@ class LogCenterState extends State<LogCenter>
                                           hintText: '搜索'),
                                     ),
                                   )),
-                                  Text("共$totalCount项"),
+                                  Text("共${totalCount.value}项"),
                                 ],
                               ),
                             ),
@@ -304,9 +292,9 @@ class LogCenterState extends State<LogCenter>
                                   horizontal: AppConstants.paddingLarge),
                               itemBuilder: (context, i) {
                                 return LogItem(
-                                    log: logsDisplay[i], logType: 'log');
+                                    log: logsDisplay.value[i], logType: 'log');
                               },
-                              itemCount: logsDisplay.length,
+                              itemCount: logsDisplay.value.length,
                               separatorBuilder: (context, i) {
                                 return const SizedBox(
                                   height: 20,
@@ -316,7 +304,7 @@ class LogCenterState extends State<LogCenter>
                           ),
                         ],
                       ),
-                loadingHistory
+                loadingHistory.value
                     ? const Center(
                         child: CupertinoActivityIndicator(
                           radius: 14,
@@ -325,9 +313,10 @@ class LogCenterState extends State<LogCenter>
                     : ListView.separated(
                         padding: const EdgeInsets.all(20),
                         itemBuilder: (context, i) {
-                          return LogItem(log: histories[i], logType: 'history');
+                          return LogItem(
+                              log: histories.value[i], logType: 'history');
                         },
-                        itemCount: histories.length,
+                        itemCount: histories.value.length,
                         separatorBuilder: (context, i) {
                           return const SizedBox(
                             height: 20,
