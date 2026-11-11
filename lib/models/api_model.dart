@@ -1,6 +1,7 @@
 /// maxVersion : 6
 /// minVersion : 1
 /// path : "auth.cgi"
+library;
 
 class DsmApiInfo {
   DsmApiInfo(

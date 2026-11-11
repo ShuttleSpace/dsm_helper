@@ -10,7 +10,6 @@ import 'package:flutter/foundation.dart';
 import 'package:garden/extensions/datetime.dart';
 import 'package:garden/models/api_model.dart';
 import 'package:garden/stores/connection_store.dart';
-import 'package:garden/util/log.dart';
 
 part 'dsm_api.base.dart';
 part 'dsm_api.util.dart';

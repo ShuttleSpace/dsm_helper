@@ -179,7 +179,7 @@ void _loadFromStorage<T>(
       }
     }
   } catch (e) {
-    print('加载持久化数据失败: $e');
+    Log.error('加载持久化数据失败: $e');
   }
 }
 
@@ -204,6 +204,6 @@ void _saveToStorage<T>(
 
     await prefs.setString(key, valueToSave);
   } catch (e) {
-    print('保存持久化数据失败: $e');
+    Log.error('保存持久化数据失败: $e');
   }
 }

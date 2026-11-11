@@ -171,16 +171,16 @@ Future<dynamic> _doHttpRequest(
     if (response.data is String) {
       try {
         return jsonDecode(response.data);
-      } on Exception catch (e) {
-        //Log.error('_httpRequest: decode response as json failed: $e');
+      } on Exception {
+        //Log.error('_httpRequest: decode response as json failed');
       }
     }
     if (response.data is Map) {
       return response.data as Map;
     }
     return response.data;
-  } on DioException catch (e) {
-    //Log.error("_httpRequest DioException: $e");
+  } on DioException {
+    //Log.error("_httpRequest DioException");
     rethrow;
   } catch (e) {
     //Log.error("_httpRequest Exception: $e");
@@ -288,11 +288,11 @@ Future<dynamic> _httpDownload(String endpoint,
           },
         ));
     return response.data;
-  } on DioException catch (e) {
-//Log.error("download DioException: $e");
+  } on DioException {
+//Log.error("download DioException");
     rethrow;
-  } catch (e) {
-//Log.error("download: $e");
+  } catch (_) {
+//Log.error("download error");
     rethrow;
   }
 }
