@@ -9,56 +9,48 @@ import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:garden/constants/app_constants.dart';
-import 'package:signals_flutter/signals_flutter.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:signals_hooks/signals_hooks.dart';
 
-class Users extends StatefulWidget {
+class Users extends HookWidget {
   const Users({super.key});
 
   @override
-  UsersState createState() => UsersState();
-}
+  Widget build(BuildContext context) {
+    final tickerProvider = useSingleTickerProvider();
+    final tabController = useMemoized(
+      () => TabController(length: 2, vsync: tickerProvider),
+      const [],
+    );
+    final users = useSignal<List>([]);
+    final groups = useSignal<List>([]);
+    final loading = useSignal(true);
 
-class UsersState extends State<Users> with SingleTickerProviderStateMixin {
-  late TabController _tabController;
-  List users = [];
-  List groups = [];
-  bool loading = true;
-  @override
-  void initState() {
-    _tabController = TabController(length: 2, vsync: this);
-    getData();
-    super.initState();
-  }
-
-  getData() async {
-    var res = await dsmCoreUserList();
-    if (res['success']) {
-      setState(() {
-        users = res['data']['users'];
-      });
-    } else {
-      UiUtil.toast("加载失败");
-      if (context.mounted) {
-        // ignore: use_build_context_synchronously
-        Navigator.of(context).pop();
+    getData() async {
+      var res = await dsmCoreUserList();
+      if (res['success']) {
+        users.value = res['data']['users'];
+      } else {
+        UiUtil.toast("加载失败");
+        if (context.mounted) {
+          // ignore: use_build_context_synchronously
+          Navigator.of(context).pop();
+        }
+      }
+      var group = await dsmCoreGroupList();
+      if (group['success']) {
+        loading.value = false;
+        groups.value = group['data']['groups'];
+      } else {
+        UiUtil.toast("加载失败");
+        if (context.mounted) {
+          // ignore: use_build_context_synchronously
+          Navigator.of(context).pop();
+        }
       }
     }
-    var group = await dsmCoreGroupList();
-    if (group['success']) {
-      setState(() {
-        loading = false;
-        groups = group['data']['groups'];
-      });
-    } else {
-      UiUtil.toast("加载失败");
-      if (context.mounted) {
-        // ignore: use_build_context_synchronously
-        Navigator.of(context).pop();
-      }
-    }
-  }
 
-  Widget _buildGroupItem(group) {
+    Widget buildGroupItem(group) {
     return Card(
       shape: RoundedRectangleBorder(
           side: const BorderSide(), borderRadius: BorderRadius.circular(18)),
@@ -93,7 +85,7 @@ class UsersState extends State<Users> with SingleTickerProviderStateMixin {
     );
   }
 
-  Widget _buildUserItem(user) {
+  Widget buildUserItem(user) {
     return GestureDetector(
       onTap: () {
         Navigator.of(context)
@@ -103,7 +95,8 @@ class UsersState extends State<Users> with SingleTickerProviderStateMixin {
                 },
                 settings: const RouteSettings(name: "user_detail")))
             .then((value) {
-          setState(() {});
+          // Refresh the list after the detail page was closed.
+          users.value = List.of(users.value);
         });
       },
       child: Card(
@@ -158,15 +151,20 @@ class UsersState extends State<Users> with SingleTickerProviderStateMixin {
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
+    useEffect(() {
+      getData();
+      return () {
+        tabController.dispose();
+      };
+    }, const []);
+
     return Scaffold(
       appBar: AppBar(
         leading: AppBackButton(context),
         title: Text(
             connectionStore.dsmVersion.watch(context) < 7 ? "用户账户" : "用户与群组"),
       ),
-      body: loading
+      body: loading.value
           ? Container(
               width: MediaQuery.sizeOf(context).width,
               height: MediaQuery.sizeOf(context).height,
@@ -191,7 +189,7 @@ class UsersState extends State<Users> with SingleTickerProviderStateMixin {
                     child: TabBar(
                       dividerHeight: 0,
                       isScrollable: false,
-                      controller: _tabController,
+                      controller: tabController,
                       indicatorSize: TabBarIndicatorSize.label,
                       labelColor: Theme.brightnessOf(context) == Brightness.dark
                           ? Colors.white
@@ -217,26 +215,26 @@ class UsersState extends State<Users> with SingleTickerProviderStateMixin {
                       ? ListView.builder(
                           padding: const EdgeInsets.all(20),
                           itemBuilder: (context, i) {
-                            return _buildUserItem(users[i]);
+                            return buildUserItem(users.value[i]);
                           },
-                          itemCount: users.length,
+                          itemCount: users.value.length,
                         )
                       : TabBarView(
-                          controller: _tabController,
+                          controller: tabController,
                           children: [
                             ListView.builder(
                               padding: const EdgeInsets.all(20),
                               itemBuilder: (context, i) {
-                                return _buildUserItem(users[i]);
+                                return buildUserItem(users.value[i]);
                               },
-                              itemCount: users.length,
+                              itemCount: users.value.length,
                             ),
                             ListView.builder(
                               padding: const EdgeInsets.all(20),
                               itemBuilder: (context, i) {
-                                return _buildGroupItem(groups[i]);
+                                return buildGroupItem(groups.value[i]);
                               },
-                              itemCount: groups.length,
+                              itemCount: groups.value.length,
                             )
                           ],
                         ),

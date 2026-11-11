@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'package:garden/util/log.dart';
 import 'package:garden/util/ui_util.dart';
 
@@ -8,42 +7,23 @@ import 'package:garden/widgets/file_icon.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:signals_hooks/signals_hooks.dart';
 
-class SharedFolders extends StatefulWidget {
+class SharedFolders extends HookWidget {
   const SharedFolders({super.key});
 
   @override
-  SharedFoldersState createState() => SharedFoldersState();
-}
+  Widget build(BuildContext context) {
+    final loading = useSignal(true);
+    final success = useSignal(true);
+    final msg = useSignal("");
+    final folders = useSignal<List>([]);
+    final volumes = useSignal<List>([]);
 
-class SharedFoldersState extends State<SharedFolders> {
-  bool loading = true;
-  bool success = true;
-  String msg = "";
-  List folders = [];
-  List volumes = [];
-  late Timer timer;
-  @override
-  void initState() {
-    getVolumes();
-    super.initState();
-  }
-
-  getVolumes() async {
-    var res = await DsmApi.volumes();
-    if (res['success']) {
-      setState(() {
-        volumes = res['data']['volumes'];
-      });
-      getData();
-    }
-  }
-
-  getData() async {
-    setState(() {
-      loading = true;
-    });
-    var res = await DsmApi.shareCore(additional: [
+    getData() async {
+      loading.value = true;
+      var res = await DsmApi.shareCore(additional: [
       "hidden",
       "encryption",
       "is_aclmode",
@@ -61,31 +41,40 @@ class SharedFoldersState extends State<SharedFolders> {
       "enable_share_compress",
       "enable_share_cow",
     ]);
-    setState(() {
-      loading = false;
-      success = res['success'];
-    });
-    if (res['success']) {
-      folders = res['data']['shares'];
-      for (var folder in folders) {
-        for (var volume in volumes) {
-          if (volume['volume_path'] == folder['vol_path']) {
-            folder['volume_name'] = volume['display_name'];
-            folder['volume_desc'] = volume['description'];
+      loading.value = false;
+      success.value = res['success'];
+      if (res['success']) {
+        folders.value = res['data']['shares'];
+        for (var folder in folders.value) {
+          for (var volume in volumes.value) {
+            if (volume['volume_path'] == folder['vol_path']) {
+              folder['volume_name'] = volume['display_name'];
+              folder['volume_desc'] = volume['description'];
+            }
           }
         }
-      }
-      setState(() {});
-    } else {
-      if (loading) {
-        setState(() {
-          msg = res['msg'] ?? "加载失败，code:${res['error']['code']}";
-        });
+        folders.value = List.of(folders.value);
+      } else {
+        if (loading.value) {
+          msg.value = res['msg'] ?? "加载失败，code:${res['error']['code']}";
+        }
       }
     }
-  }
 
-  deleteFolder(String folder) {
+    getVolumes() async {
+      var res = await DsmApi.volumes();
+      if (res['success']) {
+        volumes.value = res['data']['volumes'];
+        getData();
+      }
+    }
+
+    useEffect(() {
+      getVolumes();
+      return null;
+    }, const []);
+
+    deleteFolder(String folder) {
     showCupertinoModalPopup(
       context: context,
       builder: (context) {
@@ -167,7 +156,7 @@ class SharedFoldersState extends State<SharedFolders> {
     );
   }
 
-  Widget _buildFolderItem(folder) {
+  Widget buildFolderItem(folder) {
     return Padding(
       padding: const EdgeInsets.only(top: 20.0, left: 20, right: 20),
       child: Opacity(
@@ -350,7 +339,7 @@ class SharedFoldersState extends State<SharedFolders> {
                                               .push(CupertinoPageRoute(
                                                   builder: (context) {
                                                     return AddSharedFolders(
-                                                        volumes,
+                                                        volumes.value,
                                                         folder: folder);
                                                   },
                                                   settings: const RouteSettings(
@@ -429,15 +418,13 @@ class SharedFoldersState extends State<SharedFolders> {
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         leading: AppBackButton(context),
         title: const Text(
           "共享文件夹",
         ),
-        actions: volumes.isNotEmpty
+        actions: volumes.value.isNotEmpty
             ? [
                 Padding(
                   padding: const EdgeInsets.only(right: 10, top: 8, bottom: 8),
@@ -446,7 +433,7 @@ class SharedFoldersState extends State<SharedFolders> {
                       Navigator.of(context)
                           .push(CupertinoPageRoute(
                               builder: (context) {
-                                return AddSharedFolders(volumes);
+                                return AddSharedFolders(volumes.value);
                               },
                               settings: const RouteSettings(
                                   name: "add_shared_folders")))
@@ -462,18 +449,18 @@ class SharedFoldersState extends State<SharedFolders> {
               ]
             : null,
       ),
-      body: success
+      body: success.value
           ? Stack(
               children: [
                 ListView.builder(
                   padding: const EdgeInsets.only(bottom: 20),
                   itemBuilder: (context, i) {
-                    return _buildFolderItem(folders[i]);
+                    return buildFolderItem(folders.value[i]);
                   },
-                  itemCount: folders.length,
+                  itemCount: folders.value.length,
                 ),
                 // if (selectedFiles.length > 0)
-                if (loading)
+                if (loading.value)
                   Container(
                     width: MediaQuery.sizeOf(context).width,
                     height: MediaQuery.sizeOf(context).height,
@@ -492,7 +479,7 @@ class SharedFoldersState extends State<SharedFolders> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text(msg),
+                  Text(msg.value),
                   const SizedBox(
                     height: 20,
                   ),

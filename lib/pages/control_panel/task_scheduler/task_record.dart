@@ -5,40 +5,33 @@ import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:garden/constants/app_constants.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:signals_hooks/signals_hooks.dart';
 
-class TaskRecord extends StatefulWidget {
+class TaskRecord extends HookWidget {
   final int id;
   const TaskRecord(this.id, {super.key});
-  @override
-  TaskRecordState createState() => TaskRecordState();
-}
 
-class TaskRecordState extends State<TaskRecord> {
-  List records = [];
-  bool loading = true;
   @override
-  void initState() {
-    getData();
-    super.initState();
-  }
+  Widget build(BuildContext context) {
+    final records = useSignal<List>([]);
+    final loading = useSignal(true);
 
-  getData() async {
-    var res = await DsmApi.taskRecord(widget.id);
-    if (res['success']) {
-      setState(() {
-        loading = false;
-        records = res['data'];
-      });
-    } else {
-      UiUtil.toast("加载失败");
-      if (context.mounted) {
-        // ignore: use_build_context_synchronously
-        Navigator.of(context).pop();
+    getData() async {
+      var res = await DsmApi.taskRecord(id);
+      if (res['success']) {
+        loading.value = false;
+        records.value = res['data'];
+      } else {
+        UiUtil.toast("加载失败");
+        if (context.mounted) {
+          // ignore: use_build_context_synchronously
+          Navigator.of(context).pop();
+        }
       }
     }
-  }
 
-  Widget _buildRecordItem(record) {
+    Widget buildRecordItem(record) {
     return Card(
       shape: RoundedRectangleBorder(
           side: const BorderSide(), borderRadius: BorderRadius.circular(18)),
@@ -103,14 +96,17 @@ class TaskRecordState extends State<TaskRecord> {
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
+    useEffect(() {
+      getData();
+      return null;
+    }, const []);
+
     return Scaffold(
       appBar: AppBar(
         leading: AppBackButton(context),
         title: const Text("查看结果"),
       ),
-      body: loading
+      body: loading.value
           ? Container(
               width: MediaQuery.sizeOf(context).width,
               height: MediaQuery.sizeOf(context).height,
@@ -126,9 +122,9 @@ class TaskRecordState extends State<TaskRecord> {
           : ListView.builder(
               padding: const EdgeInsets.all(20),
               itemBuilder: (context, i) {
-                return _buildRecordItem(records[i]);
+                return buildRecordItem(records.value[i]);
               },
-              itemCount: records.length,
+              itemCount: records.value.length,
             ),
     );
   }

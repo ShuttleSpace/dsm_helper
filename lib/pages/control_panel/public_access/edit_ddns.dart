@@ -12,46 +12,51 @@ import 'package:flutter/material.dart';
 import 'package:garden/constants/app_constants.dart';
 import 'package:garden/theme/app_colors.dart';
 import 'package:flutter_vibrate/flutter_vibrate.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:signals_hooks/signals_hooks.dart';
 
-class EditDdns extends StatefulWidget {
+class EditDdns extends HookWidget {
   final Map? ddns;
   final List extIp;
   final List providers;
   const EditDdns(this.providers, {super.key, this.extIp = const [], this.ddns});
 
   @override
-  EditDdnsState createState() => EditDdnsState();
-}
+  Widget build(BuildContext context) {
+    final hostnameController = useTextEditingController();
+    final usernameController = useTextEditingController();
+    final ddnsInfo = useSignal<Map>({});
+    final Map statusStr = {
+      "service_ddns_normal": "正常",
+      "service_ddns_error_unknown": "联机失败",
+      "loading": "加载中",
+      "disabled": "已停用",
+    };
 
-class EditDdnsState extends State<EditDdns> {
-  final TextEditingController _hostnameController = TextEditingController();
-  final TextEditingController _usernameController = TextEditingController();
-  Map ddns = {};
-  Map statusStr = {
-    "service_ddns_normal": "正常",
-    "service_ddns_error_unknown": "联机失败",
-    "loading": "加载中",
-    "disabled": "已停用",
-  };
-  @override
-  void initState() {
-    setState(() {
-      if (widget.ddns != null) {
-        ddns.addAll(widget.ddns!);
+    // The ddns entry is edited in place; every change writes a new map so the
+    // signal notifies and the page rebuilds (the old code used setState).
+    void updateDdns(Map changes) {
+      ddnsInfo.value = {...ddnsInfo.value, ...changes};
+    }
+
+    useEffect(() {
+      if (ddns != null) {
+        ddnsInfo.value = {...ddns!};
       }
-    });
-    _hostnameController.value = TextEditingValue(text: ddns['hostname']);
-    _usernameController.value = TextEditingValue(text: ddns['username']);
-    if (ddns['ip'] == "0.0.0.0") {
-      ddns["ip"] = "-";
-    }
-    if (ddns['ipv6'] == "0:0:0:0:0:0:0:0") {
-      ddns['ipv6'] = "-";
-    }
-    super.initState();
-  }
+      hostnameController.value =
+          TextEditingValue(text: ddnsInfo.value['hostname']);
+      usernameController.value =
+          TextEditingValue(text: ddnsInfo.value['username']);
+      if (ddnsInfo.value['ip'] == "0.0.0.0") {
+        ddnsInfo.value["ip"] = "-";
+      }
+      if (ddnsInfo.value['ipv6'] == "0:0:0:0:0:0:0:0") {
+        ddnsInfo.value['ipv6'] = "-";
+      }
+      return null;
+    }, const []);
 
-  deleteDdns() async {
+    deleteDdns() async {
     UiUtil.vibrate(FeedbackType.warning);
     showCupertinoModalPopup(
       context: context,
@@ -90,13 +95,12 @@ class EditDdnsState extends State<EditDdns> {
                         Expanded(
                           child: OutlinedButton(
                             onPressed: () async {
-                              if (widget.ddns == null) {
+                              if (ddns == null) {
                                 UiUtil.toast('ddns 为空!');
                                 return;
                               }
                               Navigator.of(context).pop();
-                              var res =
-                                  await DsmApi.ddnsDelete(widget.ddns!['id']);
+                              var res = await DsmApi.ddnsDelete(ddns!['id']);
                               Log.log("delete ddns: $res");
                               if (res['success']) {
                                 UiUtil.toast("DDNS删除成功");
@@ -144,17 +148,21 @@ class EditDdnsState extends State<EditDdns> {
   }
 
   bool checkForm() {
-    if (ddns['provider'] == null || ddns['provider'] == "") {
+    if (ddnsInfo.value['provider'] == null ||
+        ddnsInfo.value['provider'] == "") {
       UiUtil.toast("请选择服务供应商");
       return false;
-    } else if (ddns['hostname'] == null || ddns['hostname'] == "") {
+    } else if (ddnsInfo.value['hostname'] == null ||
+        ddnsInfo.value['hostname'] == "") {
       UiUtil.toast("请输入主机名称");
       return false;
-    } else if (ddns['username'] == null || ddns['username'] == "") {
+    } else if (ddnsInfo.value['username'] == null ||
+        ddnsInfo.value['username'] == "") {
       UiUtil.toast("请输入用户名/电子邮件");
       return false;
-    } else if (widget.ddns == null &&
-        (ddns['passwd'] == null || ddns['passwd'] == "")) {
+    } else if (ddns == null &&
+        (ddnsInfo.value['passwd'] == null ||
+            ddnsInfo.value['passwd'] == "")) {
       UiUtil.toast("请输入密码/密钥");
       return false;
     }
@@ -162,8 +170,6 @@ class EditDdnsState extends State<EditDdns> {
     return true;
   }
 
-  @override
-  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         leading: AppBackButton(context),
@@ -190,9 +196,7 @@ class EditDdnsState extends State<EditDdns> {
                 ...[
                   GestureDetector(
                     onTap: () async {
-                      setState(() {
-                        ddns['enable'] = !ddns['enable'];
-                      });
+                      updateDdns({'enable': !ddnsInfo.value['enable']});
                     },
                     child: Card(
                       shape: RoundedRectangleBorder(
@@ -205,7 +209,7 @@ class EditDdnsState extends State<EditDdns> {
                           children: [
                             const Text("启用支持DDNS"),
                             const Spacer(),
-                            if (ddns['enable'])
+                            if (ddnsInfo.value['enable'])
                               const Icon(
                                 CupertinoIcons.checkmark_alt,
                                 color: AppColors.primaryAction,
@@ -236,7 +240,7 @@ class EditDdnsState extends State<EditDdns> {
                           const Text("服务供应商"),
                           const Spacer(),
                           Text(
-                              "${ddns['provider'] != null && ddns['provider'] != "" ? widget.providers.where((element) => element['provider'] == ddns['provider']).first['provider'] : "请选择"}"),
+                              "${ddnsInfo.value['provider'] != null && ddnsInfo.value['provider'] != "" ? providers.where((element) => element['provider'] == ddnsInfo.value['provider']).first['provider'] : "请选择"}"),
                         ],
                       ),
                     ),
@@ -252,8 +256,8 @@ class EditDdnsState extends State<EditDdns> {
                   child: Padding(
                     padding: const EdgeInsets.all(AppConstants.paddingSmall),
                     child: TextField(
-                      controller: _hostnameController,
-                      onChanged: (v) => ddns['hostname'] = v,
+                      controller: hostnameController,
+                      onChanged: (v) => updateDdns({'hostname': v}),
                       decoration: const InputDecoration(
                         border: InputBorder.none,
                         labelText: '主机名称',
@@ -271,8 +275,8 @@ class EditDdnsState extends State<EditDdns> {
                   child: Padding(
                     padding: const EdgeInsets.all(AppConstants.paddingSmall),
                     child: TextField(
-                      controller: _usernameController,
-                      onChanged: (v) => ddns['username'] = v,
+                      controller: usernameController,
+                      onChanged: (v) => updateDdns({'username': v}),
                       decoration: const InputDecoration(
                         border: InputBorder.none,
                         labelText: '用户名/电子邮件',
@@ -290,7 +294,7 @@ class EditDdnsState extends State<EditDdns> {
                   child: Padding(
                     padding: const EdgeInsets.all(AppConstants.paddingSmall),
                     child: TextField(
-                      onChanged: (v) => ddns['passwd'] = v,
+                      onChanged: (v) => updateDdns({'passwd': v}),
                       decoration: const InputDecoration(
                         border: InputBorder.none,
                         labelText: '密码/密钥',
@@ -311,7 +315,7 @@ class EditDdnsState extends State<EditDdns> {
                       children: [
                         const Text("外部地址(ipv4):"),
                         const Spacer(),
-                        Text("${ddns['ip']}"),
+                        Text("${ddnsInfo.value['ip']}"),
                       ],
                     ),
                   ),
@@ -329,7 +333,7 @@ class EditDdnsState extends State<EditDdns> {
                       children: [
                         const Text("外部地址(ipv6):"),
                         const Spacer(),
-                        Text("${ddns['ipv6']}"),
+                        Text("${ddnsInfo.value['ipv6']}"),
                       ],
                     ),
                   ),
@@ -354,10 +358,12 @@ class EditDdnsState extends State<EditDdns> {
                               const SizedBox(
                                 width: 10,
                               ),
-                              if (ddns['status'] != null)
+                              if (ddnsInfo.value['status'] != null)
                                 Label(
-                                  statusStr[ddns['status']] ?? ddns['status'],
-                                  ddns['status'] == "service_ddns_normal"
+                                  statusStr[ddnsInfo.value['status']] ??
+                                      ddnsInfo.value['status'],
+                                  ddnsInfo.value['status'] ==
+                                          "service_ddns_normal"
                                       ? Colors.green
                                       : Colors.red,
                                   fill: true,
@@ -378,13 +384,11 @@ class EditDdnsState extends State<EditDdns> {
                               message: const Text("测试中，请稍后"),
                               backButtonClose: true,
                               alignment: Alignment.center);
-                          var res = await DsmApi.ddnsTest(ddns);
+                          var res = await DsmApi.ddnsTest(ddnsInfo.value);
                           hide();
                           Log.info("ddnsTest:$res");
                           if (res['success']) {
-                            setState(() {
-                              ddns['status'] = res['data']['status'];
-                            });
+                            updateDdns({'status': res['data']['status']});
                           } else {
                             UiUtil.toast(
                                 "测试失败，${res['error']['errors']},code:${res['error']['code']}");
@@ -404,7 +408,7 @@ class EditDdnsState extends State<EditDdns> {
               child: OutlinedButton(
                 onPressed: () async {
                   if (checkForm()) {
-                    var res = await DsmApi.ddnsSave(ddns);
+                    var res = await DsmApi.ddnsSave(ddnsInfo.value);
                     if (res['success']) {
                       UiUtil.toast("保存成功");
                       if (context.mounted) {

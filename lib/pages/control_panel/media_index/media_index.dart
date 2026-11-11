@@ -5,66 +5,52 @@ import 'package:flutter/material.dart';
 import 'package:garden/constants/app_constants.dart';
 import 'package:garden/theme/app_colors.dart';
 import 'dart:async';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:signals_hooks/signals_hooks.dart';
 
-class MediaIndex extends StatefulWidget {
+class MediaIndex extends HookWidget {
   const MediaIndex({super.key});
 
   @override
-  MediaIndexState createState() => MediaIndexState();
-}
+  Widget build(BuildContext context) {
+    final mediaIndexing = useSignal(false);
+    final thumbnailQuality = useSignal("");
+    final mobileEnabled = useSignal(false);
+    final packages = useSignal<List>([]);
 
-class MediaIndexState extends State<MediaIndex> {
-  bool mediaIndexing = false;
-  String thumbnailQuality = "";
-  bool mobileEnabled = false;
-  List packages = [];
-  late Timer timer;
-  @override
-  void initState() {
-    timer = Timer.periodic(const Duration(seconds: 5), (timer) {
-      getData();
-    });
-    getData();
-    super.initState();
-  }
-
-  getData() async {
-    DsmApi.mediaIndexStatus().then((res) {
-      if (res['success']) {
-        List result = res['data']['result'];
-        for (var item in result) {
-          if (item['success'] == true) {
-            switch (item['api']) {
-              case "SYNO.Core.MediaIndexing":
-                setState(() {
-                  mediaIndexing = item['data']['reindexing'];
-                });
-                break;
-              case "SYNO.Core.MediaIndexing.ThumbnailQuality":
-                setState(() {
-                  thumbnailQuality = item['data']['thumbnail_quality'];
-                  packages = item['data']['packages'];
-                });
-                break;
-              case "SYNO.Core.MediaIndexing.MobileEnabled":
-                setState(() {
-                  mobileEnabled = item['data']['mobile_profile_enabled'];
-                });
+    getData() async {
+      DsmApi.mediaIndexStatus().then((res) {
+        if (res['success']) {
+          List result = res['data']['result'];
+          for (var item in result) {
+            if (item['success'] == true) {
+              switch (item['api']) {
+                case "SYNO.Core.MediaIndexing":
+                  mediaIndexing.value = item['data']['reindexing'];
+                  break;
+                case "SYNO.Core.MediaIndexing.ThumbnailQuality":
+                  thumbnailQuality.value = item['data']['thumbnail_quality'];
+                  packages.value = item['data']['packages'];
+                  break;
+                case "SYNO.Core.MediaIndexing.MobileEnabled":
+                  mobileEnabled.value = item['data']['mobile_profile_enabled'];
+              }
             }
           }
         }
-      }
-    });
-  }
+      });
+    }
 
-  @override
-  void dispose() {
-    timer.cancel();
-    super.dispose();
-  }
+    useEffect(() {
+      final timer = Timer.periodic(const Duration(seconds: 5), (timer) {
+        getData();
+      });
+      getData();
+      return () {
+        timer.cancel();
+      };
+    }, const []);
 
-  @override
-  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         leading: AppBackButton(context),
@@ -91,9 +77,11 @@ class MediaIndexState extends State<MediaIndex> {
                       ),
                       const Spacer(),
                       Text(
-                        mediaIndexing ? "索引中" : "已完成",
+                        mediaIndexing.value ? "索引中" : "已完成",
                         style: TextStyle(
-                            color: mediaIndexing ? Colors.blue : Colors.green),
+                            color: mediaIndexing.value
+                                ? Colors.blue
+                                : Colors.green),
                       ),
                     ],
                   ),
@@ -116,7 +104,7 @@ class MediaIndexState extends State<MediaIndex> {
                       Row(
                         children: [
                           Text(
-                              "应用程序：${packages.map((e) => e['name']).join("，")}"),
+                              "应用程序：${packages.value.map((e) => e['name']).join("，")}"),
                         ],
                       ),
                       const SizedBox(
@@ -124,7 +112,7 @@ class MediaIndexState extends State<MediaIndex> {
                       ),
                       OutlinedButton(
                         onPressed: () async {
-                          if (mediaIndexing) {
+                          if (mediaIndexing.value) {
                             return;
                           }
                           var res = await DsmApi.mediaReindex();
@@ -135,8 +123,9 @@ class MediaIndexState extends State<MediaIndex> {
                         child: Text(
                           "重建索引",
                           style: TextStyle(
-                              color:
-                                  mediaIndexing == true ? Colors.grey : null),
+                              color: mediaIndexing.value == true
+                                  ? Colors.grey
+                                  : null),
                         ),
                       ),
                     ],
@@ -180,11 +169,9 @@ class MediaIndexState extends State<MediaIndex> {
                           Expanded(
                             child: GestureDetector(
                               onTap: () async {
-                                setState(() {
-                                  thumbnailQuality = "normal";
-                                });
+                                thumbnailQuality.value = "normal";
                                 await DsmApi.mediaIndexSet(
-                                    thumbnailQuality, mobileEnabled);
+                                    thumbnailQuality.value, mobileEnabled.value);
                                 getData();
                               },
                               child: Card(
@@ -198,7 +185,7 @@ class MediaIndexState extends State<MediaIndex> {
                                     children: [
                                       const Text("一般品质"),
                                       const Spacer(),
-                                      if (thumbnailQuality == "normal")
+                                      if (thumbnailQuality.value == "normal")
                                         const Icon(
                                           CupertinoIcons.checkmark_alt,
                                           color: AppColors.primaryAction,
@@ -215,11 +202,9 @@ class MediaIndexState extends State<MediaIndex> {
                           Expanded(
                             child: GestureDetector(
                               onTap: () async {
-                                setState(() {
-                                  thumbnailQuality = "high";
-                                });
+                                thumbnailQuality.value = "high";
                                 await DsmApi.mediaIndexSet(
-                                    thumbnailQuality, mobileEnabled);
+                                    thumbnailQuality.value, mobileEnabled.value);
                                 getData();
                               },
                               child: Card(
@@ -233,7 +218,7 @@ class MediaIndexState extends State<MediaIndex> {
                                     children: [
                                       const Text("高品质"),
                                       const Spacer(),
-                                      if (thumbnailQuality == "high")
+                                      if (thumbnailQuality.value == "high")
                                         const Icon(
                                           CupertinoIcons.checkmark_alt,
                                           color: AppColors.primaryAction,
@@ -283,11 +268,9 @@ class MediaIndexState extends State<MediaIndex> {
                       ),
                       GestureDetector(
                         onTap: () async {
-                          setState(() {
-                            mobileEnabled = !mobileEnabled;
-                          });
+                          mobileEnabled.value = !mobileEnabled.value;
                           await DsmApi.mediaIndexSet(
-                              thumbnailQuality, mobileEnabled);
+                              thumbnailQuality.value, mobileEnabled.value);
                           getData();
                         },
                         child: Card(
@@ -301,7 +284,7 @@ class MediaIndexState extends State<MediaIndex> {
                               children: [
                                 const Text("启用移动设备视频转换"),
                                 const Spacer(),
-                                if (mobileEnabled)
+                                if (mobileEnabled.value)
                                   const Icon(
                                     CupertinoIcons.checkmark_alt,
                                     color: AppColors.primaryAction,

@@ -7,63 +7,51 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:garden/constants/app_constants.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:signals_hooks/signals_hooks.dart';
 
-class UpdateReset extends StatefulWidget {
+class UpdateReset extends HookWidget {
   const UpdateReset({super.key});
 
   @override
-  UpdateResetState createState() => UpdateResetState();
-}
-
-class UpdateResetState extends State<UpdateReset>
-    with SingleTickerProviderStateMixin {
-  final TapGestureRecognizer _updateNoteRecognizer = TapGestureRecognizer();
-  late TabController _tabController;
-  String firmwareDate = "";
-  String firmwareVer = "";
-  String model = "";
-  Map? update;
-  bool checking = true;
-  @override
-  void initState() {
-    _tabController = TabController(length: 3, vsync: this);
-    getData();
-    checkUpdate();
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    _updateNoteRecognizer.dispose();
-    super.dispose();
-  }
-
-  getData() async {
-    var res = await DsmApi.firmwareVersion();
-    if (res['success']) {
-      setState(() {
-        firmwareDate = res['data']['firmware_date'];
-        firmwareVer = res['data']['firmware_ver'];
-        model = res['data']['model'];
-      });
-    }
-  }
-
-  checkUpdate() async {
-    var res = await DsmApi.firmwareUpgrade();
-    setState(() {
-      checking = false;
-    });
-    Log.info("check update: $res");
-    if (res['success']) {
-      setState(() {
-        update = res['data']['update'];
-      });
-    } else {}
-  }
-
-  @override
   Widget build(BuildContext context) {
+    final tickerProvider = useSingleTickerProvider();
+    final tabController = useMemoized(
+      () => TabController(length: 3, vsync: tickerProvider),
+      const [],
+    );
+    final updateNoteRecognizer = useMemoized(() => TapGestureRecognizer(), const []);
+    final firmwareVer = useSignal("");
+    final model = useSignal("");
+    final update = useSignal<Map?>(null);
+    final checking = useSignal(true);
+
+    getData() async {
+      var res = await DsmApi.firmwareVersion();
+      if (res['success']) {
+        firmwareVer.value = res['data']['firmware_ver'];
+        model.value = res['data']['model'];
+      }
+    }
+
+    checkUpdate() async {
+      var res = await DsmApi.firmwareUpgrade();
+      checking.value = false;
+      Log.info("check update: $res");
+      if (res['success']) {
+        update.value = res['data']['update'];
+      } else {}
+    }
+
+    useEffect(() {
+      getData();
+      checkUpdate();
+      return () {
+        tabController.dispose();
+        updateNoteRecognizer.dispose();
+      };
+    }, const []);
+
     return Scaffold(
       appBar: AppBar(
         leading: AppBackButton(context),
@@ -79,7 +67,7 @@ class UpdateResetState extends State<UpdateReset>
             child: TabBar(
               dividerHeight: 0,
               isScrollable: true,
-              controller: _tabController,
+              controller: tabController,
               indicatorSize: TabBarIndicatorSize.label,
               labelColor: Theme.brightnessOf(context) == Brightness.dark
                   ? Colors.white
@@ -104,7 +92,7 @@ class UpdateResetState extends State<UpdateReset>
           ),
           Expanded(
             child: TabBarView(
-              controller: _tabController,
+              controller: tabController,
               children: [
                 ListView(
                   padding: const EdgeInsets.all(20),
@@ -123,7 +111,7 @@ class UpdateResetState extends State<UpdateReset>
                       child: Padding(
                         padding:
                             const EdgeInsets.all(AppConstants.paddingSmall),
-                        child: Text("产品型号: $model"),
+                        child: Text("产品型号: ${model.value}"),
                       ),
                     ),
                     const SizedBox(
@@ -136,7 +124,7 @@ class UpdateResetState extends State<UpdateReset>
                       child: Padding(
                         padding:
                             const EdgeInsets.all(AppConstants.paddingSmall),
-                        child: Text("DSM 版本: $firmwareVer"),
+                        child: Text("DSM 版本: ${firmwareVer.value}"),
                       ),
                     ),
                     const SizedBox(
@@ -154,15 +142,15 @@ class UpdateResetState extends State<UpdateReset>
                           children: [
                             const Text("状态: "),
                             Expanded(
-                              child: checking
+                              child: checking.value
                                   ? const CupertinoActivityIndicator()
-                                  : update != null &&
-                                          (update?['available'] ?? true)
+                                  : update.value != null &&
+                                          (update.value?['available'] ?? true)
                                       ? Text.rich(TextSpan(
                                           children: [
                                             TextSpan(
                                               text:
-                                                  "${update?['version']}版本可下载",
+                                                  "${update.value?['version']}版本可下载",
                                               style: const TextStyle(
                                                   color: Colors.green),
                                             ),
@@ -171,17 +159,17 @@ class UpdateResetState extends State<UpdateReset>
                                                 style: const TextStyle(
                                                     color: Colors.blue),
                                                 recognizer:
-                                                    _updateNoteRecognizer
+                                                    updateNoteRecognizer
                                                       ..onTap = () {
                                                         String url =
-                                                            "http://update.synology.com/autoupdate/whatsnew.php?model=${Uri.encodeComponent(model)}&update_version=${update?['version_details']['buildnumber']}-0";
+                                                            "http://update.synology.com/autoupdate/whatsnew.php?model=${Uri.encodeComponent(model.value)}&update_version=${update.value?['version_details']['buildnumber']}-0";
                                                         Navigator.of(context).push(
                                                             CupertinoPageRoute(
                                                           builder: (context) {
                                                             return Browser(
                                                               url: url,
                                                               title:
-                                                                  "${update?['version']}版本更新说明",
+                                                                  "${update.value?['version']}版本更新说明",
                                                             );
                                                           },
                                                           settings:

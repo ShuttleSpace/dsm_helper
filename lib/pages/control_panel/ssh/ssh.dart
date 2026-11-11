@@ -8,50 +8,48 @@ import 'package:flutter/material.dart';
 import 'package:garden/constants/app_constants.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_vibrate/flutter_vibrate.dart';
-import 'package:signals/signals_flutter.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:signals_hooks/signals_hooks.dart';
 
-class SshSetting extends StatefulWidget {
+class SshSetting extends HookWidget {
   const SshSetting({super.key});
 
   @override
-  SshSettingState createState() => SshSettingState();
-}
-
-class SshSettingState extends State<SshSetting>
-    with SingleTickerProviderStateMixin, SignalsMixin {
-  late TabController _tabController;
-  final TextEditingController _portController = TextEditingController();
-  late final loading = createSignal(true);
-  late final ssh = createSignal(false);
-  late final telnet = createSignal(false);
-  late final sshPort = createSignal('');
-
-  @override
-  void initState() {
-    _tabController = TabController(length: 2, vsync: this);
-    getData();
-    super.initState();
-  }
-
-  getData() async {
-    try {
-      var data = await dsmCoreTerminalGet();
-      loading.value = false;
-      ssh.value = data['enable_ssh'];
-      telnet.value = data['enable_telnet'];
-      sshPort.value = data['ssh_port'].toString();
-      _portController.value = TextEditingValue(text: sshPort.value);
-    } on DSMException catch (e) {
-      UiUtil.toast("获取失败，code：${e.code}");
-      if (mounted) Navigator.of(context).pop();
-    } on DioException catch (e) {
-      UiUtil.toast("网络错误：${e.message}");
-      if (mounted) Navigator.of(context).pop();
-    }
-  }
-
-  @override
   Widget build(BuildContext context) {
+    final tickerProvider = useSingleTickerProvider();
+    final tabController = useMemoized(
+      () => TabController(length: 2, vsync: tickerProvider),
+      const [],
+    );
+    useEffect(() => tabController.dispose, const []);
+    final portController = useTextEditingController();
+    final loading = useSignal(true);
+    final ssh = useSignal(false);
+    final telnet = useSignal(false);
+    final sshPort = useSignal('');
+
+    getData() async {
+      try {
+        var data = await dsmCoreTerminalGet();
+        loading.value = false;
+        ssh.value = data['enable_ssh'];
+        telnet.value = data['enable_telnet'];
+        sshPort.value = data['ssh_port'].toString();
+        portController.value = TextEditingValue(text: sshPort.value);
+      } on DSMException catch (e) {
+        UiUtil.toast("获取失败，code：${e.code}");
+        if (context.mounted) Navigator.of(context).pop();
+      } on DioException catch (e) {
+        UiUtil.toast("网络错误：${e.message}");
+        if (context.mounted) Navigator.of(context).pop();
+      }
+    }
+
+    useEffect(() {
+      getData();
+      return null;
+    }, const []);
+
     return Scaffold(
       appBar: AppBar(
         leading: AppBackButton(context),
@@ -74,7 +72,7 @@ class SshSettingState extends State<SshSetting>
                   child: TabBar(
                     dividerHeight: 0,
                     isScrollable: false,
-                    controller: _tabController,
+                    controller: tabController,
                     indicatorSize: TabBarIndicatorSize.label,
                     labelColor: Theme.brightnessOf(context) == Brightness.dark
                         ? Colors.white
@@ -97,7 +95,7 @@ class SshSettingState extends State<SshSetting>
                 ),
                 Expanded(
                   child: TabBarView(
-                    controller: _tabController,
+                    controller: tabController,
                     children: [
                       ListView(
                         padding: const EdgeInsets.all(20),
@@ -166,7 +164,7 @@ class SshSettingState extends State<SshSetting>
                               padding: const EdgeInsets.all(
                                   AppConstants.paddingSmall),
                               child: TextField(
-                                controller: _portController,
+                                controller: portController,
                                 keyboardType: TextInputType.number,
                                 onChanged: (v) => sshPort.value = v,
                                 inputFormatters: [

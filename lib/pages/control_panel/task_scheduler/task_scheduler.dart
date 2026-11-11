@@ -7,40 +7,38 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:garden/constants/app_constants.dart';
 import 'package:garden/theme/app_colors.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:signals_hooks/signals_hooks.dart';
 
-class TaskScheduler extends StatefulWidget {
+class TaskScheduler extends HookWidget {
   const TaskScheduler({super.key});
 
   @override
-  TaskSchedulerState createState() => TaskSchedulerState();
-}
+  Widget build(BuildContext context) {
+    final loading = useSignal(true);
+    final tasks = useSignal<List>([]);
 
-class TaskSchedulerState extends State<TaskScheduler> {
-  bool loading = true;
-  List tasks = [];
-  @override
-  void initState() {
-    getData();
-    super.initState();
-  }
-
-  getData() async {
-    var res = await DsmApi.taskScheduler();
-    if (res['success']) {
-      setState(() {
-        loading = false;
-        tasks = res['data']['tasks'];
-      });
-    } else {
-      UiUtil.toast("加载失败");
-      if (context.mounted) {
-        // ignore: use_build_context_synchronously
-        Navigator.of(context).pop();
+    getData() async {
+      var res = await DsmApi.taskScheduler();
+      if (res['success']) {
+        loading.value = false;
+        tasks.value = res['data']['tasks'];
+      } else {
+        UiUtil.toast("加载失败");
+        if (context.mounted) {
+          // ignore: use_build_context_synchronously
+          Navigator.of(context).pop();
+        }
       }
     }
-  }
 
-  Widget _buildTaskItem(task) {
+    // Task entries are plain maps; mutating them in place needs an explicit
+    // signal write to rebuild the list (the old code relied on setState).
+    void refreshTasks() {
+      tasks.value = List.of(tasks.value);
+    }
+
+    Widget buildTaskItem(task) {
     task['running'] = task['running'] ?? false;
     task['set'] = task['set'] ?? false;
     return Card(
@@ -93,18 +91,15 @@ class TaskSchedulerState extends State<TaskScheduler> {
               children: [
                 GestureDetector(
                   onTap: () async {
-                    setState(() {
-                      task['set'] = true;
-                    });
+                    task['set'] = true;
+                    refreshTasks();
                     var res =
                         await DsmApi.taskEnable(task['id'], !task['enable']);
-                    setState(() {
-                      task['set'] = false;
-                    });
+                    task['set'] = false;
+                    refreshTasks();
                     if (res['success']) {
-                      setState(() {
-                        task['enable'] = !task['enable'];
-                      });
+                      task['enable'] = !task['enable'];
+                      refreshTasks();
                     } else {
                       UiUtil.toast("操作失败，code：${res['error']['code']}");
                     }
@@ -160,9 +155,8 @@ class TaskSchedulerState extends State<TaskScheduler> {
                     if (task['running']) {
                       return;
                     }
-                    setState(() {
-                      task['running'] = true;
-                    });
+                    task['running'] = true;
+                    refreshTasks();
                     Map<dynamic, dynamic> res;
                     if (task['type'] == 'script') {
                       res = await DsmApi.taskRun([task['id']]);
@@ -173,9 +167,8 @@ class TaskSchedulerState extends State<TaskScheduler> {
                       return;
                     }
 
-                    setState(() {
-                      task['running'] = false;
-                    });
+                    task['running'] = false;
+                    refreshTasks();
                     if (res['success']) {
                       UiUtil.toast("任务计划执行成功");
                     } else {
@@ -202,14 +195,17 @@ class TaskSchedulerState extends State<TaskScheduler> {
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
+    useEffect(() {
+      getData();
+      return null;
+    }, const []);
+
     return Scaffold(
       appBar: AppBar(
         leading: AppBackButton(context),
         title: const Text("任务计划"),
       ),
-      body: loading
+      body: loading.value
           ? Container(
               width: MediaQuery.sizeOf(context).width,
               height: MediaQuery.sizeOf(context).height,
@@ -225,9 +221,9 @@ class TaskSchedulerState extends State<TaskScheduler> {
           : ListView.builder(
               padding: const EdgeInsets.all(20),
               itemBuilder: (context, i) {
-                return _buildTaskItem(tasks[i]);
+                return buildTaskItem(tasks.value[i]);
               },
-              itemCount: tasks.length,
+              itemCount: tasks.value.length,
             ),
     );
   }

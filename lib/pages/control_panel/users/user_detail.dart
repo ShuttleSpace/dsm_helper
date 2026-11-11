@@ -12,55 +12,88 @@ import 'package:flutter/material.dart';
 import 'package:garden/constants/app_constants.dart';
 import 'package:garden/theme/app_colors.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:signals_hooks/signals_hooks.dart';
 
-class UserDetail extends StatefulWidget {
+class UserDetail extends HookWidget {
   final Map user;
   const UserDetail(this.user, {super.key});
+
   @override
-  UserDetailState createState() => UserDetailState();
-}
+  Widget build(BuildContext context) {
+    final tickerProvider = useSingleTickerProvider();
+    final tabController = useMemoized(
+      () => TabController(length: 6, vsync: tickerProvider),
+      const [],
+    );
+    final nameController = useTextEditingController(text: user['name']);
+    final descriptionController =
+        useTextEditingController(text: user['description']);
+    final emailController = useTextEditingController(text: user['email']);
+    final userInfo = useSignal<Map?>(user);
+    final groups = useSignal<List>([]);
+    final originGroups = useSignal<List>([]);
+    final bandwidthControl = useSignal<List>([]);
+    final volumes = useSignal<List>([]);
+    final quotas = useSignal<List>([]);
+    final permissions = useSignal<List>([]);
+    final password = useSignal('');
+    final confirmPassword = useSignal('');
+    final saving = useSignal(false);
 
-class UserDetailState extends State<UserDetail>
-    with SingleTickerProviderStateMixin {
-  late TabController _tabController;
-  final TextEditingController _nameController = TextEditingController();
-  final TextEditingController _descriptionController = TextEditingController();
-  final TextEditingController _emailController = TextEditingController();
-  Map? user;
-  List groups = [];
-  List originGroups = [];
-  List bandwidthControl = [];
-  List volumes = [];
-  List quotas = [];
-  List permissions = [];
-  String password = '';
-  String confirmPassword = '';
+    getGroup() async {
+      var res = await DsmApi.userGroup(userInfo.value?['name']);
+      if (res['success']) {
+        groups.value = res['data']['groups'];
+        originGroups.value = groups.value
+            .where((group) => group['is_member'])
+            .map((e) => e['name'])
+            .toList();
+      }
+    }
 
-  bool saving = false;
-  @override
-  void initState() {
-    _tabController = TabController(length: 6, vsync: this);
-    _nameController.value = TextEditingValue(text: widget.user['name']);
-    _descriptionController.value =
-        TextEditingValue(text: widget.user['description']);
-    _emailController.value = TextEditingValue(text: widget.user['email']);
-    setState(() {
-      user = widget.user;
-    });
-    getData();
-    super.initState();
-  }
+    getData() async {
+      getGroup();
+      var res = await DsmApi.userDetail(userInfo.value?['name']);
+      if (res['success']) {
+        List result = res['data']['result'];
+        for (var item in result) {
+          if (item['success'] == true) {
+            switch (item['api']) {
+              case "SYNO.Core.User":
+                userInfo.value = item['data']['users'][0];
+                userInfo.value?['new_name'] = item['data']['users'][0]['name'];
+                break;
+              case "SYNO.Core.User.PasswordExpiry":
+                break;
+              case "SYNO.Core.Share.Permission":
+                permissions.value = item['data']['shares'];
+                break;
+              case "SYNO.Core.Storage.Volume":
+                volumes.value = item['data']['volumes'];
+                break;
+              case "SYNO.Core.BandwidthControl":
+                bandwidthControl.value = item['data']['bandwidths'];
+                break;
+              case "SYNO.Core.OTP.Admin":
+                break;
+              case "SYNO.Core.FileServ.SMB":
+                break;
+              case "SYNO.Core.Quota":
+                quotas.value = item['data']['user_quota'];
+                break;
+            }
+          }
+        }
+      }
+    }
 
-  Widget _buildVolumeItem(volume) {
-    List shares = quotas
-        .where((element) => element['volume'] == volume['volume_path'])
-        .first['shares'];
+    Widget buildVolumeItem(volume) {
+      List shares = quotas.value
+          .where((element) => element['volume'] == volume['volume_path'])
+          .first['shares'];
     return GestureDetector(
-      onTap: () {
-        setState(() {
-          // group['is_member'] = !group['is_member'];
-        });
-      },
+      onTap: () {},
       child: Card(
         shape: RoundedRectangleBorder(
             side: const BorderSide(), borderRadius: BorderRadius.circular(18)),
@@ -91,76 +124,17 @@ class UserDetailState extends State<UserDetail>
     );
   }
 
-  getGroup() async {
-    var res = await DsmApi.userGroup(user?['name']);
-    if (res['success']) {
-      setState(() {
-        groups = res['data']['groups'];
-        originGroups = groups
-            .where((group) => group['is_member'])
-            .map((e) => e['name'])
-            .toList();
-      });
-    }
-  }
+    useEffect(() {
+      getData();
+      return () {
+        tabController.dispose();
+      };
+    }, const []);
 
-  getData() async {
-    getGroup();
-    var res = await DsmApi.userDetail(user?['name']);
-    if (res['success']) {
-      List result = res['data']['result'];
-      for (var item in result) {
-        if (item['success'] == true) {
-          switch (item['api']) {
-            case "SYNO.Core.User":
-              setState(() {
-                user = item['data']['users'][0];
-                user?['new_name'] = item['data']['users'][0]['name'];
-              });
-              break;
-            case "SYNO.Core.User.PasswordExpiry":
-              setState(() {
-                // powerRecovery = item['data'];
-              });
-              break;
-            case "SYNO.Core.Share.Permission":
-              setState(() {
-                permissions = item['data']['shares'];
-              });
-              break;
-            case "SYNO.Core.Storage.Volume":
-              setState(() {
-                volumes = item['data']['volumes'];
-              });
-              break;
-            case "SYNO.Core.BandwidthControl":
-              setState(() {
-                bandwidthControl = item['data']['bandwidths'];
-              });
-              break;
-            case "SYNO.Core.OTP.Admin":
-              setState(() {});
-              break;
-            case "SYNO.Core.FileServ.SMB":
-              setState(() {});
-              break;
-            case "SYNO.Core.Quota":
-              setState(() {
-                quotas = item['data']['user_quota'];
-              });
-              break;
-          }
-        }
-      }
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         leading: AppBackButton(context),
-        title: Text("${widget.user['name']}"),
+        title: Text("${user['name']}"),
       ),
       body: Column(
         children: [
@@ -172,7 +146,7 @@ class UserDetailState extends State<UserDetail>
             child: TabBar(
               dividerHeight: 0,
               isScrollable: true,
-              controller: _tabController,
+              controller: tabController,
               indicatorSize: TabBarIndicatorSize.label,
               labelColor: Theme.brightnessOf(context) == Brightness.dark
                   ? Colors.white
@@ -209,7 +183,7 @@ class UserDetailState extends State<UserDetail>
           ),
           Expanded(
             child: TabBarView(
-              controller: _tabController,
+              controller: tabController,
               children: [
                 ListView(
                   padding: const EdgeInsets.all(20),
@@ -222,8 +196,8 @@ class UserDetailState extends State<UserDetail>
                         padding:
                             const EdgeInsets.all(AppConstants.paddingSmall),
                         child: TextField(
-                          controller: _nameController,
-                          onChanged: (v) => user?['new_name'] = v,
+                          controller: nameController,
+                          onChanged: (v) => userInfo.value?['new_name'] = v,
                           decoration: const InputDecoration(
                             border: InputBorder.none,
                             labelText: '名称',
@@ -242,8 +216,8 @@ class UserDetailState extends State<UserDetail>
                         padding:
                             const EdgeInsets.all(AppConstants.paddingSmall),
                         child: TextField(
-                          controller: _descriptionController,
-                          onChanged: (v) => user?['description'] = v,
+                          controller: descriptionController,
+                          onChanged: (v) => userInfo.value?['description'] = v,
                           decoration: const InputDecoration(
                             border: InputBorder.none,
                             labelText: '描述',
@@ -262,8 +236,8 @@ class UserDetailState extends State<UserDetail>
                         padding:
                             const EdgeInsets.all(AppConstants.paddingSmall),
                         child: TextField(
-                          controller: _emailController,
-                          onChanged: (v) => user?['email'] = v,
+                          controller: emailController,
+                          onChanged: (v) => userInfo.value?['email'] = v,
                           decoration: const InputDecoration(
                             border: InputBorder.none,
                             labelText: '电子邮件',
@@ -282,7 +256,7 @@ class UserDetailState extends State<UserDetail>
                         padding:
                             const EdgeInsets.all(AppConstants.paddingSmall),
                         child: TextField(
-                          onChanged: (v) => password = v,
+                          onChanged: (v) => password.value = v,
                           obscureText: true,
                           decoration: const InputDecoration(
                             border: InputBorder.none,
@@ -303,7 +277,7 @@ class UserDetailState extends State<UserDetail>
                             const EdgeInsets.all(AppConstants.paddingSmall),
                         child: TextField(
                           obscureText: true,
-                          onChanged: (v) => confirmPassword = v,
+                          onChanged: (v) => confirmPassword.value = v,
                           decoration: const InputDecoration(
                             border: InputBorder.none,
                             labelText: '确认密码',
@@ -316,10 +290,9 @@ class UserDetailState extends State<UserDetail>
                     ),
                     GestureDetector(
                       onTap: () {
-                        setState(() {
-                          user?['cannot_chg_passwd'] =
-                              !user?['cannot_chg_passwd'];
-                        });
+                        userInfo.value?['cannot_chg_passwd'] =
+                            !userInfo.value?['cannot_chg_passwd'];
+                        userInfo.notifyListeners();
                       },
                       child: Card(
                         shape: RoundedRectangleBorder(
@@ -332,7 +305,7 @@ class UserDetailState extends State<UserDetail>
                             children: [
                               const Text("不允许此用户修改密码"),
                               const Spacer(),
-                              if (user?['cannot_chg_passwd'] ?? false)
+                              if (userInfo.value?['cannot_chg_passwd'] ?? false)
                                 const Icon(
                                   CupertinoIcons.checkmark_alt,
                                   color: AppColors.primaryAction,
@@ -346,11 +319,7 @@ class UserDetailState extends State<UserDetail>
                       height: 20,
                     ),
                     GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          // user['passwd_never_expire'] = !user['passwd_never_expire'];
-                        });
-                      },
+                      onTap: () {},
                       child: Card(
                         shape: RoundedRectangleBorder(
                             side: const BorderSide(),
@@ -362,7 +331,7 @@ class UserDetailState extends State<UserDetail>
                             children: [
                               const Text("密码始终有效"),
                               const Spacer(),
-                              if (user?['passwd_never_expire'] ?? false)
+                              if (userInfo.value?['passwd_never_expire'] ?? false)
                                 const Icon(
                                   CupertinoIcons.checkmark_alt,
                                   color: AppColors.primaryAction,
@@ -377,13 +346,12 @@ class UserDetailState extends State<UserDetail>
                     ),
                     GestureDetector(
                       onTap: () {
-                        setState(() {
-                          if (user?['expired'] != "normal") {
-                            user?['expired'] = "normal";
-                          } else {
-                            user?['expired'] = "now";
-                          }
-                        });
+                        if (userInfo.value?['expired'] != "normal") {
+                          userInfo.value?['expired'] = "normal";
+                        } else {
+                          userInfo.value?['expired'] = "now";
+                        }
+                        userInfo.notifyListeners();
                       },
                       child: Card(
                         shape: RoundedRectangleBorder(
@@ -400,14 +368,14 @@ class UserDetailState extends State<UserDetail>
                                     style: TextStyle(fontSize: 16),
                                   ),
                                   const Spacer(),
-                                  if (user?['expired'] != "normal")
+                                  if (userInfo.value?['expired'] != "normal")
                                     const Icon(
                                       CupertinoIcons.checkmark_alt,
                                       color: AppColors.primaryAction,
                                     ),
                                 ],
                               ),
-                              if (user?['expired'] != "normal")
+                              if (userInfo.value?['expired'] != "normal")
                                 Card(
                                   shape: RoundedRectangleBorder(
                                       side: const BorderSide(),
@@ -421,9 +389,8 @@ class UserDetailState extends State<UserDetail>
                                           flex: 2,
                                           child: GestureDetector(
                                             onTap: () {
-                                              setState(() {
-                                                user?['expired'] = "now";
-                                              });
+                                              userInfo.value?['expired'] = "now";
+                                              userInfo.notifyListeners();
                                             },
                                             child: Card(
                                               shape: RoundedRectangleBorder(
@@ -445,7 +412,7 @@ class UserDetailState extends State<UserDetail>
                                                               height: 1.6),
                                                         ),
                                                         const Spacer(),
-                                                        if (user?['expired'] ==
+                                                        if (userInfo.value?['expired'] ==
                                                             "now")
                                                           const Icon(
                                                             CupertinoIcons
@@ -472,11 +439,11 @@ class UserDetailState extends State<UserDetail>
                                                   locale: LocaleType.zh,
                                                   currentTime: DateTime.now(),
                                                   onConfirm: (v) {
-                                                setState(() {
-                                                  user?['expired'] =
-                                                      v.format("Y-m-d");
-                                                  Log.info(user?['expired']);
-                                                });
+                                                userInfo.value?['expired'] =
+                                                    v.format("Y-m-d");
+                                                Log.info(
+                                                    userInfo.value?['expired']);
+                                                userInfo.notifyListeners();
                                               });
                                             },
                                             child: Card(
@@ -493,14 +460,14 @@ class UserDetailState extends State<UserDetail>
                                                     Row(
                                                       children: [
                                                         Text(
-                                                          "${user?['expired'] == "now" ? "到期于：" : user?['expired']}",
+                                                          "${userInfo.value?['expired'] == "now" ? "到期于：" : userInfo.value?['expired']}",
                                                           style:
                                                               const TextStyle(
                                                                   fontSize: 16,
                                                                   height: 1.6),
                                                         ),
                                                         const Spacer(),
-                                                        if (user?['expired'] !=
+                                                        if (userInfo.value?['expired'] !=
                                                             "now")
                                                           const Icon(
                                                             CupertinoIcons
@@ -534,15 +501,15 @@ class UserDetailState extends State<UserDetail>
                   padding: const EdgeInsets.all(20),
                   itemBuilder: (context, i) {
                     return UserGroupItem(
-                      group: groups[i],
+                      group: groups.value[i],
                       onTap: () {
-                        setState(() {
-                          groups[i]['is_member'] = !groups[i]['is_member'];
-                        });
+                        groups.value[i]['is_member'] =
+                            !groups.value[i]['is_member'];
+                        groups.notifyListeners();
                       },
                     );
                   },
-                  itemCount: groups.length,
+                  itemCount: groups.value.length,
                   separatorBuilder: (context, i) {
                     return const SizedBox(
                       height: 20,
@@ -552,9 +519,9 @@ class UserDetailState extends State<UserDetail>
                 ListView.separated(
                   padding: const EdgeInsets.all(20),
                   itemBuilder: (context, i) {
-                    return PermissionItem(permission: permissions[i]);
+                    return PermissionItem(permission: permissions.value[i]);
                   },
-                  itemCount: permissions.length,
+                  itemCount: permissions.value.length,
                   separatorBuilder: (context, i) {
                     return const SizedBox(
                       height: 20,
@@ -564,9 +531,9 @@ class UserDetailState extends State<UserDetail>
                 ListView.separated(
                   padding: const EdgeInsets.all(20),
                   itemBuilder: (context, i) {
-                    return _buildVolumeItem(volumes[i]);
+                    return buildVolumeItem(volumes.value[i]);
                   },
-                  itemCount: volumes.length,
+                  itemCount: volumes.value.length,
                   separatorBuilder: (context, i) {
                     return const SizedBox(
                       height: 20,
@@ -583,48 +550,45 @@ class UserDetailState extends State<UserDetail>
               padding: const EdgeInsets.all(20),
               child: OutlinedButton(
                 onPressed: () async {
-                  if (password.isNotBlank || confirmPassword.isNotBlank) {
-                    if (password != confirmPassword) {
+                  if (password.value.isNotBlank ||
+                      confirmPassword.value.isNotBlank) {
+                    if (password.value != confirmPassword.value) {
                       UiUtil.toast("密码输入不一致");
                       return;
                     }
-                    if (password != '' && password.length < 6) {
+                    if (password.value != '' && password.value.length < 6) {
                       UiUtil.toast("密码最低6位");
                       return;
                     }
-                    user?['password'] = password;
+                    userInfo.value?['password'] = password.value;
                   }
 
                   //对比当前groups与原始groups
-                  List newGroups = groups
+                  List newGroups = groups.value
                       .where((group) => group['is_member'])
                       .map((e) => e['name'])
                       .toList();
                   List addGroup = newGroups
-                      .where((group) => !originGroups.contains(group))
+                      .where((group) => !originGroups.value.contains(group))
                       .toList();
-                  List removeGroup = originGroups
+                  List removeGroup = originGroups.value
                       .where((group) => !newGroups.contains(group))
                       .toList();
 
-                  setState(() {
-                    saving = true;
-                  });
+                  saving.value = true;
 
-                  var res =
-                      await DsmApi.userSave(user ?? {}, addGroup, removeGroup);
-                  setState(() {
-                    saving = false;
-                  });
+                  var res = await DsmApi.userSave(
+                      userInfo.value ?? {}, addGroup, removeGroup);
+                  saving.value = false;
                   if (res['success']) {
-                    widget.user['name'] = user?['new_name'];
-                    widget.user['email'] = user?['email'];
+                    user['name'] = userInfo.value?['new_name'];
+                    user['email'] = userInfo.value?['email'];
                     UiUtil.toast("保存成功");
                   } else {
                     UiUtil.toast("保存失败,代码${res['error']['code']}");
                   }
                 },
-                child: saving
+                child: saving.value
                     ? const CupertinoActivityIndicator(
                         radius: 13,
                       )

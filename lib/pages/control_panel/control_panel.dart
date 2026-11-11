@@ -16,13 +16,14 @@ import 'package:garden/stores/settings_store.dart';
 import 'package:garden/widgets/badge.dart';
 import 'package:garden/widgets/control_panel_item.dart';
 import 'package:garden/widgets/neu_back_button.dart';
-import 'package:signals_flutter/signals_flutter.dart';
+
+import 'package:signals_hooks/signals_hooks.dart';
 
 import 'shared_folders/shared_folders.dart';
 import 'package:garden/pages/control_panel/info/info.dart';
 import 'package:flutter/material.dart' hide Badge;
 
-class ControlPanel extends StatefulWidget {
+class ControlPanel extends StatelessWidget {
   const ControlPanel(
       this.systemData, this.storageVolumes, this.storageDisks, this.appNotify,
       {super.key});
@@ -30,11 +31,7 @@ class ControlPanel extends StatefulWidget {
   final ReadonlySignal<List<dynamic>> storageVolumes;
   final ReadonlySignal<List<dynamic>> storageDisks;
   final ReadonlySignal<Map<dynamic, dynamic>> appNotify;
-  @override
-  ControlPanelState createState() => ControlPanelState();
-}
 
-class ControlPanelState extends State<ControlPanel> with SignalsMixin {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -221,8 +218,8 @@ class ControlPanelState extends State<ControlPanel> with SignalsMixin {
                           title: "信息中心",
                           iconPath:
                               "assets/control_panel/${connectionStore.dsmVersion}/info_center.png",
-                          targetPage: SystemInfo(0, widget.systemData,
-                              widget.storageDisks, widget.storageVolumes),
+                          targetPage: SystemInfo(0, systemData,
+                              storageDisks, storageVolumes),
                           routeName: "system_info_all",
                         ),
                         ControlPanelItem(
@@ -273,10 +270,10 @@ class ControlPanelState extends State<ControlPanel> with SignalsMixin {
                               targetPage: const UpdateReset(),
                               routeName: "update_and_reset",
                             ),
-                            if (widget.appNotify[
+                            if (appNotify[
                                         'SYNO.SDS.AdminCenter.Update_Reset.Main'] !=
                                     null &&
-                                widget.appNotify[
+                                appNotify[
                                             'SYNO.SDS.AdminCenter.Update_Reset.Main']
                                         ['unread'] !=
                                     null)
@@ -284,7 +281,7 @@ class ControlPanelState extends State<ControlPanel> with SignalsMixin {
                                 top: 8,
                                 right: 8,
                                 child: Badge(
-                                  widget.appNotify[
+                                  appNotify[
                                           'SYNO.SDS.AdminCenter.Update_Reset.Main']
                                       ['unread'],
                                   size: 20,

@@ -10,30 +10,24 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:garden/constants/app_constants.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
-import 'package:signals_flutter/signals_flutter.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:signals_hooks/signals_hooks.dart';
 
-class ExternalDevice extends StatefulWidget {
+class ExternalDevice extends HookWidget {
   const ExternalDevice({super.key});
 
   @override
-  ExternalDeviceState createState() => ExternalDeviceState();
-}
+  Widget build(BuildContext context) {
+    final tickerProvider = useSingleTickerProvider();
+    final tabController = useMemoized(
+      () => TabController(length: 2, vsync: tickerProvider),
+      const [],
+    );
+    final esatas = useListSignal([]);
+    final usbs = useListSignal([]);
+    final loading = useSignal(true);
 
-class ExternalDeviceState extends State<ExternalDevice>
-    with SingleTickerProviderStateMixin, SignalsMixin {
-  late TabController _tabController;
-  late final esatas = createListSignal([]);
-  late final usbs = createListSignal([]);
-  late final loading = createSignal(true);
-
-  @override
-  void initState() {
-    _tabController = TabController(length: 2, vsync: this);
-    getData();
-    super.initState();
-  }
-
-  getData() async {
+    getData() async {
     try {
       final res = await dsmCoreExternalDeviceList();
       loading.value = false;
@@ -61,7 +55,7 @@ class ExternalDeviceState extends State<ExternalDevice>
     }
   }
 
-  Widget _buildPartitionItem(partition) {
+  Widget buildPartitionItem(partition) {
     return Card(
       shape: RoundedRectangleBorder(
           side: const BorderSide(), borderRadius: BorderRadius.circular(18)),
@@ -193,7 +187,7 @@ class ExternalDeviceState extends State<ExternalDevice>
     );
   }
 
-  Widget _buildESataItem(esata) {
+  Widget buildESataItem(esata) {
     List partitions = esata['partitions'];
     return Card(
       shape: RoundedRectangleBorder(
@@ -251,15 +245,20 @@ class ExternalDeviceState extends State<ExternalDevice>
                 ),
               ],
             ),
-            ...partitions.map(_buildPartitionItem),
+            ...partitions.map(buildPartitionItem),
           ],
         ),
       ),
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
+    useEffect(() {
+      getData();
+      return () {
+        tabController.dispose();
+      };
+    }, const []);
+
     return Scaffold(
       appBar: AppBar(
         leading: AppBackButton(context),
@@ -277,7 +276,7 @@ class ExternalDeviceState extends State<ExternalDevice>
               child: TabBar(
                 dividerHeight: 0,
                 isScrollable: false,
-                controller: _tabController,
+                controller: tabController,
                 indicatorSize: TabBarIndicatorSize.label,
                 labelColor: Theme.brightnessOf(context) == Brightness.dark
                     ? Colors.white
@@ -299,7 +298,7 @@ class ExternalDeviceState extends State<ExternalDevice>
           ),
           Expanded(
             child: TabBarView(
-              controller: _tabController,
+              controller: tabController,
               children: [
                 loading.value
                     ? const Center(
@@ -311,7 +310,7 @@ class ExternalDeviceState extends State<ExternalDevice>
                         ? ListView.separated(
                             padding: const EdgeInsets.all(20),
                             itemBuilder: (context, i) {
-                              return _buildESataItem((esatas + usbs)[i]);
+                              return buildESataItem((esatas + usbs)[i]);
                             },
                             separatorBuilder: (context, i) {
                               return const SizedBox(
