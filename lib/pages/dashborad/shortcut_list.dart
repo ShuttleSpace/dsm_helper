@@ -1,4 +1,3 @@
-import 'package:garden/models/shortcut_item_model.dart';
 import 'package:garden/stores/connection_store.dart';
 import 'package:garden/pages/common/browser.dart';
 import 'package:garden/pages/control_panel/control_panel.dart';

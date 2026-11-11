@@ -1377,6 +1377,7 @@ class DashboardFileChangeLogCardState extends State<DashboardFileChangeLogCard>
         .then((res) => {fileChangeLogs.value = res['items']})
         .catchError((e) {
       error.value = e.toString();
+      return <dynamic>{};
     });
   }
 

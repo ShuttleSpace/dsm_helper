@@ -240,10 +240,7 @@ class WidgetSettingState extends State<WidgetSetting> with SignalsMixin {
                   ),
                 );
               }).toList(),
-              onReorder: (int oldIndex, int newIndex) {
-                if (oldIndex < newIndex) {
-                  newIndex -= 1;
-                }
+              onReorderItem: (int oldIndex, int newIndex) {
                 var child = showWidgets.removeAt(oldIndex);
                 showWidgets.insert(newIndex, child);
 

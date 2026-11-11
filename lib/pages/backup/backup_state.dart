@@ -1,6 +1,4 @@
-import 'package:garden/extensions/signal.dart';
-import 'package:garden/pages/file/upload.dart';
-import 'package:garden/util/storage_util.dart';
+import 'package:garden/pages/backup/backup_model.dart';
 import 'package:signals/signals_core.dart';
 import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 
@@ -15,13 +13,6 @@ class BackupState {
   final _uploading = signal<UploadItem?>(null);
   final _cancel = signal(false);
   final _continueBackup = signal(true);
-
-  final _getData = futureSignal(() async {
-    final lastBackupTime =
-        await StorageUtil.getString(lastBackupTimeKey) ?? '';
-    if (await PhotoManager.requestPermissionExtend() ==
-        PermissionState.authorized) {}
-  });
 
   dispose() {
     _uploads.dispose();

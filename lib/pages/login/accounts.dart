@@ -1,10 +1,8 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:garden/api/dsm_api.dart';
 import 'package:garden/constants/app_constants.dart';
 import 'package:garden/pages/login/login.dart';
 import 'package:garden/stores/connection_store.dart';
@@ -54,49 +52,6 @@ class AccountsState extends State<Accounts> with SignalsMixin {
     }
   }
 
-  _fetchData() async {
-    if (!mounted) return;
-    for (final server in servers) {
-      server['loading'] = true;
-      server['base_url'] = server['base_url'] ??
-          '${server['https'] ? 'https' : 'http'}://${server['host']}:${server['port']}/';
-      if (hasLogined.value) {
-        final m = await _fetchServerInfo();
-        _mapToServer(m, server);
-      } else {
-        //仅首次重新登录
-        if (server['has_logined'] == true) {
-          try {
-            final res = await dsmFileStationListListShare(
-                additional: const ["perm", "time", "size"]);
-            Log.info('accounts: dsmFileStationListListShare: $res');
-            hasLogined.value = true;
-            //获取系统信息
-            final m = await _fetchServerInfo();
-            _mapToServer(m, server);
-          } catch (e) {
-            //登录失败，尝试重新登录
-            try {
-              final res = await dsmAuthLogin(
-                  server['account'], server['password'],
-                  cookie: server['smid'], host: server['base_url']);
-              Log.info("try login: $res");
-              final m = await _fetchServerInfo();
-              _mapToServer(m, server);
-            } on DioException catch (e) {
-              Log.error("getServerInfo failed: ${e.message}");
-            } on DSMException catch (e) {
-              Log.error("getServerInfo failed: ${e.message}");
-              server['loading'] = false;
-              server['error'] = '登录失败';
-            }
-          }
-        }
-      }
-    }
-    await _saveServers();
-  }
-
   _saveServers() async {
     if (servers.isNotEmpty) {
       await StorageUtil.setString(
@@ -117,53 +72,6 @@ class AccountsState extends State<Accounts> with SignalsMixin {
                     "sid": e['sid'],
                   })
               .toList()));
-    }
-  }
-
-  /// {"data":{"cpu":{"15min_load":9,"1min_load":11,"5min_load":11,"device":"System","other_load":2,"system_load":0,"user_load":1},"disk":{"disk":[{"device":"sdc","display_name":"Drive 3","read_access":1,"read_byte":63902,"type":"internal","utilization":4,"write_access":4,"write_byte":63856},{"device":"sdd","display_name":"Drive 4","read_access":0,"read_byte":17163,"type":"internal","utilization":4,"write_access":4,"write_byte":63856}],"total":{"device":"total","read_access":1,"read_byte":81065,"utilization":4,"write_access":8,"write_byte":127712}},"lun":[],"memory":{"avail_real":142048,"avail_swap":4123504,"buffer":26996,"cached":1891992,"device":"Memory","memory_size":4194304,"real_usage":46,"si_disk":0,"so_disk":0,"swap_usage":6,"total_real":3866684,"total_swap":4419500},"network":[{"device":"total","rx":2473,"tx":42563},{"device":"eth0","rx":2473,"tx":42563},{"device":"eth1","rx":0,"tx":0}],"space":{"total":{"device":"total","read_access":0,"read_byte":32755,"utilization":0,"write_access":2,"write_byte":44746},"volume":[{"device":"dm-0","display_name":"volume1","read_access":0,"read_byte":32755,"utilization":0,"write_access":2,"write_byte":44746}]},"time":1770828360},"success":true}
-  Future<Map?> _fetchServerInfo() async {
-    try {
-      final res = await dsmCoreSystemUtilization(
-          ["cpu", "memory", "network", "lun", "disk", "space"]);
-      Log.info("accounts: serverInfo: $res");
-      if (!mounted) {
-        return null;
-      }
-    } on DioException catch (e) {
-      Log.error("fetchServerInfo failed: ${e.message}");
-      return null;
-    } on DSMException catch (e) {
-      Log.error("fetchServerInfo failed: ${e.message}");
-      final res = {};
-      res['loading'] = false;
-      if (e.code == 105) {
-        res['error'] = "权限不足，无法获取资源监控信息";
-      } else {
-        res['error'] = '获取资源监控信息失败';
-      }
-      return null;
-    }
-    return null;
-  }
-
-  _mapToServer(Map? m, MapSignal<String, dynamic> server) {
-    if (!mounted || m == null) {
-      Log.warn('_mapToServer: wrong state $mounted ${m == null}');
-      return;
-    }
-    server['cpu'] = (m['cpu']['user_load'] + m['cpu']['system_load']) ?? 0.0;
-    server['ram'] = m['memory']['real_usage'] ?? 0.0;
-    if (m['network'].length > 0) {
-      server['rx'] = m['network'][0]['rx'] ?? 0.0;
-      server['tx'] = m['network'][0]['tx'] ?? 0.0;
-    }
-    if (m['disk']['total'] != null) {
-      server['read'] = m['disk']['total']['read_byte'] ?? 0.0;
-      server['write'] = m['disk']['total']['write_byte'] ?? 0.0;
-    }
-    server['loading'] = false;
-    if (m['error'] != null) {
-      server['error'] = m['error'];
     }
   }
 
