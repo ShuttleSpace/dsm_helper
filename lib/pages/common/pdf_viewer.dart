@@ -1,21 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 
-class PdfViewer extends StatefulWidget {
+class PdfViewer extends StatelessWidget {
   final String url;
   final String name;
   const PdfViewer(this.url, this.name, {super.key});
-  @override
-  PdfViewerState createState() => PdfViewerState();
-}
 
-class PdfViewerState extends State<PdfViewer> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: Text(widget.name),
+          title: Text(name),
         ),
-        body: SfPdfViewer.network(widget.url));
+        body: SfPdfViewer.network(url));
   }
 }

@@ -2,7 +2,7 @@ import 'package:garden/pages/photos/timeline.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/material.dart';
 
-class TimelinePage extends StatefulWidget {
+class TimelinePage extends StatelessWidget {
   const TimelinePage({
     super.key,
     this.title,
@@ -18,24 +18,20 @@ class TimelinePage extends StatefulWidget {
   final bool isTeam;
   final int generalTagId;
   final bool recentlyAdd;
-  @override
-  State<TimelinePage> createState() => _TimelinePageState();
-}
 
-class _TimelinePageState extends State<TimelinePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         leading: AppBackButton(context),
-        title: Text(widget.title ?? ''),
+        title: Text(title ?? ''),
       ),
       body: Timeline(
-        widget.isTeam,
-        type: widget.type ?? '',
-        geocodingId: widget.geocodingId,
-        generalTagId: widget.generalTagId,
-        recentlyAdd: widget.recentlyAdd,
+        isTeam,
+        type: type ?? '',
+        geocodingId: geocodingId,
+        generalTagId: generalTagId,
+        recentlyAdd: recentlyAdd,
       ),
     );
   }

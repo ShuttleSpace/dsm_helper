@@ -4,42 +4,39 @@ import 'package:garden/pages/photos/widgets/photo_item_widget.dart';
 import 'package:garden/widgets/cupertino_image.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:garden/theme/app_colors.dart';
+import 'package:signals_hooks/signals_hooks.dart';
 
-class AlbumPage extends StatefulWidget {
+class AlbumPage extends HookWidget {
   const AlbumPage(this.album, {super.key, this.isTeam = false});
   final AlbumModel album;
   final bool isTeam;
-  @override
-  State<AlbumPage> createState() => _AlbumPageState();
-}
-
-class _AlbumPageState extends State<AlbumPage> {
-  double photoWidth = 0;
-  List<PhotoModel> photos = [];
-  @override
-  void initState() {
-    getData();
-    super.initState();
-  }
-
-  getData() async {
-    photos = await PhotoModel.fetch(
-      additional: [
-        "thumbnail",
-        "resolution",
-        "orientation",
-        "video_convert",
-        "video_meta",
-        "provider_user_id"
-      ],
-      albumId: widget.album.id?.toInt(),
-    );
-    setState(() {});
-  }
 
   @override
   Widget build(BuildContext context) {
+    final photos = useSignal<List<PhotoModel>>([]);
+    const double photoWidth = 0;
+
+    getData() async {
+      photos.value = await PhotoModel.fetch(
+        additional: [
+          "thumbnail",
+          "resolution",
+          "orientation",
+          "video_convert",
+          "video_meta",
+          "provider_user_id"
+        ],
+        albumId: album.id?.toInt(),
+      );
+    }
+
+    useEffect(() {
+      getData();
+      return null;
+    }, const []);
+
     return Scaffold(
       body: NestedScrollView(
         headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
@@ -53,7 +50,7 @@ class _AlbumPageState extends State<AlbumPage> {
               elevation: 0,
               flexibleSpace: FlexibleSpaceBar(
                 title: Text(
-                  "${widget.album.name}",
+                  "${album.name}",
                   style: TextStyle(
                       color:
                           Theme.of(context).appBarTheme.titleTextStyle?.color,
@@ -67,16 +64,13 @@ class _AlbumPageState extends State<AlbumPage> {
                 ),
                 centerTitle: true,
                 background: Hero(
-                  tag: widget.album.additional?.thumbnail ?? '',
+                  tag: album.additional?.thumbnail ?? '',
                   child: CupertinoExtendedImage(
-                    widget.album.additional?.thumbnail?.thumbUrl(size: 'lg') ??
-                        '',
+                    album.additional?.thumbnail?.thumbUrl(size: 'lg') ?? '',
                     fit: BoxFit.cover,
                     height: 200,
                     placeholder: CupertinoExtendedImage(
-                      widget.album.additional?.thumbnail
-                              ?.thumbUrl(size: 'sm') ??
-                          '',
+                      album.additional?.thumbnail?.thumbUrl(size: 'sm') ?? '',
                       fit: BoxFit.cover,
                     ),
                   ),
@@ -91,13 +85,13 @@ class _AlbumPageState extends State<AlbumPage> {
           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 4, mainAxisSpacing: 2, crossAxisSpacing: 2),
           itemBuilder: (context, i) {
-            if (photos.isNotEmpty) {
+            if (photos.value.isNotEmpty) {
               return PhotoItemWidget(
-                photos[i],
-                photos,
+                photos.value[i],
+                photos.value,
                 showName: false,
                 width: photoWidth,
-                isTeam: widget.isTeam,
+                isTeam: isTeam,
               );
             } else {
               return Container(
@@ -107,9 +101,9 @@ class _AlbumPageState extends State<AlbumPage> {
               );
             }
           },
-          itemCount: photos.isNotEmpty
-              ? photos.length.toInt()
-              : widget.album.itemCount?.toInt(),
+          itemCount: photos.value.isNotEmpty
+              ? photos.value.length.toInt()
+              : album.itemCount?.toInt(),
         ),
         // body: ListView(
         //   padding: EdgeInsets.symmetric(horizontal: 5, vertical: 10),

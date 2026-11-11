@@ -7,10 +7,12 @@ import 'package:garden/widgets/cupertino_image.dart';
 import 'package:garden/widgets/transparent_router.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:garden/constants/app_constants.dart';
 import 'package:garden/theme/app_colors.dart';
+import 'package:signals_hooks/signals_hooks.dart';
 
-class Timeline extends StatefulWidget {
+class Timeline extends HookWidget {
   const Timeline(this.isTeam,
       {super.key,
       this.type,
@@ -22,65 +24,166 @@ class Timeline extends StatefulWidget {
   final int geocodingId;
   final int generalTagId;
   final bool recentlyAdd;
-  @override
-  State<Timeline> createState() => TimelineState();
-}
-
-class TimelineState extends State<Timeline> {
-  final ScrollController _scrollController = ScrollController();
-  bool loading = true;
-  double photoWidth = 0;
-  List<TimelineModel> timelines = [];
-  List<Day> days = [];
-  List<int> itemTypes = [];
-  bool isTeam = false;
-  @override
-  void initState() {
-    isTeam = widget.isTeam;
-    getData(isTeam: isTeam);
-    super.initState();
-  }
-
-  Future getData({bool isTeam = false}) async {
-    setState(() {
-      this.isTeam = isTeam;
-      loading = true;
-    });
-    days = [];
-    timelines = await TimelineModel.fetch(
-      isTeam: isTeam,
-      type: widget.type,
-      itemTypes: itemTypes,
-      geocodingId: widget.geocodingId,
-      generalTagId: widget.generalTagId,
-      recentlyAdd: widget.recentlyAdd,
-    );
-    for (var timeline in timelines) {
-      days.addAll(timeline.days as Iterable<Day>);
-    }
-    for (int i = 0; i < days.length; i++) {
-      int rowCount = (days[i].itemCount ?? 0 / 4).ceil();
-      double height = 40 + rowCount * photoWidth + (rowCount - 1) * 2;
-      days[i].startPosition = i == 0 ? 0 : days[i - 1].endPosition;
-      days[i].endPosition = days[i].startPosition ?? 0 + height;
-    }
-    setState(() {
-      loading = false;
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
-    return loading
+    final scrollController = useScrollController();
+    final loading = useSignal(true);
+    final days = useSignal<List<Day>>([]);
+    const double photoWidth = 0;
+
+    Future getData({bool isTeam = false}) async {
+      loading.value = true;
+      final timelines = await TimelineModel.fetch(
+        isTeam: isTeam,
+        type: type,
+        itemTypes: const <int>[],
+        geocodingId: geocodingId,
+        generalTagId: generalTagId,
+        recentlyAdd: recentlyAdd,
+      );
+      final newDays = <Day>[];
+      for (var timeline in timelines) {
+        newDays.addAll(timeline.days as Iterable<Day>);
+      }
+      for (int i = 0; i < newDays.length; i++) {
+        int rowCount = (newDays[i].itemCount ?? 0 / 4).ceil();
+        double height = 40 + rowCount * photoWidth + (rowCount - 1) * 2;
+        newDays[i].startPosition = i == 0 ? 0 : newDays[i - 1].endPosition;
+        newDays[i].endPosition = newDays[i].startPosition ?? 0 + height;
+      }
+      days.value = newDays;
+      loading.value = false;
+    }
+
+    Widget buildPhotoItem(PhotoModel photo, List<PhotoModel> photos) {
+      return GestureDetector(
+        onTap: () {
+          if (photo.type == 'video') {
+            Navigator.of(context).push(CupertinoPageRoute(builder: (context) {
+              return VideoPlayerPage(
+                url: photo.videoUrl(isTeam: isTeam),
+                cover: photo.thumbUrl(isTeam: isTeam),
+              );
+            }));
+          } else {
+            Navigator.of(context).push(TransparentPageRoute(
+              pageBuilder: (context, _, __) {
+                return ImagePreview(
+                  photos
+                      .map((photo) =>
+                          photo.thumbUrl(size: 'xl', isTeam: isTeam))
+                      .toList(),
+                  photos.indexOf(photo),
+                  tag: photo,
+                );
+              },
+            ));
+          }
+        },
+        child: SizedBox(
+          width: photoWidth,
+          height: photoWidth,
+          child: Stack(
+            children: [
+              Hero(
+                tag: photo,
+                child: CupertinoExtendedImage(
+                  photo.thumbUrl(isTeam: isTeam),
+                  width: photoWidth,
+                  height: photoWidth,
+                  fit: BoxFit.cover,
+                  placeholder: Container(
+                    width: photoWidth,
+                    height: photoWidth,
+                    color: AppColors.placeholderBackgroundLight,
+                  ),
+                ),
+              ),
+              if (photo.type == "video")
+                Align(
+                  alignment: Alignment.center,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(
+                        Icons.play_circle_fill,
+                        color: Colors.white,
+                        size: 40,
+                      ),
+                      const SizedBox(height: 5),
+                      Text(
+                        "${photo.additional?.videoMeta?.hours.toString().padLeft(2, "0")}:${photo.additional?.videoMeta?.minutes.toString().padLeft(2, "0")}:${photo.additional?.videoMeta?.seconds.toString().padLeft(2, "0")}",
+                        style: const TextStyle(color: Colors.white, fontSize: 12),
+                      ),
+                    ],
+                  ),
+                )
+            ],
+          ),
+        ),
+      );
+    }
+
+    Widget buildTimelineItem(Day day) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            alignment: Alignment.centerLeft,
+            height: 40,
+            padding: const EdgeInsets.symmetric(
+                horizontal: AppConstants.paddingLarge),
+            child: Row(
+              children: [
+                Text(
+                  "${day.year}-${day.month.toString().padLeft(2, "0")}-${day.day.toString().padLeft(2, "0")}",
+                ),
+              ],
+            ),
+          ),
+          Wrap(
+            spacing: 2,
+            runSpacing: 2,
+            children: day.photos == null
+                ? List.generate(day.itemCount?.toInt() ?? 0, (index) {
+                    return Container(
+                      // color: AppColors.placeholderBackgroundLight,
+                      color: Colors.amber,
+                      width: photoWidth,
+                      height: photoWidth,
+                    );
+                  })
+                : day.photos?.map((item) {
+                      return buildPhotoItem(item, day.photos ?? []);
+                    }).toList() ??
+                    [
+                      Container(
+                        color: Colors.red,
+                        width: 10,
+                        height: 10,
+                      )
+                    ],
+          ),
+        ],
+      );
+    }
+
+    useEffect(() {
+      getData(isTeam: isTeam);
+      return null;
+    }, [isTeam]);
+
+    return loading.value
         ? const Center(
             child: CupertinoActivityIndicator(
               radius: 14,
             ),
           )
-        : days.isNotEmpty
+        : days.value.isNotEmpty
             ? DraggableScrollbar.semicircle(
                 labelTextBuilder: (position) {
-                  var line = days
+                  var line = days.value
                       .where((day) =>
                           (day.startPosition ?? 0) <= position &&
                           (day.endPosition ?? 0) >= position)
@@ -117,149 +220,35 @@ class TimelineState extends State<Timeline> {
                 },
                 labelConstraints: const BoxConstraints(
                     minHeight: 60, maxHeight: 60, minWidth: 140, maxWidth: 140),
-                controller: _scrollController,
+                controller: scrollController,
                 child: ListView.builder(
-                  controller: _scrollController,
+                  controller: scrollController,
                   itemBuilder: (context, i) {
-                    if (days[i].photos != null) {
-                      return _buildTimelineItem(days[i]);
+                    if (days.value[i].photos != null) {
+                      return buildTimelineItem(days.value[i]);
                     }
                     return FutureBuilder(
-                        future: days[i].fetchPhotos(
+                        future: days.value[i].fetchPhotos(
                           isTeam: isTeam,
-                          type: widget.type,
-                          itemTypes: itemTypes,
-                          geocodingId: widget.geocodingId,
-                          generalTagId: widget.generalTagId,
-                          recentlyAdd: widget.recentlyAdd,
+                          type: type,
+                          itemTypes: const <int>[],
+                          geocodingId: geocodingId,
+                          generalTagId: generalTagId,
+                          recentlyAdd: recentlyAdd,
                         ),
                         builder: (context, snapshot) {
                           if (snapshot.hasError) {
                             return Text('Error: ${snapshot.error}');
                           } else {
-                            return _buildTimelineItem(days[i]);
+                            return buildTimelineItem(days.value[i]);
                           }
                         });
                   },
-                  itemCount: days.length,
+                  itemCount: days.value.length,
                 ),
               )
             : const Center(
                 child: Text("无项目"),
               );
-  }
-
-  Widget _buildTimelineItem(Day day) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Container(
-          alignment: Alignment.centerLeft,
-          height: 40,
-          padding:
-              const EdgeInsets.symmetric(horizontal: AppConstants.paddingLarge),
-          child: Row(
-            children: [
-              Text(
-                "${day.year}-${day.month.toString().padLeft(2, "0")}-${day.day.toString().padLeft(2, "0")}",
-              ),
-              // if (line['location'] != null && ((line['location']['first_level'] != null && line['location']['first_level'] != ""))) Text("   ${line['location']['first_level']}"),
-              // if (line['location'] != null && ((line['location']['second_level'] != null && line['location']['second_level'].length > 0))) Text("${line['location']['second_level'].join(",")}"),
-            ],
-          ),
-        ),
-        Wrap(
-          spacing: 2,
-          runSpacing: 2,
-          children: day.photos == null
-              ? List.generate(day.itemCount?.toInt() ?? 0, (index) {
-                  return Container(
-                    // color: AppColors.placeholderBackgroundLight,
-                    color: Colors.amber,
-                    width: photoWidth,
-                    height: photoWidth,
-                  );
-                })
-              : day.photos?.map((item) {
-                    return _buildPhotoItem(item, day.photos ?? []);
-                  }).toList() ??
-                  [
-                    Container(
-                      color: Colors.red,
-                      width: 10,
-                      height: 10,
-                    )
-                  ],
-        ),
-      ],
-    );
-  }
-
-  Widget _buildPhotoItem(PhotoModel photo, List<PhotoModel> photos) {
-    return GestureDetector(
-      onTap: () {
-        if (photo.type == 'video') {
-          Navigator.of(context).push(CupertinoPageRoute(builder: (context) {
-            return VideoPlayerPage(
-              url: photo.videoUrl(isTeam: isTeam),
-              cover: photo.thumbUrl(isTeam: isTeam),
-            );
-          }));
-        } else {
-          Navigator.of(context).push(TransparentPageRoute(
-            pageBuilder: (context, _, __) {
-              return ImagePreview(
-                photos
-                    .map((photo) => photo.thumbUrl(size: 'xl', isTeam: isTeam))
-                    .toList(),
-                photos.indexOf(photo),
-                tag: photo,
-              );
-            },
-          ));
-        }
-      },
-      child: SizedBox(
-        width: photoWidth,
-        height: photoWidth,
-        child: Stack(
-          children: [
-            Hero(
-              tag: photo,
-              child: CupertinoExtendedImage(
-                photo.thumbUrl(isTeam: isTeam),
-                width: photoWidth,
-                height: photoWidth,
-                fit: BoxFit.cover,
-                placeholder: Container(
-                  width: photoWidth,
-                  height: photoWidth,
-                  color: AppColors.placeholderBackgroundLight,
-                ),
-              ),
-            ),
-            if (photo.type == "video")
-              Align(
-                alignment: Alignment.center,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(
-                      Icons.play_circle_fill,
-                      color: Colors.white,
-                      size: 40,
-                    ),
-                    const SizedBox(height: 5),
-                    Text(
-                      "${photo.additional?.videoMeta?.hours.toString().padLeft(2, "0")}:${photo.additional?.videoMeta?.minutes.toString().padLeft(2, "0")}:${photo.additional?.videoMeta?.seconds.toString().padLeft(2, "0")}",
-                      style: const TextStyle(color: Colors.white, fontSize: 12),
-                    ),
-                  ],
-                ),
-              )
-          ],
-        ),
-      ),
-    );
   }
 }

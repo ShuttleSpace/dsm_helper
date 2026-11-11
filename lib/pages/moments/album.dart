@@ -6,104 +6,102 @@ import 'package:garden/widgets/cupertino_image.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:signals_flutter/signals_flutter.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:signals_hooks/signals_hooks.dart';
 
-class Album extends StatefulWidget {
+class Album extends HookWidget {
   final bool shared;
   final String title;
   const Album(this.title, {super.key, this.shared = false});
-  @override
-  AlbumState createState() => AlbumState();
-}
-
-class AlbumState extends State<Album> {
-  bool loadingAlbum = true;
-  double albumWidth = 0;
-  List album = [];
-  @override
-  void initState() {
-    getAlbum();
-    super.initState();
-  }
-
-  getAlbum() async {
-    var res = await dsmFotoBrowseAlbumListMoments(shared: true);
-    if (mounted) {
-      setState(() {
-        album = res['list'];
-        loadingAlbum = false;
-      });
-    }
-  }
-
-  Widget _buildAlbumItem(album) {
-    String thumbUrl =
-        '${connectionStore.baseUri}/webapi/entry.cgi?id=${album['additional']['thumbnail']['unit_id']}&cache_key="${album['additional']['thumbnail']['cache_key']}"&type="unit"&size="sm"&api="SYNO.${connectionStore.dsmVersion.watch(context) >= 7 ? "Foto" : "Photo"}.Thumbnail"&method="get"&version=1&_sid=${connectionStore.sid}';
-    String tag = "album-${album['additional']['thumbnail']['unit_id']}";
-    return GestureDetector(
-      onTap: () {
-        Navigator.of(context).push(CupertinoPageRoute(
-          builder: (context) {
-            return Photos(album, tag: tag);
-          },
-        ));
-      },
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(
-            width: albumWidth,
-            height: albumWidth,
-            child: Hero(
-              tag: "album-${album['additional']['thumbnail']['unit_id']}",
-              child: CupertinoExtendedImage(
-                thumbUrl,
-                width: albumWidth,
-                height: albumWidth,
-                fit: BoxFit.cover,
-                boxShape: BoxShape.rectangle,
-                borderRadius: BorderRadius.circular(10),
-                placeholder: Container(
-                  width: albumWidth,
-                  height: albumWidth,
-                  color: AppColors.placeholderBackgroundLight,
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(
-            height: 5,
-          ),
-          Text(
-            "${album['name']}",
-            style: const TextStyle(fontSize: 14),
-            maxLines: 1,
-          ),
-          Text(
-            "${album['item_count']}",
-            style: const TextStyle(fontSize: 12, color: Colors.grey),
-          ),
-        ],
-      ),
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
+    final loadingAlbum = useSignal(true);
+    final album = useSignal<List>([]);
+    final dsmVersion = useSignalValue(connectionStore.dsmVersion);
+    final sid = useSignalValue(connectionStore.sid);
+    final baseUri = useSignalValue(connectionStore.baseUri);
+    const double albumWidth = 0;
+
+    getAlbum() async {
+      var res = await dsmFotoBrowseAlbumListMoments(shared: true);
+      if (context.mounted) {
+        album.value = res['list'];
+        loadingAlbum.value = false;
+      }
+    }
+
+    Widget buildAlbumItem(albumItem) {
+      String thumbUrl =
+          '$baseUri/webapi/entry.cgi?id=${albumItem['additional']['thumbnail']['unit_id']}&cache_key="${albumItem['additional']['thumbnail']['cache_key']}"&type="unit"&size="sm"&api="SYNO.${dsmVersion >= 7 ? "Foto" : "Photo"}.Thumbnail"&method="get"&version=1&_sid=$sid';
+      String tag = "album-${albumItem['additional']['thumbnail']['unit_id']}";
+      return GestureDetector(
+        onTap: () {
+          Navigator.of(context).push(CupertinoPageRoute(
+            builder: (context) {
+              return Photos(albumItem, tag: tag);
+            },
+          ));
+        },
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SizedBox(
+              width: albumWidth,
+              height: albumWidth,
+              child: Hero(
+                tag: "album-${albumItem['additional']['thumbnail']['unit_id']}",
+                child: CupertinoExtendedImage(
+                  thumbUrl,
+                  width: albumWidth,
+                  height: albumWidth,
+                  fit: BoxFit.cover,
+                  boxShape: BoxShape.rectangle,
+                  borderRadius: BorderRadius.circular(10),
+                  placeholder: Container(
+                    width: albumWidth,
+                    height: albumWidth,
+                    color: AppColors.placeholderBackgroundLight,
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(
+              height: 5,
+            ),
+            Text(
+              "${albumItem['name']}",
+              style: const TextStyle(fontSize: 14),
+              maxLines: 1,
+            ),
+            Text(
+              "${albumItem['item_count']}",
+              style: const TextStyle(fontSize: 12, color: Colors.grey),
+            ),
+          ],
+        ),
+      );
+    }
+
+    useEffect(() {
+      getAlbum();
+      return null;
+    }, const []);
+
     return Scaffold(
       appBar: AppBar(
         leading: AppBackButton(
           context,
         ),
-        title: Text(widget.title),
+        title: Text(title),
       ),
-      body: loadingAlbum
+      body: loadingAlbum.value
           ? const Center(
               child: CupertinoActivityIndicator(
                 radius: 14,
               ),
             )
-          : album.isNotEmpty
+          : album.value.isNotEmpty
               ? ListView(
                   padding: const EdgeInsets.all(20),
                   children: [
@@ -111,7 +109,7 @@ class AlbumState extends State<Album> {
                       runSpacing: 20,
                       spacing: 20,
                       children: [
-                        ...album.map(_buildAlbumItem),
+                        ...album.value.map(buildAlbumItem),
                       ],
                     )
                   ],

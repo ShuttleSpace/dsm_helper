@@ -10,13 +10,15 @@ import 'package:garden/util/http_util.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:garden/constants/app_constants.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:media_kit_video/media_kit_video.dart';
+import 'package:signals_hooks/signals_hooks.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import 'package:xml2json/xml2json.dart';
 
-class VideoPlayerPage extends StatefulWidget {
+class VideoPlayerPage extends HookWidget {
   final String? name;
   final String url;
   final String? cover;
@@ -31,99 +33,87 @@ class VideoPlayerPage extends StatefulWidget {
       this.network = true});
 
   @override
-  VideoPlayerPageState createState() => VideoPlayerPageState();
-}
+  Widget build(BuildContext context) {
+    final player = useMemoized(() => Player(), const []);
+    final videoController = useMemoized(
+      () => VideoController(player,
+          configuration: const VideoControllerConfiguration(
+              enableHardwareAcceleration: true)),
+      const [],
+    );
+    final isInitialized = useSignal(false);
+    final videoAspectRatio = useSignal(1.0);
+    final description = useSignal("");
+    final date = useSignal("");
+    final year = useSignal('');
+    final actors = useSignal<List>([]);
+    final currentSpeed = useSignal(1.0);
 
-class VideoPlayerPageState extends State<VideoPlayerPage> {
-  late final _player = Player();
-  late final _videoController = VideoController(_player,
-      configuration:
-          const VideoControllerConfiguration(enableHardwareAcceleration: true));
-  bool _isInitialized = false;
-  double _videoAspectRatio = 1;
+    // 倍速列表
+    const Map<String, double> speedList = {
+      "2.0": 2.0,
+      "1.5": 1.5,
+      "1.0": 1.0,
+      "0.5": 0.5,
+    };
 
-  String description = "";
-  String date = "";
-  String year = '';
-  List actors = [];
-  Map<String, dynamic> nfoDetail = {};
-
-  // 倍速列表
-  Map<String, double> speedList = {
-    "2.0": 2.0,
-    "1.5": 1.5,
-    "1.0": 1.0,
-    "0.5": 0.5,
-  };
-
-  double _currentSpeed = 1.0;
-
-  @override
-  void initState() {
-    super.initState();
-    parseNfo();
-    _initializeVideo();
-  }
-
-  Future<void> _initializeVideo() async {
-    try {
-      // 自动播放
-      _player.open(Media(widget.url), play: true);
-      _player.stream.videoParams.listen((event) {
-        setState(() {
-          _videoAspectRatio = event.aspect ?? 1;
-        });
-      });
-      setState(() {
-        _isInitialized = true;
-      });
-    } catch (error) {
-      Log.log("播放初始化异常: $error");
-      UiUtil.toast("视频加载失败，请尝试使用第三方播放器");
-    }
-  }
-
-  Future<void> _changeSpeed(double speed) async {
-    setState(() {
-      _currentSpeed = speed;
-    });
-    _player.setPitch(speed);
-  }
-
-  parseNfo() async {
-    if (widget.nfo != null) {
-      final myTransformer = Xml2Json();
-      String nfoUrl =
-          "${connectionStore.baseUri}/fbdownload/info.nfo?dlink=%22${widget.nfo?.utf8()}%22&_sid=%22${connectionStore.sid}%22&mode=open";
-      var res = await HttpUtil.instance.get(nfoUrl, decode: false);
+    Future<void> initializeVideo() async {
       try {
-        myTransformer.parse(res);
-        var json = jsonDecode(myTransformer.toParker());
-        setState(() {
-          nfoDetail = json['episodedetails'] ?? json['movie'];
-          description = nfoDetail['plot'] ?? '';
-          date = nfoDetail['dateadded'] ?? '';
-          actors = nfoDetail['actor'] ?? [];
-          year = nfoDetail['year'] ?? '';
+        // 自动播放
+        player.open(Media(url), play: true);
+        player.stream.videoParams.listen((event) {
+          videoAspectRatio.value = event.aspect ?? 1;
         });
-      } catch (e) {
-        Log.log("nfo解析异常: $e");
+        isInitialized.value = true;
+      } catch (error) {
+        Log.log("播放初始化异常: $error");
+        UiUtil.toast("视频加载失败，请尝试使用第三方播放器");
       }
     }
-  }
 
-  String _formatDuration(Duration duration) {
-    String twoDigits(int n) => n.toString().padLeft(2, '0');
-    final minutes = twoDigits(duration.inMinutes.remainder(60));
-    final seconds = twoDigits(duration.inSeconds.remainder(60));
-    return '$minutes:$seconds';
-  }
+    Future<void> changeSpeed(double speed) async {
+      currentSpeed.value = speed;
+      player.setPitch(speed);
+    }
 
-  @override
-  Widget build(BuildContext context) {
+    parseNfo() async {
+      if (nfo != null) {
+        final myTransformer = Xml2Json();
+        String nfoUrl =
+            "${connectionStore.baseUri}/fbdownload/info.nfo?dlink=%22${nfo?.utf8()}%22&_sid=%22${connectionStore.sid}%22&mode=open";
+        var res = await HttpUtil.instance.get(nfoUrl, decode: false);
+        try {
+          myTransformer.parse(res);
+          var json = jsonDecode(myTransformer.toParker());
+          var nfoDetail = json['episodedetails'] ?? json['movie'];
+          description.value = nfoDetail['plot'] ?? '';
+          date.value = nfoDetail['dateadded'] ?? '';
+          actors.value = nfoDetail['actor'] ?? [];
+          year.value = nfoDetail['year'] ?? '';
+        } catch (e) {
+          Log.log("nfo解析异常: $e");
+        }
+      }
+    }
+
+    String formatDuration(Duration duration) {
+      String twoDigits(int n) => n.toString().padLeft(2, '0');
+      final minutes = twoDigits(duration.inMinutes.remainder(60));
+      final seconds = twoDigits(duration.inSeconds.remainder(60));
+      return '$minutes:$seconds';
+    }
+
+    useEffect(() {
+      parseNfo();
+      initializeVideo();
+      return () {
+        player.dispose();
+      };
+    }, const []);
+
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.name ?? '视频播放'),
+        title: Text(name ?? '视频播放'),
         leading: AppBackButton(context),
         actions: [
           Padding(
@@ -131,17 +121,17 @@ class VideoPlayerPageState extends State<VideoPlayerPage> {
                 const EdgeInsets.only(left: 0, top: 8, bottom: 8, right: 8),
             child: OutlinedButton(
               onPressed: () async {
-                _player.pause();
+                player.pause();
                 if (Platform.isAndroid) {
                   AndroidIntent intent = AndroidIntent(
                     action: 'action_view',
-                    data: widget.url,
+                    data: url,
                     arguments: {},
                     type: "video/*",
                   );
                   await intent.launch();
                 } else {
-                  launchUrlString("vlc://${widget.url}");
+                  launchUrlString("vlc://$url");
                 }
               },
               child: Image.asset(
@@ -159,7 +149,7 @@ class VideoPlayerPageState extends State<VideoPlayerPage> {
             color: Theme.brightnessOf(context) == Brightness.dark
                 ? Colors.white
                 : Colors.black,
-            child: _isInitialized
+            child: isInitialized.value
                 ? ConstrainedBox(
                     constraints: BoxConstraints(
                         maxHeight: MediaQuery.sizeOf(context).height * 0.3),
@@ -167,8 +157,8 @@ class VideoPlayerPageState extends State<VideoPlayerPage> {
                       alignment: Alignment.center,
                       children: [
                         AspectRatio(
-                          aspectRatio: _videoAspectRatio,
-                          child: Video(controller: _videoController),
+                          aspectRatio: videoAspectRatio.value,
+                          child: Video(controller: videoController),
                         ),
                         // 控制面板
                         Visibility(
@@ -191,12 +181,10 @@ class VideoPlayerPageState extends State<VideoPlayerPage> {
                                       // 播放/暂停按钮
                                       IconButton(
                                         onPressed: () {
-                                          setState(() {
-                                            _player.playOrPause();
-                                          });
+                                          player.playOrPause();
                                         },
                                         icon: Icon(
-                                          _player.state.playing
+                                          player.state.playing
                                               ? Icons.pause
                                               : Icons.play_arrow,
                                           color: Colors.white,
@@ -204,7 +192,7 @@ class VideoPlayerPageState extends State<VideoPlayerPage> {
                                       ),
                                       // 时间显示
                                       Text(
-                                        "${_formatDuration(_player.state.position)} / ${_formatDuration(_player.state.duration)}",
+                                        "${formatDuration(player.state.position)} / ${formatDuration(player.state.duration)}",
                                         style: const TextStyle(
                                             color: Colors.white),
                                       ),
@@ -214,7 +202,7 @@ class VideoPlayerPageState extends State<VideoPlayerPage> {
                                         icon: Row(
                                           children: [
                                             Text(
-                                              "${_currentSpeed}x",
+                                              "${currentSpeed.value}x",
                                               style: const TextStyle(
                                                   color: Colors.white),
                                             ),
@@ -226,7 +214,7 @@ class VideoPlayerPageState extends State<VideoPlayerPage> {
                                           ],
                                         ),
                                         onSelected: (double speed) {
-                                          _changeSpeed(speed);
+                                          changeSpeed(speed);
                                         },
                                         itemBuilder: (BuildContext context) {
                                           return speedList.entries.map((entry) {
@@ -248,13 +236,12 @@ class VideoPlayerPageState extends State<VideoPlayerPage> {
                           onHorizontalDragUpdate: (details) {
                             Log.log(
                                 "detail: ${details.delta.dx.toInt() / MediaQuery.devicePixelRatioOf(context)}");
-                            _player.seek(Duration(
-                                milliseconds:
-                                    _player.state.position.inMilliseconds +
-                                        (details.delta.dx.toInt() /
-                                                MediaQuery.devicePixelRatioOf(
-                                                    context))
-                                            .toInt()));
+                            player.seek(Duration(
+                                milliseconds: player.state.position.inMilliseconds +
+                                    (details.delta.dx.toInt() /
+                                            MediaQuery.devicePixelRatioOf(
+                                                context))
+                                        .toInt()));
                           },
                           onVerticalDragUpdate: (details) => {
                             // TODO: volume & brightness
@@ -268,11 +255,11 @@ class VideoPlayerPageState extends State<VideoPlayerPage> {
                     height: MediaQuery.sizeOf(context).width * 9 / 16,
                     color: Colors.black,
                     child: Center(
-                      child: widget.cover != null && widget.cover!.isNotBlank
+                      child: cover != null && cover!.isNotBlank
                           ? ExtendedImage.network(
-                              widget.cover!.startsWith("http")
-                                  ? widget.cover!
-                                  : "${connectionStore.baseUri}/webapi/entry.cgi?path=${Uri.encodeComponent(widget.cover!)}&size=original&api=SYNO.FileStation.Thumb&method=get&version=2&_sid=${connectionStore.sid}&animate=true",
+                              cover!.startsWith("http")
+                                  ? cover!
+                                  : "${connectionStore.baseUri}/webapi/entry.cgi?path=${Uri.encodeComponent(cover!)}&size=original&api=SYNO.FileStation.Thumb&method=get&version=2&_sid=${connectionStore.sid}&animate=true",
                             )
                           : const CircularProgressIndicator(),
                     ),
@@ -289,7 +276,7 @@ class VideoPlayerPageState extends State<VideoPlayerPage> {
                     style: const TextStyle(color: Colors.grey, fontSize: 12),
                   ),
                 ),
-                if (widget.nfo != null)
+                if (nfo != null)
                   const Padding(
                     padding: EdgeInsets.symmetric(
                         horizontal: AppConstants.paddingLarge),
@@ -298,39 +285,39 @@ class VideoPlayerPageState extends State<VideoPlayerPage> {
                 const SizedBox(
                   height: 20,
                 ),
-                if (description.isNotBlank)
+                if (description.value.isNotBlank)
                   Padding(
                     padding:
                         const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-                    child: Text(description),
+                    child: Text(description.value),
                   ),
                 const SizedBox(
                   height: 10,
                 ),
-                if (year.isNotBlank)
+                if (year.value.isNotBlank)
                   Padding(
                     padding:
                         const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-                    child: Text("年份：$year"),
+                    child: Text("年份：${year.value}"),
                   ),
                 const SizedBox(
                   height: 10,
                 ),
-                if (date.isNotBlank)
+                if (date.value.isNotBlank)
                   Padding(
                     padding:
                         const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-                    child: Text("添加时间：$date"),
+                    child: Text("添加时间：${date.value}"),
                   ),
                 const SizedBox(
                   height: 20,
                 ),
-                if (actors.isNotEmpty) ...[
+                if (actors.value.isNotEmpty) ...[
                   const Padding(
                     padding: EdgeInsets.symmetric(horizontal: 20, vertical: 5),
                     child: Text("演员表："),
                   ),
-                  ...actors.map(
+                  ...actors.value.map(
                     (e) => Padding(
                       padding: const EdgeInsets.symmetric(
                           horizontal: 20, vertical: 5),
@@ -357,11 +344,5 @@ class VideoPlayerPageState extends State<VideoPlayerPage> {
         ],
       ),
     );
-  }
-
-  @override
-  void dispose() async {
-    await _player.dispose();
-    super.dispose();
   }
 }

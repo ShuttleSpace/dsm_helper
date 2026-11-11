@@ -3,12 +3,9 @@ import 'package:garden/pages/photos/timeline.dart';
 import 'package:flutter/material.dart';
 
 class PhotoTab extends StatelessWidget {
-  const PhotoTab(this.isTeam, this.isTimeline,
-      {super.key, this.timelineKey, this.folderKey});
+  const PhotoTab(this.isTeam, this.isTimeline, {super.key});
   final bool isTimeline;
   final bool isTeam;
-  final GlobalKey<TimelineState>? timelineKey;
-  final GlobalKey<FolderState>? folderKey;
   @override
   Widget build(BuildContext context) {
     if (isTimeline) {

@@ -10,11 +10,12 @@ import 'package:garden/widgets/hero_widget.dart';
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:garden/constants/app_constants.dart';
 import 'package:flutter_vibrate/flutter_vibrate.dart';
-import 'package:signals_flutter/signals_flutter.dart';
+import 'package:signals_hooks/signals_hooks.dart';
 
-class ImagePreview extends StatefulWidget {
+class ImagePreview extends HookWidget {
   final List<String> images;
   final List<String> thumbs;
   final List<String> names;
@@ -23,183 +24,163 @@ class ImagePreview extends StatefulWidget {
   final bool network;
   final Object? tag;
   final Function? onDelete;
-  final PageController pageController;
 
-  ImagePreview(this.images, this.index,
+  const ImagePreview(this.images, this.index,
       {super.key,
       this.network = true,
       this.tag,
       this.thumbs = const [],
       this.names = const [],
       this.paths = const [],
-      this.onDelete})
-      : pageController = PageController(initialPage: index);
-
-  @override
-  ImagePreviewState createState() => ImagePreviewState();
-}
-
-class ImagePreviewState extends State<ImagePreview>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _animationController;
-  Animation<double>? _animation;
-  var rebuildIndex = StreamController<int>.broadcast();
-  var rebuildSwiper = StreamController<bool>.broadcast();
-  VoidFunction? animationListener;
-  bool _showSwiper = true;
-  List<double> doubleTapScales = <double>[1.0, 2.0];
-  int currentIndex = 0;
-  bool blackBackground = false;
-  GlobalKey<ExtendedImageSlidePageState> slidePageKey =
-      GlobalKey<ExtendedImageSlidePageState>();
-  double initScale(
-      {required Size imageSize,
-      required Size size,
-      required double initialScale}) {
-    var n1 = imageSize.height / imageSize.width;
-    var n2 = size.height / size.width;
-    if (n1 > n2) {
-      final FittedSizes fittedSizes =
-          applyBoxFit(BoxFit.contain, imageSize, size);
-      //final Size sourceSize = fittedSizes.source;
-      Size destinationSize = fittedSizes.destination;
-      return size.width / destinationSize.width;
-    } else if (n1 / n2 < 1 / 10) {
-      final FittedSizes fittedSizes =
-          applyBoxFit(BoxFit.contain, imageSize, size);
-      //final Size sourceSize = fittedSizes.source;
-      Size destinationSize = fittedSizes.destination;
-      return size.height / destinationSize.height;
-    }
-
-    return initialScale;
-  }
-
-  deleteFile(int index) {
-    UiUtil.vibrate(FeedbackType.warning);
-    showCupertinoModalPopup(
-      context: context,
-      builder: (context) {
-        return Material(
-          color: Colors.transparent,
-          child: Card(
-            shape: RoundedRectangleBorder(
-                side: const BorderSide(),
-                borderRadius: BorderRadius.circular(18)),
-            child: Padding(
-              padding: const EdgeInsets.all(AppConstants.paddingSmall),
-              child: SafeArea(
-                top: false,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: <Widget>[
-                    const Text(
-                      "确认删除",
-                      style:
-                          TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
-                    ),
-                    const SizedBox(
-                      height: 12,
-                    ),
-                    const Text(
-                      "确认要删除文件？",
-                      style:
-                          TextStyle(fontSize: 20, fontWeight: FontWeight.w400),
-                    ),
-                    const SizedBox(
-                      height: 22,
-                    ),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: OutlinedButton(
-                            onPressed: () async {
-                              Navigator.of(context).pop();
-                              var res = await DsmApi.deleteTask(
-                                  [widget.paths[index]]);
-                              if (res['success']) {
-                                UiUtil.toast("文件删除成功");
-                                if (widget.thumbs.length > index) {
-                                  widget.thumbs.removeAt(index);
-                                }
-
-                                if (widget.images.length > index) {
-                                  widget.images.removeAt(index);
-                                }
-                                if (widget.paths.length > index) {
-                                  widget.paths.removeAt(index);
-                                }
-                                if (widget.names.length > index) {
-                                  widget.names.removeAt(index);
-                                }
-                                setState(() {});
-                                widget.onDelete?.call();
-                              }
-                            },
-                            child: const Text(
-                              "确认删除",
-                              style: TextStyle(
-                                  fontSize: 18, color: Colors.redAccent),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(
-                          width: 20,
-                        ),
-                        Expanded(
-                          child: OutlinedButton(
-                            onPressed: () async {
-                              Navigator.of(context).pop();
-                            },
-                            child: const Text(
-                              "取消",
-                              style: TextStyle(fontSize: 18),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(
-                      height: 8,
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-  @override
-  void initState() {
-    _animationController = AnimationController(
-        duration: const Duration(milliseconds: 150), vsync: this);
-    setState(() {
-      currentIndex = widget.index;
-    });
-    super.initState();
-  }
-
-  void onPageChanged(int index) {
-    setState(() {
-      currentIndex = index;
-    });
-  }
-
-  @override
-  void dispose() {
-    rebuildIndex.close();
-    rebuildSwiper.close();
-    _animationController.dispose();
-    clearGestureDetailsCache();
-    //cancelToken?.cancel();
-    super.dispose();
-  }
+      this.onDelete});
 
   @override
   Widget build(BuildContext context) {
+    final animationController = useAnimationController(
+        duration: const Duration(milliseconds: 150));
+    final animation = useRef<Animation<double>?>(null);
+    final animationListener = useRef<VoidFunction?>(null);
+    final rebuildIndex =
+        useMemoized(() => StreamController<int>.broadcast(), const []);
+    final rebuildSwiper =
+        useMemoized(() => StreamController<bool>.broadcast(), const []);
+    final showSwiper = useRef(true);
+    const doubleTapScales = <double>[1.0, 2.0];
+    final currentIndex = useRef<int>(index);
+    final rebuild = useSignal(0);
+    final slidePageKey = useMemoized(
+        () => GlobalKey<ExtendedImageSlidePageState>(), const []);
+    final isWechatInstalled = useSignalValue(settingsStore.isWechatInstalled);
+
+    double initScale(
+        {required Size imageSize,
+        required Size size,
+        required double initialScale}) {
+      var n1 = imageSize.height / imageSize.width;
+      var n2 = size.height / size.width;
+      if (n1 > n2) {
+        final FittedSizes fittedSizes =
+            applyBoxFit(BoxFit.contain, imageSize, size);
+        //final Size sourceSize = fittedSizes.source;
+        Size destinationSize = fittedSizes.destination;
+        return size.width / destinationSize.width;
+      } else if (n1 / n2 < 1 / 10) {
+        final FittedSizes fittedSizes =
+            applyBoxFit(BoxFit.contain, imageSize, size);
+        //final Size sourceSize = fittedSizes.source;
+        Size destinationSize = fittedSizes.destination;
+        return size.height / destinationSize.height;
+      }
+
+      return initialScale;
+    }
+
+    deleteFile(int index) {
+      UiUtil.vibrate(FeedbackType.warning);
+      showCupertinoModalPopup(
+        context: context,
+        builder: (context) {
+          return Material(
+            color: Colors.transparent,
+            child: Card(
+              shape: RoundedRectangleBorder(
+                  side: const BorderSide(),
+                  borderRadius: BorderRadius.circular(18)),
+              child: Padding(
+                padding: const EdgeInsets.all(AppConstants.paddingSmall),
+                child: SafeArea(
+                  top: false,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      const Text(
+                        "确认删除",
+                        style:
+                            TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
+                      ),
+                      const SizedBox(
+                        height: 12,
+                      ),
+                      const Text(
+                        "确认要删除文件？",
+                        style:
+                            TextStyle(fontSize: 20, fontWeight: FontWeight.w400),
+                      ),
+                      const SizedBox(
+                        height: 22,
+                      ),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: OutlinedButton(
+                              onPressed: () async {
+                                Navigator.of(context).pop();
+                                var res = await DsmApi.deleteTask(
+                                    [paths[index]]);
+                                if (res['success']) {
+                                  UiUtil.toast("文件删除成功");
+                                  if (thumbs.length > index) {
+                                    thumbs.removeAt(index);
+                                  }
+
+                                  if (images.length > index) {
+                                    images.removeAt(index);
+                                  }
+                                  if (paths.length > index) {
+                                    paths.removeAt(index);
+                                  }
+                                  if (names.length > index) {
+                                    names.removeAt(index);
+                                  }
+                                  rebuild.value++;
+                                  onDelete?.call();
+                                }
+                              },
+                              child: const Text(
+                                "确认删除",
+                                style: TextStyle(
+                                    fontSize: 18, color: Colors.redAccent),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(
+                            width: 20,
+                          ),
+                          Expanded(
+                            child: OutlinedButton(
+                              onPressed: () async {
+                                Navigator.of(context).pop();
+                              },
+                              child: const Text(
+                                "取消",
+                                style: TextStyle(fontSize: 18),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(
+                        height: 8,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          );
+        },
+      );
+    }
+
+    useEffect(() {
+      return () {
+        rebuildIndex.close();
+        rebuildSwiper.close();
+        clearGestureDetailsCache();
+        //cancelToken?.cancel();
+      };
+    }, const []);
+
     var size = MediaQuery.sizeOf(context);
     Widget result = Material(
       color: Theme.brightnessOf(context) == Brightness.dark
@@ -213,9 +194,9 @@ class ImagePreviewState extends State<ImagePreview>
         children: <Widget>[
           ExtendedImageGesturePageView.builder(
             itemBuilder: (BuildContext context, int index) {
-              var item = widget.images[index];
+              var item = images[index];
               Widget image;
-              if (widget.network) {
+              if (network) {
                 image = ExtendedImage.network(
                   item,
                   fit: BoxFit.contain,
@@ -232,12 +213,12 @@ class ImagePreviewState extends State<ImagePreview>
                                         0) /
                                     (loadingProgress?.expectedTotalBytes ?? 1)
                                 : 0;
-                        if (widget.thumbs.length > index + 1) {
+                        if (thumbs.length > index + 1) {
                           return Stack(
                             alignment: Alignment.center,
                             children: [
                               ExtendedImage.network(
-                                widget.thumbs[index],
+                                thumbs[index],
                                 width: double.infinity,
                                 fit: BoxFit.contain,
                               ),
@@ -265,7 +246,7 @@ class ImagePreviewState extends State<ImagePreview>
                   },
                   // heroBuilderForSlidingPage: (Widget result) {
                   //   return Hero(
-                  //     tag: widget.tag ?? item,
+                  //     tag: tag ?? item,
                   //     child: result,
                   //     flightShuttleBuilder: (BuildContext flightContext, Animation<double> animation, HeroFlightDirection flightDirection, BuildContext fromHeroContext, BuildContext toHeroContext) {
                   //       final Hero hero = (flightDirection == HeroFlightDirection.pop ? fromHeroContext.widget : toHeroContext.widget) as Hero;
@@ -301,38 +282,38 @@ class ImagePreviewState extends State<ImagePreview>
                     var pointerDownPosition = state.pointerDownPosition;
                     double begin = state.gestureDetails?.totalScale ?? 1.0;
                     double end;
-                    if (animationListener != null) {
-                      _animation?.removeListener(animationListener!);
+                    if (animationListener.value != null) {
+                      animation.value?.removeListener(animationListener.value!);
                     }
-                    _animationController.stop();
-                    _animationController.reset();
+                    animationController.stop();
+                    animationController.reset();
                     if (begin == doubleTapScales[0]) {
                       end = doubleTapScales[1];
                     } else {
                       end = doubleTapScales[0];
                     }
-                    animationListener = () {
+                    animationListener.value = () {
                       state.handleDoubleTap(
-                          scale: _animation?.value,
+                          scale: animation.value?.value,
                           doubleTapPosition: pointerDownPosition);
                     };
-                    _animation = _animationController
+                    animation.value = animationController
                         .drive(Tween<double>(begin: begin, end: end));
-                    if (animationListener != null) {
-                      _animation?.addListener(animationListener!);
+                    if (animationListener.value != null) {
+                      animation.value?.addListener(animationListener.value!);
                     }
-                    _animationController.forward();
+                    animationController.forward();
                   },
                 );
               } else {
                 image = ExtendedImage.file(
-                  File(widget.images[index]),
+                  File(images[index]),
                   fit: BoxFit.contain,
                   enableSlideOutPage: true,
                   mode: ExtendedImageMode.gesture,
                   // heroBuilderForSlidingPage: (Widget result) {
                   //   return Hero(
-                  //     tag: widget.tag ?? item,
+                  //     tag: tag ?? item,
                   //     child: result,
                   //     flightShuttleBuilder: (BuildContext flightContext, Animation<double> animation, HeroFlightDirection flightDirection, BuildContext fromHeroContext, BuildContext toHeroContext) {
                   //       final Hero hero = flightDirection == HeroFlightDirection.pop ? fromHeroContext.widget : toHeroContext.widget;
@@ -368,34 +349,34 @@ class ImagePreviewState extends State<ImagePreview>
                     var pointerDownPosition = state.pointerDownPosition;
                     double begin = state.gestureDetails?.totalScale ?? 1.0;
                     double end;
-                    if (animationListener != null) {
-                      _animation?.removeListener(animationListener!);
+                    if (animationListener.value != null) {
+                      animation.value?.removeListener(animationListener.value!);
                     }
-                    _animationController.stop();
-                    _animationController.reset();
+                    animationController.stop();
+                    animationController.reset();
                     if (begin == doubleTapScales[0]) {
                       end = doubleTapScales[1];
                     } else {
                       end = doubleTapScales[0];
                     }
-                    animationListener = () {
+                    animationListener.value = () {
                       state.handleDoubleTap(
-                          scale: _animation?.value,
+                          scale: animation.value?.value,
                           doubleTapPosition: pointerDownPosition);
                     };
-                    _animation = _animationController
+                    animation.value = animationController
                         .drive(Tween<double>(begin: begin, end: end));
-                    if (animationListener != null) {
-                      _animation?.addListener(animationListener!);
+                    if (animationListener.value != null) {
+                      animation.value?.addListener(animationListener.value!);
                     }
-                    _animationController.forward();
+                    animationController.forward();
                   },
                 );
               }
 
               image = GestureDetector(
                 child: HeroWidget(
-                  tag: widget.tag ?? item,
+                  tag: tag ?? item,
                   slidePagekey: slidePageKey,
                   child: image,
                   // flightShuttleBuilder: (BuildContext flightContext, Animation<double> animation, HeroFlightDirection flightDirection, BuildContext fromHeroContext, BuildContext toHeroContext) {
@@ -411,13 +392,13 @@ class ImagePreviewState extends State<ImagePreview>
 
               return image;
             },
-            itemCount: widget.images.length,
+            itemCount: images.length,
             onPageChanged: (int index) {
-              currentIndex = index;
+              currentIndex.value = index;
               rebuildIndex.add(index);
             },
             controller: ExtendedPageController(
-              initialPage: currentIndex,
+              initialPage: currentIndex.value,
             ),
             scrollDirection: Axis.horizontal,
             physics: const BouncingScrollPhysics(),
@@ -428,7 +409,7 @@ class ImagePreviewState extends State<ImagePreview>
 
               return Column(
                 children: [
-                  if (settingsStore.isWechatInstalled.watch(context))
+                  if (isWechatInstalled)
                     SafeArea(
                       child: Container(
                         height: 56,
@@ -438,16 +419,16 @@ class ImagePreviewState extends State<ImagePreview>
                         child: Row(
                           children: [
                             Expanded(
-                              child: widget.names.isEmpty
+                              child: names.isEmpty
                                   ? FileName(
-                                      widget.names, currentIndex, rebuildIndex)
+                                      names, currentIndex.value, rebuildIndex)
                                   : Container(),
                             ),
                             GestureDetector(
                               onTap: () {
-                                if (widget.images[currentIndex]
+                                if (images[currentIndex.value]
                                     .startsWith("http")) {
-                                } else if (widget.images[currentIndex]
+                                } else if (images[currentIndex.value]
                                     .startsWith("/")) {
                                 } else {
                                   UiUtil.toast("暂不支持分享此图片");
@@ -465,10 +446,10 @@ class ImagePreviewState extends State<ImagePreview>
                     ),
                   const Spacer(),
                   MySwiperPlugin(
-                    widget.images,
-                    currentIndex,
+                    images,
+                    currentIndex.value,
                     rebuildIndex,
-                    onDelete: widget.paths.length > currentIndex
+                    onDelete: paths.length > currentIndex.value
                         ? (index) {
                             deleteFile(index);
                           }
@@ -492,16 +473,16 @@ class ImagePreviewState extends State<ImagePreview>
         ///you can change other widgets' state on page as you want
         ///base on offset/isSliding etc
         //var offset= state.offset;
-        var showSwiper = !state.isSliding;
-        if (showSwiper != _showSwiper) {
+        var newShowSwiper = !state.isSliding;
+        if (newShowSwiper != showSwiper.value) {
           // do not setState directly here, the image state will change,
           // you should only notify the widgets which are needed to change
           // setState(() {
-          // _showSwiper = showSwiper;
+          // showSwiper.value = newShowSwiper;
           // });
 
-          _showSwiper = showSwiper;
-          rebuildSwiper.add(_showSwiper);
+          showSwiper.value = newShowSwiper;
+          rebuildSwiper.add(showSwiper.value);
         }
       },
       child: result,
