@@ -21,10 +21,11 @@ import 'package:garden/util/log.dart';
 import 'package:garden/util/ui_util.dart';
 import 'package:garden/widgets/label.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
-import 'package:signals_flutter/signals_flutter.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:signals_hooks/signals_hooks.dart';
 
-class DashboardSystemHealthCard extends StatefulWidget {
-  DashboardSystemHealthCard(
+class DashboardSystemHealthCard extends HookWidget {
+  const DashboardSystemHealthCard(
       {super.key,
       required this.storageVolumes,
       required this.storageDisks,
@@ -42,23 +43,16 @@ class DashboardSystemHealthCard extends StatefulWidget {
 
   static const widget = 'SYNO.SDS.SystemInfoApp.SystemHealthWidget';
 
-  late final heatDissipation = computed(() =>
-      "${systemData['sys_temp']}℃ ${systemData['temperature_warning'] == null ? (systemData['sys_temp'] > 80 ? "警告" : "正常") : (systemData['temperature_warning'] ? "警告" : "正常")}");
-
-  @override
-  State<StatefulWidget> createState() => DashboardSystemHealthCardState();
-}
-
-class DashboardSystemHealthCardState extends State<DashboardSystemHealthCard>
-    with SignalsMixin {
   @override
   Widget build(BuildContext context) {
+    final heatDissipation = useComputed(() =>
+        "${systemData['sys_temp']}℃ ${systemData['temperature_warning'] == null ? (systemData['sys_temp'] > 80 ? "警告" : "正常") : (systemData['temperature_warning'] ? "警告" : "正常")}");
     return GestureDetector(
       onTap: () {
         if (connectionStore.notVisitorAccount.value) {
           Navigator.of(context).push(CupertinoPageRoute(builder: (context) {
-            return SystemInfo(0, widget.systemData, widget.storageVolumes,
-                widget.storageDisks);
+            return SystemInfo(0, systemData, storageVolumes,
+                storageDisks);
           }));
         }
       },
@@ -72,7 +66,7 @@ class DashboardSystemHealthCardState extends State<DashboardSystemHealthCard>
             children: [
               /* wallpaper */
               Watch((context) {
-                final customize = widget.wallpaper.select((v) =>
+                final customize = wallpaper.select((v) =>
                     v['customizeWallpaper'] == true ||
                     v['customizeBackground'] == true);
                 if (settingsStore.showWallpaper.value && customize.value) {
@@ -135,7 +129,7 @@ class DashboardSystemHealthCardState extends State<DashboardSystemHealthCard>
                         // product model
                         Watch<Widget>((context) {
                           final model =
-                              widget.systemData.select((v) => v['model']);
+                              systemData.select((v) => v['model']);
                           if (model.value != null) {
                             Padding(
                               padding: const EdgeInsets.only(top: 5),
@@ -156,15 +150,15 @@ class DashboardSystemHealthCardState extends State<DashboardSystemHealthCard>
                           (context) => Row(
                             children: [
                               const Text("系统名称："),
-                              Text(widget.sessionHostname.value),
+                              Text(sessionHostname.value),
                             ],
                           ),
                         ),
                         // 散热
                         Watch<Widget>((context) {
                           final sysTemp =
-                              widget.systemData.select((v) => v['sys_temp']);
-                          final temperatureWarning = widget.systemData
+                              systemData.select((v) => v['sys_temp']);
+                          final temperatureWarning = systemData
                               .select((v) => v['temperature_warning']);
                           if (sysTemp.value != null) {
                             return Padding(
@@ -173,7 +167,7 @@ class DashboardSystemHealthCardState extends State<DashboardSystemHealthCard>
                                 children: [
                                   const Text("散热状态："),
                                   Text(
-                                    widget.heatDissipation.value,
+                                    heatDissipation.value,
                                     style: TextStyle(
                                         color: sysTemp.value == null
                                             ? (sysTemp.value > 80
@@ -194,7 +188,7 @@ class DashboardSystemHealthCardState extends State<DashboardSystemHealthCard>
                         // 运行时间
                         Watch<Widget>((context) {
                           final upTime =
-                              widget.systemData.select((v) => v['up_time']);
+                              systemData.select((v) => v['up_time']);
                           if (upTime.value != null && upTime.value.isNotEmpty) {
                             return Padding(
                               padding: const EdgeInsets.only(top: 5),
@@ -222,39 +216,55 @@ class DashboardSystemHealthCardState extends State<DashboardSystemHealthCard>
   }
 }
 
-class DashboardConnectionLogCard extends StatefulWidget {
+class DashboardConnectionLogCard extends HookWidget {
   const DashboardConnectionLogCard({super.key});
 
   @override
-  State<StatefulWidget> createState() => DashboardConnectionLogCardState();
-}
-
-class DashboardConnectionLogCardState extends State<DashboardConnectionLogCard>
-    with SignalsMixin {
-  late final connectedUsers = createListSignal<Map>([]);
-  late final error = createSignal('');
-
-  @override
-  initState() {
-    _fetchData();
-    super.initState();
-  }
-
-  _fetchData() {
-    dsmCoreCurrentConnectionList().then((res) {
-      final data = (res['items'] as List).map((e) {
-        e['running'] = true;
-        return e as Map;
-      }).toList();
-      connectedUsers.value = data;
-      debugPrint('✍️🌹 ${connectedUsers.length}');
-    }).catchError((e) {
-      error.value = e.toString();
-    });
-  }
-
-  @override
   Widget build(BuildContext context) {
+    final connectedUsers = useListSignal<Map>([]);
+    final error = useSignal('');
+
+    fetchData() {
+      dsmCoreCurrentConnectionList().then((res) {
+        final data = (res['items'] as List).map((e) {
+          e['running'] = true;
+          return e as Map;
+        }).toList();
+        connectedUsers.value = data;
+        debugPrint('✍️🌹 ${connectedUsers.length}');
+      }).catchError((e) {
+        error.value = e.toString();
+      });
+    }
+
+    onKickout(Map e) async {
+      // TODO: set running = true, update user in list
+      connectedUsers.update1(e, (ov) {
+        ov['running'] = true;
+        return ov;
+      });
+      try {
+        await dsmCoreCurrentConnectionKickConnection(
+            {"who": e['who'], "from": e['from']});
+        UiUtil.toast("连接已终止");
+        // TODO: set running = true, update user in list
+        connectedUsers.update1(e, (ov) {
+          ov['running'] = false;
+          return ov;
+        });
+      } on Exception catch (e) {
+        UiUtil.toast("连接终止失败：${e.toString()}");
+      }
+      if (context.mounted) {
+        Navigator.of(context).pop();
+      }
+    }
+
+    useEffect(() {
+      fetchData();
+      return null;
+    }, const []);
+
     return Card(
       shape: RoundedRectangleBorder(
           side: const BorderSide(), borderRadius: BorderRadius.circular(18)),
@@ -305,7 +315,7 @@ class DashboardConnectionLogCardState extends State<DashboardConnectionLogCard>
                       .map((e) => _DashboardConnectionLogItem(
                             user: (e).toSignal(),
                             onKickout: () {
-                              _onKickout(e);
+                              onKickout(e);
                             },
                           ))
                       .toList(),
@@ -321,29 +331,6 @@ class DashboardConnectionLogCardState extends State<DashboardConnectionLogCard>
         ),
       ),
     );
-  }
-
-  _onKickout(Map e) async {
-    // TODO: set running = true, update user in list
-    connectedUsers.update1(e, (ov) {
-      ov['running'] = true;
-      return ov;
-    });
-    try {
-      await dsmCoreCurrentConnectionKickConnection(
-          {"who": e['who'], "from": e['from']});
-      UiUtil.toast("连接已终止");
-      // TODO: set running = true, update user in list
-      connectedUsers.update1(e, (ov) {
-        ov['running'] = false;
-        return ov;
-      });
-    } on Exception catch (e) {
-      UiUtil.toast("连接终止失败：${e.toString()}");
-    }
-    if (mounted) {
-      Navigator.of(context).pop();
-    }
   }
 }
 
@@ -518,38 +505,31 @@ class _DashboardConnectionLogItem extends StatelessWidget {
   }
 }
 
-class DashboardTaskSchedulerCard extends StatefulWidget {
+class DashboardTaskSchedulerCard extends HookWidget {
   const DashboardTaskSchedulerCard({super.key});
 
   @override
-  State<StatefulWidget> createState() => DashboardTaskSchedulerCardState();
-}
-
-class DashboardTaskSchedulerCardState extends State<DashboardTaskSchedulerCard>
-    with SignalsMixin {
-  late final schedulerTasks = createListSignal([]);
-  late final error = createSignal('');
-
-  @override
-  initState() {
-    _fetchData();
-    super.initState();
-  }
-
-  _fetchData() {
-    dsmCoreTaskSchedulerList(
-      sortBy: 'next_trigger_time',
-      sortDirection: 'ASC',
-    ).then((res) {
-      schedulerTasks.value = res['tasks'] as List;
-      debugPrint("哇咔咔🎊🎊🎊");
-    }).catchError((e) {
-      error.value = e.toString();
-    });
-  }
-
-  @override
   Widget build(BuildContext context) {
+    final schedulerTasks = useListSignal([]);
+    final error = useSignal('');
+
+    fetchData() {
+      dsmCoreTaskSchedulerList(
+        sortBy: 'next_trigger_time',
+        sortDirection: 'ASC',
+      ).then((res) {
+        schedulerTasks.value = res['tasks'] as List;
+        debugPrint("哇咔咔🎊🎊🎊");
+      }).catchError((e) {
+        error.value = e.toString();
+      });
+    }
+
+    useEffect(() {
+      fetchData();
+      return null;
+    }, const []);
+
     return GestureDetector(
       onTap: () {
         Navigator.of(context).push(CupertinoPageRoute(builder: (context) {
@@ -682,40 +662,33 @@ class _DashboardTashSchedulerItem extends StatelessWidget {
   }
 }
 
-class DashboardRecentLogCard extends StatefulWidget {
+class DashboardRecentLogCard extends HookWidget {
   const DashboardRecentLogCard({super.key});
 
   @override
-  State<StatefulWidget> createState() => DashboardRecentLogCardState();
-}
-
-class DashboardRecentLogCardState extends State<DashboardRecentLogCard>
-    with SignalsMixin {
-  late final recentLogs = createListSignal([]);
-  late final error = createSignal('');
-
-  @override
-  initState() {
-    _fetchData();
-    super.initState();
-  }
-
-  _fetchData() {
-    dsmCoreSyslogClientLogList(
-            logtype: 'ftp,filestation,webdav,cifs,tftp,afp',
-            target: 'LOCAL',
-            sortDirection: 'desc',
-            limit: 50,
-            offset: 0)
-        .then((res) {
-      recentLogs.value = res['items'] as List;
-    }).catchError((e) {
-      error.value = e.toString();
-    });
-  }
-
-  @override
   Widget build(BuildContext context) {
+    final recentLogs = useListSignal([]);
+    final error = useSignal('');
+
+    fetchData() {
+      dsmCoreSyslogClientLogList(
+              logtype: 'ftp,filestation,webdav,cifs,tftp,afp',
+              target: 'LOCAL',
+              sortDirection: 'desc',
+              limit: 50,
+              offset: 0)
+          .then((res) {
+        recentLogs.value = res['items'] as List;
+      }).catchError((e) {
+        error.value = e.toString();
+      });
+    }
+
+    useEffect(() {
+      fetchData();
+      return null;
+    }, const []);
+
     return GestureDetector(
       onTap: () {
         Navigator.of(context).push(CupertinoPageRoute(
@@ -763,7 +736,7 @@ class DashboardRecentLogCardState extends State<DashboardRecentLogCard>
               Builder(builder: (context) {
                 if (recentLogs.watch(context).isEmpty) {
                   return TextButton(
-                      onPressed: _fetchData,
+                      onPressed: fetchData,
                       child: Text.rich(TextSpan(
                           text: error.isEmpty ? '暂无日志' : error.value,
                           children: [
@@ -810,56 +783,51 @@ class DashboardRecentLogCardState extends State<DashboardRecentLogCard>
   }
 }
 
-class DashboardResourceMonitorCard extends StatefulWidget {
+class DashboardResourceMonitorCard extends HookWidget {
   const DashboardResourceMonitorCard({super.key});
 
   @override
-  State<StatefulWidget> createState() => DashboardResourceMonitorCardState();
-}
-
-class DashboardResourceMonitorCardState
-    extends State<DashboardResourceMonitorCard> with SignalsMixin {
-  late final monitoredResources = createMapSignal({});
-  late final error = createSignal('');
-
-  final networks = List.generate(20, (i) => {"tx": 0, "rx": 0});
-  int get maxNetworkSpeed {
-    int maxSpeed = 0;
-    for (int i = 0; i < networks.length; i++) {
-      int maxVal = max(networks[i]['rx'] ?? 0, networks[i]['tx'] ?? 0);
-      if (maxSpeed < maxVal) {
-        maxSpeed = maxVal;
-      }
-    }
-    return maxSpeed;
-  }
-
-  @override
-  initState() {
-    _fetchData();
-    super.initState();
-  }
-
-  _fetchData() {
-    dsmCoreSystemUtilization(
-        ["cpu", "memory", "network", "lun", "disk", "space"]).then((res) {
-      monitoredResources.value = res as Map<String, dynamic>;
-      if (networks.length > 20) {
-        networks.removeAt(0);
-      }
-      Log.debug('🌊: ${monitoredResources.isEmpty}');
-      final networkData = res['network'][0] as Map;
-      networks.add({
-        "tx": (networkData['tx'] as num?)?.toInt() ?? 0,
-        "rx": (networkData['rx'] as num?)?.toInt() ?? 0
-      });
-    }).catchError((e) {
-      error.value = e.toString();
-    });
-  }
-
-  @override
   Widget build(BuildContext context) {
+    final monitoredResources = useMapSignal({});
+    final error = useSignal('');
+
+    final networks = useMemoized(
+        () => List.generate(20, (i) => {"tx": 0, "rx": 0}), const []);
+
+    int maxNetworkSpeed() {
+      int maxSpeed = 0;
+      for (int i = 0; i < networks.length; i++) {
+        int maxVal = max(networks[i]['rx'] ?? 0, networks[i]['tx'] ?? 0);
+        if (maxSpeed < maxVal) {
+          maxSpeed = maxVal;
+        }
+      }
+      return maxSpeed;
+    }
+
+    fetchData() {
+      dsmCoreSystemUtilization(
+          ["cpu", "memory", "network", "lun", "disk", "space"]).then((res) {
+        monitoredResources.value = res as Map<String, dynamic>;
+        if (networks.length > 20) {
+          networks.removeAt(0);
+        }
+        Log.debug('🌊: ${monitoredResources.isEmpty}');
+        final networkData = res['network'][0] as Map;
+        networks.add({
+          "tx": (networkData['tx'] as num?)?.toInt() ?? 0,
+          "rx": (networkData['rx'] as num?)?.toInt() ?? 0
+        });
+      }).catchError((e) {
+        error.value = e.toString();
+      });
+    }
+
+    useEffect(() {
+      fetchData();
+      return null;
+    }, const []);
+
     return GestureDetector(
       onTap: () {
         Navigator.of(context).push(CupertinoPageRoute(builder: (context) {
@@ -902,7 +870,7 @@ class DashboardResourceMonitorCardState
               Builder(builder: (context) {
                 if (monitoredResources.watch(context).isEmpty) {
                   return TextButton(
-                      onPressed: _fetchData,
+                      onPressed: fetchData,
                       child: Text.rich(TextSpan(
                           text: error.isEmpty ? '暂时获取不到系统数据' : error.value,
                           children: [
@@ -934,7 +902,7 @@ class DashboardResourceMonitorCardState
                         height: 15,
                       ),
                       PerformanceNetworkChartWidget(
-                          networks: networks, maxNetworkSpeed: maxNetworkSpeed)
+                          networks: networks, maxNetworkSpeed: maxNetworkSpeed())
                     ],
                   );
                 }
@@ -1354,35 +1322,28 @@ class _DashboardStorageSsdCacheItem extends StatelessWidget {
   }
 }
 
-class DashboardFileChangeLogCard extends StatefulWidget {
+class DashboardFileChangeLogCard extends HookWidget {
   const DashboardFileChangeLogCard({super.key});
 
   @override
-  State<StatefulWidget> createState() => DashboardFileChangeLogCardState();
-}
-
-class DashboardFileChangeLogCardState extends State<DashboardFileChangeLogCard>
-    with SignalsMixin {
-  late final fileChangeLogs = createListSignal([]);
-  late final error = createSignal('');
-
-  @override
-  initState() {
-    super.initState();
-    _fetchData();
-  }
-
-  _fetchData() {
-    dsmCoreSyslogClientLogList()
-        .then((res) => {fileChangeLogs.value = res['items']})
-        .catchError((e) {
-      error.value = e.toString();
-      return <dynamic>{};
-    });
-  }
-
-  @override
   Widget build(BuildContext context) {
+    final fileChangeLogs = useListSignal([]);
+    final error = useSignal('');
+
+    fetchData() {
+      dsmCoreSyslogClientLogList()
+          .then((res) => {fileChangeLogs.value = res['items']})
+          .catchError((e) {
+        error.value = e.toString();
+        return <dynamic>{};
+      });
+    }
+
+    useEffect(() {
+      fetchData();
+      return null;
+    }, const []);
+
     return Card(
       shape: RoundedRectangleBorder(
           side: const BorderSide(), borderRadius: BorderRadius.circular(18)),

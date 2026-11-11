@@ -45,7 +45,10 @@ import 'package:signals_flutter/signals_flutter.dart';
 enum ListType { list, icon }
 
 class Files extends StatefulWidget {
-  const Files({super.key});
+  final Signal<bool> filesDrawerOpen;
+  final Signal<Future<bool> Function()?> filesOnWillPop;
+  const Files(
+      {super.key, required this.filesDrawerOpen, required this.filesOnWillPop});
   @override
   FilesState createState({key}) => FilesState();
 }
@@ -78,15 +81,21 @@ class FilesState extends State<Files> {
   ListType listType = ListType.list;
   Map scrollPosition = {};
   Floating? audioPlayerFloating;
+  void Function()? _drawerOpenSubscription;
   @override
   void dispose() {
     searchTimer?.cancel();
     processingTimer?.cancel();
+    _drawerOpenSubscription?.call();
     super.dispose();
   }
 
   @override
   void initState() {
+    widget.filesOnWillPop.value = onWillPop;
+    _drawerOpenSubscription = widget.filesDrawerOpen.subscribe((open) {
+      if (!open) closeDrawer();
+    });
     getShareList();
     getSmbFolder();
     getFtpFolder();
@@ -3281,6 +3290,7 @@ class FilesState extends State<Files> {
   Widget build(BuildContext context) {
     return Scaffold(
       key: _scaffoldKey,
+      onDrawerChanged: (isOpened) => widget.filesDrawerOpen.value = isOpened,
       appBar: AppBar(
         automaticallyImplyLeading: false,
         titleSpacing: 0,

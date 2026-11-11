@@ -8,20 +8,15 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:garden/constants/app_constants.dart';
 import 'package:garden/theme/app_colors.dart';
-import 'package:signals_flutter/signals_flutter.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:signals_hooks/signals_hooks.dart';
 
-class WidgetSetting extends StatefulWidget {
+class WidgetSetting extends HookWidget {
   const WidgetSetting(this.widgets, this.restoreSizePos, {super.key});
   final ReadonlySignal<List> widgets;
   final ReadonlySignal<Map> restoreSizePos;
-  @override
-  WidgetSettingState createState() => WidgetSettingState();
-}
 
-class WidgetSettingState extends State<WidgetSetting> with SignalsMixin {
-  late final showShortcut = createSignal(true);
-  late final showWallpaper = createSignal(true);
-  List<String> allWidgets = [
+  static const List<String> allWidgets = [
     // "SYNO.SDS.SystemInfoApp.FileChangeLogWidget",
     "SYNO.SDS.SystemInfoApp.SystemHealthWidget",
     "SYNO.SDS.ResourceMonitor.Widget",
@@ -31,7 +26,7 @@ class WidgetSettingState extends State<WidgetSetting> with SignalsMixin {
     "SYNO.SDS.SystemInfoApp.FileChangeLogWidget",
     "SYNO.SDS.SystemInfoApp.RecentLogWidget",
   ];
-  Map name = {
+  static const Map<String, dynamic> name = {
     "SYNO.SDS.SystemInfoApp.FileChangeLogWidget": "文件更改日志",
     "SYNO.SDS.SystemInfoApp.RecentLogWidget": "最新日志",
     "SYNO.SDS.TaskScheduler.TaskSchedulerWidget": "计划任务",
@@ -40,22 +35,25 @@ class WidgetSettingState extends State<WidgetSetting> with SignalsMixin {
     "SYNO.SDS.SystemInfoApp.StorageUsageWidget": "存储",
     "SYNO.SDS.ResourceMonitor.Widget": "资源监控",
   };
-  late final showWidgets = createListSignal([]);
-  late final selectedWidgets = createListSignal([]);
-  @override
-  void initState() {
-    (() async {
-      showWidgets.value =
-          <dynamic>{...widget.widgets.value, ...allWidgets}.toList();
-      selectedWidgets.value = widget.widgets.value;
-      showShortcut.value = await StorageUtil.getBool("show_shortcut") ?? true;
-      showWallpaper.value = await StorageUtil.getBool("show_wallpaper") ?? true;
-    })();
-    super.initState();
-  }
 
   @override
   Widget build(BuildContext context) {
+    final showShortcut = useSignal(true);
+    final showWallpaper = useSignal(true);
+    final showWidgets = useListSignal([]);
+    final selectedWidgets = useListSignal([]);
+
+    useEffect(() {
+      (() async {
+        showWidgets.value =
+            <dynamic>{...widgets.value, ...allWidgets}.toList();
+        selectedWidgets.value = widgets.value;
+        showShortcut.value = await StorageUtil.getBool("show_shortcut") ?? true;
+        showWallpaper.value = await StorageUtil.getBool("show_wallpaper") ?? true;
+      })();
+      return null;
+    }, const []);
+
     final showWidgetsValue = showWidgets.watch(context);
     final selectedWidgetsValue = selectedWidgets.watch(context);
     final showShortcutValue = showShortcut.watch(context);
@@ -194,14 +192,12 @@ class WidgetSettingState extends State<WidgetSetting> with SignalsMixin {
                 return GestureDetector(
                   key: ValueKey(widget),
                   onTap: () {
-                    setState(() {
-                      if (selectedWidgetsValue.contains(widget)) {
-                        selectedWidgets.remove(widget);
-                      } else {
-                        selectedWidgets.add(widget);
-                      }
-                      Log.info(showWidgetsValue);
-                    });
+                    if (selectedWidgetsValue.contains(widget)) {
+                      selectedWidgets.remove(widget);
+                    } else {
+                      selectedWidgets.add(widget);
+                    }
+                    Log.info(showWidgetsValue);
                   },
                   child: Card(
                     shape: RoundedRectangleBorder(
@@ -243,8 +239,6 @@ class WidgetSettingState extends State<WidgetSetting> with SignalsMixin {
               onReorderItem: (int oldIndex, int newIndex) {
                 var child = showWidgets.removeAt(oldIndex);
                 showWidgets.insert(newIndex, child);
-
-                setState(() {});
               },
             ),
           ),

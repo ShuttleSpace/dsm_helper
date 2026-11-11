@@ -46,16 +46,11 @@ void main() async {
   }
 }
 
-class MyApp extends StatefulWidget {
+class MyApp extends StatelessWidget {
   final bool authPage;
   final bool launchAccountPage;
   const MyApp(this.authPage, this.launchAccountPage, {super.key});
 
-  @override
-  MyAppState createState() => MyAppState();
-}
-
-class MyAppState extends State<MyApp> with SignalsMixin {
   @override
   Widget build(BuildContext context) {
     return OKToast(
@@ -84,11 +79,11 @@ class MyAppState extends State<MyApp> with SignalsMixin {
             supportedLocales: const [
               Locale('zh', 'CN'),
             ],
-            home: widget.authPage
+            home: authPage
                 ? AuthPage(
-                    launchAccountPage: widget.launchAccountPage,
+                    launchAccountPage: launchAccountPage,
                   )
-                : widget.launchAccountPage
+                : launchAccountPage
                     ? const Accounts()
                     : const Login(),
             routes: {
