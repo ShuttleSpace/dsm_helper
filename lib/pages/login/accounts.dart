@@ -14,35 +14,19 @@ import 'package:garden/util/ui_util.dart';
 import 'package:garden/widgets/label.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
-import 'package:signals/signals_flutter.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:signals_hooks/signals_hooks.dart';
 
-class Accounts extends StatefulWidget {
+class Accounts extends HookWidget {
   const Accounts({super.key});
 
   @override
-  AccountsState createState() => AccountsState();
-}
+  Widget build(BuildContext context) {
+    final servers = useListSignal<MapSignal<String, dynamic>>([]);
+    final visible = useSignal(false);
+    final timer = useSignal<Timer?>(null);
 
-class AccountsState extends State<Accounts> with SignalsMixin {
-  late final servers = createListSignal<MapSignal<String, dynamic>>([]);
-  late final visible = createSignal(false);
-  late final timer = createSignal<Timer?>(null);
-  late final hasLogined = createSignal(false);
-
-  @override
-  void initState() {
-    super.initState();
-    _initState();
-  }
-
-  @override
-  void dispose() {
-    timer.value?.cancel();
-    timer.value = null;
-    super.dispose();
-  }
-
-  _initState() async {
+  loadServers() async {
     final result = await StorageUtil.getString("servers") ?? '';
     if (result.isNotBlank) {
       servers.value = json.decode(result);
@@ -52,7 +36,7 @@ class AccountsState extends State<Accounts> with SignalsMixin {
     }
   }
 
-  _saveServers() async {
+  saveServers() async {
     if (servers.isNotEmpty) {
       await StorageUtil.setString(
           "servers",
@@ -75,7 +59,7 @@ class AccountsState extends State<Accounts> with SignalsMixin {
     }
   }
 
-  Widget _buildServerItem(MapSignal server) {
+  Widget buildServerItem(MapSignal server) {
     server['cpu'] = server['cpu'] ?? 0.0;
     server['ram'] = server['ram'] ?? 0.0;
     server['tx'] = server['tx'] ?? 0.0;
@@ -133,7 +117,7 @@ class AccountsState extends State<Accounts> with SignalsMixin {
                       visible: visible,
                       onDelete: (v) async {
                         servers.remove(server);
-                        await _saveServers();
+                        await saveServers();
                         UiUtil.toast('删除成功!');
                       },
                       onEdit: (v) => {
@@ -171,8 +155,14 @@ class AccountsState extends State<Accounts> with SignalsMixin {
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
+    useEffect(() {
+      loadServers();
+      return () {
+        timer.value?.cancel();
+        timer.value = null;
+      };
+    }, const []);
+
     return Scaffold(
       appBar: AppBar(
         leading: AppBackButton(context),
@@ -207,7 +197,7 @@ class AccountsState extends State<Accounts> with SignalsMixin {
                     type: "add",
                   );
                 })).then((_) {
-                  _initState();
+                  loadServers();
                 });
                 return;
               },
@@ -219,7 +209,7 @@ class AccountsState extends State<Accounts> with SignalsMixin {
       body: ListView.separated(
         padding: const EdgeInsets.all(20),
         itemBuilder: (context, i) {
-          return _buildServerItem(servers.value[i]);
+          return buildServerItem(servers.value[i]);
         },
         itemCount: servers.value.length,
         separatorBuilder: (context, i) {
