@@ -407,9 +407,16 @@ class Packages extends HookWidget {
       fetchData();
       return () {
         searchController.removeListener(listener);
-        tabController.dispose();
       };
     }, const []);
+
+    // The tab count changes (3 -> 4) once the beta packages arrive, which
+    // rebuilds the controller; the previous instance must be disposed.
+    useEffect(() {
+      return () {
+        tabController.dispose();
+      };
+    }, [tabController]);
 
     return Scaffold(
       appBar: AppBar(

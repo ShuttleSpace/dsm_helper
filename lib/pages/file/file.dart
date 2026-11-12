@@ -63,7 +63,8 @@ class Files extends HookWidget {
     final sortBy = useSignal('name');
     final sortDirection = useSignal('ASC');
     final listType = useSignal(ListType.list);
-    final paths = useSignal<List>(['/']);
+    // 根目录用空列表表示（与迁移前 `List paths = []` 语义一致）。
+    final paths = useSignal<List>([]);
     final files = useSignal<List>([]);
     final smbFolders = useSignal<List>([]);
     final ftpFolders = useSignal<List>([]);

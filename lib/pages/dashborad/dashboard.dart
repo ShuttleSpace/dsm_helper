@@ -186,7 +186,7 @@ class Dashboard extends HookWidget {
           state.closeDrawer();
         }
       }
-    });
+    }, keys: const []);
 
     final loadingValue = loading.watch(context);
     final successValue = success.watch(context);

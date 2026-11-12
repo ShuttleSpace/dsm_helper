@@ -46,7 +46,7 @@ class ImagePreview extends HookWidget {
         useMemoized(() => StreamController<bool>.broadcast(), const []);
     final showSwiper = useRef(true);
     const doubleTapScales = <double>[1.0, 2.0];
-    final currentIndex = useRef<int>(index);
+    final currentIndex = useSignal(index);
     final rebuild = useSignal(0);
     final slidePageKey = useMemoized(
         () => GlobalKey<ExtendedImageSlidePageState>(), const []);
