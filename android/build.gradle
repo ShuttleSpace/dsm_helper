@@ -1,17 +1,32 @@
 buildscript {
-    ext.kotlin_version = '2.1.0'
+    ext.kotlin_version = '2.4.0'
     repositories {
         google()
+        // 同 allprojects：优先国内镜像，规避 Maven Central 的 TLS 握手中断。
+        maven { url 'https://maven.aliyun.com/repository/google' }
+        maven { url 'https://maven.aliyun.com/repository/public' }
+        maven { url 'https://maven.aliyun.com/repository/central' }
+        maven { url 'https://mirrors.cloud.tencent.com/nexus/repository/maven-public' }
         mavenCentral()
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:8.3.1'
+        classpath 'com.android.tools.build:gradle:8.11.1'
     }
 }
 allprojects {
     repositories {
         google()
+        // 国内网络直连 repo.maven.apache.org / jitpack.io 常因 TLS 握手中断
+        // ("Remote host terminated the handshake") 而解析失败，
+        // 因此优先走国内镜像，官方源保留在后面作为 fallback。
+        maven { url 'https://maven.aliyun.com/repository/google' }
+        maven { url 'https://maven.aliyun.com/repository/public' }
+        maven { url 'https://maven.aliyun.com/repository/central' }
+        // 腾讯云 maven-public 是聚合仓库，除 Central 外还覆盖 JitPack 的内容
+        // （如 image_cropper 依赖的 com.github.Yalantis:ucrop，
+        //   仅 JitPack 有，阿里云镜像 404）。
+        maven { url 'https://mirrors.cloud.tencent.com/nexus/repository/maven-public' }
         mavenCentral()
     }
 }
@@ -30,7 +45,12 @@ subprojects {
                 project.plugins.hasPlugin("com.android.library")) {
             project.android {
                 compileSdkVersion flutter.compileSdkVersion
-                buildToolsVersion "34.0.0"
+                buildToolsVersion "36.0.0"
+                // 统一 NDK 版本：部分插件（jni / speech_to_text 等）使用
+                // flutter.ndkVersion，实际取 AGP 的默认 NDK（27.x 的某个 patch），
+                // 本机未安装会触发 Gradle 自动下载 NDK（耗时极长）。
+                // 这里统一指向本机已安装、且 app 模块已在使用的版本。
+                ndkVersion "27.0.12077973"
             }
         }
     }

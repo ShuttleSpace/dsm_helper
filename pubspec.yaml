@@ -27,6 +27,14 @@ dependency_overrides:
       url: https://gitee.com/dsm_bay/plus_plugins.git
       ref: main
       path: packages/battery_plus/battery_plus
+  # Flutter 3.47.2 打包的 Dart 3.13 移除了 dart:ffi 的 malloc / calloc / Arena，
+  # 而 jni 1.1.2 仍在使用这些 API，无法编译。
+  # jni 由下面两个插件的内部实现引入（2.3.0 / 2.5.0 起改用 JNI），
+  # 它们的 CHANGELOG 表明这只是内部实现重构，无公开 API 变更，
+  # 因此固定到最后一个不依赖 jni 的版本。
+  # 上游 jni 修复 Dart 3.13 兼容后（dart-lang/native）即可移除这两行。
+  path_provider_android: 2.2.23
+  shared_preferences_android: 2.4.28
 dependencies:
   flutter:
     sdk: flutter
