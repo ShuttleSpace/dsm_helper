@@ -23,15 +23,18 @@
 - `/fbdownload` 是否真的返回 206（Range 生效）—— 决定 `ParallelDownloadTask` 能否多线程。
 - v3 分片上传的确切字段名、首片如何返回 `upload_id`、末片如何触发拼合。
 
-## 当前 fallback 决策（写进 transfer_contract.dart）
+## 当前决策（写进 transfer_contract.dart）
 
-| 开关 | 值 | 理由 |
-|------|----|------|
+| 项 | 值 | 理由 |
+|----|----|------|
+| 下载 dlink | 直接 `base64(path)` 构造 | 抓包中 dlink 解码即路径；走 /fbdownload（支持 Range/多线程）。**待 Task 8 真机确认 /fbdownload 接受自构造 dlink** |
 | `kUploadV3Supported` | `false` | 未实测；先走 v2 单请求上传（background_downloader 仍提供后台连续性） |
-| `kDownloadDlinkSelfConstruct` | `false` | 未实测；下载走 `SYNO.FileStation.Download` 取 dlink（与现有 `dsmFileStationDownload` 一致） |
 | `kDefaultChunkSizeBytes` | `8 * 1024 * 1024` | 分片大小（v3 开启后使用） |
 | `kDefaultConcurrency` | `4` | 上传分片并发度 |
 | `UploadV3Fields` | 字段名映射 | 预留，待实测后微调 |
+
+> 早期方案曾考虑"下载回退 SYNO.FileStation.Download 取 dlink"，但抓包证明 dlink 即路径的
+> base64，自构造即可，且只有 /fbdownload 支持 Range 多线程。故采用自构造单路径。
 
 ## 待办（Task 8 真机 / 有效 FileStation SID）
 

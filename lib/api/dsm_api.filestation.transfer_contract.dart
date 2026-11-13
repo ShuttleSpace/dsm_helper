@@ -10,10 +10,6 @@
 /// 是否启用 v3 分片上传。未实测确认 → 回退 v2 单请求上传。
 const bool kUploadV3Supported = false;
 
-/// 是否可用 base64(path) 直接构造 dlink（免调 SYNO.FileStation.Download）。
-/// 未实测 → 下载走 SYNO.FileStation.Download 取 dlink。
-const bool kDownloadDlinkSelfConstruct = false;
-
 /// 默认分片大小（上传分片用）。
 const int kDefaultChunkSizeBytes = 8 * 1024 * 1024;
 
