@@ -157,6 +157,11 @@ class TransferStore {
     return ok;
   }
 
+  void remove(String id) {
+    _tasks.value = _tasks.value.where((e) => e.id != id).toList();
+    persist();
+  }
+
   Future<void> persist() async {
     await StorageUtil.setString(
       'transfer_tasks',

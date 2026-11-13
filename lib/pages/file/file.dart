@@ -30,6 +30,8 @@ import 'package:garden/pages/file/upload.dart';
 import 'package:garden/theme/app_theme.dart';
 import 'package:garden/util/http_util.dart';
 import 'package:garden/widgets/animation_progress_bar.dart';
+import 'package:garden/widgets/transfer_list.dart';
+import 'package:garden/stores/transfer_store.dart';
 import 'package:garden/extensions/context.dart';
 import 'package:garden/widgets/file_icon.dart';
 import 'package:garden/widgets/transparent_router.dart';
@@ -320,7 +322,7 @@ class Files extends HookWidget {
         } else {
           filename = file['name'];
         }
-        await enqueDownloadTask(url, filename, onPermissionDenied: () {
+        final taskId = await enqueDownloadTask(url, filename, onPermissionDenied: () {
           showCupertinoDialog(
               context: context,
               builder: (context) {
@@ -345,6 +347,15 @@ class Files extends HookWidget {
                 );
               });
         });
+        if (taskId != null) {
+          transferStore.add(TransferTask(
+            id: taskId,
+            type: TransferType.download,
+            localPath: '',
+            remotePath: file['path'] as String,
+            state: TransferState.active,
+          ));
+        }
       }
       UiUtil.toast(
           "已添加${filePaths.length > 1 ? "${filePaths.length}个" : ""}下载任务，请至下载页面查看");
@@ -3130,6 +3141,7 @@ class Files extends HookWidget {
             ),
           if (backgroundProcess.value.isNotEmpty && showProcessList.value)
             buildProcessList(),
+          const TransferList(),
           Expanded(
             child: success.value
                 ? Stack(

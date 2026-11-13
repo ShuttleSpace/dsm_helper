@@ -8,6 +8,8 @@ import 'package:dio/dio.dart';
 import 'package:garden/pages/common/select_local_folder.dart';
 import 'package:garden/pages/file/select_folder.dart';
 import 'package:garden/theme/app_theme.dart';
+import 'package:garden/services/transfer_upload.dart';
+import 'package:garden/stores/transfer_store.dart';
 import 'package:garden/util/http_util.dart';
 import 'package:garden/widgets/file_icon.dart';
 import 'package:garden/widgets/label.dart';
@@ -569,22 +571,26 @@ class Upload extends HookWidget {
                           if (upload.status != UploadStatus.wait) {
                             continue;
                           }
-                          //上传文件
+                          //上传文件（走 transfer 引擎，后台可续传）
                           upload.status = UploadStatus.running;
                           notifyUploads();
-                          // Log.info("上传路径：$savePath${upload.subPath.isNotBlank ? "/${upload.subPath}" : ""}");
-                          var res = await DsmApi.upload(
-                              "${savePath.value}${upload.subPath.isNotBlank ? "/${upload.subPath}" : ""}",
-                              upload.path,
-                              upload.cancelToken, (progress, total) {
-                            upload.uploadSize = progress;
-                            upload.fileSize = total;
-                            notifyUploads();
-                          });
-                          Log.info(res);
-                          if (res['success']) {
+                          final remoteDir =
+                              "${savePath.value}${upload.subPath.isNotBlank ? "/${upload.subPath}" : ""}";
+                          try {
+                            final taskId = await enqueueFileUpload(
+                              localPath: upload.path,
+                              remoteDir: remoteDir,
+                            );
+                            transferStore.add(TransferTask(
+                              id: taskId,
+                              type: TransferType.upload,
+                              localPath: upload.path,
+                              remotePath: '$remoteDir/${upload.name}',
+                              state: TransferState.active,
+                            ));
                             upload.status = UploadStatus.complete;
-                          } else {
+                          } catch (e) {
+                            Log.error(e);
                             upload.status = UploadStatus.failed;
                           }
                           notifyUploads();
