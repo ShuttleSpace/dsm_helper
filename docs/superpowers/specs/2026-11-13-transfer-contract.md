@@ -38,6 +38,10 @@
 
 ## 待办（Task 8 真机 / 有效 FileStation SID）
 
-1. 用新鲜 `_SSID` 发 2 分片 v3 上传，确认字段名与拼合时机，置 `kUploadV3Supported=true`。
-2. 带 `Range` 请求 `/fbdownload`，确认 206，置 `kDownloadDlinkSelfConstruct=true`（可选优化）。
-3. 两种情况下传/下载完成后在 NAS 侧比对校验和，确认文件未损坏。
+> 已完成：`flutter build apk --debug` 通过 —— AndroidManifest（FOREGROUND_SERVICE_DATA_SYNC + dataSync service）与 Gradle/AGP 编译无误（2026-11-13）。
+> 仍有待真机/有效 SID 手动验证（沙箱无设备与在线 NAS）：
+
+1. 用新鲜 `_SSID` 发 2 分片 v3 上传，确认字段名与拼合时机，置 `kUploadV3Supported=true`（并开启分片并发）。
+2. 带 `Range` 请求 `/fbdownload`，确认 206；确认后把 `downloadConcurrency` 调高（如 4）开启多线程下载。
+3. 下载/上传完成后在 NAS 侧比对校验和，确认文件未损坏。
+4. MIUI 真机 + 模拟器各跑一次：退后台/杀进程后传输是否经 work-manager 续传；前台通知进度/暂停/取消是否可用。
