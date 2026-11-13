@@ -77,19 +77,19 @@ void main() {
 
   group('resumeUnfinishedOnStartup', () {
     test('resumes queued/active/paused but not done/canceled', () async {
-      final done = const TransferTask(
+      const done = TransferTask(
         id: 'done', type: TransferType.download,
         localPath: '/l', remotePath: '/r', state: TransferState.done,
       );
-      final active = const TransferTask(
+      const active = TransferTask(
         id: 'active', type: TransferType.download,
         localPath: '/l', remotePath: '/r', state: TransferState.active,
       );
-      final paused = const TransferTask(
+      const paused = TransferTask(
         id: 'paused', type: TransferType.upload,
         localPath: '/l', remotePath: '/r', state: TransferState.paused,
       );
-      final canceled = const TransferTask(
+      const canceled = TransferTask(
         id: 'canceled', type: TransferType.download,
         localPath: '/l', remotePath: '/r', state: TransferState.canceled,
       );

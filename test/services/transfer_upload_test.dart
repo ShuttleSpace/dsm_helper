@@ -56,7 +56,7 @@ void main() {
   });
 
   test('v3UploadFields carries part metadata and upload_id when given', () {
-    final f = UploadV3Fields();
+    const f = UploadV3Fields();
     final fields = v3UploadFields(
       remotePath: '/home/a.txt',
       filename: 'a.txt',
