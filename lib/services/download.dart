@@ -3,6 +3,7 @@ import 'dart:ui';
 
 import 'package:background_downloader/background_downloader.dart';
 import 'package:garden/extensions/string.dart';
+import 'package:garden/services/transfer_download.dart';
 import 'package:garden/util/log.dart';
 import 'package:permission_handler/permission_handler.dart';
 
@@ -28,11 +29,11 @@ Future<String?> enqueDownloadTask(
 
   fileName = fileName.makeUniqueFileName(savePath);
   Log.debug("fileName:$fileName");
-  // xross platform
-  final task = DownloadTask(
+  // xross platform —— 走 transfer 引擎（ParallelDownloadTask + 断点续传）
+  final task = buildDownloadTask(
     url: url,
-    filename: fileName,
     directory: savePath,
+    filename: fileName,
   );
   final enqueState = await FileDownloader().enqueue(task);
   if (!enqueState) {
