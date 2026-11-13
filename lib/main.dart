@@ -27,6 +27,7 @@ import 'package:media_kit/media_kit.dart';
 import 'package:oktoast/oktoast.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:signals_flutter/signals_flutter.dart';
+import 'package:garden/services/transfer_engine.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -35,6 +36,7 @@ void main() async {
 
   await settingsStore.initialize();
   await connectionStore.initialize();
+  await initTransferEngine();
   final autPage = await settingsStore.authPage.value;
   final launchAccountPage = await settingsStore.launchAccountPage.value;
   runApp(MyApp(autPage, launchAccountPage));
