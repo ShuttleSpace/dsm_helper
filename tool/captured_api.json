@@ -250,6 +250,14 @@
       ]
     },
     {
+      "method": "get",
+      "version": "1",
+      "params": [
+        "additional",
+        "id"
+      ]
+    },
+    {
       "method": "list",
       "version": "1",
       "params": [
@@ -611,6 +619,236 @@
       "version": "1",
       "params": [
         "additional"
+      ]
+    }
+  ],
+  "SYNO.Cal.Setting": [
+    {
+      "method": "set",
+      "version": "5",
+      "params": [
+        "default_cal",
+        "default_plugin_mode",
+        "default_view"
+      ]
+    },
+    {
+      "method": "get",
+      "version": "5",
+      "params": []
+    }
+  ],
+  "SYNO.Contacts.Addressbook": [
+    {
+      "method": "list",
+      "version": "1",
+      "params": []
+    }
+  ],
+  "SYNO.Cal.SyncUser": [
+    {
+      "method": "sync",
+      "version": "1",
+      "params": [
+        "user_agent"
+      ]
+    }
+  ],
+  "SYNO.Personal.Profile": [
+    {
+      "method": "get",
+      "version": "3",
+      "params": []
+    },
+    {
+      "method": "list",
+      "version": "3",
+      "params": [
+        "users"
+      ]
+    }
+  ],
+  "SYNO.Cal.Contact": [
+    {
+      "method": "list",
+      "version": "1",
+      "params": []
+    },
+    {
+      "method": "get_user_info",
+      "version": "1",
+      "params": [
+        "user_name"
+      ]
+    }
+  ],
+  "SYNO.Cal.Timezone": [
+    {
+      "method": "list",
+      "version": "5",
+      "params": []
+    }
+  ],
+  "SYNO.Cal.Cal": [
+    {
+      "method": "list",
+      "version": "5",
+      "params": [
+        "cal_type"
+      ]
+    }
+  ],
+  "SYNO.Cal.Proxy": [
+    {
+      "method": "get_config",
+      "version": "5",
+      "params": []
+    },
+    {
+      "method": "task_list",
+      "version": "1",
+      "params": []
+    }
+  ],
+  "SYNO.Personal.Notification.Mobile": [
+    {
+      "method": "stat",
+      "version": "1",
+      "params": [
+        "package"
+      ]
+    }
+  ],
+  "SYNO.Personal.Application.Info": [
+    {
+      "method": "get",
+      "version": "1",
+      "params": [
+        "app_name",
+        "is_app_portal"
+      ]
+    }
+  ],
+  "SYNO.Personal.Notification.Event": [
+    {
+      "method": "list",
+      "version": "2",
+      "params": [
+        "additional",
+        "limit",
+        "package"
+      ]
+    }
+  ],
+  "SYNO.Personal.Profile.Photo": [
+    {
+      "method": "get",
+      "version": "2",
+      "params": [
+        "user_id",
+        "v"
+      ]
+    },
+    {
+      "method": "get",
+      "version": "1",
+      "params": [
+        "f"
+      ]
+    }
+  ],
+  "SYNO.Cal.Event": [
+    {
+      "method": "list",
+      "version": "6",
+      "params": [
+        "cal_id_list",
+        "end",
+        "start"
+      ]
+    }
+  ],
+  "SYNO.Cal.Todo": [
+    {
+      "method": "list",
+      "version": "6",
+      "params": [
+        "cal_id_list",
+        "cal_ids",
+        "end",
+        "filter_complete",
+        "filter_due",
+        "limit",
+        "start"
+      ]
+    },
+    {
+      "method": "count_todo",
+      "version": "6",
+      "params": [
+        "cal_id_list",
+        "due",
+        "filter_complete",
+        "filter_due",
+        "start"
+      ]
+    }
+  ],
+  "SYNO.Cal.UserAction": [
+    {
+      "method": "set",
+      "version": "2",
+      "params": [
+        "search_bar_usage",
+        "share_calendar_link_copy",
+        "shortcut_ctrl_j",
+        "task_view_mode"
+      ]
+    }
+  ],
+  "SYNO.Contacts.Info": [
+    {
+      "method": "get",
+      "version": "1",
+      "params": []
+    },
+    {
+      "method": "get_timezone",
+      "version": "1",
+      "params": []
+    }
+  ],
+  "SYNO.Contacts.Label": [
+    {
+      "method": "list",
+      "version": "2",
+      "params": []
+    }
+  ],
+  "SYNO.Contacts.ExternalSource": [
+    {
+      "method": "list",
+      "version": "1",
+      "params": []
+    }
+  ],
+  "SYNO.Contacts.Contact": [
+    {
+      "method": "list_group",
+      "version": "1",
+      "params": [
+        "addressbook_id"
+      ]
+    },
+    {
+      "method": "list",
+      "version": "1",
+      "params": [
+        "addressbook_id",
+        "keyword",
+        "offset",
+        "sort_by",
+        "sort_direction"
       ]
     }
   ],
@@ -985,15 +1223,6 @@
       "version": "2",
       "params": [
         "timeline_group_unit"
-      ]
-    }
-  ],
-  "SYNO.Personal.Profile.Photo": [
-    {
-      "method": "get",
-      "version": "1",
-      "params": [
-        "f"
       ]
     }
   ]

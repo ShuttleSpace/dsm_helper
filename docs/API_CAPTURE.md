@@ -51,8 +51,13 @@ flutter analyze lib/api
 
 ## 已将抓到的规格生成代码的命名空间
 
-（`dsm_api.captured.g.dart`，共 70 个函数，来自 100+ 个抓到的 api/method）
+（`dsm_api.captured.g.dart`，共 95 个函数）
 
+- SYNO.Cal：Cal.list / Event.list / Todo.{list,count_todo} / Setting.{get,set} /
+  Contact.{list,get_user_info} / Proxy.{get_config,task_list} / SyncUser.sync /
+  Timezone.list / UserAction.set
+- SYNO.Contacts：Addressbook.list / Contact.{list,list_group} / ExternalSource.list /
+  Info.{get,get_timezone} / Label.list
 - SYNO.ActiveInsight：CompleteCollection.get / License.get / Setting.get / Package.get_status
 - SYNO.WebStation：Status.get / PHP.get / Python.get / Docker.tags / ScriptLanguage.Utils.get / WebService.Portal.list / WebService.Service.list
 - SYNO.DNSServer：Zone.list
@@ -69,27 +74,30 @@ flutter analyze lib/api
 - SYNO.Personal：ProfilePhoto.get
 - 以及此前未覆盖的 Core / FileStation / CloudSync / NoteStation / AudioStation 若干 method
 
-## 抓包的两类限制（重要）
+## 抓包的关键坑（修正过一次）
 
-1. **WebSocket 应用**：Synology Calendar、Synology Contacts 走 `socket.io`（WebSocket）而非
-   `entry.cgi`，HAR 里看不到 `SYNO.Cal.*` / `SYNO.Contacts.*`。这种只能抓 WebSocket 帧，
-   本流程（HTTP HAR）覆盖不到。
-2. **新标签应用**：Download Station / Synology Photos / Synology Drive / Virtual Machine Manager
-   等会开**新浏览器标签**；按 tab 的网络抓包只跟当前标签，会漏掉。对策：点开应用后，
-   `browse session_adopt --target-url <launchApp=...>` 接管新标签，再抓。
+- **新标签 + 必须 reload**：Download Station / Photos / Drive / VMM / Calendar / Contacts
+  都会开**新浏览器标签**，按 tab 抓包只跟当前标签，会漏。对策：
+  `browse session_adopt --target-url <launchApp=...>` 接管该标签，**再 `page.reload()`**
+  （否则应用已加载完，bootstrap 的 API 调用早就发完了，抓到 0 条）。Calendar/Contacts
+  就是这样补上的。
+- **WebSocket 不是应用 API**：桌面 shell 有一条 `socket.io` 长连接走
+  `/synoscgi.sock/`（Playwright `page.on('websocket')` 能抓帧），但里面几乎只有
+  `SYNO.Core.System.Utilization` 心跳和 `AppNotify`。Calendar/Contacts 的业务 API
+  （`SYNO.Cal.*` / `SYNO.Contacts.*`）**全部走 HTTP `entry.cgi`**，HAR 就能抓到。
+  → 之前误判为「WebSocket 应用、HAR 覆盖不到」，实际只是漏了 adopt + reload。
+  Whistle 虽然也支持 WS 帧，但本流程不需要它，也不必让 Chrome 走代理。
 
 ## 尚未抓到的应用（后续按同一循环补）
 
 | 套件 | 命名空间 | 卡点 |
 |---|---|---|
-| Synology Calendar | `SYNO.Cal.*` | WebSocket，需抓 WebSocket 帧 |
-| Synology Contacts | `SYNO.Contacts.*` | WebSocket |
 | Synology Photos | `SYNO.Foto.*` | 部分已抓（Setting/UserInfo），需进入相册/共享空间交互 |
 | Synology Drive | `SYNO.SynologyDrive.*` | 部分已抓（get_status），需进入管理/共享/版本 |
 | Virtual Machine Manager | `SYNO.Virtualization.*` | 部分已抓，需更多交互 |
 | Universal Search | `SYNO.Finder.*` | 点桌面搜索框触发 |
-| Secure SignIn | `SYNO.SecureSignIn.*` | 控制面板模块 |
-| Resource Monitor | `SYNO.Core.System.*` | 控制面板模块 |
+| Secure SignIn | `SYNO.SecureSignIn.*` | 控制面板模块，需进二级页 |
+| Resource Monitor | `SYNO.Core.System.*` | 控制面板模块，部分已抓 |
 | SAN Manager | `SYNO.SAS.*` / `SYNO.Core.ISCSI.*` | 部分已抓（Core.ISCSI） |
 
 第三方套件（Jellyfin / Emby / alist / aliyun / aria2 / DDNS-GO / 迅雷）不是 `SYNO.*` API，
