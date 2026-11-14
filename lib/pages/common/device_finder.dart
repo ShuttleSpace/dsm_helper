@@ -1,531 +1,141 @@
 import 'dart:convert';
-import 'package:garden/util/log.dart';
-import 'package:garden/util/ui_util.dart';
 
-import 'package:garden/widgets/neu_back_button.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:garden/util/log.dart';
+import 'package:garden/widgets/neu_back_button.dart';
 import 'package:signals_hooks/signals_hooks.dart';
-import 'package:webview_flutter/webview_flutter.dart';
 
+/// 设备发现：直接请求 finder/get_v2 获取局域网设备，列表供用户点选。
+/// urls 依次尝试（默认 cnc 失败回退 global），可自行传入覆盖。
 class DeviceFinder extends HookWidget {
-  final String url;
   final String? title;
-  const DeviceFinder({super.key, required this.url, this.title = "设备发现"});
+  final List<String> urls;
+
+  const DeviceFinder({
+    super.key,
+    this.title = "设备发现",
+    this.urls = const [
+      "https://cnc.quickconnect.cn/finder/get_v2",
+      "https://global.quickconnect.cn/finder/get_v2",
+    ],
+  });
 
   @override
   Widget build(BuildContext context) {
-    final isSearching = useSignal(false);
+    final loading = useSignal(true);
     final devices = useSignal<List<Map<String, String>>>([]);
-    final showDeviceList = useSignal(false);
-    final refresh = useSignal(0);
-    final webviewController = useMemoized(() => WebViewController(), const []);
+    final error = useSignal('');
 
-    void injectJavaScript() {
-      // 注入JavaScript代码来监听设备发现
-      const jsCode = '''
-  (function() {
-    console.log("DeviceFinder script injected");
-  
-    // 检查 DeviceFinder 是否已定义
-    if (typeof DeviceFinder === 'undefined') {
-      console.log("DeviceFinder not defined, waiting for channel registration...");
-    
-      // 等待 Flutter 注入 DeviceFinder 对象
-      let checkCount = 0;
-      const checkInterval = setInterval(function() {
-        checkCount++;
-        console.log("Checking for DeviceFinder... attempt " + checkCount);
-      
-        if (typeof DeviceFinder !== 'undefined') {
-          console.log("DeviceFinder is now defined!");
-          clearInterval(checkInterval);
-        
-          // 测试通道
-          try {
-            DeviceFinder.postMessage(JSON.stringify({type: 'channelTest', message: 'Channel working'}));
-            console.log("Channel test successful");
-          } catch (e) {
-            console.error("Channel test failed:", e);
-          }
-        } else if (checkCount > 10) {
-          console.error("DeviceFinder channel not found after 10 attempts");
-          clearInterval(checkInterval);
-        }
-      }, 500);
-    } else {
-      console.log("DeviceFinder already defined");
-    }
-  
-    // 创建本地版本的 extractDevices 函数（如果需要手动调用）
-    window.extractDevices = extractDevices;
-  
-    // 提取设备信息的函数
-    function extractDevices() {
-      const devices = [];
-    
+    Future<void> fetch() async {
+      loading.value = true;
+      error.value = '';
+      final dio = Dio(BaseOptions(
+        connectTimeout: const Duration(seconds: 8),
+        receiveTimeout: const Duration(seconds: 8),
+      ));
       try {
-        // 查找设备表格行 - 使用多种选择器
-        const rows = document.querySelectorAll('tbody tr[role="row"], .v-table-tbody tr, table tbody tr');
-      
-        rows.forEach(function(row) {
+        for (final url in urls) {
           try {
-            const cells = row.querySelectorAll('td[role="cell"], td');
-            if (cells.length >= 2) {
-              let name = '';
-              let ipAddress = '';
-              let macAddress = '';
-              let osVersion = '';
-              let model = '';
-              let status = '';
-            
-              // 提取各个列的信息
-              cells.forEach(function(cell, index) {
-                const cellContent = cell.textContent || cell.innerText || '';
-              
-                if (index === 0) {
-                  // 服务器名称
-                  name = cellContent.trim();
-                } else if (index === 1) {
-                  // IP 地址 - 查找 web-ip 类
-                  const ipSpan = cell.querySelector('.web-ip span, span');
-                  if (ipSpan) {
-                    ipAddress = ipSpan.textContent.trim();
-                  } else {
-                    // 尝试从文本中提取IP地址
-                    const ipMatch = cellContent.match(/\\b(?:\\d{1,3}\\.){3}\\d{1,3}\\b/);
-                    if (ipMatch) {
-                      ipAddress = ipMatch[0];
-                    }
-                  }
-                } else if (index === 2) {
-                  // MAC 地址
-                  macAddress = cellContent.trim();
-                } else if (index === 3) {
-                  // OS 版本
-                  osVersion = cellContent.trim();
-                } else if (index === 4) {
-                  // 产品型号
-                  model = cellContent.trim();
-                } else if (index === 5) {
-                  // 状态
-                  status = cellContent.trim();
-                }
-              });
-            
-              // 如果找到了有效的IP地址，添加到设备列表
-              if (ipAddress) {
-                devices.push({
-                  name: name,
-                  host: ipAddress,
-                  mac: macAddress,
-                  osVersion: osVersion,
-                  model: model,
-                  status: status,
-                  port: '5000'
-                });
-              }
+            final res = await dio.get(url,
+                options: Options(responseType: ResponseType.plain));
+            final data = res.data is String ? jsonDecode(res.data) : res.data;
+            final list =
+                data is List ? data : (data is Map ? data['data'] : null);
+            if (list is List && list.isNotEmpty) {
+              devices.value = list.whereType<Map>().map(_toDevice).toList();
+              return;
             }
           } catch (e) {
-            console.error("Error processing row:", e);
-          }
-        });
-      } catch (e) {
-        console.error("Error extracting devices:", e);
-      }
-    
-      // 如果找到了设备，发送给Flutter
-      if (devices.length > 0) {
-        try {
-          DeviceFinder.postMessage(JSON.stringify({
-            type: 'devicesFound',
-            devices: devices
-          }));
-        } catch (e) {
-          console.error("Error sending devices to Flutter:", e);
-        }
-      }
-    
-      return devices.length;
-    }
-  
-    // 监听页面变化
-    const observer = new MutationObserver(function(mutations) {
-      let shouldExtract = false;
-      mutations.forEach(function(mutation) {
-        if (mutation.addedNodes && mutation.addedNodes.length > 0) {
-          mutation.addedNodes.forEach(function(node) {
-            if (node.nodeType === 1) {
-              // 检查是否添加了表格行
-              if (node.tagName === 'TR' || node.querySelector && node.querySelector('tr')) {
-                shouldExtract = true;
-              }
-            }
-          });
-        }
-      });
-    
-      if (shouldExtract) {
-        setTimeout(extractDevices, 500);
-      }
-    });
-  
-    observer.observe(document.body, { childList: true, subtree: true });
-  
-    // 定期检查设备列表
-    let lastDeviceCount = -1;
-    setInterval(function() {
-      try {
-        const count = extractDevices();
-        if (count > 0 && count !== lastDeviceCount) {
-          console.log("Found " + count + " devices");
-          lastDeviceCount = count;
-        }
-      } catch (e) {
-        console.error("Error in interval check:", e);
-      }
-    }, 3000);
-  
-    // 初始检查
-    setTimeout(function() {
-      try {
-        extractDevices();
-      } catch (e) {
-        console.error("Error in initial check:", e);
-      }
-    }, 5000);
-  
-    // 监听URL变化
-    let lastUrl = window.location.href;
-    new MutationObserver(function() {
-      const currentUrl = window.location.href;
-      if (currentUrl !== lastUrl) {
-        lastUrl = currentUrl;
-        console.log("URL changed to: " + currentUrl);
-        setTimeout(extractDevices, 1000);
-      }
-    }).observe(document, { subtree: true, childList: true });
-  
-    console.log("DeviceFinder script loaded successfully");
-  })();
-      ''';
-      webviewController.runJavaScript(jsCode).then((_) {
-        Log.debug("JavaScript injected successfully");
-      }).catchError((e) {
-        Log.debug("Error injecting JavaScript: $e");
-      });
-    }
-
-    void handleMessageReceived(JavaScriptMessage message) {
-      Log.debug("Received message: ${message.message}");
-      try {
-        final data = message.message;
-        if (data.isNotEmpty) {
-          final json = jsonDecode(data) as Map<String, dynamic>;
-          if (json['type'] == 'devicesFound') {
-            final List<dynamic> devicesList = json['devices'] as List<dynamic>;
-            final List<Map<String, String>> newDevices =
-                devicesList.map((d) => Map<String, String>.from(d)).toList();
-
-            devices.value = newDevices;
-            showDeviceList.value = newDevices.isNotEmpty;
-            isSearching.value = false;
-
-            UiUtil.toast("找到 ${newDevices.length} 个设备");
+            Log.debug("DeviceFinder: $url failed: $e");
           }
         }
-      } catch (e) {
-        Log.debug("Error parsing message: $e");
+        error.value = '未找到设备，点击右上角刷新重试';
+      } finally {
+        loading.value = false;
       }
-    }
-
-    void selectDevice(Map<String, String> device) {
-      Navigator.of(context).pop(jsonEncode(device));
     }
 
     useEffect(() {
-      webviewController
-        ..loadRequest(Uri.parse(url))
-        ..setJavaScriptMode(JavaScriptMode.unrestricted)
-        ..setNavigationDelegate(
-          NavigationDelegate(
-            onPageStarted: (url) {
-              Log.debug("onPageStarted: $url");
-            
-              isSearching.value = true;
-              showDeviceList.value = false;
-              devices.value = [];
-          
-            },
-            onPageFinished: (_) {
-              Log.debug("onPageFinished");
-              refresh.value++;
-              // 等待页面完全加载后再注入 JavaScript
-              Future.delayed(const Duration(milliseconds: 500), () {
-                // 允许混合内容
-                webviewController.runJavaScript('''
-                  console.log("Setting up CSP...");
-                  // 允许混合内容
-                  if (window.location.protocol === 'https:') {
-                    const meta = document.createElement('meta');
-                    meta.httpEquiv = 'Content-Security-Policy';
-                    meta.content = 'upgrade-insecure-requests';
-                    document.head.appendChild(meta);
-                    console.log("CSP meta tag added");
-                  }
-                ''').then((_) {
-                  Log.debug("CSP setup complete");
-                  injectJavaScript();
-                }).catchError((e) {
-                  Log.debug("Error setting up CSP: $e");
-                  injectJavaScript();
-                });
-              });
-            },
-            onWebResourceError: (WebResourceError error) {
-              Log.debug('''
-  Page resource error:
-    code: ${error.errorCode}
-    description: ${error.description}
-    errorType: ${error.errorType}
-    isForMainFrame: ${error.isForMainFrame}
-              ''');
-            },
-          ),
-        )
-        ..addJavaScriptChannel(
-          'DeviceFinder',
-          onMessageReceived: handleMessageReceived,
-        );
+      fetch();
       return null;
     }, const []);
+
+    final isLoading = loading.watch(context);
+    final list = devices.watch(context);
+    final err = error.watch(context);
 
     return Scaffold(
       appBar: AppBar(
         leading: AppBackButton(context),
-        title: FutureBuilder<String?>(
-          future: webviewController.platform.getTitle(),
-          builder: (context, snapshot) {
-            if (snapshot.hasData) {
-              return Text(snapshot.data ?? title ?? "加载中……");
-            } else {
-              return Text(title ?? "设备发现");
-            }
-          },
-        ),
+        title: Text(title ?? "设备发现"),
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: 10, top: 8, bottom: 8),
             child: OutlinedButton(
-              onPressed: isSearching.value
-                  ? null
-                  : () {
-                      webviewController.reload();
-                      
-                      isSearching.value = true;
-                      showDeviceList.value = false;
-                      devices.value = [];
-                    
-                    },
+              onPressed: isLoading ? null : fetch,
               child: Icon(
                 Icons.refresh,
                 size: 20,
-                color: isSearching.value ? Colors.grey : null,
+                color: isLoading ? Colors.grey : null,
               ),
             ),
           ),
         ],
       ),
-      body: Column(
-        children: [
-          Expanded(
-            child: Stack(
-              children: [
-                WebViewWidget(
-                  controller: webviewController,
-                ),
-                // 设备列表遮罩层
-                if (showDeviceList.value && devices.value.isNotEmpty)
-                  Container(
-                    color: Colors.black.withValues(alpha: .5),
-                    child: Center(
-                      child: Container(
-                        margin: const EdgeInsets.all(20),
-                        decoration: BoxDecoration(
-                          color: Theme.of(context).scaffoldBackgroundColor,
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        constraints: BoxConstraints(
-                          maxWidth: 500,
-                          maxHeight: MediaQuery.sizeOf(context).height * 0.7,
-                        ),
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            // 标题栏
-                            Container(
-                              padding: const EdgeInsets.all(16),
-                              decoration: BoxDecoration(
-                                border: Border(
-                                  bottom: BorderSide(
-                                    color: Colors.grey.withValues(alpha: .3),
-                                  ),
-                                ),
-                              ),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    '找到 ${devices.value.length} 个设备',
-                                    style: const TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  IconButton(
-                                    icon: const Icon(Icons.close),
-                                    onPressed: () {
-                                      
-                                      showDeviceList.value = false;
-                                    
-                                    },
-                                  ),
-                                ],
-                              ),
-                            ),
-                            // 设备列表
-                            Flexible(
-                              child: ListView.separated(
-                                shrinkWrap: true,
-                                padding: const EdgeInsets.all(16),
-                                itemCount: devices.value.length,
-                                separatorBuilder: (context, index) =>
-                                    const Divider(),
-                                itemBuilder: (context, index) {
-                                  final device = devices.value[index];
-                                  return InkWell(
-                                    onTap: () => selectDevice(device),
-                                    child: Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                          vertical: 12),
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            device['name'] ?? '未知设备',
-                                            style: const TextStyle(
-                                              fontSize: 16,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                          const SizedBox(height: 4),
-                                          Text(
-                                            'IP: ${device['host'] ?? ''}',
-                                            style: TextStyle(
-                                              fontSize: 14,
-                                              color: Colors.grey[600],
-                                            ),
-                                          ),
-                                          if (device['model'] != null &&
-                                              device['model']!.isNotEmpty)
-                                            Text(
-                                              '型号: ${device['model']}',
-                                              style: TextStyle(
-                                                fontSize: 12,
-                                                color: Colors.grey[500],
-                                              ),
-                                            ),
-                                        ],
-                                      ),
-                                    ),
-                                  );
-                                },
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-              ],
+      body: Builder(builder: (context) {
+        if (isLoading) {
+          return const Center(child: CircularProgressIndicator());
+        }
+        if (list.isEmpty) {
+          return Center(
+            child: Text(
+              err.isEmpty ? '未找到设备' : err,
+              textAlign: TextAlign.center,
             ),
-          ),
-          SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-              child: Row(
-                children: <Widget>[
-                  FutureBuilder<bool>(
-                    future: webviewController.canGoBack(),
-                    builder: (context, shot) {
-                      bool canGoBack = shot.data ?? false;
-                      return OutlinedButton(
-                        onPressed: canGoBack
-                            ? () async {
-                                await webviewController.goBack();
-                                refresh.value++;
-                              }
-                            : null,
-                        child: Icon(
-                          Icons.arrow_back_ios_outlined,
-                          color: canGoBack ? Colors.black : Colors.grey,
-                          size: 22,
-                        ),
-                      );
-                    },
-                  ),
-                  const SizedBox(
-                    width: 10,
-                  ),
-                  FutureBuilder<bool>(
-                    future: webviewController.canGoForward(),
-                    builder: (context, shot) {
-                      bool canGoForward = shot.data ?? false;
-                      return OutlinedButton(
-                        onPressed: canGoForward
-                            ? () async {
-                                await webviewController.goForward();
-                                refresh.value++;
-                              }
-                            : null,
-                        child: Icon(
-                          Icons.arrow_forward_ios,
-                          size: 22,
-                          color: canGoForward ? Colors.black : Colors.grey,
-                        ),
-                      );
-                    },
-                  ),
-                  const Spacer(),
-                  OutlinedButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                    child: const Icon(
-                      Icons.close,
-                      size: 22,
-                    ),
-                  ),
-                  const SizedBox(
-                    width: 10,
-                  ),
-                  OutlinedButton(
-                    onPressed: () {
-                      webviewController.reload();
-                    },
-                    child: const Icon(
-                      Icons.replay,
-                      size: 22,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
+          );
+        }
+        return ListView.separated(
+          padding: const EdgeInsets.all(16),
+          itemCount: list.length,
+          separatorBuilder: (_, __) => const Divider(),
+          itemBuilder: (context, index) {
+            final device = list[index];
+            final detail = [
+              'IP: ${device['host']}',
+              if ((device['port'] ?? '').isNotEmpty) '端口: ${device['port']}',
+              if ((device['model'] ?? '').isNotEmpty) '型号: ${device['model']}',
+              if ((device['version'] ?? '').isNotEmpty) 'DSM ${device['version']}',
+            ].join('   ');
+            return ListTile(
+              leading: const Icon(Icons.dns_outlined),
+              title: Text(device['name'] ?? '未知设备'),
+              subtitle: Text(detail),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => Navigator.of(context).pop(jsonEncode(device)),
+            );
+          },
+        );
+      }),
     );
+  }
+
+  static Map<String, String> _toDevice(Map d) {
+    final ipv4 = (d['ipv4_interface'] as List?)
+            ?.map((e) => e?.toString() ?? '')
+            .where((e) => e.isNotEmpty)
+            .toList() ??
+        const [];
+    return {
+      'name': (d['server_name'] ?? d['alias'] ?? '未知设备').toString(),
+      'host': ipv4.isNotEmpty ? ipv4.first : (d['domain']?.toString() ?? ''),
+      'port': (d['port'] ?? 5000).toString(),
+      'https_port': (d['https_port'] ?? 5001).toString(),
+      'model': (d['model'] ?? '').toString(),
+      'version': (d['version'] ?? '').toString(),
+      'status': (d['status'] ?? '').toString(),
+      'mac': (d['mac'] ?? '').toString(),
+    };
   }
 }

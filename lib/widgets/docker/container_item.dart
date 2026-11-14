@@ -39,12 +39,14 @@ class ContainerItem extends StatelessWidget {
                       children: [
                         Row(
                           children: [
-                            Text(
-                              container['name'],
-                              style: const TextStyle(
-                                  fontSize: 18, fontWeight: FontWeight.w600),
+                            Expanded(
+                              child: Text(
+                                container['name'],
+                                style: const TextStyle(
+                                    fontSize: 18, fontWeight: FontWeight.w600),
+                                overflow: TextOverflow.ellipsis,
+                              ),
                             ),
-                            const Spacer(),
                             _buildStatusLabel(),
                           ],
                         ),
@@ -66,7 +68,7 @@ class ContainerItem extends StatelessWidget {
                             if (container['status'] == "running")
                               Text(
                                 DateTime.fromMillisecondsSinceEpoch(
-                                        container['up_time'] * 1000)
+                                        (container['up_time'] ?? 0) * 1000)
                                     .timeAgo,
                                 style: const TextStyle(
                                     fontSize: 12, color: Colors.grey),
@@ -250,7 +252,7 @@ class ContainerItem extends StatelessWidget {
                   const Text("CPU"),
                   const Spacer(),
                   Text(
-                    "${container['cpu'].toStringAsFixed(2)}%",
+                    "${(container['cpu'] ?? 0).toStringAsFixed(2)}%",
                     style: const TextStyle(
                         color: Colors.blue, fontWeight: FontWeight.w600),
                   ),
@@ -282,7 +284,8 @@ class ContainerItem extends StatelessWidget {
                   const Text("内存"),
                   const Spacer(),
                   Text(
-                    (int.parse(container['memory'])).formatSize(fixed: 0),
+                    (int.parse((container['memory'] ?? 0).toString()))
+                        .formatSize(fixed: 0),
                     style: const TextStyle(
                         color: Colors.green, fontWeight: FontWeight.w600),
                   ),

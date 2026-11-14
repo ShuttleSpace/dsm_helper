@@ -47,7 +47,7 @@ class RepoItem extends StatelessWidget {
               child: Row(
                 children: [
                   Text(
-                    int.parse(repo['used']).formatSize(),
+                    int.parse((repo['used'] ?? 0).toString()).formatSize(),
                     style: const TextStyle(color: Colors.blue),
                   ),
                   const Text(
@@ -55,7 +55,7 @@ class RepoItem extends StatelessWidget {
                     style: TextStyle(color: Colors.grey),
                   ),
                   Text(
-                    int.parse(repo['size']).formatSize(),
+                    int.parse((repo['size'] ?? 0).toString()).formatSize(),
                     style: const TextStyle(color: Colors.grey),
                   ),
                 ],
@@ -78,8 +78,8 @@ class RepoItem extends StatelessWidget {
                         changeColorValue: 90,
                         changeProgressColor: Colors.red,
                         progressColor: Colors.blue,
-                        currentValue: ((int.parse(repo['used']) /
-                                    int.parse(repo['size'])) *
+                        currentValue: ((int.parse((repo['used'] ?? 0).toString()) /
+                                    int.parse((repo['size'] ?? 0).toString())) *
                                 100)
                             .floor(),
                         displayText: '%',

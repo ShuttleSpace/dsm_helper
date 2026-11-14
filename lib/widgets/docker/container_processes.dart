@@ -36,7 +36,7 @@ class ContainerProcesses extends StatelessWidget {
                 ),
                 Expanded(
                   child: Text(
-                    "RAM：${(int.parse(process['memory'])).formatSize(fixed: 0)}",
+                    "RAM：${(int.parse((process['memory'] ?? 0).toString())).formatSize(fixed: 0)}",
                     textAlign: TextAlign.center,
                   ),
                 ),

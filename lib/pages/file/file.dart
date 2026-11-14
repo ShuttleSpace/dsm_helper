@@ -1,16 +1,11 @@
 import 'dart:async';
-import 'package:garden/services/download.dart';
 import 'package:garden/stores/settings_store.dart';
 import 'package:garden/util/file_type_util.dart';
 import 'package:garden/util/ui_util.dart';
 import 'package:garden/util/storage_util.dart';
 import 'package:garden/stores/connection_store.dart';
-import 'dart:io';
 import 'package:android_intent_plus/android_intent.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
-import 'package:device_info_plus/device_info_plus.dart';
-import 'package:draggable_scrollbar/draggable_scrollbar.dart';
-import 'package:garden/pages/download/download_state.dart';
 import 'package:garden/util/log.dart';
 import 'package:flutter_vibrate/flutter_vibrate.dart';
 import 'package:garden/pages/common/audio_player.dart';
@@ -31,7 +26,8 @@ import 'package:garden/theme/app_theme.dart';
 import 'package:garden/util/http_util.dart';
 import 'package:garden/widgets/animation_progress_bar.dart';
 import 'package:garden/widgets/transfer_list.dart';
-import 'package:garden/stores/transfer_store.dart';
+import 'package:garden/hooks/use_file_download.dart';
+import 'package:garden/hooks/use_file_click.dart';
 import 'package:garden/extensions/context.dart';
 import 'package:garden/widgets/file_icon.dart';
 import 'package:garden/widgets/transparent_router.dart';
@@ -40,7 +36,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:garden/constants/app_constants.dart';
 import 'package:flutter_floating/floating/floating.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:signals_hooks/signals_hooks.dart';
 
@@ -54,6 +49,7 @@ class Files extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
+    final openExternally = useOpenExternally(context);
     final loading = useSignal(true);
     final favoriteLoading = useSignal(true);
     final success = useSignal(true);
@@ -291,79 +287,11 @@ class Files extends HookWidget {
         UiUtil.toast('搜索出错!');
       }
     }
+    final appDownload = useFileDownload(context);
     download(List filePaths) async {
-      // 检查权限
-      if (Platform.isAndroid) {
-        DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
-        AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
-        if (androidInfo.version.sdkInt >= 30) {
-          bool permission = false;
-          permission = await Permission.manageExternalStorage.request().isGranted;
-          if (!permission) {
-            UiUtil.toast("安卓11以上需授权文件管理权限");
-            return;
-          }
-        } else {
-          bool permission = false;
-          permission = await Permission.storage.request().isGranted;
-          if (!permission) {
-            UiUtil.toast("请先授权APP访问存储权限");
-            return;
-          }
-        }
-      }
-
-      for (var file in filePaths) {
-        String url =
-            "${connectionStore.baseUri}/webapi/entry.cgi?api=SYNO.FileStation.Download&version=2&method=download&path=${Uri.encodeComponent(file['path'])}&mode=download&_sid=${connectionStore.sid}";
-        String filename = "";
-        if (file['isdir']) {
-          filename = file['name'] + ".zip";
-        } else {
-          filename = file['name'];
-        }
-        final taskId = await enqueDownloadTask(url, filename, onPermissionDenied: () {
-          showCupertinoDialog(
-              context: context,
-              builder: (context) {
-                return CupertinoAlertDialog(
-                  title: const Text("请求获取存储权限"),
-                  content: const Text("没有权限访问存储，无法下载文件"),
-                  actions: [
-                    CupertinoDialogAction(
-                      child: const Text("确定"),
-                      onPressed: () async {
-                        final status = await Permission.storage.request();
-                        if (!status.isGranted) {
-                          UiUtil.toast("请先授权APP访问存储权限, 方可下载");
-                        }
-                        if (context.mounted) {
-                          // ignore: use_build_context_synchronously
-                          Navigator.of(context).pop();
-                        }
-                      },
-                    ),
-                  ],
-                );
-              });
-        });
-        if (taskId != null) {
-          transferStore.add(TransferTask(
-            id: taskId,
-            type: TransferType.download,
-            localPath: '',
-            remotePath: file['path'] as String,
-            state: TransferState.active,
-          ));
-        }
-      }
-      UiUtil.toast(
-          "已添加${filePaths.length > 1 ? "${filePaths.length}个" : ""}下载任务，请至下载页面查看");
-      if (context.mounted) {
-        // ignore: use_build_context_synchronously
-        DownloadStateInherited.of(context)?.notifier.runLoop();
-      }
+      await appDownload(filePaths);
     }
+
     downloadFiles(List filePaths) async {
       Connectivity().onConnectivityChanged.listen((result) {
         if (result.contains(ConnectivityResult.mobile)) {
@@ -1338,15 +1266,8 @@ class Files extends HookWidget {
               }));
               break;
             default:
-              AndroidIntent intent = AndroidIntent(
-                action: 'action_view',
-                data:
-                    "${connectionStore.baseUri}/fbdownload/${file['name']}?dlink=%22${(file['path'] as String).utf8()}%22&_sid=%22${connectionStore.sid}%22&mode=open",
-                arguments: {},
-                // type: "application/vnd.ms-powerpoint|application/vnd.openxmlformats-officedocument.presentationml.presentation",
-              );
-              await intent.launch();
-            // HttpUtil.toast("暂不支持打开此类型文件");
+              // 能嵌的走 WebView JS 预览，其余弹系统"打开方式"选择器
+              await openExternally(file);
           }
         }
       }
@@ -2027,7 +1948,8 @@ class Files extends HookWidget {
                                     if (!file['isdir'])
                                       TextSpan(
                                           text: (int.parse(
-                                                  file['additional']['size']))
+                                                  file['additional']['size']
+                                                      .toString()))
                                               .formatSize()),
                                     if (file['additional'] != null &&
                                         file['additional']['time'] != null &&
@@ -3147,10 +3069,7 @@ class Files extends HookWidget {
                 ? Stack(
                     children: [
                       listType.value == ListType.list
-                          ? DraggableScrollbar.semicircle(
-                              backgroundColor:
-                                  Theme.of(context).scaffoldBackgroundColor,
-                              scrollbarTimeToFade: const Duration(seconds: 1),
+                          ? Scrollbar(
                               controller: fileScrollController,
                               child: ListView.builder(
                                 controller: fileScrollController,
@@ -3168,10 +3087,7 @@ class Files extends HookWidget {
                             )
                           : SizedBox(
                               width: double.infinity,
-                              child: DraggableScrollbar.semicircle(
-                                backgroundColor:
-                                    Theme.of(context).scaffoldBackgroundColor,
-                                scrollbarTimeToFade: const Duration(seconds: 1),
+                              child: Scrollbar(
                                 controller: fileScrollController,
                                 child: ListView(
                                   controller: fileScrollController,

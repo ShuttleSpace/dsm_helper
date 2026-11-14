@@ -140,7 +140,7 @@ class Packages extends HookWidget {
             final idx =
                 installedPackages.indexWhere((t) => t['id'] == package['id']);
             if (idx != -1) {
-              installedPackages.replaceRange(idx, idx + 1, package);
+              installedPackages.replaceRange(idx, idx + 1, [package]);
             } else {
               installedPackages.add(package);
             }

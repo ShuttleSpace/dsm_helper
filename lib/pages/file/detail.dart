@@ -11,6 +11,7 @@ import 'package:garden/theme/app_colors.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:signals_hooks/signals_hooks.dart';
+import 'package:garden/hooks/use_file_download.dart';
 
 class FileDetail extends HookWidget {
   final Map file;
@@ -23,6 +24,7 @@ class FileDetail extends HookWidget {
     final size = useSignal(0);
     final folderCount = useSignal(0);
     final fileCount = useSignal(0);
+    final appDownload = useFileDownload(context);
 
     getDirSize() async {
       var task = await DsmApi.dirSizeTask(file['path']);
@@ -52,6 +54,13 @@ class FileDetail extends HookWidget {
         title: Text(
           file['name'],
         ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.download),
+            tooltip: '下载',
+            onPressed: () => appDownload([file]),
+          ),
+        ],
       ),
       body: ListView(
         children: [

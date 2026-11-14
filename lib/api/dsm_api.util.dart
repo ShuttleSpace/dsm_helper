@@ -110,25 +110,31 @@ Future<dynamic> _httpRequest(
   Function(int, int)? onSendProgress,
   Function(int, int)? onReceiveProgress,
 }) async {
-  dynamic response;
+  DioException? lastError;
   do {
     maxRetry--;
-    response = await Future.delayed(Duration(seconds: retryDelay), () async {
-      return await _doHttpRequest(endpoint,
-          method: method,
-          host: host,
-          headers: headers,
-          data: data,
-          queryParameters: queryParameters,
-          cancelToken: cancelToken,
-          checkSsl: checkSsl,
-          cookie: cookie,
-          timeout: timeout,
-          onReceiveProgress: onReceiveProgress,
-          onSendProgress: onSendProgress);
-    });
-  } while (response != null && maxRetry > 0);
-  return response;
+    try {
+      return await Future.delayed(Duration(seconds: retryDelay), () async {
+        return await _doHttpRequest(endpoint,
+            method: method,
+            host: host,
+            headers: headers,
+            data: data,
+            queryParameters: queryParameters,
+            cancelToken: cancelToken,
+            checkSsl: checkSsl,
+            cookie: cookie,
+            timeout: timeout,
+            onReceiveProgress: onReceiveProgress,
+            onSendProgress: onSendProgress);
+      });
+    } on DioException catch (e) {
+      // 只重试传输失败（无响应），HTTP 已响应(含 DSM 业务错误)立即返回，避免重发一次性验证码
+      if (e.response != null) rethrow;
+      lastError = e;
+    }
+  } while (maxRetry > 0);
+  throw lastError;
 }
 
 Future<dynamic> _doHttpRequest(
@@ -151,7 +157,7 @@ Future<dynamic> _doHttpRequest(
         callback: (cert, host, port) {
           return !(checkSsl ?? connectionStore.checkSsl.value);
         },
-        proxy: 'PROXY 192.168.8.76:8899; PROXY 127.0.0.1:8899; DIRECT');
+        proxy: 'PROXY 192.168.8.102:8899; PROXY 127.0.0.1:8899; DIRECT');
     response = await _dio.request(endpoint,
         data: data,
         queryParameters: queryParameters,

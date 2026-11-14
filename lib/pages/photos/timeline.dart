@@ -1,4 +1,3 @@
-import 'package:draggable_scrollbar/draggable_scrollbar.dart';
 import 'package:garden/models/photos/photo_model.dart';
 import 'package:garden/models/photos/timeline_model.dart';
 import 'package:garden/pages/common/image_preview.dart';
@@ -181,45 +180,7 @@ class Timeline extends HookWidget {
             ),
           )
         : days.value.isNotEmpty
-            ? DraggableScrollbar.semicircle(
-                labelTextBuilder: (position) {
-                  var line = days.value
-                      .where((day) =>
-                          (day.startPosition ?? 0) <= position &&
-                          (day.endPosition ?? 0) >= position)
-                      .toList();
-                  if (line.isNotEmpty) {
-                    return Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: AppConstants.paddingLarge),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          Text(
-                            "${line[0].month}月",
-                            style: const TextStyle(fontSize: 30),
-                          ),
-                          Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                  "${line[0].day.toString().padLeft(2, "0")}日"),
-                              Text("${line[0].year}"),
-                            ],
-                          )
-                        ],
-                      ),
-                    );
-                  } else {
-                    return const Placeholder(
-                      child: Center(
-                        child: Text('[x]'),
-                      ),
-                    );
-                  }
-                },
-                labelConstraints: const BoxConstraints(
-                    minHeight: 60, maxHeight: 60, minWidth: 140, maxWidth: 140),
+            ? Scrollbar(
                 controller: scrollController,
                 child: ListView.builder(
                   controller: scrollController,

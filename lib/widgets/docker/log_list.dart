@@ -1,4 +1,3 @@
-import 'package:draggable_scrollbar/draggable_scrollbar.dart';
 import 'package:flutter/material.dart';
 import 'package:garden/widgets/label.dart';
 
@@ -43,9 +42,7 @@ class LogList extends StatelessWidget {
   Widget build(BuildContext context) {
     return Expanded(
       flex: 2,
-      child: DraggableScrollbar.semicircle(
-        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-        scrollbarTimeToFade: const Duration(seconds: 1),
+      child: Scrollbar(
         controller: scrollController,
         child: ListView.separated(
           controller: scrollController,

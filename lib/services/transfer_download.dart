@@ -15,20 +15,41 @@ int downloadConcurrency = 1;
 ///
 /// 绝对路径（以 `/` 开头）用 [BaseDirectory.root] 解析到真实位置；
 /// 相对路径落在应用文档目录，避免 background_downloader 把绝对路径误判为相对。
-ParallelDownloadTask buildDownloadTask({
+/// 纯构造：把 URL + 目标目录 + 文件名 包成 background_downloader 下载任务。
+///
+/// 认证头来自 [authHeaders]（_SSID Cookie + X-SYNO-TOKEN）；
+/// `allowPause` 开启断点续传（app 退后台/被杀后由系统 work-manager 续传）。
+///
+/// 单连接（[downloadConcurrency] <= 1）用普通 [DownloadTask]，只有真正多分片
+/// 时才用 [ParallelDownloadTask]——后者原生 enqueue 在单 chunk 下更脆弱。
+Task buildDownloadTask({
   required String url,
   required String directory,
   required String filename,
   int? chunks,
 }) {
   final absolute = directory.startsWith('/');
-  return ParallelDownloadTask(
+  final baseDirectory =
+      absolute ? BaseDirectory.root : BaseDirectory.applicationDocuments;
+  final chunkCount = chunks ?? downloadConcurrency;
+  if (chunkCount > 1) {
+    return ParallelDownloadTask(
+      url: url,
+      filename: filename,
+      directory: directory,
+      baseDirectory: baseDirectory,
+      headers: authHeaders(),
+      chunks: chunkCount,
+      allowPause: true,
+      retries: 3,
+    );
+  }
+  return DownloadTask(
     url: url,
     filename: filename,
     directory: directory,
-    baseDirectory: absolute ? BaseDirectory.root : BaseDirectory.applicationDocuments,
+    baseDirectory: baseDirectory,
     headers: authHeaders(),
-    chunks: chunks ?? downloadConcurrency,
     allowPause: true,
     retries: 3,
   );

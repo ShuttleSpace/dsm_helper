@@ -29,7 +29,9 @@ class Accounts extends HookWidget {
   loadServers() async {
     final result = await StorageUtil.getString("servers") ?? '';
     if (result.isNotBlank) {
-      servers.value = json.decode(result);
+      servers.value = (json.decode(result) as List)
+          .map((e) => MapSignal(Map<String, dynamic>.from(e)))
+          .toList();
       timer.value ??= Timer.periodic(const Duration(seconds: 5), (timer) {
         // _fetchData();
       });

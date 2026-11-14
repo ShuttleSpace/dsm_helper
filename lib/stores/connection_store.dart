@@ -43,7 +43,8 @@ class ConnectionStore {
 
   void setSid(String value) => _sid.value = value;
   void setAccount(String value) => _account.value = value;
-  void setBaseUri(String value) => _baseUri.value = value;
+  void setBaseUri(String value) =>
+      _baseUri.value = value.endsWith('/') ? value : '$value/';
   void setHostname(String value) => _hostname.value = value;
   void setCookie(String value) async {
     _cookie.value = value;

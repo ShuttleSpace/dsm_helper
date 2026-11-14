@@ -601,7 +601,7 @@ class DashboardTaskSchedulerCard extends HookWidget {
 
 class _DashboardTashSchedulerItem extends StatelessWidget {
   _DashboardTashSchedulerItem(this.task);
-  final ReadonlySignal<Map> task;
+  final Map task;
   final running = signal(false);
   @override
   Widget build(BuildContext context) {

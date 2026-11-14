@@ -33,6 +33,7 @@ Future<Map> dsmAuthLogin(String account, String passwd,
     api: "SYNO.API.Auth",
     method: "login",
     version: 6,
+    sid: '', // 登录不能带旧 _sid，否则 DSM 按过期会话拒绝
   )..addAll({
       "account": account,
       "passwd": passwd,
@@ -63,8 +64,14 @@ Future<Map> dsmAuthLogin(String account, String passwd,
   if (res["success"] == true) {
     final sid = res["data"]["sid"];
     connectionStore.setSid(sid);
+    // 取 synotoken 供 /fbdownload 等端点鉴权（登录后写入，否则引擎拿不到凭据）
+    try {
+      final tokenRes = await dsmAuthToken();
+      final token = tokenRes['synotoken'];
+      if (token != null) connectionStore.setSynoToken(token as String);
+    } catch (_) {}
   } else {
-    throw DSMException.fromMap(res);
+    throw DSMException.fromMap(res, module: "core");
   }
   return res;
 }

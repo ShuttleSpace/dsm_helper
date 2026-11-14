@@ -55,7 +55,11 @@ extension StringExt on String {
 
 Future<String> downloadTargetDir() async {
   if (Platform.isAndroid) {
-    return settingsStore.downloadSavePath.value;
+    final path = settingsStore.downloadSavePath.value;
+    if (path.isNotEmpty) return path;
+    // 未设置下载目录时回落到应用私有 Download，避免空目录导致入队失败
+    final dir = await getApplicationDocumentsDirectory();
+    return "${dir.path}${Platform.pathSeparator}Download";
   }
   final directory = await getApplicationDocumentsDirectory();
   return "${directory.path}${Platform.pathSeparator}Download";

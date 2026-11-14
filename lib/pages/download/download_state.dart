@@ -51,7 +51,7 @@ class DownloadStateNotifier {
       taskProgressCallback: (update) =>
           downloadCallback(update.task.taskId, progress: update.progress),
     );
-    runLoop();
+    runLoop(callback: onRunLoopCallback);
   }
 
   void bindBackgroundIsolate() {
@@ -94,8 +94,12 @@ class DownloadStateNotifier {
   }
 
   runLoop({ValueChanged<List<Task>>? callback}) async {
-    List<Task> downloadTasks = await FileDownloader().allTasks();
-    callback?.call(downloadTasks);
+    try {
+      final downloadTasks = await FileDownloader().allTasks();
+      callback?.call(downloadTasks);
+    } finally {
+      loading.value = false;
+    }
   }
 
   Future<bool> onWillPop() {

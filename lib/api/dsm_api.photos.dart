@@ -13,11 +13,11 @@ Future<Map> dsmFotoBrowseAlbum(
     int version = 2,
     CancelToken? cancelToken}) async {
   final data = _dsmApiRequestData(
-      api: 'SYNO.${_fotoApiName()}Browse.Album',
+      api: 'SYNO.${_fotoApiName()}.Browse.Album',
       method: method,
       version: version);
   if (extra != null) data.addAll(extra);
-  final res = await _httpGet(_entryCGI,
+  final res = await _httpGet(_fotoEntryCGI,
       queryParameters: data, cancelToken: cancelToken);
 //Log.info("dsmFotoBrowseAlbumList: $res");
   if (res['success'] != true) {
@@ -96,10 +96,10 @@ Future<Map> dsmFotoBrowseAlbumCreate(String name, // Album name
     {String? condition, //  Album condition (JSON array)
     CancelToken? cancelToken}) async {
   final data = _dsmApiRequestData(
-      api: 'SYNO.${_fotoApiName()}Browse.Album', method: 'create', version: 1);
+      api: 'SYNO.${_fotoApiName()}.Browse.Album', method: 'create', version: 1);
   data['name'] = name;
   if (condition != null && condition.isNotEmpty) data['condition'] = condition;
-  final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
+  final res = await _httpPost(_fotoEntryCGI, data: data, cancelToken: cancelToken);
 //Log.info("dsmFotoBrowseAlbumCreate: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
@@ -114,9 +114,9 @@ Future<Map> dsmFotoBrowseAlbumDelete(
     String id, // Album ID (comma-separated for multiple)
     {CancelToken? cancelToken}) async {
   final data = _dsmApiRequestData(
-      api: 'SYNO.${_fotoApiName()}Browse.Album', method: 'delete', version: 1);
+      api: 'SYNO.${_fotoApiName()}.Browse.Album', method: 'delete', version: 1);
   data['id'] = id;
-  final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
+  final res = await _httpPost(_fotoEntryCGI, data: data, cancelToken: cancelToken);
 //Log.info("dsmFotoBrowseAlbumDelete: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
@@ -139,7 +139,7 @@ Future<Map> dsmFotoSharingPassphraseCreate(String id, // Album or folder ID
     int? expiration, // Expiration timestamp (0 for never)
     CancelToken? cancelToken}) async {
   final data = _dsmApiRequestData(
-      api: 'SYNO.${_fotoApiName()}Sharing.Passphrase',
+      api: 'SYNO.${_fotoApiName()}.Sharing.Passphrase',
       method: 'create',
       version: 1);
   data['id'] = id;
@@ -148,7 +148,7 @@ Future<Map> dsmFotoSharingPassphraseCreate(String id, // Album or folder ID
     data['permission'] = permission;
   }
   if (expiration != null) data['expiration'] = expiration;
-  final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
+  final res = await _httpPost(_fotoEntryCGI, data: data, cancelToken: cancelToken);
 //Log.info("dsmFotoSharingPassphraseCreate: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
@@ -170,14 +170,14 @@ Future<Map> dsmFotoBrowseTimeline({
       : (dsmVersion >= 7 ? 3 : 1);
 
   final data = _dsmApiRequestData(
-    api: 'SYNO.${_fotoApiName()}Browse.$category',
+    api: 'SYNO.${_fotoApiName()}.Browse.$category',
     method: method,
     version: version,
   );
   data['timeline_group_unit'] = 'day';
   if (type != null) data['type'] = type;
 
-  final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
+  final res = await _httpPost(_fotoEntryCGI, data: data, cancelToken: cancelToken);
 //Log.info("dsmFotoBrowseTimeline: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
@@ -201,7 +201,7 @@ Future<Map> dsmFotoBrowsePhotoList({
   final version = dsmVersion >= 7 ? 1 : 2;
 
   final data = _dsmApiRequestData(
-    api: 'SYNO.${_fotoApiName()}Browse.$category',
+    api: 'SYNO.${_fotoApiName()}.Browse.$category',
     method: 'list',
     version: version,
   );
@@ -218,7 +218,7 @@ Future<Map> dsmFotoBrowsePhotoList({
   }
   if (albumId != null) data['album_id'] = albumId;
 
-  final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
+  final res = await _httpPost(_fotoEntryCGI, data: data, cancelToken: cancelToken);
 //Log.info("dsmFotoBrowsePhotoList: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
@@ -232,12 +232,12 @@ Future<Map> dsmFotoBrowseCategory({
   CancelToken? cancelToken,
 }) async {
   final data = _dsmApiRequestData(
-    api: 'SYNO.${_fotoApiName()}Browse.Category',
+    api: 'SYNO.${_fotoApiName()}.Browse.Category',
     method: 'get',
     version: 1,
   );
 
-  final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
+  final res = await _httpPost(_fotoEntryCGI, data: data, cancelToken: cancelToken);
 //Log.info("dsmFotoBrowseCategory: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
@@ -259,7 +259,7 @@ Future<Map> dsmFotoBrowseAlbumListMoments({
   final version = dsmVersion >= 7 ? 1 : 2;
 
   final data = _dsmApiRequestData(
-    api: 'SYNO.${_fotoApiName()}Browse.Album',
+    api: 'SYNO.${_fotoApiName()}.Browse.Album',
     method: 'list',
     version: version,
   );
@@ -270,7 +270,7 @@ Future<Map> dsmFotoBrowseAlbumListMoments({
   data['sort_by'] = sortBy;
   data['sort_direction'] = sortDirection;
 
-  final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
+  final res = await _httpPost(_fotoEntryCGI, data: data, cancelToken: cancelToken);
 //Log.info("dsmFotoBrowseAlbumListMoments: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
@@ -286,7 +286,7 @@ Future<Map> dsmFotoBrowseGeocoding({
   CancelToken? cancelToken,
 }) async {
   final data = _dsmApiRequestData(
-    api: 'SYNO.${_fotoApiName()}Browse.Geocoding',
+    api: 'SYNO.${_fotoApiName()}.Browse.Geocoding',
     method: 'list',
     version: 1,
   );
@@ -294,7 +294,7 @@ Future<Map> dsmFotoBrowseGeocoding({
   data['limit'] = limit;
   data['additional'] = '["thumbnail"]';
 
-  final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
+  final res = await _httpPost(_fotoEntryCGI, data: data, cancelToken: cancelToken);
 //Log.info("dsmFotoBrowseGeocoding: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
@@ -311,7 +311,7 @@ Future<Map> dsmFotoBrowseGeneral({
   CancelToken? cancelToken,
 }) async {
   final data = _dsmApiRequestData(
-    api: 'SYNO.${_fotoApiName()}Browse.GeneralTag',
+    api: 'SYNO.${_fotoApiName()}.Browse.GeneralTag',
     method: 'list',
     version: 1,
   );
@@ -319,7 +319,7 @@ Future<Map> dsmFotoBrowseGeneral({
   data['limit'] = limit;
   data['additional'] = '["thumbnail"]';
 
-  final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
+  final res = await _httpPost(_fotoEntryCGI, data: data, cancelToken: cancelToken);
 //Log.info("dsmFotoBrowseGeneral: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
@@ -339,14 +339,14 @@ Future<Map> dsmFotoBrowseTimelineLocation(
   final end = start + 60 * 60 * 24 - 1;
 
   final data = _dsmApiRequestData(
-    api: 'SYNO.${_fotoApiName()}Browse.Timeline',
+    api: 'SYNO.${_fotoApiName()}.Browse.Timeline',
     method: 'get_geocoding',
     version: 1,
   );
   data['start_time'] = start;
   data['end_time'] = end;
 
-  final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
+  final res = await _httpPost(_fotoEntryCGI, data: data, cancelToken: cancelToken);
 //Log.info("dsmFotoBrowseTimelineLocation: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
@@ -363,7 +363,7 @@ Future<Map> dsmFotoBrowseRecentlyAdded({
   final version = dsmVersion >= 7 ? 1 : 2;
 
   final data = _dsmApiRequestData(
-    api: 'SYNO.${_fotoApiName()}Browse.RecentlyAdded',
+    api: 'SYNO.${_fotoApiName()}.Browse.RecentlyAdded',
     method: 'list',
     version: version,
   );
@@ -371,7 +371,7 @@ Future<Map> dsmFotoBrowseRecentlyAdded({
   data['limit'] = 4;
   data['additional'] = '["thumbnail"]';
 
-  final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
+  final res = await _httpPost(_fotoEntryCGI, data: data, cancelToken: cancelToken);
 //Log.info("dsmFotoBrowseRecentlyAdded: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
@@ -388,13 +388,13 @@ Future<Map> dsmFotoBrowseRecentlyTimeline({
   final version = dsmVersion >= 7 ? 3 : 1;
 
   final data = _dsmApiRequestData(
-    api: 'SYNO.${_fotoApiName()}Browse.RecentlyAdded',
+    api: 'SYNO.${_fotoApiName()}.Browse.RecentlyAdded',
     method: 'get_timeline',
     version: version,
   );
   data['timeline_group_unit'] = 'day';
 
-  final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
+  final res = await _httpPost(_fotoEntryCGI, data: data, cancelToken: cancelToken);
 //Log.info("dsmFotoBrowseRecentlyTimeline: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
@@ -415,7 +415,7 @@ Future<Map> dsmFotoBrowseRecentlyPhotos({
   final version = dsmVersion >= 7 ? 1 : 2;
 
   final data = _dsmApiRequestData(
-    api: 'SYNO.${_fotoApiName()}Browse.RecentlyAdded',
+    api: 'SYNO.${_fotoApiName()}.Browse.RecentlyAdded',
     method: 'list',
     version: version,
   );
@@ -431,7 +431,7 @@ Future<Map> dsmFotoBrowseRecentlyPhotos({
   }
   if (albumId != null) data['album_id'] = albumId;
 
-  final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
+  final res = await _httpPost(_fotoEntryCGI, data: data, cancelToken: cancelToken);
 //Log.info("dsmFotoBrowseRecentlyPhotos: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
@@ -446,7 +446,7 @@ Future<Map> dsmFotoBackgroundTaskInfo(String method, // list_user_task
       api: 'SYNO.$_fotoApiName().BackgroundTask.Info',
       method: method,
       version: 1);
-  final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
+  final res = await _httpPost(_fotoEntryCGI, data: data, cancelToken: cancelToken);
 //Log.info("dsmFotoBackgroundTaskInfo: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
@@ -468,7 +468,7 @@ Future<Map> dsmFotoBackgroundTaskFile(
       'item_id': itemId,
       'folder_id': folderId,
     });
-  final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
+  final res = await _httpPost(_fotoEntryCGI, data: data, cancelToken: cancelToken);
 //Log.info("dsmFotoBackgroundTaskFile: $res");
   if (res['success'] != true) {
     throw DSMException.fromMap(res);

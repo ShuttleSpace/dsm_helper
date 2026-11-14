@@ -11,6 +11,7 @@ void main() {
   SharedPreferences.setMockInitialValues({});
 
   setUp(() {
+    downloadConcurrency = 1;
     connectionStore.setSid('');
     connectionStore.setCookie('_SSID=abc');
     connectionStore.setSynoToken('TOK');
@@ -24,7 +25,7 @@ void main() {
       filename: 'a.zip',
     );
 
-    expect(task, isA<ParallelDownloadTask>());
+    expect(task, isA<DownloadTask>());
     expect(task.url,
         'http://192.168.8.40:5000/fbdownload/a.zip?dlink=x');
     expect(task.filename, 'a.zip');
@@ -45,14 +46,23 @@ void main() {
     expect(task.baseDirectory, BaseDirectory.applicationDocuments);
   });
 
-  test('buildDownloadTask falls back to downloadConcurrency for chunks', () {
-    downloadConcurrency = 1;
-    final task = buildDownloadTask(
+  test('single connection uses DownloadTask, chunks>1 uses ParallelDownloadTask',
+      () {
+    final single = buildDownloadTask(
       url: 'http://h/f',
       directory: '/d',
       filename: 'f',
     );
-    expect(task.chunks, 1);
+    expect(single, isA<DownloadTask>());
+
+    final parallel = buildDownloadTask(
+      url: 'http://h/f',
+      directory: '/d',
+      filename: 'f',
+      chunks: 4,
+    );
+    expect(parallel, isA<ParallelDownloadTask>());
+    expect((parallel as ParallelDownloadTask).chunks, 4);
   });
 
   test('enqueueFileDownload derives /fbdownload url from remotePath', () {

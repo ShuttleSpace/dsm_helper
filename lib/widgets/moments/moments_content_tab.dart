@@ -1,10 +1,9 @@
-import 'package:draggable_scrollbar/draggable_scrollbar.dart';
 import 'package:garden/pages/moments/timeline.dart';
 import 'package:garden/widgets/moments/album_item_widget.dart';
 import 'package:garden/widgets/moments/category_card_widget.dart';
 import 'package:garden/widgets/moments/timeline_item_widget.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:garden/constants/app_constants.dart';
+import 'package:flutter/material.dart';
 
 class MomentsContentTab extends StatelessWidget {
   final int currentIndex;
@@ -64,44 +63,7 @@ class MomentsContentTab extends StatelessWidget {
     }
 
     if (timeline.isNotEmpty) {
-      return DraggableScrollbar.semicircle(
-        labelTextBuilder: (position) {
-          var line = timeline
-              .where((element) =>
-                  element['position']['start'] <= position &&
-                  element['position']['end'] >= position)
-              .toList();
-          if (line.isNotEmpty) {
-            return Container(
-              padding: const EdgeInsets.symmetric(
-                  horizontal: AppConstants.paddingLarge),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  Text(
-                    "${line[0]['month']}月",
-                    style: const TextStyle(fontSize: 30),
-                  ),
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text("${line[0]['day'].toString().padLeft(2, "0")}日"),
-                      Text("${line[0]['year']}"),
-                    ],
-                  )
-                ],
-              ),
-            );
-          } else {
-            return const Placeholder(
-              child: Center(
-                child: Text('[x]'),
-              ),
-            );
-          }
-        },
-        labelConstraints: const BoxConstraints(
-            minHeight: 60, maxHeight: 60, minWidth: 140, maxWidth: 140),
+      return Scrollbar(
         controller: scrollController,
         child: ListView.builder(
           controller: scrollController,

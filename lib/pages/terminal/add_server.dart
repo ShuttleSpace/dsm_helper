@@ -82,10 +82,7 @@ class AddServer extends HookWidget {
                 final result = await Navigator.of(context).push(
                   CupertinoPageRoute(
                     builder: (context) {
-                      return const DeviceFinder(
-                        url: "https://finds.synology.com",
-                        title: "设备发现",
-                      );
+                      return const DeviceFinder(title: "设备发现");
                     },
                   ),
                 );
@@ -107,7 +104,7 @@ class AddServer extends HookWidget {
                 }
               },
               child: const Icon(
-                Icons.open_in_browser,
+                Icons.radar,
                 size: 20,
               ),
             ),

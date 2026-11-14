@@ -348,10 +348,7 @@ class Login extends HookWidget {
       final result = await Navigator.of(context).push(
         CupertinoPageRoute(
           builder: (context) {
-            return const DeviceFinder(
-              url: "https://finds.synology.com",
-              title: "设备发现",
-            );
+            return const DeviceFinder(title: "设备发现");
           },
         ),
       );
@@ -467,7 +464,7 @@ class Login extends HookWidget {
               onPressed: openDeviceFinder,
               style: context.stadiumButtonStyle,
               child: const Icon(
-                Icons.open_in_browser,
+                Icons.radar,
                 size: 20,
               ),
             ),

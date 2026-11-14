@@ -77,9 +77,10 @@ class ContainerDetail extends HookWidget {
         shortcut.value = res['data']['profile']['shortcut'];
         cpuPriority.value = res['data']['profile']['cpu_priority'];
         links.value = res['data']['profile']['links'];
-        memoryPercent.value = res['data']['details']['memoryPercent'] * 1.0;
+        memoryPercent.value =
+            (res['data']['details']['memoryPercent'] ?? 0) * 1.0;
 
-        upTime.value = res['data']['details']['up_time'];
+        upTime.value = res['data']['details']['up_time'] ?? 0;
         status.value = res['data']['details']['status'];
         cmd.value = res['data']['details']['exe_cmd'];
 

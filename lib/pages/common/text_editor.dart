@@ -1,4 +1,3 @@
-import 'package:draggable_scrollbar/draggable_scrollbar.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_highlight/flutter_highlight.dart';
@@ -56,7 +55,7 @@ class TextEditor extends HookWidget {
         leading: AppBackButton(context),
         title: const Text("查看文件"),
       ),
-      body: DraggableScrollbar.semicircle(
+      body: Scrollbar(
         controller: scrollController,
         child: ListView(
           controller: scrollController,
