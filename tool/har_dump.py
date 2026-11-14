@@ -17,16 +17,26 @@ import json, sys, urllib.parse, collections
 NOISE = {"api", "method", "version", "_sid", "SynoToken", "_", "mode", "dlink"}
 
 
+def _clean(v):
+    """strip surrounding quotes/space that some HARs wrap the api value in."""
+    if v is None or not isinstance(v, str):
+        return v
+    v = v.strip()
+    if len(v) >= 2 and v[0] == '"' and v[-1] == '"':
+        v = v[1:-1].strip()
+    return v
+
+
 def _walk(requests, out):
     """requests: compound 里的 dict 列表。递归展开嵌套 compound。"""
     for r in requests:
         if not isinstance(r, dict):
             continue
-        api = r.get("api")
+        api = _clean(r.get("api"))
         if not api:
             continue
-        method = r.get("method")
-        ver = str(r.get("version")) if r.get("version") is not None else None
+        method = _clean(r.get("method"))
+        ver = str(_clean(r.get("version"))) if r.get("version") is not None else None
         params = {k for k in r.keys() if k not in NOISE}
         out[api][(method, ver)] |= params
         if "compound" in r:
@@ -50,10 +60,10 @@ def parse(hars):
             bq = urllib.parse.parse_qs(pd) if pd else {}
 
             # 顶层请求（GET query + POST body）
-            api = (q.get("api") or bq.get("api") or [None])[0]
+            api = _clean((q.get("api") or bq.get("api") or [None])[0])
             if api:
-                method = (q.get("method") or bq.get("method") or [None])[0]
-                ver = (q.get("version") or bq.get("version") or [None])[0]
+                method = _clean((q.get("method") or bq.get("method") or [None])[0])
+                ver = _clean((q.get("version") or bq.get("version") or [None])[0])
                 params = (set(q.keys()) | set(bq.keys())) - NOISE
                 spec[api][(method, ver)] |= params
 

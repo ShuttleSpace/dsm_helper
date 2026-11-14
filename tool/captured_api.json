@@ -898,6 +898,36 @@
       "params": []
     }
   ],
+  "SYNO.FotoTeam.Browse.SimilarItem": [
+    {
+      "method": "get",
+      "version": "2",
+      "params": [
+        "additional",
+        "id"
+      ]
+    },
+    {
+      "method": "list",
+      "version": "2",
+      "params": [
+        "additional",
+        "end_time",
+        "limit",
+        "offset",
+        "start_time"
+      ]
+    }
+  ],
+  "SYNO.FotoTeam.Download": [
+    {
+      "method": "download",
+      "version": "2",
+      "params": [
+        "item_id"
+      ]
+    }
+  ],
   "SYNO.Foto.Setting.Admin": [
     {
       "method": "get",
@@ -955,19 +985,6 @@
       "version": "2",
       "params": [
         "timeline_group_unit"
-      ]
-    }
-  ],
-  "SYNO.FotoTeam.Browse.SimilarItem": [
-    {
-      "method": "list",
-      "version": "2",
-      "params": [
-        "additional",
-        "end_time",
-        "limit",
-        "offset",
-        "start_time"
       ]
     }
   ],
