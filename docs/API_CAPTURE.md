@@ -51,7 +51,7 @@ flutter analyze lib/api
 
 ## 已将抓到的规格生成代码的命名空间
 
-（`dsm_api.captured.g.dart`，共 52 个函数）
+（`dsm_api.captured.g.dart`，共 59 个函数，来自 102 个抓到的 api/method）
 
 - SYNO.ActiveInsight：CompleteCollection.get / License.get / Setting.get / Package.get_status
 - SYNO.WebStation：Status.get / PHP.get / Python.get / Docker.tags / ScriptLanguage.Utils.get / WebService.Portal.list / WebService.Service.list
@@ -61,23 +61,32 @@ flutter analyze lib/api
 - SYNO.OAUTH：Client.list
 - SYNO.TextEditor：Preference.get
 - SYNO.C2FS：Utils.load_global_config
-- 以及此前未覆盖的 Core/FileStation/CloudSync/NoteStation/SynologyDrive/AudioStation 若干 method
+- SYNO.Virtualization：已抓到若干（创建/列表/状态）
+- 以及此前未覆盖的 Core / FileStation / CloudSync / NoteStation / SynologyDrive / AudioStation 若干 method
+
+## 抓包的两类限制（重要）
+
+1. **WebSocket 应用**：Synology Calendar、Synology Contacts 走 `socket.io`（WebSocket）而非
+   `entry.cgi`，HAR 里看不到 `SYNO.Cal.*` / `SYNO.Contacts.*`。这种只能抓 WebSocket 帧，
+   本流程（HTTP HAR）覆盖不到。
+2. **新标签应用**：Download Station / Synology Photos / Synology Drive / Virtual Machine Manager
+   等会开**新浏览器标签**；按 tab 的网络抓包只跟当前标签，会漏掉。对策：点开应用后，
+   `browse session_adopt --target-url <launchApp=...>` 接管新标签，再抓。
 
 ## 尚未抓到的应用（后续按同一循环补）
 
-已安装但还缺 app 级 method 的套件：
-
-| 套件 | 命名空间 | 说明 |
+| 套件 | 命名空间 | 卡点 |
 |---|---|---|
-| Synology Calendar | `SYNO.Cal.*` | `launchApp` 只开了桌面 SPA，应用窗口未触发；需进入应用后操作 |
-| Synology Contacts | `SYNO.Contacts.*` | 同上 |
+| Synology Calendar | `SYNO.Cal.*` | WebSocket，需抓 WebSocket 帧 |
+| Synology Contacts | `SYNO.Contacts.*` | WebSocket |
+| Download Station | `SYNO.DownloadStation2.*` | 新标签，需 adopt 新标签后抓 |
+| Synology Photos | `SYNO.Foto.*` | 新标签 / 混合 |
+| Synology Drive | `SYNO.SynologyDrive.*` | 新标签 / 混合 |
+| Virtual Machine Manager | `SYNO.Virtualization.*` | 部分已抓，需更多交互 |
 | Universal Search | `SYNO.Finder.*` | 点桌面搜索框触发 |
 | Secure SignIn | `SYNO.SecureSignIn.*` | 控制面板模块 |
-| SAN Manager | `SYNO.SAS.*` / `SYNO.Core.ISCSI.*` | 已抓到 Core.ISCSI 部分 |
-| Virtual Machine Manager | `SYNO.Virtualization.*` | 已有 2 个，需补 |
-| Synology Photos | `SYNO.Foto.*` | 已有 FotoTeam，需补 Foto |
-| Download Station | `SYNO.DownloadStation2.*` | 已有基础，需补 2.x |
-| Synology Drive | `SYNO.SynologyDrive.*` | 需补管理端 |
+| Resource Monitor | `SYNO.Core.System.*` | 控制面板模块 |
+| SAN Manager | `SYNO.SAS.*` / `SYNO.Core.ISCSI.*` | 部分已抓（Core.ISCSI） |
 
 第三方套件（Jellyfin / Emby / alist / aliyun / aria2 / DDNS-GO / 迅雷）不是 `SYNO.*` API，
 走各自反向代理端口，如需接入要单独按各自 HTTP API 实现。

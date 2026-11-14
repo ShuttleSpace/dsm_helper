@@ -458,6 +458,71 @@ Future<dynamic> dsmTextEditorPreferenceGet({Map<String, dynamic>? extra}) async 
   return res['data'];
 }
 
+/// SYNO.Virtualization.Cluster.check_status (v1) — 抓包自动生成。
+Future<dynamic> dsmVirtualizationClusterCheckStatus({Map<String, dynamic>? extra}) async {
+  final data = _dsmApiRequestData(api: 'SYNO.Virtualization.Cluster', method: 'check_status', version: 1);
+  if (extra != null) data.addAll(extra);
+  final res = await _httpGet(_entryCGI, queryParameters: data);
+  if (res['success'] != true) throw DSMException.fromMap(res);
+  return res['data'];
+}
+
+/// SYNO.Virtualization.Cluster.get (v2) — 抓包自动生成。
+Future<dynamic> dsmVirtualizationClusterGet({Map<String, dynamic>? extra}) async {
+  final data = _dsmApiRequestData(api: 'SYNO.Virtualization.Cluster', method: 'get', version: 2);
+  if (extra != null) data.addAll(extra);
+  final res = await _httpGet(_entryCGI, queryParameters: data);
+  if (res['success'] != true) throw DSMException.fromMap(res);
+  return res['data'];
+}
+
+/// SYNO.Virtualization.Cluster.get_host (v2) — 抓包自动生成。
+Future<dynamic> dsmVirtualizationClusterGetHost({Map<String, dynamic>? extra}) async {
+  final data = _dsmApiRequestData(api: 'SYNO.Virtualization.Cluster', method: 'get_host', version: 2);
+  if (extra != null) data.addAll(extra);
+  final res = await _httpGet(_entryCGI, queryParameters: data);
+  if (res['success'] != true) throw DSMException.fromMap(res);
+  return res['data'];
+}
+
+/// SYNO.Virtualization.Cluster.get_total_progress (v1) — 抓包自动生成。
+Future<dynamic> dsmVirtualizationClusterGetTotalProgress({dynamic prefix, Map<String, dynamic>? extra}) async {
+  final data = _dsmApiRequestData(api: 'SYNO.Virtualization.Cluster', method: 'get_total_progress', version: 1);
+  if (prefix != null) data['prefix'] = prefix;
+  if (extra != null) data.addAll(extra);
+  final res = await _httpGet(_entryCGI, queryParameters: data);
+  if (res['success'] != true) throw DSMException.fromMap(res);
+  return res['data'];
+}
+
+/// SYNO.Virtualization.Setting.General.get (v1) — 抓包自动生成。
+Future<dynamic> dsmVirtualizationSettingGeneralGet({Map<String, dynamic>? extra}) async {
+  final data = _dsmApiRequestData(api: 'SYNO.Virtualization.Setting.General', method: 'get', version: 1);
+  if (extra != null) data.addAll(extra);
+  final res = await _httpGet(_entryCGI, queryParameters: data);
+  if (res['success'] != true) throw DSMException.fromMap(res);
+  return res['data'];
+}
+
+/// SYNO.Virtualization.Utils.activate_mem_cache (v1) — 抓包自动生成。
+Future<dynamic> dsmVirtualizationUtilsActivateMemCache({Map<String, dynamic>? extra}) async {
+  final data = _dsmApiRequestData(api: 'SYNO.Virtualization.Utils', method: 'activate_mem_cache', version: 1);
+  if (extra != null) data.addAll(extra);
+  final res = await _httpGet(_entryCGI, queryParameters: data);
+  if (res['success'] != true) throw DSMException.fromMap(res);
+  return res['data'];
+}
+
+/// SYNO.Virtualization.Utils.check_vnc_connected (v1) — 抓包自动生成。
+Future<dynamic> dsmVirtualizationUtilsCheckVncConnected({dynamic app_id, Map<String, dynamic>? extra}) async {
+  final data = _dsmApiRequestData(api: 'SYNO.Virtualization.Utils', method: 'check_vnc_connected', version: 1);
+  if (app_id != null) data['app_id'] = app_id;
+  if (extra != null) data.addAll(extra);
+  final res = await _httpGet(_entryCGI, queryParameters: data);
+  if (res['success'] != true) throw DSMException.fromMap(res);
+  return res['data'];
+}
+
 /// SYNO.WebStation.Docker.tags (v1) — 抓包自动生成。
 Future<dynamic> dsmWebStationDockerTags({dynamic repo, Map<String, dynamic>? extra}) async {
   final data = _dsmApiRequestData(api: 'SYNO.WebStation.Docker', method: 'tags', version: 1);
