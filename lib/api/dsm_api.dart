@@ -98,3 +98,6 @@ part 'dsm_api.activebackup.other.dart';
 part 'dsm_api.moments.dart';
 
 part 'dsm_api.storage.dart';
+
+// 由 tool/gen_api.py 从抓包生成（不要手改）
+part 'dsm_api.captured.g.dart';

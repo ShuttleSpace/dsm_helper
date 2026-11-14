@@ -1,0 +1,819 @@
+{
+  "SYNO.SynologyDriveShareSync.Connection": [
+    {
+      "method": "list",
+      "version": "1",
+      "params": [
+        "additional"
+      ]
+    }
+  ],
+  "SYNO.Entry.Request": [
+    {
+      "method": "request",
+      "version": "1",
+      "params": [
+        "compound",
+        "stop_when_error"
+      ]
+    },
+    {
+      "method": "request",
+      "version": "2",
+      "params": [
+        "compound"
+      ]
+    }
+  ],
+  "SYNO.Core.ExternalDevice.Storage.USB": [
+    {
+      "method": "list",
+      "version": "1",
+      "params": [
+        "additional"
+      ]
+    }
+  ],
+  "SYNO.Core.ExternalDevice.Storage.eSATA": [
+    {
+      "method": "list",
+      "version": "1",
+      "params": [
+        "additional"
+      ]
+    }
+  ],
+  "SYNO.NoteStation.Todo": [
+    {
+      "method": "list_timeout",
+      "version": "1",
+      "params": [
+        "check_badge_setting",
+        "filter",
+        "limit",
+        "offset"
+      ]
+    }
+  ],
+  "SYNO.CloudSync": [
+    {
+      "method": "list_conn",
+      "version": "1",
+      "params": [
+        "is_tray"
+      ]
+    },
+    {
+      "method": "get_recently_change",
+      "version": "1",
+      "params": []
+    }
+  ],
+  "SYNO.SynologyDrive.Index": [
+    {
+      "method": "get_native_client_status",
+      "version": "1",
+      "params": []
+    }
+  ],
+  "SYNO.Core.Desktop.Timeout": [
+    {
+      "method": "check",
+      "version": "1",
+      "params": []
+    }
+  ],
+  "SYNO.Core.SyslogClient.Status": [
+    {
+      "method": "latestlog_get",
+      "version": "1",
+      "params": [
+        "dir",
+        "limit",
+        "start",
+        "widget"
+      ]
+    },
+    {
+      "method": "eps_get",
+      "version": "1",
+      "params": [
+        "date_from",
+        "scale"
+      ]
+    },
+    {
+      "method": "cnt_get",
+      "version": "1",
+      "params": []
+    }
+  ],
+  "SYNO.Core.CurrentConnection": [
+    {
+      "method": "list",
+      "version": "1",
+      "params": [
+        "limit",
+        "sort",
+        "sort_by",
+        "sort_direction",
+        "start"
+      ]
+    }
+  ],
+  "SYNO.Core.TaskScheduler": [
+    {
+      "method": "list",
+      "version": "3",
+      "params": [
+        "limit",
+        "sort_by",
+        "sort_direction",
+        "start"
+      ]
+    }
+  ],
+  "SYNO.Core.System": [
+    {
+      "method": "poll",
+      "version": "1",
+      "params": [
+        "type"
+      ]
+    },
+    {
+      "method": "info",
+      "version": "1",
+      "params": []
+    }
+  ],
+  "SYNO.Core.Polling.Data": [
+    {
+      "method": "get",
+      "version": "1",
+      "params": [
+        "action",
+        "load_disabled_port"
+      ]
+    }
+  ],
+  "SYNO.Core.System.SystemHealth": [
+    {
+      "method": "get",
+      "version": "1",
+      "params": []
+    }
+  ],
+  "SYNO.Core.Package": [
+    {
+      "method": "list",
+      "version": "1",
+      "params": [
+        "limit",
+        "offset"
+      ]
+    },
+    {
+      "method": "list",
+      "version": "2",
+      "params": [
+        "additional",
+        "ignore_hidden",
+        "limit",
+        "offset"
+      ]
+    }
+  ],
+  "SYNO.FileStation.BackgroundTask": [
+    {
+      "method": "list",
+      "version": "3",
+      "params": [
+        "bkg_info",
+        "is_list_sharemove",
+        "is_vfs"
+      ]
+    }
+  ],
+  "SYNO.Core.Desktop.Initdata": [
+    {
+      "method": "get",
+      "version": "1",
+      "params": [
+        "action",
+        "jsconfig"
+      ]
+    },
+    {
+      "method": "get_user_service",
+      "version": "1",
+      "params": [
+        "launch_app"
+      ]
+    },
+    {
+      "method": "get_ui_config",
+      "version": "1",
+      "params": [
+        "debug",
+        "lang",
+        "launch_app"
+      ]
+    }
+  ],
+  "SYNO.Core.Package.Info": [
+    {
+      "method": "get",
+      "version": "1",
+      "params": []
+    }
+  ],
+  "SYNO.Core.DataCollect.Application": [
+    {
+      "method": "record",
+      "version": "1",
+      "params": [
+        "app"
+      ]
+    }
+  ],
+  "SYNO.Core.AppNotify": [
+    {
+      "method": "view",
+      "version": "1",
+      "params": [
+        "app"
+      ]
+    }
+  ],
+  "SYNO.Core.Package.Thumb": [
+    {
+      "method": "get",
+      "version": "1",
+      "params": [
+        "name",
+        "size",
+        "ver"
+      ]
+    }
+  ],
+  "SYNO.Core.UserSettings": [
+    {
+      "method": "apply",
+      "version": "1",
+      "params": [
+        "data"
+      ]
+    }
+  ],
+  "SYNO.Core.Package.Server": [
+    {
+      "method": "list",
+      "version": "2",
+      "params": [
+        "blforcereload",
+        "blloadothers"
+      ]
+    },
+    {
+      "method": "check",
+      "version": "1",
+      "params": []
+    }
+  ],
+  "SYNO.Core.Package.Thumb.Server": [
+    {
+      "method": "get",
+      "version": "1",
+      "params": [
+        "bls",
+        "link",
+        "name",
+        "size",
+        "ver"
+      ]
+    }
+  ],
+  "SYNO.Core.Synohdpack": [
+    {
+      "method": "getHDIcon",
+      "version": "1",
+      "params": [
+        "app_version",
+        "path",
+        "res",
+        "retina"
+      ]
+    }
+  ],
+  "SYNO.AudioStation.Info": [
+    {
+      "method": "getinfo",
+      "version": "6",
+      "params": []
+    }
+  ],
+  "SYNO.AudioStation.Genre": [
+    {
+      "method": "list_default_genre",
+      "version": "3",
+      "params": []
+    }
+  ],
+  "SYNO.AudioStation.Pin": [
+    {
+      "method": "list",
+      "version": "1",
+      "params": [
+        "limit",
+        "offset"
+      ]
+    }
+  ],
+  "SYNO.AudioStation.WebPlayer": [
+    {
+      "method": "getplaylist",
+      "version": "1",
+      "params": [
+        "additional",
+        "id",
+        "limit",
+        "offset"
+      ]
+    }
+  ],
+  "SYNO.AudioStation.RemotePlayer": [
+    {
+      "method": "list",
+      "version": "3",
+      "params": [
+        "additional",
+        "type"
+      ]
+    }
+  ],
+  "SYNO.AudioStation.Cover": [
+    {
+      "method": "getcover",
+      "version": "3",
+      "params": [
+        "_dc",
+        "default_genre_name",
+        "is_hr",
+        "library",
+        "output_default",
+        "view"
+      ]
+    }
+  ],
+  "SYNO.AudioStation.Playlist": [
+    {
+      "method": "list",
+      "version": "3",
+      "params": [
+        "library",
+        "limit"
+      ]
+    }
+  ],
+  "SYNO.WebStation.ScriptLanguage.Utils": [
+    {
+      "method": "get",
+      "version": "1",
+      "params": [
+        "script"
+      ]
+    }
+  ],
+  "SYNO.WebStation.Status": [
+    {
+      "method": "get",
+      "version": "1",
+      "params": []
+    }
+  ],
+  "SYNO.WebStation.WebService.Service": [
+    {
+      "method": "list",
+      "version": "1",
+      "params": [
+        "all"
+      ]
+    }
+  ],
+  "SYNO.WebStation.WebService.Portal": [
+    {
+      "method": "list",
+      "version": "1",
+      "params": []
+    }
+  ],
+  "SYNO.WebStation.PHP": [
+    {
+      "method": "get",
+      "version": "1",
+      "params": []
+    }
+  ],
+  "SYNO.WebStation.Python": [
+    {
+      "method": "get",
+      "version": "1",
+      "params": []
+    }
+  ],
+  "SYNO.WebStation.Docker": [
+    {
+      "method": "tags",
+      "version": "1",
+      "params": [
+        "repo"
+      ]
+    }
+  ],
+  "SYNO.OAUTH.Client": [
+    {
+      "method": "list",
+      "version": "1",
+      "params": [
+        "limit",
+        "offset"
+      ]
+    }
+  ],
+  "SYNO.Core.MyDSCenter": [
+    {
+      "method": "query",
+      "version": "2",
+      "params": []
+    }
+  ],
+  "SYNO.ActiveInsight.Setting": [
+    {
+      "method": "get",
+      "version": "1",
+      "params": []
+    }
+  ],
+  "SYNO.ActiveInsight.License": [
+    {
+      "method": "get",
+      "version": "1",
+      "params": []
+    }
+  ],
+  "SYNO.ActiveInsight.CompleteCollection": [
+    {
+      "method": "get",
+      "version": "1",
+      "params": []
+    }
+  ],
+  "SYNO.DNSServer.Zone": [
+    {
+      "method": "list",
+      "version": "1",
+      "params": []
+    }
+  ],
+  "SYNO.LogCenter.RecvRule": [
+    {
+      "method": "list",
+      "version": "1",
+      "params": []
+    }
+  ],
+  "SYNO.MediaServer.Setting": [
+    {
+      "method": "get",
+      "version": "1",
+      "params": [
+        "section"
+      ]
+    }
+  ],
+  "SYNO.Core.ISCSI.Node": [
+    {
+      "method": "get",
+      "version": "1",
+      "params": [
+        "additional"
+      ]
+    },
+    {
+      "method": "log_list",
+      "version": "1",
+      "params": [
+        "additional",
+        "limit"
+      ]
+    }
+  ],
+  "SYNO.Core.Storage.Volume": [
+    {
+      "method": "list",
+      "version": "1",
+      "params": [
+        "limit",
+        "location",
+        "offset"
+      ]
+    }
+  ],
+  "SYNO.Core.Storage.Pool": [
+    {
+      "method": "list",
+      "version": "1",
+      "params": [
+        "limit",
+        "offset"
+      ]
+    }
+  ],
+  "SYNO.Core.ISCSI.Target": [
+    {
+      "method": "list",
+      "version": "1",
+      "params": [
+        "additional"
+      ]
+    }
+  ],
+  "SYNO.Core.ISCSI.FCTarget": [
+    {
+      "method": "list",
+      "version": "1",
+      "params": [
+        "additional"
+      ]
+    }
+  ],
+  "SYNO.Core.ISCSI.LUN": [
+    {
+      "method": "list",
+      "version": "1",
+      "params": [
+        "additional",
+        "types"
+      ]
+    }
+  ],
+  "SYNO.TextEditor.Preference": [
+    {
+      "method": "get",
+      "version": "1",
+      "params": []
+    }
+  ],
+  "SYNO.Core.Report.Config": [
+    {
+      "method": "get",
+      "version": "1",
+      "params": []
+    }
+  ],
+  "SYNO.Core.Report": [
+    {
+      "method": "list",
+      "version": "1",
+      "params": []
+    }
+  ],
+  "SYNO.Core.Report.Analyzer": [
+    {
+      "method": "getdata",
+      "version": "1",
+      "params": [
+        "filter",
+        "id",
+        "source"
+      ]
+    }
+  ],
+  "SYNO.Core.Desktop.JSUIString": [
+    {
+      "method": "getjs",
+      "version": "1",
+      "params": [
+        "lang",
+        "v"
+      ]
+    }
+  ],
+  "SYNO.Core.Desktop.UIString": [
+    {
+      "method": "getjs",
+      "version": "1",
+      "params": [
+        "lang",
+        "v"
+      ]
+    }
+  ],
+  "SYNO.Core.Desktop.Defs": [
+    {
+      "method": "getjs",
+      "version": "1",
+      "params": [
+        "launchApp",
+        "v"
+      ]
+    }
+  ],
+  "SYNO.Core.Desktop.SessionData": [
+    {
+      "method": "getjs",
+      "version": "1",
+      "params": [
+        "launchApp",
+        "v"
+      ]
+    }
+  ],
+  "SYNO.API.Auth": [
+    {
+      "method": "resume",
+      "version": "7",
+      "params": [
+        "account",
+        "enable_syno_token",
+        "kk_message",
+        "session"
+      ]
+    },
+    {
+      "method": "token",
+      "version": "6",
+      "params": [
+        "updateSynoToken"
+      ]
+    }
+  ],
+  "SYNO.Core.Desktop.PersonalUpdater": [
+    {
+      "method": "need_update",
+      "version": "1",
+      "params": []
+    }
+  ],
+  "SYNO.API.Info": [
+    {
+      "method": "query",
+      "version": "1",
+      "params": [
+        "query"
+      ]
+    }
+  ],
+  "SYNO.Core.QuickStart.Info": [
+    {
+      "method": "load_ds_info",
+      "version": "3",
+      "params": []
+    }
+  ],
+  "SYNO.Core.PersonalSettings": [
+    {
+      "method": "wallpaper",
+      "version": "1",
+      "params": [
+        "id",
+        "path",
+        "retina"
+      ]
+    }
+  ],
+  "SYNO.Core.BackgroundTask": [
+    {
+      "method": "get",
+      "version": "1",
+      "params": []
+    }
+  ],
+  "SYNO.Core.Promotion.PreInstall": [
+    {
+      "method": "get_never_show",
+      "version": "1",
+      "params": []
+    }
+  ],
+  "SYNO.Core.EW.Info": [
+    {
+      "method": "get",
+      "version": "1",
+      "params": [
+        "use_extended_cache"
+      ]
+    }
+  ],
+  "SYNO.ActiveInsight.Package": [
+    {
+      "method": "get_status",
+      "version": "2",
+      "params": []
+    }
+  ],
+  "SYNO.Core.Promotion.Info": [
+    {
+      "method": "is_2FA_enabled",
+      "version": "1",
+      "params": []
+    }
+  ],
+  "SYNO.Core.NormalUser.LoginNotify": [
+    {
+      "method": "check",
+      "version": "1",
+      "params": []
+    }
+  ],
+  "SYNO.Core.FileServ.AFP": [
+    {
+      "method": "get",
+      "version": "1",
+      "params": []
+    }
+  ],
+  "SYNO.Core.Notification.Advance.FilterSettings.Profile": [
+    {
+      "method": "list",
+      "version": "1",
+      "params": []
+    }
+  ],
+  "SYNO.Core.Storage.Disk.FWUpgrade": [
+    {
+      "method": "poll",
+      "version": "1",
+      "params": []
+    },
+    {
+      "method": "get_summary",
+      "version": "1",
+      "params": [
+        "source"
+      ]
+    }
+  ],
+  "SYNO.Core.DisableAdmin": [
+    {
+      "method": "get",
+      "version": "1",
+      "params": []
+    }
+  ],
+  "SYNO.Core.System.Status": [
+    {
+      "method": "get",
+      "version": "1",
+      "params": []
+    }
+  ],
+  "SYNO.Core.VolEncKeepKey": [
+    {
+      "method": "get",
+      "version": "1",
+      "params": []
+    }
+  ],
+  "SYNO.Core.DSMNotify.Strings": [
+    {
+      "method": "get",
+      "version": "1",
+      "params": [
+        "lang",
+        "pkgName"
+      ]
+    }
+  ],
+  "SYNO.Core.Upgrade": [
+    {
+      "method": "did_user_see_new_upgrade_setting_toast",
+      "version": "1",
+      "params": []
+    }
+  ],
+  "SYNO.C2FS.Utils": [
+    {
+      "method": "load_global_config",
+      "version": "1",
+      "params": []
+    }
+  ],
+  "SYNO.SynologyDrive": [
+    {
+      "method": "get_extension",
+      "version": "1",
+      "params": []
+    }
+  ],
+  "SYNO.Core.Upgrade.Server": [
+    {
+      "method": "check",
+      "version": "1",
+      "params": [
+        "need_auto_smallupdate"
+      ]
+    }
+  ]
+}
