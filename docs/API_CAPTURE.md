@@ -48,16 +48,29 @@ flutter analyze lib/api
 - **新标签页**：应用若在新标签打开，抓包（按 tab）抓不到。优先用 `launchApp` 在同一 tab 打开，
   或 `session_adopt` 新标签后再抓。
 - **首次加载**只覆盖读接口（list/get/info）。增删改需在应用里继续操作后再抓一次。
+- **函数名冲突**：不同 api 字符串可能 collapse 成同一个 `dsm*` 函数名，例如
+  `SYNO.Core.SecurityAutoBlock`（`dsm_api.vpn.dart` 里手写的）与
+  `SYNO.Core.Security.AutoBlock`（抓包/all_api.json5 里的正确串）都会生成
+  `dsmCoreSecurityAutoBlockGet`。`gen_api.py` 已按「已有函数名」再过滤一层，避免重复定义。
 
 ## 已将抓到的规格生成代码的命名空间
 
-（`dsm_api.captured.g.dart`，共 95 个函数）
+（`dsm_api.captured.g.dart`，共 210 个函数）
 
 - SYNO.Cal：Cal.list / Event.list / Todo.{list,count_todo} / Setting.{get,set} /
   Contact.{list,get_user_info} / Proxy.{get_config,task_list} / SyncUser.sync /
   Timezone.list / UserAction.set
 - SYNO.Contacts：Addressbook.list / Contact.{list,list_group} / ExternalSource.list /
   Info.{get,get_timezone} / Label.list
+- SYNO.Finder：Bookmark.get / FileIndexing.Folder.list / Preference.get / Settings.get
+- SYNO.SecureSignIn：AMFA.Policy.get
+- SYNO.Docker：Container.{list,stats} / Image.list / Migrate.status / Network.list /
+  Project.list / Registry.get
+- SYNO.Backup / SYNO.DSM / SYNO.Network / SYNO.S2S / SYNO.SecurityAdvisor /
+  SYNO.USBCopy / SYNO.WebDAV：控制面板模块各自若干
+- SYNO.Core.Security.*：AutoBlock / DSM / DoS / Firewall 等一批；Core.ISCSI.LUN / FCTarget
+- 控制面板图标的真实文本在 DOM 里但 `snapshot()` 不渲染，用
+  `page.evaluate` 按 `innerText` 精确匹配点击，比按 role/name 可靠。
 - SYNO.ActiveInsight：CompleteCollection.get / License.get / Setting.get / Package.get_status
 - SYNO.WebStation：Status.get / PHP.get / Python.get / Docker.tags / ScriptLanguage.Utils.get / WebService.Portal.list / WebService.Service.list
 - SYNO.DNSServer：Zone.list
@@ -95,10 +108,11 @@ flutter analyze lib/api
 | Synology Photos | `SYNO.Foto.*` | 部分已抓（Setting/UserInfo），需进入相册/共享空间交互 |
 | Synology Drive | `SYNO.SynologyDrive.*` | 部分已抓（get_status），需进入管理/共享/版本 |
 | Virtual Machine Manager | `SYNO.Virtualization.*` | 部分已抓，需更多交互 |
-| Universal Search | `SYNO.Finder.*` | 点桌面搜索框触发 |
-| Secure SignIn | `SYNO.SecureSignIn.*` | 控制面板模块，需进二级页 |
-| Resource Monitor | `SYNO.Core.System.*` | 控制面板模块，部分已抓 |
-| SAN Manager | `SYNO.SAS.*` / `SYNO.Core.ISCSI.*` | 部分已抓（Core.ISCSI） |
+| 各应用 | 写操作（create/set/delete） | 只读页面抓不到，需在界面里实际增删改后再抓 |
+| SAN Manager | `SYNO.SAS.*` | `SYNO.Core.ISCSI.*` 已抓若干，SAS 命名空间未触发 |
+
+Universal Search / Secure SignIn / Resource Monitor / Container Manager / 安全性 / 网络 /
+WebDAV / USB Copy / SecurityAdvisor 等控制面板模块已在本轮覆盖。
 
 第三方套件（Jellyfin / Emby / alist / aliyun / aria2 / DDNS-GO / 迅雷）不是 `SYNO.*` API，
 走各自反向代理端口，如需接入要单独按各自 HTTP API 实现。

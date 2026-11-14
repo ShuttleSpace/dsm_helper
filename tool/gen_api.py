@@ -59,8 +59,20 @@ def existing_apis():
     return set(re.findall(r"SYNO\.[A-Za-z0-9_.]+", src))
 
 
+def existing_fn_names():
+    """已定义的 dsm* 函数名。不同 api 字符串可能 collapse 成同名函数，需按名跳过。"""
+    names = set()
+    for f in glob.glob("lib/api/*.dart"):
+        if f.endswith(".g.dart"):
+            continue
+        src = open(f, errors="ignore").read()
+        names |= set(re.findall(r"\b(dsm[A-Za-z0-9_]+)\s*\(", src))
+    return names
+
+
 def gen(spec, out_path):
     have = existing_apis()
+    have_fns = existing_fn_names()
     # 合并同 api+method 的多版本：取最高 version，参数取并集
     merged = {}
     for api, methods in spec.items():
@@ -102,6 +114,9 @@ def gen(spec, out_path):
                     dn += "Param"
                 clean.append((dn, p))
             fn_name = fn + pascal(method)
+            if fn_name in have_fns:          # 不同 api 串 collapse 成同名时跳过，避免重复定义
+                skipped.append(api + " (fn name clash: %s)" % fn_name)
+                continue
             sig = "".join("dynamic %s, " % dn for dn, _ in clean)
             if sig:
                 sig = "{" + sig + "Map<String, dynamic>? extra}"
