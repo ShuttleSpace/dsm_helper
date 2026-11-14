@@ -51,7 +51,7 @@ flutter analyze lib/api
 
 ## 已将抓到的规格生成代码的命名空间
 
-（`dsm_api.captured.g.dart`，共 59 个函数，来自 102 个抓到的 api/method）
+（`dsm_api.captured.g.dart`，共 70 个函数，来自 100+ 个抓到的 api/method）
 
 - SYNO.ActiveInsight：CompleteCollection.get / License.get / Setting.get / Package.get_status
 - SYNO.WebStation：Status.get / PHP.get / Python.get / Docker.tags / ScriptLanguage.Utils.get / WebService.Portal.list / WebService.Service.list
@@ -62,7 +62,12 @@ flutter analyze lib/api
 - SYNO.TextEditor：Preference.get
 - SYNO.C2FS：Utils.load_global_config
 - SYNO.Virtualization：已抓到若干（创建/列表/状态）
-- 以及此前未覆盖的 Core / FileStation / CloudSync / NoteStation / SynologyDrive / AudioStation 若干 method
+- SYNO.DownloadStation2：Captcha.list / Task.list / Task.Statistic.get
+- SYNO.Foto：BackgroundTask.Info.list_user_task / Setting.Admin.get / Setting.TeamSpace.get /
+  Setting.User.get / Setting.Wizard.get / UserInfo.me
+- SYNO.SynologyDrive：get_status / Index.get_native_client_status / ShareSync.Connection.list
+- SYNO.Personal：ProfilePhoto.get
+- 以及此前未覆盖的 Core / FileStation / CloudSync / NoteStation / AudioStation 若干 method
 
 ## 抓包的两类限制（重要）
 
@@ -79,9 +84,8 @@ flutter analyze lib/api
 |---|---|---|
 | Synology Calendar | `SYNO.Cal.*` | WebSocket，需抓 WebSocket 帧 |
 | Synology Contacts | `SYNO.Contacts.*` | WebSocket |
-| Download Station | `SYNO.DownloadStation2.*` | 新标签，需 adopt 新标签后抓 |
-| Synology Photos | `SYNO.Foto.*` | 新标签 / 混合 |
-| Synology Drive | `SYNO.SynologyDrive.*` | 新标签 / 混合 |
+| Synology Photos | `SYNO.Foto.*` | 部分已抓（Setting/UserInfo），需进入相册/共享空间交互 |
+| Synology Drive | `SYNO.SynologyDrive.*` | 部分已抓（get_status），需进入管理/共享/版本 |
 | Virtual Machine Manager | `SYNO.Virtualization.*` | 部分已抓，需更多交互 |
 | Universal Search | `SYNO.Finder.*` | 点桌面搜索框触发 |
 | Secure SignIn | `SYNO.SecureSignIn.*` | 控制面板模块 |

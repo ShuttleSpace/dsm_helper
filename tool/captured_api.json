@@ -520,6 +520,11 @@
       "method": "get_extension",
       "version": "1",
       "params": []
+    },
+    {
+      "method": "get_status",
+      "version": "1",
+      "params": []
     }
   ],
   "SYNO.C2FS.Utils": [
@@ -606,6 +611,38 @@
       "version": "1",
       "params": [
         "additional"
+      ]
+    }
+  ],
+  "SYNO.DownloadStation2.Task": [
+    {
+      "method": "list",
+      "version": "2",
+      "params": [
+        "additional",
+        "limit",
+        "offset",
+        "order",
+        "sort_by",
+        "type",
+        "type_inverse"
+      ]
+    }
+  ],
+  "SYNO.DownloadStation2.Captcha": [
+    {
+      "method": "list",
+      "version": "2",
+      "params": []
+    }
+  ],
+  "SYNO.DownloadStation2.Task.Statistic": [
+    {
+      "method": "get",
+      "version": "1",
+      "params": [
+        "type",
+        "type_inverse"
       ]
     }
   ],
@@ -859,6 +896,88 @@
       "method": "get",
       "version": "1",
       "params": []
+    }
+  ],
+  "SYNO.Foto.Setting.Admin": [
+    {
+      "method": "get",
+      "version": "1",
+      "params": []
+    }
+  ],
+  "SYNO.Foto.Setting.User": [
+    {
+      "method": "get",
+      "version": "1",
+      "params": []
+    }
+  ],
+  "SYNO.Foto.UserInfo": [
+    {
+      "method": "me",
+      "version": "1",
+      "params": [
+        "profile"
+      ]
+    }
+  ],
+  "SYNO.Foto.Setting.Wizard": [
+    {
+      "method": "get",
+      "version": "1",
+      "params": []
+    }
+  ],
+  "SYNO.Foto.Setting.TeamSpace": [
+    {
+      "method": "get",
+      "version": "1",
+      "params": []
+    }
+  ],
+  "SYNO.Foto.BackgroundTask.Info": [
+    {
+      "method": "list_user_task",
+      "version": "1",
+      "params": []
+    }
+  ],
+  "SYNO.FotoTeam.Browse.SimilarTimeline": [
+    {
+      "method": "get_init_timeline",
+      "version": "2",
+      "params": [
+        "timeline_group_unit"
+      ]
+    },
+    {
+      "method": "get",
+      "version": "2",
+      "params": [
+        "timeline_group_unit"
+      ]
+    }
+  ],
+  "SYNO.FotoTeam.Browse.SimilarItem": [
+    {
+      "method": "list",
+      "version": "2",
+      "params": [
+        "additional",
+        "end_time",
+        "limit",
+        "offset",
+        "start_time"
+      ]
+    }
+  ],
+  "SYNO.Personal.Profile.Photo": [
+    {
+      "method": "get",
+      "version": "1",
+      "params": [
+        "f"
+      ]
     }
   ]
 }

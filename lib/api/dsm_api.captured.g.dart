@@ -378,6 +378,97 @@ Future<dynamic> dsmDNSServerZoneList({Map<String, dynamic>? extra}) async {
   return res['data'];
 }
 
+/// SYNO.DownloadStation2.Captcha.list (v2) — 抓包自动生成。
+Future<dynamic> dsmDownloadStation2CaptchaList({Map<String, dynamic>? extra}) async {
+  final data = _dsmApiRequestData(api: 'SYNO.DownloadStation2.Captcha', method: 'list', version: 2);
+  if (extra != null) data.addAll(extra);
+  final res = await _httpGet(_entryCGI, queryParameters: data);
+  if (res['success'] != true) throw DSMException.fromMap(res);
+  return res['data'];
+}
+
+/// SYNO.DownloadStation2.Task.list (v2) — 抓包自动生成。
+Future<dynamic> dsmDownloadStation2TaskList({dynamic additional, dynamic limit, dynamic offset, dynamic order, dynamic sort_by, dynamic type, dynamic type_inverse, Map<String, dynamic>? extra}) async {
+  final data = _dsmApiRequestData(api: 'SYNO.DownloadStation2.Task', method: 'list', version: 2);
+  if (additional != null) data['additional'] = additional;
+  if (limit != null) data['limit'] = limit;
+  if (offset != null) data['offset'] = offset;
+  if (order != null) data['order'] = order;
+  if (sort_by != null) data['sort_by'] = sort_by;
+  if (type != null) data['type'] = type;
+  if (type_inverse != null) data['type_inverse'] = type_inverse;
+  if (extra != null) data.addAll(extra);
+  final res = await _httpGet(_entryCGI, queryParameters: data);
+  if (res['success'] != true) throw DSMException.fromMap(res);
+  return res['data'];
+}
+
+/// SYNO.DownloadStation2.Task.Statistic.get (v1) — 抓包自动生成。
+Future<dynamic> dsmDownloadStation2TaskStatisticGet({dynamic type, dynamic type_inverse, Map<String, dynamic>? extra}) async {
+  final data = _dsmApiRequestData(api: 'SYNO.DownloadStation2.Task.Statistic', method: 'get', version: 1);
+  if (type != null) data['type'] = type;
+  if (type_inverse != null) data['type_inverse'] = type_inverse;
+  if (extra != null) data.addAll(extra);
+  final res = await _httpGet(_entryCGI, queryParameters: data);
+  if (res['success'] != true) throw DSMException.fromMap(res);
+  return res['data'];
+}
+
+/// SYNO.Foto.BackgroundTask.Info.list_user_task (v1) — 抓包自动生成。
+Future<dynamic> dsmFotoBackgroundTaskInfoListUserTask({Map<String, dynamic>? extra}) async {
+  final data = _dsmApiRequestData(api: 'SYNO.Foto.BackgroundTask.Info', method: 'list_user_task', version: 1);
+  if (extra != null) data.addAll(extra);
+  final res = await _httpGet(_entryCGI, queryParameters: data);
+  if (res['success'] != true) throw DSMException.fromMap(res);
+  return res['data'];
+}
+
+/// SYNO.Foto.Setting.Admin.get (v1) — 抓包自动生成。
+Future<dynamic> dsmFotoSettingAdminGet({Map<String, dynamic>? extra}) async {
+  final data = _dsmApiRequestData(api: 'SYNO.Foto.Setting.Admin', method: 'get', version: 1);
+  if (extra != null) data.addAll(extra);
+  final res = await _httpGet(_entryCGI, queryParameters: data);
+  if (res['success'] != true) throw DSMException.fromMap(res);
+  return res['data'];
+}
+
+/// SYNO.Foto.Setting.TeamSpace.get (v1) — 抓包自动生成。
+Future<dynamic> dsmFotoSettingTeamSpaceGet({Map<String, dynamic>? extra}) async {
+  final data = _dsmApiRequestData(api: 'SYNO.Foto.Setting.TeamSpace', method: 'get', version: 1);
+  if (extra != null) data.addAll(extra);
+  final res = await _httpGet(_entryCGI, queryParameters: data);
+  if (res['success'] != true) throw DSMException.fromMap(res);
+  return res['data'];
+}
+
+/// SYNO.Foto.Setting.User.get (v1) — 抓包自动生成。
+Future<dynamic> dsmFotoSettingUserGet({Map<String, dynamic>? extra}) async {
+  final data = _dsmApiRequestData(api: 'SYNO.Foto.Setting.User', method: 'get', version: 1);
+  if (extra != null) data.addAll(extra);
+  final res = await _httpGet(_entryCGI, queryParameters: data);
+  if (res['success'] != true) throw DSMException.fromMap(res);
+  return res['data'];
+}
+
+/// SYNO.Foto.Setting.Wizard.get (v1) — 抓包自动生成。
+Future<dynamic> dsmFotoSettingWizardGet({Map<String, dynamic>? extra}) async {
+  final data = _dsmApiRequestData(api: 'SYNO.Foto.Setting.Wizard', method: 'get', version: 1);
+  if (extra != null) data.addAll(extra);
+  final res = await _httpGet(_entryCGI, queryParameters: data);
+  if (res['success'] != true) throw DSMException.fromMap(res);
+  return res['data'];
+}
+
+/// SYNO.Foto.UserInfo.me (v1) — 抓包自动生成。
+Future<dynamic> dsmFotoUserInfoMe({dynamic profile, Map<String, dynamic>? extra}) async {
+  final data = _dsmApiRequestData(api: 'SYNO.Foto.UserInfo', method: 'me', version: 1);
+  if (profile != null) data['profile'] = profile;
+  if (extra != null) data.addAll(extra);
+  final res = await _httpGet(_entryCGI, queryParameters: data);
+  if (res['success'] != true) throw DSMException.fromMap(res);
+  return res['data'];
+}
+
 /// SYNO.LogCenter.RecvRule.list (v1) — 抓包自动生成。
 Future<dynamic> dsmLogCenterRecvRuleList({Map<String, dynamic>? extra}) async {
   final data = _dsmApiRequestData(api: 'SYNO.LogCenter.RecvRule', method: 'list', version: 1);
@@ -421,9 +512,28 @@ Future<dynamic> dsmOauthClientList({dynamic limit, dynamic offset, Map<String, d
   return res['data'];
 }
 
+/// SYNO.Personal.Profile.Photo.get (v1) — 抓包自动生成。
+Future<dynamic> dsmPersonalProfilePhotoGet({dynamic f, Map<String, dynamic>? extra}) async {
+  final data = _dsmApiRequestData(api: 'SYNO.Personal.Profile.Photo', method: 'get', version: 1);
+  if (f != null) data['f'] = f;
+  if (extra != null) data.addAll(extra);
+  final res = await _httpGet(_entryCGI, queryParameters: data);
+  if (res['success'] != true) throw DSMException.fromMap(res);
+  return res['data'];
+}
+
 /// SYNO.SynologyDrive.get_extension (v1) — 抓包自动生成。
 Future<dynamic> dsmSynologyDriveGetExtension({Map<String, dynamic>? extra}) async {
   final data = _dsmApiRequestData(api: 'SYNO.SynologyDrive', method: 'get_extension', version: 1);
+  if (extra != null) data.addAll(extra);
+  final res = await _httpGet(_entryCGI, queryParameters: data);
+  if (res['success'] != true) throw DSMException.fromMap(res);
+  return res['data'];
+}
+
+/// SYNO.SynologyDrive.get_status (v1) — 抓包自动生成。
+Future<dynamic> dsmSynologyDriveGetStatus({Map<String, dynamic>? extra}) async {
+  final data = _dsmApiRequestData(api: 'SYNO.SynologyDrive', method: 'get_status', version: 1);
   if (extra != null) data.addAll(extra);
   final res = await _httpGet(_entryCGI, queryParameters: data);
   if (res['success'] != true) throw DSMException.fromMap(res);
