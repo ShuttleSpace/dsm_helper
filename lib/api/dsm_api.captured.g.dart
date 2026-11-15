@@ -775,6 +775,16 @@ Future<dynamic> dsmCoreIscsiFCTargetList({dynamic additional, Map<String, dynami
   return res['data'];
 }
 
+/// SYNO.Core.ISCSI.Host.list (v1) — 抓包自动生成。
+Future<dynamic> dsmCoreIscsiHostList({dynamic additional, Map<String, dynamic>? extra}) async {
+  final data = _dsmApiRequestData(api: 'SYNO.Core.ISCSI.Host', method: 'list', version: 1);
+  if (additional != null) data['additional'] = additional;
+  if (extra != null) data.addAll(extra);
+  final res = await _httpGet(_entryCGI, queryParameters: data);
+  if (res['success'] != true) throw DSMException.fromMap(res);
+  return res['data'];
+}
+
 /// SYNO.Core.ISCSI.Node.get (v1) — 抓包自动生成。
 Future<dynamic> dsmCoreIscsiNodeGet({dynamic additional, Map<String, dynamic>? extra}) async {
   final data = _dsmApiRequestData(api: 'SYNO.Core.ISCSI.Node', method: 'get', version: 1);
@@ -1508,6 +1518,15 @@ Future<dynamic> dsmEntryRequestPollingList({dynamic extra_group_tasks, dynamic t
   final data = _dsmApiRequestData(api: 'SYNO.Entry.Request.Polling', method: 'list', version: 1);
   if (extra_group_tasks != null) data['extra_group_tasks'] = extra_group_tasks;
   if (task_id_prefix != null) data['task_id_prefix'] = task_id_prefix;
+  if (extra != null) data.addAll(extra);
+  final res = await _httpGet(_entryCGI, queryParameters: data);
+  if (res['success'] != true) throw DSMException.fromMap(res);
+  return res['data'];
+}
+
+/// SYNO.FileStation.Mount.List.get (v1) — 抓包自动生成。
+Future<dynamic> dsmFileStationMountListGet({Map<String, dynamic>? extra}) async {
+  final data = _dsmApiRequestData(api: 'SYNO.FileStation.Mount.List', method: 'get', version: 1);
   if (extra != null) data.addAll(extra);
   final res = await _httpGet(_entryCGI, queryParameters: data);
   if (res['success'] != true) throw DSMException.fromMap(res);

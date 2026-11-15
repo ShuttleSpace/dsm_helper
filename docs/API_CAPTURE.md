@@ -37,6 +37,14 @@ flutter analyze lib/api
 
 > `har_dump.py` 支持一次传多个 HAR 合并；`gen_api.py` 支持 `.har` 和 `.json` 输入。
 
+> **工具签名变更（重要）**：新版 browse 的顶层 `network stop` 不再写 HAR 文件
+> （忽略 `--output`），只返回 `exchanges` 数组。要落盘得在 `execute` 的 Playwright
+> realm 里用内部 helper：`await network.start()` → 操作 → `const s = await network.stop()`，
+> 把 `s.exchanges` 转成最小 HAR 结构 `{log:{entries:[{request:{method,url,postData}}]}}`，
+> 再 `await files.write(<绝对路径>, JSON.stringify(har))`（`files.write` 返回 Promise，
+> 必须 await）。`document`/`page` 只在嵌套 `tools.browse.execute` 的 code 里可用，且
+> 内层 code 不能用反引号（会破坏外层 JSON）。
+
 ## 关键事实（踩过的坑）
 
 - **鉴权**：登录态 Cookie 是 `_SSID`（不是 `_SID`），且受保护 API 需要
@@ -55,7 +63,7 @@ flutter analyze lib/api
 
 ## 已将抓到的规格生成代码的命名空间
 
-（`dsm_api.captured.g.dart`，共 210 个函数）
+（`dsm_api.captured.g.dart`，共 212 个函数）
 
 - SYNO.Cal：Cal.list / Event.list / Todo.{list,count_todo} / Setting.{get,set} /
   Contact.{list,get_user_info} / Proxy.{get_config,task_list} / SyncUser.sync /
@@ -110,6 +118,19 @@ flutter analyze lib/api
 | Virtual Machine Manager | `SYNO.Virtualization.*` | 部分已抓，需更多交互 |
 | 各应用 | 写操作（create/set/delete） | 只读页面抓不到，需在界面里实际增删改后再抓 |
 | SAN Manager | `SYNO.SAS.*` | `SYNO.Core.ISCSI.*` 已抓若干，SAS 命名空间未触发 |
+
+## 写操作捕获（A1：页内应用在 fresh session 抓写）
+
+结论：**写操作走普通 HTTP `entry.cgi`，页内应用（File Station 窗口）的 HAR 能抓到**，
+链路已验证通。做法：在界面新建临时对象 → 立即删除（可逆、零风险、不碰已有数据）。
+
+- 实测用例：File Station **新建文件夹 → 删除** 闭环。抓到 `SYNO.FileStation.CreateFolder.create v2`
+  （params: `folder_path, force_parent, name`）和 `SYNO.FileStation.Delete.start/status`
+  （`accurate_progress, path` / `taskid`）。这两个 API **已在 `lib/api` 手写实现**，
+  所以 `gen_api.py` 整条跳过，不重复生成。
+- 注意：`network stop` 现在只返回 exchanges，要在 `execute` 里用内部 `network` helper +
+  `files.write` 落盘（见上面「工具签名变更」）。
+- 残留清理：删除用例后务必 `remaining===false` 验证无残留临时文件，否则重新点确认框的「删除」。
 
 Universal Search / Secure SignIn / Resource Monitor / Container Manager / 安全性 / 网络 /
 WebDAV / USB Copy / SecurityAdvisor 等控制面板模块已在本轮覆盖。

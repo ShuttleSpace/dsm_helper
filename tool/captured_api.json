@@ -274,15 +274,11 @@
       "params": []
     }
   ],
-  "SYNO.Core.PersonalSettings": [
+  "SYNO.Core.BackgroundTask": [
     {
-      "method": "wallpaper",
+      "method": "get",
       "version": "1",
-      "params": [
-        "id",
-        "path",
-        "retina"
-      ]
+      "params": []
     }
   ],
   "SYNO.Core.Desktop.Timeout": [
@@ -292,11 +288,15 @@
       "params": []
     }
   ],
-  "SYNO.Core.BackgroundTask": [
+  "SYNO.Core.PersonalSettings": [
     {
-      "method": "get",
+      "method": "wallpaper",
       "version": "1",
-      "params": []
+      "params": [
+        "id",
+        "path",
+        "retina"
+      ]
     }
   ],
   "SYNO.FileStation.BackgroundTask": [
@@ -317,13 +317,6 @@
       "params": []
     }
   ],
-  "SYNO.ActiveInsight.Package": [
-    {
-      "method": "get_status",
-      "version": "2",
-      "params": []
-    }
-  ],
   "SYNO.Core.EW.Info": [
     {
       "method": "get",
@@ -337,6 +330,13 @@
     {
       "method": "is_2FA_enabled",
       "version": "1",
+      "params": []
+    }
+  ],
+  "SYNO.ActiveInsight.Package": [
+    {
+      "method": "get_status",
+      "version": "2",
       "params": []
     }
   ],
@@ -372,19 +372,6 @@
       "params": []
     }
   ],
-  "SYNO.Core.CurrentConnection": [
-    {
-      "method": "list",
-      "version": "1",
-      "params": [
-        "limit",
-        "sort",
-        "sort_by",
-        "sort_direction",
-        "start"
-      ]
-    }
-  ],
   "SYNO.Core.System": [
     {
       "method": "poll",
@@ -403,6 +390,19 @@
       "version": "3",
       "params": [
         "type"
+      ]
+    }
+  ],
+  "SYNO.Core.CurrentConnection": [
+    {
+      "method": "list",
+      "version": "1",
+      "params": [
+        "limit",
+        "sort",
+        "sort_by",
+        "sort_direction",
+        "start"
       ]
     }
   ],
@@ -497,6 +497,16 @@
       "params": []
     }
   ],
+  "SYNO.Core.DSMNotify.Strings": [
+    {
+      "method": "get",
+      "version": "1",
+      "params": [
+        "lang",
+        "pkgName"
+      ]
+    }
+  ],
   "SYNO.CloudSync": [
     {
       "method": "list_conn",
@@ -511,30 +521,11 @@
       "params": []
     }
   ],
-  "SYNO.Core.DSMNotify.Strings": [
-    {
-      "method": "get",
-      "version": "1",
-      "params": [
-        "lang",
-        "pkgName"
-      ]
-    }
-  ],
   "SYNO.SynologyDrive.Index": [
     {
       "method": "get_native_client_status",
       "version": "1",
       "params": []
-    }
-  ],
-  "SYNO.SynologyDriveShareSync.Connection": [
-    {
-      "method": "list",
-      "version": "1",
-      "params": [
-        "additional"
-      ]
     }
   ],
   "SYNO.SynologyDrive": [
@@ -549,11 +540,13 @@
       "params": []
     }
   ],
-  "SYNO.C2FS.Utils": [
+  "SYNO.SynologyDriveShareSync.Connection": [
     {
-      "method": "load_global_config",
+      "method": "list",
       "version": "1",
-      "params": []
+      "params": [
+        "additional"
+      ]
     }
   ],
   "SYNO.Core.Upgrade.Server": [
@@ -587,6 +580,13 @@
         "blforcereload",
         "blloadothers"
       ]
+    }
+  ],
+  "SYNO.C2FS.Utils": [
+    {
+      "method": "load_global_config",
+      "version": "1",
+      "params": []
     }
   ],
   "SYNO.Core.MyDSCenter": [
@@ -2172,6 +2172,58 @@
       ]
     }
   ],
+  "SYNO.FileStation.CreateFolder": [
+    {
+      "method": "create",
+      "version": "2",
+      "params": [
+        "folder_path",
+        "force_parent",
+        "name"
+      ]
+    }
+  ],
+  "SYNO.FileStation.List": [
+    {
+      "method": "list",
+      "version": "2",
+      "params": [
+        "action",
+        "additional",
+        "check_dir",
+        "filetype",
+        "folder_path",
+        "limit",
+        "offset",
+        "sort_by",
+        "sort_direction"
+      ]
+    }
+  ],
+  "SYNO.FileStation.Mount.List": [
+    {
+      "method": "get",
+      "version": "1",
+      "params": []
+    }
+  ],
+  "SYNO.FileStation.Delete": [
+    {
+      "method": "start",
+      "version": "2",
+      "params": [
+        "accurate_progress",
+        "path"
+      ]
+    },
+    {
+      "method": "status",
+      "version": "1",
+      "params": [
+        "taskid"
+      ]
+    }
+  ],
   "SYNO.MediaServer.Setting": [
     {
       "method": "get",
@@ -2289,6 +2341,15 @@
       "version": "2",
       "params": [
         "timeline_group_unit"
+      ]
+    }
+  ],
+  "SYNO.Core.ISCSI.Host": [
+    {
+      "method": "list",
+      "version": "1",
+      "params": [
+        "additional"
       ]
     }
   ]
