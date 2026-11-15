@@ -2125,6 +2125,13 @@
       "method": "list",
       "version": "1",
       "params": []
+    },
+    {
+      "method": "delete",
+      "version": "1",
+      "params": [
+        "items"
+      ]
     }
   ],
   "SYNO.Finder.AppIndexing.Search": [
@@ -2137,6 +2144,24 @@
         "lang",
         "search_weight_list",
         "size"
+      ]
+    }
+  ],
+  "SYNO.DNSServer.Zone.MasterZoneConf": [
+    {
+      "method": "create",
+      "version": "1",
+      "params": [
+        "domain_name",
+        "domain_type",
+        "enable_notify",
+        "host_ip",
+        "limit_query",
+        "limit_transfer",
+        "limit_update",
+        "listen_interface",
+        "serial_format",
+        "zone_type"
       ]
     }
   ],

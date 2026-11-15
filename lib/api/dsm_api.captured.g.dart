@@ -1427,9 +1427,38 @@ Future<dynamic> dsmCoreWebSecurityTLSProfileGet({Map<String, dynamic>? extra}) a
   return res['data'];
 }
 
+/// SYNO.DNSServer.Zone.delete (v1) — 抓包自动生成。
+Future<dynamic> dsmDNSServerZoneDelete({dynamic items, Map<String, dynamic>? extra}) async {
+  final data = _dsmApiRequestData(api: 'SYNO.DNSServer.Zone', method: 'delete', version: 1);
+  if (items != null) data['items'] = items;
+  if (extra != null) data.addAll(extra);
+  final res = await _httpGet(_entryCGI, queryParameters: data);
+  if (res['success'] != true) throw DSMException.fromMap(res);
+  return res['data'];
+}
+
 /// SYNO.DNSServer.Zone.list (v1) — 抓包自动生成。
 Future<dynamic> dsmDNSServerZoneList({Map<String, dynamic>? extra}) async {
   final data = _dsmApiRequestData(api: 'SYNO.DNSServer.Zone', method: 'list', version: 1);
+  if (extra != null) data.addAll(extra);
+  final res = await _httpGet(_entryCGI, queryParameters: data);
+  if (res['success'] != true) throw DSMException.fromMap(res);
+  return res['data'];
+}
+
+/// SYNO.DNSServer.Zone.MasterZoneConf.create (v1) — 抓包自动生成。
+Future<dynamic> dsmDNSServerZoneMasterZoneConfCreate({dynamic domain_name, dynamic domain_type, dynamic enable_notify, dynamic host_ip, dynamic limit_query, dynamic limit_transfer, dynamic limit_update, dynamic listen_interface, dynamic serial_format, dynamic zone_type, Map<String, dynamic>? extra}) async {
+  final data = _dsmApiRequestData(api: 'SYNO.DNSServer.Zone.MasterZoneConf', method: 'create', version: 1);
+  if (domain_name != null) data['domain_name'] = domain_name;
+  if (domain_type != null) data['domain_type'] = domain_type;
+  if (enable_notify != null) data['enable_notify'] = enable_notify;
+  if (host_ip != null) data['host_ip'] = host_ip;
+  if (limit_query != null) data['limit_query'] = limit_query;
+  if (limit_transfer != null) data['limit_transfer'] = limit_transfer;
+  if (limit_update != null) data['limit_update'] = limit_update;
+  if (listen_interface != null) data['listen_interface'] = listen_interface;
+  if (serial_format != null) data['serial_format'] = serial_format;
+  if (zone_type != null) data['zone_type'] = zone_type;
   if (extra != null) data.addAll(extra);
   final res = await _httpGet(_entryCGI, queryParameters: data);
   if (res['success'] != true) throw DSMException.fromMap(res);
