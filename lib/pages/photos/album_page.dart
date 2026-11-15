@@ -16,7 +16,7 @@ class AlbumPage extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final photos = useSignal<List<PhotoModel>>([]);
-    const double photoWidth = 0;
+    final double photoWidth = (MediaQuery.sizeOf(context).width - 6) / 4;
 
     getData() async {
       photos.value = await PhotoModel.fetch(

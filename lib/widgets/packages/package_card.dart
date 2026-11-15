@@ -54,7 +54,7 @@ class PackageCard extends StatelessWidget {
                   spacing: 20,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: _children(thumbnailUrl),
+                  children: _children(thumbnailUrl, horizontal: true),
                 )
               : Column(
                   spacing: 20,
@@ -65,7 +65,19 @@ class PackageCard extends StatelessWidget {
     );
   }
 
-  List<Widget> _children(String thumbnailUrl) {
+  List<Widget> _children(String thumbnailUrl, {bool horizontal = false}) {
+    final name = Text(
+      "${package['dname']}",
+      maxLines: 2,
+      overflow: TextOverflow.ellipsis,
+      textAlign: TextAlign.center,
+    );
+    final subtitle = Text(
+      _getDisplayText(),
+      maxLines: 1,
+      overflow: TextOverflow.ellipsis,
+      style: const TextStyle(color: Colors.grey),
+    );
     return [
       Stack(
         children: [
@@ -91,20 +103,8 @@ class PackageCard extends StatelessWidget {
             ),
         ],
       ),
-      SizedBox(
-        child: Text(
-          "${package['dname']}",
-          maxLines: 2,
-          overflow: TextOverflow.ellipsis,
-          textAlign: TextAlign.center,
-        ),
-      ),
-      Text(
-        _getDisplayText(),
-        maxLines: 1,
-        overflow: TextOverflow.clip,
-        style: const TextStyle(color: Colors.grey),
-      ),
+      if (horizontal) Flexible(child: name) else name,
+      if (horizontal) Flexible(child: subtitle) else subtitle,
       PackageButton(
         package: package,
         beta: isBeta,

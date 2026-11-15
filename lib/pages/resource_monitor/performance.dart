@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:garden/stores/settings_store.dart';
 import 'package:garden/theme/app_theme.dart';
 import 'package:garden/util/http_util.dart';
-import 'package:garden/util/log.dart';
 import 'package:garden/widgets/bubble_tab_indicator.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:garden/widgets/resource_monitor/cpu_tab.dart';
@@ -62,57 +61,77 @@ class Performance extends HookWidget {
 
     getData() async {
       var res = await DsmApi.utilization();
-      Log.info("performance data: $res");
-      if (res['success']) {
-        if (context.mounted) {
-          loading.value = false;
-          if (cpus.value.length > 30) {
-            cpus.value = List.of(cpus.value)..removeAt(0);
-            disks.value = List.of(disks.value)..removeAt(0);
-            luns.value = List.of(luns.value)..removeAt(0);
-            memories.value = List.of(memories.value)..removeAt(0);
-            networks.value = List.of(networks.value)..removeAt(0);
-            spaces.value = List.of(spaces.value)..removeAt(0);
-          }
-          List result = res['data']['result'];
-          for (var item in result) {
-            if (item['success'] == true) {
-              switch (item['api']) {
-                case "SYNO.Core.System.Utilization":
-                  if (item['data']['cpu'] != null) {
-                    cpus.value = [...cpus.value, item['data']];
-                  }
-                  if (item['data']['memory'] != null) {
-                    memories.value = [...memories.value, item['data']];
-                  }
-                  if (item['data']['network'] != null) {
-                    networks.value = [
-                      ...networks.value,
-                      item['data']['network']
-                    ];
-                    num totalDownload = 0;
-                    num totalUpload = 0;
-                    item['data']['network'].forEach((net) {
-                      totalDownload += net['download'];
-                      totalUpload += net['upload'];
-                    });
-                    if (totalDownload > maxNetworkSpeed.value) {
-                      maxNetworkSpeed.value = totalDownload.toInt();
-                    }
-                    if (totalUpload > maxNetworkSpeed.value) {
-                      maxNetworkSpeed.value = totalUpload.toInt();
-                    }
-                  }
-                  break;
-                case "SYNO.Storage.CPUSHareStorage.Storage":
-                  spaces.value = [...spaces.value, item['data']];
-                  break;
-                case "SYNO.Storage.CPUSHareStorage.LUN":
-                  luns.value = [...luns.value, item['data']];
-                  break;
+      if (res['success'] != true || !context.mounted) return;
+      loading.value = false;
+      final data = res['data'];
+      if (data is! Map) return;
+      if (cpus.value.length > 30) {
+        cpus.value = List.of(cpus.value)..removeAt(0);
+        disks.value = List.of(disks.value)..removeAt(0);
+        luns.value = List.of(luns.value)..removeAt(0);
+        memories.value = List.of(memories.value)..removeAt(0);
+        networks.value = List.of(networks.value)..removeAt(0);
+        spaces.value = List.of(spaces.value)..removeAt(0);
+      }
+      // DsmApi.utilization() 返回单个快照，不是复合 result[]；按图表所需结构转换
+      final cpu = data['cpu'];
+      if (cpu is Map) {
+        cpus.value = [
+          ...cpus.value,
+          {
+            'cpu': [
+              {
+                'user': (cpu['user_load'] as num?) ?? 0,
+                'system': ((cpu['system_load'] as num?) ?? 0) +
+                    ((cpu['other_load'] as num?) ?? 0),
               }
-            }
+            ]
           }
+        ];
+      }
+      final memory = data['memory'];
+      if (memory is Map) {
+        memories.value = [
+          ...memories.value,
+          {
+            'memory_usage_real': (memory['real_usage'] as num?) ?? 0,
+            'memory_swap_cached': (memory['swap_usage'] as num?) ?? 0,
+          }
+        ];
+      }
+      final network = data['network'];
+      if (network is List && network.isNotEmpty) {
+        final total = network.firstWhere(
+          (n) => n is Map && n['device'] == 'total',
+          orElse: () => const <String, dynamic>{},
+        );
+        final download = (total is Map ? total['rx'] : null) as num? ?? 0;
+        final upload = (total is Map ? total['tx'] : null) as num? ?? 0;
+        networks.value = [
+          ...networks.value,
+          {'download': download, 'upload': upload}
+        ];
+        if (download > maxNetworkSpeed.value) {
+          maxNetworkSpeed.value = download.toInt();
+        }
+        if (upload > maxNetworkSpeed.value) {
+          maxNetworkSpeed.value = upload.toInt();
+        }
+      }
+      final disk = data['disk'];
+      if (disk is Map && disk['total'] is Map) {
+        final total = disk['total'] as Map;
+        final read = (total['read_byte'] as num?) ?? 0;
+        final write = (total['write_byte'] as num?) ?? 0;
+        disks.value = [
+          ...disks.value,
+          {'read': read, 'write': write}
+        ];
+        if (read > maxDiskReadSpeed.value) {
+          maxDiskReadSpeed.value = read.toInt();
+        }
+        if (write > maxDiskWriteSpeed.value) {
+          maxDiskWriteSpeed.value = write.toInt();
         }
       }
     }

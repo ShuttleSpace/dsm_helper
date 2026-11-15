@@ -12,7 +12,8 @@ Future<Map> dsmCoreSecurityScanStatusRuleGet(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'] ?? {};
+  res['data'] ??= <String, dynamic>{};
+  return res;
 }
 
 Future<Map> dsmCoreSecurityScanStatusSystemGet(
@@ -24,5 +25,6 @@ Future<Map> dsmCoreSecurityScanStatusSystemGet(
   if (res['success'] != true) {
     throw DSMException.fromMap(res);
   }
-  return res['data'] ?? {};
+  res['data'] ??= <String, dynamic>{};
+  return res;
 }

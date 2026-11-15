@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:garden/extensions/signal.dart';
 import 'package:garden/extensions/string.dart';
+import 'package:garden/stores/connection_store.dart';
 import 'package:garden/util/storage_util.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:path_provider/path_provider.dart';
@@ -67,6 +68,10 @@ class SettingsStore {
 
   void setFirmwareVersion(String value) async {
     _firmwareVersion.value = value;
+    // shortcut: DSM major version parsed from "DSM 7.3.2-..."; connectionStore.dsmVersion
+    // has no other setter, so Photos APIs break (SYNO.Photo.* on DSM 7) without this.
+    final m = RegExp(r'(\d+)').firstMatch(value);
+    if (m != null) connectionStore.setVersion(int.parse(m.group(1)!));
     await StorageUtil.setString("firmware_version", value);
   }
 

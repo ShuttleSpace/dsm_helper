@@ -29,7 +29,7 @@ class Timeline extends HookWidget {
     final scrollController = useScrollController();
     final loading = useSignal(true);
     final days = useSignal<List<Day>>([]);
-    const double photoWidth = 0;
+    final double photoWidth = (MediaQuery.sizeOf(context).width - 6) / 4;
 
     Future getData({bool isTeam = false}) async {
       loading.value = true;

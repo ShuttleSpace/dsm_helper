@@ -16,7 +16,7 @@ class GeocodingPage extends HookWidget {
   Widget build(BuildContext context) {
     final loading = useSignal(true);
     final geocodingGroups = useSignal<Map<String, List<GeocodingModel>>>({});
-    const double photoWidth = 0;
+    final double photoWidth = (MediaQuery.sizeOf(context).width - 6) / 4;
 
     Future getData() async {
       final geocodings = await GeocodingModel.fetch(

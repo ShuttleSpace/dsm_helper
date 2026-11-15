@@ -21,8 +21,9 @@ class Moments extends HookWidget {
     final shares = useSignal<List>([]);
     final geocoding = useSignal<List>([]);
     final general = useSignal<List>([]);
-    const double photoWidth = 0;
-    const double albumWidth = 0;
+    final width = MediaQuery.sizeOf(context).width;
+    final double photoWidth = (width - 6) / 4;
+    final double albumWidth = (width - 60) / 2;
     final loadingTimeline = useSignal(true);
     final loadingAlbum = useSignal(true);
     final loadingShares = useSignal(true);

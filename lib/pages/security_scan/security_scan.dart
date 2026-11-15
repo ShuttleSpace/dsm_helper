@@ -115,7 +115,7 @@ class SecurityScan extends HookWidget {
       return null;
     }, const []);
 
-    String getTitle(String strId, int scanStatus) {
+    String getTitle(String strId, int? scanStatus) {
       if (webManagerStrings['rules'][
               "${strId}_desc_${scanStatus == 2 ? "good" : scanStatus == 0 ? "running" : "bad"}"] !=
           null) {

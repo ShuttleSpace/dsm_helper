@@ -21,7 +21,7 @@ class Album extends HookWidget {
     final dsmVersion = useSignalValue(connectionStore.dsmVersion);
     final sid = useSignalValue(connectionStore.sid);
     final baseUri = useSignalValue(connectionStore.baseUri);
-    const double albumWidth = 0;
+    final double albumWidth = (MediaQuery.sizeOf(context).width - 60) / 2;
 
     getAlbum() async {
       var res = await dsmFotoBrowseAlbumListMoments(shared: true);

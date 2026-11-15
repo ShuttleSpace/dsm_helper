@@ -511,7 +511,7 @@ class Packages extends HookWidget {
                                 horizontal: 20, vertical: 20),
                             gridDelegate:
                                 const SliverGridDelegateWithFixedCrossAxisCount(
-                                    crossAxisCount: 3),
+                                    crossAxisCount: 3, childAspectRatio: 0.36),
                             children: [
                               if (canUpdatePackages.isNotEmpty)
                                 ListView.builder(
@@ -569,7 +569,7 @@ class Packages extends HookWidget {
                                 horizontal: 20, vertical: 20),
                             gridDelegate:
                                 const SliverGridDelegateWithFixedCrossAxisCount(
-                                    crossAxisCount: 3),
+                                    crossAxisCount: 3, childAspectRatio: 0.36),
                             children: filteredPackages.value.map((package) {
                               return buildPackageItem(package, false);
                             }).toList(),
@@ -599,7 +599,7 @@ class Packages extends HookWidget {
                                 horizontal: 20, vertical: 20),
                             gridDelegate:
                                 const SliverGridDelegateWithFixedCrossAxisCount(
-                                    crossAxisCount: 3),
+                                    crossAxisCount: 3, childAspectRatio: 0.36),
                             children: filteredOthers.value.map((package) {
                               return buildPackageItem(package, false);
                             }).toList(),
