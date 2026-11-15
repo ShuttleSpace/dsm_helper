@@ -5,7 +5,8 @@
       "version": "1",
       "params": [
         "action",
-        "jsconfig"
+        "jsconfig",
+        "launch_app"
       ]
     },
     {
@@ -1209,6 +1210,20 @@
       "method": "list",
       "version": "1",
       "params": []
+    },
+    {
+      "method": "remove",
+      "version": "1",
+      "params": [
+        "ids"
+      ]
+    },
+    {
+      "method": "create",
+      "version": "1",
+      "params": [
+        "portal"
+      ]
     }
   ],
   "SYNO.Entry.Request.Polling": [
@@ -1274,6 +1289,18 @@
       "method": "list",
       "version": "1",
       "params": []
+    },
+    {
+      "method": "create",
+      "version": "1",
+      "params": [
+        "format",
+        "name",
+        "origin_name",
+        "port",
+        "protocol",
+        "ssl"
+      ]
     }
   ],
   "SYNO.Core.FileServ.NFS": [

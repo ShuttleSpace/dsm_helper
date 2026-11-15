@@ -1671,6 +1671,21 @@ Future<dynamic> dsmFotoUserInfoMe({dynamic profile, Map<String, dynamic>? extra}
   return res['data'];
 }
 
+/// SYNO.LogCenter.RecvRule.create (v1) — 抓包自动生成。
+Future<dynamic> dsmLogCenterRecvRuleCreate({dynamic format, dynamic name, dynamic origin_name, dynamic port, dynamic protocol, dynamic ssl, Map<String, dynamic>? extra}) async {
+  final data = _dsmApiRequestData(api: 'SYNO.LogCenter.RecvRule', method: 'create', version: 1);
+  if (format != null) data['format'] = format;
+  if (name != null) data['name'] = name;
+  if (origin_name != null) data['origin_name'] = origin_name;
+  if (port != null) data['port'] = port;
+  if (protocol != null) data['protocol'] = protocol;
+  if (ssl != null) data['ssl'] = ssl;
+  if (extra != null) data.addAll(extra);
+  final res = await _httpGet(_entryCGI, queryParameters: data);
+  if (res['success'] != true) throw DSMException.fromMap(res);
+  return res['data'];
+}
+
 /// SYNO.LogCenter.RecvRule.list (v1) — 抓包自动生成。
 Future<dynamic> dsmLogCenterRecvRuleList({Map<String, dynamic>? extra}) async {
   final data = _dsmApiRequestData(api: 'SYNO.LogCenter.RecvRule', method: 'list', version: 1);
@@ -2074,9 +2089,29 @@ Future<dynamic> dsmWebStationStatusGet({Map<String, dynamic>? extra}) async {
   return res['data'];
 }
 
+/// SYNO.WebStation.WebService.Portal.create (v1) — 抓包自动生成。
+Future<dynamic> dsmWebStationWebServicePortalCreate({dynamic portal, Map<String, dynamic>? extra}) async {
+  final data = _dsmApiRequestData(api: 'SYNO.WebStation.WebService.Portal', method: 'create', version: 1);
+  if (portal != null) data['portal'] = portal;
+  if (extra != null) data.addAll(extra);
+  final res = await _httpGet(_entryCGI, queryParameters: data);
+  if (res['success'] != true) throw DSMException.fromMap(res);
+  return res['data'];
+}
+
 /// SYNO.WebStation.WebService.Portal.list (v1) — 抓包自动生成。
 Future<dynamic> dsmWebStationWebServicePortalList({Map<String, dynamic>? extra}) async {
   final data = _dsmApiRequestData(api: 'SYNO.WebStation.WebService.Portal', method: 'list', version: 1);
+  if (extra != null) data.addAll(extra);
+  final res = await _httpGet(_entryCGI, queryParameters: data);
+  if (res['success'] != true) throw DSMException.fromMap(res);
+  return res['data'];
+}
+
+/// SYNO.WebStation.WebService.Portal.remove (v1) — 抓包自动生成。
+Future<dynamic> dsmWebStationWebServicePortalRemove({dynamic ids, Map<String, dynamic>? extra}) async {
+  final data = _dsmApiRequestData(api: 'SYNO.WebStation.WebService.Portal', method: 'remove', version: 1);
+  if (ids != null) data['ids'] = ids;
   if (extra != null) data.addAll(extra);
   final res = await _httpGet(_entryCGI, queryParameters: data);
   if (res['success'] != true) throw DSMException.fromMap(res);

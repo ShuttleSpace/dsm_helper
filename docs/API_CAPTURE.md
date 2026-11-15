@@ -63,7 +63,7 @@ flutter analyze lib/api
 
 ## 已将抓到的规格生成代码的命名空间
 
-（`dsm_api.captured.g.dart`，共 212 个函数）
+（`dsm_api.captured.g.dart`，共 217 个函数）
 
 - SYNO.Cal：Cal.list / Event.list / Todo.{list,count_todo} / Setting.{get,set} /
   Contact.{list,get_user_info} / Proxy.{get_config,task_list} / SyncUser.sync /
@@ -131,6 +131,26 @@ flutter analyze lib/api
 - 注意：`network stop` 现在只返回 exchanges，要在 `execute` 里用内部 `network` helper +
   `files.write` 落盘（见上面「工具签名变更」）。
 - 残留清理：删除用例后务必 `remaining===false` 验证无残留临时文件，否则重新点确认框的「删除」。
+
+### 已验证的写用例（新增函数）
+
+| 套件 | 用例 | 抓到的写 method | 结果 |
+|---|---|---|---|
+| DNSServer | 新建主域区→删除 | `Zone.MasterZoneConf.create v1`、`Zone.delete v1 [items]` | 真机成功，无残留 |
+| WebStation | 新建备用门户→删除 | `WebService.Portal.create v1 [portal]`、`remove v1 [ids]` | 真机成功，无残留；**删除 method 叫 `remove` 不是 `delete`** |
+| LogCenter | 新建接收规则 | `RecvRule.create v1 [format,name,origin_name,port,protocol,ssl]` | DSM UI 自带请求把值编码成 `%22...%22`（带引号）导致 `success:false`，仅抓到 method，未真建成功 |
+
+### 写用例的 UI 坑
+
+- **工具栏删除要先选中行**：ExtJS 网格（DNS/LogCenter）行未选中时点「删除」静默无效；
+  先点 `.x-grid3-row` 行元素使其 `x-grid3-row-selected`，再点删除才弹确认框。
+- **菜单项类名不统一**：Web Station「操作」菜单是 `.v-menu-item`（不是 `.x-menu-item`），
+  用错选择器会点到隐藏元素、删除不生效。
+- **DOM 更新延迟**：创建后列表可能不立即刷新，`created:false` 不代表没建成——
+  关对话框、重切 tab 再读列表确认真相（Web Station 就是这样：`success:true` 但列表延迟）。
+- **browse 导出的 HAR 里有脱敏坏 URL**：部分请求的 url 被替换成 `http://192.168.8.4[redacted]...`，
+  `har_dump.py` 的 `urlparse` 会报 `Invalid IPv6 URL`。数据（postData）没坏——解析前把这些 url
+  替换成合法占位符（如 `http://127.0.0.1/webapi/entry.cgi`）即可，不要丢 entry。
 
 Universal Search / Secure SignIn / Resource Monitor / Container Manager / 安全性 / 网络 /
 WebDAV / USB Copy / SecurityAdvisor 等控制面板模块已在本轮覆盖。
