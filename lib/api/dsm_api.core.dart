@@ -364,15 +364,16 @@ Future<Map> dsmCoreCurrentConnectionList(
   return res['data'] ?? {};
 }
 
-Future<Map> dsmCoreCurrentConnectionGet(String action, // enum
-    {int? offset,
-    int? limit,
-    int? start, // FIXME:???
-    String? sortBy = 'time',
-    String? sortDirection = 'DESC',
-    CancelToken? cancelToken}) async {
+Map<String, dynamic> dsmCoreCurrentConnectionGetRequestData(
+  String action, // enum
+  {int? offset,
+  int? limit,
+  int? start, // FIXME:???
+  String? sortBy = 'time',
+  String? sortDirection = 'DESC',
+}) {
   final data = _dsmApiRequestData(
-      api: 'SYNO.Core.CurrentConnection', method: 'list', version: 1);
+      api: 'SYNO.Core.CurrentConnection', method: 'get', version: 1);
   data['action'] = action;
   if (sortBy != null && sortBy.isNotEmpty) {
     data['sort_by'] = sortBy;
@@ -389,6 +390,24 @@ Future<Map> dsmCoreCurrentConnectionGet(String action, // enum
   if (start != null) {
     data['start'] = start;
   }
+  return data;
+}
+
+Future<Map> dsmCoreCurrentConnectionGet(String action, // enum
+    {int? offset,
+    int? limit,
+    int? start, // FIXME:???
+    String? sortBy = 'time',
+    String? sortDirection = 'DESC',
+    CancelToken? cancelToken}) async {
+  final data = dsmCoreCurrentConnectionGetRequestData(
+    action,
+    offset: offset,
+    limit: limit,
+    start: start,
+    sortBy: sortBy,
+    sortDirection: sortDirection,
+  );
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
 //Log.info("dsmCoreCurrentConnectionGet: $res");
   if (res['success'] != true) {

@@ -183,6 +183,15 @@ Future<Map> dsmFileStationDeleteStart(
   return res['data'] ?? {};
 }
 
+Map<String, dynamic> dsmFileStationDeleteStatusRequestData(
+  String taskid, // Task ID
+) {
+  final data = _dsmApiRequestData(
+      api: 'SYNO.FileStation.Delete', method: 'status', version: 2);
+  data['taskid'] = taskid;
+  return data;
+}
+
 /// {
 ///   "success": true,
 ///   "data": {
@@ -194,9 +203,7 @@ Future<Map> dsmFileStationDeleteStart(
 /// }
 Future<Map> dsmFileStationDeleteStatus(String taskid, // Task ID
     {CancelToken? cancelToken}) async {
-  final data = _dsmApiRequestData(
-      api: 'SYNO.FileStation.Delete', method: 'start', version: 2);
-  data['taskid'] = taskid;
+  final data = dsmFileStationDeleteStatusRequestData(taskid);
   final res = await _httpGet(_entryCGI,
       queryParameters: data, cancelToken: cancelToken);
 //Log.info("dsmFileStationDeleteStatus: $res");

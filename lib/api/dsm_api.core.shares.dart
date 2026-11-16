@@ -70,20 +70,17 @@ Future<Map> dsmCoreShareGet(String name, // Share name
   return res['data'] ?? {};
 }
 
-/// {
-///   "success": true
-/// }
-Future<Map> dsmCoreShareCreate(
-    String name, // Share name
-    String volPath, // Volume path (e.g., `/volume1`)
-    {String? desc, // Description
-    bool? encryption, // Enable encryption (default: false)
-    bool? enableShareCompress, // Enable compression (default: false)
-    bool? enableShareCow, // Enable Btrfs COW (default: false)
-    bool? recyclebin, // Enable recycle bin (default: false)
-    CancelToken? cancelToken}) async {
-  final data =
-      _dsmApiRequestData(api: 'SYNO.Core.Share', method: 'get', version: 1);
+Map<String, dynamic> dsmCoreShareCreateRequestData(
+  String name, // Share name
+  String volPath, // Volume path (e.g., `/volume1`)
+  {String? desc, // Description
+  bool? encryption, // Enable encryption (default: false)
+  bool? enableShareCompress, // Enable compression (default: false)
+  bool? enableShareCow, // Enable Btrfs COW (default: false)
+  bool? recyclebin, // Enable recycle bin (default: false)
+}) {
+  final data = _dsmApiRequestData(
+      api: 'SYNO.Core.Share', method: 'create', version: 1);
   data['name'] = name;
   data['vol_path'] = volPath;
   if (desc != null && desc.isNotEmpty) {
@@ -101,6 +98,30 @@ Future<Map> dsmCoreShareCreate(
   if (recyclebin != null) {
     data['recyclebin'] = recyclebin;
   }
+  return data;
+}
+
+/// {
+///   "success": true
+/// }
+Future<Map> dsmCoreShareCreate(
+    String name, // Share name
+    String volPath, // Volume path (e.g., `/volume1`)
+    {String? desc, // Description
+    bool? encryption, // Enable encryption (default: false)
+    bool? enableShareCompress, // Enable compression (default: false)
+    bool? enableShareCow, // Enable Btrfs COW (default: false)
+    bool? recyclebin, // Enable recycle bin (default: false)
+    CancelToken? cancelToken}) async {
+  final data = dsmCoreShareCreateRequestData(
+    name,
+    volPath,
+    desc: desc,
+    encryption: encryption,
+    enableShareCompress: enableShareCompress,
+    enableShareCow: enableShareCow,
+    recyclebin: recyclebin,
+  );
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
 //Log.info("dsmCoreShareCreate: $res");
   if (res['success'] != true) {
