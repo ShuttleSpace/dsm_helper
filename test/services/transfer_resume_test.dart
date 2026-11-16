@@ -1,8 +1,36 @@
 import 'dart:io';
 
+import 'package:dio/dio.dart' show CancelToken;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:garden/api/dsm_api.dart';
 import 'package:garden/api/dsm_api.filestation.transfer_contract.dart';
+
+/// 记录一次底层下载调用（savePath + 是否带 Range）。
+class _DownloadCall {
+  const _DownloadCall({required this.savePath, required this.headers});
+  final String savePath;
+  final Map<String, dynamic>? headers;
+
+  bool get isPartial => headers?.containsKey('Range') ?? false;
+}
+
+/// 安装下载替身：把调用记入 [calls]，由 [respond] 决定写字节/返回状态。
+void _fakeDownload({
+  required List<_DownloadCall> calls,
+  required DsmDownloadResult Function(_DownloadCall call) respond,
+}) {
+  dsmDownloadMetaForTesting = (
+    String endpoint, {
+    required String savePath,
+    Map<String, dynamic>? headers,
+    Map<String, dynamic>? queryParameters,
+    CancelToken? cancelToken,
+  }) async {
+    final call = _DownloadCall(savePath: savePath, headers: headers);
+    calls.add(call);
+    return respond(call);
+  };
+}
 
 void main() {
   group('下载断点续写助手', () {
@@ -55,6 +83,142 @@ void main() {
 
       expect(dest.readAsBytesSync(), [1, 2, 3, 4, 5]);
       expect(part.existsSync(), isFalse);
+    });
+  });
+
+  group('断点续写仅认 206 + 匹配 Content-Range', () {
+    test('isResumablePartial 只接受 206 且起点等于 expectedOffset', () {
+      expect(
+        isResumablePartial(
+          const DsmDownloadResult(
+              statusCode: 206, headers: {'content-range': 'bytes 4-5/6'}),
+          4,
+        ),
+        isTrue,
+      );
+      // 大小写不敏感
+      expect(
+        isResumablePartial(
+          const DsmDownloadResult(
+              statusCode: 206, headers: {'Content-Range': 'bytes 4-5/6'}),
+          4,
+        ),
+        isTrue,
+      );
+      // 起点不匹配 → 不可续写
+      expect(
+        isResumablePartial(
+          const DsmDownloadResult(
+              statusCode: 206, headers: {'content-range': 'bytes 0-5/6'}),
+          4,
+        ),
+        isFalse,
+      );
+      // 缺 Content-Range / 非 206 → 不可续写
+      expect(
+        isResumablePartial(
+            const DsmDownloadResult(statusCode: 206, headers: {}), 4),
+        isFalse,
+      );
+      expect(
+        isResumablePartial(
+          const DsmDownloadResult(
+              statusCode: 200, headers: {'content-range': 'bytes 4-5/6'}),
+          4,
+        ),
+        isFalse,
+      );
+      // 总大小未知（*）仍认偏移
+      expect(
+        isResumablePartial(
+          const DsmDownloadResult(
+              statusCode: 206, headers: {'content-range': 'bytes 4-5/*'}),
+          4,
+        ),
+        isTrue,
+      );
+    });
+
+    test('206 + 匹配 Content-Range → 仅追加分片字节到目标', () async {
+      final dir = Directory.systemTemp.createTempSync('resume_206_');
+      addTearDown(() {
+        dsmDownloadMetaForTesting = null;
+        if (dir.existsSync()) dir.deleteSync(recursive: true);
+      });
+      final dest = File('${dir.path}/f.bin')..writeAsBytesSync([1, 2, 3, 4]);
+      final calls = <_DownloadCall>[];
+      _fakeDownload(calls: calls, respond: (call) {
+        File(call.savePath).writeAsBytesSync([5, 6]);
+        return const DsmDownloadResult(
+          statusCode: 206,
+          headers: {'content-range': 'bytes 4-5/6'},
+          data: {'success': true, 'data': {}},
+        );
+      });
+
+      await dsmFileStationDownload('/remote/f.bin', dest.path, resumeFrom: 4);
+
+      expect(dest.readAsBytesSync(), [1, 2, 3, 4, 5, 6]);
+      expect(File('${dest.path}.part').existsSync(), isFalse);
+      expect(calls, hasLength(1));
+      expect(calls.single.isPartial, isTrue);
+      expect(calls.single.headers, containsPair('Range', 'bytes=4-'));
+      expect(calls.single.savePath, '${dest.path}.part');
+    });
+
+    test('200（服务端忽略 Range）→ 不追加，整文件重下覆盖 dest', () async {
+      final dir = Directory.systemTemp.createTempSync('resume_200_');
+      addTearDown(() {
+        dsmDownloadMetaForTesting = null;
+        if (dir.existsSync()) dir.deleteSync(recursive: true);
+      });
+      final dest = File('${dir.path}/f.bin')..writeAsBytesSync([1, 2, 3, 4]);
+      final calls = <_DownloadCall>[];
+      _fakeDownload(calls: calls, respond: (call) {
+        // 无论 Range 与否，服务端都返回整文件（HTTP 200）。
+        File(call.savePath).writeAsBytesSync([1, 2, 3, 4, 5, 6]);
+        return const DsmDownloadResult(
+          statusCode: 200,
+          headers: {},
+          data: {'success': true, 'data': {}},
+        );
+      });
+
+      await dsmFileStationDownload('/remote/f.bin', dest.path, resumeFrom: 4);
+
+      // 没有把整文件追加到半成品（否则会是 [1,2,3,4,1,2,3,4,5,6]）。
+      expect(dest.readAsBytesSync(), [1, 2, 3, 4, 5, 6]);
+      expect(File('${dest.path}.part').existsSync(), isFalse);
+      expect(calls, hasLength(2));
+      expect(calls[0].savePath, '${dest.path}.part');
+      expect(calls[0].isPartial, isTrue);
+      expect(calls[1].savePath, dest.path);
+      expect(calls[1].isPartial, isFalse); // 回退不带 Range
+    });
+
+    test('默认 resumeFrom=0 行为不变：不带 Range，整文件直写 dest', () async {
+      final dir = Directory.systemTemp.createTempSync('resume_default_');
+      addTearDown(() {
+        dsmDownloadMetaForTesting = null;
+        if (dir.existsSync()) dir.deleteSync(recursive: true);
+      });
+      final dest = File('${dir.path}/f.bin');
+      final calls = <_DownloadCall>[];
+      _fakeDownload(calls: calls, respond: (call) {
+        File(call.savePath).writeAsBytesSync([9, 8, 7]);
+        return const DsmDownloadResult(
+          statusCode: 200,
+          headers: {},
+          data: {'success': true, 'data': {}},
+        );
+      });
+
+      await dsmFileStationDownload('/remote/f.bin', dest.path);
+
+      expect(dest.readAsBytesSync(), [9, 8, 7]);
+      expect(calls, hasLength(1));
+      expect(calls.single.savePath, dest.path);
+      expect(calls.single.isPartial, isFalse);
     });
   });
 

@@ -265,7 +265,58 @@ Future<dynamic> _httpUpload(
       timeout: timeout);
 }
 
+/// 一次下载的响应元数据：HTTP 状态码、响应头与 body。
+///
+/// 断点续写必须确认服务端真的返回了 206，否则不能把字节追加到半成品文件。
+/// `_httpDownload` 只返回 body、丢弃状态码，故续写路径走 [_httpDownloadWithMeta]。
+class DsmDownloadResult {
+  const DsmDownloadResult({
+    this.statusCode,
+    this.headers = const {},
+    this.data,
+  });
+
+  final int? statusCode;
+  final Map<String, String> headers;
+  final dynamic data;
+
+  /// 大小写不敏感地读取一个响应头。
+  String? header(String name) {
+    final lower = name.toLowerCase();
+    for (final entry in headers.entries) {
+      if (entry.key.toLowerCase() == lower) return entry.value;
+    }
+    return null;
+  }
+
+  String? get contentRange => header('content-range');
+}
+
 Future<dynamic> _httpDownload(String endpoint,
+    {required String savePath,
+    String? host,
+    Map<String, dynamic>? headers,
+    Map<String, dynamic>? queryParameters,
+    CancelToken? cancelToken,
+    bool? checkSsl,
+    String? cookie,
+    int timeout = 30,
+    Function(int, int)? onReceiveProgress}) async {
+  final result = await _httpDownloadWithMeta(endpoint,
+      savePath: savePath,
+      host: host,
+      headers: headers,
+      queryParameters: queryParameters,
+      cancelToken: cancelToken,
+      checkSsl: checkSsl,
+      cookie: cookie,
+      timeout: timeout,
+      onReceiveProgress: onReceiveProgress);
+  return result.data;
+}
+
+/// 与 [_httpDownload] 相同的下载调用，但保留 HTTP 状态码与响应头供续写判定。
+Future<DsmDownloadResult> _httpDownloadWithMeta(String endpoint,
     {required String savePath,
     String? host,
     Map<String, dynamic>? headers,
@@ -293,7 +344,15 @@ Future<dynamic> _httpDownload(String endpoint,
             'cookie': cookie
           },
         ));
-    return response.data;
+    final responseHeaders = <String, String>{};
+    response.headers.forEach((key, values) {
+      if (values.isNotEmpty) responseHeaders[key] = values.first;
+    });
+    return DsmDownloadResult(
+      statusCode: response.statusCode,
+      headers: responseHeaders,
+      data: response.data,
+    );
   } on DioException {
 //Log.error("download DioException");
     rethrow;

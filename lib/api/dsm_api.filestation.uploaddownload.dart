@@ -66,11 +66,60 @@ void appendPartAndCleanup(String destPath, String partPath) {
   }
 }
 
+/// 测试替身：非空时替代底层「带元数据的下载」，用于断言 206/200 分支与落盘位置
+/// （生产恒为 null）。见 [dsmDownloadMetaForTesting] 与 [isResumablePartial]。
+@visibleForTesting
+Future<DsmDownloadResult> Function(
+  String endpoint, {
+  required String savePath,
+  Map<String, dynamic>? headers,
+  Map<String, dynamic>? queryParameters,
+  CancelToken? cancelToken,
+})?
+    dsmDownloadMetaForTesting;
+
+Future<DsmDownloadResult> _dsmDownloadMeta(
+  String endpoint, {
+  required String savePath,
+  Map<String, dynamic>? headers,
+  Map<String, dynamic>? queryParameters,
+  CancelToken? cancelToken,
+}) {
+  final override = dsmDownloadMetaForTesting;
+  if (override != null) {
+    return override(endpoint,
+        savePath: savePath,
+        headers: headers,
+        queryParameters: queryParameters,
+        cancelToken: cancelToken);
+  }
+  return _httpDownloadWithMeta(endpoint,
+      savePath: savePath,
+      headers: headers,
+      queryParameters: queryParameters,
+      cancelToken: cancelToken);
+}
+
+/// 只有「确实是 206 Partial Content 且 Content-Range 起点等于 expectedOffset」
+/// 才允许把字节追加到半成品文件。
+///
+/// 服务端忽略 Range 时会回 200 并把整文件写入 `.part`；若照单全收会造成
+/// 重复/损坏（spec 明令禁止的静默损坏），故 200/未知/偏移不符一律返回 false。
+bool isResumablePartial(DsmDownloadResult result, int expectedOffset) {
+  if (result.statusCode != 206) return false;
+  final range = result.contentRange;
+  if (range == null) return false;
+  final match = RegExp(r'^bytes\s+(\d+)-').firstMatch(range.trim());
+  if (match == null) return false;
+  return int.tryParse(match.group(1)!) == expectedOffset;
+}
+
 /// **Response:**
 /// Binary file data (or ZIP archive for multiple files)
 ///
 /// `resumeFrom` > 0 时对目标文件做字节级续写：带 `Range: bytes=N-` 拉取剩余字节，
-/// 先落 `.part` 再追加到目标文件（见 [downloadResumeRangeHeader]/[appendPartAndCleanup]）。
+/// **仅当确认 206 且 Content-Range 起点匹配时才追加**（见 [isResumablePartial]）；
+/// 若服务端忽略 Range 回 200，则改为整文件重下覆盖 destPath，绝不追加。
 /// 传 0（默认）时行为与原先完全一致。
 Future<dynamic> dsmFileStationDownload(
     String path, // File path (JSON array for multiple - creates ZIP)
@@ -84,9 +133,16 @@ Future<dynamic> dsmFileStationDownload(
   if (mode != null) data['mode'] = mode;
 
   final range = downloadResumeRangeHeader(resumeFrom);
+  final partPath = '$destPath.part';
+  final result = await _dsmDownloadMeta(_entryCGI,
+      savePath: range == null ? destPath : partPath,
+      headers: range,
+      queryParameters: data,
+      cancelToken: cancelToken);
+
+  // 默认路径（resumeFrom=0）：与原实现一致，仅校验 JSON 信封后返回 data。
   if (range == null) {
-    final res = await _httpDownload(_entryCGI,
-        savePath: destPath, queryParameters: data, cancelToken: cancelToken);
+    final res = result.data;
 //Log.info("dsmFileStationDownload: $res");
     if (res['success'] != true) {
       throw DSMException.fromMap(res);
@@ -94,15 +150,23 @@ Future<dynamic> dsmFileStationDownload(
     return res['data'] ?? {};
   }
 
-  final partPath = '$destPath.part';
-  final res = await _httpDownload(_entryCGI,
-      savePath: partPath,
-      headers: range,
+  if (isResumablePartial(result, resumeFrom)) {
+    appendPartAndCleanup(destPath, partPath);
+    final res = result.data;
+    return res is Map ? (res['data'] ?? {}) : {};
+  }
+
+  // 服务端忽略 Range（200/未知/Content-Range 偏移不符）：绝不追加，
+  // 删除 .part 后整文件重下覆盖 destPath，避免重复/损坏。
+  final part = File(partPath);
+  if (part.existsSync()) part.deleteSync();
+  final full = await _dsmDownloadMeta(_entryCGI,
+      savePath: destPath,
       queryParameters: data,
       cancelToken: cancelToken);
+  final res = full.data;
   if (res is Map && res['success'] == false) {
     throw DSMException.fromMap(res);
   }
-  appendPartAndCleanup(destPath, partPath);
   return res is Map ? (res['data'] ?? {}) : {};
 }
