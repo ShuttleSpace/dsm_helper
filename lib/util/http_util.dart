@@ -11,7 +11,7 @@ import 'package:path_provider/path_provider.dart';
 export 'package:garden/extensions/datetime.dart';
 export 'package:garden/extensions/int.dart';
 export 'package:garden/extensions/string.dart';
-export 'package:garden/util/api.dart';
+export 'package:garden/api/dsm_api.dart' show DsmApi;
 
 export 'file_types.dart';
 

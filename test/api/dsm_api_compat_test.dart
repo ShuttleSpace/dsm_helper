@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:garden/api/dsm_api.dart';
+import 'package:garden/util/http_util.dart' as http_util;
 
 void main() {
   group('compat envelope', () {
@@ -218,6 +219,12 @@ void main() {
     test('reward URL helper stays on legacy endpoint', () {
       expect(dsmRewardUrl('http://192.168.8.40:5000/'),
           'http://192.168.8.40:5000/reward');
+    });
+  });
+
+  group('http_util export', () {
+    test('DsmApi via http_util export is the compat DsmApi', () {
+      expect(http_util.DsmApi, same(DsmApi));
     });
   });
 }
