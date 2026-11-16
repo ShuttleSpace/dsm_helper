@@ -67,6 +67,8 @@ part 'dsm_api.systemservices.notestation.dart';
 part 'dsm_api.systemservices.securityadvisor.dart';
 part 'dsm_api.systemservices.usbcopy.dart';
 
+part 'dsm_api.gaps.dart';
+
 part 'dsm_api.taskscheduler.dart';
 
 part 'dsm_api.snapshot.volumesnapshots.dart';
