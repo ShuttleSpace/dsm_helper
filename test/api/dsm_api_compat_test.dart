@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:garden/api/dsm_api.dart';
 import 'package:garden/util/http_util.dart' as http_util;
@@ -225,6 +226,52 @@ void main() {
   group('http_util export', () {
     test('DsmApi via http_util export is the compat DsmApi', () {
       expect(http_util.DsmApi, same(DsmApi));
+    });
+  });
+
+  group('compat never throws on network errors', () {
+    setUp(() {
+      compatPostForTesting = null;
+    });
+
+    tearDown(() {
+      compatPostForTesting = null;
+    });
+
+    DioException httpError() => DioException(
+          requestOptions: RequestOptions(path: 'webapi/entry.cgi'),
+          type: DioExceptionType.badResponse,
+          response: Response(
+            requestOptions: RequestOptions(path: 'webapi/entry.cgi'),
+            statusCode: 500,
+            data: {'success': false, 'error': {'code': 500}},
+          ),
+        );
+
+    DioException transportError() => DioException(
+          requestOptions: RequestOptions(path: 'webapi/entry.cgi'),
+          type: DioExceptionType.connectionTimeout,
+          message: 'connect timeout',
+        );
+
+    void expectLegacyFailure(Map res) {
+      expect(res['success'], false);
+      expect(res['data'], null);
+      expect((res['error'] as Map)['code'], isNotNull);
+    }
+
+    test('compound method returns failure envelope on HTTP 4xx/5xx response',
+        () async {
+      compatPostForTesting = (endpoint, {data}) async => throw httpError();
+
+      expectLegacyFailure(await DsmApi.systemInfo(const []));
+    });
+
+    test('compound method returns failure envelope on transport failure',
+        () async {
+      compatPostForTesting = (endpoint, {data}) async => throw transportError();
+
+      expectLegacyFailure(await DsmApi.systemInfo(const []));
     });
   });
 }

@@ -107,4 +107,47 @@ void main() {
     // Capped by min(apiList.minVersion, 3), even when NAS reports higher.
     expect(capturedParams!['version'], 3);
   });
+
+  test('upload turns a DioException into the legacy failure envelope so the '
+      'backup failure branch stays reachable', () async {
+    final errors = <DioException>[
+      DioException(
+        requestOptions: RequestOptions(path: 'webapi/entry.cgi'),
+        type: DioExceptionType.badResponse,
+        response: Response(
+          requestOptions: RequestOptions(path: 'webapi/entry.cgi'),
+          statusCode: 503,
+          data: {'success': false, 'error': {'code': 503}},
+        ),
+      ),
+      DioException(
+        requestOptions: RequestOptions(path: 'webapi/entry.cgi'),
+        type: DioExceptionType.connectionTimeout,
+        message: 'connect timeout',
+      ),
+    ];
+
+    for (final error in errors) {
+      compatUploadForTesting = (
+        String endpoint, {
+        required Object data,
+        Map<String, dynamic>? queryParameters,
+        CancelToken? cancelToken,
+        Function(int, int)? onSendProgress,
+      }) async {
+        throw error;
+      };
+
+      final res = await DsmApi.upload(uploadPath, filePath, null, (_, __) {});
+
+      // backup.dart:225 only checks res['success']; it must be false here,
+      // otherwise the whole backup loop aborts and the item stays `running`.
+      expect(res['success'], false);
+      expect(res['data'], null);
+      expect((res['error'] as Map)['code'], isNotNull);
+      final tookFailureBranch = res['success'] != true;
+      expect(tookFailureBranch, isTrue,
+          reason: 'backup.dart failure branch must be reachable');
+    }
+  });
 }

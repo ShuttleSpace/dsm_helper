@@ -32,15 +32,63 @@ Map<String, dynamic> compatWrapError(Object e) {
   };
 }
 
+// 旧版 HttpUtil 从不抛 DioException；compat 在这个边界把它还原成 error 信封。
+
+/// 与 [_httpGet] 同参，参数原样转发，仅额外吞掉底层网络错误。
+Future<dynamic> _compatGet(
+  String endpoint, {
+  String? host,
+  Map<String, dynamic>? headers,
+  Map<String, dynamic>? queryParameters,
+  CancelToken? cancelToken,
+  bool? checkSsl,
+  String? cookie,
+  int timeout = 30,
+}) async {
+  try {
+    return await _httpGet(endpoint,
+        host: host,
+        headers: headers,
+        queryParameters: queryParameters,
+        cancelToken: cancelToken,
+        checkSsl: checkSsl,
+        cookie: cookie,
+        timeout: timeout);
+  } on DioException catch (e) {
+    return compatWrapError(e);
+  }
+}
+
 /// 测试替身：非空时替代底层 POST，用于断言旧请求体与原始响应透传（生产恒为 null）。
 @visibleForTesting
 Future<dynamic> Function(String endpoint, {Map<String, dynamic>? data})?
     compatPostForTesting;
 
-Future<dynamic> _compatPost(String endpoint, {Map<String, dynamic>? data}) {
-  final override = compatPostForTesting;
-  if (override != null) return override(endpoint, data: data);
-  return _httpPost(endpoint, data: data);
+/// 与 [_httpPost] 同参，参数原样转发，仅额外吞掉底层网络错误。
+Future<dynamic> _compatPost(
+  String endpoint, {
+  String? host,
+  Map<String, dynamic>? headers,
+  Map<String, dynamic>? data,
+  CancelToken? cancelToken,
+  bool? checkSsl,
+  String? cookie,
+  int timeout = 30,
+}) async {
+  try {
+    final override = compatPostForTesting;
+    if (override != null) return await override(endpoint, data: data);
+    return await _httpPost(endpoint,
+        host: host,
+        headers: headers,
+        data: data,
+        cancelToken: cancelToken,
+        checkSsl: checkSsl,
+        cookie: cookie,
+        timeout: timeout);
+  } on DioException catch (e) {
+    return compatWrapError(e);
+  }
 }
 
 /// 测试替身：非空时替代底层 multipart 上传，用于断言旧版上传请求字段与
@@ -54,26 +102,41 @@ Future<dynamic> Function(
   Function(int, int)? onSendProgress,
 })? compatUploadForTesting;
 
+/// 与 [_httpUpload] 同参，参数原样转发，仅额外吞掉底层网络错误。
 Future<dynamic> _compatUpload(
   String endpoint, {
   required Object data,
+  String? host,
+  Map<String, dynamic>? headers,
   Map<String, dynamic>? queryParameters,
   CancelToken? cancelToken,
+  bool? checkSsl,
+  String? cookie,
+  int timeout = 30,
   Function(int, int)? onSendProgress,
-}) {
-  final override = compatUploadForTesting;
-  if (override != null) {
-    return override(endpoint,
+}) async {
+  try {
+    final override = compatUploadForTesting;
+    if (override != null) {
+      return await override(endpoint,
+          data: data,
+          queryParameters: queryParameters,
+          cancelToken: cancelToken,
+          onSendProgress: onSendProgress);
+    }
+    return await _httpUpload(endpoint,
         data: data,
+        host: host,
+        headers: headers,
         queryParameters: queryParameters,
         cancelToken: cancelToken,
+        checkSsl: checkSsl,
+        cookie: cookie,
+        timeout: timeout,
         onSendProgress: onSendProgress);
+  } on DioException catch (e) {
+    return compatWrapError(e);
   }
-  return _httpUpload(endpoint,
-      data: data,
-      queryParameters: queryParameters,
-      cancelToken: cancelToken,
-      onSendProgress: onSendProgress);
 }
 
 /// 旧版 DsmApi 兼容层：方法名/签名与 lib/util/api.dart 完全一致。
@@ -83,7 +146,7 @@ class DsmApi {
   static Map<String, DsmApiInfo> apiList = {};
 
   static Future<Map?> api() async {
-    var res = await _httpPost('webapi/query.cgi', data: {
+    var res = await _compatPost('webapi/query.cgi', data: {
       "query": "all",
       "api": "SYNO.API.Info",
       "method": "query",
@@ -119,7 +182,7 @@ class DsmApi {
       // "isIframeLogin": "yes",
       "format": "sid",
     };
-    return await _httpGet(_authCGI,
+    return await _compatGet(_authCGI,
         host: host,
         queryParameters: data,
         cancelToken: cancelToken,
@@ -133,7 +196,7 @@ class DsmApi {
       bool? checkSsl,
       String? cookie,
       String? host}) async {
-    final data = await _httpPost(
+    final data = await _compatPost(
       _entryCGI,
       data: {
         "api": '"SYNO.FileStation.List"',
@@ -161,7 +224,7 @@ class DsmApi {
       bool? checkSsl,
       String? cookie,
       String? host}) async {
-    final data = await _httpPost(
+    final data = await _compatPost(
       _entryCGI,
       data: {
         "api": '"SYNO.FileStation.List"',
@@ -185,7 +248,7 @@ class DsmApi {
   }
 
   static Future<Map> shareCore({List<String> additional = const []}) async {
-    return await _httpPost(_entryCGI, data: {
+    return await _compatPost(_entryCGI, data: {
       "api": '"SYNO.Core.Share"',
       "method": '"list"',
       "version": 1,
@@ -225,7 +288,7 @@ class DsmApi {
         "enable_share_compress",
       ]),
     };
-    return await _httpPost(_entryCGI, data: data);
+    return await _compatPost(_entryCGI, data: data);
   }
 
   static Future<Map> addSharedFolder(
@@ -276,7 +339,7 @@ class DsmApi {
       "name": oldName ?? name,
       "shareinfo": jsonEncode(shareInfo),
     };
-    return await _httpPost(_entryCGI, data: data);
+    return await _compatPost(_entryCGI, data: data);
   }
 
   static Future<Map> deleteSharedFolder(List<String> name) async {
@@ -287,7 +350,7 @@ class DsmApi {
       "_sid": connectionStore.sid.value,
       "name": json.encode(name),
     };
-    return await _httpPost(_entryCGI, data: data);
+    return await _compatPost(_entryCGI, data: data);
   }
 
   static Future<Map> cleanRecycleBin(String id) async {
@@ -298,12 +361,12 @@ class DsmApi {
       "version": 1,
       "_sid": connectionStore.sid.value,
     };
-    return await _httpPost(_entryCGI, data: data);
+    return await _compatPost(_entryCGI, data: data);
   }
 
   static Future<Map> fileList(String path,
       {String sortBy = "name", String sortDirection = "asc"}) async {
-    return await _httpPost(_entryCGI, data: {
+    return await _compatPost(_entryCGI, data: {
       "api": '"SYNO.FileStation.List"',
       "method": '"list"',
       "version": 2,
@@ -319,7 +382,7 @@ class DsmApi {
   }
 
   static Future<Map> smbFolder() async {
-    return await _httpPost(_entryCGI, data: {
+    return await _compatPost(_entryCGI, data: {
       "api": '"SYNO.FileStation.VirtualFolder"',
       "method": '"list"',
       "version": 2,
@@ -343,11 +406,11 @@ class DsmApi {
       "additional":
           '["real_path","owner","time","perm","mount_point_type","volume_status"]',
     };
-    return await _httpPost(_entryCGI, data: data);
+    return await _compatPost(_entryCGI, data: data);
   }
 
   static Future<Map> remoteUnConnect(String id) async {
-    return await _httpPost(_entryCGI, data: {
+    return await _compatPost(_entryCGI, data: {
       "api": '"SYNO.FileStation.VFS.Connection"',
       "method": '"delete"',
       "version": 1,
@@ -372,11 +435,11 @@ class DsmApi {
       "version": 1,
       "_sid": connectionStore.sid.value,
     };
-    return await _httpPost(_entryCGI, data: data);
+    return await _compatPost(_entryCGI, data: data);
   }
 
   static Future<Map> unMountFolder(String path) async {
-    return await _httpPost(_entryCGI, data: {
+    return await _compatPost(_entryCGI, data: {
       "api": '"SYNO.FileStation.Mount"',
       "method": '"unmount"',
       "version": 1,
@@ -389,7 +452,7 @@ class DsmApi {
   }
 
   static Future<Map> favoriteList() async {
-    return await _httpPost(_entryCGI, data: {
+    return await _compatPost(_entryCGI, data: {
       "api": '"SYNO.FileStation.Favorite"',
       "method": '"list"',
       "version": 2,
@@ -402,7 +465,7 @@ class DsmApi {
   }
 
   static Future<Map> favoriteAdd(String name, String path) async {
-    return await _httpPost(_entryCGI, data: {
+    return await _compatPost(_entryCGI, data: {
       "api": '"SYNO.FileStation.Favorite"',
       "method": '"add"',
       "version": 2,
@@ -423,12 +486,12 @@ class DsmApi {
       "index": -1,
       "_sid": connectionStore.sid.value,
     };
-    var result = await _httpGet(_entryCGI, queryParameters: data);
+    var result = await _compatGet(_entryCGI, queryParameters: data);
     return result;
   }
 
   static Future<Map> favoriteDelete(String path) async {
-    return await _httpPost(_entryCGI, data: {
+    return await _compatPost(_entryCGI, data: {
       "api": '"SYNO.FileStation.Favorite"',
       "method": '"delete"',
       "version": 2,
@@ -447,11 +510,11 @@ class DsmApi {
       "_sid": connectionStore.sid.value,
       "path": json.encode(path),
     };
-    return await _httpPost(_entryCGI, data: data);
+    return await _compatPost(_entryCGI, data: data);
   }
 
   static Future<Map> deleteResult(String taskId) async {
-    return await _httpPost(_entryCGI, data: {
+    return await _compatPost(_entryCGI, data: {
       "taskid": taskId,
       "api": '"SYNO.FileStation.Delete"',
       "method": '"status"',
@@ -475,7 +538,7 @@ class DsmApi {
       "version": 2,
       "_sid": connectionStore.sid.value,
     };
-    return await _httpPost(_entryCGI, data: data);
+    return await _compatPost(_entryCGI, data: data);
   }
 
   static Future<Map> searchResult(String taskId) async {
@@ -491,7 +554,7 @@ class DsmApi {
       "version": 2,
       "_sid": connectionStore.sid.value,
     };
-    return await _httpPost(_entryCGI, data: data);
+    return await _compatPost(_entryCGI, data: data);
   }
 
   static Future<Map> compressTask(
@@ -516,11 +579,11 @@ class DsmApi {
       "password": password,
       "codepage": codepage,
     };
-    return await _httpPost(_entryCGI, data: data);
+    return await _compatPost(_entryCGI, data: data);
   }
 
   static Future<Map> compressResult(String taskId) async {
-    return await _httpPost(_entryCGI, data: {
+    return await _compatPost(_entryCGI, data: {
       "taskid": taskId,
       "api": '"SYNO.FileStation.Compress"',
       "method": '"status"',
@@ -531,7 +594,7 @@ class DsmApi {
 
   static Future<Map> copyMoveTask(
       List path, String destFolderPath, bool remove) async {
-    return await _httpPost(_entryCGI, data: {
+    return await _compatPost(_entryCGI, data: {
       "overwrite": "true",
       "dest_folder_path": destFolderPath,
       "api": '"SYNO.FileStation.CopyMove"',
@@ -562,7 +625,7 @@ class DsmApi {
       data['request_name'] = requestName ?? '';
       data['request_info'] = requestInfo ?? '';
     }
-    return await _httpPost(_entryCGI, data: data);
+    return await _compatPost(_entryCGI, data: data);
   }
 
   static Future<Map> editShare(
@@ -598,7 +661,7 @@ class DsmApi {
       data['request_name'] = requestName;
       data['request_info'] = requestInfo;
     }
-    return await _httpPost(_entryCGI, data: data);
+    return await _compatPost(_entryCGI, data: data);
   }
 
   static Future<Map> listShare() async {
@@ -612,7 +675,7 @@ class DsmApi {
       "version": 3,
       "_sid": connectionStore.sid.value,
     };
-    return await _httpPost(_entryCGI, data: data);
+    return await _compatPost(_entryCGI, data: data);
   }
 
   static Future<Map> deleteShare(
@@ -625,11 +688,11 @@ class DsmApi {
       "version": 3,
       "_sid": connectionStore.sid.value,
     };
-    return await _httpPost(_entryCGI, data: data);
+    return await _compatPost(_entryCGI, data: data);
   }
 
   static Future<Map> backgroundTask() async {
-    return await _httpPost(_entryCGI, data: {
+    return await _compatPost(_entryCGI, data: {
       "is_list_sharemove": true,
       "is_vfs": true,
       "bkg_info": true,
@@ -641,7 +704,7 @@ class DsmApi {
   }
 
   static Future<Map> copyMoveResult(String taskId) async {
-    return await _httpPost(_entryCGI, data: {
+    return await _compatPost(_entryCGI, data: {
       "taskid": taskId,
       "api": '"SYNO.FileStation.CopyMove"',
       "method": '"status"',
@@ -651,7 +714,7 @@ class DsmApi {
   }
 
   static Future<Map> dirSizeTask(String path) async {
-    var task = await _httpPost(_entryCGI, data: {
+    var task = await _compatPost(_entryCGI, data: {
       "api": '"SYNO.FileStation.DirSize"',
       "method": '"start"',
       "version": 1,
@@ -662,7 +725,7 @@ class DsmApi {
   }
 
   static Future<Map> dirSizeResult(String taskId) async {
-    var result = await _httpPost(_entryCGI, data: {
+    var result = await _compatPost(_entryCGI, data: {
       "api": '"SYNO.FileStation.DirSize"',
       "method": '"status"',
       "version": 1,
@@ -686,12 +749,12 @@ class DsmApi {
       "create_subfolder": "false",
     };
     data['password'] = '"$password"';
-    var task = await _httpPost(_entryCGI, data: data);
+    var task = await _compatPost(_entryCGI, data: data);
     return task;
   }
 
   static Future<Map> extractResult(String taskId) async {
-    var result = await _httpPost(_entryCGI, data: {
+    var result = await _compatPost(_entryCGI, data: {
       "api": '"SYNO.FileStation.Extract"',
       "method": '"status"',
       "version": 1,
@@ -792,7 +855,7 @@ class DsmApi {
   }
 
   static Future<Map> notifyStrings() async {
-    var result = await _httpPost(_entryCGI, data: {
+    var result = await _compatPost(_entryCGI, data: {
       "pkgName": '""',
       "lang": '"chs"',
       "api": "SYNO.Core.DSMNotify.Strings",
@@ -804,7 +867,7 @@ class DsmApi {
   }
 
   static Future<Map> notify() async {
-    var result = await _httpPost(_entryCGI, data: {
+    var result = await _compatPost(_entryCGI, data: {
       "action": "load",
       "lastRead": DateTime.now().secondsSinceEpoch,
       "lastSeen": DateTime.now().secondsSinceEpoch,
@@ -816,7 +879,7 @@ class DsmApi {
   }
 
   static Future<Map> storage() async {
-    var result = await _httpPost(_entryCGI, data: {
+    var result = await _compatPost(_entryCGI, data: {
       "api": "SYNO.Storage.CGI.Storage",
       "method": "load_info",
       "version": 1,
@@ -825,7 +888,7 @@ class DsmApi {
   }
 
   static Future<Map> kickConnection(Map connection) async {
-    var result = await _httpPost(_entryCGI, data: {
+    var result = await _compatPost(_entryCGI, data: {
       "api": '"SYNO.Core.CurrentConnection"',
       "method": '"kick_connection"',
       "version": 1,
@@ -837,7 +900,7 @@ class DsmApi {
   }
 
   static Future<Map> clearNotify() async {
-    var result = await _httpPost(_entryCGI, data: {
+    var result = await _compatPost(_entryCGI, data: {
       "api": '"SYNO.Core.DSMNotify"',
       "method": '"notify"',
       "version": 1,
@@ -849,7 +912,7 @@ class DsmApi {
   }
 
   static Future<Map> initData() async {
-    var result = await _httpPost(_entryCGI, data: {
+    var result = await _compatPost(_entryCGI, data: {
       "launch_app": "null",
       "api": '"SYNO.Core.Desktop.Initdata"',
       "method": '"get"',
@@ -860,7 +923,7 @@ class DsmApi {
   }
 
   static Future<Map> networkInfo() async {
-    var result = await _httpPost(_entryCGI, data: {
+    var result = await _compatPost(_entryCGI, data: {
       "api": '"SYNO.Core.System"',
       "method": '"info"',
       "version": 1,
@@ -882,7 +945,7 @@ class DsmApi {
       "size": await file.length(),
       "_sid": connectionStore.sid.value,
     };
-    var result = await _httpPost(_entryCGI, data: data);
+    var result = await _compatPost(_entryCGI, data: data);
     return result;
   }
 
@@ -896,7 +959,7 @@ class DsmApi {
       "name": '"$name"',
       "_sid": connectionStore.sid.value,
     };
-    var result = await _httpGet(_entryCGI, queryParameters: data);
+    var result = await _compatGet(_entryCGI, queryParameters: data);
     return result;
   }
 
@@ -909,7 +972,7 @@ class DsmApi {
       "name": '"$name"',
       "_sid": connectionStore.sid.value,
     };
-    var result = await _httpGet(_entryCGI, queryParameters: data);
+    var result = await _compatGet(_entryCGI, queryParameters: data);
     return result;
   }
 
@@ -936,7 +999,7 @@ class DsmApi {
       "_sid": connectionStore.sid.value,
     };
     Log.info(data);
-    return await _httpPost(_entryCGI, data: data);
+    return await _compatPost(_entryCGI, data: data);
   }
 
   static Future<Map> terminalInfo() async {
@@ -946,7 +1009,7 @@ class DsmApi {
       "method": "get",
       "_sid": connectionStore.sid.value,
     };
-    return await _httpPost(_entryCGI, data: data);
+    return await _compatPost(_entryCGI, data: data);
   }
 
   static Future<Map> upload(String uploadPath, String filePath,
@@ -993,7 +1056,7 @@ class DsmApi {
       "size": file.lengthSync(),
       "file": multipartFile,
     };
-    var result = await _httpUpload(url,
+    var result = await _compatUpload(url,
         data: data, cancelToken: cancelToken, onSendProgress: onSendProgress);
     return result;
   }
@@ -1008,7 +1071,7 @@ class DsmApi {
       "method": "list",
       "_sid": connectionStore.sid.value,
     };
-    return await _httpPost(_entryCGI, data: data);
+    return await _compatPost(_entryCGI, data: data);
   }
 
   static Future<Map> packages({bool others = false, int version = 1}) async {
@@ -1021,7 +1084,7 @@ class DsmApi {
       "method": "list",
       "_sid": connectionStore.sid.value,
     };
-    return await _httpPost(_entryCGI, data: data);
+    return await _compatPost(_entryCGI, data: data);
   }
 
   static Future<Map> installedPackages({int version = 1}) async {
@@ -1060,7 +1123,7 @@ class DsmApi {
       "method": "list",
       "_sid": connectionStore.sid.value,
     };
-    return await _httpPost(_entryCGI, data: data);
+    return await _compatPost(_entryCGI, data: data);
   }
 
   static Future<Map> launchedPackages() async {
@@ -1072,7 +1135,7 @@ class DsmApi {
       "method": "get",
       "_sid": connectionStore.sid.value,
     };
-    return await _httpPost(_entryCGI, data: data);
+    return await _compatPost(_entryCGI, data: data);
   }
 
   static Future<Map> launchPackage(String id, String app, String method) async {
@@ -1102,7 +1165,7 @@ class DsmApi {
       "method": "install",
       "_sid": connectionStore.sid.value,
     };
-    return await _httpPost(_entryCGI, data: data);
+    return await _compatPost(_entryCGI, data: data);
   }
 
   static Future<Map> installPackageStatus(String taskId) async {
@@ -1137,7 +1200,7 @@ class DsmApi {
       "method": "get",
       "_sid": connectionStore.sid.value,
     };
-    return await _httpPost(_entryCGI, data: data);
+    return await _compatPost(_entryCGI, data: data);
   }
 
   static Future<Map> uninstallPackageTask(String id, {Map? extra}) async {
@@ -1165,7 +1228,7 @@ class DsmApi {
       "method": "list",
       "_sid": connectionStore.sid.value,
     };
-    return await _httpPost(_entryCGI, data: data);
+    return await _compatPost(_entryCGI, data: data);
   }
 
   static Future<Map> taskRun(List<int> task) async {
@@ -1176,7 +1239,7 @@ class DsmApi {
       "task": jsonEncode(task),
       "_sid": connectionStore.sid.value,
     };
-    return await _httpPost(_entryCGI, data: data);
+    return await _compatPost(_entryCGI, data: data);
   }
 
   static Future<Map> eventRun(taskName) async {
@@ -1217,7 +1280,7 @@ class DsmApi {
       "status": jsonEncode(status),
       "_sid": connectionStore.sid.value,
     };
-    return await _httpPost(_entryCGI, data: data);
+    return await _compatPost(_entryCGI, data: data);
   }
 
   static Future<Map> users() async {
@@ -1230,7 +1293,7 @@ class DsmApi {
       "method": "list",
       "_sid": connectionStore.sid.value,
     };
-    return await _httpPost(_entryCGI, data: data);
+    return await _compatPost(_entryCGI, data: data);
   }
 
   static Future<Map> userGroups() async {
@@ -1243,7 +1306,7 @@ class DsmApi {
       "method": "list",
       "_sid": connectionStore.sid.value,
     };
-    return await _httpPost(_entryCGI, data: data);
+    return await _compatPost(_entryCGI, data: data);
   }
 
   static Future<Map> userSetting(Map save) async {
@@ -1256,7 +1319,7 @@ class DsmApi {
       "version": 1,
       "_sid": connectionStore.sid.value,
     };
-    return await _httpPost(_entryCGI, data: data);
+    return await _compatPost(_entryCGI, data: data);
   }
 
   static Future<Map> mediaConverter(String method, {int? hours}) async {
@@ -1279,7 +1342,7 @@ class DsmApi {
       "resource": ["cpu", "memory", "network", "lun", "disk", "space"],
       "_sid": sid ?? connectionStore.sid.value,
     };
-    return await _httpPost(_entryCGI,
+    return await _compatPost(_entryCGI,
         data: data, checkSsl: checkSsl, cookie: cookie, host: host);
   }
 
@@ -1290,7 +1353,7 @@ class DsmApi {
       "version": 1,
       "_sid": connectionStore.sid.value,
     };
-    return await _httpPost(_entryCGI, data: data);
+    return await _compatPost(_entryCGI, data: data);
   }
 
   static Future<Map> processGroup() async {
@@ -1303,7 +1366,7 @@ class DsmApi {
     if (connectionStore.dsmVersion.value == 7) {
       data['node'] = 'xnode-2572';
     }
-    return await _httpPost(_entryCGI, data: data);
+    return await _compatPost(_entryCGI, data: data);
   }
 
   static Future<Map> cluster(String method) async {
@@ -1324,7 +1387,7 @@ class DsmApi {
       "version": 1,
       "_sid": connectionStore.sid.value,
     };
-    return await _httpPost(_entryCGI, data: data);
+    return await _compatPost(_entryCGI, data: data);
   }
 
   static Future<Map> vmmPower(String guestId, String action) async {
@@ -1336,7 +1399,7 @@ class DsmApi {
       "version": 1,
       "_sid": connectionStore.sid.value,
     };
-    return await _httpPost(_entryCGI, data: data);
+    return await _compatPost(_entryCGI, data: data);
   }
 
   static Future<Map> dockerContainerInfo() async {
@@ -1449,7 +1512,7 @@ class DsmApi {
       "version": 1,
       "_sid": connectionStore.sid.value,
     };
-    return await _httpPost(_entryCGI, data: data);
+    return await _compatPost(_entryCGI, data: data);
   }
 
   static Future<Map> log(
@@ -1470,7 +1533,7 @@ class DsmApi {
       "version": 1,
       "_sid": connectionStore.sid.value,
     };
-    return await _httpPost(_entryCGI, data: data);
+    return await _compatPost(_entryCGI, data: data);
   }
 
   static Future<Map> logHistory() async {
@@ -1482,7 +1545,7 @@ class DsmApi {
   }
 
   static Future<Map> reward() async {
-    final res = await _httpGet(dsmRewardUrl(connectionStore.baseUri.value));
+    final res = await _compatGet(dsmRewardUrl(connectionStore.baseUri.value));
     return res is Map
         ? res
         : {
@@ -1543,7 +1606,7 @@ class DsmApi {
       "version": 1,
       "_sid": connectionStore.sid.value,
     };
-    return await _httpPost(_entryCGI, data: data);
+    return await _compatPost(_entryCGI, data: data);
   }
 
   static Future<Map?> downloadTaskCreate(String destination, String type,
@@ -1566,7 +1629,7 @@ class DsmApi {
 
       data['destination'] = '"$destination"';
       data['-1891550746'] = torrent;
-      return await _httpUpload(_entryCGI, data: data);
+      return await _compatUpload(_entryCGI, data: data);
     } else {
       if (url == null) {
         return null;
@@ -1727,7 +1790,7 @@ class DsmApi {
       "version": 1,
       "_sid": connectionStore.sid.value,
     };
-    return await _httpPost(_entryCGI, data: data);
+    return await _compatPost(_entryCGI, data: data);
   }
 
   static Future<Map> smart(String device) async {
@@ -1738,7 +1801,7 @@ class DsmApi {
       "version": 1,
       "_sid": connectionStore.sid.value,
     };
-    return await _httpPost(_entryCGI, data: data);
+    return await _compatPost(_entryCGI, data: data);
   }
 
   static Future<Map> diskTestLog(String device) async {
@@ -1754,7 +1817,7 @@ class DsmApi {
       "version": 1,
       "_sid": connectionStore.sid.value,
     };
-    return await _httpPost(_entryCGI, data: data);
+    return await _compatPost(_entryCGI, data: data);
   }
 
   static Future<Map> smartTestLog(String device) async {
@@ -1765,7 +1828,7 @@ class DsmApi {
       "version": 1,
       "_sid": connectionStore.sid.value,
     };
-    return await _httpPost(_entryCGI, data: data);
+    return await _compatPost(_entryCGI, data: data);
   }
 
   static Future<Map> doSmartTest(String device, String type) async {
@@ -1777,7 +1840,7 @@ class DsmApi {
       "version": 1,
       "_sid": connectionStore.sid.value,
     };
-    return await _httpPost(_entryCGI, data: data);
+    return await _compatPost(_entryCGI, data: data);
   }
 
   static Future<Map> saveMail(String mail) async {
@@ -1788,7 +1851,7 @@ class DsmApi {
       "version": 2,
       "_sid": connectionStore.sid.value,
     };
-    return await _httpPost(_entryCGI, data: data);
+    return await _compatPost(_entryCGI, data: data);
   }
 
   static Future<Map> getQrCode(String account) async {
@@ -1799,7 +1862,7 @@ class DsmApi {
       "version": 2,
       "_sid": connectionStore.sid.value,
     };
-    return await _httpPost(_entryCGI, data: data);
+    return await _compatPost(_entryCGI, data: data);
   }
 
   static Future<Map> authOtpCode(String code) async {
@@ -1810,7 +1873,7 @@ class DsmApi {
       "version": 2,
       "_sid": connectionStore.sid.value,
     };
-    return await _httpPost(_entryCGI, data: data);
+    return await _compatPost(_entryCGI, data: data);
   }
 
   static Future<Map> currentConnect() async {
@@ -1832,7 +1895,7 @@ class DsmApi {
       "method": "quota",
       "version": 1,
     };
-    return await _httpPost(_entryCGI, data: data);
+    return await _compatPost(_entryCGI, data: data);
   }
 
   static Future<Map> fileService() async {
@@ -1976,7 +2039,7 @@ class DsmApi {
       "method": "rule_get",
       "version": 1,
     };
-    return await _httpPost(_entryCGI, data: data);
+    return await _compatPost(_entryCGI, data: data);
   }
 
   static Future<Map> securitySystem() async {
@@ -1985,7 +2048,7 @@ class DsmApi {
       "method": "system_get",
       "version": 1,
     };
-    return await _httpPost(_entryCGI, data: data);
+    return await _compatPost(_entryCGI, data: data);
   }
 
   static Future<Map> mediaReindex() async {
@@ -2144,7 +2207,7 @@ class DsmApi {
   }
 
   static Future<void> pingpong(String host, Function callback) async {
-    var res = await _httpGet("${host}webman/pingpong.cgi");
+    var res = await _compatGet("${host}webman/pingpong.cgi");
     if (res['success']) {
       callback(host);
     } else {
@@ -2188,7 +2251,7 @@ class DsmApi {
   }
 
   static Future<Map> powerScheduleSave(List powerOns, List powerOffs) async {
-    var result = await _httpPost(_entryCGI, data: {
+    var result = await _compatPost(_entryCGI, data: {
       "poweron_tasks": json.encode(powerOns),
       "poweroff_tasks": json.encode(powerOffs),
       "api": 'SYNO.Core.Hardware.PowerSchedule',
@@ -2262,7 +2325,7 @@ class DsmApi {
       bool? enableLog,
       bool? autoPoweroffEnable,
       int? autoPoweroffTime}) async {
-    var result = await _httpPost(_entryCGI, data: {
+    var result = await _compatPost(_entryCGI, data: {
       "internal_hd_idletime": internalHdIdletime,
       "sata_deep_sleep": sataDeepSleep,
       "ignore_netbios_broadcast": false,
@@ -2403,7 +2466,7 @@ class DsmApi {
   }
 
   static Future<Map> userGroup(String name) async {
-    var result = await _httpPost(_entryCGI, data: {
+    var result = await _compatPost(_entryCGI, data: {
       "name_only": false,
       "user": '"$name"',
       "type": '"local"',
@@ -2416,7 +2479,7 @@ class DsmApi {
   }
 
   static Future<Map> firmwareVersion() async {
-    var result = await _httpPost(_entryCGI, data: {
+    var result = await _compatPost(_entryCGI, data: {
       "type": '"firmware"',
       "api": 'SYNO.Core.System',
       "method": 'info',
@@ -2427,7 +2490,7 @@ class DsmApi {
   }
 
   static Future<Map> firmwareUpgrade() async {
-    var result = await _httpPost(_entryCGI, data: {
+    var result = await _compatPost(_entryCGI, data: {
       "api": 'SYNO.Core.Upgrade.Server',
       "method": 'check',
       "version": 2,
@@ -2486,7 +2549,7 @@ class DsmApi {
       data['passwd'] = '"${ddns['passwd']}"';
     }
     Log.info(data);
-    var result = await _httpPost(_entryCGI, data: data);
+    var result = await _compatPost(_entryCGI, data: data);
     return result;
   }
 
@@ -2497,7 +2560,7 @@ class DsmApi {
       "version": 1,
     };
     data['id'] = '"$id"';
-    var result = await _httpPost(_entryCGI, data: data);
+    var result = await _compatPost(_entryCGI, data: data);
     return result;
   }
 
@@ -2509,7 +2572,7 @@ class DsmApi {
       "version": 1,
     };
     Log.info(data);
-    var result = await _httpPost(_entryCGI, data: data);
+    var result = await _compatPost(_entryCGI, data: data);
     return result;
   }
 
@@ -2531,7 +2594,7 @@ class DsmApi {
     if (ddns['passwd'] != null) {
       data['passwd'] = '"${ddns['passwd']}"';
     }
-    var result = await _httpPost(_entryCGI, data: data);
+    var result = await _compatPost(_entryCGI, data: data);
     return result;
   }
 
