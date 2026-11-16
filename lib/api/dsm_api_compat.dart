@@ -32,6 +32,17 @@ Map<String, dynamic> compatWrapError(Object e) {
   };
 }
 
+/// 测试替身：非空时替代底层 POST，用于断言旧请求体与原始响应透传（生产恒为 null）。
+@visibleForTesting
+Future<dynamic> Function(String endpoint, {Map<String, dynamic>? data})?
+    compatPostForTesting;
+
+Future<dynamic> _compatPost(String endpoint, {Map<String, dynamic>? data}) {
+  final override = compatPostForTesting;
+  if (override != null) return override(endpoint, data: data);
+  return _httpPost(endpoint, data: data);
+}
+
 /// 旧版 DsmApi 兼容层：方法名/签名与 lib/util/api.dart 完全一致。
 /// 请求经新层 `_http*` 发出，响应保持旧版原始信封形状。
 class DsmApi {
@@ -736,7 +747,7 @@ class DsmApi {
       "method": "get",
       "version": 1,
     });
-    var result = await _httpPost(_entryCGI, data: {
+    var result = await _compatPost(_entryCGI, data: {
       "api": 'SYNO.Entry.Request',
       "method": 'request',
       "mode": '"parallel"',
@@ -878,7 +889,7 @@ class DsmApi {
       "method": method,
       "_sid": connectionStore.sid.value,
     };
-    return await _httpPost(_entryCGI, data: data);
+    return await _compatPost(_entryCGI, data: data);
   }
 
   static Future<Map> setTerminal(bool ssh, bool telnet, String sshPort) async {
@@ -1042,7 +1053,7 @@ class DsmApi {
     if (method == "start") {
       data["dsm_apps"] = jsonEncode([app]);
     }
-    return await _httpPost(_entryCGI, data: data);
+    return await _compatPost(_entryCGI, data: data);
   }
 
   static Future<Map> installPackageTask(String name, String path) async {
@@ -1069,7 +1080,7 @@ class DsmApi {
       "method": "status",
       "_sid": connectionStore.sid.value,
     };
-    return await _httpPost(_entryCGI, data: data);
+    return await _compatPost(_entryCGI, data: data);
   }
 
   static Future<Map> installPackageQueue(String pkg, String version,
@@ -1081,7 +1092,7 @@ class DsmApi {
       "method": "get_queue",
       "_sid": connectionStore.sid.value,
     };
-    return await _httpPost(_entryCGI, data: data);
+    return await _compatPost(_entryCGI, data: data);
   }
 
   static Future<Map> uninstallPackageInfo(String id) async {
@@ -1107,7 +1118,7 @@ class DsmApi {
     String extraStr = jsonEncode(jsonEncode(extra));
     data['extra_values'] = extraStr;
 
-    return await _httpPost(_entryCGI, data: data);
+    return await _compatPost(_entryCGI, data: data);
   }
 
   static Future<Map> taskScheduler() async {
@@ -1143,7 +1154,7 @@ class DsmApi {
       "task_name": taskName,
       "_sid": connectionStore.sid.value,
     };
-    return await _httpPost(_entryCGI, data: data);
+    return await _compatPost(_entryCGI, data: data);
   }
 
   static Future<Map> taskRecord(int task) async {
@@ -1156,7 +1167,7 @@ class DsmApi {
       "id": task,
       "_sid": connectionStore.sid.value,
     };
-    return await _httpPost(_entryCGI, data: data);
+    return await _compatPost(_entryCGI, data: data);
   }
 
   static Future<Map> taskEnable(int task, bool enable) async {
@@ -1222,7 +1233,7 @@ class DsmApi {
       "version": 1
     };
     data['delay_hours'] = hours ?? '';
-    return await _httpPost(_entryCGI, data: data);
+    return await _compatPost(_entryCGI, data: data);
   }
 
   static Future<Map> utilization(
@@ -1269,7 +1280,7 @@ class DsmApi {
       "version": 1,
       "_sid": connectionStore.sid.value,
     };
-    return await _httpPost(_entryCGI, data: data);
+    return await _compatPost(_entryCGI, data: data);
   }
 
   static Future<Map> checkPowerOn(String guestId) async {
@@ -1309,7 +1320,7 @@ class DsmApi {
       {"api": "SYNO.Core.System.Utilization", "method": "get", "version": 1},
     ];
     Log.info("dockerContainerInfo: ${connectionStore.sid.value}");
-    final result = await _httpPost(_entryCGI, data: {
+    final result = await _compatPost(_entryCGI, data: {
       "api": 'SYNO.Entry.Request',
       "method": 'request',
       "mode": '"parallel"',
@@ -1338,7 +1349,7 @@ class DsmApi {
         "offset": 0
       }
     ];
-    var result = await _httpPost(_entryCGI, data: {
+    var result = await _compatPost(_entryCGI, data: {
       "api": 'SYNO.Entry.Request',
       "method": 'request',
       "mode": '"parallel"',
@@ -1357,7 +1368,7 @@ class DsmApi {
       "version": 1,
       "_sid": connectionStore.sid.value,
     };
-    return await _httpPost(_entryCGI, data: data);
+    return await _compatPost(_entryCGI, data: data);
   }
 
   static Future<Map> dockerLog(String name, String method,
@@ -1375,7 +1386,7 @@ class DsmApi {
       data['limit'] = 1000;
       data['offset'] = 0;
     }
-    return await _httpPost(_entryCGI, data: data);
+    return await _compatPost(_entryCGI, data: data);
   }
 
   static Future<Map> dockerPower(String name, String action,
@@ -1393,7 +1404,7 @@ class DsmApi {
     if (action == "delete") {
       data['preserve_profile'] = preserveProfile ?? '';
     }
-    return await _httpPost(_entryCGI, data: data);
+    return await _compatPost(_entryCGI, data: data);
   }
 
   static Future<Map> lastLog(int start, int limit) async {
@@ -1470,7 +1481,7 @@ class DsmApi {
         "type_inverse": true,
       },
     ];
-    var result = await _httpPost(_entryCGI, data: {
+    var result = await _compatPost(_entryCGI, data: {
       "api": 'SYNO.Entry.Request',
       "method": 'request',
       "mode": '"parallel"',
@@ -1489,7 +1500,7 @@ class DsmApi {
       "version": 1,
       "_sid": connectionStore.sid.value,
     };
-    return await _httpPost(_entryCGI, data: data);
+    return await _compatPost(_entryCGI, data: data);
   }
 
   static Future<Map> downloadLocation() async {
@@ -1539,7 +1550,7 @@ class DsmApi {
       data["url"] = json.encode(validUrls);
       data['destination'] = '"$destination"';
       data['_sid'] = connectionStore.sid.value;
-      return await _httpPost(_entryCGI, data: data);
+      return await _compatPost(_entryCGI, data: data);
     }
   }
 
@@ -1570,7 +1581,7 @@ class DsmApi {
       "version": 2,
       "_sid": connectionStore.sid.value,
     };
-    return await _httpPost(_entryCGI, data: data);
+    return await _compatPost(_entryCGI, data: data);
   }
 
   static Future<Map> downloadTracker(String id) async {
@@ -1581,7 +1592,7 @@ class DsmApi {
       "version": 2,
       "_sid": connectionStore.sid.value,
     };
-    return await _httpPost(_entryCGI, data: data);
+    return await _compatPost(_entryCGI, data: data);
   }
 
   static Future<Map> downloadTrackerAdd(
@@ -1594,7 +1605,7 @@ class DsmApi {
       "version": 2,
       "_sid": connectionStore.sid.value,
     };
-    return await _httpPost(_entryCGI, data: data);
+    return await _compatPost(_entryCGI, data: data);
   }
 
   static Future<Map> downloadPeer(String id) async {
@@ -1605,7 +1616,7 @@ class DsmApi {
       "version": 2,
       "_sid": connectionStore.sid.value,
     };
-    return await _httpPost(_entryCGI, data: data);
+    return await _compatPost(_entryCGI, data: data);
   }
 
   static Future<Map> downloadFile(String id) async {
@@ -1621,7 +1632,7 @@ class DsmApi {
       "version": 2,
       "_sid": connectionStore.sid.value,
     };
-    return await _httpPost(_entryCGI, data: data);
+    return await _compatPost(_entryCGI, data: data);
   }
 
   static Future<Map> trustDevice(String method) async {
@@ -1631,7 +1642,7 @@ class DsmApi {
       "version": 1,
       "_sid": connectionStore.sid.value,
     };
-    return await _httpPost(_entryCGI, data: data);
+    return await _compatPost(_entryCGI, data: data);
   }
 
   static Future<Map> normalUser(String method,
@@ -1645,7 +1656,7 @@ class DsmApi {
     if (changedData != null) {
       data.addAll(changedData.cast());
     }
-    return await _httpPost(_entryCGI, data: data);
+    return await _compatPost(_entryCGI, data: data);
   }
 
   static Future<Map> externalDevice() async {
@@ -1664,7 +1675,7 @@ class DsmApi {
       },
       // {"api": "SYNO.Core.ExternalDevice.Storage.EUnit", "method": "list", "version": 1},
     ];
-    var result = await _httpPost(_entryCGI, data: {
+    var result = await _compatPost(_entryCGI, data: {
       "api": 'SYNO.Entry.Request',
       "method": 'request',
       "mode": '"sequential"',
@@ -1823,7 +1834,7 @@ class DsmApi {
       // {"api": "SYNO.Core.FileServ.ServiceDiscovery", "method": "get", "version": 1},
       // {"api": "SYNO.Core.FileServ.ServiceDiscovery.WSTransfer", "method": "get", "version": 1}
     ];
-    var result = await _httpPost(_entryCGI, data: {
+    var result = await _compatPost(_entryCGI, data: {
       "api": 'SYNO.Entry.Request',
       "method": 'request',
       "mode": '"sequential"',
@@ -1841,7 +1852,7 @@ class DsmApi {
       "method": "get_level",
       "version": 1,
     };
-    return await _httpPost(_entryCGI, data: data);
+    return await _compatPost(_entryCGI, data: data);
   }
 
   static Future<Map> fileServiceLogSave(String protocol, Map logLevel) async {
@@ -1852,7 +1863,7 @@ class DsmApi {
       "method": "set_level",
       "version": 1,
     };
-    return await _httpPost(_entryCGI, data: data);
+    return await _compatPost(_entryCGI, data: data);
   }
 
   static Future<Map> fileServiceSave(
@@ -1914,7 +1925,7 @@ class DsmApi {
         "portnum": sftp['portnum']
       }
     ];
-    var result = await _httpPost(_entryCGI, data: {
+    var result = await _compatPost(_entryCGI, data: {
       "api": 'SYNO.Entry.Request',
       "method": 'request',
       "mode": '"sequential"',
@@ -1950,7 +1961,7 @@ class DsmApi {
       "method": "reindex",
       "version": 1,
     };
-    return await _httpPost(_entryCGI, data: data);
+    return await _compatPost(_entryCGI, data: data);
   }
 
   static Future<Map> mediaIndexStatus() async {
@@ -1971,7 +1982,7 @@ class DsmApi {
         },
       );
     }
-    var result = await _httpPost(_entryCGI, data: {
+    var result = await _compatPost(_entryCGI, data: {
       "api": 'SYNO.Entry.Request',
       "method": 'request',
       "mode": '"sequential"',
@@ -2000,7 +2011,7 @@ class DsmApi {
         "mobile_profile_enabled": mobileEnabled
       });
     }
-    var result = await _httpPost(_entryCGI, data: {
+    var result = await _compatPost(_entryCGI, data: {
       "api": 'SYNO.Entry.Request',
       "method": 'request',
       "mode": '"sequential"',
@@ -2131,7 +2142,7 @@ class DsmApi {
         "version": 1
       }
     ];
-    var result = await _httpPost(_entryCGI, data: {
+    var result = await _compatPost(_entryCGI, data: {
       "stop_when_error": false,
       "api": 'SYNO.Entry.Request',
       "method": 'request',
@@ -2199,7 +2210,7 @@ class DsmApi {
       "led_brightness": led['led_brightness'],
       "schedule": led['schedule']
     });
-    var result = await _httpPost(_entryCGI, data: {
+    var result = await _compatPost(_entryCGI, data: {
       "stop_when_error": false,
       "api": 'SYNO.Entry.Request',
       "method": 'request',
@@ -2296,7 +2307,7 @@ class DsmApi {
         "support_share_quota": true
       }
     ];
-    var result = await _httpPost(_entryCGI, data: {
+    var result = await _compatPost(_entryCGI, data: {
       "api": 'SYNO.Entry.Request',
       "method": 'request',
       "mode": '"sequential"',
@@ -2346,7 +2357,7 @@ class DsmApi {
         "name": userInfo['name']
       });
     }
-    var result = await _httpPost(_entryCGI, data: {
+    var result = await _compatPost(_entryCGI, data: {
       "stop_when_error": false,
       "api": 'SYNO.Entry.Request',
       "method": 'request',
@@ -2411,7 +2422,7 @@ class DsmApi {
         "method": "get_myds_account"
       },
     ];
-    var result = await _httpPost(_entryCGI, data: {
+    var result = await _compatPost(_entryCGI, data: {
       "api": 'SYNO.Entry.Request',
       "method": 'request',
       "mode": '"parallel"',
@@ -2510,7 +2521,7 @@ class DsmApi {
       },
       {"api": "SYNO.Core.Web.DSM", "method": "get", "version": 2}
     ];
-    var result = await _httpPost(_entryCGI, data: {
+    var result = await _compatPost(_entryCGI, data: {
       "stop_when_error": false,
       "api": 'SYNO.Entry.Request',
       "method": 'request',
