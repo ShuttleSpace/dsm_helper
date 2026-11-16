@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:garden/extensions/int.dart';
 import 'package:garden/api/dsm_api.dart';
 import 'package:garden/theme/app_theme.dart';
 import 'package:garden/util/log.dart';
@@ -165,17 +166,17 @@ class ExternalDevice extends HookWidget {
                         height: 5,
                       ),
                       Text(
-                          "已用：${(partition['used_size_mb'] * 1024 * 1024).formatSize()}"),
+                          "已用：${((partition['used_size_mb'] as num) * 1024 * 1024).formatSize()}"),
                       const SizedBox(
                         height: 5,
                       ),
                       Text(
-                          "可用：${(partition['total_size_mb'] * 1024 * 1024 - partition['used_size_mb'] * 1024 * 1024).formatSize()}"),
+                          "可用：${(((partition['total_size_mb'] as num) - (partition['used_size_mb'] as num)) * 1024 * 1024).formatSize()}"),
                       const SizedBox(
                         height: 5,
                       ),
                       Text(
-                          "容量：${(partition['total_size_mb'] * 1024 * 1024).formatSize()}"),
+                          "容量：${((partition['total_size_mb'] as num) * 1024 * 1024).formatSize()}"),
                     ],
                   ),
                 )

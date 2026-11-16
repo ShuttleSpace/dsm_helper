@@ -8,16 +8,21 @@ import 'package:garden/theme/app_theme.dart';
 import 'package:garden/widgets/animation_progress_bar.dart';
 
 /// 客户端传输队列（下载/上传）列表，订阅 [transferStore.tasks]。
+/// [type] 为空时显示全部；文件页只展示上传（下载进度在「下载」页呈现）。
 class TransferList extends StatelessWidget {
-  const TransferList({super.key});
+  final TransferType? type;
+  const TransferList({super.key, this.type});
 
   @override
   Widget build(BuildContext context) {
     final tasks = transferStore.tasks.watch(context);
-    if (tasks.isEmpty) return const SizedBox.shrink();
+    final filtered = type == null
+        ? tasks
+        : tasks.where((t) => t.type == type).toList();
+    if (filtered.isEmpty) return const SizedBox.shrink();
     return Column(
       mainAxisSize: MainAxisSize.min,
-      children: tasks.map((t) => _buildRow(context, t)).toList(),
+      children: filtered.map((t) => _buildRow(context, t)).toList(),
     );
   }
 

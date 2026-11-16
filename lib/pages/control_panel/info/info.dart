@@ -755,7 +755,7 @@ class SystemInfo extends HookWidget {
                                     Expanded(
                                       flex: 2,
                                       child: Text(
-                                        "${systemData['ntp_server']} ${systemData['enabled_ntp'] ? "" : "(暂未启用)"}",
+                                        "${systemData['ntp_server']} ${systemData['enabled_ntp'] == true ? "" : "(暂未启用)"}",
                                         overflow: TextOverflow.ellipsis,
                                       ),
                                     ),

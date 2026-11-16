@@ -234,7 +234,7 @@ class SharedFolders extends HookWidget {
                         height: 5,
                       ),
                       Text(
-                        "共享文件夹配额：${folder['quota_value'] > 0 ? (folder['quota_value'] * 1024 * 1024).formatSize() : "已停用"}",
+                        "共享文件夹配额：${folder['quota_value'] > 0 ? ((folder['quota_value'] as num) * 1024 * 1024).formatSize() : "已停用"}",
                         style: TextStyle(
                             fontSize: 12,
                             color: Theme.of(context)
@@ -248,7 +248,7 @@ class SharedFolders extends HookWidget {
                         height: 5,
                       ),
                       Text(
-                        "共享文件夹大小：${(folder['share_quota_used'] * 1024 * 1024).formatSize()}",
+                        "共享文件夹大小：${((folder['share_quota_used'] as num) * 1024 * 1024).formatSize()}",
                         style: TextStyle(
                             fontSize: 12,
                             color: Theme.of(context)

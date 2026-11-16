@@ -4,6 +4,7 @@ import 'dart:ui';
 
 import 'package:background_downloader/background_downloader.dart';
 import 'package:garden/pages/download/download.dart';
+import 'package:garden/stores/transfer_store.dart';
 import 'package:garden/util/http_util.dart';
 import 'package:flutter/widgets.dart';
 import 'package:garden/util/log.dart';
@@ -51,7 +52,7 @@ class DownloadStateNotifier {
       taskProgressCallback: (update) =>
           downloadCallback(update.task.taskId, progress: update.progress),
     );
-    runLoop(callback: onRunLoopCallback);
+    runLoop();
   }
 
   void bindBackgroundIsolate() {
@@ -66,13 +67,18 @@ class DownloadStateNotifier {
       Log.debug('UI Isolate Callback: $data');
       String id = data[0];
       TaskStatus status = data[1] ?? TaskStatus.notFound;
-      int progress = data[2] ?? 0;
+      // 进度回调传来的是 0~1 的 double，转成百分比 int；状态回调为 null。
+      final num? rawProgress = data[2] as num?;
+
+      transferStore.applyTaskStatus(id, status);
 
       if (tasks.value.isNotEmpty) {
         final updatedTasks = tasks.value.map((task) {
           if (task.task.taskId == id) {
             task.status = status;
-            task.progress = progress;
+            if (rawProgress != null) {
+              task.progress = (rawProgress * 100).round();
+            }
           }
           return task;
         }).toList();
@@ -85,18 +91,37 @@ class DownloadStateNotifier {
     IsolateNameServer.removePortNameMapping('downloader_send_port');
   }
 
-  onRunLoopCallback(List<Task> downloadTasks) {
-    tasks.value = downloadTasks
-        .takeWhile((t) => t is DownloadTask)
-        .map((e) => DownloadInfo.formTask(e as DownloadTask))
-        .toList();
-    loading.value = false;
+  /// 合并「实时任务」(allTasks，进行中) 与「持久记录」(database，含已完成)。
+  /// allTasks() 完成后即移除，已完成项只能从 database 取。
+  void _applyTasks(List<Task> live, List<TaskRecord> records) {
+    final byId = <String, DownloadInfo>{};
+    for (final rec in records) {
+      final t = rec.task;
+      if (t is! DownloadTask) continue;
+      byId[t.taskId] = DownloadInfo.formTask(t)
+        ..status = rec.status
+        ..progress = (rec.progress * 100).round();
+    }
+    for (final t in live) {
+      if (t is! DownloadTask) continue;
+      byId.putIfAbsent(t.taskId, () => DownloadInfo.formTask(t));
+    }
+    tasks.value = byId.values.toList();
   }
 
-  runLoop({ValueChanged<List<Task>>? callback}) async {
+  /// 删除任务：取消活动任务并移除持久记录（已完成项只在 database 里）。
+  Future<void> deleteTask(String id) async {
+    await FileDownloader().cancelTaskWithId(id);
+    await FileDownloader().database.deleteRecordWithId(id);
+  }
+
+  Future<void> runLoop() async {
     try {
-      final downloadTasks = await FileDownloader().allTasks();
-      callback?.call(downloadTasks);
+      final live = await FileDownloader().allTasks();
+      final records = await FileDownloader()
+          .database
+          .allRecords(group: FileDownloader.defaultGroup);
+      _applyTasks(live, records);
     } finally {
       loading.value = false;
     }

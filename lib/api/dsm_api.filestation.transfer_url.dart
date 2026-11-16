@@ -1,23 +1,21 @@
-import 'dart:convert';
-
-/// 路径原样 base64 编码（不做 URL 编码），用于 /fbdownload 的 `dlink`。
-/// 抓包证明 dlink 即路径的 base64。
-String dsmBase64Path(String path) => base64.encode(utf8.encode(path));
-
-/// 下载 URL：`/fbdownload/<末段>?dlink=<base64(path)>&mode=download&SynoToken=<token>`。
+/// 下载 URL：官方 `SYNO.FileStation.Download`。
 ///
-/// `baseUri` 形如 `http://192.168.8.40:5000/`（见 `connectionStore.baseUri`）。
-/// /fbdownload 是否认 `Range`（多线程）待 Task 8 真机确认。
+/// 私有端点 `/fbdownload` 在 DSM 7.3.2 上鉴权失效（实测返回 119 unauth / 38B
+/// 错误 JSON，被当成文件存成 36~38B）；官方 webapi 用 `_sid` 即可取到真文件。
 String fbDownloadUrl({
   required String baseUri,
   required String path,
-  required String synoToken,
+  required String sid,
+  int version = 2,
 }) {
-  final name = path.split('/').last;
-  return '${baseUri}fbdownload/$name'
-      '?dlink=${dsmBase64Path(path)}'
+  final base = baseUri.replaceFirst(RegExp(r'/+$'), '');
+  return '$base/webapi/entry.cgi'
+      '?api=SYNO.FileStation.Download'
+      '&method=download'
+      '&version=$version'
+      '&path=${Uri.encodeComponent(path)}'
       '&mode=download'
-      '&SynoToken=$synoToken';
+      '&_sid=$sid';
 }
 
 /// 上传入口 URL：`webapi/entry.cgi?api=SYNO.FileStation.Upload&method=upload&version=<v>&SynoToken=<token>`。

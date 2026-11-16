@@ -109,9 +109,7 @@ class DownloadTaskItemWidget extends StatelessWidget {
         ),
         const SizedBox(height: 5),
         Text(
-          DateTime.fromMillisecondsSinceEpoch(
-                  info.task.creationTime.secondsSinceEpoch)
-              .format("Y/m/d H:i:s"),
+          info.task.creationTime.format("Y/m/d H:i:s"),
           style: TextStyle(
             fontSize: 12,
             color: Theme.of(context).textTheme.headlineSmall?.color,

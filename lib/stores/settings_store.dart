@@ -162,12 +162,18 @@ class SettingsStore {
 
   final _downloadSavePath = signal<String>('');
   final _downloadWifiOnly = signal<bool>(true);
+  final _showDownloadBadge = signal<bool>(true);
 
   ReadonlySignal<String> get downloadSavePath => _downloadSavePath;
   ReadonlySignal<bool> get downloadWifiOnly => _downloadWifiOnly;
+  ReadonlySignal<bool> get showDownloadBadge => _showDownloadBadge;
 
   void setDownloadSavePath(String value) => _downloadSavePath.value = value;
   void setDownloadWifiOnly(bool value) => _downloadWifiOnly.value = value;
+  Future<void> setShowDownloadBadge(bool value) async {
+    _showDownloadBadge.value = value;
+    await StorageUtil.setBool("show_download_badge", value);
+  }
 
   // ==================== 快捷方式 ====================
 
@@ -216,6 +222,8 @@ class SettingsStore {
     setDownloadSavePath(path);
     final onyWifi = await StorageUtil.getBool("download_wifi_only");
     setDownloadWifiOnly(onyWifi ?? true);
+    _showDownloadBadge.value =
+        (await StorageUtil.getBool("show_download_badge")) ?? true;
     //震动开关
     final vibrateOn = await StorageUtil.getBool("vibrate_on");
     setVibrateOn(vibrateOn ?? true);
@@ -276,6 +284,7 @@ class SettingsStore {
   void dispose() {
     _downloadSavePath.dispose();
     _downloadWifiOnly.dispose();
+    _showDownloadBadge.dispose();
     _showShortcut.dispose();
     _refreshDuration.dispose();
     _showWallpaper.dispose();

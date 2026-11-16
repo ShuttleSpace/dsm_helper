@@ -191,12 +191,18 @@ class TransferStore {
     }
   }
 
+  /// 由状态回调（UI isolate 汇总）写入任务状态。
+  /// registerCallbacks 会屏蔽 updates 流，故不能只靠 [listenUpdates]。
+  void applyTaskStatus(String id, TaskStatus status) {
+    final s = _mapStatus(status);
+    if (s != null) setState(id, s);
+  }
+
   /// 订阅 background_downloader 的进度/状态流，刷新本地任务状态。
   void listenUpdates() {
     FileDownloader().updates.listen((update) {
       if (update is TaskStatusUpdate) {
-        final s = _mapStatus(update.status);
-        if (s != null) setState(update.task.taskId, s);
+        applyTaskStatus(update.task.taskId, update.status);
       } else if (update is TaskProgressUpdate) {
         final total = update.expectedFileSize;
         if (total > 0) {

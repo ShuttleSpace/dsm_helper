@@ -4,7 +4,7 @@ import 'package:garden/services/transfer_engine.dart';
 import 'package:garden/stores/connection_store.dart';
 
 /// 下载并发分片数。
-/// `/fbdownload` 是否认 `Range`（多线程）待 Task 8 真机确认；
+/// 官方 `SYNO.FileStation.Download` 是否认 `Range`（多线程）待真机确认；
 /// 确认前保持 1（单连接，安全），确认后调高即可开启多线程。
 int downloadConcurrency = 1;
 
@@ -58,7 +58,7 @@ Task buildDownloadTask({
 /// 入队一个 DSM 文件下载，返回 taskId。
 ///
 /// `remotePath` 为 NAS 侧绝对路径（如 `/Download/a.zip`），据此自构造
-/// `/fbdownload` URL（见 [fbDownloadUrl]，抓包已证实 dlink 即路径 base64）。
+/// 官方下载 URL（见 [fbDownloadUrl]）。
 Future<String> enqueueFileDownload({
   required String remotePath,
   required String destDir,
@@ -67,7 +67,7 @@ Future<String> enqueueFileDownload({
   final url = fbDownloadUrl(
     baseUri: connectionStore.baseUri.value,
     path: remotePath,
-    synoToken: connectionStore.synoToken.value,
+    sid: connectionStore.sid.value,
   );
   final task = buildDownloadTask(
     url: url,

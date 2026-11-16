@@ -70,14 +70,15 @@ void main() {
     final url = fbDownloadUrl(
       baseUri: connectionStore.baseUri.value,
       path: '/Download/a.zip',
-      synoToken: connectionStore.synoToken.value,
+      sid: connectionStore.sid.value,
     );
     final task = buildDownloadTask(
       url: url,
       directory: '/tmp',
       filename: 'a.zip',
     );
-    expect(task.url, contains('/fbdownload/a.zip?dlink='));
-    expect(task.url, contains('SynoToken=TOK'));
+    expect(task.url, contains('api=SYNO.FileStation.Download'));
+    expect(task.url, contains('path=%2FDownload%2Fa.zip'));
+    expect(task.url, contains('_sid='));
   });
 }

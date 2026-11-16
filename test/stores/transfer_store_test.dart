@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:background_downloader/background_downloader.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:garden/stores/transfer_store.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -72,6 +73,44 @@ void main() {
       final t = store.tasks.value.first;
       expect(t.transferredBytes, 50);
       expect(t.totalBytes, 200);
+    });
+  });
+
+  group('applyTaskStatus (UI isolate funnel)', () {
+    test('complete clears an active download so the badge count drops', () {
+      final store = TransferStore();
+      store.add(const TransferTask(
+        id: 't1',
+        type: TransferType.download,
+        localPath: '/tmp/a',
+        remotePath: '/a',
+        state: TransferState.active,
+      ));
+      int inProgress() => store.tasks.value
+          .where((t) =>
+              t.type == TransferType.download &&
+              (t.state == TransferState.active ||
+                  t.state == TransferState.queued))
+          .length;
+      expect(inProgress(), 1);
+
+      store.applyTaskStatus('t1', TaskStatus.complete);
+      expect(store.tasks.value.first.state, TransferState.done);
+      expect(inProgress(), 0);
+    });
+
+    test('running/failed/notFound map to active/error', () {
+      final store = TransferStore();
+      store.add(const TransferTask(
+        id: 't2',
+        type: TransferType.download,
+        localPath: '/tmp/b',
+        remotePath: '/b',
+      ));
+      store.applyTaskStatus('t2', TaskStatus.running);
+      expect(store.tasks.value.first.state, TransferState.active);
+      store.applyTaskStatus('t2', TaskStatus.failed);
+      expect(store.tasks.value.first.state, TransferState.error);
     });
   });
 

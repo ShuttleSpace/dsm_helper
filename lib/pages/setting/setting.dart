@@ -124,47 +124,40 @@ class Setting extends HookWidget {
     getData() async {
       var res = await DsmApi.terminalInfo();
       if (res['success']) {
-      
         ssh.value = res['data']['enable_ssh'];
         telnet.value = res['data']['enable_telnet'];
         sshPort.value = res['data']['ssh_port'].toString();
         sshLoading.value = false;
-    
       } else {
-      
         sshLoading.value = false;
         ssh.value = false;
-    
       }
     }
 
     getNormalUser() async {
       var res = await DsmApi.normalUser("get");
       if (res['success']) {
-      
         otpEnable.value = res['data']['OTP_enable'];
         otpEnforced.value = res['data']['OTP_enforced'];
         email.value = res['data']['email'];
-    
       }
     }
 
     power(String type, bool force) async {
-    
       if (type == "shutdown") {
         shutdowning.value = true;
       } else {
         rebooting.value = true;
       }
-  
+
       var res = await DsmApi.power(type, force);
-    
+
       if (type == "shutdown") {
         shutdowning.value = false;
       } else {
         rebooting.value = false;
       }
-  
+
       if (res['success']) {
         UiUtil.toast("已发送指令");
       } else if (res['error']['code'] == 117) {
@@ -222,7 +215,8 @@ class Setting extends HookWidget {
                                     child: Text(
                                       "强制${type == "shutdown" ? "关机" : "重启"}",
                                       style: const TextStyle(
-                                          fontSize: 18, color: Colors.redAccent),
+                                          fontSize: 18,
+                                          color: Colors.redAccent),
                                     ),
                                   ),
                                 ),
@@ -282,16 +276,16 @@ class Setting extends HookWidget {
                     children: <Widget>[
                       const Text(
                         "确认关机",
-                        style:
-                            TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
+                        style: TextStyle(
+                            fontSize: 20, fontWeight: FontWeight.w500),
                       ),
                       const SizedBox(
                         height: 12,
                       ),
                       const Text(
                         "确认要关闭设备吗？",
-                        style:
-                            TextStyle(fontSize: 20, fontWeight: FontWeight.w400),
+                        style: TextStyle(
+                            fontSize: 20, fontWeight: FontWeight.w400),
                       ),
                       const SizedBox(
                         height: 22,
@@ -362,16 +356,16 @@ class Setting extends HookWidget {
                     children: <Widget>[
                       const Text(
                         "确认重启",
-                        style:
-                            TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
+                        style: TextStyle(
+                            fontSize: 20, fontWeight: FontWeight.w500),
                       ),
                       const SizedBox(
                         height: 12,
                       ),
                       const Text(
                         "确认要重新启动设备？",
-                        style:
-                            TextStyle(fontSize: 20, fontWeight: FontWeight.w400),
+                        style: TextStyle(
+                            fontSize: 20, fontWeight: FontWeight.w400),
                       ),
                       const SizedBox(
                         height: 22,
@@ -439,8 +433,8 @@ class Setting extends HookWidget {
                     children: <Widget>[
                       const Text(
                         "主题颜色",
-                        style:
-                            TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
+                        style: TextStyle(
+                            fontSize: 20, fontWeight: FontWeight.w500),
                       ),
                       const SizedBox(
                         height: 12,
@@ -512,16 +506,14 @@ class Setting extends HookWidget {
               onPressed: () {
                 Navigator.of(context)
                     .push(
-                  CupertinoPageRoute(
-                    builder: (context) {
-                      return const HelperSetting();
-                    },
-                    settings: const RouteSettings(name: "helper_setting"),
-                  ),
-                )
-                    .then((_) {
-                  
-                });
+                      CupertinoPageRoute(
+                        builder: (context) {
+                          return const HelperSetting();
+                        },
+                        settings: const RouteSettings(name: "helper_setting"),
+                      ),
+                    )
+                    .then((_) {});
               },
               child: Image.asset(
                 "assets/icons/setting.png",
@@ -688,12 +680,14 @@ class Setting extends HookWidget {
                                           child: OutlinedButton(
                                             onPressed: () async {
                                               Navigator.of(context).pop();
-                                              
+
                                               sshLoading.value = true;
-                                            
+
                                               var res =
                                                   await DsmApi.setTerminal(
-                                                      !ssh.value, telnet.value, sshPort.value);
+                                                      !ssh.value,
+                                                      telnet.value,
+                                                      sshPort.value);
                                               Log.info(res);
                                               if (!res['success']) {
                                                 UiUtil.toast(

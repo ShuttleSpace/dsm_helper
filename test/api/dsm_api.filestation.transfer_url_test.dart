@@ -1,24 +1,27 @@
-import 'dart:convert';
-
 import 'package:flutter_test/flutter_test.dart';
 import 'package:garden/api/dsm_api.filestation.transfer_url.dart';
 
 void main() {
-  test('dsmBase64Path encodes the raw path without URL escaping', () {
-    const path = '/Download/中文/a.zip';
-    expect(dsmBase64Path(path), base64.encode(utf8.encode(path)));
+  test('fbDownloadUrl uses official FileStation.Download with sid and encoded path',
+      () {
+    const baseUri = 'http://192.168.8.40:5000/';
+    const path = '/Download/a b.zip';
+    final url = fbDownloadUrl(baseUri: baseUri, path: path, sid: 'SID');
+
+    expect(url, startsWith('http://192.168.8.40:5000/webapi/entry.cgi?'));
+    expect(url, contains('api=SYNO.FileStation.Download'));
+    expect(url, contains('method=download'));
+    expect(url, contains('version=2'));
+    expect(url, contains('path=${Uri.encodeComponent(path)}'));
+    expect(url, contains('mode=download'));
+    expect(url, contains('_sid=SID'));
+    expect(url, isNot(contains('fbdownload')));
   });
 
-  test('fbDownloadUrl builds /fbdownload URL with base64 dlink and token', () {
-    const baseUri = 'http://192.168.8.40:5000/';
-    const path = '/Download/a.zip';
-    const token = 'TOK';
-    final url = fbDownloadUrl(baseUri: baseUri, path: path, synoToken: token);
-
-    expect(url, startsWith('http://192.168.8.40:5000/fbdownload/a.zip?dlink='));
-    expect(url, contains('dlink=${dsmBase64Path(path)}'));
-    expect(url, contains('mode=download'));
-    expect(url, contains('SynoToken=$token'));
+  test('fbDownloadUrl tolerates a trailing slash on baseUri', () {
+    final url = fbDownloadUrl(
+        baseUri: 'http://h:5000', path: '/x', sid: 'S');
+    expect(url, startsWith('http://h:5000/webapi/entry.cgi?'));
   });
 
   test('uploadEntryUrl embeds api, version and token', () {

@@ -30,4 +30,6 @@ Future<void> initTransferEngine() async {
       (Config.runInForeground, Config.always),
     ],
   );
+  // 持久化任务记录，供「已完成」tab 展示（allTasks() 完成后即移除）。
+  await FileDownloader().trackTasksInGroup(FileDownloader.defaultGroup);
 }

@@ -22,7 +22,6 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:signals_hooks/signals_hooks.dart';
 import 'package:local_auth_darwin/local_auth_darwin.dart';
 
-
 class HelperSetting extends HookWidget {
   const HelperSetting({super.key});
 
@@ -45,18 +44,20 @@ class HelperSetting extends HookWidget {
 
     initAuth() async {
       launchAuth.value = await StorageUtil.getBool("launch_auth") ?? false;
-      password.value = await StorageUtil.getBool("launch_auth_password") ?? false;
-      biometrics.value = await StorageUtil.getBool("launch_auth_biometrics") ?? false;
-      videoPlayer.value = await StorageUtil.getBool("use_embeed_video_player") ?? false;
+      password.value =
+          await StorageUtil.getBool("launch_auth_password") ?? false;
+      biometrics.value =
+          await StorageUtil.getBool("launch_auth_biometrics") ?? false;
+      videoPlayer.value =
+          await StorageUtil.getBool("use_embeed_video_player") ?? false;
       launchAccountPage.value =
           await StorageUtil.getBool('launch_account_page') ?? false;
       canCheckBiometrics.value = await auth.canCheckBiometrics;
-    
+
       if (canCheckBiometrics.value) {
         List<BiometricType> availableBiometrics =
             await auth.getAvailableBiometrics();
         if (Platform.isIOS) {
-        
           if (availableBiometrics.contains(BiometricType.face)) {
             biometricsType.value = BiometricType.face;
           } else if (availableBiometrics.contains(BiometricType.fingerprint)) {
@@ -64,7 +65,6 @@ class HelperSetting extends HookWidget {
           } else if (availableBiometrics.contains(BiometricType.iris)) {
             biometricsType.value = BiometricType.iris;
           }
-      
         }
       }
     }
@@ -84,7 +84,6 @@ class HelperSetting extends HookWidget {
         children: [
           GestureDetector(
             onTap: () {
-              
               settingsStore
                   .setVibrateOn(!settingsStore.vibrateOn.watch(context));
               StorageUtil.setBool(
@@ -92,7 +91,6 @@ class HelperSetting extends HookWidget {
               if (settingsStore.vibrateOn.watch(context)) {
                 UiUtil.vibrate(FeedbackType.light);
               }
-            
             },
             child: Card(
               shape: RoundedRectangleBorder(
@@ -135,10 +133,9 @@ class HelperSetting extends HookWidget {
                             children: [
                               GestureDetector(
                                 onTap: () {
-                                  
-                                  settingsStore.setVibrateNormal(
-                                      !settingsStore.vibrateNormal
-                                          .watch(context));
+                                  settingsStore.setVibrateNormal(!settingsStore
+                                      .vibrateNormal
+                                      .watch(context));
                                   StorageUtil.setBool(
                                       "vibrate_warning",
                                       settingsStore.vibrateNormal
@@ -147,7 +144,6 @@ class HelperSetting extends HookWidget {
                                       .watch(context)) {
                                     UiUtil.vibrate(FeedbackType.light);
                                   }
-                                
                                 },
                                 child: Card(
                                   shape: RoundedRectangleBorder(
@@ -183,10 +179,9 @@ class HelperSetting extends HookWidget {
                               ),
                               GestureDetector(
                                 onTap: () {
-                                  
-                                  settingsStore.setVibrateWarning(
-                                      !settingsStore.vibrateWarning
-                                          .watch(context));
+                                  settingsStore.setVibrateWarning(!settingsStore
+                                      .vibrateWarning
+                                      .watch(context));
                                   StorageUtil.setBool(
                                       "vibrate_warning",
                                       settingsStore.vibrateWarning
@@ -195,7 +190,6 @@ class HelperSetting extends HookWidget {
                                       .watch(context)) {
                                     UiUtil.vibrate(FeedbackType.warning);
                                   }
-                                
                                 },
                                 child: Card(
                                   shape: RoundedRectangleBorder(
@@ -248,10 +242,9 @@ class HelperSetting extends HookWidget {
                   settings: const RouteSettings(name: "player_setting"),
                 ),
               );
-              
+
               videoPlayer.value = !videoPlayer.value;
               StorageUtil.setBool("use_embeed_video_player", videoPlayer.value);
-            
             },
             child: Card(
               shape: RoundedRectangleBorder(
@@ -341,10 +334,9 @@ class HelperSetting extends HookWidget {
           ),
           GestureDetector(
             onTap: () {
-              
               launchAccountPage.value = !launchAccountPage.value;
-              StorageUtil.setBool("launch_account_page", launchAccountPage.value);
-            
+              StorageUtil.setBool(
+                  "launch_account_page", launchAccountPage.value);
             },
             child: Card(
               shape: RoundedRectangleBorder(
@@ -382,10 +374,8 @@ class HelperSetting extends HookWidget {
           ),
           GestureDetector(
             onTap: () {
-              
               launchAuth.value = !launchAuth.value;
               StorageUtil.setBool("launch_auth", launchAuth.value);
-            
             },
             child: Card(
               shape: RoundedRectangleBorder(
@@ -428,7 +418,6 @@ class HelperSetting extends HookWidget {
                             children: [
                               GestureDetector(
                                 onTap: () {
-                                  
                                   if (password.value) {
                                     password.value = false;
                                     StorageUtil.setBool(
@@ -438,8 +427,7 @@ class HelperSetting extends HookWidget {
                                         "launch_auth_biometrics", false);
                                   } else {
                                     Navigator.of(context).push(
-                                        CupertinoPageRoute(
-                                            builder: (context) {
+                                        CupertinoPageRoute(builder: (context) {
                                       return const GesturePasswordPage();
                                     })).then((res) {
                                       if (res != null && res) {
@@ -452,7 +440,6 @@ class HelperSetting extends HookWidget {
                                   }
                                   // password.value = !password.value;
                                   // HttpUtil.setStorage("launch_password", password.value ? "1" : "0");
-                                
                                 },
                                 child: Card(
                                   shape: RoundedRectangleBorder(
@@ -530,12 +517,11 @@ class HelperSetting extends HookWidget {
                                           localizedReason: '请触摸指纹传感器',
                                         );
                                         auth.stopAuthentication();
-                                        
+
                                         biometrics.value = didAuthenticate;
                                         StorageUtil.setBool(
                                             "launch_auth_biometrics",
                                             biometrics.value);
-                                      
                                       } on PlatformException catch (e) {
                                         if (e.code == auth_error.notAvailable) {
                                           UiUtil.toast("生物验证不可用");
@@ -550,18 +536,16 @@ class HelperSetting extends HookWidget {
                                         }
                                       }
                                     } else {
-                                      
                                       biometrics.value = false;
                                       StorageUtil.setBool(
                                           "launch_auth_biometrics",
                                           biometrics.value);
-                                    
                                     }
 
-                                    // 
-                                  //   biometrics.value = !biometrics.value;
-                                  //   HttpUtil.setStorage("launch_biometrics", biometrics.value ? "1" : "0");
-                                  // 
+                                    //
+                                    //   biometrics.value = !biometrics.value;
+                                    //   HttpUtil.setStorage("launch_biometrics", biometrics.value ? "1" : "0");
+                                    //
                                   },
                                   child: Card(
                                     shape: RoundedRectangleBorder(
@@ -608,6 +592,44 @@ class HelperSetting extends HookWidget {
           const SizedBox(
             height: 20,
           ),
+          Card(
+            shape: RoundedRectangleBorder(
+                side: const BorderSide(),
+                borderRadius: BorderRadius.circular(18)),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(
+                  horizontal: AppConstants.paddingLarge,
+                  vertical: AppConstants.paddingSmall),
+              child: Row(
+                children: [
+                  const Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "下载角标",
+                          style: TextStyle(
+                              fontSize: 16, fontWeight: FontWeight.w500),
+                        ),
+                        SizedBox(height: 4),
+                        Text(
+                          "在「下载」标签上显示进行中的下载数量",
+                          style: TextStyle(color: Colors.grey, fontSize: 12),
+                        ),
+                      ],
+                    ),
+                  ),
+                  CupertinoSwitch(
+                    value: settingsStore.showDownloadBadge.watch(context),
+                    onChanged: (v) => settingsStore.setShowDownloadBadge(v),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(
+            height: 20,
+          ),
           OutlinedButton(
             onPressed: () {
               var hide = showWeuiLoadingToast(context: context);
@@ -637,10 +659,8 @@ class HelperSetting extends HookWidget {
           ),
           OutlinedButton(
             onPressed: () {
-              
               settingsStore.setDashboardCardCollapseSwitch(
                   !settingsStore.dashboardCardCollapseSwitch.watch(context));
-            
             },
             // margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
             child: Row(

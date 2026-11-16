@@ -219,7 +219,7 @@ class ControlPanel extends StatelessWidget {
                           iconPath:
                               "assets/control_panel/${connectionStore.dsmVersion}/info_center.png",
                           targetPage: SystemInfo(0, systemData,
-                              storageDisks, storageVolumes),
+                              storageVolumes, storageDisks),
                           routeName: "system_info_all",
                         ),
                         ControlPanelItem(

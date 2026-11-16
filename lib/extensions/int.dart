@@ -3,23 +3,6 @@ import 'dart:math';
 extension IntExt on int {
   DateTime get toDateTime => DateTime.fromMillisecondsSinceEpoch(this * 1000);
 
-  /// 格式化文件大小
-  String formatSize({int fixed = 2, int format = 1024, bool showByte = false}) {
-    if (this == 0) {
-      return "0${showByte ? 'Bytes' : ''}";
-    } else if (this < format) {
-      return "$this${showByte ? 'Bytes' : ''}";
-    } else if (this < pow(format, 2)) {
-      return "${(this / format).toStringAsFixed(fixed)}K";
-    } else if (this < pow(format, 3)) {
-      return "${(this / pow(format, 2)).toStringAsFixed(fixed)}M";
-    } else if (this < pow(format, 4)) {
-      return "${(this / pow(format, 3)).toStringAsFixed(fixed)}G";
-    } else {
-      return "${(this / pow(format, 4)).toStringAsFixed(fixed)}T";
-    }
-  }
-
   /// 时间转时长
   Map<String, int> formatTime() {
     int seconds = this % 60;
@@ -41,6 +24,23 @@ extension IntExt on int {
 }
 
 extension NumExt on num {
+  /// 格式化文件大小。DSM 返回的字节数可能是 int 或 double（dynamic）。
+  String formatSize({int fixed = 2, int format = 1024, bool showByte = false}) {
+    if (this == 0) {
+      return "0${showByte ? 'Bytes' : ''}";
+    } else if (this < format) {
+      return "${toInt()}${showByte ? 'Bytes' : ''}";
+    } else if (this < pow(format, 2)) {
+      return "${(this / format).toStringAsFixed(fixed)}K";
+    } else if (this < pow(format, 3)) {
+      return "${(this / pow(format, 2)).toStringAsFixed(fixed)}M";
+    } else if (this < pow(format, 4)) {
+      return "${(this / pow(format, 3)).toStringAsFixed(fixed)}G";
+    } else {
+      return "${(this / pow(format, 4)).toStringAsFixed(fixed)}T";
+    }
+  }
+
   double chartInterval() {
     if (this < 1024) {
       return 102.4;
