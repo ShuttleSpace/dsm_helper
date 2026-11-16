@@ -11,7 +11,7 @@ import 'package:garden/util/log.dart';
 import 'package:garden/pages/common/device_finder.dart';
 import 'package:garden/pages/login/accounts.dart';
 import 'package:garden/stores/connection_store.dart';
-import 'package:garden/util/http_util.dart';
+import 'package:garden/util/http_util.dart' hide DsmApi;
 import 'package:garden/util/storage_util.dart';
 import 'package:garden/util/ui_util.dart';
 import 'package:garden/extensions/context.dart';
