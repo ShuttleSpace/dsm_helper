@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:garden/api/dsm_api.filestation.transfer_contract.dart';
 import 'package:garden/extensions/string.dart';
 import 'package:signals_flutter/signals_flutter.dart';
 import 'package:garden/services/transfer_download.dart';
@@ -22,7 +23,18 @@ class TransferList extends StatelessWidget {
     if (filtered.isEmpty) return const SizedBox.shrink();
     return Column(
       mainAxisSize: MainAxisSize.min,
-      children: filtered.map((t) => _buildRow(context, t)).toList(),
+      children: [
+        // 能力边界必须随上传任务可见，禁止无提示假续传。
+        if (filtered.any((t) => t.type == TransferType.upload))
+          const Padding(
+            padding: EdgeInsets.fromLTRB(20, 12, 20, 0),
+            child: Text(
+              uploadResumeBoundaryText,
+              style: TextStyle(fontSize: 11, color: Colors.grey),
+            ),
+          ),
+        ...filtered.map((t) => _buildRow(context, t)),
+      ],
     );
   }
 

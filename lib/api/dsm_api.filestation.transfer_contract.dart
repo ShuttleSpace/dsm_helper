@@ -10,6 +10,30 @@
 /// 是否启用 v3 分片上传。未实测确认 → 回退 v2 单请求上传。
 const bool kUploadV3Supported = false;
 
+/// DSM Upload 是否具备已验证的字节级续传（offset/append/分片合并）能力。
+///
+/// Task 8 Step 1 结论：官方客户端 238MB 仍走 v2 单请求、抓包零
+/// `part_number`/`upload_id`、`all_api.json5` 无分片参数 → 无可用契约，
+/// 故不宣称字节级续传。见
+/// docs/superpowers/specs/2026-11-16-transfer-capability-probe.md
+bool get uploadByteResumeSupported => kUploadV3Supported;
+
+/// 上传策略（由能力探测结论决定，禁止无提示假续传）。
+enum UploadStrategy {
+  v2SingleRequest,
+  v3Chunked,
+}
+
+/// 当前上传策略：未实测 v3 → v2 单请求（完整保留 Task 7 备份上传契约）。
+UploadStrategy selectUploadStrategy() => kUploadV3Supported
+    ? UploadStrategy.v3Chunked
+    : UploadStrategy.v2SingleRequest;
+
+/// 必须在 UI/文档明示的上传能力边界，禁止误导性的「断点续传」承诺。
+const String uploadResumeBoundaryText =
+    '上传断点续传受 DSM 限制：DSM Upload API 未提供已验证的偏移/追加语义，'
+    '网络中断或应用重启后需重新上传（可从传输列表一键重试），暂不支持字节级续传。';
+
 /// 默认分片大小（上传分片用）。
 const int kDefaultChunkSizeBytes = 8 * 1024 * 1024;
 
