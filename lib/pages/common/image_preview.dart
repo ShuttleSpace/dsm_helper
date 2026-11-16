@@ -239,8 +239,12 @@ class ImagePreview extends HookWidget {
                       case LoadState.failed:
                         //remove memory cached
                         state.imageProvider.evict();
-                        return const Center(
-                          child: Text("图片加载失败"),
+                        final detail = state.lastException;
+                        return Center(
+                          child: Text(
+                            detail == null ? "图片加载失败" : "图片加载失败：$detail",
+                            textAlign: TextAlign.center,
+                          ),
                         );
                     }
                   },

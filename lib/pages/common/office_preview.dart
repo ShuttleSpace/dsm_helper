@@ -58,7 +58,8 @@ class _OfficePreviewPageState extends State<OfficePreviewPage> {
       );
       setState(() => _ready = true);
     } catch (e) {
-      setState(() => _error = '$e');
+      // DSMException 的 toString 已含 code/message，直接展示且留在页面内不崩溃。
+      setState(() => _error = '预览失败：$e');
     }
   }
 

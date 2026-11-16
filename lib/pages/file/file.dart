@@ -1,4 +1,7 @@
 import 'dart:async';
+import 'dart:convert';
+import 'package:garden/api/dsm_api.filestation.transfer_url.dart';
+import 'package:garden/services/office_preview.dart';
 import 'package:garden/stores/settings_store.dart';
 import 'package:garden/util/file_type_util.dart';
 import 'package:garden/util/ui_util.dart';
@@ -416,23 +419,29 @@ class Files extends HookWidget {
       }
     }
     openPlainFile(file) async {
-    
       loading.value = true;
-  
-      var res = await HttpUtil.instance.get(
-          "${connectionStore.baseUri}/webapi/entry.cgi?api=SYNO.FileStation.Download&version=1&method=download&path=${Uri.encodeComponent(file['path'])}&mode=open&_sid=${connectionStore.sid}",
-          decode: false);
-    
-      loading.value = false;
-  
-      if (context.mounted) {
-        // ignore: use_build_context_synchronously
-        Navigator.of(context).push(CupertinoPageRoute(builder: (context) {
-          return TextEditor(
-            fileName: file['name'],
-            content: res,
-          );
-        }));
+      try {
+        final url = fbDownloadUrl(
+          baseUri: connectionStore.baseUri.value,
+          path: file['path'],
+          sid: connectionStore.sid.value,
+          mode: 'open',
+        );
+        final content = utf8.decode(await fetchFileBytes(url));
+        loading.value = false;
+        if (context.mounted) {
+          // ignore: use_build_context_synchronously
+          Navigator.of(context).push(CupertinoPageRoute(builder: (context) {
+            return TextEditor(
+              fileName: file['name'],
+              content: content,
+            );
+          }));
+        }
+      } catch (e) {
+        loading.value = false;
+        Log.error("文本预览失败: $e");
+        UiUtil.toast("预览失败：$e");
       }
     }
     Widget buildSortMenu(BuildContext context) {
@@ -1095,10 +1104,15 @@ class Files extends HookWidget {
                 if (FileTypeUtil.toFileTypeEnum(
                         FileTypeUtil.getFileType(files.value[i]['name'])) ==
                     FileTypeEnum.image) {
-                  images.add(
-                      "${connectionStore.baseUri}/webapi/entry.cgi?path=${Uri.encodeComponent(files.value[i]['path'])}&size=original&api=SYNO.FileStation.Thumb&method=get&version=2&_sid=${connectionStore.sid}&animate=true");
-                  thumbs.add(
-                      "${connectionStore.baseUri}/webapi/entry.cgi?path=${Uri.encodeComponent(files.value[i]['path'])}&size=small&api=SYNO.FileStation.Thumb&method=get&version=2&_sid=${connectionStore.sid}&animate=true");
+                  images.add(thumbUrl(
+                      baseUri: connectionStore.baseUri.value,
+                      path: files.value[i]['path'],
+                      sid: connectionStore.sid.value));
+                  thumbs.add(thumbUrl(
+                      baseUri: connectionStore.baseUri.value,
+                      path: files.value[i]['path'],
+                      sid: connectionStore.sid.value,
+                      size: 'small'));
                   names.add(files.value[i]['name']);
                   imagePaths.add(files.value[i]['path']);
                   if (files.value[i]['name'] == file['name']) {
@@ -1124,8 +1138,11 @@ class Files extends HookWidget {
             case FileTypeEnum.movie:
               bool useEmbeedVideoPlayer =
                   await StorageUtil.getBool("use_embeed_video_player") ?? true;
-              String url =
-                  "${connectionStore.baseUri}/fbdownload/${Uri.encodeComponent(file['name'])}?dlink=%22${(file['path'] as String).utf8()}%22&_sid=%22${connectionStore.sid}%22&mode=open";
+              String url = fbDownloadUrl(
+                  baseUri: connectionStore.baseUri.value,
+                  path: file['path'],
+                  sid: connectionStore.sid.value,
+                  mode: 'open');
               // String url = HttpUtil.baseUrl + "/fbdownload/${file['name']}?dlink=%22${HttpUtil.utf8Encode(file['path'])}%22&_sid=%22${HttpUtil.sid}%22&mode=open";
               // Log.info(url);
               // 调用nplayer
@@ -1198,8 +1215,11 @@ class Files extends HookWidget {
               if (audioPlayerFloating.value?.isShowing == true) {
                 audioPlayerFloating.value?.close();
               }
-              String url =
-                  "${connectionStore.baseUri}/fbdownload/${file['name']}?dlink=%22${(file['path'] as String).utf8()}%22&_sid=%22${connectionStore.sid}%22&mode=open";
+              String url = fbDownloadUrl(
+                  baseUri: connectionStore.baseUri.value,
+                  path: file['path'],
+                  sid: connectionStore.sid.value,
+                  mode: 'open');
               Navigator.of(context).push(CupertinoPageRoute(builder: (context) {
                 return AudioPlayer(
                   url: url,
@@ -1262,7 +1282,11 @@ class Files extends HookWidget {
             case FileTypeEnum.pdf:
               Navigator.of(context).push(CupertinoPageRoute(builder: (context) {
                 return PdfViewer(
-                    "${connectionStore.baseUri}/fbdownload/${file['name']}?dlink=%22${(file['path'] as String).utf8()}%22&_sid=%22${connectionStore.sid}%22&mode=open",
+                    fbDownloadUrl(
+                        baseUri: connectionStore.baseUri.value,
+                        path: file['path'],
+                        sid: connectionStore.sid.value,
+                        mode: 'open'),
                     file['name']);
               }));
               break;
@@ -1902,8 +1926,11 @@ class Files extends HookWidget {
                         width: 10,
                       ),
                       Hero(
-                        tag:
-                            "${connectionStore.baseUri}/webapi/entry.cgi?path=${Uri.encodeComponent(path)}&size=original&api=SYNO.FileStation.Thumb&method=get&version=2&_sid=${connectionStore.sid}&animate=true",
+                        tag: thumbUrl(
+                          baseUri: connectionStore.baseUri.value,
+                          path: path,
+                          sid: connectionStore.sid.value,
+                        ),
                         child: FileIcon(
                           file['isdir'] ? FileTypeEnum.folder : fileType,
                           thumb: file['path'],
@@ -2002,8 +2029,11 @@ class Files extends HookWidget {
                         child: Column(
                           children: [
                             Hero(
-                              tag:
-                                  "${connectionStore.baseUri}/webapi/entry.cgi?path=${Uri.encodeComponent(path)}&size=original&api=SYNO.FileStation.Thumb&method=get&version=2&_sid=${connectionStore.sid}&animate=true",
+                              tag: thumbUrl(
+                                baseUri: connectionStore.baseUri.value,
+                                path: path,
+                                sid: connectionStore.sid.value,
+                              ),
                               child: FileIcon(
                                 file['isdir'] ? FileTypeEnum.folder : fileType,
                                 thumb: file['path'],

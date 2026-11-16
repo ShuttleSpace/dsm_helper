@@ -6,7 +6,9 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:android_intent_plus/android_intent.dart';
-import 'package:garden/util/http_util.dart';
+import 'package:garden/api/dsm_api.filestation.transfer_url.dart';
+import 'package:garden/extensions/string.dart';
+import 'package:garden/services/office_preview.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
@@ -59,15 +61,15 @@ class VideoPlayerPage extends HookWidget {
 
     Future<void> initializeVideo() async {
       try {
-        // 自动播放
-        player.open(Media(url), play: true);
+        // 等待 open 完成，失败才能落到下面的 catch（原来未 await 永远不进 catch）。
+        await player.open(Media(url), play: true);
         player.stream.videoParams.listen((event) {
           videoAspectRatio.value = event.aspect ?? 1;
         });
         isInitialized.value = true;
       } catch (error) {
-        Log.log("播放初始化异常: $error");
-        UiUtil.toast("视频加载失败，请尝试使用第三方播放器");
+        Log.error("播放初始化异常: $error");
+        UiUtil.toast("视频加载失败：$error，请尝试使用第三方播放器");
       }
     }
 
@@ -77,22 +79,25 @@ class VideoPlayerPage extends HookWidget {
     }
 
     parseNfo() async {
-      if (nfo != null) {
+      if (nfo == null) return;
+      try {
         final myTransformer = Xml2Json();
-        String nfoUrl =
-            "${connectionStore.baseUri}/fbdownload/info.nfo?dlink=%22${nfo?.utf8()}%22&_sid=%22${connectionStore.sid}%22&mode=open";
-        var res = await HttpUtil.instance.get(nfoUrl, decode: false);
-        try {
-          myTransformer.parse(res);
-          var json = jsonDecode(myTransformer.toParker());
-          var nfoDetail = json['episodedetails'] ?? json['movie'];
-          description.value = nfoDetail['plot'] ?? '';
-          date.value = nfoDetail['dateadded'] ?? '';
-          actors.value = nfoDetail['actor'] ?? [];
-          year.value = nfoDetail['year'] ?? '';
-        } catch (e) {
-          Log.log("nfo解析异常: $e");
-        }
+        final nfoUrl = fbDownloadUrl(
+          baseUri: connectionStore.baseUri.value,
+          path: nfo!,
+          sid: connectionStore.sid.value,
+          mode: 'open',
+        );
+        final bytes = await fetchFileBytes(nfoUrl);
+        myTransformer.parse(utf8.decode(bytes));
+        var json = jsonDecode(myTransformer.toParker());
+        var nfoDetail = json['episodedetails'] ?? json['movie'];
+        description.value = nfoDetail['plot'] ?? '';
+        date.value = nfoDetail['dateadded'] ?? '';
+        actors.value = nfoDetail['actor'] ?? [];
+        year.value = nfoDetail['year'] ?? '';
+      } catch (e) {
+        Log.error("nfo解析异常: $e");
       }
     }
 
@@ -259,7 +264,11 @@ class VideoPlayerPage extends HookWidget {
                           ? ExtendedImage.network(
                               cover!.startsWith("http")
                                   ? cover!
-                                  : "${connectionStore.baseUri}/webapi/entry.cgi?path=${Uri.encodeComponent(cover!)}&size=original&api=SYNO.FileStation.Thumb&method=get&version=2&_sid=${connectionStore.sid}&animate=true",
+                                  : thumbUrl(
+                                      baseUri: connectionStore.baseUri.value,
+                                      path: cover!,
+                                      sid: connectionStore.sid.value,
+                                    ),
                             )
                           : const CircularProgressIndicator(),
                     ),
