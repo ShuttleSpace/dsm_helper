@@ -101,17 +101,23 @@ class DSMException implements Exception {
   Object message;
   int code;
   Object? descriptionOrSolution;
-  DSMException(this.message, this.code, {this.descriptionOrSolution});
+  final Map<String, dynamic>? rawError;
+  final Map<String, dynamic>? rawResponse;
+  DSMException(this.message, this.code,
+      {this.descriptionOrSolution, this.rawError, this.rawResponse});
   @override
   String toString() {
     return "DSMException:code: $code, $message,$descriptionOrSolution";
   }
 
   static DSMException fromMap(Map res, {String? module}) {
-    if (!res.containsKey('error')) {
-      return DSMException("Unknown error", -1);
-    }
+    final rawResponse = Map<String, dynamic>.from(res);
     final error = res['error'];
+    final rawError = error is Map ? Map<String, dynamic>.from(error) : null;
+    if (!res.containsKey('error')) {
+      return DSMException("Unknown error", -1,
+          rawError: rawError, rawResponse: rawResponse);
+    }
     if (error is Map) {
       int code = error['code'];
       (String, String?)? errorInfo;
@@ -122,10 +128,13 @@ class DSMException implements Exception {
           _dsmApiErrorMap['common']?[code] ?? _dsmApiErrorMap['core']?[code];
       if (errorInfo != null) {
         return DSMException(errorInfo.$1, code,
-            descriptionOrSolution: errorInfo.$2);
+            descriptionOrSolution: errorInfo.$2,
+            rawError: rawError,
+            rawResponse: rawResponse);
       }
     }
-    return DSMException("Unknown error", -1);
+    return DSMException("Unknown error", -1,
+        rawError: rawError, rawResponse: rawResponse);
   }
 }
 
