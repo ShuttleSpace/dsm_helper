@@ -43,6 +43,39 @@ Future<dynamic> _compatPost(String endpoint, {Map<String, dynamic>? data}) {
   return _httpPost(endpoint, data: data);
 }
 
+/// 测试替身：非空时替代底层 multipart 上传，用于断言旧版上传请求字段与
+/// cancelToken / onSendProgress 透传（生产恒为 null）。
+@visibleForTesting
+Future<dynamic> Function(
+  String endpoint, {
+  required Object data,
+  Map<String, dynamic>? queryParameters,
+  CancelToken? cancelToken,
+  Function(int, int)? onSendProgress,
+})? compatUploadForTesting;
+
+Future<dynamic> _compatUpload(
+  String endpoint, {
+  required Object data,
+  Map<String, dynamic>? queryParameters,
+  CancelToken? cancelToken,
+  Function(int, int)? onSendProgress,
+}) {
+  final override = compatUploadForTesting;
+  if (override != null) {
+    return override(endpoint,
+        data: data,
+        queryParameters: queryParameters,
+        cancelToken: cancelToken,
+        onSendProgress: onSendProgress);
+  }
+  return _httpUpload(endpoint,
+      data: data,
+      queryParameters: queryParameters,
+      cancelToken: cancelToken,
+      onSendProgress: onSendProgress);
+}
+
 /// 旧版 DsmApi 兼容层：方法名/签名与 lib/util/api.dart 完全一致。
 /// 请求经新层 `_http*` 发出，响应保持旧版原始信封形状。
 class DsmApi {
@@ -939,7 +972,7 @@ class DsmApi {
       "file": multipartFile,
     };
 
-    var result = await _httpUpload(url,
+    var result = await _compatUpload(url,
         queryParameters: params,
         data: data,
         cancelToken: cancelToken,
