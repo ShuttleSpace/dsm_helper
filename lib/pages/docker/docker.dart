@@ -1,6 +1,6 @@
+import 'package:garden/api/dsm_api.dart';
 import 'package:garden/pages/docker/detail.dart';
 import 'package:garden/util/ui_util.dart';
-import 'package:garden/util/http_util.dart';
 import 'package:garden/util/log.dart';
 import 'package:garden/widgets/action_dialog.dart';
 import 'package:garden/widgets/animation_progress_bar.dart';
@@ -33,63 +33,86 @@ class Docker extends HookWidget {
     final containerLoading = useSignal(true);
     final imageLoading = useSignal(true);
 
-    getContainer() async {
-      var res = await DsmApi.dockerContainerInfo();
-      containerLoading.value = false;
-      if (res['success']) {
-        List result = res['data']['result'];
-        for (var item in result) {
-          if (item['success'] == true) {
-            switch (item['api']) {
-              case "SYNO.Core.System.Utilization":
-                utilization.value = item['data'];
-                break;
-              case "SYNO.Docker.Container":
-                containers.value = item['data']['containers'];
-                containers.value.sort((a, b) {
-                  return a['name'].compareTo(b['name']);
-                });
-                break;
-              case "SYNO.Docker.Container.Resource":
-                List resources = item['data']['resources'];
-                for (var resource in resources) {
-                  for (var container in containers.value) {
-                    if (resource['name'] == container['name']) {
-                      container['cpu'] = resource['cpu'];
-                      container['memory'] = resource['memory'];
-                      container['memoryPercent'] = resource['memoryPercent'];
-                    }
+    Future<void> getContainer() async {
+      try {
+        final result = await dsmDockerContainerOverview();
+        for (final item in result) {
+          if (item is! Map || item['success'] != true) continue;
+          final data = item['data'];
+          if (data is! Map) continue;
+          switch (item['api']) {
+            case "SYNO.Core.System.Utilization":
+              utilization.value = data;
+              break;
+            case "SYNO.Docker.Container":
+              containers.value = data['containers'] ?? [];
+              containers.value.sort((a, b) {
+                return a['name'].compareTo(b['name']);
+              });
+              break;
+            case "SYNO.Docker.Container.Resource":
+              final resources = data['resources'] ?? [];
+              for (final resource in resources) {
+                for (final container in containers.value) {
+                  if (resource['name'] == container['name']) {
+                    container['cpu'] = resource['cpu'];
+                    container['memory'] = resource['memory'];
+                    container['memoryPercent'] = resource['memoryPercent'];
                   }
                 }
-                containers.value = List.of(containers.value);
-                break;
-            }
+              }
+              containers.value = List.of(containers.value);
+              break;
           }
         }
+      } catch (e) {
+        // 旧层在此处静默失败；保持行为不变。
+        Log.warn('docker containers: $e');
+      } finally {
+        containerLoading.value = false;
       }
     }
 
-    getImage() async {
-      var res = await DsmApi.dockerImageInfo();
-      Log.info(res);
-      imageLoading.value = false;
-      if (res['success']) {
-        List result = res['data']['result'];
-        for (var item in result) {
-          if (item['success'] == true) {
-            switch (item['api']) {
-              case "SYNO.Docker.Image":
-                images.value = item['data']['images'];
-                images.value.sort((a, b) {
-                  return a['repository'].compareTo(b['repository']);
-                });
-                break;
-              case "SYNO.Docker.Registry":
-                registries.value = item['data']['registries'];
-                break;
-            }
+    Future<void> getImage() async {
+      try {
+        final result = await dsmDockerImageOverview();
+        Log.info(result);
+        for (final item in result) {
+          if (item is! Map || item['success'] != true) continue;
+          final data = item['data'];
+          if (data is! Map) continue;
+          switch (item['api']) {
+            case "SYNO.Docker.Image":
+              images.value = data['images'] ?? [];
+              images.value.sort((a, b) {
+                return a['repository'].compareTo(b['repository']);
+              });
+              break;
+            case "SYNO.Docker.Registry":
+              registries.value = data['registries'] ?? [];
+              break;
           }
         }
+      } catch (e) {
+        Log.warn('docker images: $e');
+      } finally {
+        imageLoading.value = false;
+      }
+    }
+
+    Future<void> sendPowerAction(container, String action,
+        {bool preserveProfile = false}) async {
+      powerLoading.value = {...powerLoading.value, container['id']: true};
+      try {
+        await dsmDockerContainerAction(container['name'], action,
+            preserveProfile: preserveProfile);
+        UiUtil.toast("请求发送成功");
+        await getContainer();
+      } catch (e) {
+        final code = e is DSMException ? e.code : -1;
+        UiUtil.toast("请求发送失败，代码：$code");
+      } finally {
+        powerLoading.value = {...powerLoading.value, container['id']: false};
       }
     }
 
@@ -110,33 +133,11 @@ class Docker extends HookWidget {
         );
 
         if (confirmed == true) {
-          powerLoading.value = {
-            ...powerLoading.value,
-            container['id']: true
-          };
-          var res = await DsmApi.dockerPower(container['name'], action,
+          await sendPowerAction(container, action,
               preserveProfile: preserveProfile);
-          if (res['success']) {
-            UiUtil.toast("请求发送成功");
-            getContainer();
-          } else {
-            UiUtil.toast("请求发送失败，代码：${res['error']['code']}");
-          }
-          powerLoading.value = {
-            ...powerLoading.value,
-            container['id']: false
-          };
         }
       } else {
-        powerLoading.value = {...powerLoading.value, container['id']: true};
-        var res = await DsmApi.dockerPower(container['name'], action);
-        if (res['success']) {
-          UiUtil.toast("请求发送成功");
-          getContainer();
-        } else {
-          UiUtil.toast("请求发送失败，代码：${res['error']['code']}");
-        }
-        powerLoading.value = {...powerLoading.value, container['id']: false};
+        await sendPowerAction(container, action);
       }
     }
 

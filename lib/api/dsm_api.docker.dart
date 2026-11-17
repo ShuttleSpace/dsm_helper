@@ -200,3 +200,161 @@ Future<Map> dsmDockerContainerResourceGet({CancelToken? cancelToken}) async {
   }
   return res['data'] ?? {};
 }
+
+/// 测试替身：非空时替代 Docker 模块的 POST，用于断言页面级复合请求的原始字段。
+@visibleForTesting
+Future<dynamic> Function(String endpoint, {Map<String, dynamic>? data})?
+    dsmDockerPostForTesting;
+
+Future<dynamic> _dsmDockerPost(String endpoint,
+    {required Map<String, dynamic> data, CancelToken? cancelToken}) async {
+  final override = dsmDockerPostForTesting;
+  if (override != null) return await override(endpoint, data: data);
+  return await _httpPost(endpoint, data: data, cancelToken: cancelToken);
+}
+
+/// 容器列表 + 资源 + 系统占用的一次性复合请求（页面总览用）。
+///
+/// 与旧 `DsmApi.dockerContainerInfo()` 的 compound 请求字段完全一致，
+/// 成功返回 `data.result` 列表，失败抛 [DSMException]。
+Future<List<dynamic>> dsmDockerContainerOverview(
+    {CancelToken? cancelToken}) async {
+  final compound = [
+    {
+      "api": "SYNO.Docker.Container",
+      "method": "list",
+      "version": 1,
+      "limit": -1,
+      "offset": 0,
+      "type": "all"
+    },
+    {"api": "SYNO.Docker.Container.Resource", "method": "get", "version": 1},
+    {"api": "SYNO.Core.System.Utilization", "method": "get", "version": 1},
+  ];
+  final res = await _dsmDockerPost(_entryCGI,
+      data: {
+        "api": 'SYNO.Entry.Request',
+        "method": 'request',
+        "mode": '"parallel"',
+        "compound": jsonEncode(compound),
+        "version": 1,
+        "_sid": connectionStore.sid.value,
+      },
+      cancelToken: cancelToken);
+  if (res is! Map || res['success'] != true) {
+    throw DSMException.fromMap(res is Map ? res : const {});
+  }
+  final data = res['data'];
+  final result = data is Map ? data['result'] : null;
+  return result is List ? result : <dynamic>[];
+}
+
+/// 镜像列表 + 注册表的一次性复合请求（页面镜像/注册表用）。
+Future<List<dynamic>> dsmDockerImageOverview({CancelToken? cancelToken}) async {
+  final compound = [
+    {
+      "api": "SYNO.Docker.Image",
+      "method": "list",
+      "version": 1,
+      "limit": -1,
+      "offset": 0,
+      "show_dsm": false
+    },
+    {
+      "api": "SYNO.Docker.Registry",
+      "method": "get",
+      "version": 1,
+      "limit": -1,
+      "offset": 0
+    }
+  ];
+  final res = await _dsmDockerPost(_entryCGI,
+      data: {
+        "api": 'SYNO.Entry.Request',
+        "method": 'request',
+        "mode": '"parallel"',
+        "compound": jsonEncode(compound),
+        "version": 1,
+        "_sid": connectionStore.sid.value,
+      },
+      cancelToken: cancelToken);
+  if (res is! Map || res['success'] != true) {
+    throw DSMException.fromMap(res is Map ? res : const {});
+  }
+  final data = res['data'];
+  final result = data is Map ? data['result'] : null;
+  return result is List ? result : <dynamic>[];
+}
+
+/// 容器电源/删除操作；保留旧层的 `signal=9` 与 `preserve_profile` 语义。
+Future<Map> dsmDockerContainerAction(String name, String action,
+    {bool? preserveProfile, CancelToken? cancelToken}) async {
+  final data = <String, dynamic>{
+    "api": 'SYNO.Docker.Container',
+    "method": action,
+    "name": '"$name"',
+    "version": 1,
+    "_sid": connectionStore.sid.value,
+  };
+  if (action == "signal") {
+    data['signal'] = 9;
+  }
+  if (action == "delete") {
+    data['preserve_profile'] = preserveProfile ?? '';
+  }
+  final res = await _dsmDockerPost(_entryCGI,
+      data: data, cancelToken: cancelToken);
+  if (res is! Map || res['success'] != true) {
+    throw DSMException.fromMap(res is Map ? res : const {});
+  }
+  return res['data'] is Map ? res['data'] as Map : <String, dynamic>{};
+}
+
+/// 容器详情/进程以外的扩展方法（`get`、`get_process` 等）。
+Future<Map> dsmDockerContainerDetail(String name, String method,
+    {CancelToken? cancelToken}) async {
+  final res = await _dsmDockerPost(_entryCGI,
+      data: {
+        "api": 'SYNO.Docker.Container',
+        "method": method,
+        "name": '"$name"',
+        "version": 1,
+        "_sid": connectionStore.sid.value,
+      },
+      cancelToken: cancelToken);
+  if (res is! Map || res['success'] != true) {
+    throw DSMException.fromMap(res is Map ? res : const {});
+  }
+  return res['data'] is Map ? res['data'] as Map : <String, dynamic>{};
+}
+
+/// 容器进程列表（SYNO.Docker.Container/get_process）。
+Future<Map> dsmDockerContainerProcesses(String name,
+    {CancelToken? cancelToken}) async {
+  return await dsmDockerContainerDetail(name, 'get_process',
+      cancelToken: cancelToken);
+}
+
+/// 容器日志：`method=get` 带日期/排序/分页，`get_date_list` 只取日期列表。
+Future<Map> dsmDockerContainerLog(String name, String method,
+    {String? date, CancelToken? cancelToken}) async {
+  final data = <String, dynamic>{
+    "api": 'SYNO.Docker.Container.Log',
+    "method": method,
+    "name": '"$name"',
+    "version": 1,
+    "_sid": connectionStore.sid.value,
+  };
+  if (method == "get") {
+    data['sort_dir'] = '"ASC"';
+    data['date'] = '"$date"';
+    data['limit'] = 1000;
+    data['offset'] = 0;
+  }
+  final res = await _dsmDockerPost(_entryCGI,
+      data: data, cancelToken: cancelToken);
+  if (res is! Map || res['success'] != true) {
+    throw DSMException.fromMap(res is Map ? res : const {});
+  }
+  return res['data'] is Map ? res['data'] as Map : <String, dynamic>{};
+}

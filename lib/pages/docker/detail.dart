@@ -1,5 +1,5 @@
+import 'package:garden/api/dsm_api.dart';
 import 'package:garden/util/ui_util.dart';
-import 'package:garden/util/http_util.dart';
 import 'package:garden/widgets/bubble_tab_indicator.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
@@ -46,52 +46,62 @@ class ContainerDetail extends HookWidget {
     final selectedDate = useSignal("");
     final processes = useSignal<List>([]);
 
-    getLog() async {
-      var log = await DsmApi.dockerLog(name, "get", date: selectedDate.value);
-      if (log['success']) {
-        logs.value = log['data']['logs'];
+    Future<void> getLog() async {
+      try {
+        final data = await dsmDockerContainerLog(name, "get",
+            date: selectedDate.value);
+        logs.value = data['logs'] ?? [];
+      } catch (e) {
+        // 旧层在日志失败时静默返回；保持行为不变。
       }
     }
 
-    getLogDates() async {
-      var res = await DsmApi.dockerLog(name, "get_date_list");
-      if (res['success']) {
-        logDates.value = res['data']['dates'];
+    Future<void> getLogDates() async {
+      try {
+        final data = await dsmDockerContainerLog(name, "get_date_list");
+        logDates.value = data['dates'] ?? [];
         if (logDates.value.isNotEmpty) {
           selectedDate.value = logDates.value[0];
         }
-
-        getLog();
+        await getLog();
+      } catch (e) {
+        // 同上，旧层静默失败。
       }
     }
 
-    getData() async {
-      var res = await DsmApi.dockerDetail(name, "get");
-      if (res['success']) {
-        loading.value = false;
-        ports.value = res['data']['profile']['port_bindings'];
-        networks.value = res['data']['profile']['network'];
-        volumes.value = res['data']['profile']['volume_bindings'];
-        envs.value = res['data']['profile']['env_variables'];
-        memory.value = res['data']['profile']['memory_limit'];
-        shortcut.value = res['data']['profile']['shortcut'];
-        cpuPriority.value = res['data']['profile']['cpu_priority'];
-        links.value = res['data']['profile']['links'];
-        memoryPercent.value =
-            (res['data']['details']['memoryPercent'] ?? 0) * 1.0;
-
-        upTime.value = res['data']['details']['up_time'] ?? 0;
-        status.value = res['data']['details']['status'];
-        cmd.value = res['data']['details']['exe_cmd'];
-
-        var process = await DsmApi.dockerDetail(name, "get_process");
-        if (process['success']) {
-          processes.value = process['data']['processes'];
-        }
-        getLogDates();
-      } else {
+    Future<void> getData() async {
+      late Map data;
+      try {
+        data = await dsmDockerContainerDetail(name, "get");
+      } catch (e) {
         UiUtil.toast("获取详情失败");
+        return;
       }
+
+      loading.value = false;
+      final profile = data['profile'] as Map? ?? const {};
+      final details = data['details'] as Map? ?? const {};
+      ports.value = profile['port_bindings'] ?? [];
+      networks.value = profile['network'] ?? [];
+      volumes.value = profile['volume_bindings'] ?? [];
+      envs.value = profile['env_variables'] ?? [];
+      memory.value = profile['memory_limit'] ?? 0;
+      shortcut.value = profile['shortcut'] ?? {};
+      cpuPriority.value = profile['cpu_priority'] ?? 0;
+      links.value = profile['links'] ?? [];
+      memoryPercent.value = (details['memoryPercent'] ?? 0) * 1.0;
+
+      upTime.value = details['up_time'] ?? 0;
+      status.value = details['status'] ?? '';
+      cmd.value = details['exe_cmd'] ?? '';
+
+      try {
+        final processData = await dsmDockerContainerProcesses(name);
+        processes.value = processData['processes'] ?? [];
+      } catch (e) {
+        // 进程列表失败不影响详情展示（旧层同样静默跳过）。
+      }
+      await getLogDates();
     }
 
     void onDateSelected(String date) {
