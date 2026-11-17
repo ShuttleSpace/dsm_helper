@@ -1,4 +1,4 @@
-import 'package:garden/util/http_util.dart';
+import 'package:garden/api/dsm_api.dart';
 import 'package:garden/util/ui_util.dart';
 import 'package:garden/widgets/label.dart';
 import 'package:garden/widgets/neu_back_button.dart';
@@ -18,16 +18,19 @@ class TaskRecord extends HookWidget {
     final loading = useSignal(true);
 
     getData() async {
-      var res = await DsmApi.taskRecord(id);
-      if (res['success']) {
-        loading.value = false;
-        records.value = res['data'];
-      } else {
+      try {
+        final data = await dsmCoreTaskRecordForPage(id);
+        records.value = data['records'] is List
+            ? List<dynamic>.from(data['records'] as List)
+            : [];
+      } catch (e) {
         UiUtil.toast("加载失败");
         if (context.mounted) {
           // ignore: use_build_context_synchronously
           Navigator.of(context).pop();
         }
+      } finally {
+        loading.value = false;
       }
     }
 

@@ -336,3 +336,66 @@ Future<void> dsmFileStationRenameForPage(String path, String name,
       },
       cancelToken: cancelToken));
 }
+
+/// 测试替身：非空时替代上传请求。
+@visibleForTesting
+Future<dynamic> Function(String endpoint,
+    {Map<String, dynamic>? queryParameters,
+    Map<String, dynamic>? data,
+    CancelToken? cancelToken,
+    Function(int, int)? onSendProgress})? dsmFileStationUploadPageForTesting;
+
+/// 备份上传（旧 DsmApi.upload 的 multipart 语义，含 size/mtime 与进度回调）。
+Future<Map<String, dynamic>> dsmFileStationUploadForPage(
+    String uploadPath,
+    String filePath,
+    CancelToken? cancelToken,
+    Function(int, int) onSendProgress) async {
+  final file = File(filePath);
+  final multipartFile = MultipartFile.fromFileSync(filePath,
+      filename: filePath.split("/").last);
+  final minVersion = availableApis
+      .where((e) => e.name == 'SYNO.FileStation.Upload')
+      .map((e) => (e.minVersion ?? 1).toInt())
+      .fold<int>(1, (a, b) => a < b ? a : b);
+  final params = {
+    "api": "SYNO.FileStation.Upload",
+    "method": "upload",
+    "version": minVersion < 3 ? minVersion : 3,
+  };
+  final data = {
+    "path": uploadPath,
+    "create_parents": true,
+    "size": file.lengthSync(),
+    "mtime": file.lastModifiedSync().millisecondsSinceEpoch,
+    "overwrite": false,
+    "file": multipartFile,
+  };
+  final override = dsmFileStationUploadPageForTesting;
+  final res = override != null
+      ? await override(_entryCGI,
+          queryParameters: params,
+          data: data,
+          cancelToken: cancelToken,
+          onSendProgress: onSendProgress)
+      : await _httpUpload(_entryCGI,
+          queryParameters: params,
+          data: data,
+          cancelToken: cancelToken,
+          onSendProgress: onSendProgress);
+  return _fsPageData(res);
+}
+
+/// 取消收藏。
+Future<void> dsmFileStationFavoriteDeleteForPage(String path,
+    {CancelToken? cancelToken}) async {
+  _fsPageData(await _dsmFsPost(_entryCGI,
+      data: {
+        "api": '"SYNO.FileStation.Favorite"',
+        "method": '"delete"',
+        "version": 2,
+        "_sid": connectionStore.sid.value,
+        "path": path,
+      },
+      cancelToken: cancelToken));
+}

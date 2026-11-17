@@ -1,5 +1,4 @@
-import 'package:garden/util/http_util.dart';
-import 'package:garden/util/log.dart';
+import 'package:garden/api/dsm_api.dart';
 import 'package:garden/util/ui_util.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
@@ -20,13 +19,14 @@ class LogSetting extends HookWidget {
     final loading = useSignal(true);
 
     getData(VoidCallback? callback) async {
-      var res = await DsmApi.fileServiceLog(protocol);
-      if (res['success']) {
-        setting.value = res['data'];
-        loading.value = false;
-      } else {
-        UiUtil.toast("获取失败，code：${res['error']['code']}");
+      try {
+        setting.value = await dsmCoreFileServiceLogForPage(protocol);
+      } catch (e) {
+        final code = e is DSMException ? e.code : -1;
+        UiUtil.toast("获取失败，code：$code");
         callback?.call();
+      } finally {
+        loading.value = false;
       }
     }
 
@@ -267,18 +267,18 @@ class LogSetting extends HookWidget {
                   padding: const EdgeInsets.all(20),
                   child: OutlinedButton(
                     onPressed: () async {
-                      var res = await DsmApi.fileServiceLogSave(
-                          protocol, setting.value);
-                      Log.info("fileServiceLogSave res: $res");
-                      if (res['success']) {
+                      try {
+                        await dsmCoreFileServiceLogSaveForPage(
+                            protocol, setting.value);
                         UiUtil.vibrate(FeedbackType.light);
                         UiUtil.toast("应用成功");
                         if (context.mounted) {
                           Navigator.of(context).pop();
                         }
-                      } else {
+                      } catch (e) {
+                        final code = e is DSMException ? e.code : -1;
                         UiUtil.vibrate(FeedbackType.warning);
-                        UiUtil.toast("应用失败，code:${res['error']['code']}");
+                        UiUtil.toast("应用失败，代码$code");
                       }
                     },
                     child: const Text(

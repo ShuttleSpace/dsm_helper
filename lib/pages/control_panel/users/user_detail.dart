@@ -1,4 +1,6 @@
-import 'package:garden/util/http_util.dart';
+import 'package:garden/api/dsm_api.dart';
+import 'package:garden/extensions/datetime.dart';
+import 'package:garden/extensions/string.dart';
 import 'package:garden/util/log.dart';
 import 'package:garden/util/ui_util.dart';
 import 'package:garden/widgets/bubble_tab_indicator.dart';
@@ -42,21 +44,28 @@ class UserDetail extends HookWidget {
     final saving = useSignal(false);
 
     getGroup() async {
-      var res = await DsmApi.userGroup(userInfo.value?['name']);
-      if (res['success']) {
-        groups.value = res['data']['groups'];
+      try {
+        final data =
+            await dsmCoreUserGroupsForUserForPage(userInfo.value?['name'] ?? '');
+        groups.value = data['groups'] ?? [];
         originGroups.value = groups.value
             .where((group) => group['is_member'])
             .map((e) => e['name'])
             .toList();
+      } catch (e) {
+        // 旧层失败时保持空列表。
       }
     }
 
     getData() async {
       getGroup();
-      var res = await DsmApi.userDetail(userInfo.value?['name']);
-      if (res['success']) {
-        List result = res['data']['result'];
+      late Map<String, dynamic> data;
+      try {
+        data = await dsmCoreUserDetailForPage(userInfo.value?['name'] ?? '');
+      } catch (e) {
+        return;
+      }
+      List result = data['result'] ?? [];
         for (var item in result) {
           if (item['success'] == true) {
             switch (item['api']) {
@@ -85,7 +94,6 @@ class UserDetail extends HookWidget {
             }
           }
         }
-      }
     }
 
     Widget buildVolumeItem(volume) {
@@ -577,15 +585,17 @@ class UserDetail extends HookWidget {
 
                   saving.value = true;
 
-                  var res = await DsmApi.userSave(
-                      userInfo.value ?? {}, addGroup, removeGroup);
-                  saving.value = false;
-                  if (res['success']) {
+                  try {
+                    await dsmCoreUserSaveForPage(
+                        userInfo.value ?? {}, addGroup, removeGroup);
                     user['name'] = userInfo.value?['new_name'];
                     user['email'] = userInfo.value?['email'];
                     UiUtil.toast("保存成功");
-                  } else {
-                    UiUtil.toast("保存失败,代码${res['error']['code']}");
+                  } catch (e) {
+                    final code = e is DSMException ? e.code : -1;
+                    UiUtil.toast("保存失败,代码$code");
+                  } finally {
+                    saving.value = false;
                   }
                 },
                 child: saving.value

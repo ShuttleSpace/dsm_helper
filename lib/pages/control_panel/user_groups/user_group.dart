@@ -1,4 +1,4 @@
-import 'package:garden/util/http_util.dart';
+import 'package:garden/api/dsm_api.dart';
 import 'package:garden/util/ui_util.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
@@ -16,16 +16,17 @@ class UserGroups extends HookWidget {
     final loading = useSignal(true);
 
     getData() async {
-      var res = await DsmApi.userGroups();
-      if (res['success']) {
-        loading.value = false;
-        groups.value = res['data']['groups'];
-      } else {
+      try {
+        final data = await dsmCoreUserGroupsForPage();
+        groups.value = data['groups'] ?? [];
+      } catch (e) {
         UiUtil.toast("加载失败");
         if (context.mounted) {
           // ignore: use_build_context_synchronously
           Navigator.of(context).pop();
         }
+      } finally {
+        loading.value = false;
       }
     }
 

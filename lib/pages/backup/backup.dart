@@ -9,7 +9,10 @@ import 'dart:ui';
 
 import 'package:cool_ui/cool_ui.dart';
 import 'package:garden/pages/common/select_ablum.dart';
-import 'package:garden/util/http_util.dart';
+import 'package:garden/api/dsm_api.dart';
+import 'package:garden/extensions/datetime.dart';
+import 'package:garden/extensions/string.dart';
+import 'package:garden/util/file_types.dart';
 import 'package:garden/widgets/file_icon.dart';
 import 'package:garden/widgets/label.dart';
 import 'package:garden/widgets/neu_back_button.dart';
@@ -214,16 +217,20 @@ void onStartBackup() async {
     //上传文件
     uploading.value?.status = UploadStatus.running;
     uploading.notifyListeners();
-    var res = await DsmApi.upload(
-        backupFolder.value, uploading.value!.file!.path,
-        uploading.value!.cancelToken, (progress, total) {
-      // print("$progress,$total");
-      uploading.value!.uploadSize = progress;
-      uploading.value!.fileSize = total;
+    try {
+      await dsmFileStationUploadForPage(
+          backupFolder.value, uploading.value!.file!.path,
+          uploading.value!.cancelToken, (progress, total) {
+        uploading.value!.uploadSize = progress;
+        uploading.value!.fileSize = total;
+        uploading.notifyListeners();
+      });
+    } catch (e) {
+      uploading.value?.status = UploadStatus.failed;
       uploading.notifyListeners();
-    });
-    if (res['success']) {
-      if (Platform.isIOS) {
+      continue;
+    }
+    if (Platform.isIOS) {
         // 仅在iOS删除源文件（iOS非真实源文件）
         uploading.value!.file!.deleteSync();
       }
@@ -231,12 +238,8 @@ void onStartBackup() async {
       StorageUtil.setString("last_backup_time",
           uploading.value!.modifyTime!.millisecondsSinceEpoch.toString());
       lastBackupTime.value = uploading.value!.modifyTime;
-      uploading.value!.status = UploadStatus.complete;
-      uploading.notifyListeners();
-    } else {
-      uploading.value!.status = UploadStatus.failed;
-      uploading.notifyListeners();
-    }
+    uploading.value!.status = UploadStatus.complete;
+    uploading.notifyListeners();
     if (i == tasks.length - 1) {
       UiUtil.toast("备份已完成");
       UiUtil.vibrate(FeedbackType.light);

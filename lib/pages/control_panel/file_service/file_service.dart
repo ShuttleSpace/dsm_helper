@@ -2,7 +2,7 @@ import 'package:garden/pages/control_panel/file_service/log_setting.dart';
 import 'package:garden/util/log.dart';
 import 'package:garden/util/ui_util.dart';
 import 'package:garden/pages/log_center/log_center.dart';
-import 'package:garden/util/http_util.dart';
+import 'package:garden/api/dsm_api.dart';
 import 'package:garden/widgets/neu_picker.dart';
 import 'package:garden/widgets/bubble_tab_indicator.dart';
 import 'package:garden/widgets/neu_back_button.dart';
@@ -45,17 +45,22 @@ class FileService extends HookWidget {
     final saving = useSignal(false);
 
     getData(Function onFailure) async {
-      var res = await DsmApi.fileService();
-      Log.log("FileService: $res");
-      if (res['success']) {
+      late Map<String, dynamic> data;
+      try {
+        data = await dsmCoreFileServiceForPage();
+      } catch (e) {
         loading.value = false;
-        if (res['data']['has_fail']) {
-          UiUtil.toast("加载失败");
-
-          onFailure();
-          return;
-        }
-        List result = res['data']['result'];
+        onFailure();
+        return;
+      }
+      Log.log("FileService: $data");
+      loading.value = false;
+      if (data['has_fail'] == true) {
+        UiUtil.toast("加载失败");
+        onFailure();
+        return;
+      }
+      List result = data['result'] ?? [];
         for (var item in result) {
           if (item['success'] == true) {
             switch (item['api']) {
@@ -109,7 +114,6 @@ class FileService extends HookWidget {
             }
           }
         }
-      }
     }
 
     useEffect(() {
@@ -1019,18 +1023,18 @@ class FileService extends HookWidget {
                           return;
                         }
                         saving.value = true;
-
-                        var res = await DsmApi.fileServiceSave(smb.value,
-                            syslogClient.value, afp.value, nfs.value,
-                            ftp.value, sftp.value);
-
-                        if (res['success']) {
-                          saving.value = false;
-
+                        try {
+                          await dsmCoreFileServiceSaveForPage(
+                              smb.value, syslogClient.value, afp.value,
+                              nfs.value, ftp.value, sftp.value);
                           UiUtil.toast("保存成功");
                           getData(() {
                             Navigator.of(context).pop();
                           });
+                        } catch (e) {
+                          UiUtil.toast("保存失败");
+                        } finally {
+                          saving.value = false;
                         }
                       },
                       child: saving.value

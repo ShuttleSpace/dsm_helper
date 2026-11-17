@@ -50,15 +50,15 @@ class HelperSetting extends HookWidget {
     };
 
     getData() async {
-      var res = await DsmApi.terminalInfo();
-      if (res['success']) {
-        ssh.value = res['data']['enable_ssh'];
-        telnet.value = res['data']['enable_telnet'];
-        sshPort.value = res['data']['ssh_port'].toString();
-        sshLoading.value = false;
-      } else {
-        sshLoading.value = false;
+      try {
+        final data = await dsmCoreTerminalInfoForPage();
+        ssh.value = data['enable_ssh'] ?? false;
+        telnet.value = data['enable_telnet'] ?? false;
+        sshPort.value = (data['ssh_port'] ?? '').toString();
+      } catch (e) {
         ssh.value = false;
+      } finally {
+        sshLoading.value = false;
       }
     }
 
@@ -115,7 +115,7 @@ class HelperSetting extends HookWidget {
                   OutlinedButton(
                     onPressed: () async {
                       // 确认弹窗简化
-                      await DsmApi.power("shutdown", false);
+                      await dsmCoreSystemPowerForPage("shutdown", false).catchError((_) => <String, dynamic>{});
                     },
                     child: const Text("关机", style: TextStyle(color: Colors.redAccent)),
                   ),
@@ -135,7 +135,7 @@ class HelperSetting extends HookWidget {
                   const Spacer(),
                   OutlinedButton(
                     onPressed: () async {
-                      await DsmApi.power("reboot", false);
+                      await dsmCoreSystemPowerForPage("reboot", false).catchError((_) => <String, dynamic>{});
                     },
                     child: const Text("重启", style: TextStyle(color: Colors.redAccent)),
                   ),
@@ -159,10 +159,12 @@ class HelperSetting extends HookWidget {
                           value: ssh.value,
                           onChanged: (v) async {
                             sshLoading.value = true;
-                            var res = await DsmApi.setTerminal(
-                                v, telnet.value, sshPort.value);
-                            if (!res['success']) {
-                              UiUtil.toast("操作失败，代码：${res['error']['code']}");
+                            try {
+                              await dsmCoreTerminalSetForPage(
+                                  v, telnet.value, sshPort.value);
+                            } catch (e) {
+                              final code = e is DSMException ? e.code : -1;
+                              UiUtil.toast("操作失败，代码：$code");
                             }
                             await getData();
                           },

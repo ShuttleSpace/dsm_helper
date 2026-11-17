@@ -2,7 +2,8 @@ import 'dart:math';
 import 'package:garden/util/log.dart';
 import 'package:garden/util/ui_util.dart';
 
-import 'package:garden/util/http_util.dart';
+import 'package:garden/extensions/int.dart';
+import 'package:garden/api/dsm_api.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -52,54 +53,58 @@ class AddSharedFolders extends HookWidget {
 
     getFolderDetail(String folderName) async {
       loading.value = true;
-      var res = await DsmApi.shareDetail(folderName);
-      if (res['success']) {
-        var folder = res['data'];
-        nameController.text = name.value = oldName.value = folder['name'];
-        descController.text = desc.value = folder['desc'];
-        hidden.value = folder['hidden'];
-        hideUnreadable.value = folder['hide_unreadable'];
-        recycleBin.value = folder['enable_recycle_bin'];
-        recycleBinAdminOnly.value = folder['recycle_bin_admin_only'];
-        encryption.value = folder['encryption'] == 1;
-        if (folder['quota_value'] > 0) {
-          enableShareQuota.value = true;
-          if (folder['quota_value'] < 1024) {
-            selectedUnitIndex.value = 2;
-            shareQuota.value = "${folder['quota_value']}";
-          } else if (folder['quota_value'] < 1024 * 1024) {
-            selectedUnitIndex.value = 1;
-            shareQuota.value = "${folder['quota_value'] ~/ 1024}";
-          } else {
-            selectedUnitIndex.value = 0;
-            shareQuota.value = "${folder['quota_value'] ~/ (1024 * 1024)}";
-          }
-          unitController.value =
-              TextEditingValue(text: units[selectedUnitIndex.value]);
-          shareQuotaController.text = shareQuota.value;
-        }
-        enableShareCow.value = folder['enable_share_cow'];
-        enableShareCompress.value = folder['enable_share_compress'];
-        shareQuotaUsed.value = folder['share_quota_used'];
-        for (var i = 0; i < volumes.length; i++) {
-          if (volumes[i]['volume_path'] == folder['vol_path']) {
-            selectedVolumeIndex.value = i;
-            volumeController.value = TextEditingValue(
-                text:
-                    "${volumes[selectedVolumeIndex.value]['display_name']}(可用容量：${int.parse(volumes[selectedVolumeIndex.value]['size_free_byte']).formatSize()}) - ${volumes[selectedVolumeIndex.value]['fs_type']}");
-            break;
-          }
-        }
-        loading.value = false;
-      } else {
-        if (res['error']['code'] == 402) {
+      late Map<String, dynamic> folder;
+      try {
+        folder = await dsmCoreShareDetailForPage(folderName);
+      } catch (e) {
+        final code = e is DSMException ? e.code : -1;
+        if (code == 402) {
           UiUtil.toast("此共享文件夹不存在");
         } else {
-          UiUtil.toast("加载失败，code: ${res['error']['code']}");
+          UiUtil.toast("加载失败，code: $code");
         }
         if (context.mounted) {
           // ignore: use_build_context_synchronously
           Navigator.of(context).pop();
+        }
+        return;
+      } finally {
+        loading.value = false;
+      }
+      nameController.text = name.value = oldName.value = folder['name'] ?? '';
+      descController.text = desc.value = folder['desc'] ?? '';
+      hidden.value = folder['hidden'] ?? false;
+      hideUnreadable.value = folder['hide_unreadable'] ?? false;
+      recycleBin.value = folder['enable_recycle_bin'] ?? false;
+      recycleBinAdminOnly.value = folder['recycle_bin_admin_only'] ?? false;
+      encryption.value = folder['encryption'] == 1;
+      if ((folder['quota_value'] ?? 0) > 0) {
+        enableShareQuota.value = true;
+        final quota = folder['quota_value'] as int;
+        if (quota < 1024) {
+          selectedUnitIndex.value = 2;
+          shareQuota.value = "$quota";
+        } else if (quota < 1024 * 1024) {
+          selectedUnitIndex.value = 1;
+          shareQuota.value = "${quota ~/ 1024}";
+        } else {
+          selectedUnitIndex.value = 0;
+          shareQuota.value = "${quota ~/ (1024 * 1024)}";
+        }
+        unitController.value =
+            TextEditingValue(text: units[selectedUnitIndex.value]);
+        shareQuotaController.text = shareQuota.value;
+      }
+      enableShareCow.value = folder['enable_share_cow'] ?? false;
+      enableShareCompress.value = folder['enable_share_compress'] ?? false;
+      shareQuotaUsed.value = folder['share_quota_used'] ?? 0;
+      for (var i = 0; i < volumes.length; i++) {
+        if (volumes[i]['volume_path'] == folder['vol_path']) {
+          selectedVolumeIndex.value = i;
+          volumeController.value = TextEditingValue(
+              text:
+                  "${volumes[selectedVolumeIndex.value]['display_name']}(可用容量：${int.parse(volumes[selectedVolumeIndex.value]['size_free_byte']).formatSize()}) - ${volumes[selectedVolumeIndex.value]['fs_type']}");
+          break;
         }
       }
     }
@@ -135,26 +140,31 @@ class AddSharedFolders extends HookWidget {
         }
       }
       creating.value = true;
-      var res = await DsmApi.addSharedFolder(
-        name.value,
-        volumes[1]['volume_path'],
-        desc.value,
-        oldName: oldName.value,
-        encryption: encryption.value,
-        password: password.value,
-        recycleBin: recycleBin.value,
-        recycleBinAdminOnly: recycleBinAdminOnly.value,
-        hidden: hidden.value,
-        hideUnreadable: hideUnreadable.value,
-        enableShareCow: enableShareCow.value,
-        enableShareQuota: enableShareQuota.value,
-        enableShareCompress: enableShareCompress.value,
-        shareQuota: shareQuota.value,
-        method: folder != null ? 'set' : 'create',
-      );
+      try {
+        await dsmCoreShareAddForPage(
+          name.value,
+          volumes[1]['volume_path'],
+          desc.value,
+          oldName: oldName.value,
+          encryption: encryption.value,
+          password: password.value,
+          recycleBin: recycleBin.value,
+          recycleBinAdminOnly: recycleBinAdminOnly.value,
+          hidden: hidden.value,
+          hideUnreadable: hideUnreadable.value,
+          enableShareCow: enableShareCow.value,
+          enableShareQuota: enableShareQuota.value,
+          enableShareCompress: enableShareCompress.value,
+          shareQuota: shareQuota.value,
+          method: folder != null ? 'set' : 'create',
+        );
+      } catch (e) {
+        creating.value = false;
+        UiUtil.toast("${folder != null ? '修改' : '新增'}共享文件夹失败");
+        return;
+      }
       creating.value = false;
-      Log.info(res);
-      if (res['success']) {
+      {
         UiUtil.toast("${folder != null ? '修改' : '新增'}共享文件夹成功");
         if (context.mounted) {
           // ignore: use_build_context_synchronously

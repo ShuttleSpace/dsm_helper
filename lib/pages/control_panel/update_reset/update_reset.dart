@@ -1,5 +1,5 @@
 import 'package:garden/pages/common/browser.dart';
-import 'package:garden/util/http_util.dart';
+import 'package:garden/api/dsm_api.dart';
 import 'package:garden/util/log.dart';
 import 'package:garden/widgets/bubble_tab_indicator.dart';
 import 'package:garden/widgets/neu_back_button.dart';
@@ -27,20 +27,25 @@ class UpdateReset extends HookWidget {
     final checking = useSignal(true);
 
     getData() async {
-      var res = await DsmApi.firmwareVersion();
-      if (res['success']) {
-        firmwareVer.value = res['data']['firmware_ver'];
-        model.value = res['data']['model'];
+      try {
+        final data = await dsmCoreFirmwareVersionForPage();
+        firmwareVer.value = data['firmware_ver'] ?? '';
+        model.value = data['model'] ?? '';
+      } catch (e) {
+        // 旧层失败时保持默认值。
       }
     }
 
     checkUpdate() async {
-      var res = await DsmApi.firmwareUpgrade();
-      checking.value = false;
-      Log.info("check update: $res");
-      if (res['success']) {
-        update.value = res['data']['update'];
-      } else {}
+      try {
+        final data = await dsmCoreFirmwareUpgradeForPage();
+        Log.info("check update: $data");
+        update.value = data['update'] as Map?;
+      } catch (e) {
+        // 旧层失败时保持空。
+      } finally {
+        checking.value = false;
+      }
     }
 
     useEffect(() {

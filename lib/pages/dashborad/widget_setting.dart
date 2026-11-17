@@ -2,7 +2,7 @@ import 'package:garden/stores/settings_store.dart';
 import 'package:garden/util/log.dart';
 import 'package:garden/util/ui_util.dart';
 import 'package:garden/util/storage_util.dart';
-import 'package:garden/util/http_util.dart';
+import 'package:garden/api/dsm_api.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -77,15 +77,16 @@ class WidgetSetting extends HookWidget {
                   "SYNO.SDS._Widget.Instance": {"modulelist": saveWidgets},
                   // "restoreSizePos": widget.restoreSizePos
                 };
-                var res = await DsmApi.userSetting(data);
-                if (res['success']) {
+                try {
+                  await dsmCoreUserSettingsApplyForPage(data);
                   UiUtil.toast("保存小组件成功");
                   if (context.mounted) {
                     // ignore: use_build_context_synchronously
                     Navigator.of(context).pop();
                   }
-                } else {
-                  UiUtil.toast("保存小组件失败，代码${res['error']['code']}");
+                } catch (e) {
+                  final code = e is DSMException ? e.code : -1;
+                  UiUtil.toast("保存小组件失败，代码$code");
                 }
               },
               child: Image.asset(

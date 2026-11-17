@@ -337,17 +337,17 @@ class Favorite extends HookWidget {
                                                                     Navigator.of(
                                                                             context)
                                                                         .pop();
-                                                                    var res = await DsmApi
-                                                                        .favoriteDelete(
-                                                                            favorite['path']);
-                                                                    if (res[
-                                                                        'success']) {
+                                                                    try {
+                                                                      await dsmFileStationFavoriteDeleteForPage(
+                                                                          favorite['path']);
                                                                       UiUtil.vibrate(
                                                                           FeedbackType
                                                                               .light);
                                                                       UiUtil.toast(
                                                                           "取消收藏成功");
                                                                       getData();
+                                                                    } catch (e) {
+                                                                      UiUtil.toast("取消收藏失败");
                                                                     }
                                                                   },
                                                                   child:

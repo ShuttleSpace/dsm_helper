@@ -346,32 +346,18 @@ class SelectFolder extends HookWidget {
                                                                 .value
                                                                 .join("/")
                                                                 .substring(1);
-                                                            var res = await DsmApi
-                                                                .createFolder(
-                                                                    path, name);
-                                                            if (res[
-                                                                'success']) {
-                                                              UiUtil.toast(
-                                                                  "文件夹创建成功");
+                                                            try {
+                                                              await dsmFileStationCreateFolderForPage(
+                                                                  path, name);
+                                                              UiUtil.toast("文件夹创建成功");
                                                               refresh();
-                                                            } else {
-                                                              if (res['error'][
-                                                                          'errors'] !=
-                                                                      null &&
-                                                                  res['error']['errors']
-                                                                          .length >
-                                                                      0 &&
-                                                                  res['error']['errors']
-                                                                              [
-                                                                              0]
-                                                                          [
-                                                                          'code'] ==
-                                                                      414) {
-                                                                UiUtil.toast(
-                                                                    "文件夹创建失败：指定的名称已存在");
+                                                            } catch (e) {
+                                                              final raw = e is DSMException ? e.rawError : null;
+                                                              final errors = raw?['errors'] as List?;
+                                                              if (errors != null && errors.isNotEmpty && errors[0]['code'] == 414) {
+                                                                UiUtil.toast("文件夹创建失败：指定的名称已存在");
                                                               } else {
-                                                                UiUtil.toast(
-                                                                    "文件夹创建失败");
+                                                                UiUtil.toast("文件夹创建失败");
                                                               }
                                                             }
                                                           },

@@ -11,7 +11,8 @@ import 'package:garden/pages/terminal/select_server.dart';
 import 'package:garden/pages/user/setting.dart';
 import 'package:garden/stores/connection_store.dart';
 import 'package:garden/stores/settings_store.dart';
-import 'package:garden/util/http_util.dart';
+import 'package:garden/api/dsm_api.dart';
+import 'package:garden/extensions/string.dart';
 import 'package:garden/util/log.dart';
 import 'package:garden/util/storage_util.dart';
 import 'package:garden/util/ui_util.dart';
@@ -122,24 +123,26 @@ class Setting extends HookWidget {
     }
 
     getData() async {
-      var res = await DsmApi.terminalInfo();
-      if (res['success']) {
-        ssh.value = res['data']['enable_ssh'];
-        telnet.value = res['data']['enable_telnet'];
-        sshPort.value = res['data']['ssh_port'].toString();
-        sshLoading.value = false;
-      } else {
-        sshLoading.value = false;
+      try {
+        final data = await dsmCoreTerminalInfoForPage();
+        ssh.value = data['enable_ssh'] ?? false;
+        telnet.value = data['enable_telnet'] ?? false;
+        sshPort.value = (data['ssh_port'] ?? '').toString();
+      } catch (e) {
         ssh.value = false;
+      } finally {
+        sshLoading.value = false;
       }
     }
 
     getNormalUser() async {
-      var res = await DsmApi.normalUser("get");
-      if (res['success']) {
-        otpEnable.value = res['data']['OTP_enable'];
-        otpEnforced.value = res['data']['OTP_enforced'];
-        email.value = res['data']['email'];
+      try {
+        final data = await dsmCoreNormalUser('get');
+        otpEnable.value = data['OTP_enable'] ?? false;
+        otpEnforced.value = data['OTP_enforced'] ?? false;
+        email.value = data['email'] ?? '';
+      } catch (e) {
+        // 旧层失败时保持默认值。
       }
     }
 
@@ -150,7 +153,16 @@ class Setting extends HookWidget {
         rebooting.value = true;
       }
 
-      var res = await DsmApi.power(type, force);
+      Map<String, dynamic>? errorData;
+      try {
+        await dsmCoreSystemPowerForPage(type, force);
+        UiUtil.toast("已发送指令");
+      } on DSMException catch (e) {
+        errorData = e.rawError;
+        if (e.code != 117) {
+          UiUtil.toast("操作失败，代码：${e.code}");
+        }
+      } catch (_) {}
 
       if (type == "shutdown") {
         shutdowning.value = false;
@@ -158,10 +170,11 @@ class Setting extends HookWidget {
         rebooting.value = false;
       }
 
-      if (res['success']) {
-        UiUtil.toast("已发送指令");
-      } else if (res['error']['code'] == 117) {
-        List errors = res['error']['errors']['runningTasks'];
+      if (errorData != null && errorData['code'] == 117) {
+        final rawErrors = errorData['errors'];
+        List errors = rawErrors is Map
+            ? (rawErrors['runningTasks'] as List? ?? [])
+            : [];
         List msgs = [];
         for (int i = 0; i < errors.length; i++) {
           List titles = errors[i].split(":");
@@ -249,8 +262,6 @@ class Setting extends HookWidget {
             );
           }
         }
-      } else {
-        UiUtil.toast("操作失败，code:${res['error']['code']}");
       }
     }
 

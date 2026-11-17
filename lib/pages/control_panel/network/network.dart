@@ -1,4 +1,4 @@
-import 'package:garden/util/http_util.dart';
+import 'package:garden/api/dsm_api.dart';
 import 'package:garden/util/log.dart';
 import 'package:garden/widgets/bubble_tab_indicator.dart';
 import 'package:garden/widgets/expansion_container.dart';
@@ -35,10 +35,16 @@ class Network extends HookWidget {
     final loading = useSignal(true);
 
     getData() async {
-      var res = await DsmApi.networkStatus();
-      if (res['success']) {
+      late Map<String, dynamic> data;
+      try {
+        data = await dsmCoreNetworkStatusForPage();
+      } catch (e) {
         loading.value = false;
-        List result = res['data']['result'];
+        return;
+      }
+      {
+        loading.value = false;
+        List result = data['result'] ?? [];
         for (var item in result) {
           if (item['success'] == true) {
             switch (item['api']) {
