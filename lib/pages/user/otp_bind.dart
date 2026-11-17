@@ -2,7 +2,8 @@ import 'dart:convert';
 import 'package:garden/util/ui_util.dart';
 import 'package:garden/stores/connection_store.dart';
 
-import 'package:garden/util/http_util.dart';
+import 'package:garden/api/dsm_api.dart';
+import 'package:garden/extensions/string.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -11,6 +12,8 @@ import 'package:garden/theme/app_colors.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:signals_hooks/signals_hooks.dart';
+
+String _errorCode(Object e) => e is DSMException ? '${e.code}' : '-1';
 
 class OtpBind extends HookWidget {
   final String username;
@@ -68,23 +71,26 @@ class OtpBind extends HookWidget {
                   return;
                 }
                 emailSaving.value = true;
-                var res = await DsmApi.saveMail(email.value);
-
-                if (res['success']) {
-                  var qrcode = await DsmApi.getQrCode(
-                      "$username@${connectionStore.hostname}");
-                  if (qrcode['success']) {
-                    qrData.value =
-                        const Base64Decoder().convert(qrcode['data']['img']);
-                    key.value = qrcode['data']['key'];
-                    step.value = 1;
-                  } else {
-                    UiUtil.toast("获取二部验证数据出错，代码${res['error']['code']}");
-                  }
-                } else {
-                  UiUtil.toast("保存邮箱出错，代码${res['error']['code']}");
+                try {
+                  await dsmCoreOTPSaveMail(mail: email.value);
+                } catch (e) {
+                  UiUtil.toast("保存邮箱出错，代码${_errorCode(e)}");
+                  emailSaving.value = false;
+                  return;
                 }
-                emailSaving.value = false;
+
+                try {
+                  final qrcode = await dsmCoreOTPGetQrcode(
+                      account: "$username@${connectionStore.hostname}");
+                  qrData.value =
+                      const Base64Decoder().convert(qrcode['img'] as String);
+                  key.value = qrcode['key'];
+                  step.value = 1;
+                } catch (e) {
+                  UiUtil.toast("获取二部验证数据出错，代码${_errorCode(e)}");
+                } finally {
+                  emailSaving.value = false;
+                }
               },
               child: emailSaving.value
                   ? const CupertinoActivityIndicator(
@@ -208,14 +214,14 @@ class OtpBind extends HookWidget {
                   return;
                 }
                 codeChecking.value = true;
-                var res = await DsmApi.authOtpCode(code.value);
-
-                if (res['success']) {
+                try {
+                  await dsmCoreOTPAuthTmpCode(code: code.value);
                   step.value = 2;
-                } else {
-                  UiUtil.toast("保存邮箱出错，代码${res['error']['code']}");
+                } catch (e) {
+                  UiUtil.toast("保存邮箱出错，代码${_errorCode(e)}");
+                } finally {
+                  emailSaving.value = false;
                 }
-                emailSaving.value = false;
               },
               child: codeChecking.value
                   ? const CupertinoActivityIndicator(

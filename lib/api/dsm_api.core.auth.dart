@@ -356,3 +356,35 @@ Future<Map> dsmCoreMyDSCenter({CancelToken? cancelToken}) async {
   }
   return res['data'] ?? {};
 }
+
+/// QuickConnect 中国节点的 request_tunnel（旧 `DsmApi.quickConnectCn` 等价实现）。
+///
+/// 该接口不走 DSM entry.cgi，且响应以 `errno` 表示成功，不带 `success` 字段，
+/// 因此不能套用 [dsmAuthControlHostRequestTunnel] 的 DSMException 约定。
+Future<Map> dsmAuthQuickConnectCnRequestTunnel(String quickConnectID,
+    {String baseUrl = 'cnc.quickconnect.cn', CancelToken? cancelToken}) async {
+  Log.info("connectCN:$baseUrl");
+  final dio = Dio(BaseOptions(
+    baseUrl: "https://$baseUrl/",
+    contentType: "text/plain",
+  ));
+  final payload =
+      '''{"version":1,"command":"request_tunnel","serverID":"$quickConnectID","id":"dsm","location":"cn","platform":"Android 11"}''';
+  try {
+    final response = await dio.post('Serv.php',
+        data: payload, cancelToken: cancelToken);
+    final body = response.data;
+    if (body is String) {
+      final decoded = jsonDecode(body);
+      return decoded is Map ? decoded : <String, dynamic>{};
+    }
+    if (body is Map) return body;
+    return <String, dynamic>{};
+  } on DioException catch (e) {
+    Log.info("请求出错 $baseUrl ${e.message}");
+    rethrow;
+  } catch (e) {
+    Log.info("请求出错 $baseUrl $e");
+    rethrow;
+  }
+}

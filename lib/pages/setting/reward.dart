@@ -1,4 +1,4 @@
-import 'package:garden/util/http_util.dart';
+import 'package:garden/api/dsm_api.dart';
 import 'package:garden/util/ui_util.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
@@ -15,16 +15,21 @@ class Reward extends HookWidget {
     final rewards = useSignal<List>([]);
 
     getData() async {
-      var res = await DsmApi.reward();
-      if (res['code'] == 1) {
-        loading.value = false;
-        rewards.value = res['data'];
-      } else {
+      try {
+        final res = await dsmReward();
+        if (res is Map && res['code'] == 1) {
+          rewards.value = res['data'] ?? [];
+        } else {
+          throw StateError('reward list failed');
+        }
+      } catch (e) {
         UiUtil.toast("获取列表失败");
         if (context.mounted) {
           // ignore: use_build_context_synchronously
           Navigator.of(context).pop();
         }
+      } finally {
+        loading.value = false;
       }
     }
 

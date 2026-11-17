@@ -1,4 +1,4 @@
-import 'package:garden/util/http_util.dart';
+import 'package:garden/api/dsm_api.dart';
 import 'package:garden/util/storage_util.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -75,7 +75,7 @@ class ConfirmLogout extends HookWidget {
                       child: OutlinedButton(
                         onPressed: () async {
                           if (forget.value) {
-                            DsmApi.trustDevice("delete");
+                            dsmCoreTrustDevice('delete').ignore();
                           }
                           StorageUtil.remove("sid");
                           // HttpUtil.removeStorage("smid");

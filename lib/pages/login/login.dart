@@ -7,11 +7,11 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_vibrate/flutter_vibrate.dart';
 import 'package:garden/api/dsm_api.dart';
+import 'package:garden/extensions/string.dart';
 import 'package:garden/util/log.dart';
 import 'package:garden/pages/common/device_finder.dart';
 import 'package:garden/pages/login/accounts.dart';
 import 'package:garden/stores/connection_store.dart';
-import 'package:garden/util/http_util.dart' hide DsmApi;
 import 'package:garden/util/storage_util.dart';
 import 'package:garden/util/ui_util.dart';
 import 'package:garden/extensions/context.dart';
@@ -242,13 +242,18 @@ class Login extends HookWidget {
             }
           }
           if (res['service']['relay_ip'] == null) {
-            final cnRes = await DsmApi.quickConnectCn(host.value,
-                baseUrl: res['env']['control_host']);
-            if (cnRes['errno'] == 0) {
-              if (cnRes['service']['relay_ip'] != null) {
-                addrs.add(
-                    "http://${cnRes['service']['relay_ip']}:${cnRes['service']['relay_port']}/");
+            try {
+              final cnRes = await dsmAuthQuickConnectCnRequestTunnel(host.value,
+                  baseUrl: res['env']['control_host']);
+              if (cnRes['errno'] == 0 && cnRes['service'] != null) {
+                final service = cnRes['service'] as Map;
+                if (service['relay_ip'] != null) {
+                  addrs.add(
+                      "http://${service['relay_ip']}:${service['relay_port']}/");
+                }
               }
+            } catch (e) {
+              Log.info("quickConnectCn failed: $e");
             }
           }
 

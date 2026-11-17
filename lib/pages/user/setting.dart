@@ -1,6 +1,6 @@
 import 'package:garden/pages/user/otp_bind.dart';
 import 'package:garden/util/ui_util.dart';
-import 'package:garden/util/http_util.dart';
+import 'package:garden/api/dsm_api.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -8,6 +8,8 @@ import 'package:garden/constants/app_constants.dart';
 import 'package:garden/theme/app_colors.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:signals_hooks/signals_hooks.dart';
+
+String _errorCode(Object e) => e is DSMException ? '${e.code}' : '-1';
 
 class UserSetting extends HookWidget {
   const UserSetting({super.key});
@@ -31,18 +33,17 @@ class UserSetting extends HookWidget {
 
     useEffect(() {
       () async {
-        var res = await DsmApi.normalUser("get");
-        if (res['success']) {
+        try {
+          normalUser.value = await dsmCoreNormalUser("get");
           loading.value = false;
-          normalUser.value = res['data'];
           usernameController.value =
-              TextEditingValue(text: normalUser.value['username']);
+              TextEditingValue(text: normalUser.value['username'] ?? '');
           fullnameController.value =
-              TextEditingValue(text: normalUser.value['fullname']);
+              TextEditingValue(text: normalUser.value['fullname'] ?? '');
           emailController.value =
-              TextEditingValue(text: normalUser.value['email']);
-        } else {
-          UiUtil.toast("加载失败，code:${res['error']['code']}");
+              TextEditingValue(text: normalUser.value['email'] ?? '');
+        } catch (e) {
+          UiUtil.toast("加载失败，code:${_errorCode(e)}");
           if (context.mounted) {
             // ignore: use_build_context_synchronously
             Navigator.of(context).pop();
@@ -261,16 +262,16 @@ class UserSetting extends HookWidget {
                         data[key] = value;
                       }
                     });
-                    var res = await DsmApi.normalUser("set", changedData: data);
-                    if (res['success']) {
+                    try {
+                      await dsmCoreNormalUser("set", changedData: data);
                       UiUtil.toast("保存成功");
                       if (context.mounted) {
                         // ignore: use_build_context_synchronously
                         Navigator.of(context).pop();
                       }
-                    } else {
+                    } catch (e) {
                       saving.value = false;
-                      UiUtil.toast("保存失败，原因:${res['error']['code']}");
+                      UiUtil.toast("保存失败，原因:${_errorCode(e)}");
                     }
                   },
                   child: saving.value
