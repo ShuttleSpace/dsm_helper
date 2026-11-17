@@ -31,7 +31,7 @@ class DownloadAppBarWidget extends StatelessWidget
           : Container()),
       title: Column(
         children: [
-          const Text("下载"),
+          const Text("传输"),
           if (Platform.isAndroid)
             Watch((context) => Text(
                   downloadPath.value,

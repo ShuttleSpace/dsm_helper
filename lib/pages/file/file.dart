@@ -32,8 +32,6 @@ import 'package:garden/pages/file/upload.dart';
 import 'package:garden/theme/app_theme.dart';
 import 'package:garden/util/file_types.dart';
 import 'package:garden/widgets/animation_progress_bar.dart';
-import 'package:garden/widgets/transfer_list.dart';
-import 'package:garden/stores/transfer_store.dart';
 import 'package:garden/hooks/use_file_download.dart';
 import 'package:garden/hooks/use_file_click.dart';
 import 'package:garden/extensions/context.dart';
@@ -3071,7 +3069,6 @@ class Files extends HookWidget {
             ),
           if (backgroundProcess.value.isNotEmpty && showProcessList.value)
             buildProcessList(),
-          const TransferList(type: TransferType.upload),
           Expanded(
             child: success.value
                 ? Stack(

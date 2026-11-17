@@ -18,6 +18,7 @@ import 'package:garden/widgets/download/download_batch_action_widget.dart';
 import 'package:garden/widgets/download/download_empty_state_widget.dart';
 import 'package:garden/widgets/download/download_task_item_widget.dart';
 import 'package:garden/widgets/transparent_router.dart';
+import 'package:garden/widgets/transfer_list.dart';
 // ignore: library_prefixes
 import 'package:path/path.dart' as Path;
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -114,8 +115,7 @@ class Download extends HookWidget {
             FileTypeUtil.toFileTypeEnum(
                     FileTypeUtil.getFileType(info.task.filename)) ==
                 FileTypeEnum.image) {
-          images.add(Path.join(
-              notifier.tasks.value[i].task.directory,
+          images.add(Path.join(notifier.tasks.value[i].task.directory,
               notifier.tasks.value[i].task.filename));
           if (notifier.tasks.value[i] == info) {
             index = images.length - 1;
@@ -217,103 +217,114 @@ class Download extends HookWidget {
     }
 
     return Scaffold(
-        appBar: DownloadAppBarWidget(
-          multiSelect: notifier.multiSelect,
-          downloadPath: notifier.downloadPath,
-          onExitMultiSelect: () {
-            notifier.multiSelect.value = false;
-            notifier.resetSelectedTasks();
-          },
-          onSelectAll: () {
-            notifier.resetSelectedTasks();
-            if (notifier.selectedTasks.value.length !=
-                notifier.tasks.value.length) {
-              notifier
-                  .addSelectedTasks(notifier.tasks.value);
-            }
-          },
-          onOpenSettings: () {
-            Navigator.of(context).push(
-              CupertinoPageRoute(
-                builder: (context) {
-                  return const DownloadSetting();
-                },
-                settings: const RouteSettings(name: "download_setting"),
-              ),
-            );
-          },
-        ),
-        body: loading.value
-            ? const Center(
-                child: CupertinoActivityIndicator(),
-              )
-            : DefaultTabController(
-                length: 3,
-                child: Stack(
-                  children: [
-                    Column(
+      appBar: DownloadAppBarWidget(
+        multiSelect: notifier.multiSelect,
+        downloadPath: notifier.downloadPath,
+        onExitMultiSelect: () {
+          notifier.multiSelect.value = false;
+          notifier.resetSelectedTasks();
+        },
+        onSelectAll: () {
+          notifier.resetSelectedTasks();
+          if (notifier.selectedTasks.value.length !=
+              notifier.tasks.value.length) {
+            notifier.addSelectedTasks(notifier.tasks.value);
+          }
+        },
+        onOpenSettings: () {
+          Navigator.of(context).push(
+            CupertinoPageRoute(
+              builder: (context) {
+                return const DownloadSetting();
+              },
+              settings: const RouteSettings(name: "download_setting"),
+            ),
+          );
+        },
+      ),
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          // 上传/下载统一在「传输」 tab 呈现，避免上传进度混入文件列表。
+          const TransferList(),
+          Expanded(
+            child: loading.value
+                ? const Center(
+                    child: CupertinoActivityIndicator(),
+                  )
+                : DefaultTabController(
+                    length: 3,
+                    child: Stack(
                       children: [
-                        const TabBar(
-                          tabs: [
-                            Tab(text: "全部"),
-                            Tab(text: "下载中"),
-                            Tab(text: "已完成"),
+                        Column(
+                          children: [
+                            const TabBar(
+                              tabs: [
+                                Tab(text: "全部"),
+                                Tab(text: "下载中"),
+                                Tab(text: "已完成"),
+                              ],
+                            ),
+                            Expanded(
+                              child: TabBarView(
+                                children: [
+                                  buildTaskList(tasks.value),
+                                  buildTaskList(
+                                      tasks.value.where(isInProgress).toList()),
+                                  buildTaskList(tasks.value
+                                      .where((t) =>
+                                          t.status == TaskStatus.complete)
+                                      .toList()),
+                                ],
+                              ),
+                            ),
                           ],
                         ),
-                        Expanded(
-                          child: TabBarView(
-                            children: [
-                              buildTaskList(tasks.value),
-                              buildTaskList(
-                                  tasks.value.where(isInProgress).toList()),
-                              buildTaskList(tasks.value
-                                  .where((t) => t.status == TaskStatus.complete)
-                                  .toList()),
-                            ],
+                        AnimatedPositioned(
+                          bottom: selectedTasks.value.isNotEmpty ? 0 : -100,
+                          duration: const Duration(milliseconds: 200),
+                          child: Card(
+                            shape: RoundedRectangleBorder(
+                                side: const BorderSide(),
+                                borderRadius: BorderRadius.circular(18)),
+                            margin: const EdgeInsets.all(20),
+                            child: Padding(
+                              padding: const EdgeInsets.all(
+                                  AppConstants.paddingSmall),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceAround,
+                                children: [
+                                  GestureDetector(
+                                    onTap: () async {
+                                      UiUtil.vibrate(FeedbackType.warning);
+                                      onDeleteActionDialog(
+                                          context, selectedTasks.value);
+                                    },
+                                    child: Column(
+                                      children: [
+                                        Image.asset(
+                                          "assets/icons/delete.png",
+                                          width: 25,
+                                        ),
+                                        const Text(
+                                          "删除",
+                                          style: TextStyle(fontSize: 12),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
                           ),
                         ),
                       ],
                     ),
-                    AnimatedPositioned(
-                      bottom: selectedTasks.value.isNotEmpty ? 0 : -100,
-                      duration: const Duration(milliseconds: 200),
-                      child: Card(
-                        shape: RoundedRectangleBorder(
-                            side: const BorderSide(),
-                            borderRadius: BorderRadius.circular(18)),
-                        margin: const EdgeInsets.all(20),
-                        child: Padding(
-                          padding:
-                              const EdgeInsets.all(AppConstants.paddingSmall),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceAround,
-                            children: [
-                              GestureDetector(
-                                onTap: () async {
-                                  UiUtil.vibrate(FeedbackType.warning);
-                                  onDeleteActionDialog(
-                                      context, selectedTasks.value);
-                                },
-                                child: Column(
-                                  children: [
-                                    Image.asset(
-                                      "assets/icons/delete.png",
-                                      width: 25,
-                                    ),
-                                    const Text(
-                                      "删除",
-                                      style: TextStyle(fontSize: 12),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ));
+                  ),
+          ),
+        ],
+      ),
+    );
   }
 }

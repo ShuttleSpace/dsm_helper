@@ -10,7 +10,8 @@ import 'package:garden/pages/file/select_folder.dart';
 import 'package:garden/theme/app_theme.dart';
 import 'package:garden/services/transfer_upload.dart';
 import 'package:garden/stores/transfer_store.dart';
-import 'package:garden/util/http_util.dart';
+import 'package:garden/extensions/string.dart';
+import 'package:garden/util/file_types.dart';
 import 'package:garden/widgets/file_icon.dart';
 import 'package:garden/widgets/label.dart';
 import 'package:garden/widgets/neu_back_button.dart';
@@ -25,6 +26,20 @@ import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:signals_hooks/signals_hooks.dart';
 
+UploadStatus uploadStatusFromTransfer(TransferState state) {
+  switch (state) {
+    case TransferState.done:
+      return UploadStatus.complete;
+    case TransferState.error:
+    case TransferState.canceled:
+      return UploadStatus.failed;
+    case TransferState.queued:
+    case TransferState.active:
+    case TransferState.paused:
+      return UploadStatus.running;
+  }
+}
+
 class UploadItem {
   String path;
   String subPath;
@@ -32,6 +47,7 @@ class UploadItem {
   int fileSize;
   int uploadSize;
   UploadStatus status;
+  String? taskId;
   CancelToken? cancelToken;
   UploadItem(this.path, this.name,
       {this.subPath = "",
@@ -68,8 +84,26 @@ class Upload extends HookWidget {
       uploads.value = List.of(uploads.value);
     }
 
+    final taskStates = useSignal<Map<String, TransferState>>({});
+    useEffect(() {
+      final dispose = effect(() {
+        taskStates.value = {
+          for (final t in transferStore.tasks.value) t.id: t.state,
+        };
+      });
+      return dispose;
+    }, const []);
+
+    UploadStatus effectiveStatus(UploadItem upload) {
+      final state = upload.taskId == null
+          ? null
+          : taskStates.watch(context)[upload.taskId];
+      return state == null ? upload.status : uploadStatusFromTransfer(state);
+    }
+
   Widget buildUploadStatus(UploadItem upload) {
-    if (upload.status == UploadStatus.complete) {
+    final status = effectiveStatus(upload);
+    if (status == UploadStatus.complete) {
       return const Label(
         "上传完成",
         Colors.lightGreen,
@@ -77,7 +111,7 @@ class Upload extends HookWidget {
         fontSize: 10,
         height: 22,
       );
-    } else if (upload.status == UploadStatus.failed) {
+    } else if (status == UploadStatus.failed) {
       return const Label(
         "上传失败",
         Colors.redAccent,
@@ -85,7 +119,7 @@ class Upload extends HookWidget {
         fontSize: 10,
         height: 22,
       );
-    } else if (upload.status == UploadStatus.canceled) {
+    } else if (status == UploadStatus.canceled) {
       return const Label(
         "取消上传",
         Colors.redAccent,
@@ -93,7 +127,7 @@ class Upload extends HookWidget {
         fontSize: 10,
         height: 22,
       );
-    } else if (upload.status == UploadStatus.running) {
+    } else if (status == UploadStatus.running) {
       return Label(
         "${(upload.uploadSize / (upload.fileSize == 0 ? 1 : upload.fileSize) * 100).toStringAsFixed(2)}%",
         Colors.lightBlueAccent,
@@ -101,7 +135,7 @@ class Upload extends HookWidget {
         fontSize: 10,
         height: 22,
       );
-    } else if (upload.status == UploadStatus.wait) {
+    } else if (status == UploadStatus.wait) {
       return const Label(
         "等待上传",
         Colors.lightBlueAccent,
@@ -588,7 +622,8 @@ class Upload extends HookWidget {
                               remotePath: '$remoteDir/${upload.name}',
                               state: TransferState.active,
                             ));
-                            upload.status = UploadStatus.complete;
+                            upload.taskId = taskId;
+                            upload.uploadSize = 0;
                           } catch (e) {
                             Log.error(e);
                             upload.status = UploadStatus.failed;

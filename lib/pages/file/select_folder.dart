@@ -48,7 +48,9 @@ class SelectFolder extends HookWidget {
       success.value = true;
     } catch (e) {
       success.value = false;
-      msg.value = '加载失败，code:${e is DSMException ? e.code : -1}';
+      msg.value = e is DSMException
+          ? '加载失败，code:${e.code}${e.message.toString().isNotEmpty ? '：${e.message}' : ''}'
+          : '加载失败：$e';
     } finally {
       loading.value = false;
     }
@@ -62,7 +64,9 @@ class SelectFolder extends HookWidget {
       success.value = true;
     } catch (e) {
       success.value = false;
-      msg.value = '加载失败，code:${e is DSMException ? e.code : -1}';
+      msg.value = e is DSMException
+          ? '加载失败，code:${e.code}${e.message.toString().isNotEmpty ? '：${e.message}' : ''}'
+          : '加载失败：$e';
     } finally {
       loading.value = false;
     }

@@ -35,7 +35,8 @@ class Home extends HookWidget {
     // They are not rendered by Home, so they must not subscribe Home to rebuilds
     // (children write them from initState during the first build).
     final filesDrawerOpen = useMemoized(() => signal<bool>(false), const []);
-    final dashboardDrawerOpen = useMemoized(() => signal<bool>(false), const []);
+    final dashboardDrawerOpen =
+        useMemoized(() => signal<bool>(false), const []);
     final filesOnWillPop =
         useMemoized(() => signal<Future<bool> Function()?>(null), const []);
     final lastPopTime = useSignal(DateTime.now());
@@ -233,7 +234,7 @@ class Home extends HookWidget {
                     );
                   },
                 ),
-                label: '下载',
+                label: '传输',
               ),
               BottomNavigationBarItem(
                 icon: Image.asset(
