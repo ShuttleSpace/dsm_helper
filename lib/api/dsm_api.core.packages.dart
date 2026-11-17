@@ -237,3 +237,104 @@ Future<Map> dsmCorePollingData({CancelToken? cancelToken}) async {
   }
   return res['data'] ?? {};
 }
+
+/// 套件页面级请求替身（测试用）。
+@visibleForTesting
+Future<dynamic> Function(String endpoint, {Map<String, dynamic>? data})?
+    dsmCorePackagePagePostForTesting;
+
+Future<dynamic> _dsmCorePackagePagePost(String endpoint,
+    {required Map<String, dynamic> data, CancelToken? cancelToken}) async {
+  final override = dsmCorePackagePagePostForTesting;
+  if (override != null) return await override(endpoint, data: data);
+  return await _httpPost(endpoint, data: data, cancelToken: cancelToken);
+}
+
+Map<String, dynamic> _corePackagePageData(dynamic res) {
+  if (res is! Map || res['success'] != true) {
+    throw DSMException.fromMap(res is Map ? res : const {});
+  }
+  return res['data'] is Map
+      ? Map<String, dynamic>.from(res['data'] as Map)
+      : <String, dynamic>{};
+}
+
+/// 安装套件（旧 installPackageTask 语义：name/blqinst/volume_path/...）。
+Future<Map<String, dynamic>> dsmCorePackageInstallTaskForPage(
+    String name, String path,
+    {CancelToken? cancelToken}) async {
+  return _corePackagePageData(await _dsmCorePackagePagePost(_entryCGI,
+      data: {
+        "name": name,
+        "blqinst": true,
+        "volume_path": path,
+        "is_syno": true,
+        "beta": false,
+        "installrunpackage": true,
+        "api": "SYNO.Core.Package.Installation",
+        "version": 1,
+        "method": "install",
+        "_sid": connectionStore.sid.value,
+      },
+      cancelToken: cancelToken));
+}
+
+/// 安装进度查询。
+Future<Map<String, dynamic>> dsmCorePackageInstallStatusForPage(String taskId,
+    {CancelToken? cancelToken}) async {
+  return _corePackagePageData(await _dsmCorePackagePagePost(_entryCGI,
+      data: {
+        "task_id": taskId,
+        "api": "SYNO.Core.Package.Installation",
+        "version": 1,
+        "method": "status",
+        "_sid": connectionStore.sid.value,
+      },
+      cancelToken: cancelToken));
+}
+
+/// 更新队列（旧 installPackageQueue 语义：pkgs 为手工拼的 JSON）。
+Future<Map<String, dynamic>> dsmCorePackageInstallQueueForPage(String pkg,
+    String version,
+    {bool beta = false, CancelToken? cancelToken}) async {
+  return _corePackagePageData(await _dsmCorePackagePagePost(_entryCGI,
+      data: {
+        "pkgs": '[{"pkg":"$pkg", "version": "$version","beta":$beta}]',
+        "api": "SYNO.Core.Package.Installation",
+        "version": 1,
+        "method": "get_queue",
+        "_sid": connectionStore.sid.value,
+      },
+      cancelToken: cancelToken));
+}
+
+/// 卸载套件（旧 uninstallPackageTask 语义：含双编码 extra_values）。
+Future<Map<String, dynamic>> dsmCorePackageUninstallTaskForPage(String id,
+    {Map? extra, CancelToken? cancelToken}) async {
+  return _corePackagePageData(await _dsmCorePackagePagePost(_entryCGI,
+      data: {
+        "id": id,
+        "api": "SYNO.Core.Package.Uninstallation",
+        "version": 1,
+        "method": "uninstall",
+        "_sid": connectionStore.sid.value,
+        "extra_values": jsonEncode(jsonEncode(extra)),
+      },
+      cancelToken: cancelToken));
+}
+
+/// 启动/停用套件（旧 launchPackage 语义：仅 start 带 dsm_apps）。
+Future<void> dsmCorePackageControlForPage(String id, String app, String method,
+    {CancelToken? cancelToken}) async {
+  final data = <String, dynamic>{
+    "id": id,
+    "api": "SYNO.Core.Package.Control",
+    "version": 1,
+    "method": method,
+    "_sid": connectionStore.sid.value,
+  };
+  if (method == "start") data["dsm_apps"] = jsonEncode([app]);
+  _corePackagePageData(
+      await _dsmCorePackagePagePost(_entryCGI,
+          data: data, cancelToken: cancelToken));
+}

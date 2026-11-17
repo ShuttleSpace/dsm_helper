@@ -93,6 +93,7 @@ part 'dsm_api.hyperbackup.dart';
 part 'dsm_api.surveillancestation.dart';
 
 part 'dsm_api.virtualization.dart';
+part 'dsm_api.virtualization.pages.dart';
 
 part 'dsm_api.directoryserver.dart';
 

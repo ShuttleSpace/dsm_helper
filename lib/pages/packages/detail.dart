@@ -1,12 +1,13 @@
 import 'dart:async';
 import 'package:garden/extensions/context.dart';
+import 'package:garden/extensions/int.dart';
 import 'package:garden/util/log.dart';
 import 'package:garden/util/ui_util.dart';
 import 'package:garden/stores/connection_store.dart';
 
 import 'package:android_intent_plus/android_intent.dart';
 import 'package:garden/pages/packages/uninstall.dart';
-import 'package:garden/util/http_util.dart';
+import 'package:garden/api/dsm_api.dart';
 import 'package:garden/widgets/cupertino_image.dart';
 import 'package:garden/widgets/label.dart';
 import 'package:garden/widgets/neu_back_button.dart';
@@ -43,47 +44,49 @@ class PackageDetail extends HookWidget {
     }
 
     install(path) async {
-      var res = await DsmApi.installPackageTask(package['id'], path);
-      Log.info(res);
-      if (res['success']) {
-        UiUtil.toast("已开始安装");
-      
-        installing.value = true;
-        installButtonText.value = "准备安装…";
-        installProgress.value = double.parse(res['data']['progress']);
-    
-        //进度
-        timer.value = Timer.periodic(const Duration(seconds: 5), (unusedTimer) {
-          DsmApi.installPackageStatus(res['data']['taskid']).then((value) {
-            Log.info(value);
-          
-            installing.value = !value['data']['finished'];
-            if (value['data']['finished']) {
-              package['installed'] = true;
-              getLaunchedPackages();
-              timer.value?.cancel();
-            } else if (value['data']['progress'] != null) {
-              if (value['data']['progress'] is double) {
-                installProgress.value = value['data']['progress'];
-              } else {
-                installProgress.value = double.parse(value['data']['progress']);
-              }
-              installButtonText.value = "下载中:${installProgress.value.toStringAsFixed(2)}%";
-            } else if (value['data']['status'] == "installing") {
-              installButtonText.value = "安装中…";
-            } else if (value['data']['status'] == 'upgrading') {
-              installButtonText.value = "更新中…";
-            }
-        
-          });
-        });
-      } else if (res['error']['code'] == 4501) {
-        UiUtil.toast("此套件需配置信息，当前暂不支持，请在WEB端安装");
-      } else {
-        UiUtil.toast("安装套件失败，代码${res['error']['code']}");
+      late Map<String, dynamic> data;
+      try {
+        data = await dsmCorePackageInstallTaskForPage(package['id'], path);
+      } on DSMException catch (e) {
+        if (e.code == 4501) {
+          UiUtil.toast("此套件需配置信息，当前暂不支持，请在WEB端安装");
+        } else {
+          UiUtil.toast("安装套件失败，代码${e.code}");
+        }
+        return;
+      } catch (e) {
+        UiUtil.toast("安装套件失败，代码-1");
+        return;
       }
+      Log.info(data);
+      UiUtil.toast("已开始安装");
+      installing.value = true;
+      installButtonText.value = "准备安装…";
+      installProgress.value = double.parse(data['progress'].toString());
+      timer.value = Timer.periodic(const Duration(seconds: 5), (unusedTimer) async {
+        try {
+          final value = await dsmCorePackageInstallStatusForPage(data['taskid']);
+          Log.info(value);
+          installing.value = value['finished'] != true;
+          if (value['finished'] == true) {
+            package['installed'] = true;
+            getLaunchedPackages();
+            timer.value?.cancel();
+          } else if (value['progress'] != null) {
+            installProgress.value = (value['progress'] is double)
+                ? value['progress']
+                : double.parse(value['progress'].toString());
+            installButtonText.value = "下载中:${installProgress.value.toStringAsFixed(2)}%";
+          } else if (value['status'] == "installing") {
+            installButtonText.value = "安装中…";
+          } else if (value['status'] == 'upgrading') {
+            installButtonText.value = "更新中…";
+          }
+        } catch (e) {
+          Log.warn('install status: $e');
+        }
+      });
     }
-
     selectVolume() {
       showCupertinoModalPopup(
         context: context,
@@ -164,11 +167,17 @@ class PackageDetail extends HookWidget {
     
       installButtonText.value = "请稍后";
   
-      var res = await DsmApi.installPackageQueue(
-          package['id'], package['version'],
-          beta: beta);
-      if (res['success']) {
-        if (res['data']['paused_pkgs'].length > 0 && context.mounted) {
+      late Map<String, dynamic> data;
+      try {
+        data = await dsmCorePackageInstallQueueForPage(
+            package['id'], package['version'],
+            beta: beta);
+      } catch (e) {
+        installButtonText.value = "更新";
+        return;
+      }
+      {
+        if ((data['paused_pkgs'] as List?)?.isNotEmpty == true && context.mounted) {
           showCupertinoModalPopup(
             // ignore: use_build_context_synchronously
             context: context,
@@ -195,7 +204,7 @@ class PackageDetail extends HookWidget {
                             height: 12,
                           ),
                           Text(
-                            '更新${res['data']['cause_pausing_pkgs'].join(",")}时，${res['data']['paused_pkgs'].join("，")}将被停用。',
+                            '更新${data['cause_pausing_pkgs'].join(",")}时，${data['paused_pkgs'].join("，")}将被停用。',
                             style: const TextStyle(
                                 fontSize: 20, fontWeight: FontWeight.w400),
                           ),
@@ -255,29 +264,30 @@ class PackageDetail extends HookWidget {
     }
 
     uninstallPackage() async {
-      var res = await DsmApi.uninstallPackageTask(package['id']);
-      if (res['success']) {
+      try {
+        await dsmCorePackageUninstallTaskForPage(package['id']);
         UiUtil.toast("卸载成功");
         if (context.mounted) {
           // ignore: use_build_context_synchronously
           Navigator.of(context).pop();
         }
-      } else {
-        UiUtil.toast("套件卸载失败，错误代码：${res['error']['code']}");
+      } catch (e) {
+        final code = e is DSMException ? e.code : -1;
+        UiUtil.toast("套件卸载失败，错误代码：$code");
       }
     }
-
     getVolumes() async {
-      var res = await DsmApi.volumes();
-      if (res['success']) {
-      
-        volumes.value = res['data']['volumes'];
+      try {
+        final data = await dsmCoreStorageVolumeListForPage();
+        volumes.value = data['volumes'] ?? [];
     
         if (method == "install") {
           selectVolume();
         } else if (method == "update") {
           update();
         }
+      } catch (e) {
+        Log.warn('volumes: $e');
       }
     }
 
@@ -824,22 +834,17 @@ class PackageDetail extends HookWidget {
                                                             Navigator.of(
                                                                     context)
                                                                 .pop();
-                                                            var res = await DsmApi
-                                                                .launchPackage(
-                                                                    package[
-                                                                        'id'],
-                                                                    package[
-                                                                        'dsm_apps'],
-                                                                    "stop");
-                                                            if (res[
-                                                                'success']) {
-                                                              UiUtil.toast(
-                                                                  "已停用");
-                                                              
-                                                              package[
-                                                                      'launched'] =
+                                                            try {
+                                                              await dsmCorePackageControlForPage(
+                                                                  package['id'],
+                                                                  package['dsm_apps'],
+                                                                  "stop");
+                                                              UiUtil.toast("已停用");
+                                                              package['launched'] =
                                                                   false;
-                                                            
+                                                              getLaunchedPackages();
+                                                            } catch (e) {
+                                                              Log.warn('stop package: $e');
                                                             }
                                                           },
                                                           child: const Text(
@@ -886,16 +891,15 @@ class PackageDetail extends HookWidget {
                               )
                             : OutlinedButton(
                                 onPressed: () async {
-                                  var res = await DsmApi.launchPackage(
-                                      package['id'],
-                                      package['dsm_apps'],
-                                      "start");
-                                  Log.info(res);
-                                  if (res['success']) {
+                                  try {
+                                    await dsmCorePackageControlForPage(
+                                        package['id'],
+                                        package['dsm_apps'],
+                                        "start");
                                     UiUtil.toast("已启动");
-                                    
                                     package['launched'] = true;
-                                  
+                                  } catch (e) {
+                                    Log.warn('start package: $e');
                                   }
                                 },
                                 child: const Text("启动"),

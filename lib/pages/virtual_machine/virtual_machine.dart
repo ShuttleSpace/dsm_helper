@@ -3,7 +3,7 @@ import 'package:garden/util/log.dart';
 import 'package:garden/util/ui_util.dart';
 
 import 'package:garden/constants/app_constants.dart';
-import 'package:garden/util/http_util.dart';
+import 'package:garden/api/dsm_api.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -31,45 +31,45 @@ class VirtualMachine extends HookWidget {
     final repos = useSignal<List>([]);
     final currentIndex = useSignal(0);
 
-    getHosts() async {
-      var res = await DsmApi.cluster("get_host");
-      if (res['success']) {
+    Future<void> getHosts() async {
+      try {
+        final data = await dsmVirtualizationClusterForPage('get_host');
         if (context.mounted) {
-          hosts.value = res['data']['hosts'];
-          hosts.value.sort((a, b) {
-            return a['name'].compareTo(b['name']);
-          });
-          hostLoading.value = false;
+          hosts.value = data['hosts'] ?? [];
+          hosts.value.sort((a, b) => a['name'].compareTo(b['name']));
         }
+      } catch (e) {
+        Log.warn('vm hosts: $e');
+      } finally {
+        if (context.mounted) hostLoading.value = false;
       }
     }
-
-    getGuests() async {
-      var res = await DsmApi.cluster("get_guest");
-      if (res['success']) {
+    Future<void> getGuests() async {
+      try {
+        final data = await dsmVirtualizationClusterForPage('get_guest');
         if (context.mounted) {
-          guests.value = res['data']['guests'];
-          guests.value.sort((a, b) {
-            return a['name'].compareTo(b['name']);
-          });
-          guestLoading.value = false;
+          guests.value = data['guests'] ?? [];
+          guests.value.sort((a, b) => a['name'].compareTo(b['name']));
         }
+      } catch (e) {
+        Log.warn('vm guests: $e');
+      } finally {
+        if (context.mounted) guestLoading.value = false;
       }
     }
-
-    getRepos() async {
-      var res = await DsmApi.cluster("get_repo");
-      if (res['success']) {
+    Future<void> getRepos() async {
+      try {
+        final data = await dsmVirtualizationClusterForPage('get_repo');
         if (context.mounted) {
-          repos.value = res['data']['repos'];
-          repos.value.sort((a, b) {
-            return a['name'].compareTo(b['name']);
-          });
-          repoLoading.value = false;
+          repos.value = data['repos'] ?? [];
+          repos.value.sort((a, b) => a['name'].compareTo(b['name']));
         }
+      } catch (e) {
+        Log.warn('vm repos: $e');
+      } finally {
+        if (context.mounted) repoLoading.value = false;
       }
     }
-
     power(guest, String action) async {
       showCupertinoModalPopup(
         context: context,
@@ -79,26 +79,29 @@ class VirtualMachine extends HookWidget {
             onConfirm: () async {
               powerLoading.value = Map<String, bool>.of(powerLoading.value)
                 ..[guest['id']] = true;
-              var res = await DsmApi.vmmPower(guest['id'], action);
-              if (res['success']) {
+              try {
+                await dsmVirtualizationGuestPowerActionForPage(
+                    guest['id'], action);
                 UiUtil.toast("请求发送成功");
-                getGuests();
-              } else {
-                UiUtil.toast("请求发送失败，代码：${res['error']['code']}");
+                await getGuests();
+              } catch (e) {
+                final code = e is DSMException ? e.code : -1;
+                UiUtil.toast("请求发送失败，代码：$code");
+              } finally {
+                powerLoading.value = Map<String, bool>.of(powerLoading.value)
+                  ..[guest['id']] = false;
               }
-              powerLoading.value = Map<String, bool>.of(powerLoading.value)
-                ..[guest['id']] = false;
             },
           );
         },
       );
     }
 
-    getData() async {
-      var res = await DsmApi.cluster("get");
-      if (res['success']) {
+    Future<void> getData() async {
+      try {
+        final data = await dsmVirtualizationClusterForPage('get');
         if (context.mounted) {
-          cluster.value = res['data'];
+          cluster.value = data;
           loading.value = false;
         }
         if (currentIndex.value == 0) {
@@ -108,9 +111,11 @@ class VirtualMachine extends HookWidget {
         } else if (currentIndex.value == 2) {
           getRepos();
         }
+      } catch (e) {
+        Log.warn('vm cluster: $e');
+        if (context.mounted) loading.value = false;
       }
     }
-
     Widget buildHostItem(host) {
       return HostItem(host: host);
     }
@@ -126,21 +131,19 @@ class VirtualMachine extends HookWidget {
         onPowerOn: () async {
           powerLoading.value = Map<String, bool>.of(powerLoading.value)
             ..[guest['id']] = true;
-          var check = await DsmApi.checkPowerOn(guest['id']);
-          Log.info(check);
-          if (check['success']) {
-            var res = await DsmApi.vmmPower(guest['id'], "poweron");
-            if (res['success']) {
-              UiUtil.toast("开机请求发送成功");
-              getGuests();
-            } else {
-              UiUtil.toast("开机请求发送失败，代码：${res['error']['code']}");
-            }
-          } else {
-            UiUtil.toast("无法开机");
+          try {
+            await dsmVirtualizationGuestCheckPowerOnForPage(guest['id']);
+            await dsmVirtualizationGuestPowerActionForPage(
+                guest['id'], "poweron");
+            UiUtil.toast("开机请求发送成功");
+            await getGuests();
+          } catch (e) {
+            final code = e is DSMException ? e.code : -1;
+            UiUtil.toast(code == -1 ? "无法开机" : "开机请求发送失败，代码：$code");
+          } finally {
+            powerLoading.value = Map<String, bool>.of(powerLoading.value)
+              ..[guest['id']] = false;
           }
-          powerLoading.value = Map<String, bool>.of(powerLoading.value)
-            ..[guest['id']] = false;
         },
       );
     }
