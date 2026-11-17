@@ -1,4 +1,6 @@
-import 'package:garden/util/http_util.dart';
+import 'dart:convert';
+import 'package:garden/api/dsm_api.dart';
+import 'package:garden/stores/connection_store.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -18,27 +20,80 @@ class MediaIndex extends HookWidget {
     final mobileEnabled = useSignal(false);
     final packages = useSignal<List>([]);
 
-    getData() async {
-      DsmApi.mediaIndexStatus().then((res) {
-        if (res['success']) {
-          List result = res['data']['result'];
-          for (var item in result) {
-            if (item['success'] == true) {
-              switch (item['api']) {
-                case "SYNO.Core.MediaIndexing":
-                  mediaIndexing.value = item['data']['reindexing'];
-                  break;
-                case "SYNO.Core.MediaIndexing.ThumbnailQuality":
-                  thumbnailQuality.value = item['data']['thumbnail_quality'];
-                  packages.value = item['data']['packages'];
-                  break;
-                case "SYNO.Core.MediaIndexing.MobileEnabled":
-                  mobileEnabled.value = item['data']['mobile_profile_enabled'];
-              }
-            }
+    Future<void> getData() async {
+      try {
+        final apis = <Map<String, dynamic>>[
+          {
+            "api": "SYNO.Core.MediaIndexing.ThumbnailQuality",
+            "method": "get",
+            "version": 1
+          },
+          {"api": "SYNO.Core.MediaIndexing", "method": "status", "version": 1}
+        ];
+        if (connectionStore.dsmVersion.value == 6) {
+          apis.add({
+            "api": "SYNO.Core.MediaIndexing.MobileEnabled",
+            "method": "get",
+            "version": 1
+          });
+        }
+        final data = await dsmControlPanelPost({
+          "api": 'SYNO.Entry.Request',
+          "method": 'request',
+          "mode": '"sequential"',
+          "compound": jsonEncode(apis),
+          "version": 1,
+        });
+        for (final item in data['result'] ?? []) {
+          if (item is! Map || item['success'] != true) continue;
+          final itemData = item['data'];
+          if (itemData is! Map) continue;
+          switch (item['api']) {
+            case "SYNO.Core.MediaIndexing":
+              mediaIndexing.value = itemData['reindexing'] ?? false;
+              break;
+            case "SYNO.Core.MediaIndexing.ThumbnailQuality":
+              thumbnailQuality.value = itemData['thumbnail_quality'] ?? '';
+              packages.value = itemData['packages'] ?? [];
+              break;
+            case "SYNO.Core.MediaIndexing.MobileEnabled":
+              mobileEnabled.value = itemData['mobile_profile_enabled'] ?? false;
+              break;
           }
         }
-      });
+      } catch (e) {
+        // 旧层失败时保持原状态。
+      }
+    }
+
+    Future<void> saveMediaIndex() async {
+      final apis = <Map<String, dynamic>>[
+        {
+          "api": "SYNO.Core.MediaIndexing.ThumbnailQuality",
+          "method": "set",
+          "version": "1",
+          "thumbnail_quality": thumbnailQuality.value,
+        }
+      ];
+      if (connectionStore.dsmVersion.value == 6) {
+        apis.add({
+          "api": "SYNO.Core.MediaIndexing.MobileEnabled",
+          "method": "set",
+          "version": "1",
+          "mobile_profile_enabled": mobileEnabled.value,
+        });
+      }
+      try {
+        await dsmControlPanelPost({
+          "api": 'SYNO.Entry.Request',
+          "method": 'request',
+          "mode": '"sequential"',
+          "compound": jsonEncode(apis),
+          "version": 1,
+        });
+      } catch (e) {
+        // 旧层忽略设置失败。
+      }
     }
 
     useEffect(() {
@@ -115,9 +170,15 @@ class MediaIndex extends HookWidget {
                           if (mediaIndexing.value) {
                             return;
                           }
-                          var res = await DsmApi.mediaReindex();
-                          if (res['success']) {
-                            getData();
+                          try {
+                            await dsmControlPanelPost({
+                              "api": "SYNO.Core.MediaIndexing",
+                              "method": "reindex",
+                              "version": 1,
+                            });
+                            await getData();
+                          } catch (e) {
+                            // 旧层失败时静默。
                           }
                         },
                         child: Text(
@@ -170,9 +231,8 @@ class MediaIndex extends HookWidget {
                             child: GestureDetector(
                               onTap: () async {
                                 thumbnailQuality.value = "normal";
-                                await DsmApi.mediaIndexSet(
-                                    thumbnailQuality.value, mobileEnabled.value);
-                                getData();
+                                await saveMediaIndex();
+                                await getData();
                               },
                               child: Card(
                                 shape: RoundedRectangleBorder(
@@ -203,9 +263,8 @@ class MediaIndex extends HookWidget {
                             child: GestureDetector(
                               onTap: () async {
                                 thumbnailQuality.value = "high";
-                                await DsmApi.mediaIndexSet(
-                                    thumbnailQuality.value, mobileEnabled.value);
-                                getData();
+                                await saveMediaIndex();
+                                await getData();
                               },
                               child: Card(
                                 shape: RoundedRectangleBorder(
@@ -269,9 +328,8 @@ class MediaIndex extends HookWidget {
                       GestureDetector(
                         onTap: () async {
                           mobileEnabled.value = !mobileEnabled.value;
-                          await DsmApi.mediaIndexSet(
-                              thumbnailQuality.value, mobileEnabled.value);
-                          getData();
+                          await saveMediaIndex();
+                          await getData();
                         },
                         child: Card(
                           shape: RoundedRectangleBorder(

@@ -1,7 +1,8 @@
 import 'package:garden/pages/control_panel/power/add_power_task.dart';
 import 'package:garden/util/ui_util.dart';
 import 'package:garden/theme/app_theme.dart';
-import 'package:garden/util/http_util.dart';
+import 'dart:convert';
+import 'package:garden/api/dsm_api.dart';
 import 'package:garden/widgets/bubble_tab_indicator.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:garden/widgets/control_panel/power_task_item.dart';
@@ -104,68 +105,89 @@ class Power extends HookWidget {
       hibernation.value = {...hibernation.value, ...changes};
     }
 
-    getData() async {
-      DsmApi.powerStatus().then((res) {
-        if (res['success']) {
-          loading.value = false;
-          List result = res['data']['result'];
-          for (var item in result) {
-            if (item['success'] == true) {
-              switch (item['api']) {
-                case "SYNO.Core.Hardware.ZRAM":
-                  enableZram.value = item['data']['enable_zram'];
-                  break;
-                case "SYNO.Core.Hardware.PowerRecovery":
-                  powerRecovery.value = item['data'];
-                  break;
-                case "SYNO.Core.Hardware.BeepControl":
-                  beepControl.value = item['data'];
-                  break;
-                case "SYNO.Core.Hardware.FanSpeed":
-                  fanSpeed.value = item['data'];
-                  break;
-                case "SYNO.Core.Hardware.Led.Brightness":
-                  led.value = item['data'];
-                  break;
-                case "SYNO.Core.ExternalDevice.UPS":
-                  ups.value = item['data'];
-                  break;
-                case "SYNO.Core.Hardware.PowerSchedule":
-                  List powerOnTasks = item['data']['poweron_tasks'];
-                  List powerOffTasks = item['data']['poweroff_tasks'];
-                  powerTasks.value = powerOnTasks.map((e) {
-                        e['type'] = "power_on";
-                        return e;
-                      }).toList() +
-                      powerOffTasks.map((e) {
-                        e['type'] = "power_off";
-                        return e;
-                      }).toList();
-                  powerTasks.value.sort((a, b) {
-                    if (a['hour'] > b['hour']) {
-                      return 1;
-                    } else if (a['hour'] == b['hour']) {
-                      if (a['min'] > b['min']) {
-                        return 1;
-                      } else if (a['min'] < b['min']) {
-                        return -1;
-                      } else {
-                        return 0;
-                      }
-                    } else {
-                      return -1;
-                    }
-                  });
-                  powerTasks.value = List.of(powerTasks.value);
-                  break;
-                case "SYNO.Core.Hardware.Hibernation":
-                  hibernation.value = item['data'];
-                  break;
-              }
-            }
+    Future<void> getData() async {
+      try {
+        final apis = [
+          {"api": "SYNO.Core.Hardware.ZRAM", "method": "get", "version": 1},
+          {
+            "api": "SYNO.Core.Hardware.PowerRecovery",
+            "method": "get",
+            "version": 1
+          },
+          {"api": "SYNO.Core.Hardware.BeepControl", "method": "get", "version": 1},
+          {"api": "SYNO.Core.Hardware.FanSpeed", "method": "get", "version": 1},
+          {
+            "api": "SYNO.Core.Hardware.Led.Brightness",
+            "method": "get",
+            "version": 1
+          },
+          {"api": "SYNO.Core.Hardware.Hibernation", "method": "get", "version": 1},
+          {"api": "SYNO.Core.ExternalDevice.UPS", "method": "get", "version": 1},
+          {
+            "api": "SYNO.Core.Hardware.PowerSchedule",
+            "method": "load",
+            "version": 1
+          }
+        ];
+        final data = await dsmControlPanelPost({
+          "stop_when_error": false,
+          "api": 'SYNO.Entry.Request',
+          "method": 'request',
+          "mode": '"sequential"',
+          "compound": jsonEncode(apis),
+          "version": 1,
+        });
+        for (final item in data['result'] ?? []) {
+          if (item is! Map || item['success'] != true) continue;
+          final itemData = item['data'];
+          if (itemData is! Map) continue;
+          switch (item['api']) {
+            case "SYNO.Core.Hardware.ZRAM":
+              enableZram.value = itemData['enable_zram'] ?? false;
+              break;
+            case "SYNO.Core.Hardware.PowerRecovery":
+              powerRecovery.value = itemData;
+              break;
+            case "SYNO.Core.Hardware.BeepControl":
+              beepControl.value = itemData;
+              break;
+            case "SYNO.Core.Hardware.FanSpeed":
+              fanSpeed.value = itemData;
+              break;
+            case "SYNO.Core.Hardware.Led.Brightness":
+              led.value = itemData;
+              break;
+            case "SYNO.Core.ExternalDevice.UPS":
+              ups.value = itemData;
+              break;
+            case "SYNO.Core.Hardware.PowerSchedule":
+              final onTasks = (itemData['poweron_tasks'] as List? ?? [])
+                  .map((e) => e..['type'] = "power_on")
+                  .toList();
+              final offTasks = (itemData['poweroff_tasks'] as List? ?? [])
+                  .map((e) => e..['type'] = "power_off")
+                  .toList();
+              powerTasks.value = onTasks + offTasks;
+              powerTasks.value.sort((a, b) {
+                if (a['hour'] > b['hour']) return 1;
+                if (a['hour'] == b['hour']) {
+                  if (a['min'] > b['min']) return 1;
+                  if (a['min'] < b['min']) return -1;
+                  return 0;
+                }
+                return -1;
+              });
+              powerTasks.value = List.of(powerTasks.value);
+              break;
+            case "SYNO.Core.Hardware.Hibernation":
+              hibernation.value = itemData;
+              break;
           }
         }
-      });
+        loading.value = false;
+      } catch (e) {
+        loading.value = false;
+      }
     }
 
     useEffect(() {
@@ -283,24 +305,71 @@ class Power extends HookWidget {
                             padding: const EdgeInsets.all(20),
                             child: OutlinedButton(
                               onPressed: () async {
-                                var res = await DsmApi.powerSet(
-                                    enableZram.value,
-                                    powerRecovery.value,
-                                    beepControl.value,
-                                    fanSpeed.value,
-                                    led.value);
-                                if (res['success']) {
-                                  if (res['data']['has_fail'] == false) {
+                                try {
+                                  final apis = <Map<String, dynamic>>[
+                                    {
+                                      "api": "SYNO.Core.Hardware.ZRAM",
+                                      "method": "set",
+                                      "version": "1",
+                                      "enable_zram": enableZram.value,
+                                    },
+                                    {
+                                      "api": "SYNO.Core.Hardware.PowerRecovery",
+                                      "method": "set",
+                                      "version": "1",
+                                      "rc_power_config":
+                                          powerRecovery.value['rc_power_config'],
+                                      "wol1": powerRecovery.value['wol1'] ?? false,
+                                      "wol2": powerRecovery.value['wol2'] ?? false,
+                                    },
+                                    {
+                                      "api": "SYNO.Core.Hardware.BeepControl",
+                                      "method": "set",
+                                      "version": "1",
+                                      "fan_fail": beepControl.value['fan_fail'] ?? false,
+                                      "volume_crash":
+                                          beepControl.value['volume_crash'] ?? false,
+                                      "ssd_cache_crash":
+                                          beepControl.value['ssd_cache_crash'] ?? false,
+                                      "poweron_beep":
+                                          beepControl.value['poweron_beep'] ?? false,
+                                      "poweroff_beep":
+                                          beepControl.value['poweroff_beep'] ?? false,
+                                    },
+                                    {
+                                      "api": "SYNO.Core.Hardware.FanSpeed",
+                                      "method": "set",
+                                      "version": "1",
+                                      "dual_fan_speed":
+                                          fanSpeed.value['dual_fan_speed'],
+                                    },
+                                    {
+                                      "api": "SYNO.Core.Hardware.Led.Brightness",
+                                      "method": "set",
+                                      "version": "1",
+                                      "led_brightness": led.value['led_brightness'],
+                                      "schedule": led.value['schedule'],
+                                    },
+                                  ];
+                                  final data = await dsmControlPanelPost({
+                                    "stop_when_error": false,
+                                    "api": 'SYNO.Entry.Request',
+                                    "method": 'request',
+                                    "mode": '"sequential"',
+                                    "compound": jsonEncode(apis),
+                                    "version": 1,
+                                  });
+                                  if (data['has_fail'] == false) {
                                     UiUtil.vibrate(FeedbackType.light);
                                     UiUtil.toast("保存成功");
                                   } else {
                                     UiUtil.vibrate(FeedbackType.warning);
                                     UiUtil.toast("设置未完全保存成功");
                                   }
-                                  getData();
-                                } else {
-                                  UiUtil.toast(
-                                      "保存失败,代码${res['error']['code']}");
+                                  await getData();
+                                } catch (e) {
+                                  final code = e is DSMException ? e.code : -1;
+                                  UiUtil.toast("保存失败,代码$code");
                                 }
                               },
                               child: const Text(
@@ -432,14 +501,19 @@ class Power extends HookWidget {
                                         e.remove("type");
                                         return e;
                                       }).toList();
-                                      var res = await DsmApi.powerScheduleSave(
-                                          powerOns, powerOffs);
-                                      if (res['success']) {
+                                      try {
+                                        await dsmControlPanelPost({
+                                          "poweron_tasks": jsonEncode(powerOns),
+                                          "poweroff_tasks": jsonEncode(powerOffs),
+                                          "api": 'SYNO.Core.Hardware.PowerSchedule',
+                                          "method": 'save',
+                                          "version": 1,
+                                        });
                                         UiUtil.toast("保存成功");
-                                        getData();
-                                      } else {
-                                        UiUtil.toast(
-                                            "保存失败,代码${res['error']['code']}");
+                                        await getData();
+                                      } catch (e) {
+                                        final code = e is DSMException ? e.code : -1;
+                                        UiUtil.toast("保存失败,代码$code");
                                       }
                                     },
                                     child: const Text(
@@ -503,24 +577,28 @@ class Power extends HookWidget {
                             padding: const EdgeInsets.all(20),
                             child: OutlinedButton(
                               onPressed: () async {
-                                var res = await DsmApi.powerHibernationSave(
-                                  internalHdIdletime: hibernation
-                                      .value['internal_hd_idletime'],
-                                  sataDeepSleep: hibernation
-                                      .value['sata_deep_sleep'] == 1,
-                                  usbIdletime: hibernation.value['usb_idletime'],
-                                  enableLog: hibernation.value['enable_log'],
-                                  autoPoweroffEnable: hibernation
-                                      .value['auto_poweroff_enable'],
-                                  autoPoweroffTime: hibernation
-                                      .value['auto_poweroff_time'],
-                                );
-                                if (res['success']) {
+                                try {
+                                  await dsmControlPanelPost({
+                                    "internal_hd_idletime":
+                                        hibernation.value['internal_hd_idletime'],
+                                    "sata_deep_sleep":
+                                        hibernation.value['sata_deep_sleep'] == 1,
+                                    "ignore_netbios_broadcast": false,
+                                    "usb_idletime": hibernation.value['usb_idletime'],
+                                    "enable_log": hibernation.value['enable_log'],
+                                    "auto_poweroff_enable":
+                                        hibernation.value['auto_poweroff_enable'],
+                                    "auto_poweroff_time":
+                                        hibernation.value['auto_poweroff_time'],
+                                    "api": 'SYNO.Core.Hardware.Hibernation',
+                                    "method": 'set',
+                                    "version": 1,
+                                  });
                                   UiUtil.toast("保存成功");
-                                  getData();
-                                } else {
-                                  UiUtil.toast(
-                                      "保存失败,代码${res['error']['code']}");
+                                  await getData();
+                                } catch (e) {
+                                  final code = e is DSMException ? e.code : -1;
+                                  UiUtil.toast("保存失败,代码$code");
                                 }
                               },
                               child: const Text(

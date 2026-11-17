@@ -3,7 +3,8 @@
 import 'package:cool_ui/cool_ui.dart';
 import 'package:garden/util/log.dart';
 import 'package:garden/util/ui_util.dart';
-import 'package:garden/util/http_util.dart';
+import 'dart:convert';
+import 'package:garden/api/dsm_api.dart';
 import 'package:garden/widgets/neu_picker.dart';
 import 'package:garden/widgets/label.dart';
 import 'package:garden/widgets/neu_back_button.dart';
@@ -100,15 +101,20 @@ class EditDdns extends HookWidget {
                                 return;
                               }
                               Navigator.of(context).pop();
-                              var res = await DsmApi.ddnsDelete(ddns!['id']);
-                              Log.log("delete ddns: $res");
-                              if (res['success']) {
+                              try {
+                                await dsmControlPanelPost({
+                                  "id": jsonEncode([ddns!['id']]),
+                                  "api": 'SYNO.Core.DDNS.Record',
+                                  "method": 'delete',
+                                  "version": 1,
+                                });
                                 UiUtil.toast("DDNS删除成功");
                                 if (context.mounted) {
                                   Navigator.of(context).pop(true);
                                 }
-                              } else {
-                                UiUtil.toast("删除失败，代码:${res['error']['code']}");
+                              } catch (e) {
+                                final code = e is DSMException ? e.code : -1;
+                                UiUtil.toast("删除失败，代码:$code");
                               }
                             },
                             child: const Text(
@@ -384,14 +390,34 @@ class EditDdns extends HookWidget {
                               message: const Text("测试中，请稍后"),
                               backButtonClose: true,
                               alignment: Alignment.center);
-                          var res = await DsmApi.ddnsTest(ddnsInfo.value);
-                          hide();
-                          Log.info("ddnsTest:$res");
-                          if (res['success']) {
-                            updateDdns({'status': res['data']['status']});
-                          } else {
-                            UiUtil.toast(
-                                "测试失败，${res['error']['errors']},code:${res['error']['code']}");
+                          Map<String, dynamic> data;
+                          try {
+                            final ddns = ddnsInfo.value;
+                            final body = <String, dynamic>{
+                              "api": 'SYNO.Core.DDNS.Record',
+                              "method": 'test',
+                              "version": 1,
+                              "heartbeat": ddns['heartbeat'],
+                              "enable": true,
+                              "provider": '"${ddns['provider'].replaceAll("*", "USER_")}"',
+                              "hostname": '"${ddns['hostname']}"',
+                              "username": '"${ddns['username']}"',
+                              "net": '"${ddns['net']}"',
+                              "ip": '"${ddns['ip']}"',
+                              "ipv6": '"${ddns['ipv6']}"',
+                            };
+                            if (ddns['passwd'] != null) {
+                              body['passwd'] = '"${ddns['passwd']}"';
+                            }
+                            data = await dsmControlPanelPost(body);
+                            Log.info("ddnsTest:$data");
+                            updateDdns({'status': data['status']});
+                          } catch (e) {
+                            final raw = e is DSMException ? e.rawError : null;
+                            final code = e is DSMException ? e.code : -1;
+                            UiUtil.toast("测试失败，$raw,code:$code");
+                          } finally {
+                            hide();
                           }
                         }
                       },
@@ -408,14 +434,33 @@ class EditDdns extends HookWidget {
               child: OutlinedButton(
                 onPressed: () async {
                   if (checkForm()) {
-                    var res = await DsmApi.ddnsSave(ddnsInfo.value);
-                    if (res['success']) {
+                    try {
+                      final ddns = ddnsInfo.value;
+                      final body = <String, dynamic>{
+                        "api": 'SYNO.Core.DDNS.Record',
+                        "method": 'set',
+                        "version": 1,
+                        "id": '"${ddns['id'].replaceAll("USER_", "*")}"',
+                        "enable": ddns['enable'],
+                        "provider": '"${ddns['provider']}"',
+                        "hostname": '"${ddns['hostname']}"',
+                        "username": '"${ddns['username']}"',
+                        "net": '"${ddns['net']}"',
+                        "ip": '"${ddns['ip']}"',
+                        "ipv6": '"${ddns['ipv6']}"',
+                        "heartbeat": ddns['heartbeat'],
+                      };
+                      if (ddns['passwd'] != null) {
+                        body['passwd'] = '"${ddns['passwd']}"';
+                      }
+                      await dsmControlPanelPost(body);
                       UiUtil.toast("保存成功");
                       if (context.mounted) {
                         Navigator.of(context).pop(true);
                       }
-                    } else {
-                      UiUtil.toast("保存失败,代码${res['error']['code']}");
+                    } catch (e) {
+                      final code = e is DSMException ? e.code : -1;
+                      UiUtil.toast("保存失败,代码$code");
                     }
                   }
                 },

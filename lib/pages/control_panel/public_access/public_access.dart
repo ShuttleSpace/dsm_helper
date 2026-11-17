@@ -2,7 +2,8 @@ import 'dart:async';
 
 import 'package:garden/extensions/color.dart';
 import 'package:garden/pages/control_panel/public_access/edit_ddns.dart';
-import 'package:garden/util/http_util.dart';
+import 'dart:convert';
+import 'package:garden/api/dsm_api.dart';
 import 'package:garden/widgets/bubble_tab_indicator.dart';
 import 'package:garden/widgets/label.dart';
 import 'package:garden/widgets/neu_back_button.dart';
@@ -32,38 +33,60 @@ class PublicAccess extends HookWidget {
       "disabled": "已停用",
     };
 
-    getData() async {
-      var res = await DsmApi.publicAccessInfo();
-      if (res['success']) {
-        List result = res['data']['result'];
-        for (var item in result) {
-          if (item['success'] == true) {
-            switch (item['api']) {
-              case "SYNO.Core.DDNS.Provider":
-                providers.value = item['data']['providers']
-                    .where((e) =>
-                        e['provider'].startsWith("USER_") || e['url'] == null)
-                    .map((e) {
-                  e['provider'] = e['provider'].replaceAll("USER_", "*");
-                  return e;
-                }).toList();
-                providers.value.sort((a, b) {
-                  return a['provider'].compareTo(b['provider']);
-                });
-                break;
-              case "SYNO.Core.DDNS.Record":
-                records.value = item['data']['records'].map((e) {
-                  e['provider'] = e['provider'].replaceAll("USER_", "*");
-                  return e;
-                }).toList();
-                break;
-              case "SYNO.Core.DDNS.ExtIP":
-                ips.value = item['data'];
-
-                break;
-            }
+    Future<void> getData() async {
+      try {
+        final apis = [
+          {"api": "SYNO.Core.DDNS.Provider", "version": 1, "method": "list"},
+          {"api": "SYNO.Core.DDNS.Record", "version": 1, "method": "list"},
+          {
+            "api": "SYNO.Core.DDNS.ExtIP",
+            "version": 2,
+            "method": "list",
+            "retry": true
+          },
+          {
+            "api": "SYNO.Core.DDNS.Synology",
+            "version": 1,
+            "method": "get_myds_account"
+          },
+        ];
+        final data = await dsmControlPanelPost({
+          "api": 'SYNO.Entry.Request',
+          "method": 'request',
+          "mode": '"parallel"',
+          "compound": jsonEncode(apis),
+          "version": 1,
+        });
+        for (final item in data['result'] ?? []) {
+          if (item is! Map || item['success'] != true) continue;
+          final itemData = item['data'];
+          if (itemData is! Map) continue;
+          switch (item['api']) {
+            case "SYNO.Core.DDNS.Provider":
+              providers.value = (itemData['providers'] as List? ?? [])
+                  .where((e) =>
+                      e['provider'].startsWith("USER_") || e['url'] == null)
+                  .map((e) {
+                e['provider'] = e['provider'].replaceAll("USER_", "*");
+                return e;
+              }).toList();
+              providers.value.sort((a, b) =>
+                  a['provider'].compareTo(b['provider']));
+              break;
+            case "SYNO.Core.DDNS.Record":
+              records.value = (itemData['records'] as List? ?? []).map((e) {
+                e['provider'] = e['provider'].replaceAll("USER_", "*");
+                return e;
+              }).toList();
+              break;
+            case "SYNO.Core.DDNS.ExtIP":
+              final rawIps = item['data'];
+              ips.value = rawIps is List ? List<dynamic>.from(rawIps) : <dynamic>[];
+              break;
           }
         }
+      } catch (e) {
+        // 旧层失败时保持原状态。
       }
     }
 
@@ -88,8 +111,17 @@ class PublicAccess extends HookWidget {
           );
         })).then((value) async {
           if (value != null && value) {
-            await DsmApi.ddnsUpdate(id: ddns['id'].replaceAll("USER_", "*"));
-            getData();
+            try {
+              await dsmControlPanelPost({
+                "api": 'SYNO.Core.DDNS.Record',
+                "method": 'update_ip_address',
+                "version": 1,
+                "id": '"${ddns['id'].replaceAll("USER_", "*")}"',
+              });
+              await getData();
+            } catch (e) {
+              // 旧层忽略失败。
+            }
           }
         });
       },
@@ -172,8 +204,17 @@ class PublicAccess extends HookWidget {
             padding: const EdgeInsets.only(right: 10, top: 8, bottom: 8),
             child: OutlinedButton(
               onPressed: () async {
-                await DsmApi.ddnsUpdate();
-                getData();
+                try {
+                  await dsmControlPanelPost({
+                    "api": 'SYNO.Core.DDNS.Record',
+                    "method": 'update_ip_address',
+                    "version": 1,
+                    "id": '"null"',
+                  });
+                  await getData();
+                } catch (e) {
+                  // 旧层忽略失败。
+                }
               },
               child: const Icon(Icons.refresh),
             ),
