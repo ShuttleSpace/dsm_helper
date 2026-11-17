@@ -1,8 +1,7 @@
-import 'package:garden/extensions/map.dart';
 import 'package:garden/pages/download_station/select_file.dart';
 import 'package:garden/util/ui_util.dart';
 import 'package:garden/pages/file/select_folder.dart';
-import 'package:garden/util/http_util.dart';
+import 'package:garden/api/dsm_api.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
@@ -11,6 +10,8 @@ import 'package:garden/constants/app_constants.dart';
 import 'package:flutter_vibrate/flutter_vibrate.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:signals_hooks/signals_hooks.dart';
+
+String _errorCode(Object e) => e is DSMException ? '${e.code}' : '-1';
 
 class AddDownloadTask extends HookWidget {
   final String? torrentPath;
@@ -22,11 +23,11 @@ class AddDownloadTask extends HookWidget {
     final torrentPathValue = useSignal(torrentPath ?? '');
     final url = useSignal("");
 
-    getData() async {
-      var res = await DsmApi.downloadLocation();
-      if (res['success']) {
-        saveFolder.value = res['data']['default_destination'];
-      } else {
+    Future<void> getData() async {
+      try {
+        final data = await dsmDownloadStation2SettingsLocationGet();
+        saveFolder.value = data['default_destination'] ?? '';
+      } catch (e) {
         UiUtil.vibrate(FeedbackType.warning);
         UiUtil.toast("获取默认保存位置失败");
       }
@@ -165,41 +166,40 @@ class AddDownloadTask extends HookWidget {
                 UiUtil.toast("请输入下载链接或选择种子文件");
                 return;
               }
-              Map<dynamic, dynamic>? res;
-              if (torrentPathValue.value != "") {
-                res = await DsmApi.downloadTaskCreate(
-                    saveFolder.value, "file",
-                    filePath: torrentPathValue.value);
-                if (res == null || res.containsKey("success") == false) {
-                  UiUtil.toast(
-                      "创建任务失败，code：${res?.getMap("error")?.getOrNull("code")}");
-                } else {
+              try {
+                final Map? res;
+                if (torrentPathValue.value != "") {
+                  res = await dsmDownloadStation2TaskCreate(
+                      saveFolder.value, "file",
+                      filePath: torrentPathValue.value);
+                  if (res == null) {
+                    UiUtil.toast("创建任务失败，code：-1");
+                    return;
+                  }
+                  final listId = res['data']?['list_id'];
                   if (context.mounted) {
                     Navigator.of(context)
                         .push(CupertinoPageRoute(builder: (context) {
-                      return SelectFile(
-                          res!['data']['list_id'], saveFolder.value);
+                      return SelectFile(listId, saveFolder.value);
                     }));
                   }
-                }
-              } else {
-                if (url.value.trim() == "") {
-                  UiUtil.toast("请输入下载链接");
-                  UiUtil.vibrate(FeedbackType.light);
-                  return;
-                }
-                res = await DsmApi.downloadTaskCreate(saveFolder.value, "url",
-                    url: url.value);
-                if (res == null || res.containsKey("success") == false) {
-                  UiUtil.toast(
-                      "创建任务失败，code：${res?.getMap("error")?.getOrNull("code")}");
                 } else {
+                  if (url.value.trim() == "") {
+                    UiUtil.toast("请输入下载链接");
+                    UiUtil.vibrate(FeedbackType.light);
+                    return;
+                  }
+                  await dsmDownloadStation2TaskCreate(
+                      saveFolder.value, "url",
+                      url: url.value);
                   UiUtil.toast("创建任务成功");
                   if (context.mounted) {
                     // ignore: use_build_context_synchronously
                     Navigator.of(context).pop();
                   }
                 }
+              } catch (e) {
+                UiUtil.toast("创建任务失败，code：${_errorCode(e)}");
               }
             },
             child: const Text(

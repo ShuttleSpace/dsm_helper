@@ -1,5 +1,7 @@
-import 'package:garden/util/http_util.dart';
+import 'package:garden/api/dsm_api.dart';
+import 'package:garden/extensions/int.dart';
 import 'package:garden/util/file_type_util.dart';
+import 'package:garden/util/file_types.dart';
 import 'package:garden/util/ui_util.dart';
 import 'package:garden/widgets/file_icon.dart';
 import 'package:garden/widgets/neu_back_button.dart';
@@ -22,17 +24,18 @@ class SelectFile extends HookWidget {
     final selectedFiles = useListSignal([]);
     final size = useSignal(0);
 
-    getData() async {
-      var res = await DsmApi.downloadFileList(listId[0]);
-      if (res['success']) {
-        title.value = res['data']['title'];
-        files.value = res['data']['files'];
-        for (var element in files.value) {
+    Future<void> getData() async {
+      try {
+        final data = await dsmDownloadStation2TaskListGet(listId[0]);
+        title.value = data['title'] ?? '';
+        files.value = data['files'] ?? [];
+        for (final element in files.value) {
           selectedFiles.add(element['index']);
         }
-        size.value = res['data']['size'];
-      } else {
-        UiUtil.toast("获取文件列表失败，代码${res['error']['code']}");
+        size.value = data['size'] ?? 0;
+      } catch (e) {
+        final code = e is DSMException ? e.code : -1;
+        UiUtil.toast("获取文件列表失败，代码$code");
       }
     }
 
@@ -224,15 +227,18 @@ class SelectFile extends HookWidget {
             child: OutlinedButton(
               onPressed: () async {
                 if (selectedFiles.isNotEmpty) {
-                  var res = await DsmApi.downloadCreate(
-                      listId[0], destination, selectedFiles.value);
-                  if (res['success']) {
+                  try {
+                    await dsmDownloadStation2TaskListPollingDownload(
+                        listId[0], destination, selectedFiles.value);
                     UiUtil.toast("下载任务创建成功");
                     if (context.mounted) {
                       // ignore: use_build_context_synchronously
                       Navigator.of(context).pop();
                       Navigator.of(context).pop();
                     }
+                  } catch (e) {
+                    final code = e is DSMException ? e.code : -1;
+                    UiUtil.toast("下载任务创建失败，代码$code");
                   }
                 } else {
                   UiUtil.toast("请选择要下载的文件");

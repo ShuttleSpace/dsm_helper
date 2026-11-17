@@ -1,4 +1,6 @@
-import 'package:garden/util/http_util.dart';
+import 'package:garden/api/dsm_api.dart';
+import 'package:garden/extensions/datetime.dart';
+import 'package:garden/extensions/int.dart';
 import 'package:garden/util/ui_util.dart';
 import 'package:garden/widgets/bubble_tab_indicator.dart';
 import 'package:garden/widgets/label.dart';
@@ -45,27 +47,36 @@ class DownloadDetail extends HookWidget {
       [isRunningTorrent],
     );
 
-    getTrackers() async {
-      var res = await DsmApi.downloadTracker(id);
-      if (res['success']) {
+    Future<void> getTrackers() async {
+      try {
+        final data = await dsmDownloadStation2TaskBTTrackerList(taskId: id);
+        trackers.value = data['items'] ?? [];
+      } catch (e) {
+        // 旧层失败时静默，这里保持一致。
+      } finally {
         loadingTrackers.value = false;
-        trackers.value = res['data']['items'];
       }
     }
 
-    getPeers() async {
-      var res = await DsmApi.downloadPeer(id);
-      if (res['success']) {
+    Future<void> getPeers() async {
+      try {
+        final data = await dsmDownloadStation2TaskBTPeerList(taskId: id);
+        peers.value = data['items'] ?? [];
+      } catch (e) {
+        // 同上。
+      } finally {
         loadingPeers.value = false;
-        peers.value = res['data']['items'];
       }
     }
 
-    getFiles() async {
-      var res = await DsmApi.downloadFile(id);
-      if (res['success']) {
+    Future<void> getFiles() async {
+      try {
+        final data = await dsmDownloadStation2TaskBTFileList(taskId: id);
+        files.value = data['items'] ?? [];
+      } catch (e) {
+        // 同上。
+      } finally {
         loadingFiles.value = false;
-        files.value = res['data']['items'];
       }
     }
 
@@ -84,13 +95,17 @@ class DownloadDetail extends HookWidget {
       }
     }
 
-    getData() async {
-      var res = await DsmApi.downloadDetail(id);
-      if (res['success']) {
-        task.value = res['data']['task'][0];
+    Future<void> getData() async {
+      try {
+        final data = await dsmDownloadStation2TaskDetail(id);
+        final tasks = data['task'] as List? ?? const [];
+        if (tasks.isNotEmpty) task.value = tasks[0];
+      } catch (e) {
+        // 旧层失败时 task 保持 null，这里保持一致。
+      } finally {
+        // Set last so the first post-loading build already has the task.
+        loading.value = false;
       }
-      // Set last so the first post-loading build already has the task.
-      loading.value = false;
     }
 
   Widget buildFileItem(file) {
@@ -302,18 +317,18 @@ class DownloadDetail extends HookWidget {
                                       child: OutlinedButton(
                                         onPressed: () async {
                                           Navigator.of(context).pop();
-                                          var res =
-                                              await DsmApi.downloadTaskAction(
-                                                  [task.value['id']], "delete");
-                                          if (res['success']) {
+                                          try {
+                                            await dsmDownloadStation2TaskAction(
+                                                [task.value['id']], "delete");
                                             UiUtil.toast("任务删除成功");
                                             if (context.mounted) {
                                               // ignore: use_build_context_synchronously
                                               Navigator.of(context).pop();
                                             }
-                                          } else {
-                                            UiUtil.toast(
-                                                "任务删除失败，代码：${res['error']['code']}");
+                                          } catch (e) {
+                                            final code =
+                                                e is DSMException ? e.code : -1;
+                                            UiUtil.toast("任务删除失败，代码：$code");
                                           }
                                         },
                                         child: const Text(

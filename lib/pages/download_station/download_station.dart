@@ -1,11 +1,14 @@
 import 'dart:async';
+import 'package:garden/extensions/int.dart';
 import 'package:garden/util/file_type_util.dart';
+import 'package:garden/util/file_types.dart';
 
 import 'package:garden/pages/download_station/add_task.dart';
 import 'package:garden/pages/download_station/detail.dart';
 import 'package:garden/theme/app_colors.dart';
 import 'package:garden/theme/app_theme.dart';
-import 'package:garden/util/http_util.dart';
+import 'package:garden/api/dsm_api.dart';
+import 'package:garden/util/log.dart';
 import 'package:garden/widgets/file_icon.dart';
 import 'package:garden/widgets/animation_progress_bar.dart';
 import 'package:garden/widgets/neu_back_button.dart';
@@ -25,27 +28,28 @@ class DownloadStation extends HookWidget {
     final uploadRate = useSignal(0);
     final pauseLoading = useMapSignal<String, bool>({});
 
-    getData() async {
-      var res = await DsmApi.downloadStationInfo();
-      if (!context.mounted) {
-        return;
-      }
-      loading.value = false;
-      if (res['success']) {
-        List result = res['data']['result'];
-        for (var item in result) {
-          if (item['success'] == true) {
-            switch (item['api']) {
-              case "SYNO.DownloadStation2.Task":
-                tasks.value = item['data']['task'];
-                break;
-              case "SYNO.DownloadStation2.Task.Statistic":
-                downloadRate.value = item['data']['download_rate'];
-                uploadRate.value = item['data']['upload_rate'];
-                break;
-            }
+    Future<void> getData() async {
+      try {
+        final result = await dsmDownloadStationOverview();
+        if (!context.mounted) return;
+        for (final item in result) {
+          if (item is! Map || item['success'] != true) continue;
+          final data = item['data'];
+          if (data is! Map) continue;
+          switch (item['api']) {
+            case "SYNO.DownloadStation2.Task":
+              tasks.value = data['task'] ?? [];
+              break;
+            case "SYNO.DownloadStation2.Task.Statistic":
+              downloadRate.value = data['download_rate'] ?? 0;
+              uploadRate.value = data['upload_rate'] ?? 0;
+              break;
           }
         }
+      } catch (e) {
+        Log.warn('download station overview: $e');
+      } finally {
+        if (context.mounted) loading.value = false;
       }
     }
 
@@ -109,12 +113,15 @@ class DownloadStation extends HookWidget {
                         ? GestureDetector(
                             onTap: () async {
                               pauseLoading[download['id']] = true;
-                              var res = await DsmApi.downloadTaskAction(
-                                  [download['id']],
-                                  download['status'] == 2 ? "pause" : "resume");
-                              pauseLoading[download['id']] = false;
-                              if (res['success']) {
-                                getData();
+                              try {
+                                await dsmDownloadStation2TaskAction(
+                                    [download['id']],
+                                    download['status'] == 2 ? "pause" : "resume");
+                                await getData();
+                              } catch (e) {
+                                Log.warn('download task action: $e');
+                              } finally {
+                                pauseLoading[download['id']] = false;
                               }
                             },
                             child: pauseLoading[download['id']] == true

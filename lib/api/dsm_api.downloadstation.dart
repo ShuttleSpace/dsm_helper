@@ -148,7 +148,7 @@ Future<Map> dsmDownloadStation2TaskBTTrackerList(
     {required String taskId, CancelToken? cancelToken}) async {
   final data = _dsmApiRequestData(
       api: 'SYNO.DownloadStation2.Task.BT.Tracker', method: 'list', version: 2)
-    ..addAll({'task_id': taskId});
+    ..addAll({'task_id': '"$taskId"'});
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
 //Log.info("dsmDownloadStation2TaskBTTrackerList: $res");
   if (res['success'] != true) {
@@ -163,7 +163,7 @@ Future<Map> dsmDownloadStation2TaskBTTrackerAdd(
     CancelToken? cancelToken}) async {
   final data = _dsmApiRequestData(
       api: 'SYNO.DownloadStation2.Task.BT.Tracker', method: 'add', version: 2)
-    ..addAll({'task_id': taskId, 'tracker': jsonEncode(tracker)});
+    ..addAll({'task_id': '"$taskId"', 'tracker': jsonEncode(tracker)});
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
 //Log.info("dsmDownloadStation2TaskBTTrackerAdd: $res");
   if (res['success'] != true) {
@@ -176,7 +176,7 @@ Future<Map> dsmDownloadStation2TaskBTPeerList(
     {required String taskId, CancelToken? cancelToken}) async {
   final data = _dsmApiRequestData(
       api: 'SYNO.DownloadStation2.Task.BT.Peer', method: 'list', version: 2)
-    ..addAll({'task_id': taskId});
+    ..addAll({'task_id': '"$taskId"'});
   final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
 //Log.info("dsmDownloadStation2TaskBTPeerList: $res");
   if (res['success'] != true) {
@@ -196,7 +196,7 @@ Future<Map> dsmDownloadStation2TaskBTFileList(
   final data = _dsmApiRequestData(
       api: 'SYNO.DownloadStation2.Task.BT.File', method: 'list', version: 2)
     ..addAll({
-      'task_id': taskId,
+      'task_id': '"$taskId"',
       'offset': offset,
       'limit': limit,
       'sort_by': sortBy,
@@ -209,4 +209,150 @@ Future<Map> dsmDownloadStation2TaskBTFileList(
     throw DSMException.fromMap(res);
   }
   return res['data'] ?? {};
+}
+
+/// 测试替身：非空时替代 DownloadStation 页面级 POST/上传请求。
+@visibleForTesting
+Future<dynamic> Function(String endpoint, {Map<String, dynamic>? data})?
+    dsmDownloadStationPostForTesting;
+
+@visibleForTesting
+Future<dynamic> Function(String endpoint, {Map<String, dynamic>? data})?
+    dsmDownloadStationUploadForTesting;
+
+Future<dynamic> _dsmDownloadStationPost(String endpoint,
+    {required Map<String, dynamic> data, CancelToken? cancelToken}) async {
+  final override = dsmDownloadStationPostForTesting;
+  if (override != null) return await override(endpoint, data: data);
+  return await _httpPost(endpoint, data: data, cancelToken: cancelToken);
+}
+
+Future<dynamic> _dsmDownloadStationUpload(String endpoint,
+    {required Map<String, dynamic> data, CancelToken? cancelToken}) async {
+  final override = dsmDownloadStationUploadForTesting;
+  if (override != null) return await override(endpoint, data: data);
+  return await _httpUpload(endpoint, data: data, cancelToken: cancelToken);
+}
+
+/// 任务列表 + 统计的一次性复合请求（旧 `DsmApi.downloadStationInfo` 语义）。
+Future<List<dynamic>> dsmDownloadStationOverview(
+    {CancelToken? cancelToken}) async {
+  final compound = [
+    {
+      "api": "SYNO.DownloadStation2.Task",
+      "method": "list",
+      "version": 2,
+      "limit": 500,
+      "offset": 0,
+      "sort_by": "task_id",
+      "order": "ASC",
+      "additional": ["detail", "transfer"],
+      "type": ["emule"],
+      "type_inverse": true,
+    },
+    {
+      "api": "SYNO.DownloadStation2.Task.Statistic",
+      "method": "get",
+      "version": 1,
+      "type": ["emule"],
+      "type_inverse": true,
+    },
+  ];
+  final res = await _dsmDownloadStationPost(_entryCGI,
+      data: {
+        "api": 'SYNO.Entry.Request',
+        "method": 'request',
+        "mode": '"parallel"',
+        "compound": jsonEncode(compound),
+        "version": 1,
+        "_sid": connectionStore.sid.value,
+      },
+      cancelToken: cancelToken);
+  if (res is! Map || res['success'] != true) {
+    throw DSMException.fromMap(res is Map ? res : const {});
+  }
+  final data = res['data'];
+  final result = data is Map ? data['result'] : null;
+  return result is List ? result : <dynamic>[];
+}
+
+/// 任务暂停/继续/删除等操作（旧 `DsmApi.downloadTaskAction` 语义）。
+Future<Map> dsmDownloadStation2TaskAction(List id, String action,
+    {CancelToken? cancelToken}) async {
+  final res = await _dsmDownloadStationPost(_entryCGI,
+      data: {
+        "id": jsonEncode(id),
+        "api": 'SYNO.DownloadStation2.Task',
+        "method": action,
+        "version": 1,
+        "_sid": connectionStore.sid.value,
+      },
+      cancelToken: cancelToken);
+  if (res is! Map || res['success'] != true) {
+    throw DSMException.fromMap(res is Map ? res : const {});
+  }
+  return res['data'] is Map ? res['data'] as Map : <String, dynamic>{};
+}
+
+/// 创建下载任务：种子走 multipart，链接走普通 POST；无有效载荷时返回 null。
+Future<Map?> dsmDownloadStation2TaskCreate(String destination, String type,
+    {String? url, String? filePath, CancelToken? cancelToken}) async {
+  final data = <String, dynamic>{
+    "api": 'SYNO.DownloadStation2.Task',
+    "method": "create",
+    "version": 2,
+  };
+  if (type == "file") {
+    if (filePath == null) return null;
+    final torrent = MultipartFile.fromFileSync(filePath,
+        filename: filePath.split("/").last,
+        contentType: MediaType.parse("application/octet-stream"));
+    data['file'] = json.encode(["-1891550746"]);
+    data['type'] = '"$type"';
+    data['create_list'] = true;
+    data['destination'] = '"$destination"';
+    data['-1891550746'] = torrent;
+    final res = await _dsmDownloadStationUpload(_entryCGI,
+        data: data, cancelToken: cancelToken);
+    if (res is! Map || res['success'] != true) {
+      throw DSMException.fromMap(res is Map ? res : const {});
+    }
+    return res;
+  }
+  if (url == null) return null;
+  final validUrls = url
+      .split("\n")
+      .map((e) => e.trim())
+      .where((e) => e.isNotEmpty)
+      .toList();
+  data['type'] = '"$type"';
+  data['create_list'] = true;
+  data['url'] = json.encode(validUrls);
+  data['destination'] = '"$destination"';
+  data['_sid'] = connectionStore.sid.value;
+  final res = await _dsmDownloadStationPost(_entryCGI,
+      data: data, cancelToken: cancelToken);
+  if (res is! Map || res['success'] != true) {
+    throw DSMException.fromMap(res is Map ? res : const {});
+  }
+  return res;
+}
+
+/// 任务详情（旧 `DsmApi.downloadDetail` 语义）。
+Future<Map> dsmDownloadStation2TaskDetail(String id,
+    {CancelToken? cancelToken}) async {
+  final res = await _dsmDownloadStationPost(_entryCGI,
+      data: {
+        "api": 'SYNO.DownloadStation2.Task',
+        "id": json.encode([id]),
+        "additional": json.encode(["detail", "transfer"]),
+        "method": "get",
+        "version": 2,
+        "_sid": connectionStore.sid.value,
+      },
+      cancelToken: cancelToken);
+  if (res is! Map || res['success'] != true) {
+    throw DSMException.fromMap(res is Map ? res : const {});
+  }
+  return res['data'] is Map ? res['data'] as Map : <String, dynamic>{};
 }

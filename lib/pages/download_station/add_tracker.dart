@@ -1,4 +1,4 @@
-import 'package:garden/util/http_util.dart';
+import 'package:garden/api/dsm_api.dart';
 import 'package:garden/util/ui_util.dart';
 import 'package:flutter/material.dart';
 import 'package:garden/constants/app_constants.dart';
@@ -51,15 +51,17 @@ class AddTracker extends HookWidget {
                 UiUtil.toast("请填写Tacker");
                 return;
               }
-              var res = await DsmApi.downloadTrackerAdd(id, trackers);
-              if (res['success']) {
+              try {
+                await dsmDownloadStation2TaskBTTrackerAdd(
+                    taskId: id, tracker: trackers);
                 UiUtil.toast("添加Tracker成功");
                 if (context.mounted) {
                   // ignore: use_build_context_synchronously
                   Navigator.of(context).pop();
                 }
-              } else {
-                UiUtil.toast("添加Tracker失败，代码${res['error']['code']}");
+              } catch (e) {
+                final code = e is DSMException ? e.code : -1;
+                UiUtil.toast("添加Tracker失败，代码$code");
               }
             },
             child: const Text(
