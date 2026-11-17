@@ -430,3 +430,16 @@ Future<Map> dsmCoreTaskSchedulerServiceModify(int taskId, // Task ID
   }
   return res['data'] ?? {};
 }
+
+/// 旧版任务运行语义（v1/run，task 为 JSON 数组），dashboard 快捷执行使用。
+Future<Map> dsmCoreTaskSchedulerRunBatch(List<int> task,
+    {CancelToken? cancelToken}) async {
+  final data = _dsmApiRequestData(
+      api: 'SYNO.Core.TaskScheduler', method: 'run', version: 1)
+    ..addAll({'task': jsonEncode(task)});
+  final res = await _httpPost(_entryCGI, data: data, cancelToken: cancelToken);
+  if (res['success'] != true) {
+    throw DSMException.fromMap(res);
+  }
+  return res['data'] is Map ? res['data'] as Map : <String, dynamic>{};
+}

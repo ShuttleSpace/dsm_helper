@@ -1,8 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:garden/util/ui_util.dart';
 import 'package:flutter/material.dart';
+import 'package:garden/api/dsm_api.dart';
+import 'package:garden/extensions/int.dart';
 import 'package:garden/theme/app_colors.dart';
-import 'package:garden/util/http_util.dart';
 
 /// Dashboard 登录用户列表项
 class DashboardUserItem extends StatelessWidget {
@@ -101,16 +102,17 @@ class DashboardUserItem extends StatelessWidget {
                                         onPressed: () async {
                                           Navigator.of(context).pop();
                                           user['running'] = true;
-                                          var res =
-                                              await DsmApi.kickConnection({
-                                            "who": user['who'],
-                                            "from": user['from']
-                                          });
-                                          user['running'] = false;
-
-                                          if (res['success']) {
+                                          try {
+                                            await dsmCoreCurrentConnectionKickConnection({
+                                              "who": user['who'],
+                                              "from": user['from']
+                                            });
                                             UiUtil.toast("连接已终止");
                                             onKickSuccess?.call();
+                                          } catch (e) {
+                                            // 旧层失败时静默，不提示。
+                                          } finally {
+                                            user['running'] = false;
                                           }
                                         },
                                         child: const Text(

@@ -106,3 +106,21 @@ Future<Map> dsmCoreStorageVolumeList({CancelToken? cancelToken}) async {
   }
   return res['data'] ?? {};
 }
+
+/// eSATA 弹出（保留旧层 dev_id 带引号的请求体）。
+Future<Map> dsmCoreExternalDeviceEjectEsata(String deviceId,
+    {CancelToken? cancelToken}) async {
+  final res = await _httpPost(_entryCGI,
+      data: {
+        "dev_id": '"$deviceId"',
+        "api": dsmCoreExternalDeviceStorageESATA,
+        "method": "eject",
+        "version": 1,
+        "_sid": connectionStore.sid.value,
+      },
+      cancelToken: cancelToken);
+  if (res['success'] != true) {
+    throw DSMException.fromMap(res);
+  }
+  return res['data'] is Map ? res['data'] as Map : <String, dynamic>{};
+}

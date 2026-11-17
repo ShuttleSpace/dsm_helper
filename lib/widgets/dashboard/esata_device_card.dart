@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:garden/api/dsm_api.dart';
+import 'package:garden/extensions/int.dart';
 import 'package:garden/util/ui_util.dart';
-import 'package:garden/util/http_util.dart';
 import 'package:garden/widgets/label.dart';
 
 /// eSata 设备卡片
@@ -50,12 +51,14 @@ class ESataDeviceCard extends StatelessWidget {
                 const Spacer(),
                 OutlinedButton(
                   onPressed: () async {
-                    var res = await DsmApi.ejectEsata(esata['dev_id']);
-                    if (res['success']) {
+                    try {
+                      await dsmCoreExternalDeviceEjectEsata(
+                          esata['dev_id'] as String);
                       UiUtil.toast("设备已退出");
                       onEjectSuccess?.call();
-                    } else {
-                      UiUtil.toast("设备退出失败，代码${res['error']['code']}");
+                    } catch (e) {
+                      final code = e is DSMException ? e.code : -1;
+                      UiUtil.toast("设备退出失败，代码$code");
                     }
                   },
                   child: SizedBox(
