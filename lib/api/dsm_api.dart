@@ -95,6 +95,8 @@ part 'dsm_api.surveillancestation.dart';
 part 'dsm_api.virtualization.dart';
 part 'dsm_api.virtualization.pages.dart';
 
+part 'dsm_api.control_panel.pages.dart';
+
 part 'dsm_api.directoryserver.dart';
 
 part 'dsm_api.activebackup.core.dart';

@@ -1,6 +1,7 @@
+import 'dart:convert';
 import 'package:garden/pages/control_panel/task_scheduler/task_record.dart';
 import 'package:garden/util/ui_util.dart';
-import 'package:garden/util/http_util.dart';
+import 'package:garden/api/dsm_api.dart';
 import 'package:garden/widgets/label.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
@@ -18,12 +19,20 @@ class TaskScheduler extends HookWidget {
     final loading = useSignal(true);
     final tasks = useSignal<List>([]);
 
-    getData() async {
-      var res = await DsmApi.taskScheduler();
-      if (res['success']) {
+    Future<void> getData() async {
+      try {
+        final data = await dsmControlPanelPost({
+          "api": "SYNO.Core.TaskScheduler",
+          "offset": 0,
+          "limit": -1,
+          "sort_by": "next_trigger_time",
+          "sort_direction": "DESC",
+          "version": 1,
+          "method": "list",
+        });
+        tasks.value = data['tasks'] ?? [];
         loading.value = false;
-        tasks.value = res['data']['tasks'];
-      } else {
+      } catch (e) {
         UiUtil.toast("加载失败");
         if (context.mounted) {
           // ignore: use_build_context_synchronously
@@ -93,15 +102,23 @@ class TaskScheduler extends HookWidget {
                   onTap: () async {
                     task['set'] = true;
                     refreshTasks();
-                    var res =
-                        await DsmApi.taskEnable(task['id'], !task['enable']);
-                    task['set'] = false;
-                    refreshTasks();
-                    if (res['success']) {
+                    try {
+                      await dsmControlPanelPost({
+                        "api": "SYNO.Core.TaskScheduler",
+                        "version": 1,
+                        "method": "set_enable",
+                        "status": jsonEncode([
+                          {"id": task['id'], "enable": !task['enable']}
+                        ]),
+                      });
                       task['enable'] = !task['enable'];
                       refreshTasks();
-                    } else {
-                      UiUtil.toast("操作失败，code：${res['error']['code']}");
+                    } catch (e) {
+                      final code = e is DSMException ? e.code : -1;
+                      UiUtil.toast("操作失败，code：$code");
+                    } finally {
+                      task['set'] = false;
+                      refreshTasks();
                     }
                   },
                   child: Card(
@@ -157,22 +174,27 @@ class TaskScheduler extends HookWidget {
                     }
                     task['running'] = true;
                     refreshTasks();
-                    Map<dynamic, dynamic> res;
-                    if (task['type'] == 'script') {
-                      res = await DsmApi.taskRun([task['id']]);
-                    } else if (task['type'] == 'event_script') {
-                      res = await DsmApi.eventRun([task['name']]);
-                    } else {
-                      UiUtil.toast("暂不支持此类型任务");
-                      return;
-                    }
-
-                    task['running'] = false;
-                    refreshTasks();
-                    if (res['success']) {
+                    try {
+                      if (task['type'] == 'script') {
+                        await dsmCoreTaskSchedulerRunBatch([task['id'] as int]);
+                      } else if (task['type'] == 'event_script') {
+                        await dsmControlPanelPost({
+                          "api": "SYNO.Core.EventScheduler",
+                          "version": 1,
+                          "method": "run",
+                          "task_name": task['name'],
+                        });
+                      } else {
+                        UiUtil.toast("暂不支持此类型任务");
+                        return;
+                      }
                       UiUtil.toast("任务计划执行成功");
-                    } else {
-                      UiUtil.toast("任务计划执行失败，code：${res['error']['code']}");
+                    } catch (e) {
+                      final code = e is DSMException ? e.code : -1;
+                      UiUtil.toast("任务计划执行失败，code：$code");
+                    } finally {
+                      task['running'] = false;
+                      refreshTasks();
                     }
                   },
                   child: SizedBox(

@@ -1,8 +1,11 @@
+import 'dart:convert';
+import 'package:garden/extensions/int.dart';
+import 'package:garden/util/file_types.dart';
 import 'package:garden/util/log.dart';
 import 'package:garden/util/ui_util.dart';
 
 import 'package:garden/pages/control_panel/shared_folders/add_shared_folder.dart';
-import 'package:garden/util/http_util.dart';
+import 'package:garden/api/dsm_api.dart';
 import 'package:garden/widgets/file_icon.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
@@ -21,32 +24,36 @@ class SharedFolders extends HookWidget {
     final folders = useSignal<List>([]);
     final volumes = useSignal<List>([]);
 
-    getData() async {
+    Future<void> getData() async {
       loading.value = true;
-      var res = await DsmApi.shareCore(additional: [
-      "hidden",
-      "encryption",
-      "is_aclmode",
-      "unite_permission",
-      "is_support_acl",
-      "is_sync_share",
-      "is_force_readonly",
-      "force_readonly_reason",
-      "recyclebin",
-      "is_share_moving",
-      "is_cluster_share",
-      "is_exfat_share",
-      "support_snapshot",
-      "share_quota",
-      "enable_share_compress",
-      "enable_share_cow",
-    ]);
-      loading.value = false;
-      success.value = res['success'];
-      if (res['success']) {
-        folders.value = res['data']['shares'];
-        for (var folder in folders.value) {
-          for (var volume in volumes.value) {
+      try {
+        final data = await dsmControlPanelPost({
+          "api": '"SYNO.Core.Share"',
+          "method": '"list"',
+          "version": 1,
+          "shareType": '"all"',
+          "additional": jsonEncode([
+            "hidden",
+            "encryption",
+            "is_aclmode",
+            "unite_permission",
+            "is_support_acl",
+            "is_sync_share",
+            "is_force_readonly",
+            "force_readonly_reason",
+            "recyclebin",
+            "is_share_moving",
+            "is_cluster_share",
+            "is_exfat_share",
+            "support_snapshot",
+            "share_quota",
+            "enable_share_compress",
+            "enable_share_cow",
+          ]),
+        });
+        folders.value = data['shares'] ?? [];
+        for (final folder in folders.value) {
+          for (final volume in volumes.value) {
             if (volume['volume_path'] == folder['vol_path']) {
               folder['volume_name'] = volume['display_name'];
               folder['volume_desc'] = volume['description'];
@@ -54,18 +61,22 @@ class SharedFolders extends HookWidget {
           }
         }
         folders.value = List.of(folders.value);
-      } else {
-        if (loading.value) {
-          msg.value = res['msg'] ?? "加载失败，code:${res['error']['code']}";
-        }
+        success.value = true;
+      } catch (e) {
+        success.value = false;
+        msg.value = '加载失败，code:${e is DSMException ? e.code : -1}';
+      } finally {
+        loading.value = false;
       }
     }
 
-    getVolumes() async {
-      var res = await DsmApi.volumes();
-      if (res['success']) {
-        volumes.value = res['data']['volumes'];
-        getData();
+    Future<void> getVolumes() async {
+      try {
+        final data = await dsmCoreStorageVolumeListForPage();
+        volumes.value = data['volumes'] ?? [];
+        await getData();
+      } catch (e) {
+        Log.warn('volumes: $e');
       }
     }
 
@@ -112,12 +123,16 @@ class SharedFolders extends HookWidget {
                         child: OutlinedButton(
                           onPressed: () async {
                             Navigator.of(context).pop();
-                            var res = await DsmApi.deleteSharedFolder([folder]);
-                            Log.info(res);
-                            if (res['success']) {
+                            try {
+                              await dsmControlPanelPost({
+                                "api": '"SYNO.Core.Share"',
+                                "method": '"delete"',
+                                "version": 1,
+                                "name": jsonEncode([folder]),
+                              });
                               UiUtil.toast("共享文件夹删除成功");
                               getData();
-                            } else {
+                            } catch (e) {
                               UiUtil.toast("共享文件夹删除出错");
                             }
                           },
@@ -363,13 +378,14 @@ class SharedFolders extends HookWidget {
                                         OutlinedButton(
                                           onPressed: () async {
                                             Navigator.of(context).pop();
-                                            DsmApi.cleanRecycleBin(
-                                                    folder['name'])
-                                                .then((res) {
-                                              if (res['success']) {
-                                                UiUtil.toast("请求已发送");
-                                              }
-                                            });
+                                            dsmControlPanelPost({
+                                              folder['name']: '"${folder['name']}"',
+                                              "api": '"SYNO.Core.RecycleBin"',
+                                              "method": 'start',
+                                              "version": 1,
+                                            }).then((_) {
+                                              UiUtil.toast("请求已发送");
+                                            }).catchError((_) {});
                                           },
                                           child: const Text(
                                             "清空回收站",
