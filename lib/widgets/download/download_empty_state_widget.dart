@@ -3,7 +3,8 @@ import 'package:garden/theme/app_theme.dart';
 
 /// 下载页面空状态显示组件
 class DownloadEmptyStateWidget extends StatelessWidget {
-  const DownloadEmptyStateWidget({super.key});
+  final String text;
+  const DownloadEmptyStateWidget({super.key, this.text = "暂无下载任务"});
 
   @override
   Widget build(BuildContext context) {
@@ -12,7 +13,7 @@ class DownloadEmptyStateWidget extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
-            "暂无下载任务",
+            text,
             style: TextStyle(color: AppTheme.of(context).placeholderColor),
           ),
           const SizedBox(

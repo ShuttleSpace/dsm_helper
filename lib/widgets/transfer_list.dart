@@ -7,20 +7,32 @@ import 'package:garden/services/transfer_upload.dart';
 import 'package:garden/stores/transfer_store.dart';
 import 'package:garden/theme/app_theme.dart';
 import 'package:garden/widgets/animation_progress_bar.dart';
+import 'package:garden/widgets/download/download_empty_state_widget.dart';
 
 /// 客户端传输队列（下载/上传）列表，订阅 [transferStore.tasks]。
-/// [type] 为空时显示全部；文件页只展示上传（下载进度在「下载」页呈现）。
+/// [type] / [state] 为空时不过滤；用于「传输」页的 5 个分类 tab。
 class TransferList extends StatelessWidget {
   final TransferType? type;
-  const TransferList({super.key, this.type});
+  final TransferState? state;
+  final String emptyText;
+  const TransferList({
+    super.key,
+    this.type,
+    this.state,
+    this.emptyText = "暂无传输任务",
+  });
 
   @override
   Widget build(BuildContext context) {
     final tasks = transferStore.tasks.watch(context);
-    final filtered = type == null
-        ? tasks
-        : tasks.where((t) => t.type == type).toList();
-    if (filtered.isEmpty) return const SizedBox.shrink();
+    final filtered = tasks.where((t) {
+      if (type != null && t.type != type) return false;
+      if (state != null && t.state != state) return false;
+      return true;
+    }).toList();
+    if (filtered.isEmpty) {
+      return DownloadEmptyStateWidget(text: emptyText);
+    }
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
