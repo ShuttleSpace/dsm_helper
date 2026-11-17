@@ -1,7 +1,8 @@
 import 'package:garden/theme/app_theme.dart';
 import 'package:garden/util/log.dart';
 import 'package:garden/util/ui_util.dart';
-import 'package:garden/util/http_util.dart';
+import 'package:garden/api/dsm_api.dart';
+import 'package:garden/util/file_types.dart';
 import 'package:garden/widgets/file_icon.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -20,10 +21,13 @@ class Favorite extends HookWidget {
 
     getData() async {
       favoriteLoading.value = true;
-      var res = await DsmApi.favoriteList();
-      favoriteLoading.value = false;
-      if (res['success']) {
-        favorites.value = res['data']['favorites'];
+      try {
+        final data = await dsmFileStationFavoriteListForPage();
+        favorites.value = data['favorites'] ?? [];
+      } catch (e) {
+        // 旧层失败时保持空列表。
+      } finally {
+        favoriteLoading.value = false;
       }
     }
 
@@ -195,18 +199,21 @@ class Favorite extends HookWidget {
                                                                         }
                                                                         Navigator.of(context)
                                                                             .pop();
-                                                                        var res = await DsmApi.favoriteRename(
-                                                                            favorite['path'],
-                                                                            name);
-                                                                        if (res[
-                                                                            'success']) {
-                                                                          UiUtil.toast(
-                                                                              "重命名成功");
+                                                                        try {
+                                                                          await dsmControlPanelGet({
+                                                                            "api": '"SYNO.FileStation.Favorite"',
+                                                                            "method": '"edit"',
+                                                                            "version": 2,
+                                                                            "path": favorite['path'],
+                                                                            "name": name,
+                                                                            "index": -1,
+                                                                          });
+                                                                          UiUtil.toast("重命名成功");
                                                                           getData();
-                                                                        } else {
-                                                                          if (res['error']['errors'] != null &&
-                                                                              res['error']['errors'].length > 0 &&
-                                                                              res['error']['errors'][0]['code'] == 414) {
+                                                                        } catch (e) {
+                                                                          final raw = e is DSMException ? e.rawError : null;
+                                                                          final errors = raw?['errors'] as List?;
+                                                                          if (errors != null && errors.isNotEmpty && errors[0]['code'] == 414) {
                                                                             UiUtil.toast("重命名失败：指定的名称已存在");
                                                                           } else {
                                                                             UiUtil.toast("重命名失败");

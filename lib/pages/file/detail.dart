@@ -2,7 +2,9 @@ import 'dart:async';
 import 'package:garden/util/log.dart';
 import 'package:garden/util/ui_util.dart';
 
-import 'package:garden/util/http_util.dart';
+import 'package:garden/api/dsm_api.dart';
+import 'package:garden/extensions/datetime.dart';
+import 'package:garden/extensions/int.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -27,19 +29,36 @@ class FileDetail extends HookWidget {
     final appDownload = useFileDownload(context);
 
     getDirSize() async {
-      var task = await DsmApi.dirSizeTask(file['path']);
-      if (task['success']) {
+      try {
+        final task = await dsmControlPanelPost({
+          "api": '"SYNO.FileStation.DirSize"',
+          "method": '"start"',
+          "version": 1,
+          "path": file['path'],
+        });
+        final taskId = task['taskid'];
         timer.value = Timer.periodic(const Duration(seconds: 1), (timer) async {
-          var result = await DsmApi.dirSizeResult(task['data']['taskid']);
-          Log.info(result);
-          if (result['success'] && result['data']['finished']) {
+          try {
+            final result = await dsmControlPanelPost({
+              "api": '"SYNO.FileStation.DirSize"',
+              "method": '"status"',
+              "version": 1,
+              "taskid": taskId,
+            });
+            Log.info(result);
+            if (result['finished'] == true) {
+              timer.cancel();
+              loadingSize.value = false;
+              size.value = result['total_size'] ?? 0;
+              folderCount.value = result['num_dir'] ?? 0;
+              fileCount.value = result['num_file'] ?? 0;
+            }
+          } catch (e) {
             timer.cancel();
-            loadingSize.value = false;
-            size.value = result['data']['total_size'];
-            folderCount.value = result['data']['num_dir'];
-            fileCount.value = result['data']['num_file'];
           }
         });
+      } catch (e) {
+        loadingSize.value = false;
       }
     }
 

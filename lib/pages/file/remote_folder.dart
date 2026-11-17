@@ -1,7 +1,8 @@
 import 'package:garden/extensions/color.dart';
 import 'package:garden/pages/file/select_folder.dart';
 import 'package:garden/util/ui_util.dart';
-import 'package:garden/util/http_util.dart';
+import 'dart:convert';
+import 'package:garden/api/dsm_api.dart';
 import 'package:garden/widgets/bubble_tab_indicator.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
@@ -218,18 +219,29 @@ class RemoteFolder extends HookWidget {
                           UiUtil.toast("请输入远程文件夹地址");
                           return;
                         }
-                        var res = await DsmApi.mountFolder(serverIp.value,
-                            account.value, passwd.value, mountPoint.value,
-                            autoMount.value);
-                        if (res['success']) {
+                        try {
+                          await dsmControlPanelPost({
+                            "mount_type": '"CIFS"',
+                            "server_ip": jsonEncode(serverIp.value),
+                            "mount_point": '"${mountPoint.value}"',
+                            "user_set": false,
+                            "auto_mount": autoMount.value,
+                            "adv_opt": '""',
+                            "account": '"${account.value}"',
+                            "passwd": '"${passwd.value}"',
+                            "api": "SYNO.FileStation.Mount",
+                            "method": "mount_remote",
+                            "version": 1,
+                          });
                           UiUtil.toast("装载成功");
                           UiUtil.vibrate(FeedbackType.light);
-                        } else {
+                        } catch (e) {
                           UiUtil.vibrate(FeedbackType.warning);
-                          if (res['error']['code'] == 436) {
+                          final code = e is DSMException ? e.code : -1;
+                          if (code == 436) {
                             UiUtil.toast("远程文件夹地址有误");
                           } else {
-                            UiUtil.toast("装载失败，代码${res['error']['code']}");
+                            UiUtil.toast("装载失败，代码$code");
                           }
                         }
                       },

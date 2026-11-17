@@ -5,7 +5,7 @@ import 'package:garden/util/ui_util.dart';
 import 'dart:io';
 import 'dart:math';
 
-import 'package:garden/util/http_util.dart';
+import 'package:garden/api/dsm_api.dart';
 import 'package:garden/widgets/hero_widget.dart';
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/cupertino.dart';
@@ -115,14 +115,13 @@ class ImagePreview extends HookWidget {
                             child: OutlinedButton(
                               onPressed: () async {
                                 Navigator.of(context).pop();
-                                var res = await DsmApi.deleteTask(
-                                    [paths[index]]);
-                                if (res['success']) {
+                                try {
+                                  await dsmFileStationDeleteStartForPage(
+                                      <String>[paths[index]]);
                                   UiUtil.toast("文件删除成功");
                                   if (thumbs.length > index) {
                                     thumbs.removeAt(index);
                                   }
-
                                   if (images.length > index) {
                                     images.removeAt(index);
                                   }
@@ -134,6 +133,8 @@ class ImagePreview extends HookWidget {
                                   }
                                   rebuild.value++;
                                   onDelete?.call();
+                                } catch (e) {
+                                  UiUtil.toast("文件删除失败");
                                 }
                               },
                               child: const Text(

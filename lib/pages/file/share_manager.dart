@@ -1,7 +1,7 @@
 import 'package:garden/pages/file/share.dart';
 import 'package:garden/util/file_type_util.dart';
-import 'package:garden/util/http_util.dart';
-import 'package:garden/util/log.dart';
+import 'package:garden/api/dsm_api.dart';
+import 'package:garden/util/file_types.dart';
 import 'package:garden/widgets/file_icon.dart';
 import 'package:garden/widgets/label.dart';
 import 'package:garden/widgets/neu_back_button.dart';
@@ -20,11 +20,21 @@ class ShareManager extends HookWidget {
     final loading = useSignal(true);
 
     getData() async {
-      var res = await DsmApi.listShare();
-      Log.info(res);
-      if (res['success']) {
+      try {
+        final data = await dsmControlPanelPost({
+          "offset": 0,
+          "limit": 100,
+          "filter_type":
+              "SYNO.SDS.App.FileStation3.Instance,SYNO.SDS.App.SharingUpload.Application",
+          "api": '"SYNO.FileStation.Sharing"',
+          "method": '"list"',
+          "version": 3,
+        });
+        links.value = data['links'] ?? [];
+      } catch (e) {
+        // 旧层失败时保持空列表。
+      } finally {
         loading.value = false;
-        links.value = res['data']['links'];
       }
     }
 

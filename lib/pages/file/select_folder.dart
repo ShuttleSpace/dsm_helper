@@ -3,7 +3,10 @@ import 'package:garden/util/file_type_util.dart';
 import 'package:garden/util/log.dart';
 import 'package:garden/util/ui_util.dart';
 import 'package:garden/stores/connection_store.dart';
-import 'package:garden/util/http_util.dart';
+import 'package:garden/api/dsm_api.dart';
+import 'package:garden/extensions/datetime.dart';
+import 'package:garden/extensions/int.dart';
+import 'package:garden/util/file_types.dart';
 import 'package:garden/widgets/file_icon.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -37,33 +40,31 @@ class SelectFolder extends HookWidget {
     }
   }
 
-  getShareList() async {
+  Future<void> getShareList() async {
     loading.value = true;
-    var res = await DsmApi.shareList();
-    success.value = res['success'];
-    if (res['success']) {
+    try {
+      final data = await dsmFileStationListShareForPage();
+      files.value = data['shares'] ?? [];
+      success.value = true;
+    } catch (e) {
+      success.value = false;
+      msg.value = '加载失败，code:${e is DSMException ? e.code : -1}';
+    } finally {
       loading.value = false;
-      files.value = res['data']['shares'];
-    } else {
-      if (loading.value) {
-        loading.value = false;
-        msg.value = res['msg'] ?? "加载失败，code:${res['error']['code']}";
-      }
     }
   }
 
-  getFileList(String path) async {
+  Future<void> getFileList(String path) async {
     loading.value = true;
-    var res = await DsmApi.fileList(path);
-    success.value = res['success'];
-    if (res['success']) {
+    try {
+      final data = await dsmFileStationListForPage(path);
+      files.value = data['files'] ?? [];
+      success.value = true;
+    } catch (e) {
+      success.value = false;
+      msg.value = '加载失败，code:${e is DSMException ? e.code : -1}';
+    } finally {
       loading.value = false;
-      files.value = res['data']['files'];
-    } else {
-      if (loading.value) {
-        loading.value = false;
-        msg.value = res['msg'] ?? "加载失败，code:${res['error']['code']}";
-      }
     }
   }
 

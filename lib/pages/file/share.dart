@@ -1,8 +1,9 @@
-import 'dart:convert';
 import 'package:garden/util/ui_util.dart';
 import 'package:garden/util/storage_util.dart';
 
-import 'package:garden/util/http_util.dart';
+import 'dart:convert';
+import 'package:garden/api/dsm_api.dart';
+import 'package:garden/extensions/datetime.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -59,13 +60,20 @@ class Share extends HookWidget {
         text: hasUpload ? (initialLink['request_info'] ?? "") : "");
 
   deleteShare() async {
-    var res = await DsmApi.deleteShare([linkInfo.value['id']]);
-    if (res['success']) {
+    try {
+      await dsmControlPanelPost({
+        "id": jsonEncode([linkInfo.value['id']]),
+        "api": '"SYNO.FileStation.Sharing"',
+        "method": '"delete"',
+        "version": 3,
+      });
       UiUtil.toast("取消共享成功");
       if (context.mounted) {
         // ignore: use_build_context_synchronously
         Navigator.of(context).pop();
       }
+    } catch (e) {
+      // 旧层失败时静默。
     }
   }
 
@@ -77,16 +85,32 @@ class Share extends HookWidget {
     if (paths == null || paths!.isEmpty) {
       return;
     }
-    var res = await DsmApi.createShare(paths!,
-        fileRequest: fileRequest ?? false,
-        requestName: requestName.value,
-        requestInfo: requestInfo.value);
-    if (res['success']) {
+    late Map<String, dynamic> data;
+    try {
+      final body = <String, dynamic>{
+        "api": '"SYNO.FileStation.Sharing"',
+        "method": '"create"',
+        "version": 3,
+        "path": jsonEncode(paths!),
+      };
+      if (fileRequest ?? false) {
+        body['file_request'] = true;
+        body['request_name'] = requestName.value;
+        body['request_info'] = requestInfo.value;
+      }
+      data = await dsmControlPanelPost(body);
+    } catch (e) {
       loading.value = false;
-      linkInfo.value = res['data']['links'][0];
-      times.value = res['data']['links'][0]['expire_times'] == 0
+      return;
+    }
+    {
+      loading.value = false;
+      final links = data['links'] as List? ?? [];
+      if (links.isEmpty) return;
+      linkInfo.value = links[0];
+      times.value = linkInfo.value['expire_times'] == 0
           ? ""
-          : res['data']['links'][0]['expire_times'].toString();
+          : linkInfo.value['expire_times'].toString();
       if (linkInfo.value['date_expired'] != "") {
         endTime.value = DateTime.parse(linkInfo.value['date_expired']);
       }
@@ -359,14 +383,34 @@ class Share extends HookWidget {
                               List<String> url = [];
                               id.add(linkInfo.value['id']);
                               url.add(linkInfo.value['url']);
-                              var res = await DsmApi.editShare(
-                                  linkInfo.value['path'], id, url,
-                                  endTime.value, startTime.value, times.value,
-                                  fileRequest: linkInfo.value['enable_upload'],
-                                  requestName: requestName.value,
-                                  requestInfo: requestInfo.value);
-                              if (res['success']) {
+                              try {
+                                final body = <String, dynamic>{
+                                  "path": linkInfo.value['path'],
+                                  "url": jsonEncode(url),
+                                  "protect_type_enable": '"false"',
+                                  "date_expired": endTime.value == null
+                                      ? ""
+                                      : '"${endTime.value!.format("Y-m-d H:i:s")}"',
+                                  "expire_times": times.value,
+                                  "protect_type": "none",
+                                  "redirect_uri": null,
+                                  "id": jsonEncode(id),
+                                  "date_available": startTime.value == null
+                                      ? ""
+                                      : '"${startTime.value!.format("Y-m-d H:i:s")}"',
+                                  "api": '"SYNO.FileStation.Sharing"',
+                                  "method": '"edit"',
+                                  "version": 3,
+                                };
+                                if (linkInfo.value['enable_upload'] == true) {
+                                  body['file_request'] = true;
+                                  body['request_name'] = requestName.value;
+                                  body['request_info'] = requestInfo.value;
+                                }
+                                await dsmControlPanelPost(body);
                                 UiUtil.toast("保存成功");
+                              } catch (e) {
+                                // 旧层失败时静默。
                               }
                             },
                             child: const Text("保存修改"),
