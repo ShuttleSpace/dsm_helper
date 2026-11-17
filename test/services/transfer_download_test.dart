@@ -34,6 +34,7 @@ void main() {
     expect(task.baseDirectory, BaseDirectory.root);
     expect(task.headers, authHeaders());
     expect(task.allowPause, isTrue);
+    expect(task.updates, Updates.statusAndProgress);
   });
 
   test('relative directory maps to applicationDocuments base', () {
@@ -63,6 +64,7 @@ void main() {
     );
     expect(parallel, isA<ParallelDownloadTask>());
     expect((parallel as ParallelDownloadTask).chunks, 4);
+    expect(parallel.updates, Updates.statusAndProgress);
   });
 
   test('enqueueFileDownload derives /fbdownload url from remotePath', () {

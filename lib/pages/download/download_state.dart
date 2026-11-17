@@ -17,6 +17,9 @@ class DownloadStateNotifier {
   final multiSelect = signal<bool>(false);
   final downloadPath = signal<String>('');
   final ReceivePort _receiverPort = ReceivePort();
+  // 回调可能早于 runLoop() 的异步列表加载到达；先按 id 存最新值，合并列表时补回。
+  final _latestUpdates = <String, ({TaskStatus? status, int? progress})>{};
+  bool _refreshing = false;
 
   void addSelectedTask(DownloadInfo task) {
     final currentTasks = [...selectedTasks.value];
@@ -72,17 +75,26 @@ class DownloadStateNotifier {
 
       transferStore.applyTaskStatus(id, status);
 
-      if (tasks.value.isNotEmpty) {
-        final updatedTasks = tasks.value.map((task) {
-          if (task.task.taskId == id) {
-            task.status = status;
-            if (rawProgress != null) {
-              task.progress = (rawProgress * 100).round();
-            }
-          }
-          return task;
-        }).toList();
-        tasks.value = updatedTasks;
+      final previous = _latestUpdates[id] ?? (status: null, progress: null);
+      _latestUpdates[id] = (
+        status: status == TaskStatus.notFound ? previous.status : status,
+        progress: rawProgress == null
+            ? previous.progress
+            : (rawProgress * 100).round(),
+      );
+
+      final latest = _latestUpdates[id]!;
+      final index = tasks.value.indexWhere((t) => t.task.taskId == id);
+      if (index >= 0) {
+        final updated = List<DownloadInfo>.of(tasks.value);
+        updated[index]
+          ..status = latest.status ?? updated[index].status
+          ..progress = latest.progress ?? updated[index].progress;
+        tasks.value = updated;
+      } else if (!_refreshing) {
+        // 新任务或回调早于列表加载：拉一次列表把它带进来（_applyTasks 会补最新值）。
+        _refreshing = true;
+        runLoop().whenComplete(() => _refreshing = false);
       }
     });
   }
@@ -106,6 +118,12 @@ class DownloadStateNotifier {
       if (t is! DownloadTask) continue;
       byId.putIfAbsent(t.taskId, () => DownloadInfo.formTask(t));
     }
+    for (final info in byId.values) {
+      final latest = _latestUpdates[info.task.taskId];
+      if (latest == null) continue;
+      if (latest.status != null) info.status = latest.status;
+      if (latest.progress != null) info.progress = latest.progress;
+    }
     tasks.value = byId.values.toList();
   }
 
@@ -113,6 +131,7 @@ class DownloadStateNotifier {
   Future<void> deleteTask(String id) async {
     await FileDownloader().cancelTaskWithId(id);
     await FileDownloader().database.deleteRecordWithId(id);
+    _latestUpdates.remove(id);
   }
 
   Future<void> runLoop() async {

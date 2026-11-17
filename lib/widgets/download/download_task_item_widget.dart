@@ -48,12 +48,12 @@ class DownloadTaskItemWidget extends StatelessWidget {
     return Padding(
       padding:
           const EdgeInsets.only(top: 10.0, bottom: 10.0, left: 20, right: 20),
-      child: Watch((context) => OutlinedButton(
+      child: Watch((context) => InkWell(
             onLongPress: () {
               UiUtil.vibrate(FeedbackType.light);
               onLongPress();
             },
-            onPressed: () {
+            onTap: () {
               if (multiSelect.value) {
                 if (selectedTasks.value.contains(info)) {
                   final currentTasks = [...selectedTasks.value];
@@ -70,7 +70,11 @@ class DownloadTaskItemWidget extends StatelessWidget {
             },
             child: Row(
               children: [
-                const SizedBox(width: 20),
+                DownloadStatusWidget(
+                  status: info.status ?? TaskStatus.notFound,
+                  progress: info.progress ?? 0,
+                ),
+                const SizedBox(width: 10),
                 _buildFileIcon(context, fileType),
                 const SizedBox(width: 10),
                 Expanded(
@@ -116,10 +120,6 @@ class DownloadTaskItemWidget extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 5),
-        DownloadStatusWidget(
-          status: info.status ?? TaskStatus.notFound,
-          progress: info.progress ?? 0,
-        ),
       ],
     );
   }

@@ -156,9 +156,8 @@ class Home extends HookWidget {
     });
 
     return PopScope(
-      // FIXME: with onPopInvokedWithResult notifier
-      canPop: DateTime.now().difference(lastPopTime.value) >
-          const Duration(seconds: 2),
+      // 交给 onWillPop 统一判定：文件页先回上一级，根目录下才走退出确认。
+      canPop: false,
       onPopInvokedWithResult: onWillPop,
       child: Scaffold(
         body: DownloadStateInherited(

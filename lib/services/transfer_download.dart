@@ -42,6 +42,7 @@ Task buildDownloadTask({
       chunks: chunkCount,
       allowPause: true,
       retries: 3,
+      updates: Updates.statusAndProgress,
     );
   }
   return DownloadTask(
@@ -52,6 +53,7 @@ Task buildDownloadTask({
     headers: authHeaders(),
     allowPause: true,
     retries: 3,
+    updates: Updates.statusAndProgress,
   );
 }
 

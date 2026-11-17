@@ -39,6 +39,7 @@ void main() async {
   await connectionStore.initialize();
   await initTransferEngine();
   transferStore.listenUpdates();
+  await transferStore.resumeUnfinishedOnStartup();
   final autPage = await settingsStore.authPage.value;
   final launchAccountPage = await settingsStore.launchAccountPage.value;
   runApp(MyApp(autPage, launchAccountPage));
