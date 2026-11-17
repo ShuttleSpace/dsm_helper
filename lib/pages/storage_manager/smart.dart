@@ -3,7 +3,8 @@ import 'package:garden/util/log.dart';
 import 'package:garden/util/ui_util.dart';
 
 import 'package:garden/theme/app_theme.dart';
-import 'package:garden/util/http_util.dart';
+import 'package:garden/api/dsm_api.dart';
+import 'package:garden/extensions/string.dart';
 import 'package:garden/widgets/bubble_tab_indicator.dart';
 import 'package:garden/widgets/label.dart';
 import 'package:garden/widgets/neu_back_button.dart';
@@ -39,19 +40,25 @@ class Smart extends HookWidget {
     final testInfo = useSignal<List>([]);
 
     getSmartLog() async {
-      var res = await DsmApi.smartTestLog(disk['device']);
-      Log.info(res);
-      if (res['success']) {
-      
-        quickLast.value = res['data']['quick_last'];
-        extendLast.value = res['data']['extend_last'];
-        testInfo.value = res['data']['testInfo'];
-        testing.value = res['data']['testInfo'].last['testing'];
-        remain.value = res['data']['testInfo'].last['remain'];
-        if (!testing.value) {
-          timer.value?.cancel();
+      try {
+        final data = await dsmControlPanelPost({
+          "device": '"${disk['device']}"',
+          "api": 'SYNO.Core.Storage.Disk',
+          "method": "get_smart_test_log",
+          "version": 1,
+        });
+        Log.info(data);
+        quickLast.value = data['quick_last'] ?? '';
+        extendLast.value = data['extend_last'] ?? '';
+        final infos = (data['testInfo'] as List?) ?? [];
+        testInfo.value = infos;
+        if (infos.isNotEmpty) {
+          testing.value = infos.last['testing'] ?? false;
+          remain.value = infos.last['remain'] ?? '';
+          if (!testing.value) timer.value?.cancel();
         }
-    
+      } catch (e) {
+        // 旧层失败时静默。
       }
     }
 
@@ -62,41 +69,62 @@ class Smart extends HookWidget {
       if (timer.value != null) {
         return;
       }
-      var res = await DsmApi.doSmartTest(disk['device'], type);
-      if (res['success']) {
+      try {
+        await dsmControlPanelPost({
+          "device": '"${disk['device']}"',
+          "type": '"$type"',
+          "api": 'SYNO.Core.Storage.Disk',
+          "method": "do_smart_test",
+          "version": 1,
+        });
         getSmartLog();
         timer.value = Timer.periodic(const Duration(seconds: 4), (unusedTimer) {
           getSmartLog();
         });
-      } else {
-        UiUtil.toast("执行检测失败，代码${res['error']['code']}");
-      
+      } catch (e) {
+        final code = e is DSMException ? e.code : -1;
+        UiUtil.toast("执行检测失败，代码$code");
         testing.value = false;
-    
       }
     }
 
     getLog() async {
-      var res = await DsmApi.diskTestLog(disk['device']);
-      if (res['success']) {
-      
+      try {
+        final data = await dsmControlPanelPost({
+          "sort_by": '"time"',
+          "sort_direction": '"DESC"',
+          "offset": 0,
+          "limit": 30,
+          "type": '"all"',
+          "device": '"${disk['device']}"',
+          "api": 'SYNO.Core.Storage.Disk',
+          "method": "disk_test_log_get",
+          "version": 1,
+        });
+        logs.value = data['testLog'] ?? [];
+      } catch (e) {
+        // 旧层失败时静默。
+      } finally {
         logLoading.value = false;
-        logs.value = res['data']['testLog'];
-    
       }
     }
 
     getData() async {
-      var res = await DsmApi.smart(disk['device']);
-      if (res['success']) {
-      
-        loading.value = false;
-        history.value = res['data']['healthInfo']['history'];
-        overview.value = res['data']['healthInfo']['overview'];
-        smartInfo.value = res['data']['healthInfo']['smartInfo'];
-    
-      } else {
+      try {
+        final data = await dsmControlPanelPost({
+          "device": '"${disk['device']}"',
+          "api": 'SYNO.Storage.CGI.Smart',
+          "method": "get_health_info",
+          "version": 1,
+        });
+        final health = (data['healthInfo'] as Map?) ?? const {};
+        history.value = health['history'] ?? [];
+        overview.value = health['overview'] ?? [];
+        smartInfo.value = health['smartInfo'] ?? [];
+      } catch (e) {
         UiUtil.toast("获取失败");
+      } finally {
+        loading.value = false;
       }
     }
 

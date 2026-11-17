@@ -1,6 +1,6 @@
 import 'package:garden/pages/storage_manager/smart.dart';
 import 'package:garden/util/ui_util.dart';
-import 'package:garden/util/http_util.dart';
+import 'package:garden/api/dsm_api.dart';
 import 'package:garden/widgets/bubble_tab_indicator.dart';
 import 'package:garden/widgets/dashed_decoration.dart';
 import 'package:garden/widgets/neu_back_button.dart';
@@ -33,30 +33,28 @@ class StorageManager extends HookWidget {
     final hotSpares = useSignal<List<Map<String, dynamic>>>([]);
     final env = useSignal<Map<String, dynamic>>({});
 
-    getData() async {
-      var res = await DsmApi.storage();
-      if (res['success']) {
+    Future<void> getData() async {
+      try {
+        final data = await dsmControlPanelPost({
+          "api": "SYNO.Storage.CGI.Storage",
+          "method": "load_info",
+          "version": 1,
+        });
+        ssdCaches.value = data['ssdCaches'] ?? [];
+        volumes.value = data['volumes'] ?? [];
+        volumes.value.sort((a, b) => a['num_id'].compareTo(b['num_id']));
+        disks.value = data['disks'] ?? [];
+        disks.value.sort((a, b) => a['num_id'].compareTo(b['num_id']));
+        storagePools.value = data['storagePools'] ?? [];
+        env.value = data['env'] is Map
+            ? Map<String, dynamic>.from(data['env'] as Map)
+            : {};
+        hotSpares.value = data['hotSpares'] ?? [];
         loading.value = false;
-        ssdCaches.value = res['data']['ssdCaches'];
-        volumes.value = res['data']['volumes'];
-
-        volumes.value.sort((a, b) {
-          return a['num_id'].compareTo(b['num_id']);
-        });
-        // print(volumes);
-        disks.value = res['data']['disks'];
-        disks.value.sort((a, b) {
-          return a['num_id'].compareTo(b['num_id']);
-        });
-        storagePools.value = res['data']['storagePools'];
-        env.value = res['data']['env'];
-        hotSpares.value = res['data']['hotSpares'];
-      } else {
-        UiUtil.toast("获取存储空间信息失败，代码${res['error']['code']}");
-        if (context.mounted) {
-          // ignore: use_build_context_synchronously
-          Navigator.of(context).pop();
-        }
+      } catch (e) {
+        final code = e is DSMException ? e.code : -1;
+        UiUtil.toast("获取存储空间信息失败，代码$code");
+        loading.value = false;
       }
     }
 

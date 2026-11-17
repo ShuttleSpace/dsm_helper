@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:garden/util/log.dart';
 import 'package:garden/util/ui_util.dart';
 
-import 'package:garden/util/http_util.dart';
+import 'package:garden/api/dsm_api.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -23,14 +23,23 @@ class UninstallPackage extends HookWidget {
     final rebuild = useSignal(0);
 
     getData() async {
-      var res = await DsmApi.uninstallPackageInfo(package['id']);
-      if (res['success']) {
-        loading.value = false;
-        pageData.value = jsonDecode(Uri.decodeComponent(
-            res['data']['additional']['uninstall_pages']));
+      try {
+        final data = await dsmControlPanelPost({
+          "id": package['id'],
+          "additional": jsonEncode(["uninstall_pages"]),
+          "api": "SYNO.Core.Package",
+          "version": 1,
+          "method": "get",
+        });
+        final additional = (data['additional'] as Map?) ?? const {};
+        pageData.value =
+            jsonDecode(Uri.decodeComponent(additional['uninstall_pages']));
         Log.info(pageData.value);
-      } else {
-        UiUtil.toast("获取卸载信息失败，代码${res['error']['code']}");
+      } catch (e) {
+        final code = e is DSMException ? e.code : -1;
+        UiUtil.toast("获取卸载信息失败，代码$code");
+      } finally {
+        loading.value = false;
       }
     }
 
@@ -175,7 +184,8 @@ class UninstallPackage extends HookWidget {
                             }
                           }
                           uninstalling.value = true;
-                          await DsmApi.uninstallPackageTask(package['id'],
+                          await dsmCorePackageUninstallTaskForPage(
+                              package['id'],
                               extra: extra);
                           UiUtil.toast("卸载成功");
                           if (context.mounted) {

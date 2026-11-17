@@ -1,5 +1,5 @@
-import 'package:garden/util/http_util.dart';
-import 'package:garden/util/log.dart';
+import 'dart:convert';
+import 'package:garden/api/dsm_api.dart';
 import 'package:garden/util/ui_util.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
@@ -16,13 +16,18 @@ class Users extends HookWidget {
     final users = useSignal<List>([]);
 
     getData() async {
-      var res = await DsmApi.currentConnect();
-      Log.info(res);
-      if (res['success']) {
+      try {
+        final data = await dsmCoreCurrentConnectionGet('enum',
+            offset: 0,
+            limit: 50,
+            start: 0,
+            sortBy: 'time',
+            sortDirection: 'DESC');
+        users.value = data['items'] ?? [];
         loading.value = false;
-        users.value = res['data']['items'];
-      } else {
-        UiUtil.toast("获取目前连接用户失败，代码${res['error']['code']}");
+      } catch (e) {
+        final code = e is DSMException ? e.code : -1;
+        UiUtil.toast("获取目前连接用户失败，代码$code");
         if (context.mounted) {
           // ignore: use_build_context_synchronously
           Navigator.of(context).pop();
@@ -161,17 +166,23 @@ class Users extends HookWidget {
                                             user['running'] = true;
                                             users.value =
                                                 List.of(users.value);
-                                            var res =
-                                                await DsmApi.kickConnection({
-                                              "who": user['who'],
-                                              "from": user['from']
-                                            });
-                                            user['running'] = false;
-                                            users.value =
-                                                List.of(users.value);
-
-                                            if (res['success']) {
+                                            try {
+                                              await dsmControlPanelPost({
+                                                "api": '"SYNO.Core.CurrentConnection"',
+                                                "method": '"kick_connection"',
+                                                "version": 1,
+                                                "http_conn": jsonEncode({
+                                                  "who": user['who'],
+                                                  "from": user['from']
+                                                }),
+                                                "service_conn": "[]",
+                                              });
                                               UiUtil.toast("连接已终止");
+                                            } catch (e) {
+                                              // 旧层失败时静默。
+                                            } finally {
+                                              user['running'] = false;
+                                              users.value = List.of(users.value);
                                             }
                                           },
                                           child: const Text(

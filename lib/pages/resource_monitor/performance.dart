@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:garden/stores/settings_store.dart';
 import 'package:garden/theme/app_theme.dart';
-import 'package:garden/util/http_util.dart';
+import 'package:garden/api/dsm_api.dart';
 import 'package:garden/widgets/bubble_tab_indicator.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:garden/widgets/resource_monitor/cpu_tab.dart';
@@ -60,11 +60,15 @@ class Performance extends HookWidget {
     }
 
     getData() async {
-      var res = await DsmApi.utilization();
-      if (res['success'] != true || !context.mounted) return;
+      late Map data;
+      try {
+        data = await dsmCoreSystemUtilization(
+            ['cpu', 'memory', 'network', 'lun', 'disk', 'space']);
+      } catch (e) {
+        return;
+      }
+      if (!context.mounted) return;
       loading.value = false;
-      final data = res['data'];
-      if (data is! Map) return;
       if (cpus.value.length > 30) {
         cpus.value = List.of(cpus.value)..removeAt(0);
         disks.value = List.of(disks.value)..removeAt(0);
@@ -73,7 +77,7 @@ class Performance extends HookWidget {
         networks.value = List.of(networks.value)..removeAt(0);
         spaces.value = List.of(spaces.value)..removeAt(0);
       }
-      // DsmApi.utilization() 返回单个快照，不是复合 result[]；按图表所需结构转换
+      // 新层返回单个快照，不是复合 result[]；按图表所需结构转换
       final cpu = data['cpu'];
       if (cpu is Map) {
         cpus.value = [
