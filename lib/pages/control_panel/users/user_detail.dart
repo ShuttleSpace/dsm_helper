@@ -45,8 +45,8 @@ class UserDetail extends HookWidget {
 
     getGroup() async {
       try {
-        final data =
-            await dsmCoreUserGroupsForUserForPage(userInfo.value?['name'] ?? '');
+        final data = await dsmCoreUserGroupsForUserForPage(
+            userInfo.value?['name'] ?? '');
         groups.value = data['groups'] ?? [];
         originGroups.value = groups.value
             .where((group) => group['is_member'])
@@ -66,71 +66,72 @@ class UserDetail extends HookWidget {
         return;
       }
       List result = data['result'] ?? [];
-        for (var item in result) {
-          if (item['success'] == true) {
-            switch (item['api']) {
-              case "SYNO.Core.User":
-                userInfo.value = item['data']['users'][0];
-                userInfo.value?['new_name'] = item['data']['users'][0]['name'];
-                break;
-              case "SYNO.Core.User.PasswordExpiry":
-                break;
-              case "SYNO.Core.Share.Permission":
-                permissions.value = item['data']['shares'];
-                break;
-              case "SYNO.Core.Storage.Volume":
-                volumes.value = item['data']['volumes'];
-                break;
-              case "SYNO.Core.BandwidthControl":
-                bandwidthControl.value = item['data']['bandwidths'];
-                break;
-              case "SYNO.Core.OTP.Admin":
-                break;
-              case "SYNO.Core.FileServ.SMB":
-                break;
-              case "SYNO.Core.Quota":
-                quotas.value = item['data']['user_quota'];
-                break;
-            }
+      for (var item in result) {
+        if (item['success'] == true) {
+          switch (item['api']) {
+            case "SYNO.Core.User":
+              userInfo.value = item['data']['users'][0];
+              userInfo.value?['new_name'] = item['data']['users'][0]['name'];
+              break;
+            case "SYNO.Core.User.PasswordExpiry":
+              break;
+            case "SYNO.Core.Share.Permission":
+              permissions.value = item['data']['shares'];
+              break;
+            case "SYNO.Core.Storage.Volume":
+              volumes.value = item['data']['volumes'];
+              break;
+            case "SYNO.Core.BandwidthControl":
+              bandwidthControl.value = item['data']['bandwidths'];
+              break;
+            case "SYNO.Core.OTP.Admin":
+              break;
+            case "SYNO.Core.FileServ.SMB":
+              break;
+            case "SYNO.Core.Quota":
+              quotas.value = item['data']['user_quota'];
+              break;
           }
         }
+      }
     }
 
     Widget buildVolumeItem(volume) {
       List shares = quotas.value
           .where((element) => element['volume'] == volume['volume_path'])
           .first['shares'];
-    return GestureDetector(
-      onTap: () {},
-      child: Card(
-        shape: RoundedRectangleBorder(
-            side: const BorderSide(), borderRadius: BorderRadius.circular(18)),
-        child: Padding(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            children: [
-              Row(
-                children: [
-                  Text(
-                    "${volume['display_name']}",
-                    style: const TextStyle(fontSize: 16),
-                  ),
-                  const SizedBox(
-                    width: 5,
-                  ),
-                  Label("${volume['description']}", Colors.lightBlueAccent),
-                ],
-              ),
-              const SizedBox(
-                height: 10,
-              ),
-              ...shares.map((quota) => QuotaItem(quota: quota)),
-            ],
+      return GestureDetector(
+        onTap: () {},
+        child: Card(
+          shape: RoundedRectangleBorder(
+              side: const BorderSide(),
+              borderRadius: BorderRadius.circular(18)),
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              children: [
+                Row(
+                  children: [
+                    Text(
+                      "${volume['display_name']}",
+                      style: const TextStyle(fontSize: 16),
+                    ),
+                    const SizedBox(
+                      width: 5,
+                    ),
+                    Label("${volume['description']}", Colors.lightBlueAccent),
+                  ],
+                ),
+                const SizedBox(
+                  height: 10,
+                ),
+                ...shares.map((quota) => QuotaItem(quota: quota)),
+              ],
+            ),
           ),
         ),
-      ),
-    );
-  }
+      );
+    }
 
     useEffect(() {
       getData();
@@ -339,7 +340,8 @@ class UserDetail extends HookWidget {
                             children: [
                               const Text("密码始终有效"),
                               const Spacer(),
-                              if (userInfo.value?['passwd_never_expire'] ?? false)
+                              if (userInfo.value?['passwd_never_expire'] ??
+                                  false)
                                 const Icon(
                                   CupertinoIcons.checkmark_alt,
                                   color: AppColors.primaryAction,
@@ -397,7 +399,8 @@ class UserDetail extends HookWidget {
                                           flex: 2,
                                           child: GestureDetector(
                                             onTap: () {
-                                              userInfo.value?['expired'] = "now";
+                                              userInfo.value?['expired'] =
+                                                  "now";
                                               userInfo.notifyListeners();
                                             },
                                             child: Card(
@@ -420,7 +423,8 @@ class UserDetail extends HookWidget {
                                                               height: 1.6),
                                                         ),
                                                         const Spacer(),
-                                                        if (userInfo.value?['expired'] ==
+                                                        if (userInfo.value?[
+                                                                'expired'] ==
                                                             "now")
                                                           const Icon(
                                                             CupertinoIcons
@@ -475,7 +479,8 @@ class UserDetail extends HookWidget {
                                                                   height: 1.6),
                                                         ),
                                                         const Spacer(),
-                                                        if (userInfo.value?['expired'] !=
+                                                        if (userInfo.value?[
+                                                                'expired'] !=
                                                             "now")
                                                           const Icon(
                                                             CupertinoIcons

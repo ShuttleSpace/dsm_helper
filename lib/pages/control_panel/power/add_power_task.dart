@@ -406,8 +406,12 @@ class AddPowerTask extends HookWidget {
                           onTap: () {
                             DatePicker.showTimePicker(
                               context,
-                              currentTime: DateTime(2021, 01, 01,
-                                  taskValue.value['hour'], taskValue.value['min']),
+                              currentTime: DateTime(
+                                  2021,
+                                  01,
+                                  01,
+                                  taskValue.value['hour'],
+                                  taskValue.value['min']),
                               showSecondsColumn: false,
                               onConfirm: (time) {
                                 taskValue.value['hour'] = time.hour;

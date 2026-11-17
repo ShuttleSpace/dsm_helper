@@ -95,7 +95,11 @@ class SortMenu extends HookWidget {
       );
     }
 
-    return Material(
+    return SizedBox(
+
+      width: double.infinity,
+
+      child: Material(
       color: Colors.transparent,
       child: Card(
         shape: RoundedRectangleBorder(
@@ -176,6 +180,8 @@ class SortMenu extends HookWidget {
           ),
         ),
       ),
+    ),
+
     );
   }
 }

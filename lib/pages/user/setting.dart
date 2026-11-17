@@ -22,14 +22,16 @@ class UserSetting extends HookWidget {
     final normalUser = useSignal<Map>({});
     final loading = useSignal(true);
     final saving = useSignal(false);
-    final changedData = useMemoized<Map<String, dynamic>>(() => {
-          "username": "",
-          "fullname": "",
-          "email": "",
-          "old_password": "",
-          "password": "",
-          "confirm_password": "",
-        }, const []);
+    final changedData = useMemoized<Map<String, dynamic>>(
+        () => {
+              "username": "",
+              "fullname": "",
+              "email": "",
+              "old_password": "",
+              "password": "",
+              "confirm_password": "",
+            },
+        const []);
 
     useEffect(() {
       () async {

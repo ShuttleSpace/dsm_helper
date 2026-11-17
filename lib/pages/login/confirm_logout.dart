@@ -13,7 +13,9 @@ class ConfirmLogout extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final forget = useSignal(false);
-    return Material(
+    return SizedBox(
+      width: double.infinity,
+      child: Material(
       color: Colors.transparent,
       child: Card(
         shape: RoundedRectangleBorder(
@@ -113,6 +115,7 @@ class ConfirmLogout extends HookWidget {
           ),
         ),
       ),
+    ),
     );
   }
 }

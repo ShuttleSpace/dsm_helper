@@ -244,7 +244,9 @@ class AddSharedFolders extends HookWidget {
                       showCupertinoModalPopup(
                         context: context,
                         builder: (context) {
-                          return Material(
+                          return SizedBox(
+                            width: double.infinity,
+                            child: Material(
                             color: Colors.transparent,
                             child: Card(
                               shape: RoundedRectangleBorder(
@@ -321,6 +323,7 @@ class AddSharedFolders extends HookWidget {
                                 ),
                               ),
                             ),
+                          ),
                           );
                         },
                       );
@@ -702,7 +705,9 @@ class AddSharedFolders extends HookWidget {
                               showCupertinoModalPopup(
                                 context: context,
                                 builder: (context) {
-                                  return Material(
+                                  return SizedBox(
+                                    width: double.infinity,
+                                    child: Material(
                                     color: Colors.transparent,
                                     child: Card(
                                       shape: RoundedRectangleBorder(
@@ -771,6 +776,7 @@ class AddSharedFolders extends HookWidget {
                                         ),
                                       ),
                                     ),
+                                  ),
                                   );
                                 },
                               );

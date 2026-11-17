@@ -3,7 +3,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:garden/constants/app_constants.dart';
-import 'package:garden/theme/app_colors.dart';
 import 'package:garden/util/file_types.dart';
 import 'package:garden/util/file_type_util.dart';
 import 'package:garden/util/http_util.dart';
@@ -137,8 +136,9 @@ class SelectLocalFolder extends HookWidget {
                 const SizedBox(
                   width: 10,
                 ),
-                OutlinedButton(
-                  onPressed: () {
+                Checkbox(
+                  value: selectedFiles.value.contains(file),
+                  onChanged: (_) {
                     if (multi) {
                       if (selectedFiles.value.contains(file)) {
                         selectedFiles.value =
@@ -150,16 +150,8 @@ class SelectLocalFolder extends HookWidget {
                       selectedFiles.value = [file];
                     }
                   },
-                  child: SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: selectedFiles.value.contains(file)
-                        ? const Icon(
-                            CupertinoIcons.checkmark_alt,
-                            color: AppColors.primaryAction,
-                          )
-                        : null,
-                  ),
+                  materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  visualDensity: VisualDensity.compact,
                 ),
                 const SizedBox(
                   width: 20,
@@ -196,7 +188,9 @@ class SelectLocalFolder extends HookWidget {
 
     return PopScope(
       onPopInvokedWithResult: onWillPop,
-      child: Material(
+      child: SizedBox(
+        width: double.infinity,
+        child: Material(
         color: Theme.of(context).scaffoldBackgroundColor,
         child: SizedBox(
           height: MediaQuery.sizeOf(context).height * 0.8,
@@ -267,6 +261,7 @@ class SelectLocalFolder extends HookWidget {
             ),
           ),
         ),
+      ),
       ),
     );
   }

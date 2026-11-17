@@ -16,7 +16,11 @@ class NeuPicker extends HookWidget {
     final selected = useSignal(value);
     final controller = useFixedExtentScrollController(initialItem: value);
 
-    return Material(
+    return SizedBox(
+
+      width: double.infinity,
+
+      child: Material(
       child: Card(
         shape: RoundedRectangleBorder(
             side: const BorderSide(), borderRadius: BorderRadius.circular(18)),
@@ -61,6 +65,8 @@ class NeuPicker extends HookWidget {
           ],
         ),
       ),
+    ),
+
     );
   }
 }

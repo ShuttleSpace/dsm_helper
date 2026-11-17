@@ -80,7 +80,9 @@ class ImagePreview extends HookWidget {
       showCupertinoModalPopup(
         context: context,
         builder: (context) {
-          return Material(
+          return SizedBox(
+            width: double.infinity,
+            child: Material(
             color: Colors.transparent,
             child: Card(
               shape: RoundedRectangleBorder(
@@ -168,6 +170,7 @@ class ImagePreview extends HookWidget {
                 ),
               ),
             ),
+          ),
           );
         },
       );

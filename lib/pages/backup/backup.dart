@@ -139,7 +139,9 @@ Future<dynamic> onChooseBackupTargetDialog(BuildContext context) {
     filter: ImageFilter.blur(),
     context: context,
     builder: (context) {
-      return Material(
+      return SizedBox(
+        width: double.infinity,
+        child: Material(
         child: Card(
           shape: RoundedRectangleBorder(
               side: const BorderSide(),
@@ -148,6 +150,7 @@ Future<dynamic> onChooseBackupTargetDialog(BuildContext context) {
             multi: false,
           ),
         ),
+      ),
       );
     },
   );
@@ -157,7 +160,9 @@ Future<dynamic> onChooseBackupSourceDialog(BuildContext context) {
   return showCupertinoModalPopup(
     context: context,
     builder: (context) {
-      return Material(
+      return SizedBox(
+        width: double.infinity,
+        child: Material(
         child: Card(
           shape: RoundedRectangleBorder(
               side: const BorderSide(),
@@ -167,6 +172,7 @@ Future<dynamic> onChooseBackupSourceDialog(BuildContext context) {
             selected: albums.value,
           ),
         ),
+      ),
       );
     },
   );

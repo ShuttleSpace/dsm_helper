@@ -68,7 +68,9 @@ class Favorite extends HookWidget {
                   showCupertinoModalPopup(
                     context: context,
                     builder: (context) {
-                      return Material(
+                      return SizedBox(
+                        width: double.infinity,
+                        child: Material(
                         color: Colors.transparent,
                         child: Card(
                           shape: RoundedRectangleBorder(
@@ -113,7 +115,9 @@ class Favorite extends HookWidget {
                                             showCupertinoDialog(
                                               context: context,
                                               builder: (context) {
-                                                return Material(
+                                                return SizedBox(
+                                                  width: double.infinity,
+                                                  child: Material(
                                                   color: Colors.transparent,
                                                   child: Column(
                                                     mainAxisAlignment:
@@ -257,6 +261,7 @@ class Favorite extends HookWidget {
                                                       ),
                                                     ],
                                                   ),
+                                                ),
                                                 );
                                               },
                                             );
@@ -288,7 +293,9 @@ class Favorite extends HookWidget {
                                             showCupertinoModalPopup(
                                               context: context,
                                               builder: (context) {
-                                                return Material(
+                                                return SizedBox(
+                                                  width: double.infinity,
+                                                  child: Material(
                                                   color: Colors.transparent,
                                                   child: Card(
                                                     shape: RoundedRectangleBorder(
@@ -391,6 +398,7 @@ class Favorite extends HookWidget {
                                                       ),
                                                     ),
                                                   ),
+                                                ),
                                                 );
                                               },
                                             );
@@ -431,6 +439,7 @@ class Favorite extends HookWidget {
                             ),
                           ),
                         ),
+                      ),
                       );
                     },
                   );

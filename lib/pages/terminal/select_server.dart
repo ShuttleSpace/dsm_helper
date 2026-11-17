@@ -20,14 +20,28 @@ class SelectServer extends HookWidget {
     final loading = useSignal(true);
     final servers = useSignal<List>([]);
 
+    Future<void> createCurrentServer() async {
+      final host = await StorageUtil.getString("host") ?? '';
+      if (host.isBlank) return;
+      final server = {
+        "host": host,
+        "port": "22",
+        "account": await StorageUtil.getString("account") ?? '',
+        "password": await StorageUtil.getString("password") ?? '',
+      };
+      servers.value = [server];
+      await StorageUtil.setString("terminal_servers", jsonEncode(servers.value));
+    }
+
     getData() async {
       String str = await StorageUtil.getString("terminal_servers") ?? '';
-      loading.value = false;
       if (str.isNotBlank) {
         servers.value = json.decode(str);
-      } else {
-        servers.value = [];
       }
+      if (servers.value.isEmpty) {
+        await createCurrentServer();
+      }
+      loading.value = false;
       Log.info(servers.value);
     }
 

@@ -18,7 +18,9 @@ class UpdateDialog extends StatelessWidget {
     final cupertinoTheme = CupertinoTheme.of(context);
 
     return Center(
-      child: Material(
+      child: SizedBox(
+        width: double.infinity,
+        child: Material(
         color: Colors.transparent,
         child: SizedBox(
           width: 300,
@@ -215,6 +217,7 @@ class UpdateDialog extends StatelessWidget {
             ],
           ),
         ),
+      ),
       ),
     );
   }

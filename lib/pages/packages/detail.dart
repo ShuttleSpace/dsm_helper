@@ -91,7 +91,9 @@ class PackageDetail extends HookWidget {
       showCupertinoModalPopup(
         context: context,
         builder: (context) {
-          return Material(
+          return SizedBox(
+            width: double.infinity,
+            child: Material(
             color: Colors.transparent,
             child: Card(
               shape: RoundedRectangleBorder(
@@ -158,6 +160,7 @@ class PackageDetail extends HookWidget {
                 ),
               ),
             ),
+          ),
           );
         },
       );
@@ -182,7 +185,9 @@ class PackageDetail extends HookWidget {
             // ignore: use_build_context_synchronously
             context: context,
             builder: (context) {
-              return Material(
+              return SizedBox(
+                width: double.infinity,
+                child: Material(
                 color: Colors.transparent,
                 child: Card(
                   shape: RoundedRectangleBorder(
@@ -250,6 +255,7 @@ class PackageDetail extends HookWidget {
                     ),
                   ),
                 ),
+              ),
               );
             },
           ).then((value) {
@@ -690,7 +696,9 @@ class PackageDetail extends HookWidget {
                             showCupertinoModalPopup(
                               context: context,
                               builder: (context) {
-                                return Material(
+                                return SizedBox(
+                                  width: double.infinity,
+                                  child: Material(
                                   color: Colors.transparent,
                                   child: Card(
                                     shape: RoundedRectangleBorder(
@@ -767,6 +775,7 @@ class PackageDetail extends HookWidget {
                                       ),
                                     ),
                                   ),
+                                ),
                                 );
                               },
                             );
@@ -791,7 +800,9 @@ class PackageDetail extends HookWidget {
                                   showCupertinoModalPopup(
                                     context: context,
                                     builder: (context) {
-                                      return Material(
+                                      return SizedBox(
+                                        width: double.infinity,
+                                        child: Material(
                                         color: Colors.transparent,
                                         child: Card(
                                           shape: RoundedRectangleBorder(
@@ -883,6 +894,7 @@ class PackageDetail extends HookWidget {
                                             ),
                                           ),
                                         ),
+                                      ),
                                       );
                                     },
                                   );

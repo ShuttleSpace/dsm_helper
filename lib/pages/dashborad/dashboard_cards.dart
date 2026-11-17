@@ -429,7 +429,9 @@ class _DashboardConnectionLogItem extends StatelessWidget {
     return showCupertinoModalPopup(
       context: context,
       builder: (context) {
-        return Material(
+        return SizedBox(
+          width: double.infinity,
+          child: Material(
           color: Colors.transparent,
           child: Card(
             shape: RoundedRectangleBorder(
@@ -499,6 +501,7 @@ class _DashboardConnectionLogItem extends StatelessWidget {
               ),
             ),
           ),
+        ),
         );
       },
     );

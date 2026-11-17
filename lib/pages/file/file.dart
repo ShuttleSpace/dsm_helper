@@ -295,7 +295,9 @@ class Files extends HookWidget {
               // ignore: use_build_context_synchronously
               context: context,
               builder: (context) {
-                return Material(
+                return SizedBox(
+                  width: double.infinity,
+                  child: Material(
                   color: Colors.transparent,
                   child: Card(
                     shape: RoundedRectangleBorder(
@@ -363,6 +365,7 @@ class Files extends HookWidget {
                       ),
                     ),
                   ),
+                ),
                 );
               },
             ).then((value) {
@@ -435,7 +438,9 @@ class Files extends HookWidget {
       }
     }
     Widget buildSortMenu(BuildContext context) {
-      return Material(
+      return SizedBox(
+        width: double.infinity,
+        child: Material(
         color: Colors.transparent,
         child: Card(
           shape: context.stadiumShapeBorder,
@@ -867,6 +872,7 @@ class Files extends HookWidget {
             ),
           ),
         ),
+      ),
       );
     }
     deleteFile(List<String> filePaths) {
@@ -874,7 +880,9 @@ class Files extends HookWidget {
       showCupertinoModalPopup(
         context: context,
         builder: (context) {
-          return Material(
+          return SizedBox(
+            width: double.infinity,
+            child: Material(
             color: Colors.transparent,
             child: Card(
               shape: RoundedRectangleBorder(
@@ -957,6 +965,7 @@ class Files extends HookWidget {
                 ),
               ),
             ),
+          ),
           );
         },
       );
@@ -973,7 +982,9 @@ class Files extends HookWidget {
       showCupertinoModalPopup(
         context: context,
         builder: (context) {
-          return Material(
+          return SizedBox(
+            width: double.infinity,
+            child: Material(
             color: Colors.transparent,
             child: Card(
               shape: RoundedRectangleBorder(
@@ -1062,6 +1073,7 @@ class Files extends HookWidget {
                 ),
               ),
             ),
+          ),
           );
         },
       );
@@ -1293,7 +1305,9 @@ class Files extends HookWidget {
       showCupertinoModalPopup(
         context: context,
         builder: (context) {
-          return Material(
+          return SizedBox(
+            width: double.infinity,
+            child: Material(
             color: Colors.transparent,
             child: Card(
               shape: RoundedRectangleBorder(
@@ -1542,7 +1556,9 @@ class Files extends HookWidget {
                                     showCupertinoDialog(
                                       context: context,
                                       builder: (context) {
-                                        return Material(
+                                        return SizedBox(
+                                          width: double.infinity,
+                                          child: Material(
                                           color: Colors.transparent,
                                           child: Column(
                                             mainAxisAlignment:
@@ -1668,6 +1684,7 @@ class Files extends HookWidget {
                                               ),
                                             ],
                                           ),
+                                        ),
                                         );
                                       },
                                     );
@@ -1833,6 +1850,7 @@ class Files extends HookWidget {
                 ),
               ),
             ),
+          ),
           );
         },
       );
@@ -2227,7 +2245,9 @@ class Files extends HookWidget {
                   showCupertinoModalPopup(
                     context: context,
                     builder: (context) {
-                      return Material(
+                      return SizedBox(
+                        width: double.infinity,
+                        child: Material(
                         color: Colors.transparent,
                         child: Card(
                           shape: RoundedRectangleBorder(
@@ -2332,6 +2352,7 @@ class Files extends HookWidget {
                             ),
                           ),
                         ),
+                      ),
                       );
                     },
                   );
@@ -2478,7 +2499,9 @@ class Files extends HookWidget {
                   showCupertinoModalPopup(
                     context: context,
                     builder: (context) {
-                      return Material(
+                      return SizedBox(
+                        width: double.infinity,
+                        child: Material(
                         color: Colors.transparent,
                         child: Card(
                           shape: RoundedRectangleBorder(
@@ -2573,7 +2596,9 @@ class Files extends HookWidget {
                                                 showCupertinoDialog(
                                                     context: context,
                                                     builder: (context) {
-                                                      return Material(
+                                                      return SizedBox(
+                                                        width: double.infinity,
+                                                        child: Material(
                                                         color: Colors.transparent,
                                                         child: Column(
                                                           mainAxisAlignment:
@@ -2701,6 +2726,7 @@ class Files extends HookWidget {
                                                             ),
                                                           ],
                                                         ),
+                                                      ),
                                                       );
                                                     });
                                               },
@@ -2889,6 +2915,7 @@ class Files extends HookWidget {
                             ),
                           ),
                         ),
+                      ),
                       );
                     },
                   );

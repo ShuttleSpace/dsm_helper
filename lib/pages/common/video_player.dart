@@ -242,11 +242,12 @@ class VideoPlayerPage extends HookWidget {
                             Log.log(
                                 "detail: ${details.delta.dx.toInt() / MediaQuery.devicePixelRatioOf(context)}");
                             player.seek(Duration(
-                                milliseconds: player.state.position.inMilliseconds +
-                                    (details.delta.dx.toInt() /
-                                            MediaQuery.devicePixelRatioOf(
-                                                context))
-                                        .toInt()));
+                                milliseconds:
+                                    player.state.position.inMilliseconds +
+                                        (details.delta.dx.toInt() /
+                                                MediaQuery.devicePixelRatioOf(
+                                                    context))
+                                            .toInt()));
                           },
                           onVerticalDragUpdate: (details) => {
                             // TODO: volume & brightness

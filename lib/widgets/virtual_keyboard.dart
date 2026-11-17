@@ -26,18 +26,21 @@ class VirtualKeyboardView extends HookWidget {
               Row(
                 children: [
                   TerminalButton(
+                    width: 36,
                     onPressed: () {
                       terminal.keyInput(TerminalKey.escape);
                     },
                     child: const Text("ESC"),
                   ),
                   TerminalButton(
+                    width: 36,
                     onPressed: () {
                       terminal.onOutput?.call('/');
                     },
                     child: const Text("/"),
                   ),
                   TerminalButton(
+                    width: 36,
                     onPressed: () {
                       terminal.keyInput(TerminalKey.arrowUp);
                     },
@@ -51,6 +54,7 @@ class VirtualKeyboardView extends HookWidget {
                   ),
                   const Spacer(),
                   TerminalButton(
+                    width: 36,
                     onPressed: () {
                       terminal.keyInput(TerminalKey.home);
                     },
@@ -60,6 +64,7 @@ class VirtualKeyboardView extends HookWidget {
                     ),
                   ),
                   TerminalButton(
+                    width: 36,
                     onPressed: () {
                       terminal.keyInput(TerminalKey.insert);
                     },
@@ -69,6 +74,7 @@ class VirtualKeyboardView extends HookWidget {
                     ),
                   ),
                   TerminalButton(
+                    width: 36,
                     onPressed: () {
                       terminal.keyInput(TerminalKey.pageUp);
                     },
@@ -82,6 +88,7 @@ class VirtualKeyboardView extends HookWidget {
               Row(
                 children: [
                   TerminalButton(
+                    width: 36,
                     onPressed: () {
                       terminal.keyInput(TerminalKey.tab);
                     },
@@ -89,6 +96,7 @@ class VirtualKeyboardView extends HookWidget {
                   ),
                   // 左
                   TerminalButton(
+                    width: 36,
                     onPressed: () {
                       terminal.keyInput(TerminalKey.arrowLeft);
                     },
@@ -99,6 +107,7 @@ class VirtualKeyboardView extends HookWidget {
                   ),
                   // //下
                   TerminalButton(
+                    width: 36,
                     onPressed: () {
                       terminal.keyInput(TerminalKey.arrowDown);
                     },
@@ -109,6 +118,7 @@ class VirtualKeyboardView extends HookWidget {
                   ),
                   // // 右
                   TerminalButton(
+                    width: 36,
                     onPressed: () {
                       terminal.keyInput(TerminalKey.arrowRight);
                     },
@@ -119,6 +129,7 @@ class VirtualKeyboardView extends HookWidget {
                   ),
                   const Spacer(),
                   TerminalButton(
+                    width: 36,
                     onPressed: () {
                       keyboard.ctrl = !keyboard.ctrl;
                       rebuild.value++;
@@ -127,6 +138,7 @@ class VirtualKeyboardView extends HookWidget {
                     child: const Text("Ctrl"),
                   ),
                   TerminalButton(
+                    width: 36,
                     onPressed: () {
                       keyboard.alt = !keyboard.alt;
                       rebuild.value++;
@@ -135,6 +147,7 @@ class VirtualKeyboardView extends HookWidget {
                     child: const Text("Alt"),
                   ),
                   TerminalButton(
+                    width: 36,
                     onPressed: () {
                       keyboard.shift = !keyboard.shift;
                       rebuild.value++;
@@ -143,18 +156,21 @@ class VirtualKeyboardView extends HookWidget {
                     child: const Text("Shift"),
                   ),
                   TerminalButton(
+                    width: 36,
                     onPressed: () {
                       terminal.keyInput(TerminalKey.delete);
                     },
                     child: const Text("DEL"),
                   ),
                   TerminalButton(
+                    width: 36,
                     onPressed: () {
                       terminal.keyInput(TerminalKey.end);
                     },
                     child: const Text("END"),
                   ),
                   TerminalButton(
+                    width: 36,
                     onPressed: () {
                       terminal.keyInput(TerminalKey.pageDown);
                     },

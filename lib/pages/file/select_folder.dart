@@ -11,7 +11,6 @@ import 'package:garden/widgets/file_icon.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:garden/constants/app_constants.dart';
-import 'package:garden/theme/app_colors.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:signals_hooks/signals_hooks.dart';
 
@@ -183,8 +182,9 @@ class SelectFolder extends HookWidget {
               const SizedBox(
                 width: 10,
               ),
-              OutlinedButton(
-                onPressed: () {
+              Checkbox(
+                value: selectedFiles.contains(file['path']),
+                onChanged: (_) {
                   if (multi) {
                     if (selectedFiles.contains(file['path'])) {
                       selectedFiles.remove(file['path']);
@@ -195,14 +195,8 @@ class SelectFolder extends HookWidget {
                     selectedFiles.value = [file['path']];
                   }
                 },
-                child: SizedBox(
-                  child: selectedFiles.contains(file['path'])
-                      ? const Icon(
-                          CupertinoIcons.checkmark_alt,
-                          color: AppColors.primaryAction,
-                        )
-                      : null,
-                ),
+                materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                visualDensity: VisualDensity.compact,
               ),
             ],
           ),
@@ -237,7 +231,9 @@ class SelectFolder extends HookWidget {
 
     return PopScope(
       onPopInvokedWithResult: onWillPop,
-      child: Material(
+      child: SizedBox(
+        width: double.infinity,
+        child: Material(
         color: Theme.of(context).scaffoldBackgroundColor,
         child: SafeArea(
           top: false,
@@ -278,7 +274,9 @@ class SelectFolder extends HookWidget {
                               showCupertinoDialog(
                                   context: context,
                                   builder: (context) {
-                                    return Material(
+                                    return SizedBox(
+                                      width: double.infinity,
+                                      child: Material(
                                       color: Colors.transparent,
                                       child: Column(
                                         mainAxisAlignment:
@@ -397,6 +395,7 @@ class SelectFolder extends HookWidget {
                                           ),
                                         ],
                                       ),
+                                    ),
                                     );
                                   });
                             },
@@ -485,6 +484,7 @@ class SelectFolder extends HookWidget {
             ),
           ),
         ),
+      ),
       ),
     );
   }

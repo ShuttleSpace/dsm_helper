@@ -3,19 +3,15 @@ import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:garden/pages/backup/backup.dart';
-import 'package:garden/pages/control_panel/ssh/ssh.dart';
 import 'package:garden/pages/login/accounts.dart';
 import 'package:garden/pages/login/confirm_logout.dart';
 import 'package:garden/pages/setting/helper_setting.dart';
 import 'package:garden/pages/terminal/select_server.dart';
 import 'package:garden/pages/user/setting.dart';
-import 'package:garden/stores/connection_store.dart';
 import 'package:garden/stores/settings_store.dart';
 import 'package:garden/api/dsm_api.dart';
 import 'package:garden/extensions/string.dart';
-import 'package:garden/util/log.dart';
 import 'package:garden/util/storage_util.dart';
-import 'package:garden/util/ui_util.dart';
 import 'package:garden/widgets/terminal_button.dart';
 import 'package:garden/constants/app_constants.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -105,8 +101,6 @@ class Setting extends HookWidget {
     final ssh = useSignal(false);
     final telnet = useSignal(false);
     final sshLoading = useSignal(true);
-    final shutdowning = useSignal(false);
-    final rebooting = useSignal(false);
     final sshPort = useSignal('');
     final servers = useSignal<List>([]);
     final account = useSignal("");
@@ -146,290 +140,13 @@ class Setting extends HookWidget {
       }
     }
 
-    power(String type, bool force) async {
-      if (type == "shutdown") {
-        shutdowning.value = true;
-      } else {
-        rebooting.value = true;
-      }
-
-      Map<String, dynamic>? errorData;
-      try {
-        await dsmCoreSystemPowerForPage(type, force);
-        UiUtil.toast("已发送指令");
-      } on DSMException catch (e) {
-        errorData = e.rawError;
-        if (e.code != 117) {
-          UiUtil.toast("操作失败，代码：${e.code}");
-        }
-      } catch (_) {}
-
-      if (type == "shutdown") {
-        shutdowning.value = false;
-      } else {
-        rebooting.value = false;
-      }
-
-      if (errorData != null && errorData['code'] == 117) {
-        final rawErrors = errorData['errors'];
-        List errors = rawErrors is Map
-            ? (rawErrors['runningTasks'] as List? ?? [])
-            : [];
-        List msgs = [];
-        for (int i = 0; i < errors.length; i++) {
-          List titles = errors[i].split(":");
-          if (titles.length == 3) {
-            msgs.add(
-                connectionStore.strings.value[titles[0]][titles[1]][titles[2]]);
-          }
-          //系统正在处理下列任务。现在关机可能会导致套件异常或数据丢失。是否确定要继续？
-          if (context.mounted) {
-            showCupertinoModalPopup(
-              // ignore: use_build_context_synchronously
-              context: context,
-              builder: (context) {
-                return Material(
-                  color: Colors.transparent,
-                  child: Card(
-                    shape: RoundedRectangleBorder(
-                        side: const BorderSide(),
-                        borderRadius: BorderRadius.circular(18)),
-                    child: SafeArea(
-                      top: false,
-                      child: Padding(
-                        padding: const EdgeInsets.all(20),
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: <Widget>[
-                            const Text(
-                              "系统正在处理下列任务。现在关机可能会导致套件异常或数据丢失。是否确定要继续？",
-                              style: TextStyle(
-                                  fontSize: 20, fontWeight: FontWeight.w500),
-                            ),
-                            const SizedBox(
-                              height: 12,
-                            ),
-                            Text(
-                              msgs.join("\n"),
-                              style: const TextStyle(
-                                  fontSize: 20, fontWeight: FontWeight.w400),
-                            ),
-                            const SizedBox(
-                              height: 22,
-                            ),
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: OutlinedButton(
-                                    onPressed: () async {
-                                      Navigator.of(context).pop();
-                                      power(type, true);
-                                    },
-                                    child: Text(
-                                      "强制${type == "shutdown" ? "关机" : "重启"}",
-                                      style: const TextStyle(
-                                          fontSize: 18,
-                                          color: Colors.redAccent),
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(
-                                  width: 16,
-                                ),
-                                Expanded(
-                                  child: OutlinedButton(
-                                    onPressed: () async {
-                                      Navigator.of(context).pop();
-                                    },
-                                    child: const Text(
-                                      "取消",
-                                      style: TextStyle(fontSize: 18),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(
-                              height: 8,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                );
-              },
-            );
-          }
-        }
-      }
-    }
-
-    onShutdown() async {
-      if (shutdowning.value) {
-        return;
-      }
-      showCupertinoModalPopup(
-        context: context,
-        builder: (context) {
-          return Material(
-            color: Colors.transparent,
-            child: Card(
-              shape: RoundedRectangleBorder(
-                  side: const BorderSide(),
-                  borderRadius: BorderRadius.circular(18)),
-              child: SafeArea(
-                top: false,
-                child: Padding(
-                  padding: const EdgeInsets.all(20),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: <Widget>[
-                      const Text(
-                        "确认关机",
-                        style: TextStyle(
-                            fontSize: 20, fontWeight: FontWeight.w500),
-                      ),
-                      const SizedBox(
-                        height: 12,
-                      ),
-                      const Text(
-                        "确认要关闭设备吗？",
-                        style: TextStyle(
-                            fontSize: 20, fontWeight: FontWeight.w400),
-                      ),
-                      const SizedBox(
-                        height: 22,
-                      ),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: OutlinedButton(
-                              onPressed: () async {
-                                Navigator.of(context).pop();
-                                power("shutdown", false);
-                              },
-                              child: const Text(
-                                "确认关机",
-                                style: TextStyle(
-                                    fontSize: 18, color: Colors.redAccent),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(
-                            width: 16,
-                          ),
-                          Expanded(
-                            child: OutlinedButton(
-                              onPressed: () async {
-                                Navigator.of(context).pop();
-                              },
-                              child: const Text(
-                                "取消",
-                                style: TextStyle(fontSize: 18),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(
-                        height: 8,
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          );
-        },
-      );
-    }
-
-    onReboot() async {
-      if (rebooting.value) {
-        return;
-      }
-      showCupertinoModalPopup(
-        context: context,
-        builder: (context) {
-          return Material(
-            color: Colors.transparent,
-            child: Card(
-              shape: RoundedRectangleBorder(
-                  side: const BorderSide(),
-                  borderRadius: BorderRadius.circular(18)),
-              child: SafeArea(
-                top: false,
-                child: Padding(
-                  padding: const EdgeInsets.all(20),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: <Widget>[
-                      const Text(
-                        "确认重启",
-                        style: TextStyle(
-                            fontSize: 20, fontWeight: FontWeight.w500),
-                      ),
-                      const SizedBox(
-                        height: 12,
-                      ),
-                      const Text(
-                        "确认要重新启动设备？",
-                        style: TextStyle(
-                            fontSize: 20, fontWeight: FontWeight.w400),
-                      ),
-                      const SizedBox(
-                        height: 22,
-                      ),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: OutlinedButton(
-                              onPressed: () async {
-                                Navigator.of(context).pop();
-                                power("reboot", false);
-                              },
-                              child: const Text(
-                                "确认重启",
-                                style: TextStyle(
-                                    fontSize: 18, color: Colors.redAccent),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(
-                            width: 16,
-                          ),
-                          Expanded(
-                            child: OutlinedButton(
-                              onPressed: () async {
-                                Navigator.of(context).pop();
-                              },
-                              child: const Text(
-                                "取消",
-                                style: TextStyle(fontSize: 18),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(
-                        height: 8,
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          );
-        },
-      );
-    }
-
     onTheme() async {
       showCupertinoModalPopup(
         context: context,
         builder: (context) {
-          return Material(
+          return SizedBox(
+            width: double.infinity,
+            child: Material(
             color: Colors.transparent,
             child: Card(
               shape: RoundedRectangleBorder(
@@ -489,6 +206,7 @@ class Setting extends HookWidget {
                 ),
               ),
             ),
+          ),
           );
         },
       );
@@ -504,7 +222,6 @@ class Setting extends HookWidget {
       return null;
     }, const []);
 
-    double width = (MediaQuery.sizeOf(context).width - 81) / 3;
     return Scaffold(
       appBar: AppBar(
         title: const Text(

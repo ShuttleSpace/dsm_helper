@@ -111,7 +111,11 @@ class SelectAlbum extends HookWidget {
       return null;
     }, const []);
 
-    return Material(
+    return SizedBox(
+
+      width: double.infinity,
+
+      child: Material(
       color: Theme.of(context).scaffoldBackgroundColor,
       child: SizedBox(
         height: MediaQuery.sizeOf(context).height * 0.8,
@@ -154,6 +158,8 @@ class SelectAlbum extends HookWidget {
           ),
         ),
       ),
+    ),
+
     );
   }
 }

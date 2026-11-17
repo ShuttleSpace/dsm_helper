@@ -43,7 +43,11 @@ class MediaConverter extends HookWidget {
       };
     }, const []);
 
-    return Material(
+    return SizedBox(
+
+      width: double.infinity,
+
+      child: Material(
       color: Colors.transparent,
       child: Card(
         shape: RoundedRectangleBorder(
@@ -204,7 +208,9 @@ class MediaConverter extends HookWidget {
                               showCupertinoModalPopup(
                                   context: context,
                                   builder: (context) {
-                                    return Material(
+                                    return SizedBox(
+                                      width: double.infinity,
+                                      child: Material(
                                       child: Padding(
                                         padding: const EdgeInsets.all(
                                             AppConstants.paddingLarge),
@@ -313,6 +319,7 @@ class MediaConverter extends HookWidget {
                                           ],
                                         ),
                                       ),
+                                    ),
                                     );
                                   }).then((value) async {
                                 if (value != null) {
@@ -364,6 +371,8 @@ class MediaConverter extends HookWidget {
           ),
         ),
       ),
+    ),
+
     );
   }
 }

@@ -10,12 +10,13 @@ import 'package:garden/constants/app_constants.dart';
 import 'package:garden/pages/common/gesture_password.dart';
 import 'package:garden/pages/setting/player_setting.dart';
 import 'package:garden/api/dsm_api.dart';
+import 'package:garden/stores/connection_store.dart';
 import 'package:garden/stores/settings_store.dart';
-import 'package:garden/theme/app_colors.dart';
 import 'package:garden/util/storage_util.dart';
 import 'package:garden/util/ui_util.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:garden/widgets/neu_picker.dart';
+import 'package:garden/widgets/status_checkbox.dart';
 import 'package:local_auth/error_codes.dart' as auth_error;
 import 'package:local_auth/local_auth.dart';
 import 'package:local_auth_android/local_auth_android.dart';
@@ -62,6 +63,188 @@ class HelperSetting extends HookWidget {
       }
     }
 
+    power(String type, bool force) async {
+      if (type == "shutdown") {
+        shutdowning.value = true;
+      } else {
+        rebooting.value = true;
+      }
+
+      Map<String, dynamic>? errorData;
+      try {
+        await dsmCoreSystemPowerForPage(type, force);
+        UiUtil.toast("已发送指令");
+      } on DSMException catch (e) {
+        errorData = e.rawError;
+        if (e.code != 117) {
+          UiUtil.toast("操作失败，代码：${e.code}");
+        }
+      } catch (_) {}
+
+      if (type == "shutdown") {
+        shutdowning.value = false;
+      } else {
+        rebooting.value = false;
+      }
+
+      if (errorData != null && errorData['code'] == 117) {
+        final rawErrors = errorData['errors'];
+        final errors = rawErrors is Map
+            ? (rawErrors['runningTasks'] as List? ?? [])
+            : <dynamic>[];
+        final msgs = <String>[];
+        for (final error in errors) {
+          final titles = error.toString().split(":");
+          if (titles.length == 3) {
+            msgs.add(
+                connectionStore.strings.value[titles[0]][titles[1]][titles[2]]);
+          }
+        }
+        if (context.mounted) {
+          showCupertinoModalPopup(
+            context: context,
+            builder: (context) {
+              return SizedBox(
+                width: double.infinity,
+                child: Material(
+                  color: Colors.transparent,
+                  child: Card(
+                    shape: RoundedRectangleBorder(
+                        side: const BorderSide(),
+                        borderRadius: BorderRadius.circular(18)),
+                    child: SafeArea(
+                      top: false,
+                      child: Padding(
+                        padding: const EdgeInsets.all(20),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: <Widget>[
+                            const Text(
+                              "系统正在处理下列任务。现在关机可能会导致套件异常或数据丢失。是否确定要继续？",
+                              style: TextStyle(
+                                  fontSize: 20, fontWeight: FontWeight.w500),
+                            ),
+                            const SizedBox(height: 12),
+                            Text(
+                              msgs.join("\n"),
+                              style: const TextStyle(
+                                  fontSize: 20, fontWeight: FontWeight.w400),
+                            ),
+                            const SizedBox(height: 22),
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: OutlinedButton(
+                                    onPressed: () {
+                                      Navigator.of(context).pop();
+                                      power(type, true);
+                                    },
+                                    child: Text(
+                                      "强制${type == "shutdown" ? "关机" : "重启"}",
+                                      style: const TextStyle(
+                                          fontSize: 18,
+                                          color: Colors.redAccent),
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 16),
+                                Expanded(
+                                  child: OutlinedButton(
+                                    onPressed: () =>
+                                        Navigator.of(context).pop(),
+                                    child: const Text(
+                                      "取消",
+                                      style: TextStyle(fontSize: 18),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 8),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              );
+            },
+          );
+        }
+      }
+    }
+
+    void showPowerConfirm(String type) {
+      final isShutdown = type == "shutdown";
+      showCupertinoModalPopup(
+        context: context,
+        builder: (context) {
+          return SizedBox(
+            width: double.infinity,
+            child: Material(
+              color: Colors.transparent,
+              child: Card(
+                shape: RoundedRectangleBorder(
+                    side: const BorderSide(),
+                    borderRadius: BorderRadius.circular(18)),
+                child: SafeArea(
+                  top: false,
+                  child: Padding(
+                    padding: const EdgeInsets.all(20),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: <Widget>[
+                        Text(
+                          isShutdown ? "确认关机" : "确认重启",
+                          style: const TextStyle(
+                              fontSize: 20, fontWeight: FontWeight.w500),
+                        ),
+                        const SizedBox(height: 12),
+                        Text(
+                          isShutdown ? "确认要关闭设备吗？" : "确认要重新启动设备？",
+                          style: const TextStyle(
+                              fontSize: 20, fontWeight: FontWeight.w400),
+                        ),
+                        const SizedBox(height: 22),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: OutlinedButton(
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                  power(type, false);
+                                },
+                                child: Text(
+                                  isShutdown ? "确认关机" : "确认重启",
+                                  style: const TextStyle(
+                                      fontSize: 18, color: Colors.redAccent),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 16),
+                            Expanded(
+                              child: OutlinedButton(
+                                onPressed: () => Navigator.of(context).pop(),
+                                child: const Text(
+                                  "取消",
+                                  style: TextStyle(fontSize: 18),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          );
+        },
+      );
+    }
+
     initAuth() async {
       launchAuth.value = await StorageUtil.getBool("launch_auth") ?? false;
       password.value =
@@ -105,7 +288,8 @@ class HelperSetting extends HookWidget {
         children: [
           Card(
             shape: RoundedRectangleBorder(
-                side: const BorderSide(), borderRadius: BorderRadius.circular(18)),
+                side: const BorderSide(),
+                borderRadius: BorderRadius.circular(18)),
             child: Padding(
               padding: const EdgeInsets.all(20),
               child: Row(
@@ -113,11 +297,11 @@ class HelperSetting extends HookWidget {
                   const Text("关机", style: TextStyle(fontSize: 16)),
                   const Spacer(),
                   OutlinedButton(
-                    onPressed: () async {
-                      // 确认弹窗简化
-                      await dsmCoreSystemPowerForPage("shutdown", false).catchError((_) => <String, dynamic>{});
-                    },
-                    child: const Text("关机", style: TextStyle(color: Colors.redAccent)),
+                    onPressed: () => showPowerConfirm("shutdown"),
+                    child: shutdowning.value
+                        ? const CupertinoActivityIndicator(radius: 10)
+                        : const Text("关机",
+                            style: TextStyle(color: Colors.redAccent)),
                   ),
                 ],
               ),
@@ -126,7 +310,8 @@ class HelperSetting extends HookWidget {
           const SizedBox(height: 20),
           Card(
             shape: RoundedRectangleBorder(
-                side: const BorderSide(), borderRadius: BorderRadius.circular(18)),
+                side: const BorderSide(),
+                borderRadius: BorderRadius.circular(18)),
             child: Padding(
               padding: const EdgeInsets.all(20),
               child: Row(
@@ -134,10 +319,11 @@ class HelperSetting extends HookWidget {
                   const Text("重启", style: TextStyle(fontSize: 16)),
                   const Spacer(),
                   OutlinedButton(
-                    onPressed: () async {
-                      await dsmCoreSystemPowerForPage("reboot", false).catchError((_) => <String, dynamic>{});
-                    },
-                    child: const Text("重启", style: TextStyle(color: Colors.redAccent)),
+                    onPressed: () => showPowerConfirm("reboot"),
+                    child: rebooting.value
+                        ? const CupertinoActivityIndicator(radius: 10)
+                        : const Text("重启",
+                            style: TextStyle(color: Colors.redAccent)),
                   ),
                 ],
               ),
@@ -146,7 +332,8 @@ class HelperSetting extends HookWidget {
           const SizedBox(height: 20),
           Card(
             shape: RoundedRectangleBorder(
-                side: const BorderSide(), borderRadius: BorderRadius.circular(18)),
+                side: const BorderSide(),
+                borderRadius: BorderRadius.circular(18)),
             child: Padding(
               padding: const EdgeInsets.all(20),
               child: Row(
@@ -206,11 +393,9 @@ class HelperSetting extends HookWidget {
                           style: TextStyle(fontSize: 16),
                         ),
                         const Spacer(),
-                        if (settingsStore.vibrateOn.watch(context))
-                          Icon(
-                            CupertinoIcons.checkmark_alt,
-                            color: Theme.of(context).colorScheme.primary,
-                          ),
+                        StatusCheckbox(
+                          value: settingsStore.vibrateOn.watch(context),
+                        ),
                       ],
                     ),
                     if (settingsStore.vibrateOn.watch(context))
@@ -253,14 +438,10 @@ class HelperSetting extends HookWidget {
                                               fontSize: 16, height: 1.6),
                                         ),
                                         const Spacer(),
-                                        if (settingsStore.vibrateNormal
-                                            .watch(context))
-                                          Icon(
-                                            CupertinoIcons.checkmark_alt,
-                                            color: Theme.of(context)
-                                                .colorScheme
-                                                .primary,
-                                          ),
+                                        StatusCheckbox(
+                                          value: settingsStore.vibrateNormal
+                                              .watch(context),
+                                        ),
                                       ],
                                     ),
                                   ),
@@ -299,14 +480,10 @@ class HelperSetting extends HookWidget {
                                               fontSize: 16, height: 1.6),
                                         ),
                                         const Spacer(),
-                                        if (settingsStore.vibrateWarning
-                                            .watch(context))
-                                          Icon(
-                                            CupertinoIcons.checkmark_alt,
-                                            color: Theme.of(context)
-                                                .colorScheme
-                                                .primary,
-                                          ),
+                                        StatusCheckbox(
+                                          value: settingsStore.vibrateWarning
+                                              .watch(context),
+                                        ),
                                       ],
                                     ),
                                   ),
@@ -359,11 +536,9 @@ class HelperSetting extends HookWidget {
                       style: TextStyle(fontSize: 16, height: 1.6),
                     ),
                     const Spacer(),
-                    if (videoPlayer.value)
-                      Icon(
-                        CupertinoIcons.checkmark_alt,
-                        color: Theme.of(context).colorScheme.primary,
-                      ),
+                    StatusCheckbox(
+                      value: videoPlayer.value,
+                    ),
                   ],
                 ),
               ),
@@ -451,11 +626,9 @@ class HelperSetting extends HookWidget {
                       style: TextStyle(fontSize: 16, height: 1.6),
                     ),
                     const Spacer(),
-                    if (launchAccountPage.value)
-                      Icon(
-                        CupertinoIcons.checkmark_alt,
-                        color: Theme.of(context).colorScheme.primary,
-                      ),
+                    StatusCheckbox(
+                      value: launchAccountPage.value,
+                    ),
                   ],
                 ),
               ),
@@ -491,11 +664,9 @@ class HelperSetting extends HookWidget {
                           style: TextStyle(fontSize: 16),
                         ),
                         const Spacer(),
-                        if (launchAuth.value)
-                          Icon(
-                            CupertinoIcons.checkmark_alt,
-                            color: Theme.of(context).colorScheme.primary,
-                          ),
+                        StatusCheckbox(
+                          value: launchAuth.value,
+                        ),
                       ],
                     ),
                     if (launchAuth.value)
@@ -551,13 +722,9 @@ class HelperSetting extends HookWidget {
                                                   fontSize: 16, height: 1.6),
                                             ),
                                             const Spacer(),
-                                            if (password.value)
-                                              Icon(
-                                                CupertinoIcons.checkmark_alt,
-                                                color: Theme.of(context)
-                                                    .colorScheme
-                                                    .primary,
-                                              ),
+                                            StatusCheckbox(
+                                              value: password.value,
+                                            ),
                                           ],
                                         ),
                                       ],
@@ -658,12 +825,9 @@ class HelperSetting extends HookWidget {
                                                     fontSize: 16, height: 1.6),
                                               ),
                                               const Spacer(),
-                                              if (biometrics.value)
-                                                const Icon(
-                                                  CupertinoIcons.checkmark_alt,
-                                                  color:
-                                                      AppColors.primaryAction,
-                                                ),
+                                              StatusCheckbox(
+                                                value: biometrics.value,
+                                              ),
                                             ],
                                           ),
                                         ],
@@ -766,11 +930,10 @@ class HelperSetting extends HookWidget {
                   style: TextStyle(fontSize: 16),
                 ),
                 const Spacer(),
-                if (settingsStore.dashboardCardCollapseSwitch.watch(context))
-                  Icon(
-                    CupertinoIcons.checkmark_alt,
-                    color: Theme.of(context).colorScheme.primary,
-                  ),
+                StatusCheckbox(
+                  value:
+                      settingsStore.dashboardCardCollapseSwitch.watch(context),
+                ),
               ],
             ),
           ),
