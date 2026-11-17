@@ -9,6 +9,7 @@ import 'package:flutter_vibrate/flutter_vibrate.dart';
 import 'package:garden/constants/app_constants.dart';
 import 'package:garden/pages/common/gesture_password.dart';
 import 'package:garden/pages/setting/player_setting.dart';
+import 'package:garden/api/dsm_api.dart';
 import 'package:garden/stores/settings_store.dart';
 import 'package:garden/theme/app_colors.dart';
 import 'package:garden/util/storage_util.dart';
@@ -35,12 +36,31 @@ class HelperSetting extends HookWidget {
     final videoPlayer = useSignal(false);
     final launchAccountPage = useSignal(false);
     final biometricsType = useSignal(BiometricType.fingerprint);
+    final ssh = useSignal(false);
+    final telnet = useSignal(false);
+    final sshLoading = useSignal(true);
+    final sshPort = useSignal('');
+    final shutdowning = useSignal(false);
+    final rebooting = useSignal(false);
 
     final Map<BiometricType, String> biometricTypeName = {
       BiometricType.face: "FaceId",
       BiometricType.fingerprint: "指纹",
       BiometricType.iris: "人脸",
     };
+
+    getData() async {
+      var res = await DsmApi.terminalInfo();
+      if (res['success']) {
+        ssh.value = res['data']['enable_ssh'];
+        telnet.value = res['data']['enable_telnet'];
+        sshPort.value = res['data']['ssh_port'].toString();
+        sshLoading.value = false;
+      } else {
+        sshLoading.value = false;
+        ssh.value = false;
+      }
+    }
 
     initAuth() async {
       launchAuth.value = await StorageUtil.getBool("launch_auth") ?? false;
@@ -71,6 +91,7 @@ class HelperSetting extends HookWidget {
 
     useEffect(() {
       initAuth();
+      getData();
       return null;
     }, const []);
 
@@ -82,6 +103,75 @@ class HelperSetting extends HookWidget {
       body: ListView(
         padding: const EdgeInsets.all(20),
         children: [
+          Card(
+            shape: RoundedRectangleBorder(
+                side: const BorderSide(), borderRadius: BorderRadius.circular(18)),
+            child: Padding(
+              padding: const EdgeInsets.all(20),
+              child: Row(
+                children: [
+                  const Text("关机", style: TextStyle(fontSize: 16)),
+                  const Spacer(),
+                  OutlinedButton(
+                    onPressed: () async {
+                      // 确认弹窗简化
+                      await DsmApi.power("shutdown", false);
+                    },
+                    child: const Text("关机", style: TextStyle(color: Colors.redAccent)),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 20),
+          Card(
+            shape: RoundedRectangleBorder(
+                side: const BorderSide(), borderRadius: BorderRadius.circular(18)),
+            child: Padding(
+              padding: const EdgeInsets.all(20),
+              child: Row(
+                children: [
+                  const Text("重启", style: TextStyle(fontSize: 16)),
+                  const Spacer(),
+                  OutlinedButton(
+                    onPressed: () async {
+                      await DsmApi.power("reboot", false);
+                    },
+                    child: const Text("重启", style: TextStyle(color: Colors.redAccent)),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 20),
+          Card(
+            shape: RoundedRectangleBorder(
+                side: const BorderSide(), borderRadius: BorderRadius.circular(18)),
+            child: Padding(
+              padding: const EdgeInsets.all(20),
+              child: Row(
+                children: [
+                  const Text("SSH", style: TextStyle(fontSize: 16)),
+                  const Spacer(),
+                  sshLoading.value
+                      ? const CupertinoActivityIndicator(radius: 12)
+                      : CupertinoSwitch(
+                          value: ssh.value,
+                          onChanged: (v) async {
+                            sshLoading.value = true;
+                            var res = await DsmApi.setTerminal(
+                                v, telnet.value, sshPort.value);
+                            if (!res['success']) {
+                              UiUtil.toast("操作失败，代码：${res['error']['code']}");
+                            }
+                            await getData();
+                          },
+                        ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 20),
           GestureDetector(
             onTap: () {
               settingsStore
