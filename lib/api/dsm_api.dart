@@ -45,6 +45,7 @@ part 'dsm_api.filestation.compression.dart';
 part 'dsm_api.filestation.sharing.dart';
 part 'dsm_api.filestation.uploaddownload.dart';
 part 'dsm_api.filestation.mount.dart';
+part 'dsm_api.filestation.pages.dart';
 
 part 'dsm_api.fototeam.dart';
 

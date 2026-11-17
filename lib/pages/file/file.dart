@@ -1,6 +1,10 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:garden/api/dsm_api.dart';
 import 'package:garden/api/dsm_api.filestation.transfer_url.dart';
+import 'package:garden/extensions/datetime.dart';
+import 'package:garden/extensions/int.dart';
+import 'package:garden/extensions/string.dart';
 import 'package:garden/services/office_preview.dart';
 import 'package:garden/stores/settings_store.dart';
 import 'package:garden/util/file_type_util.dart';
@@ -26,7 +30,7 @@ import 'package:garden/pages/file/share.dart';
 import 'package:garden/pages/file/share_manager.dart';
 import 'package:garden/pages/file/upload.dart';
 import 'package:garden/theme/app_theme.dart';
-import 'package:garden/util/http_util.dart';
+import 'package:garden/util/file_types.dart';
 import 'package:garden/widgets/animation_progress_bar.dart';
 import 'package:garden/widgets/transfer_list.dart';
 import 'package:garden/stores/transfer_store.dart';
@@ -42,6 +46,8 @@ import 'package:garden/constants/app_constants.dart';
 import 'package:flutter_floating/floating/floating.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:signals_hooks/signals_hooks.dart';
+
+String _dsmErrorCode(Object e) => e is DSMException ? '${e.code}' : '-1';
 
 enum ListType { list, icon }
 
@@ -106,27 +112,21 @@ class Files extends HookWidget {
         // }
       });
     }
-    getFileList(String path) async {
-    
+    Future<void> getFileList(String path) async {
       loading.value = true;
-  
-      var res = await DsmApi.fileList(path,
-          sortBy: sortBy.value, sortDirection: sortDirection.value);
-    
-      loading.value = false;
-      success.value = res['success'];
-  
-      if (res['success']) {
-      
-        files.value = res['data']['files'];
+      try {
+        final data = await dsmFileStationListForPage(path,
+            sortBy: sortBy.value, sortDirection: sortDirection.value);
+        files.value = data['files'] ?? [];
+        success.value = true;
         Log.info(files.value);
-    
-      } else {
-      
-        msg.value = res['msg'] ?? connectionStore.notVisitorAccount
+      } catch (e) {
+        success.value = false;
+        msg.value = connectionStore.notVisitorAccount.value
             ? '暂无文件'
-            : "加载失败，code:${res['error']['code']}";
-    
+            : '加载失败，code:${_dsmErrorCode(e)}';
+      } finally {
+        loading.value = false;
       }
     }
     getShareList() async {
@@ -143,22 +143,15 @@ class Files extends HookWidget {
         listType.value = ListType.list;
       }
       loading.value = true;
-  
-      var res = await DsmApi.shareList();
-    
-      loading.value = false;
-      success.value = res['success'];
-  
-      if (res['success']) {
-      
-        files.value = res['data']['shares'];
-    
-      } else {
-        if (loading.value) {
-        
-          msg.value = res['msg'] ?? "加载失败，code:${res['error']['code']}";
-      
-        }
+      try {
+        final data = await dsmFileStationListShareForPage();
+        files.value = data['shares'] ?? [];
+        success.value = true;
+      } catch (e) {
+        success.value = false;
+        msg.value = '加载失败，code:${_dsmErrorCode(e)}';
+      } finally {
+        loading.value = false;
       }
     }
     setPaths(String path) {
@@ -218,24 +211,27 @@ class Files extends HookWidget {
       goPath(path);
     }
     extractFile(file, {String password = ''}) async {
-      var res = await DsmApi.extractTask(file['path'], "/${paths.value.join("/")}",
-          password: password);
-      if (res['success']) {
-        backgroundProcess.value[res['data']['taskid']] = {
+      try {
+        final data = await dsmFileStationExtractStartForPage(
+            file['path'], "/${paths.value.join("/")}",
+            password: password);
+        backgroundProcess.value[data['taskid']] = {
           "timer": null,
           "data": null,
           "type": 'extract',
           "path": [file['path']],
         };
-        getProcessingTaskResult(res['data']['taskid']);
+        getProcessingTaskResult(data['taskid']);
+      } catch (e) {
+        Log.warn('extract failed: $e');
       }
     }
     initFloating() {}
     Future<List> getVolumes() async {
-      var res = await DsmApi.volumes();
-      if (res['success']) {
-        return res['data']['volumes'];
-      } else {
+      try {
+        final data = await dsmCoreStorageVolumeListForPage();
+        return data['volumes'] ?? [];
+      } catch (e) {
         return [];
       }
     }
@@ -245,24 +241,17 @@ class Files extends HookWidget {
       }
     }
     Future<bool?> result(String taskId) async {
-      var res = await DsmApi.searchResult(taskId);
-      if (res['success']) {
-        if (res['data']['finished']) {
+      try {
+        final data = await dsmFileStationSearchListForPage(taskId);
+        final finished = data['finished'] == true;
+        if (finished) {
           searchTimer.value?.cancel();
         }
-      
         loading.value = false;
-        searching.value = !res['data']['finished'];
-
-        if (res['data']['files'] != null) {
-          files.value = res['data']['files'];
-        } else {
-          files.value = [];
-        }
-    
-
-        return res['data']['finished'];
-      } else {
+        searching.value = !finished;
+        files.value = data['files'] ?? [];
+        return finished;
+      } catch (e) {
         return null;
       }
     }
@@ -272,23 +261,26 @@ class Files extends HookWidget {
       searching.value = true;
       loading.value = true;
   
-      var res =
-          await DsmApi.searchTask(folders, pattern, searchContent: searchContent);
-      if (res['success']) {
-        bool? r = await result(res['data']['taskid']);
-        if (r == null) {
-          UiUtil.toast('Wrong State!');
-          return;
-        }
-        if (r == false) {
-          //搜索未结束
-          searchTimer.value = Timer.periodic(const Duration(seconds: 2), (timer) {
-            // result(res['data']['taskid']);
-          });
-        }
-      } else {
-        Log.info("搜索出错");
-        UiUtil.toast('搜索出错!');
+      late Map<String, dynamic> data;
+      try {
+        data = await dsmFileStationSearchStartForPage(folders, pattern,
+            searchContent: searchContent);
+      } catch (e) {
+        Log.info("搜索出错: $e");
+        searching.value = false;
+        loading.value = false;
+        return;
+      }
+      bool? r = await result(data['taskid']);
+      if (r == null) {
+        UiUtil.toast('Wrong State!');
+        return;
+      }
+      if (r == false) {
+        //搜索未结束
+        searchTimer.value = Timer.periodic(const Duration(seconds: 2), (timer) {
+          // result(res['data']['taskid']);
+        });
       }
     }
     final appDownload = useFileDownload(context);
@@ -386,36 +378,36 @@ class Files extends HookWidget {
         }
       });
     }
-    getSmbFolder() async {
-      var res = await DsmApi.smbFolder();
-      if (res['success']) {
-      
-        smbFolders.value = res['data']['folders'];
-    
+    Future<void> getSmbFolder() async {
+      try {
+        final data = await dsmFileStationVirtualFolderSmbForPage();
+        smbFolders.value = data['folders'] ?? [];
+      } catch (e) {
+        Log.warn('smb folders: $e');
       }
     }
-    getFtpFolder() async {
-      var res = await DsmApi.remoteLink("ftp");
-      if (res['success']) {
-      
-        ftpFolders.value = res['data']['folders'];
-    
+    Future<void> getFtpFolder() async {
+      try {
+        final data = await dsmFileStationVirtualFolderForPage('ftp');
+        ftpFolders.value = data['folders'] ?? [];
+      } catch (e) {
+        Log.warn('ftp folders: $e');
       }
     }
-    getSftpFolder() async {
-      var res = await DsmApi.remoteLink("sftp");
-      if (res['success']) {
-      
-        sftpFolders.value = res['data']['folders'];
-    
+    Future<void> getSftpFolder() async {
+      try {
+        final data = await dsmFileStationVirtualFolderForPage('sftp');
+        sftpFolders.value = data['folders'] ?? [];
+      } catch (e) {
+        Log.warn('sftp folders: $e');
       }
     }
-    getDavFolder() async {
-      var res = await DsmApi.remoteLink("davs");
-      if (res['success']) {
-      
-        davFolders.value = res['data']['folders'];
-    
+    Future<void> getDavFolder() async {
+      try {
+        final data = await dsmFileStationVirtualFolderForPage('davs');
+        davFolders.value = data['folders'] ?? [];
+      } catch (e) {
+        Log.warn('dav folders: $e');
       }
     }
     openPlainFile(file) async {
@@ -919,21 +911,21 @@ class Files extends HookWidget {
                             child: OutlinedButton(
                               onPressed: () async {
                                 Navigator.of(context).pop();
-                                var res = await DsmApi.deleteTask(filePaths);
-                                backgroundProcess.value[res['data']['taskid']] = {
-                                  "timer": null,
-                                  "data": {
-                                    "progress": 0,
-                                  },
-                                  "type": 'delete',
-                                  "path": filePaths,
-                                };
-                                if (res['success']) {
-                                
+                                try {
+                                  final data = await dsmFileStationDeleteStartForPage(filePaths);
+                                  backgroundProcess.value[data['taskid']] = {
+                                    "timer": null,
+                                    "data": {
+                                      "progress": 0,
+                                    },
+                                    "type": 'delete',
+                                    "path": filePaths,
+                                  };
                                   selectedFiles.value = [];
                                   multiSelect.value = false;
-                              
-                                  getProcessingTaskResult(res['data']['taskid']);
+                                  getProcessingTaskResult(data['taskid']);
+                                } catch (e) {
+                                  UiUtil.toast("删除失败，代码：${_dsmErrorCode(e)}");
                                 }
                               },
                               child: const Text(
@@ -1015,9 +1007,10 @@ class Files extends HookWidget {
                       OutlinedButton(
                         onPressed: () async {
                           Navigator.of(context).pop();
-                          var res = await DsmApi.compressTask(file, destPath);
-                          if (res['success']) {
-                            backgroundProcess.value[res['data']['taskid']] = {
+                          try {
+                            final data =
+                                await dsmFileStationCompressStartForPage(file, destPath);
+                            backgroundProcess.value[data['taskid']] = {
                               "timer": null,
                               "data": {
                                 "dest_folder_path": destPath,
@@ -1026,11 +1019,11 @@ class Files extends HookWidget {
                               "path": [file],
                               "type": 'compress',
                             };
-                          
                             multiSelect.value = false;
                             selectedFiles.value = [];
-                        
-                            getProcessingTaskResult(res['data']['taskid']);
+                            getProcessingTaskResult(data['taskid']);
+                          } catch (e) {
+                            UiUtil.toast("压缩失败，代码：${_dsmErrorCode(e)}");
                           }
                         },
                         child: const Text(
@@ -1624,33 +1617,23 @@ class Files extends HookWidget {
                                                                 Navigator.of(
                                                                         context)
                                                                     .pop();
-                                                                var res = await DsmApi
-                                                                    .rename(
-                                                                        file[
-                                                                            'path'],
-                                                                        name);
-                                                                if (res[
-                                                                    'success']) {
-                                                                  UiUtil.toast(
-                                                                      "重命名成功");
+                                                                try {
+                                                                  await dsmFileStationRenameForPage(
+                                                                      file['path'], name);
+                                                                  UiUtil.toast("重命名成功");
                                                                   refresh();
-                                                                } else {
-                                                                  if (res['error']
-                                                                              [
-                                                                              'errors'] !=
-                                                                          null &&
-                                                                      res['error']['errors']
-                                                                              .length >
-                                                                          0 &&
-                                                                      res['error']['errors'][0]
-                                                                              [
-                                                                              'code'] ==
-                                                                          414) {
-                                                                    UiUtil.toast(
-                                                                        "重命名失败：指定的名称已存在");
+                                                                } catch (e) {
+                                                                  final raw = e is DSMException
+                                                                      ? e.rawError
+                                                                      : null;
+                                                                  final errors =
+                                                                      raw?['errors'] as List?;
+                                                                  if (errors != null &&
+                                                                      errors.isNotEmpty &&
+                                                                      errors[0]['code'] == 414) {
+                                                                    UiUtil.toast("重命名失败：指定的名称已存在");
                                                                   } else {
-                                                                    UiUtil.toast(
-                                                                        "重命名失败");
+                                                                    UiUtil.toast("重命名失败");
                                                                   }
                                                                 }
                                                               },
@@ -1716,14 +1699,13 @@ class Files extends HookWidget {
                                 child: OutlinedButton(
                                   onPressed: () async {
                                     Navigator.of(context).pop();
-                                    var res = await DsmApi.favoriteAdd(
-                                        "${file['name']} - ${paths.value[1]}",
-                                        file['path']);
-                                    if (res['success']) {
+                                    try {
+                                      await dsmFileStationFavoriteAddForPage(
+                                          "${file['name']} - ${paths.value[1]}",
+                                          file['path']);
                                       UiUtil.toast("收藏成功");
-                                    } else {
-                                      UiUtil.toast(
-                                          "收藏失败，代码${res['error']['code']}");
+                                    } catch (e) {
+                                      UiUtil.toast("收藏失败，代码${_dsmErrorCode(e)}");
                                     }
                                   },
                                   child: Column(
@@ -1750,15 +1732,13 @@ class Files extends HookWidget {
                                 child: OutlinedButton(
                                   onPressed: () async {
                                     Navigator.of(context).pop();
-                                    var res =
-                                        await DsmApi.unMountFolder(file['path']);
-                                    if (res['success']) {
+                                    try {
+                                      await dsmFileStationMountUnmountForPage(file['path']);
                                       UiUtil.toast("卸载成功");
                                       refresh();
                                       getSmbFolder();
-                                    } else {
-                                      UiUtil.toast(
-                                          "卸载失败，代码${res['error']['code']}");
+                                    } catch (e) {
+                                      UiUtil.toast("卸载失败，代码${_dsmErrorCode(e)}");
                                     }
                                   },
                                   child: Column(
@@ -1783,15 +1763,13 @@ class Files extends HookWidget {
                                 child: OutlinedButton(
                                   onPressed: () async {
                                     Navigator.of(context).pop();
-                                    var res = await DsmApi.remoteUnConnect(
-                                        file['path']);
-                                    if (res['success']) {
+                                    try {
+                                      await dsmFileStationVFSConnectionDeleteForPage(file['path']);
                                       UiUtil.toast("远程连接已断开");
                                       refresh();
                                       getSmbFolder();
-                                    } else {
-                                      UiUtil.toast(
-                                          "断开连接失败，代码${res['error']['code']}");
+                                    } catch (e) {
+                                      UiUtil.toast("断开连接失败，代码${_dsmErrorCode(e)}");
                                     }
                                   },
                                   child: Column(
@@ -2226,15 +2204,13 @@ class Files extends HookWidget {
                     scaffoldKey.currentState?.openDrawer();
                   
                     favoriteLoading.value = true;
-                
-                    var res = await DsmApi.favoriteList();
-                  
-                    favoriteLoading.value = false;
-                
-                    if (res['success']) {
-                    
-                      favorites.value = res['data']['favorites'];
-                  
+                    try {
+                      final data = await dsmFileStationFavoriteListForPage();
+                      favorites.value = data['favorites'] ?? [];
+                    } catch (e) {
+                      Log.warn('favorites: $e');
+                    } finally {
+                      favoriteLoading.value = false;
                     }
                   }
                 },
@@ -2678,13 +2654,14 @@ class Files extends HookWidget {
                                                                               String
                                                                                   path =
                                                                                   "/${paths.value.join("/")}";
-                                                                              var res =
-                                                                                  await DsmApi.createFolder(path, name);
-                                                                              if (res['success']) {
+                                                                              try {
+                                                                                await dsmFileStationCreateFolderForPage(path, name);
                                                                                 UiUtil.toast("文件夹创建成功");
                                                                                 refresh();
-                                                                              } else {
-                                                                                if (res['error']['errors'] != null && res['error']['errors'].length > 0 && res['error']['errors'][0]['code'] == 414) {
+                                                                              } catch (e) {
+                                                                                final raw = e is DSMException ? e.rawError : null;
+                                                                                final errors = raw?['errors'] as List?;
+                                                                                if (errors != null && errors.isNotEmpty && errors[0]['code'] == 414) {
                                                                                   UiUtil.toast("文件夹创建失败：指定的名称已存在");
                                                                                 } else {
                                                                                   UiUtil.toast("文件夹创建失败");
@@ -3171,27 +3148,25 @@ class Files extends HookWidget {
                                         List<String> movePaths = selectedFiles.value
                                             .map((e) => e['path'] as String)
                                             .toList();
-                                        var res = await DsmApi.copyMoveTask(
-                                            movePaths, folder[0], true);
-                                        if (res['success']) {
-                                          
+                                        try {
+                                          final data = await dsmFileStationCopyMoveStartForPage(
+                                              movePaths, folder[0], true);
                                           selectedFiles.value = [];
                                           multiSelect.value = false;
-                                          backgroundProcess.value[res['data']
-                                              ['taskid']] = {
+                                          backgroundProcess.value[data['taskid']] = {
                                             "timer": null,
                                             "data": {
                                               "dest_folder_path": folder[0],
                                               "progress": 0,
                                             },
-                                            "type": 'move',
+                                            "type": "move",
                                             "path": movePaths,
                                           };
-                                        
-                                          //获取移动进度
-                                          getProcessingTaskResult(
-                                              res['data']['taskid']);
+                                          getProcessingTaskResult(data['taskid']);
+                                        } catch (e) {
+                                          Log.warn('copy/move failed: $e');
                                         }
+
                                       }
                                     });
                                   },
@@ -3223,14 +3198,12 @@ class Files extends HookWidget {
                                         List<String> copyPaths = selectedFiles.value
                                             .map((e) => e['path'] as String)
                                             .toList();
-                                        var res = await DsmApi.copyMoveTask(
-                                            copyPaths, folder[0], false);
-                                        if (res['success']) {
-                                          
+                                        try {
+                                          final data = await dsmFileStationCopyMoveStartForPage(
+                                              copyPaths, folder[0], false);
                                           selectedFiles.value = [];
                                           multiSelect.value = false;
-                                          backgroundProcess.value[res['data']
-                                              ['taskid']] = {
+                                          backgroundProcess.value[data['taskid']] = {
                                             "timer": null,
                                             "data": {
                                               "dest_folder_path": folder[0],
@@ -3239,10 +3212,11 @@ class Files extends HookWidget {
                                             "type": "copy",
                                             "path": copyPaths,
                                           };
-                                        
-                                          getProcessingTaskResult(
-                                              res['data']['taskid']);
+                                          getProcessingTaskResult(data['taskid']);
+                                        } catch (e) {
+                                          Log.warn('copy/move failed: $e');
                                         }
+
                                       }
                                     });
                                   },
