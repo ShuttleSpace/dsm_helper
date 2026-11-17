@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
-import 'dart:math';
 
 import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio/dio.dart';
@@ -9,7 +8,6 @@ import 'package:dio/io.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:flutter/foundation.dart';
 import 'package:garden/extensions/datetime.dart';
-import 'package:garden/extensions/string.dart';
 import 'package:garden/models/api_model.dart';
 import 'package:garden/stores/connection_store.dart';
 import 'package:garden/util/log.dart';
@@ -73,7 +71,6 @@ part 'dsm_api.systemservices.securityadvisor.dart';
 part 'dsm_api.systemservices.usbcopy.dart';
 
 part 'dsm_api.gaps.dart';
-part 'dsm_api_compat.dart';
 
 part 'dsm_api.taskscheduler.dart';
 

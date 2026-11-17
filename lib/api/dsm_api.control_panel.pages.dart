@@ -185,7 +185,7 @@ Future<Map<String, dynamic>> dsmCoreUserDetailForPage(String name) async {
         "support_share_quota": true
       }
     ];
-    var result = await _compatPost(_entryCGI, data: {
+    var result = await _dsmCpRequest(_entryCGI, data: {
       "api": 'SYNO.Entry.Request',
       "method": 'request',
       "mode": '"sequential"',
@@ -235,7 +235,7 @@ Future<Map<String, dynamic>> dsmCoreUserSaveForPage(
         "name": userInfo['name']
       });
     }
-    var result = await _compatPost(_entryCGI, data: {
+    var result = await _dsmCpRequest(_entryCGI, data: {
       "stop_when_error": false,
       "api": 'SYNO.Entry.Request',
       "method": 'request',
@@ -261,7 +261,7 @@ Future<Map<String, dynamic>> dsmCoreTaskRecordForPage(int task) async {
 }
 
 Future<Map<String, dynamic>> dsmCoreFirmwareVersionForPage() async {
-    var result = await _compatPost(_entryCGI, data: {
+    var result = await _dsmCpRequest(_entryCGI, data: {
       "type": '"firmware"',
       "api": 'SYNO.Core.System',
       "method": 'info',
@@ -272,7 +272,7 @@ Future<Map<String, dynamic>> dsmCoreFirmwareVersionForPage() async {
 }
 
 Future<Map<String, dynamic>> dsmCoreFirmwareUpgradeForPage() async {
-    var result = await _compatPost(_entryCGI, data: {
+    var result = await _dsmCpRequest(_entryCGI, data: {
       "api": 'SYNO.Core.Upgrade.Server',
       "method": 'check',
       "version": 2,
@@ -316,7 +316,7 @@ Future<Map<String, dynamic>> dsmCoreFileServiceForPage() async {
       // {"api": "SYNO.Core.FileServ.ServiceDiscovery", "method": "get", "version": 1},
       // {"api": "SYNO.Core.FileServ.ServiceDiscovery.WSTransfer", "method": "get", "version": 1}
     ];
-    var result = await _compatPost(_entryCGI, data: {
+    var result = await _dsmCpRequest(_entryCGI, data: {
       "api": 'SYNO.Entry.Request',
       "method": 'request',
       "mode": '"sequential"',
@@ -407,7 +407,7 @@ Future<Map<String, dynamic>> dsmCoreFileServiceSaveForPage(
         "portnum": sftp['portnum']
       }
     ];
-    var result = await _compatPost(_entryCGI, data: {
+    var result = await _dsmCpRequest(_entryCGI, data: {
       "api": 'SYNO.Entry.Request',
       "method": 'request',
       "mode": '"sequential"',
@@ -437,7 +437,7 @@ Future<Map<String, dynamic>> dsmCoreNetworkStatusForPage() async {
       },
       {"api": "SYNO.Core.Web.DSM", "method": "get", "version": 2}
     ];
-    var result = await _compatPost(_entryCGI, data: {
+    var result = await _dsmCpRequest(_entryCGI, data: {
       "stop_when_error": false,
       "api": 'SYNO.Entry.Request',
       "method": 'request',

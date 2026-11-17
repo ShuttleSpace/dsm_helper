@@ -354,10 +354,11 @@ Future<Map<String, dynamic>> dsmFileStationUploadForPage(
   final file = File(filePath);
   final multipartFile = MultipartFile.fromFileSync(filePath,
       filename: filePath.split("/").last);
-  final minVersion = availableApis
+  final versions = availableApis
       .where((e) => e.name == 'SYNO.FileStation.Upload')
       .map((e) => (e.minVersion ?? 1).toInt())
-      .fold<int>(1, (a, b) => a < b ? a : b);
+      .toList();
+  final minVersion = versions.isEmpty ? 1 : versions.reduce((a, b) => a < b ? a : b);
   final params = {
     "api": "SYNO.FileStation.Upload",
     "method": "upload",

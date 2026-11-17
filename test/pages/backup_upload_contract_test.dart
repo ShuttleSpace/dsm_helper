@@ -6,7 +6,7 @@ import 'package:garden/api/dsm_api.dart';
 import 'package:garden/models/api_model.dart';
 
 /// Locks the request shape and progress forwarding that backup.dart's
-/// `onStartBackup` relies on when it calls `DsmApi.upload`.
+/// `onStartBackup` relies on when it calls `dsmFileStationUploadForPage`.
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
@@ -18,13 +18,13 @@ void main() {
     file = File('${Directory.systemTemp.path}/backup_upload_contract.bin');
     file.writeAsBytesSync(List<int>.filled(1234, 3));
     filePath = file.path;
-    compatUploadForTesting = null;
-    DsmApi.apiList = {};
+    dsmFileStationUploadPageForTesting = null;
+    availableApis.clear();
   });
 
   tearDown(() {
-    compatUploadForTesting = null;
-    DsmApi.apiList = {};
+    dsmFileStationUploadPageForTesting = null;
+    availableApis.clear();
     if (file.existsSync()) file.deleteSync();
   });
 
@@ -37,36 +37,35 @@ void main() {
     Function(int, int)? capturedProgress;
     final token = CancelToken();
 
-    compatUploadForTesting = (
+    dsmFileStationUploadPageForTesting = (
       String endpoint, {
-      required Object data,
+      Map<String, dynamic>? data,
       Map<String, dynamic>? queryParameters,
       CancelToken? cancelToken,
       Function(int, int)? onSendProgress,
     }) async {
       capturedEndpoint = endpoint;
       capturedParams = queryParameters;
-      capturedData = Map<String, dynamic>.from(data as Map);
+      capturedData = Map<String, dynamic>.from(data ?? const {});
       capturedToken = cancelToken;
       capturedProgress = onSendProgress;
       return {'success': true, 'data': {'id': 'x'}};
     };
 
     final progressEvents = <List<int>>[];
-    final result = await DsmApi.upload(
+    final result = await dsmFileStationUploadForPage(
       uploadPath,
       filePath,
       token,
       (count, total) => progressEvents.add([count, total]),
     );
 
-    // Response is passed straight back (raw legacy envelope).
-    expect(result, {'success': true, 'data': {'id': 'x'}});
+    expect(result, {'id': 'x'});
 
     expect(capturedEndpoint, 'webapi/entry.cgi');
     expect(capturedParams!['api'], 'SYNO.FileStation.Upload');
     expect(capturedParams!['method'], 'upload');
-    // No apiList entry -> legacy default minVersion 1, capped at 3.
+    // No availableApis entry -> legacy default minVersion 1, capped at 3.
     expect(capturedParams!['version'], 1);
 
     expect(capturedData!['path'], uploadPath);
@@ -78,18 +77,17 @@ void main() {
     expect(capturedData!['file'], isA<MultipartFile>());
 
     expect(capturedToken, same(token));
-    expect(capturedProgress, isNotNull);
-    capturedProgress!(50, 100);
+    capturedProgress!(10, 100);
     expect(progressEvents, [
-      [50, 100]
+      [10, 100]
     ]);
   });
 
-  test('upload caps negotiated version at 3', () async {
+  test('upload version is capped at 3 when NAS reports higher', () async {
     Map<String, dynamic>? capturedParams;
-    compatUploadForTesting = (
+    dsmFileStationUploadPageForTesting = (
       String endpoint, {
-      required Object data,
+      Map<String, dynamic>? data,
       Map<String, dynamic>? queryParameters,
       CancelToken? cancelToken,
       Function(int, int)? onSendProgress,
@@ -97,19 +95,17 @@ void main() {
       capturedParams = queryParameters;
       return {'success': true};
     };
-    DsmApi.apiList = {
-      'SYNO.FileStation.Upload':
-          DsmApiInfo('SYNO.FileStation.Upload', minVersion: 5),
-    };
+    availableApis.add(
+      DsmApiInfo('SYNO.FileStation.Upload', minVersion: 5),
+    );
 
-    await DsmApi.upload(uploadPath, filePath, null, (_, __) {});
+    await dsmFileStationUploadForPage(uploadPath, filePath, null, (_, __) {});
 
-    // Capped by min(apiList.minVersion, 3), even when NAS reports higher.
     expect(capturedParams!['version'], 3);
   });
 
-  test('upload turns a DioException into the legacy failure envelope so the '
-      'backup failure branch stays reachable', () async {
+  test('upload surfaces transport failures as exceptions so backup.dart '
+      'failure branch stays reachable', () async {
     final errors = <DioException>[
       DioException(
         requestOptions: RequestOptions(path: 'webapi/entry.cgi'),
@@ -128,9 +124,9 @@ void main() {
     ];
 
     for (final error in errors) {
-      compatUploadForTesting = (
+      dsmFileStationUploadPageForTesting = (
         String endpoint, {
-        required Object data,
+        Map<String, dynamic>? data,
         Map<String, dynamic>? queryParameters,
         CancelToken? cancelToken,
         Function(int, int)? onSendProgress,
@@ -138,16 +134,11 @@ void main() {
         throw error;
       };
 
-      final res = await DsmApi.upload(uploadPath, filePath, null, (_, __) {});
-
-      // backup.dart:225 only checks res['success']; it must be false here,
-      // otherwise the whole backup loop aborts and the item stays `running`.
-      expect(res['success'], false);
-      expect(res['data'], null);
-      expect((res['error'] as Map)['code'], isNotNull);
-      final tookFailureBranch = res['success'] != true;
-      expect(tookFailureBranch, isTrue,
-          reason: 'backup.dart failure branch must be reachable');
+      expect(
+        dsmFileStationUploadForPage(uploadPath, filePath, null, (_, __) {}),
+        throwsA(isNotNull),
+        reason: 'backup.dart catch branch must be reachable',
+      );
     }
   });
 }
