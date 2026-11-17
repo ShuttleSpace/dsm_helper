@@ -1,5 +1,5 @@
+import 'package:garden/api/dsm_api.dart';
 import 'package:garden/extensions/color.dart';
-import 'package:garden/util/http_util.dart';
 import 'package:garden/widgets/bubble_tab_indicator.dart';
 import 'package:garden/widgets/log_center/log_item.dart';
 import 'package:garden/widgets/log_center/log_level_filter.dart';
@@ -33,32 +33,41 @@ class LogCenter extends HookWidget {
     final infoCount = useSignal(0);
     final totalCount = useSignal(0);
 
-    getData({int start = 0, int limit = 50}) async {
-      var res = await DsmApi.lastLog(start, limit);
-      if (res['success']) {
+    Future<void> getData({int start = 0, int limit = 50}) async {
+      try {
+        final data = await dsmCoreSyslogClientLatestLogs(start, limit);
+        lastLogs.value = data['logs'] ?? [];
+      } catch (e) {
+        // 旧层失败时保持空列表，这里同样不打断页面。
+      } finally {
         loadingRecent.value = false;
-        lastLogs.value = res['data']['logs'];
       }
     }
 
-    getLogs() async {
-      var res = await DsmApi.log(0, 1000);
-      if (res['success']) {
-        loadingLogs.value = false;
-        logs.value = res['data']['items'];
+    Future<void> getLogs() async {
+      try {
+        final data = await dsmCoreSyslogClientLogs(0, 1000);
+        logs.value = data['items'] ?? [];
         logsDisplay.value = List.of(logs.value);
-        errorCount.value = res['data']['errorCount'];
-        warnCount.value = res['data']['warnCount'];
-        infoCount.value = res['data']['infoCount'];
-        totalCount.value = res['data']['total'];
+        errorCount.value = data['errorCount'] ?? 0;
+        warnCount.value = data['warnCount'] ?? 0;
+        infoCount.value = data['infoCount'] ?? 0;
+        totalCount.value = data['total'] ?? 0;
+      } catch (e) {
+        // 同上，失败时保留空列表。
+      } finally {
+        loadingLogs.value = false;
       }
     }
 
-    getHistories() async {
-      var res = await DsmApi.logHistory();
-      if (res['success']) {
+    Future<void> getHistories() async {
+      try {
+        final data = await dsmLogCenterHistoryList();
+        histories.value = data['items'] ?? [];
+      } catch (e) {
+        // 同上。
+      } finally {
         loadingHistory.value = false;
-        histories.value = res['data']['items'];
       }
     }
 

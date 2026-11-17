@@ -158,3 +158,41 @@ Future<Map> dsmCoreSyslogClientSettingStorageList(
   }
   return res['data'] ?? {};
 }
+
+/// 最近日志（旧 `DsmApi.lastLog` 的 POST 语义，页面使用）。
+Future<Map> dsmCoreSyslogClientLatestLogs(int start, int limit,
+    {CancelToken? cancelToken}) async {
+  final res = await _httpPost(_entryCGI,
+      data: {
+        "api": 'SYNO.Core.SyslogClient.Status',
+        "start": start,
+        "limit": limit,
+        "method": "latestlog_get",
+        "version": 1,
+        "_sid": connectionStore.sid.value,
+      },
+      cancelToken: cancelToken);
+  if (res['success'] != true) {
+    throw DSMException.fromMap(res);
+  }
+  return res['data'] is Map ? res['data'] as Map : <String, dynamic>{};
+}
+
+/// 日志列表（旧 `DsmApi.log` 的 POST 语义，页面使用）。
+Future<Map> dsmCoreSyslogClientLogs(int start, int limit,
+    {CancelToken? cancelToken}) async {
+  final res = await _httpPost(_entryCGI,
+      data: {
+        "api": 'SYNO.Core.SyslogClient.Log',
+        "start": start,
+        "limit": limit,
+        "method": "list",
+        "version": 1,
+        "_sid": connectionStore.sid.value,
+      },
+      cancelToken: cancelToken);
+  if (res['success'] != true) {
+    throw DSMException.fromMap(res);
+  }
+  return res['data'] is Map ? res['data'] as Map : <String, dynamic>{};
+}

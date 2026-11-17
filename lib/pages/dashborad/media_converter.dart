@@ -1,7 +1,8 @@
 import 'dart:async';
 import 'dart:math';
 
-import 'package:garden/util/http_util.dart';
+import 'package:garden/api/dsm_api.dart';
+import 'package:garden/extensions/datetime.dart';
 import 'package:garden/util/log.dart';
 import 'package:garden/widgets/animation_progress_bar.dart';
 import 'package:flutter/cupertino.dart';
@@ -19,11 +20,15 @@ class MediaConverter extends HookWidget {
   Widget build(BuildContext context) {
     final converterValue = useSignal<Map>(converter);
 
-    getMediaConverter() async {
-      var res = await DsmApi.mediaConverter("status");
-      if (res['success'] && context.mounted) {
-        converterValue.value = res['data'];
-        Log.info("get media converter status $res}");
+    Future<void> getMediaConverter() async {
+      try {
+        final data = await dsmCoreMediaIndexingMediaConverter('status');
+        if (context.mounted) {
+          converterValue.value = data;
+          Log.info("get media converter status $data");
+        }
+      } catch (e) {
+        Log.warn("get media converter failed: $e");
       }
     }
 
@@ -189,9 +194,11 @@ class MediaConverter extends HookWidget {
                         GestureDetector(
                           onTap: () async {
                             if (converterValue.value['status'] == "paused") {
-                              var res = await DsmApi.mediaConverter("resume");
-                              if (res['success']) {
-                                getMediaConverter();
+                              try {
+                                await dsmCoreMediaIndexingMediaConverter('resume');
+                                await getMediaConverter();
+                              } catch (e) {
+                                Log.warn("resume media converter failed: $e");
                               }
                             } else {
                               showCupertinoModalPopup(
@@ -309,10 +316,12 @@ class MediaConverter extends HookWidget {
                                     );
                                   }).then((value) async {
                                 if (value != null) {
-                                  var res = await DsmApi.mediaConverter("pause",
-                                      hours: value);
-                                  if (res['success']) {
-                                    getMediaConverter();
+                                  try {
+                                    await dsmCoreMediaIndexingMediaConverter('pause',
+                                        delayHours: value);
+                                    await getMediaConverter();
+                                  } catch (e) {
+                                    Log.warn("pause media converter failed: $e");
                                   }
                                 }
                               });
