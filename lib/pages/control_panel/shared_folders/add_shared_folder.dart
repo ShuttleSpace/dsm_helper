@@ -1,5 +1,7 @@
 import 'dart:math';
 import 'package:garden/util/log.dart';
+import 'package:garden/widgets/bottom_option_sheet.dart';
+import 'package:garden/widgets/settings/settings_toggle_tile.dart';
 import 'package:garden/util/ui_util.dart';
 
 import 'package:garden/extensions/int.dart';
@@ -8,7 +10,6 @@ import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:garden/constants/app_constants.dart';
-import 'package:garden/theme/app_colors.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:signals_hooks/signals_hooks.dart';
@@ -243,89 +244,25 @@ class AddSharedFolders extends HookWidget {
                       FocusScope.of(context).unfocus();
                       showCupertinoModalPopup(
                         context: context,
-                        builder: (context) {
-                          return SizedBox(
-                            width: double.infinity,
-                            child: Material(
-                            color: Colors.transparent,
-                            child: Card(
-                              shape: RoundedRectangleBorder(
-                                  side: const BorderSide(),
-                                  borderRadius: BorderRadius.circular(18)),
-                              child: SafeArea(
-                                top: false,
-                                child: Padding(
-                                  padding: const EdgeInsets.all(20),
-                                  child: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: <Widget>[
-                                      const Text(
-                                        "选择所在位置",
-                                        style: TextStyle(
-                                            fontSize: 20,
-                                            fontWeight: FontWeight.w500),
-                                      ),
-                                      const SizedBox(
-                                        height: 12,
-                                      ),
-                                      ...volumes.map((volume) {
-                                        return Padding(
-                                          padding:
-                                              const EdgeInsets.only(bottom: 20),
-                                          child: OutlinedButton(
-                                            onPressed: () {
-                                              selectedVolumeIndex.value = volumes
-                                                  .indexOf(volume);
-                                              volumeController.value =
-                                                  TextEditingValue(
-                                                      text:
-                                                          "${volumes[selectedVolumeIndex.value]['display_name']}(可用容量：${int.parse(volumes[selectedVolumeIndex.value]['size_free_byte']).formatSize()}) - ${volumes[selectedVolumeIndex.value]['fs_type']}");
-                                              Navigator.of(context).pop();
-                                            },
-                                            child: Container(
-                                              padding: const EdgeInsets.only(
-                                                  left: 20),
-                                              width: double.infinity,
-                                              child: Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: [
-                                                  Text(
-                                                      "${volume['display_name']}(可用容量：${int.parse(volume['size_free_byte']).formatSize()}) - ${volume['fs_type']}"),
-                                                  const SizedBox(
-                                                    height: 5,
-                                                  ),
-                                                  Text(
-                                                    "${volume['description']}",
-                                                    style: const TextStyle(
-                                                        color: Colors.grey),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          ),
-                                        );
-                                      }),
-                                      OutlinedButton(
-                                        onPressed: () async {
-                                          Navigator.of(context).pop();
-                                        },
-                                        child: const Text(
-                                          "取消",
-                                          style: TextStyle(fontSize: 18),
-                                        ),
-                                      ),
-                                      const SizedBox(
-                                        height: 8,
-                                      ),
-                                    ],
-                                  ),
-                                ),
+                        builder: (context) => BottomOptionSheet(
+                          title: "选择所在位置",
+                          options: [
+                            for (final volume in volumes)
+                              BottomOption(
+                                title:
+                                    "${volume['display_name']}(可用容量：${int.parse(volume['size_free_byte']).formatSize()}) - ${volume['fs_type']}",
+                                subtitle: "${volume['description']}",
+                                onPressed: () {
+                                  selectedVolumeIndex.value =
+                                      volumes.indexOf(volume);
+                                  volumeController.value = TextEditingValue(
+                                    text:
+                                        "${volumes[selectedVolumeIndex.value]['display_name']}(可用容量：${int.parse(volumes[selectedVolumeIndex.value]['size_free_byte']).formatSize()}) - ${volumes[selectedVolumeIndex.value]['fs_type']}",
+                                  );
+                                },
                               ),
-                            ),
-                          ),
-                          );
-                        },
+                          ],
+                        ),
                       );
                     },
                     child: Card(
@@ -349,60 +286,32 @@ class AddSharedFolders extends HookWidget {
                   const SizedBox(
                     height: 20,
                   ),
-                  GestureDetector(
+                  SettingsToggleTile(
+                    label: "在“网上邻居”隐藏此共享文件夹",
+                    value: hidden.value,
+                    shape: RoundedRectangleBorder(
+                      side: const BorderSide(),
+                      borderRadius: BorderRadius.circular(18),
+                    ),
                     onTap: () {
                       FocusScope.of(context).unfocus();
                       hidden.value = !hidden.value;
                     },
-                    child: Card(
-                      shape: RoundedRectangleBorder(
-                          side: const BorderSide(),
-                          borderRadius: BorderRadius.circular(18)),
-                      child: Padding(
-                        padding:
-                            const EdgeInsets.all(AppConstants.paddingSmall),
-                        child: Row(
-                          children: [
-                            const Text("在“网上邻居”隐藏此共享文件夹"),
-                            const Spacer(),
-                            if (hidden.value)
-                              const Icon(
-                                CupertinoIcons.checkmark_alt,
-                                color: AppColors.primaryAction,
-                              ),
-                          ],
-                        ),
-                      ),
-                    ),
                   ),
                   const SizedBox(
                     height: 20,
                   ),
-                  GestureDetector(
+                  SettingsToggleTile(
+                    label: "对没有权限的用户隐藏子文件夹和文件",
+                    value: hideUnreadable.value,
+                    shape: RoundedRectangleBorder(
+                      side: const BorderSide(),
+                      borderRadius: BorderRadius.circular(18),
+                    ),
                     onTap: () {
                       FocusScope.of(context).unfocus();
                       hideUnreadable.value = !hideUnreadable.value;
                     },
-                    child: Card(
-                      shape: RoundedRectangleBorder(
-                          side: const BorderSide(),
-                          borderRadius: BorderRadius.circular(18)),
-                      child: Padding(
-                        padding:
-                            const EdgeInsets.all(AppConstants.paddingSmall),
-                        child: Row(
-                          children: [
-                            const Text("对没有权限的用户隐藏子文件夹和文件"),
-                            const Spacer(),
-                            if (hideUnreadable.value)
-                              const Icon(
-                                CupertinoIcons.checkmark_alt,
-                                color: AppColors.primaryAction,
-                              ),
-                          ],
-                        ),
-                      ),
-                    ),
                   ),
                   const SizedBox(
                     height: 20,
@@ -411,36 +320,17 @@ class AddSharedFolders extends HookWidget {
                     children: [
                       Expanded(
                         flex: 3,
-                        child: GestureDetector(
+                        child: SettingsToggleTile(
+                          label: "启用回收站",
+                          value: recycleBin.value,
+                          shape: RoundedRectangleBorder(
+                            side: const BorderSide(),
+                            borderRadius: BorderRadius.circular(18),
+                          ),
                           onTap: () {
                             FocusScope.of(context).unfocus();
                             recycleBin.value = !recycleBin.value;
                           },
-                          child: Card(
-                            shape: RoundedRectangleBorder(
-                                side: const BorderSide(),
-                                borderRadius: BorderRadius.circular(18)),
-                            child: Padding(
-                              padding: const EdgeInsets.all(
-                                  AppConstants.paddingSmall),
-                              child: Row(
-                                children: [
-                                  const Expanded(
-                                    child: Text(
-                                      "启用回收站",
-                                      overflow: TextOverflow.clip,
-                                      maxLines: 1,
-                                    ),
-                                  ),
-                                  if (recycleBin.value)
-                                    const Icon(
-                                      CupertinoIcons.checkmark_alt,
-                                      color: AppColors.primaryAction,
-                                    ),
-                                ],
-                              ),
-                            ),
-                          ),
                         ),
                       ),
                       const SizedBox(
@@ -448,38 +338,20 @@ class AddSharedFolders extends HookWidget {
                       ),
                       Expanded(
                         flex: 4,
-                        child: GestureDetector(
+                        child: SettingsToggleTile(
+                          label: "只允许管理员访问",
+                          value: recycleBinAdminOnly.value,
+                          shape: RoundedRectangleBorder(
+                            side: const BorderSide(),
+                            borderRadius: BorderRadius.circular(18),
+                          ),
                           onTap: () {
                             FocusScope.of(context).unfocus();
                             if (recycleBin.value) {
-                              recycleBinAdminOnly.value = !recycleBinAdminOnly.value;
+                              recycleBinAdminOnly.value =
+                                  !recycleBinAdminOnly.value;
                             }
                           },
-                          child: Card(
-                            shape: RoundedRectangleBorder(
-                                side: const BorderSide(),
-                                borderRadius: BorderRadius.circular(18)),
-                            child: Padding(
-                              padding: const EdgeInsets.all(
-                                  AppConstants.paddingSmall),
-                              child: Row(
-                                children: [
-                                  const Expanded(
-                                    child: Text(
-                                      "只允许管理员访问",
-                                      overflow: TextOverflow.clip,
-                                      maxLines: 1,
-                                    ),
-                                  ),
-                                  if (recycleBinAdminOnly.value)
-                                    const Icon(
-                                      CupertinoIcons.checkmark_alt,
-                                      color: AppColors.primaryAction,
-                                    ),
-                                ],
-                              ),
-                            ),
-                          ),
                         ),
                       ),
                     ],
@@ -487,31 +359,17 @@ class AddSharedFolders extends HookWidget {
                   const SizedBox(
                     height: 20,
                   ),
-                  GestureDetector(
+                  SettingsToggleTile(
+                    label: "加密共享此文件夹",
+                    value: encryption.value,
+                    shape: RoundedRectangleBorder(
+                      side: const BorderSide(),
+                      borderRadius: BorderRadius.circular(18),
+                    ),
                     onTap: () {
                       FocusScope.of(context).unfocus();
                       encryption.value = !encryption.value;
                     },
-                    child: Card(
-                      shape: RoundedRectangleBorder(
-                          side: const BorderSide(),
-                          borderRadius: BorderRadius.circular(18)),
-                      child: Padding(
-                        padding:
-                            const EdgeInsets.all(AppConstants.paddingSmall),
-                        child: Row(
-                          children: [
-                            const Text("加密共享此文件夹"),
-                            const Spacer(),
-                            if (encryption.value)
-                              const Icon(
-                                CupertinoIcons.checkmark_alt,
-                                color: AppColors.primaryAction,
-                              ),
-                          ],
-                        ),
-                      ),
-                    ),
                   ),
                   if (encryption.value) ...[
                     const SizedBox(
@@ -568,7 +426,13 @@ class AddSharedFolders extends HookWidget {
                   const SizedBox(
                     height: 20,
                   ),
-                  GestureDetector(
+                  SettingsToggleTile(
+                    label: "启用数据总和检查码以实现高级数据完整性",
+                    value: enableShareCow.value,
+                    shape: RoundedRectangleBorder(
+                      side: const BorderSide(),
+                      borderRadius: BorderRadius.circular(18),
+                    ),
                     onTap: () {
                       FocusScope.of(context).unfocus();
                       if (volumes[selectedVolumeIndex.value]['fs_type'] ==
@@ -576,31 +440,17 @@ class AddSharedFolders extends HookWidget {
                         enableShareCow.value = !enableShareCow.value;
                       }
                     },
-                    child: Card(
-                      shape: RoundedRectangleBorder(
-                          side: const BorderSide(),
-                          borderRadius: BorderRadius.circular(18)),
-                      child: Padding(
-                        padding:
-                            const EdgeInsets.all(AppConstants.paddingSmall),
-                        child: Row(
-                          children: [
-                            const Text("启用数据总和检查码以实现高级数据完整性"),
-                            const Spacer(),
-                            if (enableShareCow.value)
-                              const Icon(
-                                CupertinoIcons.checkmark_alt,
-                                color: AppColors.primaryAction,
-                              ),
-                          ],
-                        ),
-                      ),
-                    ),
                   ),
                   const SizedBox(
                     height: 20,
                   ),
-                  GestureDetector(
+                  SettingsToggleTile(
+                    label: "启用文件压缩",
+                    value: enableShareCompress.value,
+                    shape: RoundedRectangleBorder(
+                      side: const BorderSide(),
+                      borderRadius: BorderRadius.circular(18),
+                    ),
                     onTap: () {
                       FocusScope.of(context).unfocus();
                       if (volumes[selectedVolumeIndex.value]['fs_type'] ==
@@ -608,31 +458,17 @@ class AddSharedFolders extends HookWidget {
                         enableShareCompress.value = !enableShareCompress.value;
                       }
                     },
-                    child: Card(
-                      shape: RoundedRectangleBorder(
-                          side: const BorderSide(),
-                          borderRadius: BorderRadius.circular(18)),
-                      child: Padding(
-                        padding:
-                            const EdgeInsets.all(AppConstants.paddingSmall),
-                        child: Row(
-                          children: [
-                            const Text("启用文件压缩"),
-                            const Spacer(),
-                            if (enableShareCompress.value)
-                              const Icon(
-                                CupertinoIcons.checkmark_alt,
-                                color: AppColors.primaryAction,
-                              ),
-                          ],
-                        ),
-                      ),
-                    ),
                   ),
                   const SizedBox(
                     height: 20,
                   ),
-                  GestureDetector(
+                  SettingsToggleTile(
+                    label: "启用共享文件夹配额",
+                    value: enableShareQuota.value,
+                    shape: RoundedRectangleBorder(
+                      side: const BorderSide(),
+                      borderRadius: BorderRadius.circular(18),
+                    ),
                     onTap: () {
                       FocusScope.of(context).unfocus();
                       if (volumes[selectedVolumeIndex.value]['fs_type'] ==
@@ -640,30 +476,6 @@ class AddSharedFolders extends HookWidget {
                         enableShareQuota.value = !enableShareQuota.value;
                       }
                     },
-                    child: Card(
-                      shape: RoundedRectangleBorder(
-                          side: const BorderSide(),
-                          borderRadius: BorderRadius.circular(18)),
-                      child: Padding(
-                        padding:
-                            const EdgeInsets.all(AppConstants.paddingSmall),
-                        child: Row(
-                          children: [
-                            const Text("启用共享文件夹配额"),
-                            Text(
-                              "(已使用${(shareQuotaUsed.value * 1024 * 1024).toInt().formatSize()})",
-                              style: const TextStyle(color: Colors.blue),
-                            ),
-                            const Spacer(),
-                            if (enableShareQuota.value)
-                              const Icon(
-                                CupertinoIcons.checkmark_alt,
-                                color: AppColors.primaryAction,
-                              ),
-                          ],
-                        ),
-                      ),
-                    ),
                   ),
                   if (enableShareQuota.value) ...[
                     const SizedBox(
@@ -704,81 +516,23 @@ class AddSharedFolders extends HookWidget {
                               FocusScope.of(context).unfocus();
                               showCupertinoModalPopup(
                                 context: context,
-                                builder: (context) {
-                                  return SizedBox(
-                                    width: double.infinity,
-                                    child: Material(
-                                    color: Colors.transparent,
-                                    child: Card(
-                                      shape: RoundedRectangleBorder(
-                                          side: const BorderSide(),
-                                          borderRadius:
-                                              BorderRadius.circular(5)),
-                                      child: SafeArea(
-                                        top: false,
-                                        child: Padding(
-                                          padding: const EdgeInsets.all(20),
-                                          child: Column(
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: <Widget>[
-                                              const Text(
-                                                "选择单位",
-                                                style: TextStyle(
-                                                    fontSize: 20,
-                                                    fontWeight:
-                                                        FontWeight.w500),
-                                              ),
-                                              const SizedBox(
-                                                height: 12,
-                                              ),
-                                              ...units.map((unit) {
-                                                return Padding(
-                                                  padding:
-                                                      const EdgeInsets.only(
-                                                          bottom: 20),
-                                                  child: OutlinedButton(
-                                                    onPressed: () {
-                                                      selectedUnitIndex.value =
-                                                          units.indexOf(unit);
-                                                      unitController.value =
-                                                          TextEditingValue(
-                                                              text: units[
-                                                                  selectedUnitIndex.value]);
-                                                      Navigator.of(context)
-                                                          .pop();
-                                                    },
-                                                    child: SizedBox(
-                                                      width: double.infinity,
-                                                      child: Text(
-                                                        unit,
-                                                        textAlign:
-                                                            TextAlign.center,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                );
-                                              }),
-                                              OutlinedButton(
-                                                onPressed: () async {
-                                                  Navigator.of(context).pop();
-                                                },
-                                                child: const Text(
-                                                  "取消",
-                                                  style:
-                                                      TextStyle(fontSize: 18),
-                                                ),
-                                              ),
-                                              const SizedBox(
-                                                height: 8,
-                                              ),
-                                            ],
-                                          ),
-                                        ),
+                                builder: (context) => BottomOptionSheet(
+                                  title: "选择单位",
+                                  borderRadius: 5,
+                                  optionTextAlign: TextAlign.center,
+                                  options: [
+                                    for (final unit in units)
+                                      BottomOption(
+                                        title: unit,
+                                        onPressed: () {
+                                          selectedUnitIndex.value =
+                                              units.indexOf(unit);
+                                          unitController.value =
+                                              TextEditingValue(text: unit);
+                                        },
                                       ),
-                                    ),
-                                  ),
-                                  );
-                                },
+                                  ],
+                                ),
                               );
                             },
                             child: Card(

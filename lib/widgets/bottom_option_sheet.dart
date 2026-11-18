@@ -23,6 +23,8 @@ class BottomOptionSheet extends StatelessWidget {
   final String cancelText;
   final double padding;
   final bool popBeforeOnPressed;
+  final double borderRadius;
+  final TextAlign optionTextAlign;
 
   const BottomOptionSheet({
     super.key,
@@ -31,6 +33,8 @@ class BottomOptionSheet extends StatelessWidget {
     this.cancelText = "取消",
     this.padding = 20,
     this.popBeforeOnPressed = true,
+    this.borderRadius = 18,
+    this.optionTextAlign = TextAlign.start,
   });
 
   @override
@@ -42,7 +46,7 @@ class BottomOptionSheet extends StatelessWidget {
         child: Card(
           shape: RoundedRectangleBorder(
             side: const BorderSide(),
-            borderRadius: BorderRadius.circular(18),
+            borderRadius: BorderRadius.circular(borderRadius),
           ),
           child: SafeArea(
             top: false,
@@ -75,7 +79,10 @@ class BottomOptionSheet extends StatelessWidget {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(option.title),
+                              Text(
+                                option.title,
+                                textAlign: optionTextAlign,
+                              ),
                               if (option.subtitle != null) ...[
                                 const SizedBox(height: 5),
                                 Text(
