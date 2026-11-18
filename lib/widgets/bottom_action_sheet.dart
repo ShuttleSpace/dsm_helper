@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:garden/widgets/bottom_sheet_card.dart';
 
 /// 底部动作面板中的单个操作项。
 class BottomActionItem {
@@ -41,90 +42,74 @@ class BottomActionSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: double.infinity,
-      child: Material(
-        color: Colors.transparent,
-        child: Card(
-          shape: RoundedRectangleBorder(
-            side: const BorderSide(),
-            borderRadius: BorderRadius.circular(18),
+    return BottomSheetCard(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          Stack(
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    title,
+                    style: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
+              if (leading != null) leading!,
+            ],
           ),
-          child: SafeArea(
-            top: false,
-            child: Padding(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  Stack(
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
+          SizedBox(height: titleSpacing),
+          SizedBox(
+            width: double.infinity,
+            child: Wrap(
+              runSpacing: 20,
+              spacing: 20,
+              children: [
+                for (final action in actions)
+                  Container(
+                    constraints: const BoxConstraints(maxWidth: 112),
+                    width: (MediaQuery.sizeOf(context).width - 100) /
+                        action.widthDivisor,
+                    child: OutlinedButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                        action.onPressed();
+                      },
+                      child: Column(
                         children: [
+                          Image.asset(
+                            action.iconAsset,
+                            width: 30,
+                          ),
                           Text(
-                            title,
-                            style: const TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.w500,
+                            action.label,
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: action.labelColor,
                             ),
                           ),
                         ],
                       ),
-                      if (leading != null) leading!,
-                    ],
-                  ),
-                  SizedBox(height: titleSpacing),
-                  SizedBox(
-                    width: double.infinity,
-                    child: Wrap(
-                      runSpacing: 20,
-                      spacing: 20,
-                      children: [
-                        for (final action in actions)
-                          Container(
-                            constraints: const BoxConstraints(maxWidth: 112),
-                            width: (MediaQuery.sizeOf(context).width - 100) /
-                                action.widthDivisor,
-                            child: OutlinedButton(
-                              onPressed: () {
-                                Navigator.of(context).pop();
-                                action.onPressed();
-                              },
-                              child: Column(
-                                children: [
-                                  Image.asset(
-                                    action.iconAsset,
-                                    width: 30,
-                                  ),
-                                  Text(
-                                    action.label,
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      color: action.labelColor,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                      ],
                     ),
                   ),
-                  SizedBox(height: cancelSpacing),
-                  OutlinedButton(
-                    onPressed: () => Navigator.of(context).pop(),
-                    child: Text(
-                      cancelText,
-                      style: const TextStyle(fontSize: 18),
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                ],
-              ),
+              ],
             ),
           ),
-        ),
+          SizedBox(height: cancelSpacing),
+          OutlinedButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text(
+              cancelText,
+              style: const TextStyle(fontSize: 18),
+            ),
+          ),
+          const SizedBox(height: 8),
+        ],
       ),
     );
   }

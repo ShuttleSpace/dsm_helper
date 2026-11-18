@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:garden/widgets/bottom_sheet_card.dart';
 
 /// 底部确认浮层：标题 + 说明 + 「确认/取消」按钮。
 ///
@@ -40,77 +41,57 @@ class BottomConfirmSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: double.infinity,
-      child: Material(
-        color: Colors.transparent,
-        child: Card(
-          shape: RoundedRectangleBorder(
-            side: const BorderSide(),
-            borderRadius: BorderRadius.circular(borderRadius),
-          ),
-          child: SafeArea(
-            top: false,
-            child: Padding(
-              padding: EdgeInsets.all(padding),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  Text(
-                    title,
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w500,
-                      color: textColor,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  Text(
-                    content,
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w400,
-                      color: textColor,
-                    ),
-                  ),
-                  const SizedBox(height: 22),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: OutlinedButton(
-                          onPressed: () {
-                            if (popBeforeConfirm) {
-                              Navigator.of(context).pop(confirmResult);
-                            }
-                            onConfirm();
-                          },
-                          child: Text(
-                            confirmText,
-                            style: TextStyle(
-                              fontSize: 18,
-                              color: confirmColor,
-                            ),
-                          ),
-                        ),
-                      ),
-                      SizedBox(width: buttonSpacing),
-                      Expanded(
-                        child: OutlinedButton(
-                          onPressed: () => Navigator.of(context).pop(cancelResult),
-                          child: Text(
-                            cancelText,
-                            style: const TextStyle(fontSize: 18),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  if (showTrailingSpace) const SizedBox(height: 8),
-                ],
-              ),
+    return BottomSheetCard(
+      padding: EdgeInsets.all(padding),
+      borderRadius: borderRadius,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          Text(
+            title,
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.w500,
+              color: textColor,
             ),
           ),
-        ),
+          const SizedBox(height: 12),
+          Text(
+            content,
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.w400,
+              color: textColor,
+            ),
+          ),
+          const SizedBox(height: 22),
+          Row(
+            children: [
+              Expanded(
+                child: OutlinedButton(
+                  onPressed: () {
+                    if (popBeforeConfirm) {
+                      Navigator.of(context).pop(confirmResult);
+                    }
+                    onConfirm();
+                  },
+                  child: Text(
+                    confirmText,
+                    style: TextStyle(fontSize: 18, color: confirmColor),
+                  ),
+                ),
+              ),
+              SizedBox(width: buttonSpacing),
+              Expanded(
+                child: OutlinedButton(
+                  onPressed: () => Navigator.of(context).pop(cancelResult),
+                  child: Text(cancelText, style: const TextStyle(fontSize: 18)),
+                ),
+              ),
+            ],
+          ),
+          if (showTrailingSpace) const SizedBox(height: 8),
+        ],
       ),
     );
   }

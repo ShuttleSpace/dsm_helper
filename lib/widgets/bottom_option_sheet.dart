@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:garden/widgets/bottom_sheet_card.dart';
 
 /// 底部选项面板中的一行选项。
 class BottomOption {
@@ -39,75 +40,61 @@ class BottomOptionSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: double.infinity,
-      child: Material(
-        color: Colors.transparent,
-        child: Card(
-          shape: RoundedRectangleBorder(
-            side: const BorderSide(),
-            borderRadius: BorderRadius.circular(borderRadius),
-          ),
-          child: SafeArea(
-            top: false,
-            child: Padding(
-              padding: EdgeInsets.all(padding),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  Text(
-                    title,
-                    style: const TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  for (final option in options)
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 20),
-                      child: OutlinedButton(
-                        onPressed: () {
-                          if (popBeforeOnPressed) {
-                            Navigator.of(context).pop();
-                          }
-                          option.onPressed();
-                        },
-                        child: Container(
-                          padding: const EdgeInsets.only(left: 20),
-                          width: double.infinity,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                option.title,
-                                textAlign: optionTextAlign,
-                              ),
-                              if (option.subtitle != null) ...[
-                                const SizedBox(height: 5),
-                                Text(
-                                  option.subtitle!,
-                                  style: const TextStyle(color: Colors.grey),
-                                ),
-                              ],
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  OutlinedButton(
-                    onPressed: () => Navigator.of(context).pop(),
-                    child: Text(
-                      cancelText,
-                      style: const TextStyle(fontSize: 18),
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                ],
-              ),
+    return BottomSheetCard(
+      padding: EdgeInsets.all(padding),
+      borderRadius: borderRadius,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          Text(
+            title,
+            style: const TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.w500,
             ),
           ),
-        ),
+          const SizedBox(height: 12),
+          for (final option in options)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 20),
+              child: OutlinedButton(
+                onPressed: () {
+                  if (popBeforeOnPressed) {
+                    Navigator.of(context).pop();
+                  }
+                  option.onPressed();
+                },
+                child: Container(
+                  padding: const EdgeInsets.only(left: 20),
+                  width: double.infinity,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        option.title,
+                        textAlign: optionTextAlign,
+                      ),
+                      if (option.subtitle != null) ...[
+                        const SizedBox(height: 5),
+                        Text(
+                          option.subtitle!,
+                          style: const TextStyle(color: Colors.grey),
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          OutlinedButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text(
+              cancelText,
+              style: const TextStyle(fontSize: 18),
+            ),
+          ),
+          const SizedBox(height: 8),
+        ],
       ),
     );
   }
