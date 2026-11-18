@@ -10,20 +10,20 @@ void main() {
       home: Scaffold(
         body: ListView(
           children: [
-            DownloadFileItem(<String, dynamic>{
+            DownloadFileItem(const <String, dynamic>{
               'name': 'test.zip',
               'size_downloaded': 50,
               'size': 100,
               'priority': 'normal',
             }),
-            DownloadPeerItem(<String, dynamic>{
+            DownloadPeerItem(const <String, dynamic>{
               'ip': '1.2.3.4',
               'client': 'Transmission',
               'progress': 0.5,
               'speed_download': 1024,
               'speed_upload': 512,
             }),
-            DownloadTrackerItem(<String, dynamic>{
+            DownloadTrackerItem(const <String, dynamic>{
               'url': 'http://tracker',
               'seeds': 3,
               'peers': 4,
