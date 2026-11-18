@@ -9,6 +9,7 @@ import 'package:garden/api/dsm_api.dart';
 import 'package:garden/widgets/hero_widget.dart';
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:garden/widgets/bottom_confirm_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:garden/constants/app_constants.dart';
@@ -36,8 +37,8 @@ class ImagePreview extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final animationController = useAnimationController(
-        duration: const Duration(milliseconds: 150));
+    final animationController =
+        useAnimationController(duration: const Duration(milliseconds: 150));
     final animation = useRef<Animation<double>?>(null);
     final animationListener = useRef<VoidFunction?>(null);
     final rebuildIndex =
@@ -48,8 +49,8 @@ class ImagePreview extends HookWidget {
     const doubleTapScales = <double>[1.0, 2.0];
     final currentIndex = useSignal(index);
     final rebuild = useSignal(0);
-    final slidePageKey = useMemoized(
-        () => GlobalKey<ExtendedImageSlidePageState>(), const []);
+    final slidePageKey =
+        useMemoized(() => GlobalKey<ExtendedImageSlidePageState>(), const []);
     final isWechatInstalled = useSignalValue(settingsStore.isWechatInstalled);
 
     double initScale(
@@ -79,100 +80,34 @@ class ImagePreview extends HookWidget {
       UiUtil.vibrate(FeedbackType.warning);
       showCupertinoModalPopup(
         context: context,
-        builder: (context) {
-          return SizedBox(
-            width: double.infinity,
-            child: Material(
-            color: Colors.transparent,
-            child: Card(
-              shape: RoundedRectangleBorder(
-                  side: const BorderSide(),
-                  borderRadius: BorderRadius.circular(18)),
-              child: Padding(
-                padding: const EdgeInsets.all(AppConstants.paddingSmall),
-                child: SafeArea(
-                  top: false,
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: <Widget>[
-                      const Text(
-                        "确认删除",
-                        style:
-                            TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
-                      ),
-                      const SizedBox(
-                        height: 12,
-                      ),
-                      const Text(
-                        "确认要删除文件？",
-                        style:
-                            TextStyle(fontSize: 20, fontWeight: FontWeight.w400),
-                      ),
-                      const SizedBox(
-                        height: 22,
-                      ),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: OutlinedButton(
-                              onPressed: () async {
-                                Navigator.of(context).pop();
-                                try {
-                                  await dsmFileStationDeleteStartForPage(
-                                      <String>[paths[index]]);
-                                  UiUtil.toast("文件删除成功");
-                                  if (thumbs.length > index) {
-                                    thumbs.removeAt(index);
-                                  }
-                                  if (images.length > index) {
-                                    images.removeAt(index);
-                                  }
-                                  if (paths.length > index) {
-                                    paths.removeAt(index);
-                                  }
-                                  if (names.length > index) {
-                                    names.removeAt(index);
-                                  }
-                                  rebuild.value++;
-                                  onDelete?.call();
-                                } catch (e) {
-                                  UiUtil.toast("文件删除失败");
-                                }
-                              },
-                              child: const Text(
-                                "确认删除",
-                                style: TextStyle(
-                                    fontSize: 18, color: Colors.redAccent),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(
-                            width: 20,
-                          ),
-                          Expanded(
-                            child: OutlinedButton(
-                              onPressed: () async {
-                                Navigator.of(context).pop();
-                              },
-                              child: const Text(
-                                "取消",
-                                style: TextStyle(fontSize: 18),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(
-                        height: 8,
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ),
-          );
-        },
+        builder: (context) => BottomConfirmSheet(
+          title: "确认删除",
+          content: "确认要删除文件？",
+          confirmText: "确认删除",
+          showTrailingSpace: true,
+          onConfirm: () async {
+            try {
+              await dsmFileStationDeleteStartForPage(<String>[paths[index]]);
+              UiUtil.toast("文件删除成功");
+              if (thumbs.length > index) {
+                thumbs.removeAt(index);
+              }
+              if (images.length > index) {
+                images.removeAt(index);
+              }
+              if (paths.length > index) {
+                paths.removeAt(index);
+              }
+              if (names.length > index) {
+                names.removeAt(index);
+              }
+              rebuild.value++;
+              onDelete?.call();
+            } catch (e) {
+              UiUtil.toast("文件删除失败");
+            }
+          },
+        ),
       );
     }
 

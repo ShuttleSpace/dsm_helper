@@ -17,6 +17,8 @@ class BottomConfirmSheet extends StatelessWidget {
   final double padding;
   final double buttonSpacing;
   final double borderRadius;
+  final Color? textColor;
+  final bool popBeforeConfirm;
 
   const BottomConfirmSheet({
     super.key,
@@ -32,6 +34,8 @@ class BottomConfirmSheet extends StatelessWidget {
     this.padding = 8,
     this.buttonSpacing = 20,
     this.borderRadius = 18,
+    this.textColor,
+    this.popBeforeConfirm = true,
   });
 
   @override
@@ -54,17 +58,19 @@ class BottomConfirmSheet extends StatelessWidget {
                 children: <Widget>[
                   Text(
                     title,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.w500,
+                      color: textColor,
                     ),
                   ),
                   const SizedBox(height: 12),
                   Text(
                     content,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.w400,
+                      color: textColor,
                     ),
                   ),
                   const SizedBox(height: 22),
@@ -73,7 +79,9 @@ class BottomConfirmSheet extends StatelessWidget {
                       Expanded(
                         child: OutlinedButton(
                           onPressed: () {
-                            Navigator.of(context).pop(confirmResult);
+                            if (popBeforeConfirm) {
+                              Navigator.of(context).pop(confirmResult);
+                            }
                             onConfirm();
                           },
                           child: Text(

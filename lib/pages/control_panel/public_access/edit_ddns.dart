@@ -9,6 +9,7 @@ import 'package:garden/widgets/neu_picker.dart';
 import 'package:garden/widgets/label.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:garden/widgets/bottom_confirm_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:garden/constants/app_constants.dart';
 import 'package:garden/theme/app_colors.dart';
@@ -58,126 +59,63 @@ class EditDdns extends HookWidget {
     }, const []);
 
     deleteDdns() async {
-    UiUtil.vibrate(FeedbackType.warning);
-    showCupertinoModalPopup(
-      context: context,
-      builder: (context) {
-        return SizedBox(
-          width: double.infinity,
-          child: Material(
-          color: Colors.transparent,
-          child: Card(
-            shape: RoundedRectangleBorder(
-                side: const BorderSide(),
-                borderRadius: BorderRadius.circular(18)),
-            child: SafeArea(
-              top: false,
-              child: Padding(
-                padding: const EdgeInsets.all(AppConstants.paddingSmall),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: <Widget>[
-                    const Text(
-                      "确认删除",
-                      style:
-                          TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
-                    ),
-                    const SizedBox(
-                      height: 12,
-                    ),
-                    const Text(
-                      "确认要删除以下DDNS？",
-                      style:
-                          TextStyle(fontSize: 20, fontWeight: FontWeight.w400),
-                    ),
-                    const SizedBox(
-                      height: 22,
-                    ),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: OutlinedButton(
-                            onPressed: () async {
-                              if (ddns == null) {
-                                UiUtil.toast('ddns 为空!');
-                                return;
-                              }
-                              Navigator.of(context).pop();
-                              try {
-                                await dsmControlPanelPost({
-                                  "id": jsonEncode([ddns!['id']]),
-                                  "api": 'SYNO.Core.DDNS.Record',
-                                  "method": 'delete',
-                                  "version": 1,
-                                });
-                                UiUtil.toast("DDNS删除成功");
-                                if (context.mounted) {
-                                  Navigator.of(context).pop(true);
-                                }
-                              } catch (e) {
-                                final code = e is DSMException ? e.code : -1;
-                                UiUtil.toast("删除失败，代码:$code");
-                              }
-                            },
-                            child: const Text(
-                              "确认删除",
-                              style: TextStyle(
-                                  fontSize: 18, color: Colors.redAccent),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(
-                          width: 20,
-                        ),
-                        Expanded(
-                          child: OutlinedButton(
-                            onPressed: () async {
-                              Navigator.of(context).pop();
-                            },
-                            child: const Text(
-                              "取消",
-                              style: TextStyle(fontSize: 18),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(
-                      height: 8,
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
+      UiUtil.vibrate(FeedbackType.warning);
+      showCupertinoModalPopup(
+        context: context,
+        builder: (context) => BottomConfirmSheet(
+          title: "确认删除",
+          content: "确认要删除以下DDNS？",
+          confirmText: "确认删除",
+          showTrailingSpace: true,
+          popBeforeConfirm: false,
+          onConfirm: () async {
+            if (ddns == null) {
+              UiUtil.toast('ddns 为空!');
+              return;
+            }
+            Navigator.of(context).pop();
+            try {
+              await dsmControlPanelPost({
+                "id": jsonEncode([ddns!['id']]),
+                "api": 'SYNO.Core.DDNS.Record',
+                "method": 'delete',
+                "version": 1,
+              });
+              UiUtil.toast("DDNS删除成功");
+              if (context.mounted) {
+                Navigator.of(context).pop(true);
+              }
+            } catch (e) {
+              final code = e is DSMException ? e.code : -1;
+              UiUtil.toast("删除失败，代码:$code");
+            }
+          },
         ),
-        );
-      },
-    );
-  }
-
-  bool checkForm() {
-    if (ddnsInfo.value['provider'] == null ||
-        ddnsInfo.value['provider'] == "") {
-      UiUtil.toast("请选择服务供应商");
-      return false;
-    } else if (ddnsInfo.value['hostname'] == null ||
-        ddnsInfo.value['hostname'] == "") {
-      UiUtil.toast("请输入主机名称");
-      return false;
-    } else if (ddnsInfo.value['username'] == null ||
-        ddnsInfo.value['username'] == "") {
-      UiUtil.toast("请输入用户名/电子邮件");
-      return false;
-    } else if (ddns == null &&
-        (ddnsInfo.value['passwd'] == null ||
-            ddnsInfo.value['passwd'] == "")) {
-      UiUtil.toast("请输入密码/密钥");
-      return false;
+      );
     }
 
-    return true;
-  }
+    bool checkForm() {
+      if (ddnsInfo.value['provider'] == null ||
+          ddnsInfo.value['provider'] == "") {
+        UiUtil.toast("请选择服务供应商");
+        return false;
+      } else if (ddnsInfo.value['hostname'] == null ||
+          ddnsInfo.value['hostname'] == "") {
+        UiUtil.toast("请输入主机名称");
+        return false;
+      } else if (ddnsInfo.value['username'] == null ||
+          ddnsInfo.value['username'] == "") {
+        UiUtil.toast("请输入用户名/电子邮件");
+        return false;
+      } else if (ddns == null &&
+          (ddnsInfo.value['passwd'] == null ||
+              ddnsInfo.value['passwd'] == "")) {
+        UiUtil.toast("请输入密码/密钥");
+        return false;
+      }
+
+      return true;
+    }
 
     return Scaffold(
       appBar: AppBar(
@@ -402,7 +340,8 @@ class EditDdns extends HookWidget {
                               "version": 1,
                               "heartbeat": ddns['heartbeat'],
                               "enable": true,
-                              "provider": '"${ddns['provider'].replaceAll("*", "USER_")}"',
+                              "provider":
+                                  '"${ddns['provider'].replaceAll("*", "USER_")}"',
                               "hostname": '"${ddns['hostname']}"',
                               "username": '"${ddns['username']}"',
                               "net": '"${ddns['net']}"',

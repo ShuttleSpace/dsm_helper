@@ -74,4 +74,34 @@ void main() {
     expect(result, false);
     expect(confirmed, isFalse);
   });
+  testWidgets('popBeforeConfirm false leaves popup open for callback',
+      (tester) async {
+    var confirmed = false;
+    await tester.pumpWidget(MaterialApp(
+      home: Scaffold(
+        body: Builder(
+          builder: (context) => ElevatedButton(
+            onPressed: () => showCupertinoModalPopup(
+              context: context,
+              builder: (context) => BottomConfirmSheet(
+                title: '确认',
+                content: '内容',
+                popBeforeConfirm: false,
+                onConfirm: () => confirmed = true,
+              ),
+            ),
+            child: const Text('open'),
+          ),
+        ),
+      ),
+    ));
+
+    await tester.tap(find.text('open'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('确定'));
+    await tester.pumpAndSettle();
+
+    expect(confirmed, isTrue);
+  });
+
 }

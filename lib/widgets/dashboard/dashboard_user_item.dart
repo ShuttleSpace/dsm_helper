@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:garden/widgets/bottom_confirm_sheet.dart';
 import 'package:garden/util/ui_util.dart';
 import 'package:flutter/material.dart';
 import 'package:garden/api/dsm_api.dart';
@@ -61,89 +62,28 @@ class DashboardUserItem extends StatelessWidget {
                 }
                 showCupertinoModalPopup(
                   context: context,
-                  builder: (context) {
-                    return SizedBox(
-                      width: double.infinity,
-                      child: Material(
-                      color: Colors.transparent,
-                      child: Card(
-                        shape: RoundedRectangleBorder(
-                            side: const BorderSide(),
-                            borderRadius: BorderRadius.circular(18)),
-                        child: SafeArea(
-                          top: false,
-                          child: Padding(
-                            padding: const EdgeInsets.all(20),
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: <Widget>[
-                                const Text(
-                                  "终止连接",
-                                  style: TextStyle(
-                                      fontSize: 20,
-                                      color: Colors.black,
-                                      fontWeight: FontWeight.w500),
-                                ),
-                                const SizedBox(
-                                  height: 12,
-                                ),
-                                const Text(
-                                  "确认要终止此连接？",
-                                  style: TextStyle(
-                                      fontSize: 20,
-                                      color: Colors.black,
-                                      fontWeight: FontWeight.w400),
-                                ),
-                                const SizedBox(
-                                  height: 22,
-                                ),
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      child: OutlinedButton(
-                                        onPressed: () async {
-                                          Navigator.of(context).pop();
-                                          user['running'] = true;
-                                          try {
-                                            await dsmCoreCurrentConnectionKickConnection({
-                                              "who": user['who'],
-                                              "from": user['from']
-                                            });
-                                            UiUtil.toast("连接已终止");
-                                            onKickSuccess?.call();
-                                          } catch (e) {
-                                            // 旧层失败时静默，不提示。
-                                          } finally {
-                                            user['running'] = false;
-                                          }
-                                        },
-                                        child: const Text(
-                                          "终止连接",
-                                          style: TextStyle(color: Colors.red),
-                                        ),
-                                      ),
-                                    ),
-                                    const SizedBox(
-                                      width: 10,
-                                    ),
-                                    Expanded(
-                                      child: OutlinedButton(
-                                        onPressed: () {
-                                          Navigator.of(context).pop();
-                                        },
-                                        child: const Text("取消"),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    );
-                  },
+                  builder: (context) => BottomConfirmSheet(
+                    title: "终止连接",
+                    content: "确认要终止此连接？",
+                    confirmText: "终止连接",
+                    confirmColor: Colors.red,
+                    textColor: Colors.black,
+                    padding: 20,
+                    buttonSpacing: 10,
+                    onConfirm: () async {
+                      user['running'] = true;
+                      try {
+                        await dsmCoreCurrentConnectionKickConnection(
+                            {"who": user['who'], "from": user['from']});
+                        UiUtil.toast("连接已终止");
+                        onKickSuccess?.call();
+                      } catch (e) {
+                        // 旧层失败时静默，不提示。
+                      } finally {
+                        user['running'] = false;
+                      }
+                    },
+                  ),
                 );
               },
               child: SizedBox(

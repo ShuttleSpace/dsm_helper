@@ -3,6 +3,7 @@ import 'package:garden/api/dsm_api.dart';
 import 'package:garden/util/ui_util.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:garden/widgets/bottom_confirm_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:signals_hooks/signals_hooks.dart';
@@ -123,105 +124,34 @@ class Users extends HookWidget {
                   }
                   showCupertinoModalPopup(
                     context: context,
-                    builder: (context) {
-                      return SizedBox(
-                        width: double.infinity,
-                        child: Material(
-                        color: Colors.transparent,
-                        child: Card(
-                          shape: RoundedRectangleBorder(
-                              side: const BorderSide(),
-                              borderRadius: BorderRadius.circular(18)),
-                          child: SafeArea(
-                            top: false,
-                            child: Padding(
-                              padding: const EdgeInsets.all(20),
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: <Widget>[
-                                  const Text(
-                                    "终止连接",
-                                    style: TextStyle(
-                                        fontSize: 20,
-                                        color: Colors.black,
-                                        fontWeight: FontWeight.w500),
-                                  ),
-                                  const SizedBox(
-                                    height: 12,
-                                  ),
-                                  const Text(
-                                    "确认要终止此连接？",
-                                    style: TextStyle(
-                                        fontSize: 20,
-                                        color: Colors.black,
-                                        fontWeight: FontWeight.w400),
-                                  ),
-                                  const SizedBox(
-                                    height: 22,
-                                  ),
-                                  Row(
-                                    children: [
-                                      Expanded(
-                                        child: OutlinedButton(
-                                          onPressed: () async {
-                                            Navigator.of(context).pop();
-                                            user['running'] = true;
-                                            users.value =
-                                                List.of(users.value);
-                                            try {
-                                              await dsmControlPanelPost({
-                                                "api": '"SYNO.Core.CurrentConnection"',
-                                                "method": '"kick_connection"',
-                                                "version": 1,
-                                                "http_conn": jsonEncode({
-                                                  "who": user['who'],
-                                                  "from": user['from']
-                                                }),
-                                                "service_conn": "[]",
-                                              });
-                                              UiUtil.toast("连接已终止");
-                                            } catch (e) {
-                                              // 旧层失败时静默。
-                                            } finally {
-                                              user['running'] = false;
-                                              users.value = List.of(users.value);
-                                            }
-                                          },
-                                          child: const Text(
-                                            "终止连接",
-                                            style: TextStyle(
-                                                fontSize: 18,
-                                                color: Colors.redAccent),
-                                          ),
-                                        ),
-                                      ),
-                                      const SizedBox(
-                                        width: 16,
-                                      ),
-                                      Expanded(
-                                        child: OutlinedButton(
-                                          onPressed: () async {
-                                            Navigator.of(context).pop();
-                                          },
-                                          child: const Text(
-                                            "取消",
-                                            style: TextStyle(fontSize: 18),
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  const SizedBox(
-                                    height: 8,
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                      );
-                    },
+                    builder: (context) => BottomConfirmSheet(
+                      title: "终止连接",
+                      content: "确认要终止此连接？",
+                      confirmText: "终止连接",
+                      textColor: Colors.black,
+                      padding: 20,
+                      buttonSpacing: 16,
+                      onConfirm: () async {
+                        user['running'] = true;
+                        users.value = List.of(users.value);
+                        try {
+                          await dsmControlPanelPost({
+                            "api": '"SYNO.Core.CurrentConnection"',
+                            "method": '"kick_connection"',
+                            "version": 1,
+                            "http_conn": jsonEncode(
+                                {"who": user['who'], "from": user['from']}),
+                            "service_conn": "[]",
+                          });
+                          UiUtil.toast("连接已终止");
+                        } catch (e) {
+                          // 旧层失败时静默。
+                        } finally {
+                          user['running'] = false;
+                          users.value = List.of(users.value);
+                        }
+                      },
+                    ),
                   );
                 },
                 child: SizedBox(

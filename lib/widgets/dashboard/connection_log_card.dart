@@ -1,5 +1,5 @@
-
 import 'package:flutter/cupertino.dart';
+import 'package:garden/widgets/bottom_confirm_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:garden/api/dsm_api.dart';
 import 'package:garden/extensions/int.dart';
@@ -100,7 +100,8 @@ class DashboardConnectionLogCard extends HookWidget {
                         text: error.isNotEmpty ? error.value : "暂无用户登录",
                         children: [
                           TextSpan(
-                              text: "\t\t点击重试", style: dashboardRetryTextStyle(context))
+                              text: "\t\t点击重试",
+                              style: dashboardRetryTextStyle(context))
                         ])));
               } else if (context.isCardItemCollapsed('ConnectionLog')) {
                 return Flexible(
@@ -222,83 +223,17 @@ class _DashboardConnectionLogItem extends StatelessWidget {
   Future<dynamic> onDisconnectAlert(BuildContext context) {
     return showCupertinoModalPopup(
       context: context,
-      builder: (context) {
-        return SizedBox(
-          width: double.infinity,
-          child: Material(
-          color: Colors.transparent,
-          child: Card(
-            shape: RoundedRectangleBorder(
-                side: const BorderSide(),
-                borderRadius: BorderRadius.circular(18)),
-            child: SafeArea(
-              top: false,
-              child: Padding(
-                padding: const EdgeInsets.all(20),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: <Widget>[
-                    const Text(
-                      "终止连接",
-                      style: TextStyle(
-                          fontSize: 20,
-                          color: Colors.black,
-                          fontWeight: FontWeight.w500),
-                    ),
-                    const SizedBox(
-                      height: 12,
-                    ),
-                    const Text(
-                      "确认要终止此连接？",
-                      style: TextStyle(
-                          fontSize: 20,
-                          color: Colors.black,
-                          fontWeight: FontWeight.w400),
-                    ),
-                    const SizedBox(
-                      height: 22,
-                    ),
-                    Row(
-                      children: [
-                        Flexible(
-                          child: OutlinedButton(
-                            onPressed: onKickout,
-                            child: Text(
-                              "终止连接",
-                              style: TextStyle(
-                                  fontSize: 18,
-                                  color: AppTheme.of(context).errorColor),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(
-                          width: 16,
-                        ),
-                        Flexible(
-                          child: OutlinedButton(
-                            onPressed: () async {
-                              Navigator.of(context).pop();
-                            },
-                            child: const Text(
-                              "取消",
-                              style: TextStyle(fontSize: 18),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(
-                      height: 8,
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ),
-        );
-      },
+      builder: (context) => BottomConfirmSheet(
+        title: "终止连接",
+        content: "确认要终止此连接？",
+        confirmText: "终止连接",
+        confirmColor: AppTheme.of(context).errorColor ?? Colors.red,
+        textColor: Colors.black,
+        padding: 20,
+        buttonSpacing: 16,
+        popBeforeConfirm: false,
+        onConfirm: onKickout,
+      ),
     );
   }
 }
-
