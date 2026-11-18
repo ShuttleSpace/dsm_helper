@@ -34,6 +34,7 @@ import 'package:garden/widgets/bottom_confirm_sheet.dart';
 import 'package:garden/hooks/use_file_download.dart';
 import 'package:garden/hooks/use_file_click.dart';
 import 'package:garden/widgets/file/file_list_item.dart';
+import 'package:garden/widgets/file/remote_folder_sheet.dart';
 import 'package:garden/widgets/file/sort_menu.dart';
 import 'package:garden/widgets/folder_picker_sheet.dart';
 import 'package:garden/widgets/name_input_dialog.dart';
@@ -1101,135 +1102,22 @@ class Files extends HookWidget {
                 onPressed: () async {
                   showCupertinoModalPopup(
                     context: context,
-                    builder: (context) {
-                      return SizedBox(
-                        width: double.infinity,
-                        child: Material(
-                          color: Colors.transparent,
-                          child: Card(
-                            shape: RoundedRectangleBorder(
-                                side: const BorderSide(),
-                                borderRadius: BorderRadius.circular(18)),
-                            child: SafeArea(
-                              top: false,
-                              child: Padding(
-                                padding: const EdgeInsets.all(20),
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: <Widget>[
-                                    Stack(
-                                      children: [
-                                        const Align(
-                                          alignment: Alignment.center,
-                                          child: Text(
-                                            "远程文件夹",
-                                            style: TextStyle(
-                                                fontSize: 20,
-                                                fontWeight: FontWeight.w500),
-                                          ),
-                                        ),
-                                        Align(
-                                          alignment: Alignment.centerRight,
-                                          child: SizedBox(
-                                            width: 30,
-                                            height: 30,
-                                            child: OutlinedButton(
-                                              onPressed: () async {
-                                                UiUtil.toast("重新加载远程连接中");
-                                                Navigator.of(context).pop();
-                                                getFtpFolder();
-                                                getSftpFolder();
-                                                getSmbFolder();
-                                                getDavFolder();
-                                              },
-                                              child: const Icon(
-                                                Icons.refresh,
-                                                size: 20,
-                                              ),
-                                            ),
-                                          ),
-                                        )
-                                      ],
-                                    ),
-                                    const SizedBox(
-                                      height: 20,
-                                    ),
-                                    Container(
-                                      constraints: BoxConstraints(
-                                        minHeight: 50,
-                                        maxHeight:
-                                            MediaQuery.sizeOf(context).height *
-                                                0.8,
-                                      ),
-                                      child: SingleChildScrollView(
-                                        child: Column(
-                                          children: [
-                                            if ((smbFolders.value +
-                                                    ftpFolders.value +
-                                                    sftpFolders.value +
-                                                    davFolders.value)
-                                                .isNotEmpty) ...[
-                                              ...(smbFolders.value +
-                                                      ftpFolders.value +
-                                                      sftpFolders.value +
-                                                      davFolders.value)
-                                                  .map((folder) {
-                                                return FileListItem(
-                                                  file: folder,
-                                                  remote: true,
-                                                  iconMode: false,
-                                                  multiSelect: false,
-                                                  selected: false,
-                                                  onAction: () => fileAction(
-                                                      folder,
-                                                      remote: true),
-                                                  onTap: () => openFile(folder,
-                                                      fileType: FileTypeUtil
-                                                          .toFileTypeEnum(
-                                                              FileTypeUtil
-                                                                  .getFileType(
-                                                                      folder[
-                                                                          'name'])),
-                                                      remote: true),
-                                                );
-                                              }),
-                                            ] else
-                                              Center(
-                                                child: Text(
-                                                  "未挂载远程文件夹",
-                                                  style: TextStyle(
-                                                      color: AppTheme.of(
-                                                              context)
-                                                          .placeholderColor),
-                                                ),
-                                              ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                    const SizedBox(
-                                      height: 16,
-                                    ),
-                                    OutlinedButton(
-                                      onPressed: () async {
-                                        Navigator.of(context).pop();
-                                      },
-                                      child: const Text(
-                                        "取消",
-                                        style: TextStyle(fontSize: 18),
-                                      ),
-                                    ),
-                                    const SizedBox(
-                                      height: 8,
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      );
-                    },
+                    builder: (context) => RemoteFolderSheet(
+                      folders: smbFolders.value +
+                          ftpFolders.value +
+                          sftpFolders.value +
+                          davFolders.value,
+                      onRefresh: () {
+                        getFtpFolder();
+                        getSftpFolder();
+                        getSmbFolder();
+                        getDavFolder();
+                      },
+                      onFolderAction: (folder) =>
+                          fileAction(folder, remote: true),
+                      onFolderTap: (folder, fileType) =>
+                          openFile(folder, fileType: fileType, remote: true),
+                    ),
                   );
                 },
                 child: Image.asset(
