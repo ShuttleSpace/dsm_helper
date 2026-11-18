@@ -35,6 +35,7 @@ import 'package:garden/widgets/file/path_item.dart';
 import 'package:garden/widgets/file/process_list.dart';
 import 'package:garden/widgets/file/remote_folder_sheet.dart';
 import 'package:garden/widgets/file/sort_menu.dart';
+import 'package:garden/widgets/file/title_actions.dart';
 import 'package:garden/widgets/folder_picker_sheet.dart';
 import 'package:garden/widgets/name_input_dialog.dart';
 import 'package:garden/widgets/transparent_router.dart';
@@ -951,227 +952,6 @@ class Files extends HookWidget {
       return Future.value(false);
     }
 
-    Widget buildTitleAction(BuildContext context) {
-      return SizedBox(
-        width: MediaQuery.sizeOf(context).width,
-        height: 50,
-        child: ListView(
-          scrollDirection: Axis.horizontal,
-          shrinkWrap: true,
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(left: 10, top: 8, bottom: 8),
-              child: OutlinedButton(
-                onPressed: () async {
-                  if (multiSelect.value) {
-                    multiSelect.value = false;
-                    selectedFiles.value = [];
-                  } else {
-                    scaffoldKey.currentState?.openDrawer();
-
-                    favoriteLoading.value = true;
-                    try {
-                      final data = await dsmFileStationFavoriteListForPage();
-                      favorites.value = data['favorites'] ?? [];
-                    } catch (e) {
-                      Log.warn('favorites: $e');
-                    } finally {
-                      favoriteLoading.value = false;
-                    }
-                  }
-                },
-                child: multiSelect.value
-                    ? const Icon(Icons.close)
-                    : Image.asset(
-                        "assets/icons/collect.png",
-                        width: 20,
-                      ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(left: 10, top: 8, bottom: 8),
-              child: OutlinedButton(
-                onPressed: () async {
-                  showCupertinoModalPopup(
-                    context: context,
-                    builder: (context) => RemoteFolderSheet(
-                      folders: smbFolders.value +
-                          ftpFolders.value +
-                          sftpFolders.value +
-                          davFolders.value,
-                      onRefresh: () {
-                        getFtpFolder();
-                        getSftpFolder();
-                        getSmbFolder();
-                        getDavFolder();
-                      },
-                      onFolderAction: (folder) =>
-                          fileAction(folder, remote: true),
-                      onFolderTap: (folder, fileType) =>
-                          openFile(folder, fileType: fileType, remote: true),
-                    ),
-                  );
-                },
-                child: Image.asset(
-                  "assets/icons/remote.png",
-                  width: 20,
-                ),
-              ),
-            ),
-            if (connectionStore.notVisitorAccount.watch(context) &&
-                paths.value.isNotEmpty &&
-                !multiSelect.value)
-              Padding(
-                padding: const EdgeInsets.only(left: 10, top: 8, bottom: 8),
-                child: OutlinedButton(
-                  onPressed: () async {
-                    Navigator.of(context)
-                        .push(CupertinoPageRoute(
-                            builder: (context) {
-                              return Upload("/${paths.value.join("/")}");
-                            },
-                            settings: const RouteSettings(name: "upload")))
-                        .then((value) {
-                      refresh();
-                    });
-                  },
-                  child: Image.asset(
-                    "assets/icons/upload.png",
-                    width: 20,
-                  ),
-                ),
-              ),
-            if (backgroundProcess.value.isNotEmpty)
-              Padding(
-                padding: const EdgeInsets.only(left: 10, top: 8, bottom: 8),
-                child: OutlinedButton(
-                  onPressed: () async {
-                    showProcessList.value = !showProcessList.value;
-                  },
-                  child: Image.asset(
-                    "assets/icons/bgtask.gif",
-                    width: 20,
-                  ),
-                ),
-              ),
-            const SizedBox(
-              width: 24,
-            ),
-            if (paths.value.isNotEmpty)
-              Padding(
-                padding: const EdgeInsets.only(right: 10, top: 8, bottom: 8),
-                child: OutlinedButton(
-                  onPressed: () async {
-                    Navigator.of(context)
-                        .push(CupertinoPageRoute(
-                            builder: (content) {
-                              return Search("/${paths.value.join("/")}");
-                            },
-                            settings: const RouteSettings(name: "search")))
-                        .then((res) {
-                      if (res != null) {
-                        search(res['folders'], res['pattern'],
-                            res['search_content']);
-                      }
-                    });
-                  },
-                  child: Image.asset(
-                    "assets/icons/search.png",
-                    width: 20,
-                  ),
-                ),
-              ),
-            Padding(
-              padding: const EdgeInsets.only(right: 10, top: 8, bottom: 8),
-              child: OutlinedButton(
-                onPressed: () {
-                  listType.value = listType.value == ListType.list
-                      ? ListType.icon
-                      : ListType.list;
-
-                  StorageUtil.setString("file_list_type",
-                      listType.value == ListType.list ? "list" : "icon");
-                },
-                child: Image.asset(
-                  listType.value == ListType.list
-                      ? "assets/icons/list_list.png"
-                      : "assets/icons/list_icon.png",
-                  width: 20,
-                  height: 20,
-                ),
-              ),
-            ),
-            if (multiSelect.value)
-              Padding(
-                padding: const EdgeInsets.only(right: 10, top: 8, bottom: 8),
-                child: OutlinedButton(
-                  onPressed: () {
-                    if (selectedFiles.value.length == files.value.length) {
-                      selectedFiles.value = [];
-                    } else {
-                      selectedFiles.value = [];
-                      for (var file in files.value) {
-                        selectedFiles.value = [...selectedFiles.value, file];
-                      }
-                    }
-                  },
-                  child: Image.asset(
-                    "assets/icons/select_all.png",
-                    width: 20,
-                    height: 20,
-                  ),
-                ),
-              )
-            else if (paths.value.length > 1)
-              Padding(
-                padding: const EdgeInsets.only(right: 10, top: 8, bottom: 8),
-                child: OutlinedButton(
-                  onPressed: () {
-                    showCupertinoModalPopup(
-                      context: context,
-                      builder: (context) {
-                        return FileSortMenu(
-                          sortBy: sortBy,
-                          sortDirection: sortDirection,
-                        );
-                      },
-                    ).then((value) {
-                      refresh();
-                    });
-                  },
-                  child: Image.asset(
-                    "assets/icons/sort.png",
-                    width: 20,
-                    height: 20,
-                  ),
-                ),
-              ),
-            Padding(
-              padding: const EdgeInsets.only(right: 10, top: 8, bottom: 8),
-              child: OutlinedButton(
-                onPressed: () {
-                  showCupertinoModalPopup(
-                    context: context,
-                    builder: (context) => FileCreateActionSheet(
-                      paths: paths.value,
-                      getVolumes: getVolumes,
-                      onRefresh: refresh,
-                      onReloadRemote: getSmbFolder,
-                    ),
-                  );
-                },
-                child: Image.asset(
-                  "assets/icons/actions.png",
-                  width: 20,
-                  height: 20,
-                ),
-              ),
-            )
-          ],
-        ),
-      );
-    }
-
     useEffect(() {
       filesOnWillPop.value = onWillPop;
       final subscription = filesDrawerOpen.subscribe((open) {
@@ -1211,7 +991,90 @@ class Files extends HookWidget {
       appBar: AppBar(
         automaticallyImplyLeading: false,
         titleSpacing: 0,
-        title: buildTitleAction(context),
+        title: FileTitleActions(
+          multiSelect: multiSelect,
+          showProcessList: showProcessList,
+          selectedFiles: selectedFiles,
+          files: files,
+          paths: paths,
+          sortBy: sortBy,
+          sortDirection: sortDirection,
+          notVisitor: connectionStore.notVisitorAccount.watch(context),
+          iconMode: listType.value == ListType.icon,
+          hasBackgroundProcess: backgroundProcess.value.isNotEmpty,
+          remoteFolders: smbFolders.value +
+              ftpFolders.value +
+              sftpFolders.value +
+              davFolders.value,
+          onToggleFavorite: () async {
+            if (multiSelect.value) {
+              multiSelect.value = false;
+              selectedFiles.value = [];
+            } else {
+              scaffoldKey.currentState?.openDrawer();
+              favoriteLoading.value = true;
+              try {
+                final data = await dsmFileStationFavoriteListForPage();
+                favorites.value = data['favorites'] ?? [];
+              } catch (e) {
+                Log.warn('favorites: $e');
+              } finally {
+                favoriteLoading.value = false;
+              }
+            }
+          },
+          onToggleProcessList: () =>
+              showProcessList.value = !showProcessList.value,
+          onUpload: () {
+            Navigator.of(context)
+                .push(CupertinoPageRoute(
+                  builder: (context) => Upload("/${paths.value.join("/")}"),
+                  settings: const RouteSettings(name: "upload"),
+                ))
+                .then((value) => refresh());
+          },
+          onSearch: () {
+            Navigator.of(context)
+                .push(CupertinoPageRoute(
+              builder: (content) => Search("/${paths.value.join("/")}"),
+              settings: const RouteSettings(name: "search"),
+            ))
+                .then((res) {
+              if (res != null) {
+                search(res['folders'], res['pattern'], res['search_content']);
+              }
+            });
+          },
+          onToggleListType: () {
+            listType.value =
+                listType.value == ListType.list ? ListType.icon : ListType.list;
+            StorageUtil.setString(
+              "file_list_type",
+              listType.value == ListType.list ? "list" : "icon",
+            );
+          },
+          onSelectAll: () {
+            if (selectedFiles.value.length == files.value.length) {
+              selectedFiles.value = [];
+            } else {
+              selectedFiles.value = [];
+              for (var file in files.value) {
+                selectedFiles.value = [...selectedFiles.value, file];
+              }
+            }
+          },
+          onRefresh: refresh,
+          onRefreshRemote: () {
+            getFtpFolder();
+            getSftpFolder();
+            getSmbFolder();
+            getDavFolder();
+          },
+          getVolumes: getVolumes,
+          onFolderAction: (folder) => fileAction(folder, remote: true),
+          onFolderTap: (folder, fileType) =>
+              openFile(folder, fileType: fileType, remote: true),
+        ),
       ),
       body: Column(
         children: [
