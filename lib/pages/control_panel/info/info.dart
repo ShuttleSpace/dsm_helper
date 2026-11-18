@@ -3,8 +3,10 @@ import 'package:garden/util/http_util.dart';
 import 'package:garden/util/log.dart';
 import 'package:garden/widgets/bubble_tab_indicator.dart';
 import 'package:garden/widgets/dashboard/volume_card.dart';
-import 'package:garden/widgets/label.dart';
 import 'package:garden/widgets/neu_back_button.dart';
+import 'package:garden/widgets/system_info/dev_item.dart';
+import 'package:garden/widgets/system_info/disk_item.dart';
+import 'package:garden/widgets/system_info/nif_item.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:garden/constants/app_constants.dart';
@@ -58,214 +60,6 @@ class SystemInfo extends HookWidget {
       } catch (e) {
         Log.error('dsmCoreNetworkGet: $e');
       }
-    }
-
-    Widget buildNifItem(nif) {
-      return Card(
-        shape: RoundedRectangleBorder(
-            side: const BorderSide(), borderRadius: BorderRadius.circular(18)),
-        margin: const EdgeInsets.only(top: 20, left: 20, right: 20),
-        child: Padding(
-          padding: const EdgeInsets.all(AppConstants.paddingSmall),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(top: 20, left: 20),
-                child: Text(
-                  "局域网 ${nifs.indexOf(nif) + 1}",
-                  style: const TextStyle(
-                      fontSize: 18, fontWeight: FontWeight.w600),
-                ),
-              ),
-              Card(
-                shape: RoundedRectangleBorder(
-                    side: const BorderSide(),
-                    borderRadius: BorderRadius.circular(18)),
-                margin: const EdgeInsets.only(top: 20, left: 20, right: 20),
-                child: Padding(
-                  padding: const EdgeInsets.all(AppConstants.paddingSmall),
-                  child: Row(
-                    children: [
-                      const Expanded(
-                        child: Text(
-                          "MAC 地址",
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                      Expanded(
-                        flex: 2,
-                        child: Text(
-                          "${nif['mac']}",
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              Card(
-                shape: RoundedRectangleBorder(
-                    side: const BorderSide(),
-                    borderRadius: BorderRadius.circular(18)),
-                margin: const EdgeInsets.only(top: 20, left: 20, right: 20),
-                child: Padding(
-                  padding: const EdgeInsets.all(AppConstants.paddingSmall),
-                  child: Row(
-                    children: [
-                      const Expanded(
-                        flex: 1,
-                        child: Text(
-                          "IP 地址",
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                      Expanded(
-                        flex: 2,
-                        child: Text(
-                          "${nif['addr']}",
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              Card(
-                shape: RoundedRectangleBorder(
-                    side: const BorderSide(),
-                    borderRadius: BorderRadius.circular(18)),
-                margin: const EdgeInsets.only(top: 20, left: 20, right: 20),
-                child: Padding(
-                  padding: const EdgeInsets.all(AppConstants.paddingSmall),
-                  child: Row(
-                    children: [
-                      const Expanded(
-                        flex: 1,
-                        child: Text(
-                          "子网掩码",
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                      Expanded(
-                        flex: 2,
-                        child: Text(
-                          "${nif['mask']}",
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              const SizedBox(
-                height: 20,
-              ),
-            ],
-          ),
-        ),
-      );
-    }
-
-    Widget buildDevItem(dev) {
-      return Card(
-        shape: RoundedRectangleBorder(
-            side: const BorderSide(), borderRadius: BorderRadius.circular(18)),
-        margin: const EdgeInsets.only(top: 20, left: 20, right: 20),
-        child: Padding(
-          padding: const EdgeInsets.all(AppConstants.paddingSmall),
-          child: Row(
-            children: [
-              Expanded(
-                child: Text(
-                  dev['cls'] == "hub" ? "USB集线器" : dev['cls'],
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-              Expanded(
-                flex: 2,
-                child: Text(
-                  "${dev['product']}${dev['producer']}",
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-            ],
-          ),
-        ),
-      );
-    }
-
-    Widget buildDiskItem(disk) {
-      return Card(
-        shape: RoundedRectangleBorder(
-            side: const BorderSide(), borderRadius: BorderRadius.circular(18)),
-        margin: const EdgeInsets.only(top: 20, left: 20, right: 20),
-        child: Padding(
-          padding: const EdgeInsets.all(AppConstants.paddingSmall),
-          child: Row(
-            children: [
-              Card(
-                shape: RoundedRectangleBorder(
-                    side: const BorderSide(),
-                    borderRadius: BorderRadius.circular(18)),
-                margin: const EdgeInsets.all(10),
-                child: Padding(
-                  padding: const EdgeInsets.all(AppConstants.paddingSmall),
-                  child: Image.asset(
-                    disk['isSsd']
-                        ? "assets/icons/ssd.png"
-                        : "assets/icons/hdd.png",
-                    width: 40,
-                  ),
-                ),
-              ),
-              const SizedBox(
-                width: 10,
-              ),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Text(
-                          "${disk['longName']}",
-                          style: const TextStyle(fontWeight: FontWeight.w600),
-                        ),
-                        const SizedBox(
-                          width: 5,
-                        ),
-                        Label(
-                          disk['overview_status'] == "normal"
-                              ? "正常"
-                              : disk['overview_status'],
-                          disk['overview_status'] == "normal"
-                              ? Colors.green
-                              : Colors.red,
-                          fill: true,
-                        ),
-                      ],
-                    ),
-                    const SizedBox(
-                      height: 5,
-                    ),
-                    Text("${disk['vendor'].trim()} ${disk['model'].trim()}"),
-                    const SizedBox(
-                      height: 5,
-                    ),
-                    Row(
-                      children: [
-                        Text(int.parse(disk['size_total']).formatSize()),
-                        Text("  ${disk['temp']}℃"),
-                      ],
-                    ),
-                  ],
-                ),
-              )
-            ],
-          ),
-        ),
-      );
     }
 
     Widget buildVolume() {
@@ -329,7 +123,7 @@ class SystemInfo extends HookWidget {
                           TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
                     ),
                   ),
-                  ...value.map(buildDiskItem),
+                  ...value.map((disk) => SystemDiskItem(disk)),
                   const SizedBox(
                     height: 20,
                   ),
@@ -657,8 +451,7 @@ class SystemInfo extends HookWidget {
                                     Expanded(
                                       flex: 2,
                                       child: Text(
-                                        parseOpTime(
-                                            systemData['up_time']),
+                                        parseOpTime(systemData['up_time']),
                                         overflow: TextOverflow.ellipsis,
                                       ),
                                     ),
@@ -692,9 +485,7 @@ class SystemInfo extends HookWidget {
                                               color: systemData[
                                                           'temperature_warning'] ==
                                                       null
-                                                  ? (systemData[
-                                                              'sys_temp'] >
-                                                          80
+                                                  ? (systemData['sys_temp'] > 80
                                                       ? Colors.red
                                                       : Colors.green)
                                                   : (systemData[
@@ -818,7 +609,7 @@ class SystemInfo extends HookWidget {
                                       fontWeight: FontWeight.w600),
                                 ),
                               ),
-                              ...usbDev.value.map(buildDevItem),
+                              ...usbDev.value.map((dev) => UsbDeviceItem(dev)),
                               const SizedBox(
                                 height: 20,
                               ),
@@ -957,7 +748,8 @@ class SystemInfo extends HookWidget {
                         ),
                       ),
                     ),
-                    ...nifs.map(buildNifItem),
+                    ...nifs.map(
+                        (nif) => NetworkInterfaceItem(nif, nifs.indexOf(nif))),
                   ],
                 ),
                 Expanded(child: buildVolume()),
