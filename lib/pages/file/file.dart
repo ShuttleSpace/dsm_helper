@@ -18,13 +18,10 @@ import 'package:garden/pages/common/image_preview.dart';
 import 'package:garden/pages/common/pdf_viewer.dart';
 import 'package:garden/pages/common/text_editor.dart';
 import 'package:garden/pages/common/video_player.dart';
-import 'package:garden/pages/control_panel/shared_folders/add_shared_folder.dart';
 import 'package:garden/pages/file/detail.dart';
 import 'package:garden/pages/file/favorite.dart';
-import 'package:garden/pages/file/remote_folder.dart';
 import 'package:garden/pages/file/search.dart';
 import 'package:garden/pages/file/share.dart';
-import 'package:garden/pages/file/share_manager.dart';
 import 'package:garden/pages/file/upload.dart';
 import 'package:garden/theme/app_theme.dart';
 import 'package:garden/util/file_types.dart';
@@ -32,6 +29,7 @@ import 'package:garden/widgets/bottom_action_sheet.dart';
 import 'package:garden/widgets/bottom_confirm_sheet.dart';
 import 'package:garden/hooks/use_file_download.dart';
 import 'package:garden/hooks/use_file_click.dart';
+import 'package:garden/widgets/file/create_action_sheet.dart';
 import 'package:garden/widgets/file/file_list_item.dart';
 import 'package:garden/widgets/file/path_item.dart';
 import 'package:garden/widgets/file/process_list.dart';
@@ -1154,116 +1152,11 @@ class Files extends HookWidget {
                 onPressed: () {
                   showCupertinoModalPopup(
                     context: context,
-                    builder: (context) => BottomActionSheet(
-                      title: "选择操作",
-                      titleSpacing: 12,
-                      cancelSpacing: 20,
-                      actions: [
-                        if (paths.value.isEmpty)
-                          BottomActionItem(
-                            label: "共享文件夹",
-                            iconAsset: "assets/icons/new_folder.png",
-                            onPressed: () async {
-                              List volumes = await getVolumes();
-                              if (volumes.isNotEmpty) {
-                                if (context.mounted) {
-                                  Navigator.of(context)
-                                      .push(CupertinoPageRoute(
-                                    builder: (context) =>
-                                        AddSharedFolders(volumes),
-                                    settings: const RouteSettings(
-                                        name: "add_shared_folders"),
-                                  ))
-                                      .then((res) {
-                                    if (res != null && res) {
-                                      refresh();
-                                    }
-                                  });
-                                }
-                              } else {
-                                UiUtil.toast("未获取到存储空间");
-                              }
-                            },
-                          ),
-                        if (paths.value.isNotEmpty)
-                          BottomActionItem(
-                            label: "新建文件夹",
-                            iconAsset: "assets/icons/new_folder.png",
-                            onPressed: () {
-                              showCupertinoDialog(
-                                context: context,
-                                builder: (context) => NameInputDialog(
-                                  title: "新建文件夹",
-                                  labelText: "文件夹名",
-                                  hintText: "请输入文件夹名",
-                                  emptyMessage: "请输入文件夹名",
-                                  onConfirm: (name) async {
-                                    String path = "/${paths.value.join("/")}";
-                                    try {
-                                      await dsmFileStationCreateFolderForPage(
-                                          path, name);
-                                      UiUtil.toast("文件夹创建成功");
-                                      refresh();
-                                    } catch (e) {
-                                      final raw =
-                                          e is DSMException ? e.rawError : null;
-                                      final errors = raw?['errors'] as List?;
-                                      if (errors != null &&
-                                          errors.isNotEmpty &&
-                                          errors[0]['code'] == 414) {
-                                        UiUtil.toast("文件夹创建失败：指定的名称已存在");
-                                      } else {
-                                        UiUtil.toast("文件夹创建失败");
-                                      }
-                                    }
-                                  },
-                                ),
-                              );
-                            },
-                          ),
-                        if (paths.value.isNotEmpty)
-                          BottomActionItem(
-                            label: "创建文件请求",
-                            iconAsset: "assets/icons/upload.png",
-                            widthDivisor: 4,
-                            onPressed: () {
-                              Navigator.of(context).push(CupertinoPageRoute(
-                                builder: (context) => Share(
-                                  paths: ["/${paths.value.join("/")}"],
-                                  fileRequest: true,
-                                ),
-                                settings: const RouteSettings(name: "share"),
-                              ));
-                            },
-                          ),
-                        BottomActionItem(
-                          label: "共享链接管理",
-                          iconAsset: "assets/icons/link.png",
-                          onPressed: () {
-                            Navigator.of(context).push(CupertinoPageRoute(
-                              builder: (content) => const ShareManager(),
-                              settings:
-                                  const RouteSettings(name: "share_manager"),
-                            ));
-                          },
-                        ),
-                        BottomActionItem(
-                          label: "装载远程",
-                          iconAsset: "assets/icons/remote.png",
-                          onPressed: () {
-                            Navigator.of(context)
-                                .push(CupertinoPageRoute(
-                              builder: (content) => const RemoteFolder(),
-                              settings:
-                                  const RouteSettings(name: "remote_folder"),
-                            ))
-                                .then((res) {
-                              refresh();
-                              getSmbFolder();
-                            });
-                          },
-                        ),
-                      ],
+                    builder: (context) => FileCreateActionSheet(
+                      paths: paths.value,
+                      getVolumes: getVolumes,
+                      onRefresh: refresh,
+                      onReloadRemote: getSmbFolder,
                     ),
                   );
                 },
