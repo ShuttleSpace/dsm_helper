@@ -3,7 +3,10 @@ import 'package:garden/extensions/datetime.dart';
 import 'package:garden/extensions/int.dart';
 import 'package:garden/util/ui_util.dart';
 import 'package:garden/widgets/bubble_tab_indicator.dart';
-import 'package:garden/widgets/label.dart';
+import 'package:garden/widgets/download_station/download_file_item.dart';
+import 'package:garden/widgets/download_station/download_peer_item.dart';
+import 'package:garden/widgets/download_station/download_tracker_item.dart';
+import 'package:garden/widgets/bottom_confirm_sheet.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -108,151 +111,6 @@ class DownloadDetail extends HookWidget {
       }
     }
 
-  Widget buildFileItem(file) {
-    return Card(
-      shape: RoundedRectangleBorder(
-          side: const BorderSide(), borderRadius: BorderRadius.circular(18)),
-      child: Padding(
-        padding: const EdgeInsets.all(AppConstants.paddingSmall),
-        child: Column(
-          children: [
-            Text(
-              "${file['name']}",
-              style: const TextStyle(fontWeight: FontWeight.w600),
-            ),
-            const SizedBox(
-              height: 10,
-            ),
-            Row(
-              children: [
-                Text("${file['size_downloaded'].formatSize()} / "),
-                Text(file['size'].formatSize()),
-                const SizedBox(
-                  width: 10,
-                ),
-                Text(
-                  "${(file['size_downloaded'] * 100 / file['size']).toStringAsFixed(2)} %",
-                  style: const TextStyle(color: Colors.blue),
-                ),
-                const Spacer(),
-                Label(
-                  file['priority'] == "normal"
-                      ? "一般"
-                      : file['priority'] == "high"
-                          ? "高"
-                          : "低",
-                  file['priority'] == "normal"
-                      ? Colors.blue
-                      : file['priority'] == "high"
-                          ? Colors.orange
-                          : Colors.grey,
-                  fill: true,
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget buildPeerItem(peer) {
-    return Card(
-      shape: RoundedRectangleBorder(
-          side: const BorderSide(), borderRadius: BorderRadius.circular(18)),
-      child: Padding(
-        padding: const EdgeInsets.all(AppConstants.paddingSmall),
-        child: Column(
-          children: [
-            Row(
-              children: [
-                Text("${peer['ip']}"),
-                const Spacer(),
-                Text("${peer['client']}"),
-              ],
-            ),
-            const SizedBox(
-              height: 10,
-            ),
-            Row(
-              children: [
-                Text("进度：${(peer['progress'] * 100).toStringAsFixed(0)}%"),
-                const Spacer(),
-                const Icon(
-                  Icons.download_sharp,
-                  color: Colors.green,
-                  size: 16,
-                ),
-                Text(
-                  peer['speed_download'].formatSize(),
-                  style: const TextStyle(color: Colors.green),
-                ),
-                const SizedBox(
-                  width: 10,
-                ),
-                const Icon(
-                  Icons.upload_sharp,
-                  color: Colors.blue,
-                  size: 16,
-                ),
-                Text(
-                  peer['speed_upload'].formatSize(),
-                  style: const TextStyle(color: Colors.blue),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget buildTrackerItem(tracker) {
-    return Card(
-      shape: RoundedRectangleBorder(
-          side: const BorderSide(), borderRadius: BorderRadius.circular(18)),
-      child: Padding(
-        padding: const EdgeInsets.all(AppConstants.paddingSmall),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text("${tracker['url']}"),
-            const SizedBox(
-              height: 10,
-            ),
-            Row(
-              children: [
-                Text(
-                  "种子数：${tracker['seeds'] >= 0 ? tracker['seeds'] : "-"}",
-                  style: const TextStyle(color: Colors.green),
-                ),
-                const SizedBox(
-                  width: 10,
-                ),
-                Text(
-                  "Peer数：${tracker['peers'] >= 0 ? tracker['peers'] : "-"}",
-                  style: const TextStyle(color: Colors.blue),
-                ),
-                const SizedBox(
-                  width: 10,
-                ),
-                Expanded(
-                  child: Text(
-                    "${tracker['status']}",
-                    style: TextStyle(
-                        color: tracker['status'] == "Success"
-                            ? Colors.green
-                            : Colors.red),
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
     useEffect(() {
       getData();
       return null;
@@ -278,96 +136,28 @@ class DownloadDetail extends HookWidget {
                 UiUtil.vibrate(FeedbackType.warning);
                 showCupertinoModalPopup(
                   context: context,
-                  builder: (context) {
-                    return SizedBox(
-                      width: double.infinity,
-                      child: Material(
-                      color: Colors.transparent,
-                      child: Card(
-                        shape: RoundedRectangleBorder(
-                            side: const BorderSide(),
-                            borderRadius: BorderRadius.circular(18)),
-                        child: SafeArea(
-                          top: false,
-                          child: Padding(
-                            padding:
-                                const EdgeInsets.all(AppConstants.paddingSmall),
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: <Widget>[
-                                const Text(
-                                  "确认删除",
-                                  style: TextStyle(
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.w500),
-                                ),
-                                const SizedBox(
-                                  height: 12,
-                                ),
-                                const Text(
-                                  "确认要删除此任务？",
-                                  style: TextStyle(
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.w400),
-                                ),
-                                const SizedBox(
-                                  height: 22,
-                                ),
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      child: OutlinedButton(
-                                        onPressed: () async {
-                                          Navigator.of(context).pop();
-                                          try {
-                                            await dsmDownloadStation2TaskAction(
-                                                [task.value['id']], "delete");
-                                            UiUtil.toast("任务删除成功");
-                                            if (context.mounted) {
-                                              // ignore: use_build_context_synchronously
-                                              Navigator.of(context).pop();
-                                            }
-                                          } catch (e) {
-                                            final code =
-                                                e is DSMException ? e.code : -1;
-                                            UiUtil.toast("任务删除失败，代码：$code");
-                                          }
-                                        },
-                                        child: const Text(
-                                          "确认删除",
-                                          style: TextStyle(
-                                              fontSize: 18,
-                                              color: Colors.redAccent),
-                                        ),
-                                      ),
-                                    ),
-                                    const SizedBox(
-                                      width: 20,
-                                    ),
-                                    Expanded(
-                                      child: OutlinedButton(
-                                        onPressed: () async {
-                                          Navigator.of(context).pop();
-                                        },
-                                        child: const Text(
-                                          "取消",
-                                          style: TextStyle(fontSize: 18),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(
-                                  height: 8,
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    );
-                  },
+                  builder: (context) => BottomConfirmSheet(
+                    title: "确认删除",
+                    content: "确认要删除此任务？",
+                    confirmText: "确认删除",
+                    showTrailingSpace: true,
+                    onConfirm: () async {
+                      try {
+                        await dsmDownloadStation2TaskAction(
+                          [task.value['id']],
+                          "delete",
+                        );
+                        UiUtil.toast("任务删除成功");
+                        if (context.mounted) {
+                          // ignore: use_build_context_synchronously
+                          Navigator.of(context).pop();
+                        }
+                      } catch (e) {
+                        final code = e is DSMException ? e.code : -1;
+                        UiUtil.toast("任务删除失败，代码：$code");
+                      }
+                    },
+                  ),
                 );
               },
               child: Image.asset(
@@ -414,7 +204,8 @@ class DownloadDetail extends HookWidget {
                             EdgeInsets.symmetric(vertical: 10, horizontal: 5),
                         child: Text("传输信息"),
                       ),
-                      if (task.value['type'] == "bt" && task.value['status'] == 2) ...[
+                      if (task.value['type'] == "bt" &&
+                          task.value['status'] == 2) ...[
                         const Padding(
                           padding:
                               EdgeInsets.symmetric(vertical: 10, horizontal: 5),
@@ -546,8 +337,8 @@ class DownloadDetail extends HookWidget {
                                   OutlinedButton(
                                     onPressed: () async {
                                       ClipboardData data = ClipboardData(
-                                          text: task.value['additional']['detail']
-                                              ['uri']);
+                                          text: task.value['additional']
+                                              ['detail']['uri']);
                                       Clipboard.setData(data);
                                       UiUtil.toast("已复制到剪贴板");
                                     },
@@ -626,8 +417,8 @@ class DownloadDetail extends HookWidget {
                                   Text(task.value['additional']['detail']
                                               ['waiting_seconds'] >
                                           0
-                                      ? (int.parse(task.value['additional']['detail']
-                                              ['waiting_seconds']))
+                                      ? (int.parse(task.value['additional']
+                                              ['detail']['waiting_seconds']))
                                           .timeRemaining()
                                       : "无法取得"),
                                 ],
@@ -685,14 +476,17 @@ class DownloadDetail extends HookWidget {
                                                                 color: Colors
                                                                     .grey),
                                                           )
-                                                        : task.value['status'] == 101
+                                                        : task.value[
+                                                                    'status'] ==
+                                                                101
                                                             ? const Text(
                                                                 "错误",
                                                                 style: TextStyle(
                                                                     color: Colors
                                                                         .red),
                                                               )
-                                                            : task.value['status'] ==
+                                                            : task.value[
+                                                                        'status'] ==
                                                                     105
                                                                 ? const Text(
                                                                     "空间不足",
@@ -700,7 +494,8 @@ class DownloadDetail extends HookWidget {
                                                                         color: Colors
                                                                             .red),
                                                                   )
-                                                                : task.value['status'] ==
+                                                                : task.value[
+                                                                            'status'] ==
                                                                         113
                                                                     ? const Text(
                                                                         "重复的任务",
@@ -876,8 +671,8 @@ class DownloadDetail extends HookWidget {
                               child: Row(
                                 children: [
                                   const Text("已做种时间："),
-                                  Text((int.parse(task.value['additional']['detail']
-                                          ['seed_elapsed']))
+                                  Text((int.parse(task.value['additional']
+                                          ['detail']['seed_elapsed']))
                                       .timeRemaining()),
                                 ],
                               ),
@@ -923,7 +718,8 @@ class DownloadDetail extends HookWidget {
                                                       task.value['additional']
                                                               ['transfer']
                                                           ['size_downloaded']) /
-                                                  task.value['additional']['transfer']
+                                                  task.value['additional']
+                                                          ['transfer']
                                                       ['speed_download'])
                                               .ceil()))
                                           .timeRemaining()
@@ -934,7 +730,8 @@ class DownloadDetail extends HookWidget {
                           ),
                         ],
                       ),
-                      if (task.value['type'] == "bt" && task.value['status'] == 2) ...[
+                      if (task.value['type'] == "bt" &&
+                          task.value['status'] == 2) ...[
                         loadingTrackers.value
                             ? const Center(
                                 child: CupertinoActivityIndicator(
@@ -948,7 +745,8 @@ class DownloadDetail extends HookWidget {
                                 : ListView.separated(
                                     padding: const EdgeInsets.all(20),
                                     itemBuilder: (context, i) {
-                                      return buildTrackerItem(trackers.value[i]);
+                                      return DownloadTrackerItem(
+                                          trackers.value[i]);
                                     },
                                     separatorBuilder: (context, i) {
                                       return const SizedBox(
@@ -969,7 +767,7 @@ class DownloadDetail extends HookWidget {
                                 : ListView.separated(
                                     padding: const EdgeInsets.all(20),
                                     itemBuilder: (context, i) {
-                                      return buildPeerItem(peers.value[i]);
+                                      return DownloadPeerItem(peers.value[i]);
                                     },
                                     separatorBuilder: (context, i) {
                                       return const SizedBox(
@@ -990,7 +788,7 @@ class DownloadDetail extends HookWidget {
                                 : ListView.separated(
                                     padding: const EdgeInsets.all(20),
                                     itemBuilder: (context, i) {
-                                      return buildFileItem(files.value[i]);
+                                      return DownloadFileItem(files.value[i]);
                                     },
                                     separatorBuilder: (context, i) {
                                       return const SizedBox(
