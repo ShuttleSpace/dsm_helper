@@ -14,6 +14,7 @@ import 'package:garden/pages/login/accounts.dart';
 import 'package:garden/stores/connection_store.dart';
 import 'package:garden/util/storage_util.dart';
 import 'package:garden/util/ui_util.dart';
+import 'package:garden/widgets/settings/settings_toggle_tile.dart';
 import 'package:garden/extensions/context.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:signals_hooks/signals_hooks.dart';
@@ -32,7 +33,8 @@ class Login extends HookWidget {
     final passwordController = useTextEditingController();
     final portController = useTextEditingController();
     final otpController = useTextEditingController();
-    final licenseRecognizer = useMemoized(() => TapGestureRecognizer(), const []);
+    final licenseRecognizer =
+        useMemoized(() => TapGestureRecognizer(), const []);
     final privacyRecognizer =
         useMemoized(() => TapGestureRecognizer(), const []);
     final cancelToken = useRef(CancelToken());
@@ -678,28 +680,15 @@ class Login extends HookWidget {
                     width: 10,
                   ),
                   Expanded(
-                    child: GestureDetector(
+                    child: SettingsToggleTile(
+                      label: "记住设备",
+                      value: rememberDevice.value,
+                      checkColor: Theme.of(context).colorScheme.primary,
+                      shape: context.stadiumShapeBorder,
                       onTap: () {
                         FocusScope.of(context).unfocus();
                         rememberDevice.value = !rememberDevice.value;
                       },
-                      child: Card(
-                        shape: context.stadiumShapeBorder,
-                        child: Padding(
-                          padding: const EdgeInsets.all(12.0),
-                          child: Row(
-                            children: [
-                              const Text("记住设备"),
-                              const Spacer(),
-                              if (rememberDevice.value)
-                                Icon(
-                                  CupertinoIcons.checkmark_alt,
-                                  color: Theme.of(context).colorScheme.primary,
-                                ),
-                            ],
-                          ),
-                        ),
-                      ),
                     ),
                   ),
                 ],
@@ -711,62 +700,37 @@ class Login extends HookWidget {
             Row(
               children: [
                 Expanded(
-                  child: GestureDetector(
+                  child: SettingsToggleTile(
+                    label: "记住密码",
+                    value: rememberPassword.value,
+                    checkColor: Theme.of(context).colorScheme.primary,
+                    shape: StadiumBorder(
+                      side: BorderSide(
+                          color: Theme.of(context).colorScheme.primary),
+                    ),
                     onTap: () {
                       rememberPassword.value = !rememberPassword.value;
                       if (!rememberPassword.value) {
                         autoLogin.value = false;
                       }
                     },
-                    child: Card(
-                      shape: StadiumBorder(
-                          side: BorderSide(
-                              color: Theme.of(context).colorScheme.primary)),
-                      child: Padding(
-                        padding: const EdgeInsets.all(12.0),
-                        child: Row(
-                          children: [
-                            const Text("记住密码"),
-                            const Spacer(),
-                            if (rememberPassword.value)
-                              Icon(
-                                CupertinoIcons.checkmark_alt,
-                                color: Theme.of(context).colorScheme.primary,
-                              ),
-                          ],
-                        ),
-                      ),
-                    ),
                   ),
                 ),
                 const SizedBox(
                   width: 20,
                 ),
                 Expanded(
-                  child: GestureDetector(
+                  child: SettingsToggleTile(
+                    label: "自动登录",
+                    value: autoLogin.value,
+                    checkColor: Theme.of(context).colorScheme.primary,
+                    shape: context.stadiumShapeBorder,
                     onTap: () {
                       autoLogin.value = !autoLogin.value;
                       if (autoLogin.value) {
                         rememberPassword.value = true;
                       }
                     },
-                    child: Card(
-                      shape: context.stadiumShapeBorder,
-                      child: Padding(
-                        padding: const EdgeInsets.all(12.0),
-                        child: Row(
-                          children: [
-                            const Text("自动登录"),
-                            const Spacer(),
-                            if (autoLogin.value)
-                              Icon(
-                                CupertinoIcons.checkmark_alt,
-                                color: Theme.of(context).colorScheme.primary,
-                              ),
-                          ],
-                        ),
-                      ),
-                    ),
                   ),
                 ),
               ],
@@ -777,27 +741,14 @@ class Login extends HookWidget {
             if (https.value)
               Padding(
                 padding: const EdgeInsets.only(bottom: 20),
-                child: GestureDetector(
+                child: SettingsToggleTile(
+                  label: "验证SSL证书",
+                  value: checkSsl.value,
+                  checkColor: Theme.of(context).colorScheme.primary,
+                  shape: context.stadiumShapeBorder,
                   onTap: () {
                     checkSsl.value = !checkSsl.value;
                   },
-                  child: Card(
-                    shape: context.stadiumShapeBorder,
-                    child: Padding(
-                      padding: const EdgeInsets.all(12.0),
-                      child: Row(
-                        children: [
-                          const Text("验证SSL证书"),
-                          const Spacer(),
-                          if (checkSsl.value)
-                            Icon(
-                              CupertinoIcons.checkmark_alt,
-                              color: Theme.of(context).colorScheme.primary,
-                            ),
-                        ],
-                      ),
-                    ),
-                  ),
                 ),
               ),
             OutlinedButton(

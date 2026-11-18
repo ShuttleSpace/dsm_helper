@@ -13,6 +13,7 @@ class SettingsToggleTile extends StatelessWidget {
   final bool value;
   final VoidCallback onTap;
   final Color checkColor;
+  final ShapeBorder? shape;
 
   const SettingsToggleTile({
     super.key,
@@ -20,6 +21,7 @@ class SettingsToggleTile extends StatelessWidget {
     required this.value,
     required this.onTap,
     this.checkColor = AppColors.primaryAction,
+    this.shape,
   });
 
   @override
@@ -27,10 +29,11 @@ class SettingsToggleTile extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Card(
-        shape: RoundedRectangleBorder(
-          side: const BorderSide(),
-          borderRadius: BorderRadius.circular(5),
-        ),
+        shape: shape ??
+            RoundedRectangleBorder(
+              side: const BorderSide(),
+              borderRadius: BorderRadius.circular(5),
+            ),
         child: Padding(
           padding: const EdgeInsets.all(AppConstants.paddingSmall),
           child: Row(
