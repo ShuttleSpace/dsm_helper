@@ -8,6 +8,8 @@ import 'package:garden/stores/connection_store.dart';
 import 'package:android_intent_plus/android_intent.dart';
 import 'package:garden/pages/packages/uninstall.dart';
 import 'package:garden/api/dsm_api.dart';
+import 'package:garden/widgets/bottom_confirm_sheet.dart';
+import 'package:garden/widgets/bottom_option_sheet.dart';
 import 'package:garden/widgets/cupertino_image.dart';
 import 'package:garden/widgets/label.dart';
 import 'package:garden/widgets/neu_back_button.dart';
@@ -90,79 +92,22 @@ class PackageDetail extends HookWidget {
     selectVolume() {
       showCupertinoModalPopup(
         context: context,
-        builder: (context) {
-          return SizedBox(
-            width: double.infinity,
-            child: Material(
-            color: Colors.transparent,
-            child: Card(
-              shape: RoundedRectangleBorder(
-                  side: const BorderSide(),
-                  borderRadius: BorderRadius.circular(18)),
-              child: SafeArea(
-                top: false,
-                child: Padding(
-                  padding: const EdgeInsets.all(20),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: <Widget>[
-                      const Text(
-                        "选择套件安装位置",
-                        style:
-                            TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
-                      ),
-                      const SizedBox(
-                        height: 12,
-                      ),
-                      ...volumes.map((volume) {
-                        return Padding(
-                          padding: const EdgeInsets.only(bottom: 20),
-                          child: OutlinedButton(
-                            onPressed: () async {
-                              install(volume['volume_path']);
-                              Navigator.of(context).pop();
-                            },
-                            child: Container(
-                              padding: const EdgeInsets.only(left: 20),
-                              width: double.infinity,
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                      "${volume['display_name']}(可用容量：${int.parse(volume['size_free_byte']).formatSize()}) - ${volume['fs_type']}"),
-                                  const SizedBox(
-                                    height: 5,
-                                  ),
-                                  Text(
-                                    "${volume['description']}",
-                                    style: const TextStyle(color: Colors.grey),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        );
-                      }),
-                      OutlinedButton(
-                        onPressed: () async {
-                          Navigator.of(context).pop();
-                        },
-                        child: const Text(
-                          "取消",
-                          style: TextStyle(fontSize: 18),
-                        ),
-                      ),
-                      const SizedBox(
-                        height: 8,
-                      ),
-                    ],
-                  ),
-                ),
+        builder: (context) => BottomOptionSheet(
+          title: "选择套件安装位置",
+          popBeforeOnPressed: false,
+          options: [
+            for (final volume in volumes.value)
+              BottomOption(
+                title:
+                    "${volume['display_name']}(可用容量：${int.parse(volume['size_free_byte']).formatSize()}) - ${volume['fs_type']}",
+                subtitle: "${volume['description']}",
+                onPressed: () {
+                  install(volume['volume_path']);
+                  Navigator.of(context).pop();
+                },
               ),
-            ),
-          ),
-          );
-        },
+          ],
+        ),
       );
     }
 
@@ -184,80 +129,16 @@ class PackageDetail extends HookWidget {
           showCupertinoModalPopup(
             // ignore: use_build_context_synchronously
             context: context,
-            builder: (context) {
-              return SizedBox(
-                width: double.infinity,
-                child: Material(
-                color: Colors.transparent,
-                child: Card(
-                  shape: RoundedRectangleBorder(
-                      side: const BorderSide(),
-                      borderRadius: BorderRadius.circular(18)),
-                  child: SafeArea(
-                    top: false,
-                    child: Padding(
-                      padding: const EdgeInsets.all(20),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: <Widget>[
-                          const Text(
-                            "确认更新",
-                            style: TextStyle(
-                                fontSize: 20, fontWeight: FontWeight.w500),
-                          ),
-                          const SizedBox(
-                            height: 12,
-                          ),
-                          Text(
-                            '更新${data['cause_pausing_pkgs'].join(",")}时，${data['paused_pkgs'].join("，")}将被停用。',
-                            style: const TextStyle(
-                                fontSize: 20, fontWeight: FontWeight.w400),
-                          ),
-                          const SizedBox(
-                            height: 22,
-                          ),
-                          Row(
-                            children: [
-                              Expanded(
-                                child: OutlinedButton(
-                                  onPressed: () async {
-                                    install(installPath.value);
-                                    Navigator.of(context).pop();
-                                  },
-                                  child: const Text(
-                                    "继续更新",
-                                    style: TextStyle(
-                                        fontSize: 18, color: Colors.redAccent),
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(
-                                width: 16,
-                              ),
-                              Expanded(
-                                child: OutlinedButton(
-                                  onPressed: () async {
-                                    Navigator.of(context).pop();
-                                  },
-                                  child: const Text(
-                                    "取消",
-                                    style: TextStyle(fontSize: 18),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(
-                            height: 8,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              );
-            },
+            builder: (context) => BottomConfirmSheet(
+              title: "确认更新",
+              content:
+                  '更新${data['cause_pausing_pkgs'].join(",")}时，${data['paused_pkgs'].join("，")}将被停用。',
+              confirmText: "继续更新",
+              padding: 20,
+              buttonSpacing: 16,
+              showTrailingSpace: true,
+              onConfirm: () => install(installPath.value),
+            ),
           ).then((value) {
           
             installButtonText.value = "更新";
@@ -695,89 +576,13 @@ class PackageDetail extends HookWidget {
                           } else {
                             showCupertinoModalPopup(
                               context: context,
-                              builder: (context) {
-                                return SizedBox(
-                                  width: double.infinity,
-                                  child: Material(
-                                  color: Colors.transparent,
-                                  child: Card(
-                                    shape: RoundedRectangleBorder(
-                                        side: const BorderSide(),
-                                        borderRadius:
-                                            BorderRadius.circular(18)),
-                                    child: SafeArea(
-                                      top: false,
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(
-                                            AppConstants.paddingSmall),
-                                        child: Column(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: <Widget>[
-                                            const Text(
-                                              "卸载套件",
-                                              style: TextStyle(
-                                                  fontSize: 20,
-                                                  fontWeight: FontWeight.w500),
-                                            ),
-                                            const SizedBox(
-                                              height: 12,
-                                            ),
-                                            const Text(
-                                              "确认要卸载此套件？",
-                                              style: TextStyle(
-                                                  fontSize: 20,
-                                                  fontWeight: FontWeight.w400),
-                                            ),
-                                            const SizedBox(
-                                              height: 22,
-                                            ),
-                                            Row(
-                                              children: [
-                                                Expanded(
-                                                  child: OutlinedButton(
-                                                    onPressed: () async {
-                                                      Navigator.of(context)
-                                                          .pop();
-                                                      uninstallPackage();
-                                                    },
-                                                    child: const Text(
-                                                      "卸载",
-                                                      style: TextStyle(
-                                                          fontSize: 18,
-                                                          color:
-                                                              Colors.redAccent),
-                                                    ),
-                                                  ),
-                                                ),
-                                                const SizedBox(
-                                                  width: 20,
-                                                ),
-                                                Expanded(
-                                                  child: OutlinedButton(
-                                                    onPressed: () async {
-                                                      Navigator.of(context)
-                                                          .pop();
-                                                    },
-                                                    child: const Text(
-                                                      "取消",
-                                                      style: TextStyle(
-                                                          fontSize: 18),
-                                                    ),
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                            const SizedBox(
-                                              height: 8,
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                );
-                              },
+                              builder: (context) => BottomConfirmSheet(
+                                title: "卸载套件",
+                                content: "确认要卸载此套件？",
+                                confirmText: "卸载",
+                                showTrailingSpace: true,
+                                onConfirm: () => uninstallPackage(),
+                              ),
                             );
                           }
                         },
@@ -799,104 +604,27 @@ class PackageDetail extends HookWidget {
                                 onPressed: () {
                                   showCupertinoModalPopup(
                                     context: context,
-                                    builder: (context) {
-                                      return SizedBox(
-                                        width: double.infinity,
-                                        child: Material(
-                                        color: Colors.transparent,
-                                        child: Card(
-                                          shape: RoundedRectangleBorder(
-                                              side: const BorderSide(),
-                                              borderRadius:
-                                                  BorderRadius.circular(5)),
-                                          child: SafeArea(
-                                            top: false,
-                                            child: Padding(
-                                              padding: const EdgeInsets.all(
-                                                  AppConstants.paddingSmall),
-                                              child: Column(
-                                                mainAxisSize: MainAxisSize.min,
-                                                children: <Widget>[
-                                                  const Text(
-                                                    "停用套件",
-                                                    style: TextStyle(
-                                                        fontSize: 20,
-                                                        fontWeight:
-                                                            FontWeight.w500),
-                                                  ),
-                                                  const SizedBox(
-                                                    height: 12,
-                                                  ),
-                                                  const Text(
-                                                    "确认要停用此套件？",
-                                                    style: TextStyle(
-                                                        fontSize: 20,
-                                                        fontWeight:
-                                                            FontWeight.w400),
-                                                  ),
-                                                  const SizedBox(
-                                                    height: 22,
-                                                  ),
-                                                  Row(
-                                                    children: [
-                                                      Expanded(
-                                                        child: OutlinedButton(
-                                                          onPressed: () async {
-                                                            Navigator.of(
-                                                                    context)
-                                                                .pop();
-                                                            try {
-                                                              await dsmCorePackageControlForPage(
-                                                                  package['id'],
-                                                                  package['dsm_apps'],
-                                                                  "stop");
-                                                              UiUtil.toast("已停用");
-                                                              package['launched'] =
-                                                                  false;
-                                                              getLaunchedPackages();
-                                                            } catch (e) {
-                                                              Log.warn('stop package: $e');
-                                                            }
-                                                          },
-                                                          child: const Text(
-                                                            "停用",
-                                                            style: TextStyle(
-                                                                fontSize: 18,
-                                                                color: Colors
-                                                                    .redAccent),
-                                                          ),
-                                                        ),
-                                                      ),
-                                                      const SizedBox(
-                                                        width: 20,
-                                                      ),
-                                                      Expanded(
-                                                        child: OutlinedButton(
-                                                          onPressed: () async {
-                                                            Navigator.of(
-                                                                    context)
-                                                                .pop();
-                                                          },
-                                                          child: const Text(
-                                                            "取消",
-                                                            style: TextStyle(
-                                                                fontSize: 18),
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                  const SizedBox(
-                                                    height: 8,
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                      );
-                                    },
+                                    builder: (context) => BottomConfirmSheet(
+                                      title: "停用套件",
+                                      content: "确认要停用此套件？",
+                                      confirmText: "停用",
+                                      borderRadius: 5,
+                                      showTrailingSpace: true,
+                                      onConfirm: () async {
+                                        try {
+                                          await dsmCorePackageControlForPage(
+                                            package['id'],
+                                            package['dsm_apps'],
+                                            "stop",
+                                          );
+                                          UiUtil.toast("已停用");
+                                          package['launched'] = false;
+                                          getLaunchedPackages();
+                                        } catch (e) {
+                                          Log.warn('stop package: $e');
+                                        }
+                                      },
+                                    ),
                                   );
                                 },
                                 child: const Text("停用"),

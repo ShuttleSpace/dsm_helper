@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:garden/constants/app_constants.dart';
 
 /// 底部确认浮层：标题 + 说明 + 「确认/取消」按钮。
 ///
@@ -15,6 +14,9 @@ class BottomConfirmSheet extends StatelessWidget {
   final bool showTrailingSpace;
   final Object? confirmResult;
   final Object? cancelResult;
+  final double padding;
+  final double buttonSpacing;
+  final double borderRadius;
 
   const BottomConfirmSheet({
     super.key,
@@ -27,6 +29,9 @@ class BottomConfirmSheet extends StatelessWidget {
     this.showTrailingSpace = false,
     this.confirmResult,
     this.cancelResult,
+    this.padding = 8,
+    this.buttonSpacing = 20,
+    this.borderRadius = 18,
   });
 
   @override
@@ -38,12 +43,12 @@ class BottomConfirmSheet extends StatelessWidget {
         child: Card(
           shape: RoundedRectangleBorder(
             side: const BorderSide(),
-            borderRadius: BorderRadius.circular(18),
+            borderRadius: BorderRadius.circular(borderRadius),
           ),
           child: SafeArea(
             top: false,
             child: Padding(
-              padding: const EdgeInsets.all(AppConstants.paddingSmall),
+              padding: EdgeInsets.all(padding),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
@@ -80,7 +85,7 @@ class BottomConfirmSheet extends StatelessWidget {
                           ),
                         ),
                       ),
-                      const SizedBox(width: 20),
+                      SizedBox(width: buttonSpacing),
                       Expanded(
                         child: OutlinedButton(
                           onPressed: () => Navigator.of(context).pop(cancelResult),
