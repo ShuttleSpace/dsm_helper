@@ -8,7 +8,7 @@ void main() {
   testWidgets('system info item cards render their data', (tester) async {
     await tester.pumpWidget(MaterialApp(
       home: ListView(
-        children: [
+        children: const [
           NetworkInterfaceItem({
             'mac': '00:11:22:33:44:55',
             'addr': '192.168.1.2',
