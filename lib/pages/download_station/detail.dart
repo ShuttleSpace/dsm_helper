@@ -5,6 +5,7 @@ import 'package:garden/util/ui_util.dart';
 import 'package:garden/widgets/bubble_tab_indicator.dart';
 import 'package:garden/widgets/download_station/detail_info_row.dart';
 import 'package:garden/widgets/download_station/download_file_item.dart';
+import 'package:garden/widgets/download_station/status_label.dart';
 import 'package:garden/widgets/download_station/download_peer_item.dart';
 import 'package:garden/widgets/download_station/download_tracker_item.dart';
 import 'package:garden/widgets/bottom_confirm_sheet.dart';
@@ -326,304 +327,95 @@ class DownloadDetail extends HookWidget {
                       ),
                       ListView(
                         children: [
-                          Card(
-                            shape: RoundedRectangleBorder(
-                                side: const BorderSide(),
-                                borderRadius: BorderRadius.circular(18)),
-                            margin: const EdgeInsets.symmetric(
-                                horizontal: 20, vertical: 10),
-                            child: Padding(
-                              padding: const EdgeInsets.all(
-                                  AppConstants.paddingSmall),
-                              child: Row(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  const Text("状态："),
-                                  Expanded(
-                                    child: task.value['status'] == 1
-                                        ? const Text(
-                                            "等待中",
-                                            style:
-                                                TextStyle(color: Colors.grey),
-                                          )
-                                        : task.value['status'] == 2
-                                            ? Text(
-                                                "${task.value['additional']['transfer']['speed_download'].formatSize()}/s",
-                                                style: const TextStyle(
-                                                    color:
-                                                        Colors.lightBlueAccent),
-                                              )
-                                            : task.value['status'] == 3
-                                                ? const Text(
-                                                    "已暂停",
-                                                    style: TextStyle(
-                                                        color: Colors.grey),
-                                                  )
-                                                : task.value['status'] == 5
-                                                    ? const Text(
-                                                        "已完成",
-                                                        style: TextStyle(
-                                                            color:
-                                                                Colors.green),
-                                                      )
-                                                    : task.value['status'] == 6
-                                                        ? const Text(
-                                                            "检查中",
-                                                            style: TextStyle(
-                                                                color: Colors
-                                                                    .grey),
-                                                          )
-                                                        : task.value[
-                                                                    'status'] ==
-                                                                101
-                                                            ? const Text(
-                                                                "错误",
-                                                                style: TextStyle(
-                                                                    color: Colors
-                                                                        .red),
-                                                              )
-                                                            : task.value[
-                                                                        'status'] ==
-                                                                    105
-                                                                ? const Text(
-                                                                    "空间不足",
-                                                                    style: TextStyle(
-                                                                        color: Colors
-                                                                            .red),
-                                                                  )
-                                                                : task.value[
-                                                                            'status'] ==
-                                                                        113
-                                                                    ? const Text(
-                                                                        "重复的任务",
-                                                                        style: TextStyle(
-                                                                            color:
-                                                                                Colors.red),
-                                                                      )
-                                                                    : Text(
-                                                                        "代码：${task.value['status']}",
-                                                                        style: const TextStyle(
-                                                                            color:
-                                                                                Colors.red),
-                                                                      ),
-                                  ),
-                                ],
-                              ),
+                          DetailInfoRow(
+                            label: "状态：",
+                            startAlign: true,
+                            value: DownloadStatusLabel(
+                              status: task.value['status'] as int,
+                              speedDownload: task.value['additional']
+                                  ['transfer']['speed_download'] as num,
                             ),
                           ),
-                          Card(
-                            shape: RoundedRectangleBorder(
-                                side: const BorderSide(),
-                                borderRadius: BorderRadius.circular(18)),
-                            margin: const EdgeInsets.symmetric(
-                                horizontal: 20, vertical: 10),
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 20, vertical: 15),
-                              child: Row(
-                                children: [
-                                  const Text("已下载："),
-                                  Expanded(
-                                    child: Text(
-                                      task.value['additional']['transfer']
-                                              ['size_downloaded']
-                                          .formatSize(),
-                                    ),
-                                  ),
-                                ],
-                              ),
+                          DetailInfoRow(
+                            label: "已下载：",
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 20, vertical: 15),
+                            value: Text(
+                              task.value['additional']['transfer']
+                                      ['size_downloaded']
+                                  .formatSize(),
                             ),
                           ),
-                          Card(
-                            shape: RoundedRectangleBorder(
-                                side: const BorderSide(),
-                                borderRadius: BorderRadius.circular(18)),
-                            margin: const EdgeInsets.symmetric(
-                                horizontal: 20, vertical: 10),
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 20, vertical: 15),
-                              child: Row(
-                                children: [
-                                  const Text("已上传："),
-                                  Expanded(
-                                    child: Text(
-                                      "${task.value['additional']['transfer']['size_uploaded'].formatSize()} （${task.value['additional']['transfer']['size_downloaded'] > 0 ? (task.value['additional']['transfer']['size_uploaded'] / task.value['additional']['transfer']['size_downloaded'] * 100).toStringAsFixed(2) : "0"}%)",
-                                    ),
-                                  ),
-                                ],
-                              ),
+                          DetailInfoRow(
+                            label: "已上传：",
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 20, vertical: 15),
+                            value: Text(
+                              "${task.value['additional']['transfer']['size_uploaded'].formatSize()} （${task.value['additional']['transfer']['size_downloaded'] > 0 ? (task.value['additional']['transfer']['size_uploaded'] / task.value['additional']['transfer']['size_downloaded'] * 100).toStringAsFixed(2) : "0"}%)",
                             ),
                           ),
-                          Card(
-                            shape: RoundedRectangleBorder(
-                                side: const BorderSide(),
-                                borderRadius: BorderRadius.circular(18)),
-                            margin: const EdgeInsets.symmetric(
-                                horizontal: 20, vertical: 10),
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 20, vertical: 15),
-                              child: Row(
-                                children: [
-                                  const Text("进度："),
-                                  Expanded(
-                                    child: Text(
-                                      "${task.value['size'] > 0 ? (task.value['additional']['transfer']['size_downloaded'] / task.value['size'] * 100).toStringAsFixed(2) : "0"}%",
-                                    ),
-                                  ),
-                                ],
-                              ),
+                          DetailInfoRow(
+                            label: "进度：",
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 20, vertical: 15),
+                            value: Text(
+                              "${task.value['size'] > 0 ? (task.value['additional']['transfer']['size_downloaded'] / task.value['size'] * 100).toStringAsFixed(2) : "0"}%",
                             ),
                           ),
-                          Card(
-                            shape: RoundedRectangleBorder(
-                                side: const BorderSide(),
-                                borderRadius: BorderRadius.circular(18)),
-                            margin: const EdgeInsets.symmetric(
-                                horizontal: 20, vertical: 10),
-                            child: Padding(
-                              padding: const EdgeInsets.all(
-                                  AppConstants.paddingSmall),
-                              child: Row(
-                                children: [
-                                  const Text("速度："),
-                                  Text(task.value['additional']['transfer']
-                                              ['speed_download'] >
-                                          0
-                                      ? task.value['additional']['transfer']
-                                              ['speed_download']
-                                          .formatSize()
-                                      : "无法取得"),
-                                ],
-                              ),
-                            ),
+                          DetailInfoRow.text(
+                            label: "速度：",
+                            text: task.value['additional']['transfer']
+                                        ['speed_download'] >
+                                    0
+                                ? task.value['additional']['transfer']
+                                        ['speed_download']
+                                    .formatSize()
+                                : "无法取得",
                           ),
-                          Card(
-                            shape: RoundedRectangleBorder(
-                                side: const BorderSide(),
-                                borderRadius: BorderRadius.circular(18)),
-                            margin: const EdgeInsets.symmetric(
-                                horizontal: 20, vertical: 10),
-                            child: Padding(
-                              padding: const EdgeInsets.all(
-                                  AppConstants.paddingSmall),
-                              child: Row(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  const Text("Peer数："),
-                                  Expanded(
-                                      child: Text(
-                                          "${task.value['additional']['detail']['total_peers'] > 0 ? task.value['additional']['detail']['total_peers'] : "无法取得"}")),
-                                ],
-                              ),
-                            ),
+                          DetailInfoRow.text(
+                            label: "Peer数：",
+                            text:
+                                "${task.value['additional']['detail']['total_peers'] > 0 ? task.value['additional']['detail']['total_peers'] : "无法取得"}",
+                            startAlign: true,
                           ),
-                          Card(
-                            shape: RoundedRectangleBorder(
-                                side: const BorderSide(),
-                                borderRadius: BorderRadius.circular(18)),
-                            margin: const EdgeInsets.symmetric(
-                                horizontal: 20, vertical: 10),
-                            child: Padding(
-                              padding: const EdgeInsets.all(
-                                  AppConstants.paddingSmall),
-                              child: Row(
-                                children: [
-                                  const Text("分块总数："),
-                                  Expanded(
-                                      child: Text(
-                                          "${task.value['additional']['detail']['total_pieces'] > 0 ? task.value['additional']['detail']['total_pieces'] : "无法取得"}")),
-                                ],
-                              ),
-                            ),
+                          DetailInfoRow.text(
+                            label: "分块总数：",
+                            text:
+                                "${task.value['additional']['detail']['total_pieces'] > 0 ? task.value['additional']['detail']['total_pieces'] : "无法取得"}",
                           ),
-                          Card(
-                            shape: RoundedRectangleBorder(
-                                side: const BorderSide(),
-                                borderRadius: BorderRadius.circular(18)),
-                            margin: const EdgeInsets.symmetric(
-                                horizontal: 20, vertical: 10),
-                            child: Padding(
-                              padding: const EdgeInsets.all(
-                                  AppConstants.paddingSmall),
-                              child: Row(
-                                children: [
-                                  const Text("已下载分块数："),
-                                  Text(
-                                      "${task.value['additional']['transfer']['downloaded_pieces']}"),
-                                ],
-                              ),
-                            ),
+                          DetailInfoRow.text(
+                            label: "已下载分块数：",
+                            text:
+                                "${task.value['additional']['transfer']['downloaded_pieces']}",
                           ),
-                          Card(
-                            shape: RoundedRectangleBorder(
-                                side: const BorderSide(),
-                                borderRadius: BorderRadius.circular(18)),
-                            margin: const EdgeInsets.symmetric(
-                                horizontal: 20, vertical: 10),
-                            child: Padding(
-                              padding: const EdgeInsets.all(
-                                  AppConstants.paddingSmall),
-                              child: Row(
-                                children: [
-                                  const Text("已做种时间："),
-                                  Text((int.parse(task.value['additional']
-                                          ['detail']['seed_elapsed']))
-                                      .timeRemaining()),
-                                ],
-                              ),
-                            ),
+                          DetailInfoRow.text(
+                            label: "已做种时间：",
+                            text: (int.parse(task.value['additional']['detail']
+                                    ['seed_elapsed']))
+                                .timeRemaining(),
                           ),
-                          Card(
-                            shape: RoundedRectangleBorder(
-                                side: const BorderSide(),
-                                borderRadius: BorderRadius.circular(18)),
-                            margin: const EdgeInsets.symmetric(
-                                horizontal: 20, vertical: 10),
-                            child: Padding(
-                              padding: const EdgeInsets.all(
-                                  AppConstants.paddingSmall),
-                              child: Row(
-                                children: [
-                                  const Text("开始时间："),
-                                  Text(DateTime.fromMillisecondsSinceEpoch(
-                                          task.value['additional']['detail']
-                                                  ['started_time'] *
-                                              1000)
-                                      .format("Y-m-d H:i:s")),
-                                ],
-                              ),
-                            ),
+                          DetailInfoRow.text(
+                            label: "开始时间：",
+                            text: DateTime.fromMillisecondsSinceEpoch(
+                                    task.value['additional']['detail']
+                                            ['started_time'] *
+                                        1000)
+                                .format("Y-m-d H:i:s"),
                           ),
-                          Card(
-                            shape: RoundedRectangleBorder(
-                                side: const BorderSide(),
-                                borderRadius: BorderRadius.circular(18)),
-                            margin: const EdgeInsets.symmetric(
-                                horizontal: 20, vertical: 10),
-                            child: Padding(
-                              padding: const EdgeInsets.all(
-                                  AppConstants.paddingSmall),
-                              child: Row(
-                                children: [
-                                  const Text("剩余时间："),
-                                  Text(task.value['additional']['transfer']
-                                              ['speed_download'] >
-                                          0
-                                      ? (int.parse(((task.value['size'] -
-                                                      task.value['additional']
-                                                              ['transfer']
-                                                          ['size_downloaded']) /
-                                                  task.value['additional']
-                                                          ['transfer']
-                                                      ['speed_download'])
-                                              .ceil()))
-                                          .timeRemaining()
-                                      : "无法取得"),
-                                ],
-                              ),
-                            ),
+                          DetailInfoRow.text(
+                            label: "剩余时间：",
+                            text: task.value['additional']['transfer']
+                                        ['speed_download'] >
+                                    0
+                                ? (int.parse(((task.value['size'] -
+                                                task.value['additional']
+                                                        ['transfer']
+                                                    ['size_downloaded']) /
+                                            task.value['additional']['transfer']
+                                                ['speed_download'])
+                                        .ceil()))
+                                    .timeRemaining()
+                                : "无法取得",
                           ),
                         ],
                       ),
