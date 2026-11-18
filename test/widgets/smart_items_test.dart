@@ -7,8 +7,8 @@ void main() {
   testWidgets('smart info and log items render their data', (tester) async {
     await tester.pumpWidget(MaterialApp(
       home: ListView(
-        children: [
-          const SmartInfoItem({
+        children: const [
+          SmartInfoItem({
             'id': '5',
             'status': 'OK',
             'name': '温度',
@@ -17,7 +17,7 @@ void main() {
             'threshold': 60,
             'raw': 100,
           }),
-          SmartLogItem({
+          SmartLogItem(
             'time': '2026-01-01',
             'result': 'smart_complete',
             'test_type': 'quick',
