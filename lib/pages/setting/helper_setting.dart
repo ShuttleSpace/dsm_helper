@@ -14,6 +14,7 @@ import 'package:garden/stores/connection_store.dart';
 import 'package:garden/stores/settings_store.dart';
 import 'package:garden/util/storage_util.dart';
 import 'package:garden/util/ui_util.dart';
+import 'package:garden/widgets/bottom_confirm_sheet.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:garden/widgets/neu_picker.dart';
 import 'package:garden/widgets/status_checkbox.dart';
@@ -103,72 +104,15 @@ class HelperSetting extends HookWidget {
         if (context.mounted) {
           showCupertinoModalPopup(
             context: context,
-            builder: (context) {
-              return SizedBox(
-                width: double.infinity,
-                child: Material(
-                  color: Colors.transparent,
-                  child: Card(
-                    shape: RoundedRectangleBorder(
-                        side: const BorderSide(),
-                        borderRadius: BorderRadius.circular(18)),
-                    child: SafeArea(
-                      top: false,
-                      child: Padding(
-                        padding: const EdgeInsets.all(20),
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: <Widget>[
-                            const Text(
-                              "系统正在处理下列任务。现在关机可能会导致套件异常或数据丢失。是否确定要继续？",
-                              style: TextStyle(
-                                  fontSize: 20, fontWeight: FontWeight.w500),
-                            ),
-                            const SizedBox(height: 12),
-                            Text(
-                              msgs.join("\n"),
-                              style: const TextStyle(
-                                  fontSize: 20, fontWeight: FontWeight.w400),
-                            ),
-                            const SizedBox(height: 22),
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: OutlinedButton(
-                                    onPressed: () {
-                                      Navigator.of(context).pop();
-                                      power(type, true);
-                                    },
-                                    child: Text(
-                                      "强制${type == "shutdown" ? "关机" : "重启"}",
-                                      style: const TextStyle(
-                                          fontSize: 18,
-                                          color: Colors.redAccent),
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(width: 16),
-                                Expanded(
-                                  child: OutlinedButton(
-                                    onPressed: () =>
-                                        Navigator.of(context).pop(),
-                                    child: const Text(
-                                      "取消",
-                                      style: TextStyle(fontSize: 18),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 8),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              );
-            },
+            builder: (context) => BottomConfirmSheet(
+              title: "系统正在处理下列任务。现在关机可能会导致套件异常或数据丢失。是否确定要继续？",
+              content: msgs.join("\n"),
+              confirmText: "强制${type == "shutdown" ? "关机" : "重启"}",
+              padding: 20,
+              buttonSpacing: 16,
+              showTrailingSpace: true,
+              onConfirm: () => power(type, true),
+            ),
           );
         }
       }
@@ -178,70 +122,15 @@ class HelperSetting extends HookWidget {
       final isShutdown = type == "shutdown";
       showCupertinoModalPopup(
         context: context,
-        builder: (context) {
-          return SizedBox(
-            width: double.infinity,
-            child: Material(
-              color: Colors.transparent,
-              child: Card(
-                shape: RoundedRectangleBorder(
-                    side: const BorderSide(),
-                    borderRadius: BorderRadius.circular(18)),
-                child: SafeArea(
-                  top: false,
-                  child: Padding(
-                    padding: const EdgeInsets.all(20),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: <Widget>[
-                        Text(
-                          isShutdown ? "确认关机" : "确认重启",
-                          style: const TextStyle(
-                              fontSize: 20, fontWeight: FontWeight.w500),
-                        ),
-                        const SizedBox(height: 12),
-                        Text(
-                          isShutdown ? "确认要关闭设备吗？" : "确认要重新启动设备？",
-                          style: const TextStyle(
-                              fontSize: 20, fontWeight: FontWeight.w400),
-                        ),
-                        const SizedBox(height: 22),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: OutlinedButton(
-                                onPressed: () {
-                                  Navigator.of(context).pop();
-                                  power(type, false);
-                                },
-                                child: Text(
-                                  isShutdown ? "确认关机" : "确认重启",
-                                  style: const TextStyle(
-                                      fontSize: 18, color: Colors.redAccent),
-                                ),
-                              ),
-                            ),
-                            const SizedBox(width: 16),
-                            Expanded(
-                              child: OutlinedButton(
-                                onPressed: () => Navigator.of(context).pop(),
-                                child: const Text(
-                                  "取消",
-                                  style: TextStyle(fontSize: 18),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 8),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          );
-        },
+        builder: (context) => BottomConfirmSheet(
+          title: isShutdown ? "确认关机" : "确认重启",
+          content: isShutdown ? "确认要关闭设备吗？" : "确认要重新启动设备？",
+          confirmText: isShutdown ? "确认关机" : "确认重启",
+          padding: 20,
+          buttonSpacing: 16,
+          showTrailingSpace: true,
+          onConfirm: () => power(type, false),
+        ),
       );
     }
 
