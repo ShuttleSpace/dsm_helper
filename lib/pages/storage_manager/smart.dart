@@ -7,11 +7,12 @@ import 'package:garden/api/dsm_api.dart';
 import 'package:garden/extensions/string.dart';
 import 'package:garden/widgets/bubble_tab_indicator.dart';
 import 'package:garden/widgets/label.dart';
+import 'package:garden/widgets/storage_manager/smart_info_item.dart';
+import 'package:garden/widgets/storage_manager/smart_log_item.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:garden/constants/app_constants.dart';
 import 'package:garden/theme/app_colors.dart';
 import 'package:signals_hooks/signals_hooks.dart';
 
@@ -63,9 +64,8 @@ class Smart extends HookWidget {
     }
 
     doSmartTest(String type) async {
-    
       testing.value = true;
-  
+
       if (timer.value != null) {
         return;
       }
@@ -126,131 +126,6 @@ class Smart extends HookWidget {
       } finally {
         loading.value = false;
       }
-    }
-
-
-    Widget buildSmartItem(smart) {
-      return Card(
-        shape: RoundedRectangleBorder(
-            side: const BorderSide(), borderRadius: BorderRadius.circular(18)),
-        child: Padding(
-          padding: const EdgeInsets.all(AppConstants.paddingSmall),
-          child: Column(
-            children: [
-              Row(
-                children: [
-                  Label(smart['id'], Colors.lightBlueAccent),
-                  const SizedBox(
-                    width: 5,
-                  ),
-                  Label(
-                    smart['status'],
-                    smart['status'] == "OK" ? Colors.green : Colors.red,
-                    fill: true,
-                  ),
-                  const SizedBox(
-                    width: 5,
-                  ),
-                  Text(smart['name']),
-                ],
-              ),
-              const SizedBox(
-                height: 5,
-              ),
-              Row(
-                children: [
-                  SizedBox(
-                    width: 100,
-                    child: Text.rich(
-                      TextSpan(
-                        children: [
-                          const TextSpan(
-                              text: "现值：",
-                              style: TextStyle(fontWeight: FontWeight.w600)),
-                          TextSpan(text: "${smart['current']}"),
-                        ],
-                      ),
-                    ),
-                  ),
-                  Text.rich(
-                    TextSpan(
-                      children: [
-                        const TextSpan(
-                            text: "最差值：",
-                            style: TextStyle(fontWeight: FontWeight.w600)),
-                        TextSpan(text: "${smart['worst']}"),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(
-                height: 5,
-              ),
-              Row(
-                children: [
-                  SizedBox(
-                    width: 100,
-                    child: Text.rich(
-                      TextSpan(
-                        children: [
-                          const TextSpan(
-                              text: "临界值：",
-                              style: TextStyle(fontWeight: FontWeight.w600)),
-                          TextSpan(text: "${smart['threshold']}"),
-                        ],
-                      ),
-                    ),
-                  ),
-                  Text.rich(
-                    TextSpan(
-                      children: [
-                        const TextSpan(
-                            text: "原始资料：",
-                            style: TextStyle(fontWeight: FontWeight.w600)),
-                        TextSpan(text: "${smart['raw']}"),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-      );
-    }
-
-    Widget buildLogItem(log) {
-      return Card(
-        shape: RoundedRectangleBorder(
-            side: const BorderSide(), borderRadius: BorderRadius.circular(18)),
-        child: Padding(
-          padding: const EdgeInsets.all(AppConstants.paddingSmall),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text("${log['time']}"),
-              const SizedBox(
-                height: 10,
-              ),
-              Row(
-                children: [
-                  Label(
-                    log['result'] == "smart_complete" ? "正常" : log['result'],
-                    log['result'] == "smart_complete" ? Colors.green : Colors.red,
-                    fill: true,
-                  ),
-                  const SizedBox(
-                    width: 10,
-                  ),
-                  Text(
-                      "${log['test_type'] == "quick" ? "S.M.A.R.T. 快速测试" : log['test_type']}"),
-                ],
-              )
-            ],
-          ),
-        ),
-      );
     }
 
     useEffect(() {
@@ -342,8 +217,7 @@ class Smart extends HookWidget {
                                   CircleAvatar(
                                     radius: 30,
                                     backgroundColor:
-                                        disk['overview_status'] ==
-                                                "normal"
+                                        disk['overview_status'] == "normal"
                                             ? Colors.green
                                             : Colors.red,
                                     child: Icon(
@@ -366,8 +240,7 @@ class Smart extends HookWidget {
                                           "${disk['overview_status'] == "normal" ? "正常" : disk['overview_status']}",
                                           style: TextStyle(
                                               fontSize: 20,
-                                              color: disk[
-                                                          'overview_status'] ==
+                                              color: disk['overview_status'] ==
                                                       "normal"
                                                   ? Colors.green
                                                   : Colors.red),
@@ -420,7 +293,8 @@ class Smart extends HookWidget {
                                               fontWeight: FontWeight.w600),
                                         ),
                                       ),
-                                      Text("${overview.value['poweron'] ?? "-"} 小时"),
+                                      Text(
+                                          "${overview.value['poweron'] ?? "-"} 小时"),
                                     ],
                                   ),
                                   const SizedBox(
@@ -487,7 +361,8 @@ class Smart extends HookWidget {
                                       Text(
                                         "${overview.value['smart'] == "normal" ? "正常" : overview.value['smart_status']}",
                                         style: TextStyle(
-                                            color: overview.value['smart'] == "normal"
+                                            color: overview.value['smart'] ==
+                                                    "normal"
                                                 ? Colors.green
                                                 : Colors.red),
                                       ),
@@ -546,11 +421,13 @@ class Smart extends HookWidget {
                                       ),
                                       if (quickLast.value.isNotBlank)
                                         Label(
-                                          testInfo.value.last['quick_error_before'] ==
+                                          testInfo.value.last[
+                                                      'quick_error_before'] ==
                                                   false
                                               ? "正常"
                                               : "错误",
-                                          testInfo.value.last['quick_error_before'] ==
+                                          testInfo.value.last[
+                                                      'quick_error_before'] ==
                                                   false
                                               ? Colors.green
                                               : Colors.red,
@@ -584,11 +461,13 @@ class Smart extends HookWidget {
                                       ),
                                       if (extendLast.value.isNotBlank)
                                         Label(
-                                          testInfo.value.last['quick_error_before'] ==
+                                          testInfo.value.last[
+                                                      'quick_error_before'] ==
                                                   false
                                               ? "正常"
                                               : "错误",
-                                          testInfo.value.last['quick_error_before'] ==
+                                          testInfo.value.last[
+                                                      'quick_error_before'] ==
                                                   false
                                               ? Colors.green
                                               : Colors.red,
@@ -773,7 +652,7 @@ class Smart extends HookWidget {
                       ListView.separated(
                         padding: const EdgeInsets.all(20),
                         itemBuilder: (context, i) {
-                          return buildSmartItem(smartInfo.value[i]);
+                          return SmartInfoItem(smartInfo.value[i]);
                         },
                         itemCount: smartInfo.value.length,
                         separatorBuilder: (context, i) {
@@ -794,7 +673,7 @@ class Smart extends HookWidget {
                               ? ListView.separated(
                                   padding: const EdgeInsets.all(20),
                                   itemBuilder: (context, i) {
-                                    return buildLogItem(logs.value[i]);
+                                    return SmartLogItem(logs.value[i]);
                                   },
                                   separatorBuilder: (context, i) {
                                     return const SizedBox(
