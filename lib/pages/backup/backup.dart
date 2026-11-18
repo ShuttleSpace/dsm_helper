@@ -25,7 +25,7 @@ import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:signals_hooks/signals_hooks.dart';
 
-import '../file/select_folder.dart';
+import 'package:garden/widgets/folder_picker_sheet.dart';
 class Backup extends HookWidget {
   const Backup({super.key});
 
@@ -135,25 +135,7 @@ Widget buildAlbumLabel(AssetPathEntity album) {
 }
 
 Future<dynamic> onChooseBackupTargetDialog(BuildContext context) {
-  return showCupertinoModalPopup(
-    filter: ImageFilter.blur(),
-    context: context,
-    builder: (context) {
-      return SizedBox(
-        width: double.infinity,
-        child: Material(
-        child: Card(
-          shape: RoundedRectangleBorder(
-              side: const BorderSide(),
-              borderRadius: BorderRadius.circular(18)),
-          child: const SelectFolder(
-            multi: false,
-          ),
-        ),
-      ),
-      );
-    },
-  );
+  return showFolderPickerSheet(context, filter: ImageFilter.blur());
 }
 
 Future<dynamic> onChooseBackupSourceDialog(BuildContext context) {

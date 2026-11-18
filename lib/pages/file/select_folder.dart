@@ -2,6 +2,7 @@ import 'package:garden/theme/app_theme.dart';
 import 'package:garden/util/file_type_util.dart';
 import 'package:garden/util/log.dart';
 import 'package:garden/util/ui_util.dart';
+import 'package:garden/widgets/name_input_dialog.dart';
 import 'package:garden/stores/connection_store.dart';
 import 'package:garden/api/dsm_api.dart';
 import 'package:garden/extensions/datetime.dart';
@@ -270,134 +271,37 @@ class SelectFolder extends HookWidget {
                               vertical: AppConstants.paddingSmall + 2),
                           child: OutlinedButton(
                             onPressed: () {
-                              String name = "";
                               showCupertinoDialog(
                                   context: context,
-                                  builder: (context) {
-                                    return SizedBox(
-                                      width: double.infinity,
-                                      child: Material(
-                                      color: Colors.transparent,
-                                      child: Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          Card(
-                                            shape: RoundedRectangleBorder(
-                                                side: const BorderSide(),
-                                                borderRadius:
-                                                    BorderRadius.circular(5)),
-                                            margin: const EdgeInsets.symmetric(
-                                                horizontal: 50),
-                                            child: Padding(
-                                              padding: const EdgeInsets.all(20),
-                                              child: Column(
-                                                children: [
-                                                  const Text(
-                                                    "新建文件夹",
-                                                    style: TextStyle(
-                                                        fontSize: 20,
-                                                        fontWeight:
-                                                            FontWeight.w500),
-                                                  ),
-                                                  const SizedBox(
-                                                    height: 16,
-                                                  ),
-                                                  Card(
-                                                    shape: RoundedRectangleBorder(
-                                                        side:
-                                                            const BorderSide(),
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(5)),
-                                                    child: Padding(
-                                                      padding:
-                                                          const EdgeInsets.all(
-                                                              8.0),
-                                                      child: TextField(
-                                                        onChanged: (v) =>
-                                                            name = v,
-                                                        decoration:
-                                                            const InputDecoration(
-                                                          border:
-                                                              InputBorder.none,
-                                                          hintText: "请输入文件夹名",
-                                                          labelText: "文件夹名",
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  ),
-                                                  const SizedBox(
-                                                    height: 20,
-                                                  ),
-                                                  Row(
-                                                    children: [
-                                                      Expanded(
-                                                        child: OutlinedButton(
-                                                          onPressed: () async {
-                                                            if (name.trim() ==
-                                                                "") {
-                                                              UiUtil.toast(
-                                                                  "请输入文件夹名");
-                                                              return;
-                                                            }
-                                                            Navigator.of(
-                                                                    context)
-                                                                .pop();
-                                                            String path = paths
-                                                                .value
-                                                                .join("/")
-                                                                .substring(1);
-                                                            try {
-                                                              await dsmFileStationCreateFolderForPage(
-                                                                  path, name);
-                                                              UiUtil.toast("文件夹创建成功");
-                                                              refresh();
-                                                            } catch (e) {
-                                                              final raw = e is DSMException ? e.rawError : null;
-                                                              final errors = raw?['errors'] as List?;
-                                                              if (errors != null && errors.isNotEmpty && errors[0]['code'] == 414) {
-                                                                UiUtil.toast("文件夹创建失败：指定的名称已存在");
-                                                              } else {
-                                                                UiUtil.toast("文件夹创建失败");
-                                                              }
-                                                            }
-                                                          },
-                                                          child: const Text(
-                                                            "确定",
-                                                            style: TextStyle(
-                                                                fontSize: 18),
-                                                          ),
-                                                        ),
-                                                      ),
-                                                      const SizedBox(
-                                                        width: 16,
-                                                      ),
-                                                      Expanded(
-                                                        child: OutlinedButton(
-                                                          onPressed: () async {
-                                                            Navigator.of(
-                                                                    context)
-                                                                .pop();
-                                                          },
-                                                          child: const Text(
-                                                            "取消",
-                                                            style: TextStyle(
-                                                                fontSize: 18),
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  )
-                                                ],
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                    );
-                                  });
+                                  builder: (context) => NameInputDialog(
+                                    title: "新建文件夹",
+                                    labelText: "文件夹名",
+                                    hintText: "请输入文件夹名",
+                                    emptyMessage: "请输入文件夹名",
+                                    onConfirm: (name) async {
+                                      String path = paths.value
+                                          .join("/")
+                                          .substring(1);
+                                      try {
+                                        await dsmFileStationCreateFolderForPage(
+                                            path, name);
+                                        UiUtil.toast("文件夹创建成功");
+                                        refresh();
+                                      } catch (e) {
+                                        final raw = e is DSMException
+                                            ? e.rawError
+                                            : null;
+                                        final errors = raw?['errors'] as List?;
+                                        if (errors != null &&
+                                            errors.isNotEmpty &&
+                                            errors[0]['code'] == 414) {
+                                          UiUtil.toast("文件夹创建失败：指定的名称已存在");
+                                        } else {
+                                          UiUtil.toast("文件夹创建失败");
+                                        }
+                                      }
+                                    },
+                                  ));
                             },
                             child: const Text(
                               "新建",

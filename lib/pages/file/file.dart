@@ -25,17 +25,20 @@ import 'package:garden/pages/file/detail.dart';
 import 'package:garden/pages/file/favorite.dart';
 import 'package:garden/pages/file/remote_folder.dart';
 import 'package:garden/pages/file/search.dart';
-import 'package:garden/pages/file/select_folder.dart';
 import 'package:garden/pages/file/share.dart';
 import 'package:garden/pages/file/share_manager.dart';
 import 'package:garden/pages/file/upload.dart';
 import 'package:garden/theme/app_theme.dart';
 import 'package:garden/util/file_types.dart';
 import 'package:garden/widgets/animation_progress_bar.dart';
+import 'package:garden/widgets/bottom_action_sheet.dart';
+import 'package:garden/widgets/bottom_confirm_sheet.dart';
 import 'package:garden/hooks/use_file_download.dart';
 import 'package:garden/hooks/use_file_click.dart';
 import 'package:garden/extensions/context.dart';
 import 'package:garden/widgets/file_icon.dart';
+import 'package:garden/widgets/folder_picker_sheet.dart';
+import 'package:garden/widgets/name_input_dialog.dart';
 import 'package:garden/widgets/transparent_router.dart';
 import 'package:extended_text/extended_text.dart';
 import 'package:flutter/cupertino.dart';
@@ -294,80 +297,15 @@ class Files extends HookWidget {
             showCupertinoModalPopup(
               // ignore: use_build_context_synchronously
               context: context,
-              builder: (context) {
-                return SizedBox(
-                  width: double.infinity,
-                  child: Material(
-                  color: Colors.transparent,
-                  child: Card(
-                    shape: RoundedRectangleBorder(
-                        side: const BorderSide(),
-                        borderRadius: BorderRadius.circular(18)),
-                    child: SafeArea(
-                      top: false,
-                      child: Padding(
-                        padding: const EdgeInsets.all(AppConstants.paddingSmall),
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: <Widget>[
-                            const Text(
-                              "下载确认",
-                              style: TextStyle(
-                                  fontSize: 20, fontWeight: FontWeight.w500),
-                            ),
-                            const SizedBox(
-                              height: 12,
-                            ),
-                            const Text(
-                              "您当前正在使用数据网络，下载文件可能会产生流量费用，是否继续下载？",
-                              style: TextStyle(
-                                  fontSize: 20, fontWeight: FontWeight.w400),
-                            ),
-                            const SizedBox(
-                              height: 22,
-                            ),
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: OutlinedButton(
-                                    onPressed: () async {
-                                      Navigator.of(context).pop(true);
-                                      download(filePaths);
-                                    },
-                                    child: const Text(
-                                      "下载",
-                                      style: TextStyle(
-                                          fontSize: 18, color: Colors.redAccent),
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(
-                                  width: 20,
-                                ),
-                                Expanded(
-                                  child: OutlinedButton(
-                                    onPressed: () async {
-                                      Navigator.of(context).pop(false);
-                                    },
-                                    child: const Text(
-                                      "取消",
-                                      style: TextStyle(fontSize: 18),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(
-                              height: 8,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-                );
-              },
+              builder: (context) => BottomConfirmSheet(
+                title: "下载确认",
+                content: "您当前正在使用数据网络，下载文件可能会产生流量费用，是否继续下载？",
+                confirmText: "下载",
+                confirmResult: true,
+                cancelResult: false,
+                showTrailingSpace: true,
+                onConfirm: () => download(filePaths),
+              ),
             ).then((value) {
               if (value == null || value == false) {
                 return;
@@ -879,95 +817,31 @@ class Files extends HookWidget {
       UiUtil.vibrate(FeedbackType.warning);
       showCupertinoModalPopup(
         context: context,
-        builder: (context) {
-          return SizedBox(
-            width: double.infinity,
-            child: Material(
-            color: Colors.transparent,
-            child: Card(
-              shape: RoundedRectangleBorder(
-                  side: const BorderSide(),
-                  borderRadius: BorderRadius.circular(18)),
-              child: SafeArea(
-                top: false,
-                child: Padding(
-                  padding: const EdgeInsets.all(AppConstants.paddingSmall),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: <Widget>[
-                      const Text(
-                        "确认删除",
-                        style:
-                            TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
-                      ),
-                      const SizedBox(
-                        height: 12,
-                      ),
-                      const Text(
-                        "确认要删除文件？",
-                        style:
-                            TextStyle(fontSize: 20, fontWeight: FontWeight.w400),
-                      ),
-                      const SizedBox(
-                        height: 22,
-                      ),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: OutlinedButton(
-                              onPressed: () async {
-                                Navigator.of(context).pop();
-                                try {
-                                  final data = await dsmFileStationDeleteStartForPage(filePaths);
-                                  backgroundProcess.value[data['taskid']] = {
-                                    "timer": null,
-                                    "data": {
-                                      "progress": 0,
-                                    },
-                                    "type": 'delete',
-                                    "path": filePaths,
-                                  };
-                                  selectedFiles.value = [];
-                                  multiSelect.value = false;
-                                  getProcessingTaskResult(data['taskid']);
-                                } catch (e) {
-                                  UiUtil.toast("删除失败，代码：${_dsmErrorCode(e)}");
-                                }
-                              },
-                              child: const Text(
-                                "确认删除",
-                                style: TextStyle(
-                                    fontSize: 18, color: Colors.redAccent),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(
-                            width: 20,
-                          ),
-                          Expanded(
-                            child: OutlinedButton(
-                              onPressed: () async {
-                                Navigator.of(context).pop();
-                              },
-                              child: const Text(
-                                "取消",
-                                style: TextStyle(fontSize: 18),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(
-                        height: 8,
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ),
-          );
-        },
+        builder: (context) => BottomConfirmSheet(
+          title: "确认删除",
+          content: "确认要删除文件？",
+          confirmText: "确认删除",
+          showTrailingSpace: true,
+          onConfirm: () async {
+            try {
+              final data =
+                  await dsmFileStationDeleteStartForPage(filePaths);
+              backgroundProcess.value[data['taskid']] = {
+                "timer": null,
+                "data": {
+                  "progress": 0,
+                },
+                "type": 'delete',
+                "path": filePaths,
+              };
+              selectedFiles.value = [];
+              multiSelect.value = false;
+              getProcessingTaskResult(data['taskid']);
+            } catch (e) {
+              UiUtil.toast("删除失败，代码：${_dsmErrorCode(e)}");
+            }
+          },
+        ),
       );
     }
     compressFile(List<String> file) {
@@ -1304,555 +1178,177 @@ class Files extends HookWidget {
       UiUtil.vibrate(FeedbackType.light);
       showCupertinoModalPopup(
         context: context,
-        builder: (context) {
-          return SizedBox(
-            width: double.infinity,
-            child: Material(
-            color: Colors.transparent,
-            child: Card(
-              shape: RoundedRectangleBorder(
-                  side: const BorderSide(),
-                  borderRadius: BorderRadius.circular(18)),
-              child: SafeArea(
-                top: false,
-                child: Padding(
-                  padding: const EdgeInsets.all(20),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: <Widget>[
-                      Stack(
+        builder: (context) => BottomActionSheet(
+          title: "选择操作",
+          leading: !remote
+              ? Row(
+                  children: [
+                    OutlinedButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                        selectedFiles.value = [...selectedFiles.value, file];
+                        multiSelect.value = true;
+                      },
+                      child: Row(
                         children: [
-                          const Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                "选择操作",
-                                style: TextStyle(
-                                    fontSize: 20, fontWeight: FontWeight.w500),
-                              ),
-                            ],
+                          Image.asset(
+                            "assets/icons/select_all.png",
+                            width: 20,
+                            height: 20,
                           ),
-                          if (!remote)
-                            Row(
-                              children: [
-                                OutlinedButton(
-                                  onPressed: () async {
-                                    Navigator.of(context).pop();
-                                  
-                                    selectedFiles.value = [...selectedFiles.value, file];
-                                    multiSelect.value = true;
-                                
-                                  },
-                                  child: Row(
-                                    children: [
-                                      Image.asset(
-                                        "assets/icons/select_all.png",
-                                        width: 20,
-                                        height: 20,
-                                      ),
-                                      const SizedBox(
-                                        width: 5,
-                                      ),
-                                      const Text("多选"),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
+                          const SizedBox(width: 5),
+                          const Text("多选"),
                         ],
                       ),
-                      const SizedBox(
-                        height: 20,
-                      ),
-                      SizedBox(
-                        width: double.infinity,
-                        child: Wrap(
-                          runSpacing: 20,
-                          spacing: 20,
-                          children: [
-                            Container(
-                              constraints: const BoxConstraints(maxWidth: 112),
-                              width: (MediaQuery.sizeOf(context).width - 100) / 3,
-                              child: OutlinedButton(
-                                onPressed: () async {
-                                  Navigator.of(context).pop();
-                                  Navigator.of(context).push(CupertinoPageRoute(
-                                      builder: (context) {
-                                        return FileDetail(file);
-                                      },
-                                      settings: const RouteSettings(
-                                          name: "file_detail")));
-                                },
-                                child: Column(
-                                  children: [
-                                    Image.asset(
-                                      "assets/icons/info_liner.png",
-                                      width: 30,
-                                    ),
-                                    const Text(
-                                      "详情",
-                                      style: TextStyle(fontSize: 12),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                            Container(
-                              constraints: const BoxConstraints(maxWidth: 112),
-                              width: (MediaQuery.sizeOf(context).width - 100) / 3,
-                              child: OutlinedButton(
-                                onPressed: () async {
-                                  Navigator.of(context).pop();
-                                  downloadFiles([file]);
-                                },
-                                child: Column(
-                                  children: [
-                                    Image.asset(
-                                      "assets/icons/download.png",
-                                      width: 30,
-                                    ),
-                                    const Text(
-                                      "下载",
-                                      style: TextStyle(fontSize: 12),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                            if (FileTypeUtil.toFileTypeEnum(
-                                        FileTypeUtil.getFileType(file['name'])) ==
-                                    FileTypeEnum.zip &&
-                                !remote &&
-                                file['path'].startsWith("/"))
-                              Container(
-                                constraints: const BoxConstraints(maxWidth: 112),
-                                width:
-                                    (MediaQuery.sizeOf(context).width - 100) / 3,
-                                child: OutlinedButton(
-                                  onPressed: () async {
-                                    Navigator.of(context).pop();
-                                    extractFile(file);
-                                  },
-                                  child: Column(
-                                    children: [
-                                      Image.asset(
-                                        "assets/icons/unzip.png",
-                                        width: 30,
-                                      ),
-                                      const Text(
-                                        "解压",
-                                        style: TextStyle(fontSize: 12),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            if (paths.value.length > 1 &&
-                                !remote &&
-                                !remote &&
-                                file['path'].startsWith("/"))
-                              Container(
-                                constraints: const BoxConstraints(maxWidth: 112),
-                                width:
-                                    (MediaQuery.sizeOf(context).width - 100) / 3,
-                                child: OutlinedButton(
-                                  onPressed: () async {
-                                    Navigator.of(context).pop();
-                                    compressFile([file['path']]);
-                                  },
-                                  child: Column(
-                                    children: [
-                                      Image.asset(
-                                        "assets/icons/archive.png",
-                                        width: 30,
-                                      ),
-                                      const Text(
-                                        "压缩",
-                                        style: TextStyle(fontSize: 12),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            if (!remote &&
-                                !remote &&
-                                file['path'].startsWith("/"))
-                              Container(
-                                constraints: const BoxConstraints(maxWidth: 112),
-                                width:
-                                    (MediaQuery.sizeOf(context).width - 100) / 3,
-                                child: OutlinedButton(
-                                  onPressed: () async {
-                                    Navigator.of(context).pop();
-                                    Navigator.of(context).push(CupertinoPageRoute(
-                                        builder: (context) {
-                                          return Share(paths: [file['path']]);
-                                        },
-                                        settings:
-                                            const RouteSettings(name: "share")));
-                                  },
-                                  child: Column(
-                                    children: [
-                                      Image.asset(
-                                        "assets/icons/share.png",
-                                        width: 30,
-                                      ),
-                                      const Text(
-                                        "共享",
-                                        style: TextStyle(fontSize: 12),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            if (file['isdir'] &&
-                                !remote &&
-                                !remote &&
-                                file['path'].startsWith("/")) ...[
-                              Container(
-                                constraints: const BoxConstraints(maxWidth: 112),
-                                width:
-                                    (MediaQuery.sizeOf(context).width - 100) / 3,
-                                child: OutlinedButton(
-                                  onPressed: () async {
-                                    Navigator.of(context).pop();
-                                    Navigator.of(context).push(CupertinoPageRoute(
-                                        builder: (context) {
-                                          return Share(
-                                            paths: [file['path']],
-                                            fileRequest: true,
-                                          );
-                                        },
-                                        settings:
-                                            const RouteSettings(name: "share")));
-                                  },
-                                  child: Column(
-                                    children: [
-                                      Image.asset(
-                                        "assets/icons/upload.png",
-                                        width: 30,
-                                      ),
-                                      const Text(
-                                        "文件请求",
-                                        style: TextStyle(fontSize: 12),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ],
-                            if (paths.value.isNotEmpty)
-                              Container(
-                                constraints: const BoxConstraints(maxWidth: 112),
-                                width:
-                                    (MediaQuery.sizeOf(context).width - 100) / 3,
-                                child: OutlinedButton(
-                                  onPressed: () async {
-                                    TextEditingController nameController =
-                                        TextEditingController.fromValue(
-                                            TextEditingValue(text: file['name']));
-                                    Navigator.of(context).pop();
-                                    String name = "";
-                                    showCupertinoDialog(
-                                      context: context,
-                                      builder: (context) {
-                                        return SizedBox(
-                                          width: double.infinity,
-                                          child: Material(
-                                          color: Colors.transparent,
-                                          child: Column(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            children: [
-                                              Card(
-                                                shape: RoundedRectangleBorder(
-                                                    side: const BorderSide(),
-                                                    borderRadius:
-                                                        BorderRadius.circular(5)),
-                                                margin:
-                                                    const EdgeInsets.symmetric(
-                                                        horizontal: 50),
-                                                child: Padding(
-                                                  padding:
-                                                      const EdgeInsets.all(20),
-                                                  child: Column(
-                                                    children: [
-                                                      const Text(
-                                                        "重命名",
-                                                        style: TextStyle(
-                                                            fontSize: 20,
-                                                            fontWeight:
-                                                                FontWeight.w500),
-                                                      ),
-                                                      const SizedBox(
-                                                        height: 16,
-                                                      ),
-                                                      Card(
-                                                        shape: RoundedRectangleBorder(
-                                                            side:
-                                                                const BorderSide(),
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .circular(5)),
-                                                        child: Padding(
-                                                          padding:
-                                                              const EdgeInsets
-                                                                  .all(8.0),
-                                                          child: TextField(
-                                                            onChanged: (v) =>
-                                                                name = v,
-                                                            controller:
-                                                                nameController,
-                                                            decoration:
-                                                                const InputDecoration(
-                                                              border: InputBorder
-                                                                  .none,
-                                                              hintText: "请输入新的名称",
-                                                              labelText: "文件名",
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      ),
-                                                      const SizedBox(
-                                                        height: 16,
-                                                      ),
-                                                      Row(
-                                                        children: [
-                                                          Expanded(
-                                                            child: OutlinedButton(
-                                                              onPressed:
-                                                                  () async {
-                                                                if (name.trim() ==
-                                                                    "") {
-                                                                  UiUtil.toast(
-                                                                      "请输入新文件名");
-                                                                  return;
-                                                                }
-                                                                Navigator.of(
-                                                                        context)
-                                                                    .pop();
-                                                                try {
-                                                                  await dsmFileStationRenameForPage(
-                                                                      file['path'], name);
-                                                                  UiUtil.toast("重命名成功");
-                                                                  refresh();
-                                                                } catch (e) {
-                                                                  final raw = e is DSMException
-                                                                      ? e.rawError
-                                                                      : null;
-                                                                  final errors =
-                                                                      raw?['errors'] as List?;
-                                                                  if (errors != null &&
-                                                                      errors.isNotEmpty &&
-                                                                      errors[0]['code'] == 414) {
-                                                                    UiUtil.toast("重命名失败：指定的名称已存在");
-                                                                  } else {
-                                                                    UiUtil.toast("重命名失败");
-                                                                  }
-                                                                }
-                                                              },
-                                                              child: const Text(
-                                                                "确定",
-                                                                style: TextStyle(
-                                                                    fontSize: 18),
-                                                              ),
-                                                            ),
-                                                          ),
-                                                          const SizedBox(
-                                                            width: 16,
-                                                          ),
-                                                          Expanded(
-                                                            child: OutlinedButton(
-                                                              onPressed:
-                                                                  () async {
-                                                                Navigator.of(
-                                                                        context)
-                                                                    .pop();
-                                                              },
-                                                              child: const Text(
-                                                                "取消",
-                                                                style: TextStyle(
-                                                                    fontSize: 18),
-                                                              ),
-                                                            ),
-                                                          ),
-                                                        ],
-                                                      )
-                                                    ],
-                                                  ),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                        );
-                                      },
-                                    );
-                                  },
-                                  child: Column(
-                                    children: [
-                                      Image.asset(
-                                        "assets/icons/edit.png",
-                                        width: 30,
-                                      ),
-                                      const Text(
-                                        "重命名",
-                                        style: TextStyle(fontSize: 12),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            if (file['isdir'] &&
-                                !remote &&
-                                !remote &&
-                                file['path'].startsWith("/"))
-                              Container(
-                                constraints: const BoxConstraints(maxWidth: 112),
-                                width:
-                                    (MediaQuery.sizeOf(context).width - 100) / 3,
-                                child: OutlinedButton(
-                                  onPressed: () async {
-                                    Navigator.of(context).pop();
-                                    try {
-                                      await dsmFileStationFavoriteAddForPage(
-                                          "${file['name']} - ${paths.value[1]}",
-                                          file['path']);
-                                      UiUtil.toast("收藏成功");
-                                    } catch (e) {
-                                      UiUtil.toast("收藏失败，代码${_dsmErrorCode(e)}");
-                                    }
-                                  },
-                                  child: Column(
-                                    children: [
-                                      Image.asset(
-                                        "assets/icons/collect.png",
-                                        width: 30,
-                                      ),
-                                      const Text(
-                                        "添加收藏",
-                                        style: TextStyle(fontSize: 12),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            if (file['additional']['mount_point_type'] ==
-                                    "remote" &&
-                                file['path'].startsWith("/"))
-                              Container(
-                                constraints: const BoxConstraints(maxWidth: 112),
-                                width:
-                                    (MediaQuery.sizeOf(context).width - 100) / 3,
-                                child: OutlinedButton(
-                                  onPressed: () async {
-                                    Navigator.of(context).pop();
-                                    try {
-                                      await dsmFileStationMountUnmountForPage(file['path']);
-                                      UiUtil.toast("卸载成功");
-                                      refresh();
-                                      getSmbFolder();
-                                    } catch (e) {
-                                      UiUtil.toast("卸载失败，代码${_dsmErrorCode(e)}");
-                                    }
-                                  },
-                                  child: Column(
-                                    children: [
-                                      Image.asset(
-                                        "assets/icons/eject.png",
-                                        width: 30,
-                                      ),
-                                      const Text(
-                                        "卸载",
-                                        style: TextStyle(fontSize: 12),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            if (remote && !file['path'].startsWith("/"))
-                              Container(
-                                constraints: const BoxConstraints(maxWidth: 112),
-                                width:
-                                    (MediaQuery.sizeOf(context).width - 100) / 3,
-                                child: OutlinedButton(
-                                  onPressed: () async {
-                                    Navigator.of(context).pop();
-                                    try {
-                                      await dsmFileStationVFSConnectionDeleteForPage(file['path']);
-                                      UiUtil.toast("远程连接已断开");
-                                      refresh();
-                                      getSmbFolder();
-                                    } catch (e) {
-                                      UiUtil.toast("断开连接失败，代码${_dsmErrorCode(e)}");
-                                    }
-                                  },
-                                  child: Column(
-                                    children: [
-                                      Image.asset(
-                                        "assets/icons/eject.png",
-                                        width: 30,
-                                      ),
-                                      const Text(
-                                        "断开连接",
-                                        style: TextStyle(fontSize: 12),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            if (paths.value.length > 1)
-                              Container(
-                                constraints: const BoxConstraints(maxWidth: 112),
-                                width:
-                                    (MediaQuery.sizeOf(context).width - 100) / 3,
-                                child: OutlinedButton(
-                                  onPressed: () async {
-                                    Navigator.of(context).pop();
-                                    deleteFile([file['path']]);
-                                  },
-                                  child: Column(
-                                    children: [
-                                      Image.asset(
-                                        "assets/icons/delete.png",
-                                        width: 30,
-                                      ),
-                                      const Text(
-                                        "删除",
-                                        style: TextStyle(
-                                            fontSize: 12,
-                                            color: Colors.redAccent),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(
-                        height: 16,
-                      ),
-                      OutlinedButton(
-                        onPressed: () async {
-                          Navigator.of(context).pop();
-                        },
-                        child: const Text(
-                          "取消",
-                          style: TextStyle(fontSize: 18),
-                        ),
-                      ),
-                      const SizedBox(
-                        height: 8,
-                      ),
-                    ],
-                  ),
-                ),
-              ),
+                    ),
+                  ],
+                )
+              : null,
+          actions: [
+            BottomActionItem(
+              label: "详情",
+              iconAsset: "assets/icons/info_liner.png",
+              onPressed: () {
+                Navigator.of(context).push(CupertinoPageRoute(
+                  builder: (context) => FileDetail(file),
+                  settings: const RouteSettings(name: "file_detail"),
+                ));
+              },
             ),
-          ),
-          );
-        },
+            BottomActionItem(
+              label: "下载",
+              iconAsset: "assets/icons/download.png",
+              onPressed: () => downloadFiles([file]),
+            ),
+            if (FileTypeUtil.toFileTypeEnum(
+                        FileTypeUtil.getFileType(file['name'])) ==
+                    FileTypeEnum.zip &&
+                !remote &&
+                file['path'].startsWith("/"))
+              BottomActionItem(
+                label: "解压",
+                iconAsset: "assets/icons/unzip.png",
+                onPressed: () => extractFile(file),
+              ),
+            if (paths.value.length > 1 &&
+                !remote &&
+                file['path'].startsWith("/"))
+              BottomActionItem(
+                label: "压缩",
+                iconAsset: "assets/icons/archive.png",
+                onPressed: () => compressFile([file['path']]),
+              ),
+            if (!remote && file['path'].startsWith("/"))
+              BottomActionItem(
+                label: "共享",
+                iconAsset: "assets/icons/share.png",
+                onPressed: () {
+                  Navigator.of(context).push(CupertinoPageRoute(
+                    builder: (context) => Share(paths: [file['path']]),
+                    settings: const RouteSettings(name: "share"),
+                  ));
+                },
+              ),
+            if (file['isdir'] && !remote && file['path'].startsWith("/"))
+              BottomActionItem(
+                label: "文件请求",
+                iconAsset: "assets/icons/upload.png",
+                onPressed: () {
+                  Navigator.of(context).push(CupertinoPageRoute(
+                    builder: (context) => Share(
+                      paths: [file['path']],
+                      fileRequest: true,
+                    ),
+                    settings: const RouteSettings(name: "share"),
+                  ));
+                },
+              ),
+            if (paths.value.isNotEmpty)
+              BottomActionItem(
+                label: "重命名",
+                iconAsset: "assets/icons/edit.png",
+                onPressed: () {
+                  showCupertinoDialog(
+                    context: context,
+                    builder: (context) => NameInputDialog(
+                      title: "重命名",
+                      onConfirm: (name) async {
+                        try {
+                          await dsmFileStationRenameForPage(file['path'], name);
+                          UiUtil.toast("重命名成功");
+                          refresh();
+                        } catch (e) {
+                          final raw = e is DSMException ? e.rawError : null;
+                          final errors = raw?['errors'] as List?;
+                          if (errors != null &&
+                              errors.isNotEmpty &&
+                              errors[0]['code'] == 414) {
+                            UiUtil.toast("重命名失败：指定的名称已存在");
+                          } else {
+                            UiUtil.toast("重命名失败");
+                          }
+                        }
+                      },
+                    ),
+                  );
+                },
+              ),
+            if (file['isdir'] && !remote && file['path'].startsWith("/"))
+              BottomActionItem(
+                label: "添加收藏",
+                iconAsset: "assets/icons/collect.png",
+                onPressed: () async {
+                  try {
+                    await dsmFileStationFavoriteAddForPage(
+                      "${file['name']} - ${paths.value[1]}",
+                      file['path'],
+                    );
+                    UiUtil.toast("收藏成功");
+                  } catch (e) {
+                    UiUtil.toast("收藏失败，代码${_dsmErrorCode(e)}");
+                  }
+                },
+              ),
+            if (file['additional']['mount_point_type'] == "remote" &&
+                file['path'].startsWith("/"))
+              BottomActionItem(
+                label: "卸载",
+                iconAsset: "assets/icons/eject.png",
+                onPressed: () async {
+                  try {
+                    await dsmFileStationMountUnmountForPage(file['path']);
+                    UiUtil.toast("卸载成功");
+                    refresh();
+                    getSmbFolder();
+                  } catch (e) {
+                    UiUtil.toast("卸载失败，代码${_dsmErrorCode(e)}");
+                  }
+                },
+              ),
+            if (remote && !file['path'].startsWith("/"))
+              BottomActionItem(
+                label: "断开连接",
+                iconAsset: "assets/icons/eject.png",
+                onPressed: () async {
+                  try {
+                    await dsmFileStationVFSConnectionDeleteForPage(file['path']);
+                    UiUtil.toast("远程连接已断开");
+                    refresh();
+                    getSmbFolder();
+                  } catch (e) {
+                    UiUtil.toast("断开连接失败，代码${_dsmErrorCode(e)}");
+                  }
+                },
+              ),
+            if (paths.value.length > 1)
+              BottomActionItem(
+                label: "删除",
+                iconAsset: "assets/icons/delete.png",
+                labelColor: Colors.redAccent,
+                onPressed: () => deleteFile([file['path']]),
+              ),
+          ],
+        ),
       );
     }
     Widget buildFileItem(file, {bool remote = false}) {
@@ -2498,426 +1994,119 @@ class Files extends HookWidget {
                 onPressed: () {
                   showCupertinoModalPopup(
                     context: context,
-                    builder: (context) {
-                      return SizedBox(
-                        width: double.infinity,
-                        child: Material(
-                        color: Colors.transparent,
-                        child: Card(
-                          shape: RoundedRectangleBorder(
-                              side: const BorderSide(),
-                              borderRadius: BorderRadius.circular(18)),
-                          child: SafeArea(
-                            top: false,
-                            child: Padding(
-                              padding: const EdgeInsets.all(20),
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: <Widget>[
-                                  const Text(
-                                    "选择操作",
-                                    style: TextStyle(
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.w500),
-                                  ),
-                                  const SizedBox(
-                                    height: 12,
-                                  ),
-                                  SizedBox(
-                                    width: double.infinity,
-                                    child: Wrap(
-                                      runSpacing: 20,
-                                      spacing: 20,
-                                      children: [
-                                        if (paths.value.isEmpty) ...[
-                                          Container(
-                                            constraints: const BoxConstraints(
-                                                maxWidth: 112),
-                                            width: (MediaQuery.of(context)
-                                                        .size
-                                                        .width -
-                                                    100) /
-                                                3,
-                                            child: OutlinedButton(
-                                              onPressed: () async {
-                                                Navigator.of(context).pop();
-                                                List volumes = await getVolumes();
-                                                if (volumes.isNotEmpty) {
-                                                  if (context.mounted) {
-                                                    Navigator.of(context)
-                                                        .push(CupertinoPageRoute(
-                                                            builder: (context) {
-                                                              return AddSharedFolders(
-                                                                  volumes);
-                                                            },
-                                                            settings:
-                                                                const RouteSettings(
-                                                                    name:
-                                                                        "add_shared_folders")))
-                                                        .then((res) {
-                                                      if (res != null && res) {
-                                                        refresh();
-                                                      }
-                                                    });
-                                                  }
-                                                } else {
-                                                  UiUtil.toast("未获取到存储空间");
-                                                }
-                                              },
-                                              child: Column(
-                                                children: [
-                                                  Image.asset(
-                                                    "assets/icons/new_folder.png",
-                                                    width: 30,
-                                                  ),
-                                                  const Text(
-                                                    "共享文件夹",
-                                                    style:
-                                                        TextStyle(fontSize: 12),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                        if (paths.value.isNotEmpty) ...[
-                                          Container(
-                                            constraints: const BoxConstraints(
-                                                maxWidth: 112),
-                                            width: (MediaQuery.of(context)
-                                                        .size
-                                                        .width -
-                                                    100) /
-                                                3,
-                                            child: OutlinedButton(
-                                              onPressed: () async {
-                                                Navigator.of(context).pop();
-                                                String name = "";
-                                                showCupertinoDialog(
-                                                    context: context,
-                                                    builder: (context) {
-                                                      return SizedBox(
-                                                        width: double.infinity,
-                                                        child: Material(
-                                                        color: Colors.transparent,
-                                                        child: Column(
-                                                          mainAxisAlignment:
-                                                              MainAxisAlignment
-                                                                  .center,
-                                                          children: [
-                                                            Card(
-                                                              shape: RoundedRectangleBorder(
-                                                                  side:
-                                                                      const BorderSide(),
-                                                                  borderRadius:
-                                                                      BorderRadius
-                                                                          .circular(
-                                                                              5)),
-                                                              child: Padding(
-                                                                padding:
-                                                                    const EdgeInsets
-                                                                        .all(20),
-                                                                child: Column(
-                                                                  children: [
-                                                                    const Text(
-                                                                      "新建文件夹",
-                                                                      style: TextStyle(
-                                                                          fontSize:
-                                                                              20,
-                                                                          fontWeight:
-                                                                              FontWeight.w500),
-                                                                    ),
-                                                                    const SizedBox(
-                                                                      height: 16,
-                                                                    ),
-                                                                    Card(
-                                                                      shape: RoundedRectangleBorder(
-                                                                          side:
-                                                                              const BorderSide(),
-                                                                          borderRadius:
-                                                                              BorderRadius.circular(5)),
-                                                                      child:
-                                                                          Padding(
-                                                                        padding: const EdgeInsets
-                                                                            .all(
-                                                                            8.0),
-                                                                        child:
-                                                                            TextField(
-                                                                          onChanged:
-                                                                              (v) =>
-                                                                                  name = v,
-                                                                          decoration:
-                                                                              const InputDecoration(
-                                                                            border:
-                                                                                InputBorder.none,
-                                                                            hintText:
-                                                                                "请输入文件夹名",
-                                                                            labelText:
-                                                                                "文件夹名",
-                                                                          ),
-                                                                        ),
-                                                                      ),
-                                                                    ),
-                                                                    const SizedBox(
-                                                                      height: 20,
-                                                                    ),
-                                                                    Row(
-                                                                      children: [
-                                                                        Expanded(
-                                                                          child:
-                                                                              OutlinedButton(
-                                                                            onPressed:
-                                                                                () async {
-                                                                              if (name.trim() ==
-                                                                                  "") {
-                                                                                UiUtil.toast("请输入文件夹名");
-                                                                                return;
-                                                                              }
-                                                                              Navigator.of(context).pop();
-                                                                              String
-                                                                                  path =
-                                                                                  "/${paths.value.join("/")}";
-                                                                              try {
-                                                                                await dsmFileStationCreateFolderForPage(path, name);
-                                                                                UiUtil.toast("文件夹创建成功");
-                                                                                refresh();
-                                                                              } catch (e) {
-                                                                                final raw = e is DSMException ? e.rawError : null;
-                                                                                final errors = raw?['errors'] as List?;
-                                                                                if (errors != null && errors.isNotEmpty && errors[0]['code'] == 414) {
-                                                                                  UiUtil.toast("文件夹创建失败：指定的名称已存在");
-                                                                                } else {
-                                                                                  UiUtil.toast("文件夹创建失败");
-                                                                                }
-                                                                              }
-                                                                            },
-                                                                            child:
-                                                                                const Text(
-                                                                              "确定",
-                                                                              style:
-                                                                                  TextStyle(fontSize: 18),
-                                                                            ),
-                                                                          ),
-                                                                        ),
-                                                                        const SizedBox(
-                                                                          width:
-                                                                              16,
-                                                                        ),
-                                                                        Expanded(
-                                                                          child:
-                                                                              OutlinedButton(
-                                                                            onPressed:
-                                                                                () async {
-                                                                              Navigator.of(context).pop();
-                                                                            },
-                                                                            child:
-                                                                                const Text(
-                                                                              "取消",
-                                                                              style:
-                                                                                  TextStyle(fontSize: 18),
-                                                                            ),
-                                                                          ),
-                                                                        ),
-                                                                      ],
-                                                                    )
-                                                                  ],
-                                                                ),
-                                                              ),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                      ),
-                                                      );
-                                                    });
-                                              },
-                                              child: Column(
-                                                children: [
-                                                  Image.asset(
-                                                    "assets/icons/new_folder.png",
-                                                    width: 30,
-                                                  ),
-                                                  const Text(
-                                                    "新建文件夹",
-                                                    style:
-                                                        TextStyle(fontSize: 12),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          ),
-                                          SizedBox(
-                                            width: (MediaQuery.of(context)
-                                                        .size
-                                                        .width -
-                                                    100) /
-                                                4,
-                                            child: OutlinedButton(
-                                              onPressed: () async {
-                                                Navigator.of(context).pop();
-                                                Navigator.of(context).push(
-                                                    CupertinoPageRoute(
-                                                        builder: (context) {
-                                                          return Share(
-                                                            paths: [
-                                                              "/${paths.value.join("/")}"
-                                                            ],
-                                                            fileRequest: true,
-                                                          );
-                                                        },
-                                                        settings:
-                                                            const RouteSettings(
-                                                                name: "share")));
-                                              },
-                                              child: Column(
-                                                children: [
-                                                  Image.asset(
-                                                    "assets/icons/upload.png",
-                                                    width: 30,
-                                                  ),
-                                                  const Text(
-                                                    "创建文件请求",
-                                                    style:
-                                                        TextStyle(fontSize: 12),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                        Container(
-                                          constraints:
-                                              const BoxConstraints(maxWidth: 112),
-                                          width:
-                                              (MediaQuery.sizeOf(context).width -
-                                                      100) /
-                                                  3,
-                                          child: OutlinedButton(
-                                            onPressed: () async {
-                                              Navigator.of(context).pop();
-                                              Navigator.of(context).push(
-                                                  CupertinoPageRoute(
-                                                      builder: (content) {
-                                                        return const ShareManager();
-                                                      },
-                                                      settings: const RouteSettings(
-                                                          name:
-                                                              "share_manager")));
-                                            },
-                                            child: Column(
-                                              children: [
-                                                Image.asset(
-                                                  "assets/icons/link.png",
-                                                  width: 30,
-                                                ),
-                                                const Text(
-                                                  "共享链接管理",
-                                                  style: TextStyle(fontSize: 12),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                        Container(
-                                          constraints:
-                                              const BoxConstraints(maxWidth: 112),
-                                          width:
-                                              (MediaQuery.sizeOf(context).width -
-                                                      100) /
-                                                  3,
-                                          child: OutlinedButton(
-                                            onPressed: () async {
-                                              Navigator.of(context).pop();
-                                              Navigator.of(context)
-                                                  .push(CupertinoPageRoute(
-                                                      builder: (content) {
-                                                        return const RemoteFolder();
-                                                      },
-                                                      settings: const RouteSettings(
-                                                          name: "remote_folder")))
-                                                  .then((res) {
-                                                refresh();
-                                                getSmbFolder();
-                                              });
-                                            },
-                                            child: Column(
-                                              children: [
-                                                Image.asset(
-                                                  "assets/icons/remote.png",
-                                                  width: 30,
-                                                ),
-                                                const Text(
-                                                  "装载远程",
-                                                  style: TextStyle(fontSize: 12),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                        // if (paths.length > 0)
-                                        //   Container(
-                                        //     constraints: BoxConstraints(maxWidth: 112),
-                                        //     width: (MediaQuery.sizeOf(context).width - 100) / 3,
-                                        //     child: NeuButton(
-                                        //       onPressed: () async {
-                                        //         Navigator.of(context).pop();
-                                        //         Navigator.of(context)
-                                        //             .push(CupertinoPageRoute(
-                                        //                 builder: (content) {
-                                        //                   return Search("/" + paths.join("/"));
-                                        //                 },
-                                        //                 settings: RouteSettings(name: "search")))
-                                        //             .then((res) {
-                                        //           if (res != null) {
-                                        //             search(res['folders'], res['pattern'], res['search_content']);
-                                        //           }
-                                        //         });
-                                        //       },
-                                        //       decoration: NeumorphicDecoration(
-                                        //         color: Theme.of(context).scaffoldBackgroundColor,
-                                        //         borderRadius: BorderRadius.circular(10),
-                                        //       ),
-                                        //       bevel: 20,
-                                        //       padding: EdgeInsets.symmetric(vertical: AppConstants.paddingSmall + 2),
-                                        //       child: Column(
-                                        //         children: [
-                                        //           Image.asset(
-                                        //             "assets/icons/search.png",
-                                        //             width: 30,
-                                        //           ),
-                                        //           Text(
-                                        //             "搜索",
-                                        //             style: TextStyle(fontSize: 12),
-                                        //           ),
-                                        //         ],
-                                        //       ),
-                                        //     ),
-                                        //   ),
-                                      ],
-                                    ),
-                                  ),
-                                  const SizedBox(
-                                    height: 20,
-                                  ),
-                                  OutlinedButton(
-                                    onPressed: () async {
-                                      Navigator.of(context).pop();
-                                    },
-                                    child: const Text(
-                                      "取消",
-                                      style: TextStyle(fontSize: 18),
-                                    ),
-                                  ),
-                                  const SizedBox(
-                                    height: 8,
-                                  ),
-                                ],
-                              ),
-                            ),
+                    builder: (context) => BottomActionSheet(
+                      title: "选择操作",
+                      titleSpacing: 12,
+                      cancelSpacing: 20,
+                      actions: [
+                        if (paths.value.isEmpty)
+                          BottomActionItem(
+                            label: "共享文件夹",
+                            iconAsset: "assets/icons/new_folder.png",
+                            onPressed: () async {
+                              List volumes = await getVolumes();
+                              if (volumes.isNotEmpty) {
+                                if (context.mounted) {
+                                  Navigator.of(context)
+                                      .push(CupertinoPageRoute(
+                                    builder: (context) =>
+                                        AddSharedFolders(volumes),
+                                    settings: const RouteSettings(
+                                        name: "add_shared_folders"),
+                                  ))
+                                      .then((res) {
+                                    if (res != null && res) {
+                                      refresh();
+                                    }
+                                  });
+                                }
+                              } else {
+                                UiUtil.toast("未获取到存储空间");
+                              }
+                            },
                           ),
+                        if (paths.value.isNotEmpty)
+                          BottomActionItem(
+                            label: "新建文件夹",
+                            iconAsset: "assets/icons/new_folder.png",
+                            onPressed: () {
+                              showCupertinoDialog(
+                                context: context,
+                                builder: (context) => NameInputDialog(
+                                  title: "新建文件夹",
+                                  labelText: "文件夹名",
+                                  hintText: "请输入文件夹名",
+                                  emptyMessage: "请输入文件夹名",
+                                  onConfirm: (name) async {
+                                    String path =
+                                        "/${paths.value.join("/")}";
+                                    try {
+                                      await dsmFileStationCreateFolderForPage(
+                                          path, name);
+                                      UiUtil.toast("文件夹创建成功");
+                                      refresh();
+                                    } catch (e) {
+                                      final raw = e is DSMException
+                                          ? e.rawError
+                                          : null;
+                                      final errors = raw?['errors'] as List?;
+                                      if (errors != null &&
+                                          errors.isNotEmpty &&
+                                          errors[0]['code'] == 414) {
+                                        UiUtil.toast("文件夹创建失败：指定的名称已存在");
+                                      } else {
+                                        UiUtil.toast("文件夹创建失败");
+                                      }
+                                    }
+                                  },
+                                ),
+                              );
+                            },
+                          ),
+                        if (paths.value.isNotEmpty)
+                          BottomActionItem(
+                            label: "创建文件请求",
+                            iconAsset: "assets/icons/upload.png",
+                            widthDivisor: 4,
+                            onPressed: () {
+                              Navigator.of(context).push(CupertinoPageRoute(
+                                builder: (context) => Share(
+                                  paths: ["/${paths.value.join("/")}"],
+                                  fileRequest: true,
+                                ),
+                                settings: const RouteSettings(name: "share"),
+                              ));
+                            },
+                          ),
+                        BottomActionItem(
+                          label: "共享链接管理",
+                          iconAsset: "assets/icons/link.png",
+                          onPressed: () {
+                            Navigator.of(context).push(CupertinoPageRoute(
+                              builder: (content) => const ShareManager(),
+                              settings:
+                                  const RouteSettings(name: "share_manager"),
+                            ));
+                          },
                         ),
-                      ),
-                      );
-                    },
+                        BottomActionItem(
+                          label: "装载远程",
+                          iconAsset: "assets/icons/remote.png",
+                          onPressed: () {
+                            Navigator.of(context)
+                                .push(CupertinoPageRoute(
+                              builder: (content) => const RemoteFolder(),
+                              settings:
+                                  const RouteSettings(name: "remote_folder"),
+                            ))
+                                .then((res) {
+                              refresh();
+                              getSmbFolder();
+                            });
+                          },
+                        ),
+                      ],
+                    ),
                   );
                 },
                 child: Image.asset(
@@ -3159,14 +2348,7 @@ class Files extends HookWidget {
                               children: [
                                 GestureDetector(
                                   onTap: () {
-                                    showCupertinoModalPopup(
-                                      context: context,
-                                      builder: (context) {
-                                        return const SelectFolder(
-                                          multi: false,
-                                        );
-                                      },
-                                    ).then((folder) async {
+                                    showFolderPickerSheet(context).then((folder) async {
                                       if (folder != null &&
                                           folder.length == 1) {
                                         List<String> movePaths = selectedFiles.value
@@ -3209,14 +2391,7 @@ class Files extends HookWidget {
                                 ),
                                 GestureDetector(
                                   onTap: () {
-                                    showCupertinoModalPopup(
-                                      context: context,
-                                      builder: (context) {
-                                        return const SelectFolder(
-                                          multi: false,
-                                        );
-                                      },
-                                    ).then((folder) async {
+                                    showFolderPickerSheet(context).then((folder) async {
                                       if (folder != null &&
                                           folder.length == 1) {
                                         List<String> copyPaths = selectedFiles.value
