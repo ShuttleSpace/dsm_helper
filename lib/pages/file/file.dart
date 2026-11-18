@@ -35,7 +35,7 @@ import 'package:garden/widgets/bottom_action_sheet.dart';
 import 'package:garden/widgets/bottom_confirm_sheet.dart';
 import 'package:garden/hooks/use_file_download.dart';
 import 'package:garden/hooks/use_file_click.dart';
-import 'package:garden/extensions/context.dart';
+import 'package:garden/widgets/file/sort_menu.dart';
 import 'package:garden/widgets/file_icon.dart';
 import 'package:garden/widgets/folder_picker_sheet.dart';
 import 'package:garden/widgets/name_input_dialog.dart';
@@ -113,6 +113,7 @@ class Files extends HookWidget {
         // }
       });
     }
+
     Future<void> getFileList(String path) async {
       loading.value = true;
       try {
@@ -130,10 +131,10 @@ class Files extends HookWidget {
         loading.value = false;
       }
     }
+
     getShareList() async {
       String listTypeStr = await StorageUtil.getString("file_list_type") ?? '';
 
-    
       if (listTypeStr.isNotBlank) {
         if (listTypeStr == "list") {
           listType.value = ListType.list;
@@ -155,21 +156,18 @@ class Files extends HookWidget {
         loading.value = false;
       }
     }
+
     setPaths(String path) {
-    
       searchResult.value = false;
       searching.value = false;
-  
+
       if (path == "") {
-      
         paths.value = [];
-    
       } else {
         if (path.startsWith("/")) {
           List<String> items = path.split("/").sublist(1);
-        
+
           paths.value = items;
-      
         } else {
           List<String> parts = path.split("://");
           String scheme = parts[0];
@@ -177,18 +175,18 @@ class Files extends HookWidget {
           // String first = "${uri.scheme}://${uri.userInfo}@${uri.host}";
           List<String> items = path.replaceAll(first, "").split("/");
           items[0] = first;
-        
+
           paths.value = items;
-      
         }
       }
     }
+
     goPath(String path) async {
       Log.info("path:$path");
       UiUtil.vibrate(FeedbackType.light);
-    
+
       success.value = true;
-  
+
       setPaths(path);
       if (path == "/" || path == "") {
         await getShareList();
@@ -200,6 +198,7 @@ class Files extends HookWidget {
           duration: const Duration(milliseconds: 200), curve: Curves.ease);
       fileScrollController.jumpTo(scrollPosition.value[path] ?? 0);
     }
+
     refresh() {
       String path = "";
       if (paths.value.isNotEmpty && paths.value[0].contains("//")) {
@@ -211,6 +210,7 @@ class Files extends HookWidget {
       }
       goPath(path);
     }
+
     extractFile(file, {String password = ''}) async {
       try {
         final data = await dsmFileStationExtractStartForPage(
@@ -227,6 +227,7 @@ class Files extends HookWidget {
         Log.warn('extract failed: $e');
       }
     }
+
     initFloating() {}
     Future<List> getVolumes() async {
       try {
@@ -236,11 +237,13 @@ class Files extends HookWidget {
         return [];
       }
     }
+
     closeDrawer() {
       if (scaffoldKey.currentState?.isDrawerOpen == true) {
         Navigator.of(context).pop();
       }
     }
+
     Future<bool?> result(String taskId) async {
       try {
         final data = await dsmFileStationSearchListForPage(taskId);
@@ -256,12 +259,12 @@ class Files extends HookWidget {
         return null;
       }
     }
+
     search(List<String> folders, String pattern, bool searchContent) async {
-    
       searchResult.value = true;
       searching.value = true;
       loading.value = true;
-  
+
       late Map<String, dynamic> data;
       try {
         data = await dsmFileStationSearchStartForPage(folders, pattern,
@@ -284,6 +287,7 @@ class Files extends HookWidget {
         });
       }
     }
+
     final appDownload = useFileDownload(context);
     download(List filePaths) async {
       await appDownload(filePaths);
@@ -317,6 +321,7 @@ class Files extends HookWidget {
         }
       });
     }
+
     Future<void> getSmbFolder() async {
       try {
         final data = await dsmFileStationVirtualFolderSmbForPage();
@@ -325,6 +330,7 @@ class Files extends HookWidget {
         Log.warn('smb folders: $e');
       }
     }
+
     Future<void> getFtpFolder() async {
       try {
         final data = await dsmFileStationVirtualFolderForPage('ftp');
@@ -333,6 +339,7 @@ class Files extends HookWidget {
         Log.warn('ftp folders: $e');
       }
     }
+
     Future<void> getSftpFolder() async {
       try {
         final data = await dsmFileStationVirtualFolderForPage('sftp');
@@ -341,6 +348,7 @@ class Files extends HookWidget {
         Log.warn('sftp folders: $e');
       }
     }
+
     Future<void> getDavFolder() async {
       try {
         final data = await dsmFileStationVirtualFolderForPage('davs');
@@ -349,6 +357,7 @@ class Files extends HookWidget {
         Log.warn('dav folders: $e');
       }
     }
+
     openPlainFile(file) async {
       loading.value = true;
       try {
@@ -375,444 +384,7 @@ class Files extends HookWidget {
         UiUtil.toast("预览失败：$e");
       }
     }
-    Widget buildSortMenu(BuildContext context) {
-      return SizedBox(
-        width: double.infinity,
-        child: Material(
-        color: Colors.transparent,
-        child: Card(
-          shape: context.stadiumShapeBorder,
-          child: Padding(
-            padding: const EdgeInsets.all(20),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                Card(
-                  shape: RoundedRectangleBorder(
-                      side: const BorderSide(),
-                      borderRadius: BorderRadius.circular(18)),
-                  child: SafeArea(
-                    top: false,
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 20, vertical: 10),
-                      child: Column(
-                        children: [
-                          GestureDetector(
-                            onTap: () {
-                              sortBy.value = "name";
-                            },
-                            child: Row(
-                              children: [
-                                const Expanded(
-                                  child: Text("名称"),
-                                ),
-                                Card(
-                                  shape: RoundedRectangleBorder(
-                                      side: const BorderSide(),
-                                      borderRadius: BorderRadius.circular(18)),
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(
-                                        AppConstants.paddingSmall),
-                                    child: SizedBox(
-                                      width: 20,
-                                      height: 20,
-                                      child: sortBy.value == "name"
-                                          ? Icon(
-                                              CupertinoIcons.checkmark_alt,
-                                              color: Theme.of(context)
-                                                  .colorScheme
-                                                  .primary,
-                                            )
-                                          : null,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(height: 5),
-                          GestureDetector(
-                            onTap: () {
-                              sortBy.value = "size";
-                            },
-                            child: Row(
-                              children: [
-                                const Expanded(
-                                  child: Text("大小"),
-                                ),
-                                Card(
-                                  shape: RoundedRectangleBorder(
-                                      side: const BorderSide(),
-                                      borderRadius: BorderRadius.circular(18)),
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(
-                                        AppConstants.paddingSmall),
-                                    child: SizedBox(
-                                      width: 20,
-                                      height: 20,
-                                      child: sortBy.value == "size"
-                                          ? Icon(
-                                              CupertinoIcons.checkmark_alt,
-                                              color: Theme.of(context)
-                                                  .colorScheme
-                                                  .primary,
-                                            )
-                                          : null,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(height: 5),
-                          GestureDetector(
-                            onTap: () {
-                              sortBy.value = "type";
-                            },
-                            child: Row(
-                              children: [
-                                const Expanded(
-                                  child: Text("文件类型"),
-                                ),
-                                Card(
-                                  shape: RoundedRectangleBorder(
-                                      side: const BorderSide(),
-                                      borderRadius: BorderRadius.circular(18)),
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(
-                                        AppConstants.paddingSmall),
-                                    child: SizedBox(
-                                      width: 20,
-                                      height: 20,
-                                      child: sortBy.value == "type"
-                                          ? Icon(
-                                              CupertinoIcons.checkmark_alt,
-                                              color: Theme.of(context)
-                                                  .colorScheme
-                                                  .primary,
-                                            )
-                                          : null,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(height: 5),
-                          GestureDetector(
-                            onTap: () {
-                              sortBy.value = "mtime";
-                            },
-                            child: Row(
-                              children: [
-                                const Expanded(
-                                  child: Text("修改日期"),
-                                ),
-                                Card(
-                                  shape: RoundedRectangleBorder(
-                                      side: const BorderSide(),
-                                      borderRadius: BorderRadius.circular(18)),
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(
-                                        AppConstants.paddingSmall),
-                                    child: SizedBox(
-                                      width: 20,
-                                      height: 20,
-                                      child: sortBy.value == "mtime"
-                                          ? Icon(
-                                              CupertinoIcons.checkmark_alt,
-                                              color: Theme.of(context)
-                                                  .colorScheme
-                                                  .primary,
-                                            )
-                                          : null,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(height: 5),
-                          GestureDetector(
-                            onTap: () {
-                              sortBy.value = "crtime";
-                            },
-                            child: Row(
-                              children: [
-                                const Expanded(
-                                  child: Text("创建日期"),
-                                ),
-                                Card(
-                                  shape: RoundedRectangleBorder(
-                                      side: const BorderSide(),
-                                      borderRadius: BorderRadius.circular(18)),
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(
-                                        AppConstants.paddingSmall),
-                                    child: SizedBox(
-                                      width: 20,
-                                      height: 20,
-                                      child: sortBy.value == "crtime"
-                                          ? Icon(
-                                              CupertinoIcons.checkmark_alt,
-                                              color: Theme.of(context)
-                                                  .colorScheme
-                                                  .primary,
-                                            )
-                                          : null,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(height: 5),
-                          GestureDetector(
-                            onTap: () {
-                              sortBy.value = "atime";
-                            },
-                            child: Row(
-                              children: [
-                                const Expanded(
-                                  child: Text("最近访问时间"),
-                                ),
-                                Card(
-                                  shape: RoundedRectangleBorder(
-                                      side: const BorderSide(),
-                                      borderRadius: BorderRadius.circular(18)),
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(
-                                        AppConstants.paddingSmall),
-                                    child: SizedBox(
-                                      width: 20,
-                                      height: 20,
-                                      child: sortBy.value == "atime"
-                                          ? Icon(
-                                              CupertinoIcons.checkmark_alt,
-                                              color: Theme.of(context)
-                                                  .colorScheme
-                                                  .primary,
-                                            )
-                                          : null,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(height: 5),
-                          GestureDetector(
-                            onTap: () {
-                              sortBy.value = "posix";
-                            },
-                            child: Row(
-                              children: [
-                                const Expanded(
-                                  child: Text("权限"),
-                                ),
-                                Card(
-                                  shape: RoundedRectangleBorder(
-                                      side: const BorderSide(),
-                                      borderRadius: BorderRadius.circular(18)),
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(
-                                        AppConstants.paddingSmall),
-                                    child: SizedBox(
-                                      width: 20,
-                                      height: 20,
-                                      child: sortBy.value == "posix"
-                                          ? Icon(
-                                              CupertinoIcons.checkmark_alt,
-                                              color: Theme.of(context)
-                                                  .colorScheme
-                                                  .primary,
-                                            )
-                                          : null,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(height: 5),
-                          GestureDetector(
-                            onTap: () {
-                              sortBy.value = "user";
-                            },
-                            child: Row(
-                              children: [
-                                const Expanded(
-                                  child: Text("拥有者"),
-                                ),
-                                Card(
-                                  shape: RoundedRectangleBorder(
-                                      side: const BorderSide(),
-                                      borderRadius: BorderRadius.circular(18)),
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(
-                                        AppConstants.paddingSmall),
-                                    child: SizedBox(
-                                      width: 20,
-                                      height: 20,
-                                      child: sortBy.value == "user"
-                                          ? Icon(
-                                              CupertinoIcons.checkmark_alt,
-                                              color: Theme.of(context)
-                                                  .colorScheme
-                                                  .primary,
-                                            )
-                                          : null,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(height: 5),
-                          GestureDetector(
-                            onTap: () {
-                              sortBy.value = "group";
-                            },
-                            child: Row(
-                              children: [
-                                const Expanded(
-                                  child: Text("群组"),
-                                ),
-                                Card(
-                                  shape: RoundedRectangleBorder(
-                                      side: const BorderSide(),
-                                      borderRadius: BorderRadius.circular(18)),
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(
-                                        AppConstants.paddingSmall),
-                                    child: SizedBox(
-                                      width: 20,
-                                      height: 20,
-                                      child: sortBy.value == "group"
-                                          ? Icon(
-                                              CupertinoIcons.checkmark_alt,
-                                              color: Theme.of(context)
-                                                  .colorScheme
-                                                  .primary,
-                                            )
-                                          : null,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(
-                  height: 20,
-                ),
-                Card(
-                  shape: RoundedRectangleBorder(
-                      side: const BorderSide(),
-                      borderRadius: BorderRadius.circular(18)),
-                  child: Padding(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                    child: Column(
-                      children: [
-                        GestureDetector(
-                          onTap: () {
-                            sortDirection.value = "ASC";
-                          },
-                          child: Row(
-                            children: [
-                              const Expanded(
-                                child: Text("由小至大"),
-                              ),
-                              Card(
-                                shape: RoundedRectangleBorder(
-                                    side: const BorderSide(),
-                                    borderRadius: BorderRadius.circular(18)),
-                                child: Padding(
-                                  padding: const EdgeInsets.all(
-                                      AppConstants.paddingSmall),
-                                  child: SizedBox(
-                                    width: 20,
-                                    height: 20,
-                                    child: sortDirection.value == "ASC"
-                                        ? Icon(
-                                            CupertinoIcons.checkmark_alt,
-                                            color: Theme.of(context)
-                                                .colorScheme
-                                                .primary,
-                                          )
-                                        : null,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(height: 5),
-                        GestureDetector(
-                          onTap: () {
-                            sortDirection.value = "DESC";
-                          },
-                          child: Row(
-                            children: [
-                              const Expanded(
-                                child: Text("由大至小"),
-                              ),
-                              Card(
-                                shape: RoundedRectangleBorder(
-                                    side: const BorderSide(),
-                                    borderRadius: BorderRadius.circular(18)),
-                                child: Padding(
-                                  padding: const EdgeInsets.all(
-                                      AppConstants.paddingSmall),
-                                  child: SizedBox(
-                                    width: 20,
-                                    height: 20,
-                                    child: sortDirection.value == "DESC"
-                                        ? Icon(
-                                            CupertinoIcons.checkmark_alt,
-                                            color: Theme.of(context)
-                                                .colorScheme
-                                                .primary,
-                                          )
-                                        : null,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                const SizedBox(
-                  height: 22,
-                ),
-                OutlinedButton(
-                  onPressed: () async {
-                    Navigator.of(context).pop();
-                  },
-                  child: const Text(
-                    "确定",
-                    style: TextStyle(fontSize: 18),
-                  ),
-                ),
-                const SizedBox(
-                  height: 8,
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-      );
-    }
+
     deleteFile(List<String> filePaths) {
       UiUtil.vibrate(FeedbackType.warning);
       showCupertinoModalPopup(
@@ -824,8 +396,7 @@ class Files extends HookWidget {
           showTrailingSpace: true,
           onConfirm: () async {
             try {
-              final data =
-                  await dsmFileStationDeleteStartForPage(filePaths);
+              final data = await dsmFileStationDeleteStartForPage(filePaths);
               backgroundProcess.value[data['taskid']] = {
                 "timer": null,
                 "data": {
@@ -844,6 +415,7 @@ class Files extends HookWidget {
         ),
       );
     }
+
     compressFile(List<String> file) {
       String zipName = "";
       String destPath = "";
@@ -859,109 +431,110 @@ class Files extends HookWidget {
           return SizedBox(
             width: double.infinity,
             child: Material(
-            color: Colors.transparent,
-            child: Card(
-              shape: RoundedRectangleBorder(
-                  side: const BorderSide(),
-                  borderRadius: BorderRadius.circular(18)),
-              child: SafeArea(
-                top: false,
-                child: Padding(
-                  padding: const EdgeInsets.all(AppConstants.paddingSmall),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: <Widget>[
-                      const Text(
-                        "压缩文件",
-                        style:
-                            TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
-                      ),
-                      const SizedBox(
-                        height: 12,
-                      ),
-                      Text(
-                        "确认要压缩到$zipName？",
-                        style: const TextStyle(
-                            fontSize: 20, fontWeight: FontWeight.w400),
-                      ),
-                      const SizedBox(
-                        height: 22,
-                      ),
-                      OutlinedButton(
-                        onPressed: () async {
-                          Navigator.of(context).pop();
-                          try {
-                            final data =
-                                await dsmFileStationCompressStartForPage(file, destPath);
-                            backgroundProcess.value[data['taskid']] = {
-                              "timer": null,
-                              "data": {
-                                "dest_folder_path": destPath,
-                                "progress": 0,
-                              },
-                              "path": [file],
-                              "type": 'compress',
-                            };
-                            multiSelect.value = false;
-                            selectedFiles.value = [];
-                            getProcessingTaskResult(data['taskid']);
-                          } catch (e) {
-                            UiUtil.toast("压缩失败，代码：${_dsmErrorCode(e)}");
-                          }
-                        },
-                        child: const Text(
-                          "开始压缩",
-                          style: TextStyle(fontSize: 18),
+              color: Colors.transparent,
+              child: Card(
+                shape: RoundedRectangleBorder(
+                    side: const BorderSide(),
+                    borderRadius: BorderRadius.circular(18)),
+                child: SafeArea(
+                  top: false,
+                  child: Padding(
+                    padding: const EdgeInsets.all(AppConstants.paddingSmall),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: <Widget>[
+                        const Text(
+                          "压缩文件",
+                          style: TextStyle(
+                              fontSize: 20, fontWeight: FontWeight.w500),
                         ),
-                      ),
-                      const SizedBox(
-                        height: 16,
-                      ),
-                      OutlinedButton(
-                        onPressed: () async {
-                          // Navigator.of(context).pop();
-                          UiUtil.toast("敬请期待");
-                        },
-                        child: const Text(
-                          "更多选项",
-                          style: TextStyle(fontSize: 18),
+                        const SizedBox(
+                          height: 12,
                         ),
-                      ),
-                      const SizedBox(
-                        height: 16,
-                      ),
-                      OutlinedButton(
-                        onPressed: () async {
-                          Navigator.of(context).pop();
-                        },
-                        child: const Text(
-                          "取消",
-                          style: TextStyle(fontSize: 18),
+                        Text(
+                          "确认要压缩到$zipName？",
+                          style: const TextStyle(
+                              fontSize: 20, fontWeight: FontWeight.w400),
                         ),
-                      ),
-                      const SizedBox(
-                        height: 8,
-                      ),
-                    ],
+                        const SizedBox(
+                          height: 22,
+                        ),
+                        OutlinedButton(
+                          onPressed: () async {
+                            Navigator.of(context).pop();
+                            try {
+                              final data =
+                                  await dsmFileStationCompressStartForPage(
+                                      file, destPath);
+                              backgroundProcess.value[data['taskid']] = {
+                                "timer": null,
+                                "data": {
+                                  "dest_folder_path": destPath,
+                                  "progress": 0,
+                                },
+                                "path": [file],
+                                "type": 'compress',
+                              };
+                              multiSelect.value = false;
+                              selectedFiles.value = [];
+                              getProcessingTaskResult(data['taskid']);
+                            } catch (e) {
+                              UiUtil.toast("压缩失败，代码：${_dsmErrorCode(e)}");
+                            }
+                          },
+                          child: const Text(
+                            "开始压缩",
+                            style: TextStyle(fontSize: 18),
+                          ),
+                        ),
+                        const SizedBox(
+                          height: 16,
+                        ),
+                        OutlinedButton(
+                          onPressed: () async {
+                            // Navigator.of(context).pop();
+                            UiUtil.toast("敬请期待");
+                          },
+                          child: const Text(
+                            "更多选项",
+                            style: TextStyle(fontSize: 18),
+                          ),
+                        ),
+                        const SizedBox(
+                          height: 16,
+                        ),
+                        OutlinedButton(
+                          onPressed: () async {
+                            Navigator.of(context).pop();
+                          },
+                          child: const Text(
+                            "取消",
+                            style: TextStyle(fontSize: 18),
+                          ),
+                        ),
+                        const SizedBox(
+                          height: 8,
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
           );
         },
       );
     }
+
     openFile(file,
-        {FileTypeEnum fileType = FileTypeEnum.other, bool remote = false}) async {
+        {FileTypeEnum fileType = FileTypeEnum.other,
+        bool remote = false}) async {
       if (multiSelect.value) {
-      
         if (selectedFiles.value.contains(file)) {
           selectedFiles.value = List.of(selectedFiles.value)..remove(file);
         } else {
           selectedFiles.value = [...selectedFiles.value, file];
         }
-    
       } else {
         if (file['isdir']) {
           goPath(file['path']);
@@ -1174,6 +747,7 @@ class Files extends HookWidget {
         }
       }
     }
+
     fileAction(file, {bool remote = false}) async {
       UiUtil.vibrate(FeedbackType.light);
       showCupertinoModalPopup(
@@ -1331,7 +905,8 @@ class Files extends HookWidget {
                 iconAsset: "assets/icons/eject.png",
                 onPressed: () async {
                   try {
-                    await dsmFileStationVFSConnectionDeleteForPage(file['path']);
+                    await dsmFileStationVFSConnectionDeleteForPage(
+                        file['path']);
                     UiUtil.toast("远程连接已断开");
                     refresh();
                     getSmbFolder();
@@ -1351,6 +926,7 @@ class Files extends HookWidget {
         ),
       );
     }
+
     Widget buildFileItem(file, {bool remote = false}) {
       FileTypeEnum fileType =
           FileTypeUtil.toFileTypeEnum(FileTypeUtil.getFileType(file['name']));
@@ -1437,7 +1013,8 @@ class Files extends HookWidget {
                               file['name'],
                               style: TextStyle(
                                   fontSize: 14,
-                                  color: file['additional']['mount_point_type'] ==
+                                  color: file['additional']
+                                              ['mount_point_type'] ==
                                           "remotefail"
                                       ? AppTheme.of(context).titleColor
                                       : Theme.brightnessOf(context) ==
@@ -1459,15 +1036,16 @@ class Files extends HookWidget {
                             ),
                             if (!file['isdir'] && file['additional'] != null ||
                                 (file['additional']['time'] != null &&
-                                    file['additional']['time']['mtime'] != null))
+                                    file['additional']['time']['mtime'] !=
+                                        null))
                               Text.rich(
                                 TextSpan(
                                   children: [
                                     if (!file['isdir'])
                                       TextSpan(
-                                          text: (int.parse(
-                                                  file['additional']['size']
-                                                      .toString()))
+                                          text: (int.parse(file['additional']
+                                                      ['size']
+                                                  .toString()))
                                               .formatSize()),
                                     if (file['additional'] != null &&
                                         file['additional']['time'] != null &&
@@ -1484,8 +1062,8 @@ class Files extends HookWidget {
                                   ],
                                   style: TextStyle(
                                       fontSize: 12,
-                                      color:
-                                          AppTheme.of(context).placeholderColor),
+                                      color: AppTheme.of(context)
+                                          .placeholderColor),
                                 ),
                               ),
                             if (remote)
@@ -1493,7 +1071,8 @@ class Files extends HookWidget {
                                 file['path'],
                                 style: TextStyle(
                                     fontSize: 12,
-                                    color: AppTheme.of(context).placeholderColor),
+                                    color:
+                                        AppTheme.of(context).placeholderColor),
                               ),
                           ],
                         ),
@@ -1528,7 +1107,8 @@ class Files extends HookWidget {
                                 file['isdir'] ? FileTypeEnum.folder : fileType,
                                 thumb: file['path'],
                                 width:
-                                    (MediaQuery.sizeOf(context).width - 140) / 3,
+                                    (MediaQuery.sizeOf(context).width - 140) /
+                                        3,
                                 height: 30,
                               ),
                             ),
@@ -1560,6 +1140,7 @@ class Files extends HookWidget {
         ),
       );
     }
+
     Widget buildPathItem(BuildContext context, int index) {
       return Container(
         padding:
@@ -1589,16 +1170,13 @@ class Files extends HookWidget {
         ),
       );
     }
+
     Future<bool> onWillPop() {
       if (multiSelect.value) {
-      
         multiSelect.value = false;
         selectedFiles.value = [];
-    
       } else if (searchResult.value) {
-      
         refresh();
-    
       } else {
         if (paths.value.isNotEmpty) {
           paths.value = List.of(paths.value)..removeLast();
@@ -1619,6 +1197,7 @@ class Files extends HookWidget {
 
       return Future.value(false);
     }
+
     Widget buildProcessList() {
       List<Widget> children = [];
       Map<String, String> types = {
@@ -1695,6 +1274,7 @@ class Files extends HookWidget {
         children: children,
       );
     }
+
     Widget buildTitleAction(BuildContext context) {
       return SizedBox(
         width: MediaQuery.sizeOf(context).width,
@@ -1708,13 +1288,11 @@ class Files extends HookWidget {
               child: OutlinedButton(
                 onPressed: () async {
                   if (multiSelect.value) {
-                  
                     multiSelect.value = false;
                     selectedFiles.value = [];
-                
                   } else {
                     scaffoldKey.currentState?.openDrawer();
-                  
+
                     favoriteLoading.value = true;
                     try {
                       final data = await dsmFileStationFavoriteListForPage();
@@ -1744,111 +1322,113 @@ class Files extends HookWidget {
                       return SizedBox(
                         width: double.infinity,
                         child: Material(
-                        color: Colors.transparent,
-                        child: Card(
-                          shape: RoundedRectangleBorder(
-                              side: const BorderSide(),
-                              borderRadius: BorderRadius.circular(18)),
-                          child: SafeArea(
-                            top: false,
-                            child: Padding(
-                              padding: const EdgeInsets.all(20),
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: <Widget>[
-                                  Stack(
-                                    children: [
-                                      const Align(
-                                        alignment: Alignment.center,
-                                        child: Text(
-                                          "远程文件夹",
-                                          style: TextStyle(
-                                              fontSize: 20,
-                                              fontWeight: FontWeight.w500),
-                                        ),
-                                      ),
-                                      Align(
-                                        alignment: Alignment.centerRight,
-                                        child: SizedBox(
-                                          width: 30,
-                                          height: 30,
-                                          child: OutlinedButton(
-                                            onPressed: () async {
-                                              UiUtil.toast("重新加载远程连接中");
-                                              Navigator.of(context).pop();
-                                              getFtpFolder();
-                                              getSftpFolder();
-                                              getSmbFolder();
-                                              getDavFolder();
-                                            },
-                                            child: const Icon(
-                                              Icons.refresh,
-                                              size: 20,
-                                            ),
+                          color: Colors.transparent,
+                          child: Card(
+                            shape: RoundedRectangleBorder(
+                                side: const BorderSide(),
+                                borderRadius: BorderRadius.circular(18)),
+                            child: SafeArea(
+                              top: false,
+                              child: Padding(
+                                padding: const EdgeInsets.all(20),
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: <Widget>[
+                                    Stack(
+                                      children: [
+                                        const Align(
+                                          alignment: Alignment.center,
+                                          child: Text(
+                                            "远程文件夹",
+                                            style: TextStyle(
+                                                fontSize: 20,
+                                                fontWeight: FontWeight.w500),
                                           ),
                                         ),
-                                      )
-                                    ],
-                                  ),
-                                  const SizedBox(
-                                    height: 20,
-                                  ),
-                                  Container(
-                                    constraints: BoxConstraints(
-                                      minHeight: 50,
-                                      maxHeight:
-                                          MediaQuery.sizeOf(context).height * 0.8,
+                                        Align(
+                                          alignment: Alignment.centerRight,
+                                          child: SizedBox(
+                                            width: 30,
+                                            height: 30,
+                                            child: OutlinedButton(
+                                              onPressed: () async {
+                                                UiUtil.toast("重新加载远程连接中");
+                                                Navigator.of(context).pop();
+                                                getFtpFolder();
+                                                getSftpFolder();
+                                                getSmbFolder();
+                                                getDavFolder();
+                                              },
+                                              child: const Icon(
+                                                Icons.refresh,
+                                                size: 20,
+                                              ),
+                                            ),
+                                          ),
+                                        )
+                                      ],
                                     ),
-                                    child: SingleChildScrollView(
-                                      child: Column(
-                                        children: [
-                                          if ((smbFolders.value +
-                                                  ftpFolders.value +
-                                                  sftpFolders.value +
-                                                  davFolders.value)
-                                              .isNotEmpty) ...[
-                                            ...(smbFolders.value +
+                                    const SizedBox(
+                                      height: 20,
+                                    ),
+                                    Container(
+                                      constraints: BoxConstraints(
+                                        minHeight: 50,
+                                        maxHeight:
+                                            MediaQuery.sizeOf(context).height *
+                                                0.8,
+                                      ),
+                                      child: SingleChildScrollView(
+                                        child: Column(
+                                          children: [
+                                            if ((smbFolders.value +
                                                     ftpFolders.value +
                                                     sftpFolders.value +
                                                     davFolders.value)
-                                                .map((folder) {
-                                              return buildFileItem(folder,
-                                                  remote: true);
-                                            }),
-                                          ] else
-                                            Center(
-                                              child: Text(
-                                                "未挂载远程文件夹",
-                                                style: TextStyle(
-                                                    color: AppTheme.of(context)
-                                                        .placeholderColor),
+                                                .isNotEmpty) ...[
+                                              ...(smbFolders.value +
+                                                      ftpFolders.value +
+                                                      sftpFolders.value +
+                                                      davFolders.value)
+                                                  .map((folder) {
+                                                return buildFileItem(folder,
+                                                    remote: true);
+                                              }),
+                                            ] else
+                                              Center(
+                                                child: Text(
+                                                  "未挂载远程文件夹",
+                                                  style: TextStyle(
+                                                      color: AppTheme.of(
+                                                              context)
+                                                          .placeholderColor),
+                                                ),
                                               ),
-                                            ),
-                                        ],
+                                          ],
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                  const SizedBox(
-                                    height: 16,
-                                  ),
-                                  OutlinedButton(
-                                    onPressed: () async {
-                                      Navigator.of(context).pop();
-                                    },
-                                    child: const Text(
-                                      "取消",
-                                      style: TextStyle(fontSize: 18),
+                                    const SizedBox(
+                                      height: 16,
                                     ),
-                                  ),
-                                  const SizedBox(
-                                    height: 8,
-                                  ),
-                                ],
+                                    OutlinedButton(
+                                      onPressed: () async {
+                                        Navigator.of(context).pop();
+                                      },
+                                      child: const Text(
+                                        "取消",
+                                        style: TextStyle(fontSize: 18),
+                                      ),
+                                    ),
+                                    const SizedBox(
+                                      height: 8,
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
                           ),
                         ),
-                      ),
                       );
                     },
                   );
@@ -1887,9 +1467,7 @@ class Files extends HookWidget {
                 padding: const EdgeInsets.only(left: 10, top: 8, bottom: 8),
                 child: OutlinedButton(
                   onPressed: () async {
-                  
                     showProcessList.value = !showProcessList.value;
-                
                   },
                   child: Image.asset(
                     "assets/icons/bgtask.gif",
@@ -1928,10 +1506,10 @@ class Files extends HookWidget {
               padding: const EdgeInsets.only(right: 10, top: 8, bottom: 8),
               child: OutlinedButton(
                 onPressed: () {
-                
-                  listType.value =
-                      listType.value == ListType.list ? ListType.icon : ListType.list;
-              
+                  listType.value = listType.value == ListType.list
+                      ? ListType.icon
+                      : ListType.list;
+
                   StorageUtil.setString("file_list_type",
                       listType.value == ListType.list ? "list" : "icon");
                 },
@@ -1957,8 +1535,6 @@ class Files extends HookWidget {
                         selectedFiles.value = [...selectedFiles.value, file];
                       }
                     }
-
-                  
                   },
                   child: Image.asset(
                     "assets/icons/select_all.png",
@@ -1975,7 +1551,10 @@ class Files extends HookWidget {
                     showCupertinoModalPopup(
                       context: context,
                       builder: (context) {
-                        return Watch((context) => buildSortMenu(context));
+                        return FileSortMenu(
+                          sortBy: sortBy,
+                          sortDirection: sortDirection,
+                        );
                       },
                     ).then((value) {
                       refresh();
@@ -2038,17 +1617,15 @@ class Files extends HookWidget {
                                   hintText: "请输入文件夹名",
                                   emptyMessage: "请输入文件夹名",
                                   onConfirm: (name) async {
-                                    String path =
-                                        "/${paths.value.join("/")}";
+                                    String path = "/${paths.value.join("/")}";
                                     try {
                                       await dsmFileStationCreateFolderForPage(
                                           path, name);
                                       UiUtil.toast("文件夹创建成功");
                                       refresh();
                                     } catch (e) {
-                                      final raw = e is DSMException
-                                          ? e.rawError
-                                          : null;
+                                      final raw =
+                                          e is DSMException ? e.rawError : null;
                                       final errors = raw?['errors'] as List?;
                                       if (errors != null &&
                                           errors.isNotEmpty &&
@@ -2120,6 +1697,7 @@ class Files extends HookWidget {
         ),
       );
     }
+
     useEffect(() {
       filesOnWillPop.value = onWillPop;
       final subscription = filesDrawerOpen.subscribe((open) {
@@ -2194,11 +1772,10 @@ class Files extends HookWidget {
                   GestureDetector(
                     onTap: () {
                       searchTimer.value?.cancel();
-                      
+
                       searching.value = false;
                       searchResult.value = false;
                       refresh();
-                    
                     },
                     child: Container(
                       margin: const EdgeInsets.only(right: 20),
@@ -2298,8 +1875,9 @@ class Files extends HookWidget {
                                     left: 20,
                                     right: 20,
                                     top: 20,
-                                    bottom:
-                                        selectedFiles.value.isNotEmpty ? 140 : 20),
+                                    bottom: selectedFiles.value.isNotEmpty
+                                        ? 140
+                                        : 20),
                                 itemBuilder: (context, i) {
                                   return buildFileItem(files.value[i]);
                                 },
@@ -2317,8 +1895,9 @@ class Files extends HookWidget {
                                     Wrap(
                                       runSpacing: 20,
                                       spacing: 20,
-                                      children:
-                                          files.value.map(buildFileItem).toList(),
+                                      children: files.value
+                                          .map(buildFileItem)
+                                          .toList(),
                                     )
                                   ],
                                 ),
@@ -2348,18 +1927,22 @@ class Files extends HookWidget {
                               children: [
                                 GestureDetector(
                                   onTap: () {
-                                    showFolderPickerSheet(context).then((folder) async {
+                                    showFolderPickerSheet(context)
+                                        .then((folder) async {
                                       if (folder != null &&
                                           folder.length == 1) {
-                                        List<String> movePaths = selectedFiles.value
+                                        List<String> movePaths = selectedFiles
+                                            .value
                                             .map((e) => e['path'] as String)
                                             .toList();
                                         try {
-                                          final data = await dsmFileStationCopyMoveStartForPage(
-                                              movePaths, folder[0], true);
+                                          final data =
+                                              await dsmFileStationCopyMoveStartForPage(
+                                                  movePaths, folder[0], true);
                                           selectedFiles.value = [];
                                           multiSelect.value = false;
-                                          backgroundProcess.value[data['taskid']] = {
+                                          backgroundProcess
+                                              .value[data['taskid']] = {
                                             "timer": null,
                                             "data": {
                                               "dest_folder_path": folder[0],
@@ -2368,11 +1951,11 @@ class Files extends HookWidget {
                                             "type": "move",
                                             "path": movePaths,
                                           };
-                                          getProcessingTaskResult(data['taskid']);
+                                          getProcessingTaskResult(
+                                              data['taskid']);
                                         } catch (e) {
                                           Log.warn('copy/move failed: $e');
                                         }
-
                                       }
                                     });
                                   },
@@ -2391,18 +1974,22 @@ class Files extends HookWidget {
                                 ),
                                 GestureDetector(
                                   onTap: () {
-                                    showFolderPickerSheet(context).then((folder) async {
+                                    showFolderPickerSheet(context)
+                                        .then((folder) async {
                                       if (folder != null &&
                                           folder.length == 1) {
-                                        List<String> copyPaths = selectedFiles.value
+                                        List<String> copyPaths = selectedFiles
+                                            .value
                                             .map((e) => e['path'] as String)
                                             .toList();
                                         try {
-                                          final data = await dsmFileStationCopyMoveStartForPage(
-                                              copyPaths, folder[0], false);
+                                          final data =
+                                              await dsmFileStationCopyMoveStartForPage(
+                                                  copyPaths, folder[0], false);
                                           selectedFiles.value = [];
                                           multiSelect.value = false;
-                                          backgroundProcess.value[data['taskid']] = {
+                                          backgroundProcess
+                                              .value[data['taskid']] = {
                                             "timer": null,
                                             "data": {
                                               "dest_folder_path": folder[0],
@@ -2411,11 +1998,11 @@ class Files extends HookWidget {
                                             "type": "copy",
                                             "path": copyPaths,
                                           };
-                                          getProcessingTaskResult(data['taskid']);
+                                          getProcessingTaskResult(
+                                              data['taskid']);
                                         } catch (e) {
                                           Log.warn('copy/move failed: $e');
                                         }
-
                                       }
                                     });
                                   },
