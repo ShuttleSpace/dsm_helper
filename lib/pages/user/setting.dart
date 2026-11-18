@@ -3,6 +3,7 @@ import 'package:garden/util/ui_util.dart';
 import 'package:garden/api/dsm_api.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:garden/widgets/settings/settings_text_field.dart';
 import 'package:flutter/material.dart';
 import 'package:garden/constants/app_constants.dart';
 import 'package:garden/theme/app_colors.dart';
@@ -69,41 +70,19 @@ class UserSetting extends HookWidget {
           : ListView(
               padding: const EdgeInsets.all(20),
               children: [
-                Card(
-                  shape: RoundedRectangleBorder(
-                      side: const BorderSide(),
-                      borderRadius: BorderRadius.circular(18)),
-                  child: Padding(
-                    padding: const EdgeInsets.all(AppConstants.paddingSmall),
-                    child: TextField(
-                      controller: usernameController,
-                      onChanged: (v) => changedData['username'] = v,
-                      enabled: false,
-                      decoration: const InputDecoration(
-                        border: InputBorder.none,
-                        labelText: '名称',
-                      ),
-                    ),
-                  ),
+                SettingsTextField(
+                  controller: usernameController,
+                  label: "名称",
+                  onChanged: (v) => changedData['username'] = v,
+                  enabled: false,
                 ),
                 const SizedBox(
                   height: 20,
                 ),
-                Card(
-                  shape: RoundedRectangleBorder(
-                      side: const BorderSide(),
-                      borderRadius: BorderRadius.circular(18)),
-                  child: Padding(
-                    padding: const EdgeInsets.all(AppConstants.paddingSmall),
-                    child: TextField(
-                      controller: fullnameController,
-                      onChanged: (v) => changedData['fullname'] = v,
-                      decoration: const InputDecoration(
-                        border: InputBorder.none,
-                        labelText: '描述',
-                      ),
-                    ),
-                  ),
+                SettingsTextField(
+                  controller: fullnameController,
+                  label: "描述",
+                  onChanged: (v) => changedData['fullname'] = v,
                 ),
                 if (!normalUser.value['disallowchpasswd']) ...[
                   const SizedBox(
@@ -164,21 +143,10 @@ class UserSetting extends HookWidget {
                 const SizedBox(
                   height: 20,
                 ),
-                Card(
-                  shape: RoundedRectangleBorder(
-                      side: const BorderSide(),
-                      borderRadius: BorderRadius.circular(18)),
-                  child: Padding(
-                    padding: const EdgeInsets.all(AppConstants.paddingSmall),
-                    child: TextField(
-                      controller: emailController,
-                      onChanged: (v) => changedData['email'] = v,
-                      decoration: const InputDecoration(
-                        border: InputBorder.none,
-                        labelText: '邮箱',
-                      ),
-                    ),
-                  ),
+                SettingsTextField(
+                  controller: emailController,
+                  label: "邮箱",
+                  onChanged: (v) => changedData['email'] = v,
                 ),
                 const SizedBox(
                   height: 20,

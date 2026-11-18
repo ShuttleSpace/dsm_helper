@@ -8,6 +8,7 @@ import 'package:garden/widgets/settings/settings_toggle_tile.dart';
 import 'package:garden/widgets/bubble_tab_indicator.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:garden/widgets/settings/settings_text_field.dart';
 import 'package:flutter/material.dart';
 import 'package:garden/constants/app_constants.dart';
 import 'package:flutter/services.dart';
@@ -222,24 +223,11 @@ class FileService extends HookWidget {
                                     const SizedBox(
                                       height: 20,
                                     ),
-                                    Card(
-                                      shape: RoundedRectangleBorder(
-                                          side: const BorderSide(),
-                                          borderRadius:
-                                              BorderRadius.circular(5)),
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(
-                                            AppConstants.paddingSmall),
-                                        child: TextField(
-                                          controller: workgroupController,
-                                          onChanged: (v) =>
-                                              smb.value['workgroup'] = v,
-                                          decoration: const InputDecoration(
-                                            border: InputBorder.none,
-                                            labelText: '工作群组',
-                                          ),
-                                        ),
-                                      ),
+                                    SettingsTextField(
+                                      controller: workgroupController,
+                                      label: "工作群组",
+                                      onChanged: (v) =>
+                                          smb.value['workgroup'] = v,
                                     ),
                                     const SizedBox(
                                       height: 20,
@@ -419,24 +407,11 @@ class FileService extends HookWidget {
                                     const SizedBox(
                                       height: 20,
                                     ),
-                                    Card(
-                                      shape: RoundedRectangleBorder(
-                                          side: const BorderSide(),
-                                          borderRadius:
-                                              BorderRadius.circular(5)),
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(
-                                            AppConstants.paddingSmall),
-                                        child: TextField(
-                                          controller: nfsv4Controller,
-                                          onChanged: (v) =>
-                                              nfs.value['nfs_v4_domain'] = v,
-                                          decoration: const InputDecoration(
-                                            border: InputBorder.none,
-                                            labelText: 'NFSv4 域',
-                                          ),
-                                        ),
-                                      ),
+                                    SettingsTextField(
+                                      controller: nfsv4Controller,
+                                      label: "NFSv4 域",
+                                      onChanged: (v) =>
+                                          nfs.value['nfs_v4_domain'] = v,
                                     ),
                                   ],
                                 ],
@@ -495,70 +470,33 @@ class FileService extends HookWidget {
                                     const SizedBox(
                                       height: 20,
                                     ),
-                                    Card(
-                                      shape: RoundedRectangleBorder(
-                                          side: const BorderSide(),
-                                          borderRadius:
-                                              BorderRadius.circular(5)),
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(
-                                            AppConstants.paddingSmall),
-                                        child: TextField(
-                                          controller: timeoutController,
-                                          onChanged: (v) {
-                                            try {
-                                              ftp.value['timeout'] =
-                                                  int.parse(v);
-                                            } catch (e) {
-                                              Log.log(
-                                                  "parse ftp timeout error $e");
-                                            }
-                                          },
-                                          keyboardType: TextInputType.number,
-                                          inputFormatters: [
-                                            FilteringTextInputFormatter
-                                                .digitsOnly,
-                                          ],
-                                          decoration: const InputDecoration(
-                                            border: InputBorder.none,
-                                            labelText: '超时(1-7200秒)',
-                                          ),
-                                        ),
-                                      ),
+                                    SettingsTextField(
+                                      controller: timeoutController,
+                                      label: "超时(1-7200秒)",
+                                      onChanged: (v) {
+                                        try {
+                                          ftp.value['timeout'] = int.parse(v);
+                                        } catch (e) {
+                                          Log.log("parse ftp timeout error $e");
+                                        }
+                                      },
+                                      keyboardType: TextInputType.number,
                                     ),
                                     const SizedBox(
                                       height: 20,
                                     ),
-                                    Card(
-                                      shape: RoundedRectangleBorder(
-                                          side: const BorderSide(),
-                                          borderRadius:
-                                              BorderRadius.circular(5)),
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(
-                                            AppConstants.paddingSmall),
-                                        child: TextField(
-                                          controller: ftpPortController,
-                                          onChanged: (v) {
-                                            try {
-                                              ftp.value['portnum'] =
-                                                  int.parse(v);
-                                            } catch (e) {
-                                              Log.log(
-                                                  "parse ftp portnum error: $e");
-                                            }
-                                          },
-                                          keyboardType: TextInputType.number,
-                                          inputFormatters: [
-                                            FilteringTextInputFormatter
-                                                .digitsOnly,
-                                          ],
-                                          decoration: const InputDecoration(
-                                            border: InputBorder.none,
-                                            labelText: 'FTP 服务所使用的端口号',
-                                          ),
-                                        ),
-                                      ),
+                                    SettingsTextField(
+                                      controller: ftpPortController,
+                                      label: "FTP 服务所使用的端口号",
+                                      onChanged: (v) {
+                                        try {
+                                          ftp.value['portnum'] = int.parse(v);
+                                        } catch (e) {
+                                          Log.log(
+                                              "parse ftp portnum error: $e");
+                                        }
+                                      },
+                                      keyboardType: TextInputType.number,
                                     ),
                                     const SizedBox(
                                       height: 20,
@@ -674,36 +612,17 @@ class FileService extends HookWidget {
                                   const SizedBox(
                                     height: 20,
                                   ),
-                                  Card(
-                                    shape: RoundedRectangleBorder(
-                                        side: const BorderSide(),
-                                        borderRadius:
-                                            BorderRadius.circular(18)),
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(
-                                          AppConstants.paddingSmall),
-                                      child: TextField(
-                                        controller: sftpPortController,
-                                        onChanged: (v) {
-                                          try {
-                                            sftp.value['portnum'] =
-                                                int.parse(v);
-                                          } catch (e) {
-                                            Log.log(
-                                                "parse ftp portnum error: $e");
-                                          }
-                                        },
-                                        keyboardType: TextInputType.number,
-                                        inputFormatters: [
-                                          FilteringTextInputFormatter
-                                              .digitsOnly,
-                                        ],
-                                        decoration: const InputDecoration(
-                                          border: InputBorder.none,
-                                          labelText: '端口号',
-                                        ),
-                                      ),
-                                    ),
+                                  SettingsTextField(
+                                    controller: sftpPortController,
+                                    label: "端口号",
+                                    onChanged: (v) {
+                                      try {
+                                        sftp.value['portnum'] = int.parse(v);
+                                      } catch (e) {
+                                        Log.log("parse ftp portnum error: $e");
+                                      }
+                                    },
+                                    keyboardType: TextInputType.number,
                                   ),
                                 ],
                               ),

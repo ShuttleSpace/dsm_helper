@@ -10,6 +10,7 @@ import 'package:garden/widgets/control_panel/user_group_item.dart';
 import 'package:garden/widgets/label.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:garden/widgets/settings/settings_text_field.dart';
 import 'package:flutter/material.dart';
 import 'package:garden/constants/app_constants.dart';
 import 'package:garden/theme/app_colors.dart';
@@ -197,62 +198,26 @@ class UserDetail extends HookWidget {
                 ListView(
                   padding: const EdgeInsets.all(20),
                   children: [
-                    Card(
-                      shape: RoundedRectangleBorder(
-                          side: const BorderSide(),
-                          borderRadius: BorderRadius.circular(18)),
-                      child: Padding(
-                        padding:
-                            const EdgeInsets.all(AppConstants.paddingSmall),
-                        child: TextField(
-                          controller: nameController,
-                          onChanged: (v) => userInfo.value?['new_name'] = v,
-                          decoration: const InputDecoration(
-                            border: InputBorder.none,
-                            labelText: '名称',
-                          ),
-                        ),
-                      ),
+                    SettingsTextField(
+                      controller: nameController,
+                      label: "名称",
+                      onChanged: (v) => userInfo.value?['new_name'] = v,
                     ),
                     const SizedBox(
                       height: 20,
                     ),
-                    Card(
-                      shape: RoundedRectangleBorder(
-                          side: const BorderSide(),
-                          borderRadius: BorderRadius.circular(18)),
-                      child: Padding(
-                        padding:
-                            const EdgeInsets.all(AppConstants.paddingSmall),
-                        child: TextField(
-                          controller: descriptionController,
-                          onChanged: (v) => userInfo.value?['description'] = v,
-                          decoration: const InputDecoration(
-                            border: InputBorder.none,
-                            labelText: '描述',
-                          ),
-                        ),
-                      ),
+                    SettingsTextField(
+                      controller: descriptionController,
+                      label: "描述",
+                      onChanged: (v) => userInfo.value?['description'] = v,
                     ),
                     const SizedBox(
                       height: 20,
                     ),
-                    Card(
-                      shape: RoundedRectangleBorder(
-                          side: const BorderSide(),
-                          borderRadius: BorderRadius.circular(18)),
-                      child: Padding(
-                        padding:
-                            const EdgeInsets.all(AppConstants.paddingSmall),
-                        child: TextField(
-                          controller: emailController,
-                          onChanged: (v) => userInfo.value?['email'] = v,
-                          decoration: const InputDecoration(
-                            border: InputBorder.none,
-                            labelText: '电子邮件',
-                          ),
-                        ),
-                      ),
+                    SettingsTextField(
+                      controller: emailController,
+                      label: "电子邮件",
+                      onChanged: (v) => userInfo.value?['email'] = v,
                     ),
                     const SizedBox(
                       height: 20,

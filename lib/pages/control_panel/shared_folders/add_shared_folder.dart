@@ -8,6 +8,7 @@ import 'package:garden/extensions/int.dart';
 import 'package:garden/api/dsm_api.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:garden/widgets/settings/settings_text_field.dart';
 import 'package:flutter/material.dart';
 import 'package:garden/constants/app_constants.dart';
 import 'package:flutter/services.dart';
@@ -201,40 +202,18 @@ class AddSharedFolders extends HookWidget {
                   const SizedBox(
                     height: 20,
                   ),
-                  Card(
-                    shape: RoundedRectangleBorder(
-                        side: const BorderSide(),
-                        borderRadius: BorderRadius.circular(18)),
-                    child: Padding(
-                      padding: const EdgeInsets.all(AppConstants.paddingSmall),
-                      child: TextField(
-                        controller: nameController,
-                        onChanged: (v) => name.value = v,
-                        decoration: const InputDecoration(
-                          border: InputBorder.none,
-                          labelText: '名称',
-                        ),
-                      ),
-                    ),
+                  SettingsTextField(
+                    controller: nameController,
+                    label: "名称",
+                    onChanged: (v) => name.value = v,
                   ),
                   const SizedBox(
                     height: 20,
                   ),
-                  Card(
-                    shape: RoundedRectangleBorder(
-                        side: const BorderSide(),
-                        borderRadius: BorderRadius.circular(18)),
-                    child: Padding(
-                      padding: const EdgeInsets.all(AppConstants.paddingSmall),
-                      child: TextField(
-                        controller: descController,
-                        onChanged: (v) => desc.value = v,
-                        decoration: const InputDecoration(
-                          border: InputBorder.none,
-                          labelText: '描述',
-                        ),
-                      ),
-                    ),
+                  SettingsTextField(
+                    controller: descController,
+                    label: "描述",
+                    onChanged: (v) => desc.value = v,
                   ),
                   const SizedBox(
                     height: 20,
@@ -265,22 +244,10 @@ class AddSharedFolders extends HookWidget {
                         ),
                       );
                     },
-                    child: Card(
-                      shape: RoundedRectangleBorder(
-                          side: const BorderSide(),
-                          borderRadius: BorderRadius.circular(18)),
-                      child: Padding(
-                        padding:
-                            const EdgeInsets.all(AppConstants.paddingSmall),
-                        child: TextField(
-                          controller: volumeController,
-                          decoration: const InputDecoration(
-                            enabled: false,
-                            border: InputBorder.none,
-                            labelText: "所在位置",
-                          ),
-                        ),
-                      ),
+                    child: SettingsTextField(
+                      controller: volumeController,
+                      label: "所在位置",
+                      enabled: false,
                     ),
                   ),
                   const SizedBox(
@@ -378,46 +345,22 @@ class AddSharedFolders extends HookWidget {
                     Row(
                       children: [
                         Expanded(
-                          child: Card(
-                            shape: RoundedRectangleBorder(
-                                side: const BorderSide(),
-                                borderRadius: BorderRadius.circular(18)),
-                            child: Padding(
-                              padding: const EdgeInsets.all(
-                                  AppConstants.paddingSmall),
-                              child: TextField(
-                                onChanged: (v) => password.value = v,
-                                obscureText: true,
-                                controller: passwordController,
-                                decoration: const InputDecoration(
-                                  border: InputBorder.none,
-                                  labelText: '加密密钥',
-                                ),
-                              ),
-                            ),
+                          child: SettingsTextField(
+                            controller: passwordController,
+                            label: "加密密钥",
+                            onChanged: (v) => password.value = v,
+                            obscureText: true,
                           ),
                         ),
                         const SizedBox(
                           width: 20,
                         ),
                         Expanded(
-                          child: Card(
-                            shape: RoundedRectangleBorder(
-                                side: const BorderSide(),
-                                borderRadius: BorderRadius.circular(18)),
-                            child: Padding(
-                              padding: const EdgeInsets.all(
-                                  AppConstants.paddingSmall),
-                              child: TextField(
-                                onChanged: (v) => confirmPassword.value = v,
-                                obscureText: true,
-                                controller: confirmPasswordController,
-                                decoration: const InputDecoration(
-                                  border: InputBorder.none,
-                                  labelText: '确认密钥',
-                                ),
-                              ),
-                            ),
+                          child: SettingsTextField(
+                            controller: confirmPasswordController,
+                            label: "确认密钥",
+                            onChanged: (v) => confirmPassword.value = v,
+                            obscureText: true,
                           ),
                         ),
                       ],
@@ -485,25 +428,10 @@ class AddSharedFolders extends HookWidget {
                       children: [
                         Expanded(
                           flex: 2,
-                          child: Card(
-                            shape: RoundedRectangleBorder(
-                                side: const BorderSide(),
-                                borderRadius: BorderRadius.circular(18)),
-                            child: Padding(
-                              padding: const EdgeInsets.all(
-                                  AppConstants.paddingSmall),
-                              child: TextField(
-                                onChanged: (v) => shareQuota.value = v,
-                                inputFormatters: [
-                                  FilteringTextInputFormatter.digitsOnly,
-                                ],
-                                controller: shareQuotaController,
-                                decoration: const InputDecoration(
-                                  border: InputBorder.none,
-                                  labelText: '共享文件夹配额',
-                                ),
-                              ),
-                            ),
+                          child: SettingsTextField(
+                            controller: shareQuotaController,
+                            label: "共享文件夹配额",
+                            onChanged: (v) => shareQuota.value = v,
                           ),
                         ),
                         const SizedBox(
@@ -535,22 +463,10 @@ class AddSharedFolders extends HookWidget {
                                 ),
                               );
                             },
-                            child: Card(
-                              shape: RoundedRectangleBorder(
-                                  side: const BorderSide(),
-                                  borderRadius: BorderRadius.circular(18)),
-                              child: Padding(
-                                padding: const EdgeInsets.all(
-                                    AppConstants.paddingSmall),
-                                child: TextField(
-                                  controller: unitController,
-                                  decoration: const InputDecoration(
-                                    enabled: false,
-                                    border: InputBorder.none,
-                                    labelText: "单位",
-                                  ),
-                                ),
-                              ),
+                            child: SettingsTextField(
+                              controller: unitController,
+                              label: "单位",
+                              enabled: false,
                             ),
                           ),
                         ),

@@ -5,6 +5,7 @@ import 'package:garden/widgets/expansion_container.dart';
 import 'package:garden/widgets/label.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:garden/widgets/settings/settings_text_field.dart';
 import 'package:flutter/material.dart';
 import 'package:garden/constants/app_constants.dart';
 import 'package:garden/theme/app_colors.dart';
@@ -181,29 +182,17 @@ class Network extends HookWidget {
                                   const SizedBox(
                                     height: 20,
                                   ),
-                                  Card(
-                                    shape: RoundedRectangleBorder(
-                                        side: const BorderSide(),
-                                        borderRadius:
-                                            BorderRadius.circular(18)),
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(
-                                          AppConstants.paddingSmall),
-                                      child: TextField(
-                                        controller: serverNameController,
-                                        onChanged: (v) =>
-                                            network.value['server_name'] = v,
-                                        decoration: const InputDecoration(
-                                          border: InputBorder.none,
-                                          labelText: '系统名称',
-                                        ),
-                                      ),
-                                    ),
+                                  SettingsTextField(
+                                    controller: serverNameController,
+                                    label: "系统名称",
+                                    onChanged: (v) =>
+                                        network.value['server_name'] = v,
                                   ),
                                   const SizedBox(
                                     height: 20,
                                   ),
-                                  Text("默认网关(gateway): ${network.value['gateway']}"),
+                                  Text(
+                                      "默认网关(gateway): ${network.value['gateway']}"),
                                   const SizedBox(
                                     height: 5,
                                   ),
@@ -245,48 +234,22 @@ class Network extends HookWidget {
                                   const SizedBox(
                                     height: 20,
                                   ),
-                                  Card(
-                                    shape: RoundedRectangleBorder(
-                                        side: const BorderSide(),
-                                        borderRadius:
-                                            BorderRadius.circular(18)),
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(
-                                          AppConstants.paddingSmall),
-                                      child: TextField(
-                                        controller: dnsPrimaryController,
-                                        enabled: network.value['dns_manual'],
-                                        onChanged: (v) =>
-                                            network.value['dns_primary'] = v,
-                                        decoration: const InputDecoration(
-                                          border: InputBorder.none,
-                                          labelText: '首选DNS服务器',
-                                        ),
-                                      ),
-                                    ),
+                                  SettingsTextField(
+                                    controller: dnsPrimaryController,
+                                    label: "首选DNS服务器",
+                                    onChanged: (v) =>
+                                        network.value['dns_primary'] = v,
+                                    enabled: network.value['dns_manual'],
                                   ),
                                   const SizedBox(
                                     height: 20,
                                   ),
-                                  Card(
-                                    shape: RoundedRectangleBorder(
-                                        side: const BorderSide(),
-                                        borderRadius:
-                                            BorderRadius.circular(18)),
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(
-                                          AppConstants.paddingSmall),
-                                      child: TextField(
-                                        controller: dnsSecondaryController,
-                                        enabled: network.value['dns_manual'],
-                                        onChanged: (v) =>
-                                            network.value['dns_secondary'] = v,
-                                        decoration: const InputDecoration(
-                                          border: InputBorder.none,
-                                          labelText: '备用DNS服务器',
-                                        ),
-                                      ),
-                                    ),
+                                  SettingsTextField(
+                                    controller: dnsSecondaryController,
+                                    label: "备用DNS服务器",
+                                    onChanged: (v) =>
+                                        network.value['dns_secondary'] = v,
+                                    enabled: network.value['dns_manual'],
                                   ),
                                 ],
                               ),
@@ -319,7 +282,8 @@ class Network extends HookWidget {
                                   GestureDetector(
                                     onTap: () {
                                       FocusScope.of(context).unfocus();
-                                      proxy.value['enable'] = !proxy.value['enable'];
+                                      proxy.value['enable'] =
+                                          !proxy.value['enable'];
                                       proxy.notifyListeners();
                                     },
                                     child: Card(
@@ -348,48 +312,22 @@ class Network extends HookWidget {
                                   const SizedBox(
                                     height: 20,
                                   ),
-                                  Card(
-                                    shape: RoundedRectangleBorder(
-                                        side: const BorderSide(),
-                                        borderRadius:
-                                            BorderRadius.circular(18)),
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(
-                                          AppConstants.paddingSmall),
-                                      child: TextField(
-                                        controller: proxyHttpHostController,
-                                        enabled: proxy.value['enable'],
-                                        onChanged: (v) =>
-                                            proxy.value['http_host'] = v,
-                                        decoration: const InputDecoration(
-                                          border: InputBorder.none,
-                                          labelText: '地址',
-                                        ),
-                                      ),
-                                    ),
+                                  SettingsTextField(
+                                    controller: proxyHttpHostController,
+                                    label: "地址",
+                                    onChanged: (v) =>
+                                        proxy.value['http_host'] = v,
+                                    enabled: proxy.value['enable'],
                                   ),
                                   const SizedBox(
                                     height: 20,
                                   ),
-                                  Card(
-                                    shape: RoundedRectangleBorder(
-                                        side: const BorderSide(),
-                                        borderRadius:
-                                            BorderRadius.circular(18)),
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(
-                                          AppConstants.paddingSmall),
-                                      child: TextField(
-                                        controller: proxyHttpPortController,
-                                        enabled: proxy.value['enable'],
-                                        onChanged: (v) =>
-                                            proxy.value['http_port'] = v,
-                                        decoration: const InputDecoration(
-                                          border: InputBorder.none,
-                                          labelText: '端口',
-                                        ),
-                                      ),
-                                    ),
+                                  SettingsTextField(
+                                    controller: proxyHttpPortController,
+                                    label: "端口",
+                                    onChanged: (v) =>
+                                        proxy.value['http_port'] = v,
+                                    enabled: proxy.value['enable'],
                                   ),
                                 ],
                               ),
