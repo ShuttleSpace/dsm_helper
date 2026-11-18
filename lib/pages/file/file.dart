@@ -2,8 +2,6 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:garden/api/dsm_api.dart';
 import 'package:garden/api/dsm_api.filestation.transfer_url.dart';
-import 'package:garden/extensions/datetime.dart';
-import 'package:garden/extensions/int.dart';
 import 'package:garden/extensions/string.dart';
 import 'package:garden/services/office_preview.dart';
 import 'package:garden/stores/settings_store.dart';
@@ -35,12 +33,11 @@ import 'package:garden/widgets/bottom_action_sheet.dart';
 import 'package:garden/widgets/bottom_confirm_sheet.dart';
 import 'package:garden/hooks/use_file_download.dart';
 import 'package:garden/hooks/use_file_click.dart';
+import 'package:garden/widgets/file/file_list_item.dart';
 import 'package:garden/widgets/file/sort_menu.dart';
-import 'package:garden/widgets/file_icon.dart';
 import 'package:garden/widgets/folder_picker_sheet.dart';
 import 'package:garden/widgets/name_input_dialog.dart';
 import 'package:garden/widgets/transparent_router.dart';
-import 'package:extended_text/extended_text.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:garden/constants/app_constants.dart';
@@ -927,220 +924,6 @@ class Files extends HookWidget {
       );
     }
 
-    Widget buildFileItem(file, {bool remote = false}) {
-      FileTypeEnum fileType =
-          FileTypeUtil.toFileTypeEnum(FileTypeUtil.getFileType(file['name']));
-      String path = file['path'];
-      Widget actionButton = multiSelect.value
-          ? Card(
-              shape: RoundedRectangleBorder(
-                  side: const BorderSide(),
-                  borderRadius: BorderRadius.circular(18)),
-              child: SizedBox(
-                width: 20,
-                height: 20,
-                child: selectedFiles.value.contains(file)
-                    ? Icon(
-                        CupertinoIcons.checkmark_alt,
-                        color: Theme.of(context).colorScheme.primary,
-                      )
-                    : null,
-              ),
-            )
-          : GestureDetector(
-              onTap: () {
-                fileAction(file, remote: remote);
-              },
-              child: Card(
-                shape: RoundedRectangleBorder(
-                    side: const BorderSide(),
-                    borderRadius: BorderRadius.circular(18)),
-                // padding: EdgeInsets.zero,
-                child: const Padding(
-                  padding: EdgeInsets.all(2.0),
-                  child: Icon(
-                    CupertinoIcons.right_chevron,
-                    size: 14,
-                  ),
-                ),
-              ),
-            );
-      return Container(
-        constraints: listType.value == ListType.icon && !remote
-            ? const BoxConstraints(maxWidth: 112)
-            : null,
-        width: listType.value == ListType.icon && !remote
-            ? (MediaQuery.sizeOf(context).width - 80) / 3
-            : double.infinity,
-        padding: listType.value == ListType.icon && !remote
-            ? EdgeInsets.zero
-            : const EdgeInsets.only(bottom: 20.0),
-        child: OutlinedButton(
-          onLongPress: () {
-            UiUtil.vibrate(FeedbackType.light);
-            fileAction(file, remote: remote);
-          },
-          onPressed: () {
-            openFile(file, fileType: fileType, remote: remote);
-          },
-          child: listType.value == ListType.list || remote
-              ? Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 5),
-                  child: Row(
-                    children: [
-                      const SizedBox(
-                        width: 10,
-                      ),
-                      Hero(
-                        tag: thumbUrl(
-                          baseUri: connectionStore.baseUri.value,
-                          path: path,
-                          sid: connectionStore.sid.value,
-                        ),
-                        child: FileIcon(
-                          file['isdir'] ? FileTypeEnum.folder : fileType,
-                          thumb: file['path'],
-                        ),
-                      ),
-                      const SizedBox(
-                        width: 10,
-                      ),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            ExtendedText(
-                              file['name'],
-                              style: TextStyle(
-                                  fontSize: 14,
-                                  color: file['additional']
-                                              ['mount_point_type'] ==
-                                          "remotefail"
-                                      ? AppTheme.of(context).titleColor
-                                      : Theme.brightnessOf(context) ==
-                                              Brightness.dark
-                                          ? Colors.white
-                                          : Colors.black),
-                              overflowWidget: const TextOverflowWidget(
-                                position: TextOverflowPosition.middle,
-                                align: TextOverflowAlign.right,
-                                child: Text(
-                                  "…",
-                                  style: TextStyle(color: Colors.grey),
-                                ),
-                              ),
-                              maxLines: 2,
-                            ),
-                            const SizedBox(
-                              height: 5,
-                            ),
-                            if (!file['isdir'] && file['additional'] != null ||
-                                (file['additional']['time'] != null &&
-                                    file['additional']['time']['mtime'] !=
-                                        null))
-                              Text.rich(
-                                TextSpan(
-                                  children: [
-                                    if (!file['isdir'])
-                                      TextSpan(
-                                          text: (int.parse(file['additional']
-                                                      ['size']
-                                                  .toString()))
-                                              .formatSize()),
-                                    if (file['additional'] != null &&
-                                        file['additional']['time'] != null &&
-                                        file['additional']['time']['mtime'] !=
-                                            null)
-                                      TextSpan(
-                                        text: (file['isdir'] ? "" : " | ") +
-                                            DateTime.fromMillisecondsSinceEpoch(
-                                                    file['additional']['time']
-                                                            ['mtime'] *
-                                                        1000)
-                                                .format("Y/m/d H:i:s"),
-                                      )
-                                  ],
-                                  style: TextStyle(
-                                      fontSize: 12,
-                                      color: AppTheme.of(context)
-                                          .placeholderColor),
-                                ),
-                              ),
-                            if (remote)
-                              Text(
-                                file['path'],
-                                style: TextStyle(
-                                    fontSize: 12,
-                                    color:
-                                        AppTheme.of(context).placeholderColor),
-                              ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(
-                        width: 10,
-                      ),
-                      actionButton,
-                      const SizedBox(
-                        width: 10,
-                      ),
-                    ],
-                  ),
-                )
-              : Stack(
-                  children: [
-                    Align(
-                      alignment: Alignment.center,
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          vertical: 5,
-                        ),
-                        child: Column(
-                          children: [
-                            Hero(
-                              tag: thumbUrl(
-                                baseUri: connectionStore.baseUri.value,
-                                path: path,
-                                sid: connectionStore.sid.value,
-                              ),
-                              child: FileIcon(
-                                file['isdir'] ? FileTypeEnum.folder : fileType,
-                                thumb: file['path'],
-                                width:
-                                    (MediaQuery.sizeOf(context).width - 140) /
-                                        3,
-                                height: 30,
-                              ),
-                            ),
-                            const SizedBox(
-                              height: 10,
-                            ),
-                            Text(
-                              file['name'],
-                              maxLines: 1,
-                              textAlign: TextAlign.center,
-                              style: const TextStyle(
-                                fontSize: 12,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    if (multiSelect.value)
-                      Align(
-                        alignment: Alignment.topRight,
-                        child: Padding(
-                          padding: const EdgeInsets.all(10.0),
-                          child: actionButton,
-                        ),
-                      ),
-                  ],
-                ),
-        ),
-      );
-    }
-
     Widget buildPathItem(BuildContext context, int index) {
       return Container(
         padding:
@@ -1391,8 +1174,24 @@ class Files extends HookWidget {
                                                       sftpFolders.value +
                                                       davFolders.value)
                                                   .map((folder) {
-                                                return buildFileItem(folder,
-                                                    remote: true);
+                                                return FileListItem(
+                                                  file: folder,
+                                                  remote: true,
+                                                  iconMode: false,
+                                                  multiSelect: false,
+                                                  selected: false,
+                                                  onAction: () => fileAction(
+                                                      folder,
+                                                      remote: true),
+                                                  onTap: () => openFile(folder,
+                                                      fileType: FileTypeUtil
+                                                          .toFileTypeEnum(
+                                                              FileTypeUtil
+                                                                  .getFileType(
+                                                                      folder[
+                                                                          'name'])),
+                                                      remote: true),
+                                                );
                                               }),
                                             ] else
                                               Center(
@@ -1879,7 +1678,20 @@ class Files extends HookWidget {
                                         ? 140
                                         : 20),
                                 itemBuilder: (context, i) {
-                                  return buildFileItem(files.value[i]);
+                                  final file = files.value[i];
+                                  return FileListItem(
+                                    file: file,
+                                    remote: false,
+                                    iconMode: listType.value == ListType.icon,
+                                    multiSelect: multiSelect.value,
+                                    selected:
+                                        selectedFiles.value.contains(file),
+                                    onAction: () => fileAction(file),
+                                    onTap: () => openFile(file,
+                                        fileType: FileTypeUtil.toFileTypeEnum(
+                                            FileTypeUtil.getFileType(
+                                                file['name']))),
+                                  );
                                 },
                                 itemCount: files.value.length,
                               ),
@@ -1895,9 +1707,23 @@ class Files extends HookWidget {
                                     Wrap(
                                       runSpacing: 20,
                                       spacing: 20,
-                                      children: files.value
-                                          .map(buildFileItem)
-                                          .toList(),
+                                      children: files.value.map((file) {
+                                        return FileListItem(
+                                          file: file,
+                                          remote: false,
+                                          iconMode:
+                                              listType.value == ListType.icon,
+                                          multiSelect: multiSelect.value,
+                                          selected: selectedFiles.value
+                                              .contains(file),
+                                          onAction: () => fileAction(file),
+                                          onTap: () => openFile(file,
+                                              fileType:
+                                                  FileTypeUtil.toFileTypeEnum(
+                                                      FileTypeUtil.getFileType(
+                                                          file['name']))),
+                                        );
+                                      }).toList(),
                                     )
                                   ],
                                 ),
