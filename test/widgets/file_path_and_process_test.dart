@@ -18,7 +18,7 @@ void main() {
 
   testWidgets('FileProcessList shows task description and progress',
       (tester) async {
-    await tester.pumpWidget(MaterialApp(
+    await tester.pumpWidget(const MaterialApp(
       home: Scaffold(
         body: FileProcessList({
           'task-1': {
