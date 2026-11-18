@@ -4,7 +4,7 @@ import 'package:garden/widgets/download_station/detail_info_row.dart';
 
 void main() {
   testWidgets('DetailInfoRow renders label and value', (tester) async {
-    await tester.pumpWidget(const MaterialApp(
+    await tester.pumpWidget(MaterialApp(
       home: Scaffold(
         body: DetailInfoRow.text(label: '文件名：', text: 'test.zip'),
       ),
