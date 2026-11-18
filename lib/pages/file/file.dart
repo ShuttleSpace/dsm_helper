@@ -28,12 +28,13 @@ import 'package:garden/pages/file/share_manager.dart';
 import 'package:garden/pages/file/upload.dart';
 import 'package:garden/theme/app_theme.dart';
 import 'package:garden/util/file_types.dart';
-import 'package:garden/widgets/animation_progress_bar.dart';
 import 'package:garden/widgets/bottom_action_sheet.dart';
 import 'package:garden/widgets/bottom_confirm_sheet.dart';
 import 'package:garden/hooks/use_file_download.dart';
 import 'package:garden/hooks/use_file_click.dart';
 import 'package:garden/widgets/file/file_list_item.dart';
+import 'package:garden/widgets/file/path_item.dart';
+import 'package:garden/widgets/file/process_list.dart';
 import 'package:garden/widgets/file/remote_folder_sheet.dart';
 import 'package:garden/widgets/file/sort_menu.dart';
 import 'package:garden/widgets/folder_picker_sheet.dart';
@@ -925,36 +926,6 @@ class Files extends HookWidget {
       );
     }
 
-    Widget buildPathItem(BuildContext context, int index) {
-      return Container(
-        padding:
-            const EdgeInsets.symmetric(vertical: AppConstants.paddingSmall + 2),
-        child: OutlinedButton(
-          onPressed: () {
-            String path = "";
-            List<String> items = [];
-            if (paths.value.length > 1 && paths.value[0].contains("//")) {
-              Log.info("远程");
-              items = paths.value.getRange(0, index + 1).toList().cast();
-              path = items.join("/");
-              goPath(path);
-            } else {
-              Log.info("本地");
-              items = paths.value.getRange(0, index + 1).toList().cast();
-              path = "/${items.join("/")}";
-            }
-            goPath(path);
-          },
-          child: Text(
-            paths.value[index],
-            style: TextStyle(
-                fontSize: 12,
-                color: Theme.of(context).textTheme.headlineMedium?.color),
-          ),
-        ),
-      );
-    }
-
     Future<bool> onWillPop() {
       if (multiSelect.value) {
         multiSelect.value = false;
@@ -980,83 +951,6 @@ class Files extends HookWidget {
       }
 
       return Future.value(false);
-    }
-
-    Widget buildProcessList() {
-      List<Widget> children = [];
-      Map<String, String> types = {
-        "copy": "复制：",
-        "move": "移动：",
-        "delete": "删除：",
-        "extract": "解压：",
-        "compress": "压缩：",
-      };
-      backgroundProcess.value.forEach((key, task) {
-        var value = task['data'];
-        children.add(
-          Card(
-            shape: RoundedRectangleBorder(
-                side: const BorderSide(),
-                borderRadius: BorderRadius.circular(18)),
-            margin: const EdgeInsets.only(left: 20, right: 20, bottom: 20),
-            child: Padding(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text.rich(
-                    TextSpan(
-                      children: [
-                        TextSpan(
-                          text: types["${task['type'] ?? ''}"],
-                        ),
-                        TextSpan(
-                          text: task['path']
-                              .map((e) => e.split("/").last)
-                              .join(","),
-                          style: TextStyle(
-                              color: AppTheme.of(context).placeholderColor),
-                        ),
-                        if (['copy', 'move', 'achieve', 'compress']
-                                .contains(task['type']) &&
-                            value != null) ...[
-                          const TextSpan(
-                            text: " 至 ",
-                          ),
-                          TextSpan(
-                            text: value['dest_folder_path'] ?? '',
-                            style: TextStyle(
-                                color: AppTheme.of(context).placeholderColor),
-                          ),
-                        ],
-                      ],
-                    ),
-                    style: const TextStyle(fontSize: 14, color: Colors.grey),
-                  ),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  if (value != null)
-                    FAProgressBar(
-                      backgroundColor: Colors.transparent,
-                      changeColorValue: 100,
-                      changeProgressColor: Colors.green,
-                      progressColor: Colors.blue,
-                      size: 20,
-                      currentValue:
-                          (num.parse("${value['progress']}") * 100).toInt(),
-                      displayText: '%',
-                    ),
-                ],
-              ),
-            ),
-          ),
-        );
-      });
-      return Column(
-        mainAxisSize: MainAxisSize.min,
-        children: children,
-      );
     }
 
     Widget buildTitleAction(BuildContext context) {
@@ -1530,7 +1424,34 @@ class Files extends HookWidget {
                   Expanded(
                     child: ListView.separated(
                       controller: pathScrollController,
-                      itemBuilder: buildPathItem,
+                      itemBuilder: (context, index) {
+                        final label = paths.value[index];
+                        return FilePathItem(
+                          label: label,
+                          onTap: () {
+                            String path = "";
+                            List<String> items = [];
+                            if (paths.value.length > 1 &&
+                                paths.value[0].contains("//")) {
+                              Log.info("远程");
+                              items = paths.value
+                                  .getRange(0, index + 1)
+                                  .toList()
+                                  .cast();
+                              path = items.join("/");
+                              goPath(path);
+                            } else {
+                              Log.info("本地");
+                              items = paths.value
+                                  .getRange(0, index + 1)
+                                  .toList()
+                                  .cast();
+                              path = "/${items.join("/")}";
+                            }
+                            goPath(path);
+                          },
+                        );
+                      },
                       itemCount: paths.value.length,
                       scrollDirection: Axis.horizontal,
                       separatorBuilder: (context, i) {
@@ -1548,7 +1469,7 @@ class Files extends HookWidget {
               ),
             ),
           if (backgroundProcess.value.isNotEmpty && showProcessList.value)
-            buildProcessList(),
+            FileProcessList(backgroundProcess.value),
           Expanded(
             child: success.value
                 ? Stack(
