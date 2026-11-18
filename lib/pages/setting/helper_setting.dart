@@ -16,6 +16,7 @@ import 'package:garden/util/storage_util.dart';
 import 'package:garden/util/ui_util.dart';
 import 'package:garden/widgets/bottom_confirm_sheet.dart';
 import 'package:garden/widgets/neu_back_button.dart';
+import 'package:garden/widgets/settings/settings_action_card.dart';
 import 'package:garden/widgets/neu_picker.dart';
 import 'package:garden/widgets/status_checkbox.dart';
 import 'package:local_auth/error_codes.dart' as auth_error;
@@ -175,79 +176,44 @@ class HelperSetting extends HookWidget {
       body: ListView(
         padding: const EdgeInsets.all(20),
         children: [
-          Card(
-            shape: RoundedRectangleBorder(
-                side: const BorderSide(),
-                borderRadius: BorderRadius.circular(18)),
-            child: Padding(
-              padding: const EdgeInsets.all(20),
-              child: Row(
-                children: [
-                  const Text("关机", style: TextStyle(fontSize: 16)),
-                  const Spacer(),
-                  OutlinedButton(
-                    onPressed: () => showPowerConfirm("shutdown"),
-                    child: shutdowning.value
-                        ? const CupertinoActivityIndicator(radius: 10)
-                        : const Text("关机",
-                            style: TextStyle(color: Colors.redAccent)),
-                  ),
-                ],
-              ),
+          SettingsActionCard(
+            label: "关机",
+            trailing: OutlinedButton(
+              onPressed: () => showPowerConfirm("shutdown"),
+              child: shutdowning.value
+                  ? const CupertinoActivityIndicator(radius: 10)
+                  : const Text("关机", style: TextStyle(color: Colors.redAccent)),
             ),
           ),
           const SizedBox(height: 20),
-          Card(
-            shape: RoundedRectangleBorder(
-                side: const BorderSide(),
-                borderRadius: BorderRadius.circular(18)),
-            child: Padding(
-              padding: const EdgeInsets.all(20),
-              child: Row(
-                children: [
-                  const Text("重启", style: TextStyle(fontSize: 16)),
-                  const Spacer(),
-                  OutlinedButton(
-                    onPressed: () => showPowerConfirm("reboot"),
-                    child: rebooting.value
-                        ? const CupertinoActivityIndicator(radius: 10)
-                        : const Text("重启",
-                            style: TextStyle(color: Colors.redAccent)),
-                  ),
-                ],
-              ),
+          SettingsActionCard(
+            label: "重启",
+            trailing: OutlinedButton(
+              onPressed: () => showPowerConfirm("reboot"),
+              child: rebooting.value
+                  ? const CupertinoActivityIndicator(radius: 10)
+                  : const Text("重启", style: TextStyle(color: Colors.redAccent)),
             ),
           ),
           const SizedBox(height: 20),
-          Card(
-            shape: RoundedRectangleBorder(
-                side: const BorderSide(),
-                borderRadius: BorderRadius.circular(18)),
-            child: Padding(
-              padding: const EdgeInsets.all(20),
-              child: Row(
-                children: [
-                  const Text("SSH", style: TextStyle(fontSize: 16)),
-                  const Spacer(),
-                  sshLoading.value
-                      ? const CupertinoActivityIndicator(radius: 12)
-                      : CupertinoSwitch(
-                          value: ssh.value,
-                          onChanged: (v) async {
-                            sshLoading.value = true;
-                            try {
-                              await dsmCoreTerminalSetForPage(
-                                  v, telnet.value, sshPort.value);
-                            } catch (e) {
-                              final code = e is DSMException ? e.code : -1;
-                              UiUtil.toast("操作失败，代码：$code");
-                            }
-                            await getData();
-                          },
-                        ),
-                ],
-              ),
-            ),
+          SettingsActionCard(
+            label: "SSH",
+            trailing: sshLoading.value
+                ? const CupertinoActivityIndicator(radius: 12)
+                : CupertinoSwitch(
+                    value: ssh.value,
+                    onChanged: (v) async {
+                      sshLoading.value = true;
+                      try {
+                        await dsmCoreTerminalSetForPage(
+                            v, telnet.value, sshPort.value);
+                      } catch (e) {
+                        final code = e is DSMException ? e.code : -1;
+                        UiUtil.toast("操作失败，代码：$code");
+                      }
+                      await getData();
+                    },
+                  ),
           ),
           const SizedBox(height: 20),
           GestureDetector(

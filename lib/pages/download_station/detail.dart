@@ -3,6 +3,7 @@ import 'package:garden/extensions/datetime.dart';
 import 'package:garden/extensions/int.dart';
 import 'package:garden/util/ui_util.dart';
 import 'package:garden/widgets/bubble_tab_indicator.dart';
+import 'package:garden/widgets/download_station/detail_info_row.dart';
 import 'package:garden/widgets/download_station/download_file_item.dart';
 import 'package:garden/widgets/download_station/download_peer_item.dart';
 import 'package:garden/widgets/download_station/download_tracker_item.dart';
@@ -236,194 +237,90 @@ class DownloadDetail extends HookWidget {
                     children: [
                       ListView(
                         children: [
-                          Card(
-                            shape: RoundedRectangleBorder(
-                                side: const BorderSide(),
-                                borderRadius: BorderRadius.circular(18)),
-                            margin: const EdgeInsets.symmetric(
-                                horizontal: 20, vertical: 10),
-                            child: Padding(
-                              padding: const EdgeInsets.all(
-                                  AppConstants.paddingSmall),
-                              child: Row(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  const Text("文件名："),
-                                  Expanded(
-                                    child: Text(task.value['title']),
-                                  ),
-                                ],
-                              ),
-                            ),
+                          DetailInfoRow(
+                            label: "文件名：",
+                            value: Text(task.value['title']),
+                            startAlign: true,
                           ),
-                          Card(
-                            shape: RoundedRectangleBorder(
-                                side: const BorderSide(),
-                                borderRadius: BorderRadius.circular(18)),
-                            margin: const EdgeInsets.symmetric(
-                                horizontal: 20, vertical: 10),
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 20, vertical: 15),
-                              child: Row(
-                                children: [
-                                  const Text("保存位置："),
-                                  Expanded(
-                                    child: Text(
-                                      task.value['additional']['detail']
-                                          ['destination'],
+                          DetailInfoRow(
+                            label: "保存位置：",
+                            value: Text(task.value['additional']['detail']
+                                ['destination']),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 20, vertical: 15),
+                          ),
+                          DetailInfoRow(
+                            label: "文件大小：",
+                            value: Text(task.value['size'] > 0
+                                ? task.value['size'].formatSize()
+                                : "未取得"),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 20, vertical: 15),
+                          ),
+                          DetailInfoRow.text(
+                            label: "用户名：",
+                            text: "${task.value['username']}",
+                          ),
+                          DetailInfoRow(
+                            label: "网址：",
+                            startAlign: true,
+                            value: Row(
+                              children: [
+                                Expanded(
+                                  child: Text(
+                                    "${task.value['additional']['detail']['uri']}",
+                                  ),
+                                ),
+                                OutlinedButton(
+                                  onPressed: () {
+                                    Clipboard.setData(ClipboardData(
+                                      text: task.value['additional']['detail']
+                                          ['uri'],
+                                    ));
+                                    UiUtil.toast("已复制到剪贴板");
+                                  },
+                                  child: const SizedBox(
+                                    width: 20,
+                                    height: 20,
+                                    child: Icon(
+                                      Icons.copy,
+                                      color: AppColors.primaryAction,
+                                      size: 16,
                                     ),
                                   ),
-                                ],
-                              ),
+                                ),
+                              ],
                             ),
                           ),
-                          Card(
-                            shape: RoundedRectangleBorder(
-                                side: const BorderSide(),
-                                borderRadius: BorderRadius.circular(18)),
-                            margin: const EdgeInsets.symmetric(
-                                horizontal: 20, vertical: 10),
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 20, vertical: 15),
-                              child: Row(
-                                children: [
-                                  const Text("文件大小："),
-                                  Expanded(
-                                    child: Text(
-                                      task.value['size'] > 0
-                                          ? task.value['size'].formatSize()
-                                          : "未取得",
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
+                          DetailInfoRow.text(
+                            label: "创建时间：",
+                            text: DateTime.fromMillisecondsSinceEpoch(
+                                    task.value['additional']['detail']
+                                            ['created_time'] *
+                                        1000)
+                                .format("Y-m-d H:i:s"),
                           ),
-                          Card(
-                            shape: RoundedRectangleBorder(
-                                side: const BorderSide(),
-                                borderRadius: BorderRadius.circular(18)),
-                            margin: const EdgeInsets.symmetric(
-                                horizontal: 20, vertical: 10),
-                            child: Padding(
-                              padding: const EdgeInsets.all(
-                                  AppConstants.paddingSmall),
-                              child: Row(
-                                children: [
-                                  const Text("用户名："),
-                                  Text("${task.value['username']}"),
-                                ],
-                              ),
-                            ),
+                          DetailInfoRow.text(
+                            label: "完成时间：",
+                            text: task.value['additional']['detail']
+                                        ['completed_time'] >
+                                    0
+                                ? DateTime.fromMillisecondsSinceEpoch(
+                                        task.value['additional']['detail']
+                                                ['completed_time'] *
+                                            1000)
+                                    .format("Y-m-d H:i:s")
+                                : "无法取得",
                           ),
-                          Card(
-                            shape: RoundedRectangleBorder(
-                                side: const BorderSide(),
-                                borderRadius: BorderRadius.circular(18)),
-                            margin: const EdgeInsets.symmetric(
-                                horizontal: 20, vertical: 10),
-                            child: Padding(
-                              padding: const EdgeInsets.all(
-                                  AppConstants.paddingSmall),
-                              child: Row(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  const Text("网址："),
-                                  Expanded(
-                                      child: Text(
-                                          "${task.value['additional']['detail']['uri']}")),
-                                  OutlinedButton(
-                                    onPressed: () async {
-                                      ClipboardData data = ClipboardData(
-                                          text: task.value['additional']
-                                              ['detail']['uri']);
-                                      Clipboard.setData(data);
-                                      UiUtil.toast("已复制到剪贴板");
-                                    },
-                                    child: const SizedBox(
-                                      width: 20,
-                                      height: 20,
-                                      child: Icon(
-                                        Icons.copy,
-                                        color: AppColors.primaryAction,
-                                        size: 16,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                          Card(
-                            shape: RoundedRectangleBorder(
-                                side: const BorderSide(),
-                                borderRadius: BorderRadius.circular(18)),
-                            margin: const EdgeInsets.symmetric(
-                                horizontal: 20, vertical: 10),
-                            child: Padding(
-                              padding: const EdgeInsets.all(
-                                  AppConstants.paddingSmall),
-                              child: Row(
-                                children: [
-                                  const Text("创建时间："),
-                                  Text(DateTime.fromMillisecondsSinceEpoch(
-                                          task.value['additional']['detail']
-                                                  ['created_time'] *
-                                              1000)
-                                      .format("Y-m-d H:i:s")),
-                                ],
-                              ),
-                            ),
-                          ),
-                          Card(
-                            shape: RoundedRectangleBorder(
-                                side: const BorderSide(),
-                                borderRadius: BorderRadius.circular(18)),
-                            margin: const EdgeInsets.symmetric(
-                                horizontal: 20, vertical: 10),
-                            child: Padding(
-                              padding: const EdgeInsets.all(
-                                  AppConstants.paddingSmall),
-                              child: Row(
-                                children: [
-                                  const Text("完成时间："),
-                                  Text(task.value['additional']['detail']
-                                              ['completed_time'] >
-                                          0
-                                      ? DateTime.fromMillisecondsSinceEpoch(
-                                              task.value['additional']['detail']
-                                                      ['completed_time'] *
-                                                  1000)
-                                          .format("Y-m-d H:i:s")
-                                      : "无法取得"),
-                                ],
-                              ),
-                            ),
-                          ),
-                          Card(
-                            shape: RoundedRectangleBorder(
-                                side: const BorderSide(),
-                                borderRadius: BorderRadius.circular(18)),
-                            margin: const EdgeInsets.symmetric(
-                                horizontal: 20, vertical: 10),
-                            child: Padding(
-                              padding: const EdgeInsets.all(
-                                  AppConstants.paddingSmall),
-                              child: Row(
-                                children: [
-                                  const Text("预计等待时间："),
-                                  Text(task.value['additional']['detail']
-                                              ['waiting_seconds'] >
-                                          0
-                                      ? (int.parse(task.value['additional']
-                                              ['detail']['waiting_seconds']))
-                                          .timeRemaining()
-                                      : "无法取得"),
-                                ],
-                              ),
-                            ),
+                          DetailInfoRow.text(
+                            label: "预计等待时间：",
+                            text: task.value['additional']['detail']
+                                        ['waiting_seconds'] >
+                                    0
+                                ? (int.parse(task.value['additional']['detail']
+                                        ['waiting_seconds']))
+                                    .timeRemaining()
+                                : "无法取得",
                           ),
                         ],
                       ),
