@@ -18,6 +18,7 @@ import 'package:garden/widgets/bottom_confirm_sheet.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:garden/widgets/settings/settings_action_card.dart';
 import 'package:garden/widgets/neu_picker.dart';
+import 'package:garden/widgets/settings/settings_checkbox_tile.dart';
 import 'package:garden/widgets/status_checkbox.dart';
 import 'package:local_auth/error_codes.dart' as auth_error;
 import 'package:local_auth/local_auth.dart';
@@ -263,7 +264,11 @@ class HelperSetting extends HookWidget {
                           padding: const EdgeInsets.all(20),
                           child: Column(
                             children: [
-                              GestureDetector(
+                              SettingsCheckboxTile(
+                                label: "基础操作震动",
+                                value:
+                                    settingsStore.vibrateNormal.watch(context),
+                                padding: 8,
                                 onTap: () {
                                   settingsStore.setVibrateNormal(!settingsStore
                                       .vibrateNormal
@@ -277,35 +282,15 @@ class HelperSetting extends HookWidget {
                                     UiUtil.vibrate(FeedbackType.light);
                                   }
                                 },
-                                child: Card(
-                                  shape: RoundedRectangleBorder(
-                                      side: const BorderSide(),
-                                      borderRadius: BorderRadius.circular(18)),
-                                  // margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(
-                                        AppConstants.paddingSmall),
-                                    child: Row(
-                                      children: [
-                                        const Text(
-                                          "基础操作震动",
-                                          style: TextStyle(
-                                              fontSize: 16, height: 1.6),
-                                        ),
-                                        const Spacer(),
-                                        StatusCheckbox(
-                                          value: settingsStore.vibrateNormal
-                                              .watch(context),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
                               ),
                               const SizedBox(
                                 height: 20,
                               ),
-                              GestureDetector(
+                              SettingsCheckboxTile(
+                                label: "敏感操作震动",
+                                value:
+                                    settingsStore.vibrateWarning.watch(context),
+                                padding: 8,
                                 onTap: () {
                                   settingsStore.setVibrateWarning(!settingsStore
                                       .vibrateWarning
@@ -319,30 +304,6 @@ class HelperSetting extends HookWidget {
                                     UiUtil.vibrate(FeedbackType.warning);
                                   }
                                 },
-                                child: Card(
-                                  shape: RoundedRectangleBorder(
-                                      side: const BorderSide(),
-                                      borderRadius: BorderRadius.circular(18)),
-                                  // margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(
-                                        AppConstants.paddingSmall),
-                                    child: Row(
-                                      children: [
-                                        const Text(
-                                          "敏感操作震动",
-                                          style: TextStyle(
-                                              fontSize: 16, height: 1.6),
-                                        ),
-                                        const Spacer(),
-                                        StatusCheckbox(
-                                          value: settingsStore.vibrateWarning
-                                              .watch(context),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
                               ),
                             ],
                           ),
@@ -356,7 +317,12 @@ class HelperSetting extends HookWidget {
           const SizedBox(
             height: 20,
           ),
-          GestureDetector(
+          SettingsCheckboxTile(
+            label: "播放器设置",
+            value: videoPlayer.value,
+            iconAsset: "assets/icons/player.png",
+            iconWidth: 25,
+            padding: 20,
             onTap: () {
               Navigator.of(context).push(
                 MaterialPageRoute(
@@ -370,34 +336,6 @@ class HelperSetting extends HookWidget {
               videoPlayer.value = !videoPlayer.value;
               StorageUtil.setBool("use_embeed_video_player", videoPlayer.value);
             },
-            child: Card(
-              shape: RoundedRectangleBorder(
-                  side: const BorderSide(),
-                  borderRadius: BorderRadius.circular(18)),
-              // margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-              child: Padding(
-                padding: const EdgeInsets.all(AppConstants.paddingSmall),
-                child: Row(
-                  children: [
-                    Image.asset(
-                      "assets/icons/player.png",
-                      width: 25,
-                    ),
-                    const SizedBox(
-                      width: 8,
-                    ),
-                    const Text(
-                      "播放器设置",
-                      style: TextStyle(fontSize: 16, height: 1.6),
-                    ),
-                    const Spacer(),
-                    StatusCheckbox(
-                      value: videoPlayer.value,
-                    ),
-                  ],
-                ),
-              ),
-            ),
           ),
           const SizedBox(
             height: 20,
@@ -454,40 +392,17 @@ class HelperSetting extends HookWidget {
           const SizedBox(
             height: 20,
           ),
-          GestureDetector(
+          SettingsCheckboxTile(
+            label: "启动时默认进入选择账号页面",
+            value: launchAccountPage.value,
+            iconAsset: "assets/icons/change.png",
+            iconWidth: 25,
+            padding: 20,
             onTap: () {
               launchAccountPage.value = !launchAccountPage.value;
               StorageUtil.setBool(
                   "launch_account_page", launchAccountPage.value);
             },
-            child: Card(
-              shape: RoundedRectangleBorder(
-                  side: const BorderSide(),
-                  borderRadius: BorderRadius.circular(18)),
-              // margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-              child: Padding(
-                padding: const EdgeInsets.all(AppConstants.paddingSmall),
-                child: Row(
-                  children: [
-                    Image.asset(
-                      "assets/icons/change.png",
-                      width: 25,
-                    ),
-                    const SizedBox(
-                      width: 8,
-                    ),
-                    const Text(
-                      "启动时默认进入选择账号页面",
-                      style: TextStyle(fontSize: 16, height: 1.6),
-                    ),
-                    const Spacer(),
-                    StatusCheckbox(
-                      value: launchAccountPage.value,
-                    ),
-                  ],
-                ),
-              ),
-            ),
           ),
           const SizedBox(
             height: 20,
@@ -534,7 +449,10 @@ class HelperSetting extends HookWidget {
                           padding: const EdgeInsets.all(20),
                           child: Column(
                             children: [
-                              GestureDetector(
+                              SettingsCheckboxTile(
+                                label: "图形密码",
+                                value: password.value,
+                                padding: 8,
                                 onTap: () {
                                   if (password.value) {
                                     password.value = false;
@@ -559,39 +477,16 @@ class HelperSetting extends HookWidget {
                                   // password.value = !password.value;
                                   // HttpUtil.setStorage("launch_password", password.value ? "1" : "0");
                                 },
-                                child: Card(
-                                  shape: RoundedRectangleBorder(
-                                      side: const BorderSide(),
-                                      borderRadius: BorderRadius.circular(18)),
-                                  // margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(
-                                        AppConstants.paddingSmall),
-                                    child: Column(
-                                      children: [
-                                        Row(
-                                          children: [
-                                            const Text(
-                                              "图形密码",
-                                              style: TextStyle(
-                                                  fontSize: 16, height: 1.6),
-                                            ),
-                                            const Spacer(),
-                                            StatusCheckbox(
-                                              value: password.value,
-                                            ),
-                                          ],
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
                               ),
                               if (canCheckBiometrics.value) ...[
                                 const SizedBox(
                                   height: 20,
                                 ),
-                                GestureDetector(
+                                SettingsCheckboxTile(
+                                  label:
+                                      "${biometricTypeName[biometricsType.value]}验证",
+                                  value: biometrics.value,
+                                  padding: 8,
                                   onTap: () async {
                                     if (biometrics.value == false) {
                                       if (password.value == false) {
@@ -661,34 +556,6 @@ class HelperSetting extends HookWidget {
                                     //   HttpUtil.setStorage("launch_biometrics", biometrics.value ? "1" : "0");
                                     //
                                   },
-                                  child: Card(
-                                    shape: RoundedRectangleBorder(
-                                        side: const BorderSide(),
-                                        borderRadius:
-                                            BorderRadius.circular(18)),
-                                    // margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(
-                                          AppConstants.paddingSmall),
-                                      child: Column(
-                                        children: [
-                                          Row(
-                                            children: [
-                                              Text(
-                                                "${biometricTypeName[biometricsType.value]}验证",
-                                                style: const TextStyle(
-                                                    fontSize: 16, height: 1.6),
-                                              ),
-                                              const Spacer(),
-                                              StatusCheckbox(
-                                                value: biometrics.value,
-                                              ),
-                                            ],
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
                                 ),
                               ],
                             ],
