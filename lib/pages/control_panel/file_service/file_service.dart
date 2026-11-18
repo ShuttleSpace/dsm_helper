@@ -4,12 +4,12 @@ import 'package:garden/util/ui_util.dart';
 import 'package:garden/pages/log_center/log_center.dart';
 import 'package:garden/api/dsm_api.dart';
 import 'package:garden/widgets/neu_picker.dart';
+import 'package:garden/widgets/settings/settings_toggle_tile.dart';
 import 'package:garden/widgets/bubble_tab_indicator.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:garden/constants/app_constants.dart';
-import 'package:garden/theme/app_colors.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:signals_hooks/signals_hooks.dart';
@@ -61,59 +61,59 @@ class FileService extends HookWidget {
         return;
       }
       List result = data['result'] ?? [];
-        for (var item in result) {
-          if (item['success'] == true) {
-            switch (item['api']) {
-              case "SYNO.Core.FileServ.SMB":
-                smb.value = item['data'];
-                workgroupController.value =
-                    TextEditingValue(text: smb.value['workgroup'] ?? "");
-                break;
-              case "SYNO.Core.FileServ.AFP":
-                afp.value = item['data'];
-                break;
-              case "SYNO.Core.FileServ.NFS":
-                nfs.value = item['data'];
-                nfsv4Controller.value =
-                    TextEditingValue(text: nfs.value['nfs_v4_domain'] ?? "");
-                break;
-              case "SYNO.Core.FileServ.FTP":
-                ftp.value = item['data'];
-                timeoutController.value =
-                    TextEditingValue(text: "${ftp.value['timeout']}");
-                ftpPortController.value =
-                    TextEditingValue(text: "${ftp.value['portnum']}");
-                break;
-              case "SYNO.Core.FileServ.FTP.SFTP":
-                sftp.value = item['data'];
-                Log.log("SFTP: ${sftp.value}");
-                sftpPortController.value =
-                    TextEditingValue(text: "${sftp.value['portnum']}");
-                break;
-              case "SYNO.Core.BandwidthControl.Protocol":
-                bandwidth.value = item['data'];
-                break;
-              case "SYNO.Core.TFTP":
-                tftp.value = item['data'];
-                break;
-              case "SYNO.Backup.Service.NetworkBackup":
-                backup.value = item['data'];
-                break;
-              case "SYNO.Core.ExternalDevice.Printer.BonjourSharing":
-                bonjourSharing.value = item['data'];
-                break;
-              case "SYNO.Core.FileServ.ServiceDiscovery":
-                serviceDiscovery.value = item['data'];
-                break;
-              case "SYNO.Core.SyslogClient.FileTransfer":
-                syslogClient.value = item['data'];
-                break;
-              case "SYNO.Core.FileServ.ServiceDiscovery.WSTransfer":
-                // enable_wstransfer was assigned but never read (dead state).
-                break;
-            }
+      for (var item in result) {
+        if (item['success'] == true) {
+          switch (item['api']) {
+            case "SYNO.Core.FileServ.SMB":
+              smb.value = item['data'];
+              workgroupController.value =
+                  TextEditingValue(text: smb.value['workgroup'] ?? "");
+              break;
+            case "SYNO.Core.FileServ.AFP":
+              afp.value = item['data'];
+              break;
+            case "SYNO.Core.FileServ.NFS":
+              nfs.value = item['data'];
+              nfsv4Controller.value =
+                  TextEditingValue(text: nfs.value['nfs_v4_domain'] ?? "");
+              break;
+            case "SYNO.Core.FileServ.FTP":
+              ftp.value = item['data'];
+              timeoutController.value =
+                  TextEditingValue(text: "${ftp.value['timeout']}");
+              ftpPortController.value =
+                  TextEditingValue(text: "${ftp.value['portnum']}");
+              break;
+            case "SYNO.Core.FileServ.FTP.SFTP":
+              sftp.value = item['data'];
+              Log.log("SFTP: ${sftp.value}");
+              sftpPortController.value =
+                  TextEditingValue(text: "${sftp.value['portnum']}");
+              break;
+            case "SYNO.Core.BandwidthControl.Protocol":
+              bandwidth.value = item['data'];
+              break;
+            case "SYNO.Core.TFTP":
+              tftp.value = item['data'];
+              break;
+            case "SYNO.Backup.Service.NetworkBackup":
+              backup.value = item['data'];
+              break;
+            case "SYNO.Core.ExternalDevice.Printer.BonjourSharing":
+              bonjourSharing.value = item['data'];
+              break;
+            case "SYNO.Core.FileServ.ServiceDiscovery":
+              serviceDiscovery.value = item['data'];
+              break;
+            case "SYNO.Core.SyslogClient.FileTransfer":
+              syslogClient.value = item['data'];
+              break;
+            case "SYNO.Core.FileServ.ServiceDiscovery.WSTransfer":
+              // enable_wstransfer was assigned but never read (dead state).
+              break;
           }
         }
+      }
     }
 
     useEffect(() {
@@ -209,37 +209,14 @@ class FileService extends HookWidget {
                                   const SizedBox(
                                     height: 20,
                                   ),
-                                  GestureDetector(
+                                  SettingsToggleTile(
+                                    label: "启用SMB服务",
+                                    value: smb.value['enable_samba'],
                                     onTap: () {
                                       smb.value['enable_samba'] =
                                           !smb.value['enable_samba'];
                                       smb.notifyListeners();
-
                                     },
-                                    child: Card(
-                                      shape: RoundedRectangleBorder(
-                                          side: const BorderSide(),
-                                          borderRadius:
-                                              BorderRadius.circular(5)),
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(
-                                            AppConstants.paddingSmall),
-                                        child: Row(
-                                          children: [
-                                            const Expanded(
-                                              child: Text(
-                                                "启用SMB服务",
-                                              ),
-                                            ),
-                                            if (smb.value['enable_samba'])
-                                              const Icon(
-                                                CupertinoIcons.checkmark_alt,
-                                                color: AppColors.primaryAction,
-                                              ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
                                   ),
                                   if (smb.value['enable_samba']) ...[
                                     const SizedBox(
@@ -267,43 +244,21 @@ class FileService extends HookWidget {
                                     const SizedBox(
                                       height: 20,
                                     ),
-                                    GestureDetector(
+                                    SettingsToggleTile(
+                                      label: "不可访问以前版本",
+                                      value: smb.value['disable_shadow_copy'],
                                       onTap: () {
                                         smb.value['disable_shadow_copy'] =
                                             !smb.value['disable_shadow_copy'];
                                         smb.notifyListeners();
-
                                       },
-                                      child: Card(
-                                        shape: RoundedRectangleBorder(
-                                            side: const BorderSide(),
-                                            borderRadius:
-                                                BorderRadius.circular(5)),
-                                        child: Padding(
-                                          padding: const EdgeInsets.all(
-                                              AppConstants.paddingSmall),
-                                          child: Row(
-                                            children: [
-                                              const Expanded(
-                                                child: Text(
-                                                  "不可访问以前版本",
-                                                ),
-                                              ),
-                                              if (smb.value['disable_shadow_copy'])
-                                                const Icon(
-                                                  CupertinoIcons.checkmark_alt,
-                                                  color:
-                                                      AppColors.primaryAction,
-                                                ),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
                                     ),
                                     const SizedBox(
                                       height: 20,
                                     ),
-                                    GestureDetector(
+                                    SettingsToggleTile(
+                                      label: "启动传输日志",
+                                      value: syslogClient.value['cifs'],
                                       onTap: () {
                                         syslogClient.value['cifs'] =
                                             !syslogClient.value['cifs'];
@@ -317,31 +272,6 @@ class FileService extends HookWidget {
                                           }));
                                         }
                                       },
-                                      child: Card(
-                                        shape: RoundedRectangleBorder(
-                                            side: const BorderSide(),
-                                            borderRadius:
-                                                BorderRadius.circular(5)),
-                                        child: Padding(
-                                          padding: const EdgeInsets.all(
-                                              AppConstants.paddingSmall),
-                                          child: Row(
-                                            children: [
-                                              const Expanded(
-                                                child: Text(
-                                                  "启动传输日志",
-                                                ),
-                                              ),
-                                              if (syslogClient.value['cifs'])
-                                                const Icon(
-                                                  CupertinoIcons.checkmark_alt,
-                                                  color:
-                                                      AppColors.primaryAction,
-                                                ),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
                                     ),
                                     if (syslogClient.value['cifs']) ...[
                                       const SizedBox(
@@ -352,7 +282,8 @@ class FileService extends HookWidget {
                                           Expanded(
                                             child: OutlinedButton(
                                               onPressed: () {
-                                                if (syslogClient.value['cifs']) {
+                                                if (syslogClient
+                                                    .value['cifs']) {
                                                   Navigator.of(context).push(
                                                       CupertinoPageRoute(
                                                           builder: (context) {
@@ -411,73 +342,27 @@ class FileService extends HookWidget {
                                   const SizedBox(
                                     height: 20,
                                   ),
-                                  GestureDetector(
+                                  SettingsToggleTile(
+                                    label: "启用AFP服务",
+                                    value: afp.value['enable_afp'],
                                     onTap: () {
-                                      afp.value['enable_afp'] = !afp.value['enable_afp'];
+                                      afp.value['enable_afp'] =
+                                          !afp.value['enable_afp'];
                                       afp.notifyListeners();
-
                                     },
-                                    child: Card(
-                                      shape: RoundedRectangleBorder(
-                                          side: const BorderSide(),
-                                          borderRadius:
-                                              BorderRadius.circular(5)),
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(
-                                            AppConstants.paddingSmall),
-                                        child: Row(
-                                          children: [
-                                            const Expanded(
-                                              child: Text(
-                                                "启用AFP服务",
-                                              ),
-                                            ),
-                                            if (afp.value['enable_afp'])
-                                              const Icon(
-                                                CupertinoIcons.checkmark_alt,
-                                                color: AppColors.primaryAction,
-                                              ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
                                   ),
                                   if (afp.value['enable_afp']) ...[
                                     const SizedBox(
                                       height: 20,
                                     ),
-                                    GestureDetector(
+                                    SettingsToggleTile(
+                                      label: "启动传输日志",
+                                      value: syslogClient.value['afp'],
                                       onTap: () {
                                         syslogClient.value['afp'] =
                                             !syslogClient.value['afp'];
                                         syslogClient.notifyListeners();
-
                                       },
-                                      child: Card(
-                                        shape: RoundedRectangleBorder(
-                                            side: const BorderSide(),
-                                            borderRadius:
-                                                BorderRadius.circular(5)),
-                                        child: Padding(
-                                          padding: const EdgeInsets.all(
-                                              AppConstants.paddingSmall),
-                                          child: Row(
-                                            children: [
-                                              const Expanded(
-                                                child: Text(
-                                                  "启动传输日志",
-                                                ),
-                                              ),
-                                              if (syslogClient.value['afp'])
-                                                const Icon(
-                                                  CupertinoIcons.checkmark_alt,
-                                                  color:
-                                                      AppColors.primaryAction,
-                                                ),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
                                     ),
                                   ],
                                 ],
@@ -506,73 +391,27 @@ class FileService extends HookWidget {
                                   const SizedBox(
                                     height: 20,
                                   ),
-                                  GestureDetector(
+                                  SettingsToggleTile(
+                                    label: "启用NFS服务",
+                                    value: nfs.value['enable_nfs'],
                                     onTap: () {
-                                      nfs.value['enable_nfs'] = !nfs.value['enable_nfs'];
+                                      nfs.value['enable_nfs'] =
+                                          !nfs.value['enable_nfs'];
                                       nfs.notifyListeners();
-
                                     },
-                                    child: Card(
-                                      shape: RoundedRectangleBorder(
-                                          side: const BorderSide(),
-                                          borderRadius:
-                                              BorderRadius.circular(5)),
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(
-                                            AppConstants.paddingSmall),
-                                        child: Row(
-                                          children: [
-                                            const Expanded(
-                                              child: Text(
-                                                "启用NFS服务",
-                                              ),
-                                            ),
-                                            if (nfs.value['enable_nfs'])
-                                              const Icon(
-                                                CupertinoIcons.checkmark_alt,
-                                                color: AppColors.primaryAction,
-                                              ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
                                   ),
                                   if (nfs.value['enable_nfs']) ...[
                                     const SizedBox(
                                       height: 20,
                                     ),
-                                    GestureDetector(
+                                    SettingsToggleTile(
+                                      label: "启用 NFSv4.1 支持",
+                                      value: nfs.value['enable_nfs_v4'],
                                       onTap: () {
                                         nfs.value['enable_nfs_v4'] =
                                             !nfs.value['enable_nfs_v4'];
                                         nfs.notifyListeners();
-
                                       },
-                                      child: Card(
-                                        shape: RoundedRectangleBorder(
-                                            side: const BorderSide(),
-                                            borderRadius:
-                                                BorderRadius.circular(5)),
-                                        child: Padding(
-                                          padding: const EdgeInsets.all(
-                                              AppConstants.paddingSmall),
-                                          child: Row(
-                                            children: [
-                                              const Expanded(
-                                                child: Text(
-                                                  "启用 NFSv4.1 支持",
-                                                ),
-                                              ),
-                                              if (nfs.value['enable_nfs_v4'])
-                                                const Icon(
-                                                  CupertinoIcons.checkmark_alt,
-                                                  color:
-                                                      AppColors.primaryAction,
-                                                ),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
                                     ),
                                   ],
                                   if (nfs.value['enable_nfs'] &&
@@ -631,71 +470,26 @@ class FileService extends HookWidget {
                                   const SizedBox(
                                     height: 20,
                                   ),
-                                  GestureDetector(
+                                  SettingsToggleTile(
+                                    label: "启用FTP服务",
+                                    value: ftp.value['enable_ftp'],
                                     onTap: () {
-                                      ftp.value['enable_ftp'] = !ftp.value['enable_ftp'];
+                                      ftp.value['enable_ftp'] =
+                                          !ftp.value['enable_ftp'];
                                       ftp.notifyListeners();
-
                                     },
-                                    child: Card(
-                                      shape: RoundedRectangleBorder(
-                                          side: const BorderSide(),
-                                          borderRadius:
-                                              BorderRadius.circular(5)),
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(
-                                            AppConstants.paddingSmall),
-                                        child: Row(
-                                          children: [
-                                            const Expanded(
-                                              child: Text(
-                                                "启用FTP服务",
-                                              ),
-                                            ),
-                                            if (ftp.value['enable_ftp'])
-                                              const Icon(
-                                                CupertinoIcons.checkmark_alt,
-                                                color: AppColors.primaryAction,
-                                              ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
                                   ),
                                   const SizedBox(
                                     height: 20,
                                   ),
-                                  GestureDetector(
+                                  SettingsToggleTile(
+                                    label: "启用 FTP SSL/TLS 加密服务（FTPS）",
+                                    value: ftp.value['enable_ftps'],
                                     onTap: () {
                                       ftp.value['enable_ftps'] =
                                           !ftp.value['enable_ftps'];
                                       ftp.notifyListeners();
-
                                     },
-                                    child: Card(
-                                      shape: RoundedRectangleBorder(
-                                          side: const BorderSide(),
-                                          borderRadius:
-                                              BorderRadius.circular(5)),
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(
-                                            AppConstants.paddingSmall),
-                                        child: Row(
-                                          children: [
-                                            const Expanded(
-                                              child: Text(
-                                                "启用 FTP SSL/TLS 加密服务（FTPS）",
-                                              ),
-                                            ),
-                                            if (ftp.value['enable_ftps'])
-                                              const Icon(
-                                                CupertinoIcons.checkmark_alt,
-                                                color: AppColors.primaryAction,
-                                              ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
                                   ),
                                   if (ftp.value['enable_ftps']) ...[
                                     const SizedBox(
@@ -713,7 +507,8 @@ class FileService extends HookWidget {
                                           controller: timeoutController,
                                           onChanged: (v) {
                                             try {
-                                              ftp.value['timeout'] = int.parse(v);
+                                              ftp.value['timeout'] =
+                                                  int.parse(v);
                                             } catch (e) {
                                               Log.log(
                                                   "parse ftp timeout error $e");
@@ -746,7 +541,8 @@ class FileService extends HookWidget {
                                           controller: ftpPortController,
                                           onChanged: (v) {
                                             try {
-                                              ftp.value['portnum'] = int.parse(v);
+                                              ftp.value['portnum'] =
+                                                  int.parse(v);
                                             } catch (e) {
                                               Log.log(
                                                   "parse ftp portnum error: $e");
@@ -767,110 +563,38 @@ class FileService extends HookWidget {
                                     const SizedBox(
                                       height: 20,
                                     ),
-                                    GestureDetector(
+                                    SettingsToggleTile(
+                                      label: "启用 FXP",
+                                      value: ftp.value['enable_fxp'],
                                       onTap: () {
                                         ftp.value['enable_fxp'] =
                                             !ftp.value['enable_fxp'];
                                         ftp.notifyListeners();
-
                                       },
-                                      child: Card(
-                                        shape: RoundedRectangleBorder(
-                                            side: const BorderSide(),
-                                            borderRadius:
-                                                BorderRadius.circular(5)),
-                                        child: Padding(
-                                          padding: const EdgeInsets.all(
-                                              AppConstants.paddingSmall),
-                                          child: Row(
-                                            children: [
-                                              const Expanded(
-                                                child: Text(
-                                                  "启用 FXP",
-                                                ),
-                                              ),
-                                              if (ftp.value['enable_fxp'])
-                                                const Icon(
-                                                  CupertinoIcons.checkmark_alt,
-                                                  color:
-                                                      AppColors.primaryAction,
-                                                ),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
                                     ),
                                     const SizedBox(
                                       height: 20,
                                     ),
-                                    GestureDetector(
+                                    SettingsToggleTile(
+                                      label: "启用 FIPS 加密模块",
+                                      value: ftp.value['enable_fips'],
                                       onTap: () {
                                         ftp.value['enable_fips'] =
                                             !ftp.value['enable_fips'];
                                         ftp.notifyListeners();
-
                                       },
-                                      child: Card(
-                                        shape: RoundedRectangleBorder(
-                                            side: const BorderSide(),
-                                            borderRadius:
-                                                BorderRadius.circular(5)),
-                                        child: Padding(
-                                          padding: const EdgeInsets.all(
-                                              AppConstants.paddingSmall),
-                                          child: Row(
-                                            children: [
-                                              const Expanded(
-                                                child: Text(
-                                                  "启用 FIPS 加密模块",
-                                                ),
-                                              ),
-                                              if (ftp.value['enable_fips'])
-                                                const Icon(
-                                                  CupertinoIcons.checkmark_alt,
-                                                  color:
-                                                      AppColors.primaryAction,
-                                                ),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
                                     ),
                                     const SizedBox(
                                       height: 20,
                                     ),
-                                    GestureDetector(
+                                    SettingsToggleTile(
+                                      label: "支持 ASCII 传送模式",
+                                      value: ftp.value['enable_ascii'],
                                       onTap: () {
                                         ftp.value['enable_ascii'] =
                                             !ftp.value['enable_ascii'];
                                         ftp.notifyListeners();
-
                                       },
-                                      child: Card(
-                                        shape: RoundedRectangleBorder(
-                                            side: const BorderSide(),
-                                            borderRadius:
-                                                BorderRadius.circular(5)),
-                                        child: Padding(
-                                          padding: const EdgeInsets.all(
-                                              AppConstants.paddingSmall),
-                                          child: Row(
-                                            children: [
-                                              const Expanded(
-                                                child: Text(
-                                                  "支持 ASCII 传送模式",
-                                                ),
-                                              ),
-                                              if (ftp.value['enable_ascii'])
-                                                const Icon(
-                                                  CupertinoIcons.checkmark_alt,
-                                                  color:
-                                                      AppColors.primaryAction,
-                                                ),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
                                     ),
                                     const SizedBox(
                                       height: 20,
@@ -887,7 +611,6 @@ class FileService extends HookWidget {
                                               onConfirm: (v) {
                                                 ftp.value['utf8_mode'] = v;
                                                 ftp.notifyListeners();
-
                                               },
                                             );
                                           },
@@ -905,7 +628,8 @@ class FileService extends HookWidget {
                                             children: [
                                               const Text("UTF-8 编码:"),
                                               const Spacer(),
-                                              Text(utf8Modes[ftp.value['utf8_mode']]),
+                                              Text(utf8Modes[
+                                                  ftp.value['utf8_mode']]),
                                             ],
                                           ),
                                         ),
@@ -938,36 +662,14 @@ class FileService extends HookWidget {
                                   const SizedBox(
                                     height: 20,
                                   ),
-                                  GestureDetector(
+                                  SettingsToggleTile(
+                                    label: "启用SFTP服务",
+                                    value: sftp.value['enable'],
                                     onTap: () {
-                                      sftp.value['enable'] = !sftp.value['enable'];
+                                      sftp.value['enable'] =
+                                          !sftp.value['enable'];
                                       sftp.notifyListeners();
-
                                     },
-                                    child: Card(
-                                      shape: RoundedRectangleBorder(
-                                          side: const BorderSide(),
-                                          borderRadius:
-                                              BorderRadius.circular(5)),
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(
-                                            AppConstants.paddingSmall),
-                                        child: Row(
-                                          children: [
-                                            const Expanded(
-                                              child: Text(
-                                                "启用SFTP服务",
-                                              ),
-                                            ),
-                                            if (sftp.value['enable'])
-                                              const Icon(
-                                                CupertinoIcons.checkmark_alt,
-                                                color: AppColors.primaryAction,
-                                              ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
                                   ),
                                   const SizedBox(
                                     height: 20,
@@ -984,7 +686,8 @@ class FileService extends HookWidget {
                                         controller: sftpPortController,
                                         onChanged: (v) {
                                           try {
-                                            sftp.value['portnum'] = int.parse(v);
+                                            sftp.value['portnum'] =
+                                                int.parse(v);
                                           } catch (e) {
                                             Log.log(
                                                 "parse ftp portnum error: $e");
@@ -1025,8 +728,12 @@ class FileService extends HookWidget {
                         saving.value = true;
                         try {
                           await dsmCoreFileServiceSaveForPage(
-                              smb.value, syslogClient.value, afp.value,
-                              nfs.value, ftp.value, sftp.value);
+                              smb.value,
+                              syslogClient.value,
+                              afp.value,
+                              nfs.value,
+                              ftp.value,
+                              sftp.value);
                           UiUtil.toast("保存成功");
                           getData(() {
                             Navigator.of(context).pop();
