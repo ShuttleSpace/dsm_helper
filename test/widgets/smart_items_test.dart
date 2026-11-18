@@ -17,7 +17,7 @@ void main() {
             'threshold': 60,
             'raw': 100,
           }),
-          SmartLogItem(
+          SmartLogItem({
             'time': '2026-01-01',
             'result': 'smart_complete',
             'test_type': 'quick',
