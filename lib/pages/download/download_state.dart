@@ -50,10 +50,27 @@ class DownloadStateNotifier {
         });
     bindBackgroundIsolate();
     FileDownloader().registerCallbacks(
-      taskStatusCallback: (update) =>
-          downloadCallback(update.task.taskId, status: update.status),
-      taskProgressCallback: (update) =>
-          downloadCallback(update.task.taskId, progress: update.progress),
+      taskStatusCallback: (update) {
+        transferStore.applyTaskStatusUpdate(update);
+        downloadCallback(update.task.taskId, status: update.status);
+      },
+      taskProgressCallback: (update) {
+        final total = update.hasExpectedFileSize ? update.expectedFileSize : -1;
+        if (total > 0) {
+          transferStore.updateProgress(
+            update.task.taskId,
+            (update.progress * total).toInt(),
+            total,
+            speedBytesPerSecond: update.hasNetworkSpeed
+                ? update.networkSpeed * 1024 * 1024
+                : null,
+            etaSeconds: update.hasTimeRemaining
+                ? update.timeRemaining.inSeconds
+                : null,
+          );
+        }
+        downloadCallback(update.task.taskId, progress: update.progress);
+      },
     );
     runLoop();
   }
@@ -73,7 +90,8 @@ class DownloadStateNotifier {
       // 进度回调传来的是 0~1 的 double，转成百分比 int；状态回调为 null。
       final num? rawProgress = data[2] as num?;
 
-      transferStore.applyTaskStatus(id, status);
+      // 详见 registerCallbacks：isolate 通道只有 status + progress，
+      // 完整 update（速度/ETA/错误）已直接写入 transferStore。
 
       final previous = _latestUpdates[id] ?? (status: null, progress: null);
       _latestUpdates[id] = (

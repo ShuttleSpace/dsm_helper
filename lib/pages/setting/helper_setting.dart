@@ -570,44 +570,6 @@ class HelperSetting extends HookWidget {
           const SizedBox(
             height: 20,
           ),
-          Card(
-            shape: RoundedRectangleBorder(
-                side: const BorderSide(),
-                borderRadius: BorderRadius.circular(18)),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(
-                  horizontal: AppConstants.paddingLarge,
-                  vertical: AppConstants.paddingSmall),
-              child: Row(
-                children: [
-                  const Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          "下载角标",
-                          style: TextStyle(
-                              fontSize: 16, fontWeight: FontWeight.w500),
-                        ),
-                        SizedBox(height: 4),
-                        Text(
-                          "在「下载」标签上显示进行中的下载数量",
-                          style: TextStyle(color: Colors.grey, fontSize: 12),
-                        ),
-                      ],
-                    ),
-                  ),
-                  CupertinoSwitch(
-                    value: settingsStore.showDownloadBadge.watch(context),
-                    onChanged: (v) => settingsStore.setShowDownloadBadge(v),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          const SizedBox(
-            height: 20,
-          ),
           OutlinedButton(
             onPressed: () {
               var hide = showWeuiLoadingToast(context: context);

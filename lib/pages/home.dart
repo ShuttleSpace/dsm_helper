@@ -10,10 +10,8 @@ import 'package:garden/pages/download/download_state.dart';
 import 'package:garden/pages/file/file.dart';
 import 'package:garden/pages/setting/setting.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart' hide Badge;
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:garden/stores/transfer_store.dart';
-import 'package:garden/widgets/badge.dart';
 import 'package:flutter_sharing_intent/flutter_sharing_intent.dart';
 import 'package:flutter_sharing_intent/model/sharing_file.dart';
 import 'package:flutter_vibrate/flutter_vibrate.dart';
@@ -205,34 +203,10 @@ class Home extends HookWidget {
                 label: "文件",
               ),
               BottomNavigationBarItem(
-                icon: Builder(
-                  builder: (context) {
-                    final showBadge =
-                        settingsStore.showDownloadBadge.watch(context);
-                    final count = transferStore.tasks
-                        .watch(context)
-                        .where((t) =>
-                            t.type == TransferType.download &&
-                            (t.state == TransferState.active ||
-                                t.state == TransferState.queued))
-                        .length;
-                    return Stack(
-                      clipBehavior: Clip.none,
-                      children: [
-                        Image.asset(
-                          "assets/tabbar/save.png",
-                          width: 30,
-                          height: 30,
-                        ),
-                        if (showBadge && count > 0)
-                          Positioned(
-                            right: -6,
-                            top: -6,
-                            child: Badge(count, size: 18),
-                          ),
-                      ],
-                    );
-                  },
+                icon: Image.asset(
+                  "assets/tabbar/save.png",
+                  width: 30,
+                  height: 30,
                 ),
                 label: '传输',
               ),

@@ -61,7 +61,7 @@ void main() {
       expect(store.tasks.value.first.state, TransferState.done);
     });
 
-    test('updateProgress writes transferred/total', () {
+    test('updateProgress writes transferred/total and speed/eta', () {
       final store = TransferStore();
       store.add(const TransferTask(
         id: 't2',
@@ -69,10 +69,42 @@ void main() {
         localPath: '/l',
         remotePath: '/r',
       ));
-      store.updateProgress('t2', 50, 200);
+      store.updateProgress(
+        't2',
+        50,
+        200,
+        speedBytesPerSecond: 1024 * 1024,
+        etaSeconds: 12,
+      );
       final t = store.tasks.value.first;
       expect(t.transferredBytes, 50);
       expect(t.totalBytes, 200);
+      expect(t.speedBytesPerSecond, 1024 * 1024);
+      expect(t.etaSeconds, 12);
+      expect(t.updatedAt, isNotNull);
+    });
+
+    test('setError and resume clear readable error', () async {
+      final store = TransferStore(
+        onResume: (id) async => true,
+      );
+      store.add(const TransferTask(
+        id: 't3',
+        type: TransferType.download,
+        localPath: '/l',
+        remotePath: '/r',
+      ));
+      store.setError('t3', '连接中断', statusCode: 503);
+      final failed = store.tasks.value.first;
+      expect(failed.state, TransferState.error);
+      expect(failed.errorMessage, '连接中断');
+      expect(failed.statusCode, 503);
+
+      await store.resumeTask('t3');
+      final resumed = store.tasks.value.first;
+      expect(resumed.state, TransferState.active);
+      expect(resumed.errorMessage, isNull);
+      expect(resumed.statusCode, isNull);
     });
   });
 

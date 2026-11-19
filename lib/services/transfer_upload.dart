@@ -139,6 +139,7 @@ Future<String> enqueueV2Upload(
     ),
     headers: authHeaders(),
     retries: 3,
+    updates: Updates.statusAndProgress,
   );
   final ok = await FileDownloader().enqueue(task);
   if (!ok) throw Exception('enqueue upload failed: ${task.taskId}');

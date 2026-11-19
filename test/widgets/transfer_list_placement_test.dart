@@ -22,8 +22,12 @@ void main() {
 
   test('transfer page has five filter tabs', () {
     final downloadPage = read('lib/pages/download/download.dart');
-    for (final label in ['全部', '下载', '上传', '失败', '完成']) {
-      expect(downloadPage, contains('Tab(text: "$label")'),
+    for (final label in ['下载', '上传']) {
+      expect(downloadPage, contains("tabLabel('${label}'"),
+          reason: '缺少传输过滤 tab: $label');
+    }
+    for (final label in ['全部', '失败', '完成']) {
+      expect(downloadPage, contains("Tab(text: \"${label}\")"),
           reason: '缺少传输过滤 tab: $label');
     }
     expect(downloadPage, contains('length: 5'));

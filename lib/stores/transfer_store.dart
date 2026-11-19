@@ -45,6 +45,12 @@ class TransferTask {
     this.transferredBytes = 0,
     this.state = TransferState.queued,
     this.chunks,
+    this.createdAt,
+    this.updatedAt,
+    this.speedBytesPerSecond,
+    this.etaSeconds,
+    this.errorMessage,
+    this.statusCode,
   });
 
   final String id;
@@ -55,12 +61,25 @@ class TransferTask {
   final int transferredBytes;
   final TransferState state;
   final List<ChunkState>? chunks;
+  final DateTime? createdAt;
+  final DateTime? updatedAt;
+  final double? speedBytesPerSecond;
+  final int? etaSeconds;
+  final String? errorMessage;
+  final int? statusCode;
 
   TransferTask copyWith({
     int? totalBytes,
     int? transferredBytes,
     TransferState? state,
     List<ChunkState>? chunks,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+    double? speedBytesPerSecond,
+    int? etaSeconds,
+    String? errorMessage,
+    int? statusCode,
+    bool resetError = false,
   }) =>
       TransferTask(
         id: id,
@@ -71,6 +90,13 @@ class TransferTask {
         transferredBytes: transferredBytes ?? this.transferredBytes,
         state: state ?? this.state,
         chunks: chunks ?? this.chunks,
+        createdAt: createdAt ?? this.createdAt,
+        updatedAt: updatedAt ?? this.updatedAt,
+        speedBytesPerSecond:
+            resetError ? null : speedBytesPerSecond ?? this.speedBytesPerSecond,
+        etaSeconds: resetError ? null : etaSeconds ?? this.etaSeconds,
+        errorMessage: resetError ? null : errorMessage ?? this.errorMessage,
+        statusCode: resetError ? null : statusCode ?? this.statusCode,
       );
 
   Map<String, dynamic> toJson() => {
@@ -82,21 +108,42 @@ class TransferTask {
         'transferredBytes': transferredBytes,
         'state': state.index,
         'chunks': chunks?.map((c) => c.toJson()).toList(),
+        'createdAt': createdAt?.millisecondsSinceEpoch,
+        'updatedAt': updatedAt?.millisecondsSinceEpoch,
+        'speedBytesPerSecond': speedBytesPerSecond,
+        'etaSeconds': etaSeconds,
+        'errorMessage': errorMessage,
+        'statusCode': statusCode,
       };
 
-  factory TransferTask.fromJson(Map<String, dynamic> j) => TransferTask(
-        id: j['id'] as String,
-        type: TransferType.values[j['type'] as int],
-        localPath: j['localPath'] as String,
-        remotePath: j['remotePath'] as String,
-        totalBytes: j['totalBytes'] as int? ?? 0,
-        transferredBytes: j['transferredBytes'] as int? ?? 0,
-        state: TransferState.values[j['state'] as int],
-        chunks: (j['chunks'] as List?)
-            ?.cast<Map<String, dynamic>>()
-            .map(ChunkState.fromJson)
-            .toList(),
-      );
+  factory TransferTask.fromJson(Map<String, dynamic> j) {
+    DateTime? readTime(String key) {
+      final ms = j[key] as num?;
+      return ms == null || ms <= 0
+          ? null
+          : DateTime.fromMillisecondsSinceEpoch(ms.toInt());
+    }
+
+    return TransferTask(
+      id: j['id'] as String,
+      type: TransferType.values[j['type'] as int],
+      localPath: j['localPath'] as String,
+      remotePath: j['remotePath'] as String,
+      totalBytes: j['totalBytes'] as int? ?? 0,
+      transferredBytes: j['transferredBytes'] as int? ?? 0,
+      state: TransferState.values[j['state'] as int],
+      chunks: (j['chunks'] as List?)
+          ?.cast<Map<String, dynamic>>()
+          .map(ChunkState.fromJson)
+          .toList(),
+      createdAt: readTime('createdAt'),
+      updatedAt: readTime('updatedAt'),
+      speedBytesPerSecond: (j['speedBytesPerSecond'] as num?)?.toDouble(),
+      etaSeconds: j['etaSeconds'] as int?,
+      errorMessage: j['errorMessage'] as String?,
+      statusCode: j['statusCode'] as int?,
+    );
+  }
 }
 
 /// 引擎控制钩子（便于测试注入；默认走 background_downloader 单例）。
@@ -116,20 +163,53 @@ class TransferStore {
       _tasks.value.where((t) => t.id == id).firstOrNull;
 
   void add(TransferTask t) {
-    _tasks.value = [..._tasks.value.where((e) => e.id != t.id), t];
+    final now = DateTime.now();
+    _tasks.value = [
+      ..._tasks.value.where((e) => e.id != t.id),
+      t.copyWith(createdAt: t.createdAt ?? now, updatedAt: now),
+    ];
     persist();
   }
 
-  void updateProgress(String id, int transferred, int total) {
+  void updateProgress(
+    String id,
+    int transferred,
+    int total, {
+    double? speedBytesPerSecond,
+    int? etaSeconds,
+  }) {
     final t = _find(id);
     if (t == null) return;
-    _replace(t.copyWith(transferredBytes: transferred, totalBytes: total));
+    _replace(t.copyWith(
+      transferredBytes: transferred,
+      totalBytes: total,
+      speedBytesPerSecond: speedBytesPerSecond,
+      etaSeconds: etaSeconds,
+      updatedAt: DateTime.now(),
+    ));
   }
 
   void setState(String id, TransferState s) {
     final t = _find(id);
     if (t == null) return;
-    _replace(t.copyWith(state: s));
+    _replace(t.copyWith(state: s, updatedAt: DateTime.now()));
+  }
+
+  void setError(String id, String message, {int? statusCode}) {
+    final t = _find(id);
+    if (t == null) return;
+    _replace(t.copyWith(
+      state: TransferState.error,
+      errorMessage: message,
+      statusCode: statusCode,
+      updatedAt: DateTime.now(),
+    ));
+  }
+
+  void clearTransferError(String id) {
+    final t = _find(id);
+    if (t == null) return;
+    _replace(t.copyWith(resetError: true, updatedAt: DateTime.now()));
   }
 
   void _replace(TransferTask t) {
@@ -139,7 +219,10 @@ class TransferStore {
 
   Future<bool> resumeTask(String id) async {
     final ok = await (onResume?.call(id) ?? Future.value(false));
-    if (ok) setState(id, TransferState.active);
+    if (ok) {
+      clearTransferError(id);
+      setState(id, TransferState.active);
+    }
     return ok;
   }
 
@@ -198,18 +281,40 @@ class TransferStore {
     if (s != null) setState(id, s);
   }
 
+  /// 状态回调带错误时保留可读原因；不展示响应体。
+  void applyTaskStatusUpdate(TaskStatusUpdate update) {
+    final exception = update.exception;
+    if (exception != null && _mapStatus(update.status) == TransferState.error) {
+      final statusCode = update.responseStatusCode ??
+          (exception is TaskHttpException && exception.httpResponseCode > 0
+              ? exception.httpResponseCode
+              : null);
+      setError(
+        update.task.taskId,
+        exception.description,
+        statusCode: statusCode,
+      );
+      return;
+    }
+    applyTaskStatus(update.task.taskId, update.status);
+  }
+
   /// 订阅 background_downloader 的进度/状态流，刷新本地任务状态。
   void listenUpdates() {
     FileDownloader().updates.listen((update) {
       if (update is TaskStatusUpdate) {
-        applyTaskStatus(update.task.taskId, update.status);
+        applyTaskStatusUpdate(update);
       } else if (update is TaskProgressUpdate) {
-        final total = update.expectedFileSize;
+        final total = update.hasExpectedFileSize ? update.expectedFileSize : -1;
         if (total > 0) {
           updateProgress(
             update.task.taskId,
             (update.progress * total).toInt(),
             total,
+            speedBytesPerSecond:
+                update.hasNetworkSpeed ? update.networkSpeed * 1024 * 1024 : null,
+            etaSeconds:
+                update.hasTimeRemaining ? update.timeRemaining.inSeconds : null,
           );
         }
       }
