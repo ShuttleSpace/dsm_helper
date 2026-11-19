@@ -117,266 +117,273 @@ class SharedFolders extends HookWidget {
         padding: const EdgeInsets.only(top: 20.0, left: 20, right: 20),
         child: Opacity(
           opacity: 1,
-          child: OutlinedButton(
-            onPressed: () async {},
-            // margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-            child: Row(
-              children: [
-                const SizedBox(
-                  width: 20,
-                ),
-                folder['encryption'] == null || folder['encryption'] == 0
-                    ? const FileIcon(
-                        FileTypeEnum.folder,
-                      )
-                    : Image.asset(
-                        "assets/icons/folder_locked.png",
-                        width: 40,
-                        height: 40,
-                      ),
-                const SizedBox(
-                  width: 10,
-                ),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        folder['name'],
-                        style: const TextStyle(
-                          fontSize: 16,
-                        ),
-                      ),
-                      const SizedBox(
-                        height: 5,
-                      ),
-                      Text(
-                        "${folder['volume_name']}${folder['volume_desc'] != "" ? "(${folder['volume_desc']})" : ""}",
-                        style: TextStyle(
-                            fontSize: 12,
-                            color: Theme.of(context)
-                                .textTheme
-                                .headlineSmall
-                                ?.color),
-                      ),
-                      if (folder['unite_permission'] != null) ...[
-                        const SizedBox(
-                          height: 5,
-                        ),
-                        Text(
-                          "高级权限：${folder['unite_permission'] ? "已启动" : "已停用"}",
-                          style: TextStyle(
-                              fontSize: 12,
-                              color: Theme.of(context)
-                                  .textTheme
-                                  .headlineSmall
-                                  ?.color),
-                        ),
-                      ],
-                      if (folder['enable_recycle_bin'] != null) ...[
-                        const SizedBox(
-                          height: 5,
-                        ),
-                        Text(
-                          "回收站：${folder['enable_recycle_bin'] ? "已启动" : "已停用"}",
-                          style: TextStyle(
-                              fontSize: 12,
-                              color: Theme.of(context)
-                                  .textTheme
-                                  .headlineSmall
-                                  ?.color),
-                        ),
-                      ],
-                      if (folder['quota_value'] != null) ...[
-                        const SizedBox(
-                          height: 5,
-                        ),
-                        Text(
-                          "共享文件夹配额：${folder['quota_value'] > 0 ? ((folder['quota_value'] as num) * 1024 * 1024).formatSize() : "已停用"}",
-                          style: TextStyle(
-                              fontSize: 12,
-                              color: Theme.of(context)
-                                  .textTheme
-                                  .headlineSmall
-                                  ?.color),
-                        ),
-                      ],
-                      if (folder['share_quota_used'] != null) ...[
-                        const SizedBox(
-                          height: 5,
-                        ),
-                        Text(
-                          "共享文件夹大小：${((folder['share_quota_used'] as num) * 1024 * 1024).formatSize()}",
-                          style: TextStyle(
-                              fontSize: 12,
-                              color: Theme.of(context)
-                                  .textTheme
-                                  .headlineSmall
-                                  ?.color),
-                        ),
-                      ],
-                      if (folder['enable_share_compress'] != null) ...[
-                        const SizedBox(
-                          height: 5,
-                        ),
-                        Text(
-                          "文件压缩：${folder['enable_share_compress'] ? "已启动" : "已禁用"}",
-                          style: TextStyle(
-                              fontSize: 12,
-                              color: Theme.of(context)
-                                  .textTheme
-                                  .headlineSmall
-                                  ?.color),
-                        ),
-                      ],
-                      if (folder['enable_share_cow'] != null) ...[
-                        const SizedBox(
-                          height: 5,
-                        ),
-                        Text(
-                          "数据完整性保护：${folder['enable_share_cow'] ? "已启动" : "已禁用"}",
-                          style: TextStyle(
-                              fontSize: 12,
-                              color: Theme.of(context)
-                                  .textTheme
-                                  .headlineSmall
-                                  ?.color),
-                        ),
-                      ],
-                    ],
+          child: Card(
+            borderOnForeground: false,
+            child: InkWell(
+              onTap: () async {},
+              // margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              child: Row(
+                children: [
+                  const SizedBox(
+                    width: 20,
                   ),
-                ),
-                const SizedBox(
-                  width: 10,
-                ),
-                folder['is_share_moving']
-                    ? const Text("移动中")
-                    : OutlinedButton(
-                        onPressed: () {
-                          showCupertinoModalPopup(
-                            context: context,
-                            builder: (context) {
-                              return SizedBox(
-                                width: double.infinity,
-                                child: Material(
-                                  color: Colors.transparent,
-                                  child: Card(
-                                    shape: RoundedRectangleBorder(
-                                        side: const BorderSide(),
-                                        borderRadius:
-                                            BorderRadius.circular(18)),
-                                    child: SafeArea(
-                                      top: false,
-                                      child: Column(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: <Widget>[
-                                          const Text(
-                                            "选择操作",
-                                            style: TextStyle(
-                                                fontSize: 20,
-                                                fontWeight: FontWeight.w500),
-                                          ),
-                                          const SizedBox(
-                                            height: 12,
-                                          ),
-                                          if (folder['support_snapshot']) ...[
-                                            OutlinedButton(
-                                              onPressed: () async {
-                                                Navigator.of(context).pop();
-                                              },
-                                              child: const Text(
-                                                "克隆",
-                                                style: TextStyle(fontSize: 18),
-                                              ),
-                                            ),
-                                            const SizedBox(
-                                              height: 16,
-                                            ),
-                                          ],
-                                          OutlinedButton(
-                                            onPressed: () async {
-                                              Navigator.of(context).pop();
-                                              Navigator.of(context)
-                                                  .push(CupertinoPageRoute(
-                                                      builder: (context) {
-                                                        return AddSharedFolders(
-                                                            volumes.value,
-                                                            folder: folder);
-                                                      },
-                                                      settings: const RouteSettings(
-                                                          name:
-                                                              "add_shared_folders")))
-                                                  .then((res) {
-                                                if (res != null && res) {
-                                                  getData();
-                                                }
-                                              });
-                                            },
-                                            child: const Text(
-                                              "编辑",
-                                              style: TextStyle(fontSize: 18),
-                                            ),
-                                          ),
-                                          const SizedBox(
-                                            height: 16,
-                                          ),
-                                          if (folder['enable_recycle_bin']) ...[
-                                            OutlinedButton(
-                                              onPressed: () async {
-                                                Navigator.of(context).pop();
-                                                dsmControlPanelPost({
-                                                  folder['name']:
-                                                      '"${folder['name']}"',
-                                                  "api":
-                                                      '"SYNO.Core.RecycleBin"',
-                                                  "method": 'start',
-                                                  "version": 1,
-                                                }).then((_) {
-                                                  UiUtil.toast("请求已发送");
-                                                }).catchError((_) {});
-                                              },
-                                              child: const Text(
-                                                "清空回收站",
-                                                style: TextStyle(fontSize: 18),
-                                              ),
-                                            ),
-                                            const SizedBox(
-                                              height: 16,
-                                            ),
-                                          ],
-                                          OutlinedButton(
-                                            onPressed: () async {
-                                              Navigator.of(context).pop();
-                                              deleteFolder(folder['name']);
-                                            },
-                                            child: const Text(
-                                              "删除",
+                  folder['encryption'] == null || folder['encryption'] == 0
+                      ? const FileIcon(
+                          FileTypeEnum.folder,
+                        )
+                      : Image.asset(
+                          "assets/icons/folder_locked.png",
+                          width: 40,
+                          height: 40,
+                        ),
+                  const SizedBox(
+                    width: 10,
+                  ),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          folder['name'],
+                          style: const TextStyle(
+                            fontSize: 16,
+                          ),
+                        ),
+                        const SizedBox(
+                          height: 5,
+                        ),
+                        Text(
+                          "${folder['volume_name']}${folder['volume_desc'] != "" ? "(${folder['volume_desc']})" : ""}",
+                          style: TextStyle(
+                              fontSize: 12,
+                              color: Theme.of(context)
+                                  .textTheme
+                                  .headlineSmall
+                                  ?.color),
+                        ),
+                        if (folder['unite_permission'] != null) ...[
+                          const SizedBox(
+                            height: 5,
+                          ),
+                          Text(
+                            "高级权限：${folder['unite_permission'] ? "已启动" : "已停用"}",
+                            style: TextStyle(
+                                fontSize: 12,
+                                color: Theme.of(context)
+                                    .textTheme
+                                    .headlineSmall
+                                    ?.color),
+                          ),
+                        ],
+                        if (folder['enable_recycle_bin'] != null) ...[
+                          const SizedBox(
+                            height: 5,
+                          ),
+                          Text(
+                            "回收站：${folder['enable_recycle_bin'] ? "已启动" : "已停用"}",
+                            style: TextStyle(
+                                fontSize: 12,
+                                color: Theme.of(context)
+                                    .textTheme
+                                    .headlineSmall
+                                    ?.color),
+                          ),
+                        ],
+                        if (folder['quota_value'] != null) ...[
+                          const SizedBox(
+                            height: 5,
+                          ),
+                          Text(
+                            "共享文件夹配额：${folder['quota_value'] > 0 ? ((folder['quota_value'] as num) * 1024 * 1024).formatSize() : "已停用"}",
+                            style: TextStyle(
+                                fontSize: 12,
+                                color: Theme.of(context)
+                                    .textTheme
+                                    .headlineSmall
+                                    ?.color),
+                          ),
+                        ],
+                        if (folder['share_quota_used'] != null) ...[
+                          const SizedBox(
+                            height: 5,
+                          ),
+                          Text(
+                            "共享文件夹大小：${((folder['share_quota_used'] as num) * 1024 * 1024).formatSize()}",
+                            style: TextStyle(
+                                fontSize: 12,
+                                color: Theme.of(context)
+                                    .textTheme
+                                    .headlineSmall
+                                    ?.color),
+                          ),
+                        ],
+                        if (folder['enable_share_compress'] != null) ...[
+                          const SizedBox(
+                            height: 5,
+                          ),
+                          Text(
+                            "文件压缩：${folder['enable_share_compress'] ? "已启动" : "已禁用"}",
+                            style: TextStyle(
+                                fontSize: 12,
+                                color: Theme.of(context)
+                                    .textTheme
+                                    .headlineSmall
+                                    ?.color),
+                          ),
+                        ],
+                        if (folder['enable_share_cow'] != null) ...[
+                          const SizedBox(
+                            height: 5,
+                          ),
+                          Text(
+                            "数据完整性保护：${folder['enable_share_cow'] ? "已启动" : "已禁用"}",
+                            style: TextStyle(
+                                fontSize: 12,
+                                color: Theme.of(context)
+                                    .textTheme
+                                    .headlineSmall
+                                    ?.color),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+                  const SizedBox(
+                    width: 10,
+                  ),
+                  folder['is_share_moving']
+                      ? const Text("移动中")
+                      : OutlinedButton(
+                          onPressed: () {
+                            showCupertinoModalPopup(
+                              context: context,
+                              builder: (context) {
+                                return SizedBox(
+                                  width: double.infinity,
+                                  child: Material(
+                                    color: Colors.transparent,
+                                    child: Card(
+                                      shape: RoundedRectangleBorder(
+                                          side: const BorderSide(),
+                                          borderRadius:
+                                              BorderRadius.circular(18)),
+                                      child: SafeArea(
+                                        top: false,
+                                        child: Column(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: <Widget>[
+                                            const Text(
+                                              "选择操作",
                                               style: TextStyle(
-                                                  fontSize: 18,
-                                                  color: Colors.redAccent),
+                                                  fontSize: 20,
+                                                  fontWeight: FontWeight.w500),
                                             ),
-                                          ),
-                                          const SizedBox(
-                                            height: 8,
-                                          ),
-                                        ],
+                                            const SizedBox(
+                                              height: 12,
+                                            ),
+                                            if (folder['support_snapshot']) ...[
+                                              OutlinedButton(
+                                                onPressed: () async {
+                                                  Navigator.of(context).pop();
+                                                },
+                                                child: const Text(
+                                                  "克隆",
+                                                  style:
+                                                      TextStyle(fontSize: 18),
+                                                ),
+                                              ),
+                                              const SizedBox(
+                                                height: 16,
+                                              ),
+                                            ],
+                                            OutlinedButton(
+                                              onPressed: () async {
+                                                Navigator.of(context).pop();
+                                                Navigator.of(context)
+                                                    .push(CupertinoPageRoute(
+                                                        builder: (context) {
+                                                          return AddSharedFolders(
+                                                              volumes.value,
+                                                              folder: folder);
+                                                        },
+                                                        settings:
+                                                            const RouteSettings(
+                                                                name:
+                                                                    "add_shared_folders")))
+                                                    .then((res) {
+                                                  if (res != null && res) {
+                                                    getData();
+                                                  }
+                                                });
+                                              },
+                                              child: const Text(
+                                                "编辑",
+                                                style: TextStyle(fontSize: 18),
+                                              ),
+                                            ),
+                                            const SizedBox(
+                                              height: 16,
+                                            ),
+                                            if (folder[
+                                                'enable_recycle_bin']) ...[
+                                              OutlinedButton(
+                                                onPressed: () async {
+                                                  Navigator.of(context).pop();
+                                                  dsmControlPanelPost({
+                                                    folder['name']:
+                                                        '"${folder['name']}"',
+                                                    "api":
+                                                        '"SYNO.Core.RecycleBin"',
+                                                    "method": 'start',
+                                                    "version": 1,
+                                                  }).then((_) {
+                                                    UiUtil.toast("请求已发送");
+                                                  }).catchError((_) {});
+                                                },
+                                                child: const Text(
+                                                  "清空回收站",
+                                                  style:
+                                                      TextStyle(fontSize: 18),
+                                                ),
+                                              ),
+                                              const SizedBox(
+                                                height: 16,
+                                              ),
+                                            ],
+                                            OutlinedButton(
+                                              onPressed: () async {
+                                                Navigator.of(context).pop();
+                                                deleteFolder(folder['name']);
+                                              },
+                                              child: const Text(
+                                                "删除",
+                                                style: TextStyle(
+                                                    fontSize: 18,
+                                                    color: Colors.redAccent),
+                                              ),
+                                            ),
+                                            const SizedBox(
+                                              height: 8,
+                                            ),
+                                          ],
+                                        ),
                                       ),
                                     ),
                                   ),
-                                ),
-                              );
-                            },
-                          );
-                        },
-                        child: const Icon(
-                          CupertinoIcons.right_chevron,
-                          size: 18,
+                                );
+                              },
+                            );
+                          },
+                          child: const Icon(
+                            CupertinoIcons.right_chevron,
+                            size: 12,
+                          ),
                         ),
-                      ),
-                const SizedBox(
-                  width: 20,
-                ),
-              ],
+                  const SizedBox(
+                    width: 20,
+                  ),
+                ],
+              ),
             ),
           ),
         ),
