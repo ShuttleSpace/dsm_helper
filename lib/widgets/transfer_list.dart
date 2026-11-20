@@ -50,7 +50,8 @@ List<TransferTask> filterTransferTasks({
     if (state != null && t.state != state) return false;
     if (keyword.isEmpty) return true;
     return t.remotePath.toLowerCase().contains(keyword) ||
-        t.localPath.toLowerCase().contains(keyword);
+        t.localPath.toLowerCase().contains(keyword) ||
+        transferTaskName(t).toLowerCase().contains(keyword);
   }).toList();
 
   int compare(TransferTask a, TransferTask b) => switch (sort) {
@@ -70,6 +71,27 @@ List<TransferTask> filterTransferTasks({
 }
 
 String _nameOf(TransferTask t) => t.remotePath.split('/').last;
+
+String transferTaskName(TransferTask t) =>
+    t.steps == null ? _nameOf(t) : '相册备份（${t.steps!.length} 个文件）';
+
+/// 重试单个备份子步骤：重新入队并返回一个全新的干净步骤。
+Future<TransferStep> retryTransferStep(
+  TransferStep step,
+  Future<String> Function(String localPath, String remoteDir) enqueue,
+) async {
+  final newId = await enqueue(
+    step.localPath,
+    step.remotePath.substring(0, step.remotePath.lastIndexOf('/')),
+  );
+  return TransferStep(
+    id: newId,
+    localPath: step.localPath,
+    remotePath: step.remotePath,
+    state: TransferState.active,
+    modifyTime: step.modifyTime,
+  );
+}
 
 int _progressOf(TransferTask t) => t.state == TransferState.done
     ? 100
@@ -134,6 +156,7 @@ class TransferList extends HookWidget {
   @override
   Widget build(BuildContext context) {
     useExistingSignal(transferStore.tasks).watch(context);
+    final expanded = useState<Set<String>>({});
     final filtered = filterTransferTasks(
       tab: tab,
       type: type,
@@ -183,7 +206,7 @@ class TransferList extends HookWidget {
             ),
           );
         }
-        return _buildRow(context, row as TransferTask);
+        return _buildRow(context, row as TransferTask, expanded);
       },
     );
   }
@@ -215,9 +238,11 @@ class TransferList extends HookWidget {
     ];
   }
 
-  Widget _buildRow(BuildContext context, TransferTask t) {
+  Widget _buildRow(BuildContext context, TransferTask t, ValueNotifier<Set<String>> expanded) {
     final theme = AppTheme.of(context);
-    final name = _nameOf(t);
+    final name = transferTaskName(t);
+    final isParent = t.steps != null;
+    final isExpanded = expanded.value.contains(t.id);
     final pct = _progressOf(t);
     final selected = selectedIds.contains(t.id);
     final stateText = _stateText(t.state);
@@ -227,6 +252,12 @@ class TransferList extends HookWidget {
       margin: const EdgeInsets.only(left: 20, right: 20, bottom: 12),
       padding: const EdgeInsets.all(14),
       onTap: () {
+        if (isParent && !multiSelect) {
+          expanded.value = isExpanded
+              ? expanded.value.where((id) => id != t.id).toSet()
+              : {...expanded.value, t.id};
+          return;
+        }
         if (multiSelect) {
           onSelect?.call(t.id);
         } else {
@@ -266,6 +297,12 @@ class TransferList extends HookWidget {
                 color: AppColors.infoOf(context),
               ),
               const SizedBox(width: 8),
+              if (isParent)
+                Icon(
+                  isExpanded ? Icons.expand_less : Icons.expand_more,
+                  size: 18,
+                  color: theme.placeholderColor,
+                ),
               Expanded(
                 child: Text(
                   name,
@@ -306,6 +343,40 @@ class TransferList extends HookWidget {
               currentValue: pct,
               displayText: '%',
             ),
+          ],
+          if (isParent && isExpanded) ...[
+            const SizedBox(height: 8),
+            ...t.steps!.map((s) => Padding(
+                  padding: const EdgeInsets.only(top: 6, left: 8),
+                  child: Row(
+                    children: [
+                      Icon(
+                        s.state == TransferState.done
+                            ? Icons.check_circle_outline
+                            : s.state == TransferState.error
+                                ? Icons.error_outline
+                                : Icons.radio_button_unchecked,
+                        size: 14,
+                        color: _stateColor(context, s.state),
+                      ),
+                      const SizedBox(width: 6),
+                      Expanded(
+                        child: Text(
+                          '${s.remotePath.split('/').last}  ${s.transferredBytes.formatSize()}/${s.totalBytes.formatSize()}',
+                          style: TextStyle(
+                              fontSize: 12, color: theme.titleColor),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      if (s.errorMessage != null && s.errorMessage!.isNotEmpty)
+                        IconButton(
+                          icon: const Icon(Icons.replay, size: 16),
+                          tooltip: '重试该步骤',
+                          onPressed: () => _retryStep(context, t, s),
+                        ),
+                    ],
+                  ),
+                )),
           ],
           if (t.errorMessage != null && t.errorMessage!.isNotEmpty) ...[
             const SizedBox(height: 8),
@@ -418,14 +489,44 @@ class TransferList extends HookWidget {
   }
 
   Future<bool> _remove(String id) async {
+    final t = transferStore.tasks.value.where((e) => e.id == id).firstOrNull;
+    if (t?.steps != null) {
+      transferStore.deleteTransferCache(id);
+      for (final step in t!.steps!) {
+        await FileDownloader().database.deleteRecordWithId(step.id);
+      }
+    } else {
+      await FileDownloader().database.deleteRecordWithId(id);
+    }
     transferStore.remove(id);
-    await FileDownloader().database.deleteRecordWithId(id);
     UiUtil.toast('已移除');
     return true;
   }
 
+  Future<void> _retryStep(
+    BuildContext context,
+    TransferTask parent,
+    TransferStep step,
+  ) async {
+    try {
+      final fresh = await retryTransferStep(
+          step, (path, dir) => enqueueFileUpload(localPath: path, remoteDir: dir));
+      await FileDownloader().cancelTaskWithId(step.id);
+      await FileDownloader().database.deleteRecordWithId(step.id);
+      transferStore.removeStep(parent.id, step.id);
+      transferStore.addStep(parent.id, fresh);
+      UiUtil.toast('已重新加入队列');
+    } catch (_) {
+      UiUtil.toast('重试失败，请检查连接');
+    }
+  }
+
   /// 重试必须先清掉旧记录，否则同一次失败会留下重复任务。
   Future<void> _retry(TransferTask t) async {
+    if (t.steps != null) {
+      UiUtil.toast('请展开任务后重试失败的步骤');
+      return;
+    }
     final String newId;
     try {
       if (t.type == TransferType.upload) {
@@ -502,7 +603,7 @@ void showTransferTaskDetail(BuildContext context, TransferTask task) {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              _nameOf(task),
+              transferTaskName(task),
               style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w500,

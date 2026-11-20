@@ -36,6 +36,95 @@ void main() {
     expect(source, contains('AppColors.successOf(context)'));
   });
 
+  testWidgets('parent backup task expands to show steps', (tester) async {
+    final parent = TransferTask(
+      id: 'backup_widget_1',
+      type: TransferType.upload,
+      localPath: '',
+      remotePath: '/photos',
+      state: TransferState.active,
+      steps: [
+        TransferStep(
+          id: 's1',
+          localPath: '/c/a.jpg',
+          remotePath: '/photos/a.jpg',
+          totalBytes: 100,
+          transferredBytes: 50,
+          state: TransferState.active,
+        ),
+      ],
+    );
+    transferStore.add(parent);
+    addTearDown(() => transferStore.remove(parent.id));
+
+    await tester.pumpWidget(const MaterialApp(
+      home: Scaffold(body: TransferList(type: TransferType.upload)),
+    ));
+
+    expect(find.textContaining('相册备份'), findsOneWidget);
+    expect(find.textContaining('a.jpg'), findsNothing);
+    await tester.tap(find.textContaining('相册备份'));
+    await tester.pump();
+    expect(find.textContaining('a.jpg'), findsOneWidget);
+
+    expect(transferTaskName(parent), contains('相册备份'));
+    expect(transferTaskName(const TransferTask(
+      id: 'x',
+      type: TransferType.upload,
+      localPath: '/l',
+      remotePath: '/remote/file.txt',
+    )), 'file.txt');
+  });
+
+  test('retryTransferStep re-enqueues with a fresh id and clears progress', () async {
+    final step = TransferStep(
+      id: 'old',
+      localPath: '/cache/a.jpg',
+      remotePath: '/photos/a.jpg',
+      totalBytes: 100,
+      transferredBytes: 70,
+      state: TransferState.error,
+      errorMessage: 'offline',
+    );
+    final retried = await retryTransferStep(step, (localPath, remoteDir) async {
+      expect(localPath, '/cache/a.jpg');
+      expect(remoteDir, '/photos');
+      return 'new';
+    });
+    expect(retried.id, 'new');
+    expect(retried.localPath, '/cache/a.jpg');
+    expect(retried.remotePath, '/photos/a.jpg');
+    expect(retried.state, TransferState.active);
+    expect(retried.transferredBytes, 0);
+    expect(retried.errorMessage, isNull);
+  });
+
+  test('deleteTransferCache removes cached files of every step', () async {
+    final cache = await Directory.systemTemp.createTemp('transfer_cache_');
+    addTearDown(() {
+      if (cache.existsSync()) cache.deleteSync(recursive: true);
+    });
+    final file = File('${cache.path}/a.jpg')..writeAsStringSync('x');
+    final parent = TransferTask(
+      id: 'backup_cache_cleanup',
+      type: TransferType.upload,
+      localPath: '',
+      remotePath: '/photos',
+      steps: [
+        TransferStep(
+          id: 's1',
+          localPath: file.path,
+          remotePath: '/photos/a.jpg',
+        ),
+      ],
+    );
+    transferStore.add(parent);
+    addTearDown(() => transferStore.remove(parent.id));
+
+    transferStore.deleteTransferCache(parent.id);
+    expect(file.existsSync(), isFalse);
+  });
+
   testWidgets('done task hides progress; upload hides download-only stats', (tester) async {
     const task = TransferTask(
       id: 'done-no-bytes',

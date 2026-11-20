@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:background_downloader/background_downloader.dart';
 import 'package:garden/util/storage_util.dart';
@@ -473,6 +474,20 @@ class TransferStore {
     final ok = await _control(id, onCancel, defaultControlFor('cancel'));
     setState(id, TransferState.canceled);
     return ok;
+  }
+
+  /// 删除父任务所有子步骤的本地缓存文件。
+  void deleteTransferCache(String groupId) {
+    final parent = _find(groupId);
+    if (parent?.steps == null) return;
+    for (final step in parent!.steps!) {
+      final file = File(step.localPath);
+      if (file.existsSync()) {
+        try {
+          file.deleteSync();
+        } catch (_) {}
+      }
+    }
   }
 
   void remove(String id) {
