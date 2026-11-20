@@ -111,9 +111,7 @@ class Download extends HookWidget {
 
     Future<void> clearTasks(Iterable<TransferTask> targets) async {
       for (final t in targets) {
-        await FileDownloader().cancelTaskWithId(t.id);
-        await FileDownloader().database.deleteRecordWithId(t.id);
-        transferStore.remove(t.id);
+        await transferStore.deleteTask(t);
       }
     }
 
@@ -246,8 +244,7 @@ class Download extends HookWidget {
 
     Future<void> batchRemove() async {
       for (final t in selectedTasks) {
-        transferStore.remove(t.id);
-        await FileDownloader().database.deleteRecordWithId(t.id);
+        await transferStore.deleteTask(t);
       }
       UiUtil.toast('已移除 ${selectedTasks.length} 项');
     }

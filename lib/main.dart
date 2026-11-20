@@ -39,6 +39,7 @@ void main() async {
   await connectionStore.initialize();
   await initTransferEngine();
   transferStore.listenUpdates();
+  transferStore.startBackupTimeSync(); // app 生命周期内持续写回备份时间
   await transferStore.resumeUnfinishedOnStartup();
   final autPage = await settingsStore.authPage.value;
   final launchAccountPage = await settingsStore.launchAccountPage.value;

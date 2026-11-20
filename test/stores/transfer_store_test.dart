@@ -1,8 +1,10 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:background_downloader/background_downloader.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:garden/stores/transfer_store.dart';
+import 'package:garden/util/storage_util.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
@@ -301,6 +303,76 @@ void main() {
       final store = TransferStore();
       expect(store.hasDefaultControlHooks, isTrue);
       expect(store.defaultControlFor('s1'), isNotNull);
+    });
+  });
+
+  group('cleanup and completion time', () {
+    test('deleteTransferCache removes step files and their directories', () async {
+      final dir = await Directory.systemTemp.createTemp('transfer_cache_');
+      addTearDown(() {
+        if (dir.existsSync()) dir.deleteSync(recursive: true);
+      });
+      final file = File('${dir.path}/a.jpg')..writeAsStringSync('x');
+      final store = TransferStore();
+      store.add(TransferTask(
+        id: 'backup_1',
+        type: TransferType.upload,
+        localPath: '',
+        remotePath: '/photos',
+        steps: [
+          TransferStep(
+              id: 's1',
+              localPath: file.path,
+              remotePath: '/photos/a.jpg'),
+        ],
+      ));
+      expect(store.engineTaskIds('backup_1'), ['s1']);
+      store.deleteTransferCache('backup_1');
+      expect(file.existsSync(), isFalse);
+      expect(dir.existsSync(), isFalse);
+    });
+
+    test('startBackupTimeSync persists max modifyTime, never moves backwards',
+        () async {
+      SharedPreferences.setMockInitialValues({});
+      await StorageUtil.setString('last_backup_time', '500');
+      final store = TransferStore();
+      final stop = store.startBackupTimeSync();
+      store.add(TransferTask(
+        id: 'b1',
+        type: TransferType.upload,
+        localPath: '',
+        remotePath: '/photos',
+        state: TransferState.done,
+        steps: [
+          TransferStep(
+              id: 's1',
+              localPath: '/c/a',
+              remotePath: '/photos/a',
+              modifyTime: DateTime.fromMillisecondsSinceEpoch(1000)),
+        ],
+      ));
+      await Future<void>.delayed(Duration.zero);
+      expect(await StorageUtil.getString('last_backup_time'), '1000');
+
+      store.remove('b1');
+      store.add(TransferTask(
+        id: 'b2',
+        type: TransferType.upload,
+        localPath: '',
+        remotePath: '/photos',
+        state: TransferState.done,
+        steps: [
+          TransferStep(
+              id: 's2',
+              localPath: '/c/b',
+              remotePath: '/photos/b',
+              modifyTime: DateTime.fromMillisecondsSinceEpoch(700)),
+        ],
+      ));
+      await Future<void>.delayed(Duration.zero);
+      expect(await StorageUtil.getString('last_backup_time'), '1000');
+      stop();
     });
   });
 

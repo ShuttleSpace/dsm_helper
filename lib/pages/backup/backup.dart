@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:background_downloader/background_downloader.dart';
 import 'package:garden/stores/transfer_store.dart';
 import 'package:garden/services/transfer_upload.dart';
 import 'package:path_provider/path_provider.dart';
@@ -77,6 +78,7 @@ Future<TransferTask> startBackup({
   required List<AssetEntity> assets,
   required Future<String> Function(String cachePath, String remoteDir) enqueue,
   required Directory cacheRoot,
+  Future<void> Function(String stepId)? cancelEnqueued,
 }) async {
   final parent = TransferTask(
     id: 'backup_${DateTime.now().microsecondsSinceEpoch}',
@@ -87,6 +89,7 @@ Future<TransferTask> startBackup({
     steps: const [],
   );
   transferStore.add(parent);
+  final enqueued = <String>[];
   for (final asset in assets) {
     try {
       final file = await asset.originFile;
@@ -98,6 +101,7 @@ Future<TransferTask> startBackup({
       await file.copy(cachePath);
       File(cachePath).setLastModifiedSync(asset.modifiedDateTime);
       final taskId = await enqueue(cachePath, backupFolder);
+      enqueued.add(taskId);
       transferStore.addStep(parent.id, TransferStep(
         id: taskId,
         localPath: cachePath,
@@ -106,12 +110,16 @@ Future<TransferTask> startBackup({
         modifyTime: asset.modifiedDateTime,
       ));
     } catch (e) {
-      transferStore.setError(parent.id, '备份入队未完成: $e');
+      for (final stepId in enqueued) {
+        await cancelEnqueued?.call(stepId);
+        transferStore.setError(stepId, '备份入队未完成: $e');
+      }
+      transferStore.setError(parent.id, '备份入队未完成: $e', manual: true);
       throw BackupEnqueueIncomplete('备份入队未完成: $e');
     }
   }
   if (transferStore.tasks.value.firstWhere((t) => t.id == parent.id).steps!.isEmpty) {
-    transferStore.setError(parent.id, '没有可备份的文件');
+    transferStore.setError(parent.id, '没有可备份的文件', manual: true);
     throw BackupEnqueueIncomplete('没有可备份的文件');
   }
   return transferStore.tasks.value.firstWhere((t) => t.id == parent.id);
@@ -119,24 +127,6 @@ Future<TransferTask> startBackup({
 
 String remoteDir(String backupFolder, String filename) =>
     backupFolder.endsWith('/') ? '$backupFolder$filename' : '$backupFolder/$filename';
-
-/// 父任务完成时把备份时间推进到所有子步骤中最晚的修改时间。
-void Function() syncBackupTimeOnCompletion(ValueChanged<DateTime?> onTime) {
-  final subscription = transferStore.tasks.toStream().listen((tasks) {
-    for (final t in tasks) {
-      if (t.steps == null || t.state != TransferState.done) continue;
-      final latest = t.steps!
-          .map((s) => s.modifyTime)
-          .whereType<DateTime>()
-          .fold<DateTime?>(null, (a, b) => a == null || b.isAfter(a) ? b : a);
-      if (latest == null) continue;
-      StorageUtil.setString(
-          'last_backup_time', latest.millisecondsSinceEpoch.toString());
-      onTime(latest);
-    }
-  });
-  return subscription.cancel;
-}
 
 class Backup extends HookWidget {
   const Backup({super.key});
@@ -286,6 +276,10 @@ void onStartBackup() async {
       cacheRoot: Directory('${docs.path}/backup_cache'),
       enqueue: (cachePath, remoteDir) =>
           enqueueFileUpload(localPath: cachePath, remoteDir: remoteDir),
+      cancelEnqueued: (stepId) async {
+        await FileDownloader().cancelTaskWithId(stepId);
+        await FileDownloader().database.deleteRecordWithId(stepId);
+      },
     );
     UiUtil.vibrate(FeedbackType.light);
     UiUtil.toast("已创建备份任务（${parent.steps!.length} 个文件），请到传输页查看");
@@ -297,10 +291,7 @@ void onStartBackup() async {
 
     useEffect(() {
       getData();
-      final dispose = syncBackupTimeOnCompletion((time) {
-        lastBackupTime.value = time;
-      });
-      return dispose;
+      return null;
     }, const []);
 
     return Scaffold(

@@ -17,6 +17,11 @@ void main() {
     '${Directory.current.path}/lib/widgets/transfer_list.dart',
   ).readAsStringSync();
 
+  test('backup parent hides unsupported upload controls', () {
+    expect(source, contains('if (t.state == TransferState.active && !isBackup)'));
+    expect(source, contains('if (t.state == TransferState.error && !isBackup)'));
+  });
+
   test('card actions live in tap sheet, not inline buttons', () {
     expect(source, contains('_showActions(context, t)'));
     expect(source, contains('BottomOptionSheet('));

@@ -395,12 +395,14 @@ class TransferList extends HookWidget {
   }
 
   void _showActions(BuildContext context, TransferTask t) {
+    final isBackup = t.steps != null;
     final options = <BottomOption>[
-      if (t.state == TransferState.active)
+      if (t.state == TransferState.active && !isBackup)
         BottomOption(title: '暂停', onPressed: () => _pause(t)),
-      if (t.state == TransferState.paused || t.state == TransferState.error)
+      if ((t.state == TransferState.paused || t.state == TransferState.error) &&
+          !isBackup)
         BottomOption(title: '继续', onPressed: () => _resume(t)),
-      if (t.state == TransferState.error)
+      if (t.state == TransferState.error && !isBackup)
         BottomOption(title: '重试', onPressed: () => _retry(t)),
       if (t.state != TransferState.done && t.state != TransferState.canceled)
         BottomOption(
@@ -490,15 +492,7 @@ class TransferList extends HookWidget {
 
   Future<bool> _remove(String id) async {
     final t = transferStore.tasks.value.where((e) => e.id == id).firstOrNull;
-    if (t?.steps != null) {
-      transferStore.deleteTransferCache(id);
-      for (final step in t!.steps!) {
-        await FileDownloader().database.deleteRecordWithId(step.id);
-      }
-    } else {
-      await FileDownloader().database.deleteRecordWithId(id);
-    }
-    transferStore.remove(id);
+    if (t != null) await transferStore.deleteTask(t);
     UiUtil.toast('已移除');
     return true;
   }

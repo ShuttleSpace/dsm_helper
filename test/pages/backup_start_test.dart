@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:background_downloader/background_downloader.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:garden/pages/backup/backup.dart';
 import 'package:garden/stores/transfer_store.dart';
@@ -40,24 +41,41 @@ void main() {
     transferStore.remove(parent.id);
   });
 
-  test('partial enqueue failure marks parent error', () async {
+  test('partial enqueue failure stays failed after earlier step completes',
+      () async {
     final cacheRoot = await Directory.systemTemp.createTemp('backup_test_');
     addTearDown(() => cacheRoot.deleteSync(recursive: true));
-    final source = File('${cacheRoot.path}/source.jpg')
+    final first = File('${cacheRoot.path}/first.jpg')
       ..writeAsStringSync('photo');
-    final asset = FakeAsset('a', DateTime(2026, 2, 1), sourceFile: source);
+    final second = File('${cacheRoot.path}/second.jpg')
+      ..writeAsStringSync('photo');
+    final assets = [
+      FakeAsset('a', DateTime(2026, 2, 1), sourceFile: first),
+      FakeAsset('b', DateTime(2026, 2, 2), sourceFile: second),
+    ];
+    final canceled = <String>[];
     await expectLater(
       () => startBackup(
         backupFolder: '/photos',
-        assets: [asset],
+        assets: assets,
         cacheRoot: cacheRoot,
-        enqueue: (cachePath, remoteDir) async => throw Exception('offline'),
+        enqueue: (cachePath, remoteDir) async {
+          if (cachePath.endsWith('/first.jpg')) return 'step1';
+          throw Exception('offline');
+        },
+        cancelEnqueued: (id) async => canceled.add(id),
       ),
       throwsA(isA<BackupEnqueueIncomplete>()),
     );
     final parent = transferStore.tasks.value.firstWhere((t) => t.id.startsWith('backup_'));
     expect(parent.state, TransferState.error);
     expect(parent.errorMessage, contains('offline'));
+    expect(canceled, ['step1']);
+
+    transferStore.applyTaskStatus('step1', TaskStatus.complete);
+    final after = transferStore.tasks.value.firstWhere((t) => t.id == parent.id);
+    expect(after.state, TransferState.error);
+    expect(after.errorMessage, contains('offline'));
     transferStore.remove(parent.id);
   });
 }

@@ -120,6 +120,7 @@ class TransferTask {
     this.etaSeconds,
     this.errorMessage,
     this.statusCode,
+    this.enqueueFailed = false,
   });
 
   final String id;
@@ -137,6 +138,8 @@ class TransferTask {
   final int? etaSeconds;
   final String? errorMessage;
   final int? statusCode;
+  /// 入队阶段失败：后续子步骤回调不能再把父任务改成完成。
+  final bool enqueueFailed;
 
   TransferTask copyWith({
     int? totalBytes,
@@ -150,6 +153,7 @@ class TransferTask {
     int? etaSeconds,
     String? errorMessage,
     int? statusCode,
+    bool? enqueueFailed,
     bool resetError = false,
   }) =>
       TransferTask(
@@ -169,6 +173,7 @@ class TransferTask {
         etaSeconds: resetError ? null : etaSeconds ?? this.etaSeconds,
         errorMessage: resetError ? null : errorMessage ?? this.errorMessage,
         statusCode: resetError ? null : statusCode ?? this.statusCode,
+        enqueueFailed: resetError ? false : enqueueFailed ?? this.enqueueFailed,
       );
 
   Map<String, dynamic> toJson() => {
@@ -187,6 +192,7 @@ class TransferTask {
         'etaSeconds': etaSeconds,
         'errorMessage': errorMessage,
         'statusCode': statusCode,
+        'enqueueFailed': enqueueFailed,
       };
 
   factory TransferTask.fromJson(Map<String, dynamic> j) {
@@ -219,6 +225,7 @@ class TransferTask {
       etaSeconds: j['etaSeconds'] as int?,
       errorMessage: j['errorMessage'] as String?,
       statusCode: j['statusCode'] as int?,
+      enqueueFailed: j['enqueueFailed'] as bool? ?? false,
     );
   }
 }
@@ -286,6 +293,7 @@ class TransferStore {
       );
     }).toList();
     _replace(_withSteps(parent, steps,
+        stickyError: !resetError,
         speedBytesPerSecond: speedBytesPerSecond,
         etaSeconds: etaSeconds,
         errorMessage: errorMessage,
@@ -296,6 +304,8 @@ class TransferStore {
   TransferTask _withSteps(
     TransferTask parent,
     List<TransferStep> steps, {
+    // 入队失败等人工标记的错误不能被后续子步骤回调冲掉。
+    bool stickyError = false,
     double? speedBytesPerSecond,
     int? etaSeconds,
     String? errorMessage,
@@ -318,31 +328,38 @@ class TransferStore {
       state = TransferState.paused;
     }
     final errorStep = steps.where((s) => s.state == TransferState.error).firstOrNull;
+    final effectiveError =
+        (stickyError && parent.state == TransferState.error) ||
+            (parent.enqueueFailed && !resetError);
     return parent.copyWith(
       steps: steps,
       totalBytes: total,
       transferredBytes: transferred,
-      state: state,
+      state: effectiveError ? TransferState.error : state,
       speedBytesPerSecond: speedBytesPerSecond,
       etaSeconds: etaSeconds,
-      errorMessage: errorMessage ?? (resetError ? null : errorStep?.errorMessage),
-      statusCode: errorStep != null ? parent.statusCode : null,
+      errorMessage: effectiveError
+          ? (parent.errorMessage ?? errorMessage ?? errorStep?.errorMessage)
+          : (errorMessage ?? (resetError ? null : errorStep?.errorMessage)),
+      statusCode: effectiveError || errorStep != null ? parent.statusCode : null,
       updatedAt: updatedAt ?? DateTime.now(),
       resetError: resetError,
     );
   }
 
-  void addStep(String groupId, TransferStep step) {
+  void addStep(String groupId, TransferStep step, {bool stickyError = false}) {
     final parent = _find(groupId);
     if (parent?.steps == null) return;
-    _replace(_withSteps(parent!, [...parent.steps!, step]));
+    _replace(_withSteps(parent!, [...parent.steps!, step],
+        stickyError: stickyError));
   }
 
   void removeStep(String groupId, String stepId) {
     final parent = _find(groupId);
     if (parent?.steps == null) return;
     _replace(_withSteps(
-        parent!, parent.steps!.where((s) => s.id != stepId).toList()));
+        parent!, parent.steps!.where((s) => s.id != stepId).toList(),
+        stickyError: true));
   }
 
   void updateProgress(
@@ -384,7 +401,15 @@ class TransferStore {
     _replace(t.copyWith(state: s, updatedAt: DateTime.now()));
   }
 
-  void setError(String id, String message, {int? statusCode}) {
+  /// 返回父任务中每个需要清理的引擎任务 id：有子步骤时是步骤 id。
+  List<String> engineTaskIds(String id) {
+    final t = _find(id);
+    if (t?.steps != null) return t!.steps!.map((s) => s.id).toList();
+    return [id];
+  }
+
+  void setError(String id, String message,
+      {int? statusCode, bool manual = false}) {
     final owner = findStepOwner(id);
     if (owner != null) {
       updateStep(owner.groupId, id,
@@ -397,6 +422,7 @@ class TransferStore {
       state: TransferState.error,
       errorMessage: message,
       statusCode: statusCode,
+      enqueueFailed: manual ? true : null,
       updatedAt: DateTime.now(),
     ));
   }
@@ -487,7 +513,23 @@ class TransferStore {
           file.deleteSync();
         } catch (_) {}
       }
+      final dir = file.parent;
+      if (dir.existsSync()) {
+        try {
+          dir.deleteSync();
+        } catch (_) {}
+      }
     }
+  }
+
+  /// 一处完成引擎记录、缓存和本地记录的清理。
+  Future<void> deleteTask(TransferTask t) async {
+    for (final id in t.steps == null ? [t.id] : t.steps!.map((s) => s.id)) {
+      await FileDownloader().cancelTaskWithId(id);
+      await FileDownloader().database.deleteRecordWithId(id);
+    }
+    deleteTransferCache(t.id);
+    remove(t.id);
   }
 
   void remove(String id) {
@@ -510,6 +552,30 @@ class TransferStore {
     }
     final list = (jsonDecode(raw) as List).cast<Map<String, dynamic>>();
     _tasks.value = list.map(TransferTask.fromJson).toList();
+  }
+
+  /// 备份父任务完成时推进 last_backup_time，只向前推进；app 生命周期内只需调用一次。
+  void Function() startBackupTimeSync() {
+    final subscription = tasks.toStream().listen((all) async {
+      DateTime? latest;
+      for (final t in all) {
+        if (t.steps == null || t.state != TransferState.done) continue;
+        for (final s in t.steps!) {
+          final time = s.modifyTime;
+          if (time != null && (latest == null || time.isAfter(latest))) {
+            latest = time;
+          }
+        }
+      }
+      if (latest == null) return;
+      final stored =
+          int.tryParse(await StorageUtil.getString('last_backup_time') ?? '') ?? 0;
+      if (latest.millisecondsSinceEpoch > stored) {
+        await StorageUtil.setString(
+            'last_backup_time', latest.millisecondsSinceEpoch.toString());
+      }
+    });
+    return subscription.cancel;
   }
 
   /// app 启动时恢复未完成传输（依赖引擎自身的持久化队列续传）。
