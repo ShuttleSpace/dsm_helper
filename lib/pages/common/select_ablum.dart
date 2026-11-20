@@ -7,6 +7,9 @@ import 'package:garden/theme/app_colors.dart';
 import 'package:signals_hooks/signals_hooks.dart';
 import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 
+/// 相册重建后对象相等性会变化，因此按稳定 id 判断选中。
+bool isSameAlbum(AssetPathEntity a, AssetPathEntity b) => a.id == b.id;
+
 class SelectAlbum extends HookWidget {
   final bool multi;
   final bool folder;
@@ -42,8 +45,8 @@ class SelectAlbum extends HookWidget {
                   final selected = selectedAlbums.value
                       .where((element) => !element.isAll)
                       .toList();
-                  if (selected.contains(album)) {
-                    selected.remove(album);
+                  if (selected.any((e) => isSameAlbum(e, album))) {
+                    selected.removeWhere((e) => isSameAlbum(e, album));
                   } else {
                     selected.add(album);
                   }
@@ -87,7 +90,7 @@ class SelectAlbum extends HookWidget {
                     child: SizedBox(
                       width: 20,
                       height: 20,
-                      child: selectedAlbums.value.contains(album)
+                      child: selectedAlbums.value.any((e) => isSameAlbum(e, album))
                           ? const Icon(
                               CupertinoIcons.checkmark_alt,
                               color: AppColors.primaryAction,

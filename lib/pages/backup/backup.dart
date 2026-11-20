@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'package:garden/pages/backup/backup_model.dart';
 import 'package:garden/stores/transfer_store.dart';
 import 'package:garden/services/transfer_upload.dart';
 import 'package:path_provider/path_provider.dart';
@@ -14,8 +13,6 @@ import 'package:cool_ui/cool_ui.dart';
 import 'package:garden/pages/common/select_ablum.dart';
 import 'package:garden/extensions/datetime.dart';
 import 'package:garden/extensions/string.dart';
-import 'package:garden/util/file_types.dart';
-import 'package:garden/widgets/file_icon.dart';
 import 'package:garden/widgets/label.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
@@ -151,9 +148,6 @@ class Backup extends HookWidget {
     final backupFolder = useSignal("");
     final lastBackupTime =
         useSignal<DateTime?>(DateTime.now().add(const Duration(days: -5)));
-    final uploading = useSignal<UploadItem?>(null);
-    // Only read/written from the backup loop, never during build.
-    final cancel = useRef(false);
     final continueBackup = useSignal(true);
 
 getAssetCount() async {
@@ -335,78 +329,6 @@ void onStartBackup() async {
       body: ListView(
         padding: const EdgeInsets.all(20),
         children: [
-          ...[
-            Card(
-              shape: RoundedRectangleBorder(
-                  side: const BorderSide(),
-                  borderRadius: BorderRadius.circular(18)),
-              child: Padding(
-                padding: const EdgeInsets.all(AppConstants.paddingSmall),
-                child: Stack(
-                  children: [
-                    Container(
-                      width: (MediaQuery.sizeOf(context).width - 40) *
-                          (uploading.value?.uploadSize ??
-                              1 /
-                                  (uploading.value?.fileSize == 0
-                                      ? 1
-                                      : (uploading.value?.fileSize ?? 1))),
-                      height: 70,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
-                        color: Colors.amber[100],
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 20, vertical: 15),
-                      child: Row(
-                        children: [
-                          uploading.value?.type == AssetType.image
-                              ? Image.file(
-                                  uploading.value!.file!,
-                                  height: 40,
-                                  width: 40,
-                                )
-                              : const FileIcon(FileTypeEnum.image),
-                          const SizedBox(
-                            width: 20,
-                          ),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  uploading.value?.file?.path.split("/").last ??
-                                      '[Idle]',
-                                  overflow: TextOverflow.ellipsis,
-                                  maxLines: 2,
-                                  style: const TextStyle(fontSize: 13),
-                                ),
-                                const SizedBox(
-                                  height: 5,
-                                ),
-                                Text(
-                                  uploading.value?.file?.parent.path ?? '[Idle]',
-                                  overflow: TextOverflow.ellipsis,
-                                  maxLines: 1,
-                                  style: const TextStyle(
-                                      fontSize: 12, color: Colors.grey),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            const SizedBox(
-              height: 20,
-            ),
-          ],
           OutlinedButton(
             onPressed: () => onChooseBackupTargetDialog(context).then((res) {
               if (res != null && res.length == 1) {
@@ -612,18 +534,10 @@ void onStartBackup() async {
           const SizedBox(
             height: 20,
           ),
-          uploading.value == null
-              ? OutlinedButton(
-                  onPressed: onStartBackup,
-                  child: const Text("开始备份"),
-                )
-              : OutlinedButton(
-                  onPressed: () async {
-                    cancel.value = true;
-                    UiUtil.toast("当前文件上传完成后将暂停任务");
-                  },
-                  child: const Text("暂停备份"),
-                ),
+          OutlinedButton(
+            onPressed: onStartBackup,
+            child: const Text("开始备份"),
+          ),
         ],
       ),
     );
