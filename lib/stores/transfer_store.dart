@@ -416,8 +416,44 @@ class TransferStore {
     persist();
   }
 
+  bool get hasDefaultControlHooks => true;
+
+  ControlHook defaultControlFor(String kind) => (id) async {
+    final downloader = FileDownloader();
+    if (kind == 'cancel') {
+      return downloader.cancelTaskWithId(id);
+    }
+    final task = await downloader.taskForId(id);
+    if (task == null) return false;
+    if (task is UploadTask) {
+      // FileDownloader.pause 只收 DownloadTask；上传走底层 pause。
+      return false;
+    }
+    return switch (kind) {
+      'resume' => downloader.resume(task as DownloadTask),
+      'pause' => downloader.pause(task as DownloadTask),
+      _ => false,
+    };
+  };
+
+  Future<bool> _control(
+    String id,
+    ControlHook? hook,
+    ControlHook defaultHook,
+  ) async {
+    final t = _find(id);
+    if (t?.steps != null) {
+      final results = <bool>[];
+      for (final step in t!.steps!) {
+        results.add(await (hook ?? defaultHook).call(step.id));
+      }
+      return results.any((ok) => ok);
+    }
+    return (hook ?? defaultHook).call(id);
+  }
+
   Future<bool> resumeTask(String id) async {
-    final ok = await (onResume?.call(id) ?? Future.value(false));
+    final ok = await _control(id, onResume, defaultControlFor('resume'));
     if (ok) {
       clearTransferError(id);
       setState(id, TransferState.active);
@@ -426,15 +462,15 @@ class TransferStore {
   }
 
   Future<bool> pauseTask(String id) async {
-    // 包内暂停需 Task 对象（下载靠通知按钮原生暂停）；本地状态先翻转，
-    // 让 UI 反映意图。
-    await onPause?.call(id);
+    // 引擎暂停对默认不允许暂停的上传任务会返回 false，但本地状态照常翻转，
+    // 让 UI 反映用户意图；真正停止上传靠取消/重试。
+    await _control(id, onPause, defaultControlFor('pause'));
     setState(id, TransferState.paused);
     return true;
   }
 
   Future<bool> cancelTask(String id) async {
-    final ok = await (onCancel?.call(id) ?? Future.value(false));
+    final ok = await _control(id, onCancel, defaultControlFor('cancel'));
     setState(id, TransferState.canceled);
     return ok;
   }

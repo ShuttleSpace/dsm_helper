@@ -242,6 +242,68 @@ void main() {
     });
   });
 
+  group('engine controls', () {
+    const parent = TransferTask(
+      id: 'backup_1',
+      type: TransferType.upload,
+      localPath: '',
+      remotePath: '/photos',
+      state: TransferState.active,
+      steps: [
+        TransferStep(
+          id: 's1',
+          localPath: '/c/a',
+          remotePath: '/photos/a',
+          totalBytes: 1,
+          state: TransferState.active,
+        ),
+        TransferStep(
+          id: 's2',
+          localPath: '/c/b',
+          remotePath: '/photos/b',
+          totalBytes: 1,
+          state: TransferState.active,
+        ),
+      ],
+    );
+
+    test('control hooks receive step ids, not only the parent id', () async {
+      final resumed = <String>[];
+      final paused = <String>[];
+      final canceled = <String>[];
+      final store = TransferStore(
+        onResume: (id) async {
+          resumed.add(id);
+          return true;
+        },
+        onPause: (id) async {
+          paused.add(id);
+          return true;
+        },
+        onCancel: (id) async {
+          canceled.add(id);
+          return true;
+        },
+      );
+      store.add(parent);
+
+      await store.resumeTask('backup_1');
+      expect(resumed, ['s1', 's2']);
+      await store.pauseTask('backup_1');
+      expect(paused, ['s1', 's2']);
+      expect(store.tasks.value.first.state, TransferState.paused);
+      await store.cancelTask('backup_1');
+      expect(canceled, ['s1', 's2']);
+      expect(store.tasks.value.first.state, TransferState.canceled);
+    });
+
+    test('default engine controls exist when no hooks are injected', () {
+      final store = TransferStore();
+      expect(store.hasDefaultControlHooks, isTrue);
+      expect(store.defaultControlFor('s1'), isNotNull);
+    });
+  });
+
   group('resumeUnfinishedOnStartup', () {
     test('resumes queued/active/paused but not done/canceled', () async {
       const done = TransferTask(
