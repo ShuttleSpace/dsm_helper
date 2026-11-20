@@ -26,6 +26,29 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:signals_hooks/signals_hooks.dart';
 
 import 'package:garden/widgets/folder_picker_sheet.dart';
+
+/// 把多个相册的资产展平并按 id 去重。
+Future<List<AssetEntity>> collectBackupAssets(
+  Iterable<AssetPathEntity> albums, {
+  Future<List<AssetEntity>> Function(AssetPathEntity) fetch = _defaultAssetFetch,
+}) async {
+  final result = <AssetEntity>[];
+  final ids = <String>{};
+  for (final album in albums) {
+    for (final asset in await fetch(album)) {
+      if (ids.add(asset.id)) result.add(asset);
+    }
+  }
+  return result;
+}
+
+Future<List<AssetEntity>> _defaultAssetFetch(AssetPathEntity album) =>
+    album.getAssetListRange(start: 0, end: 100000000);
+
+/// iOS 的 asset id 含 "/"，不能直接当目录名。
+String backupCacheDirName(String assetId) =>
+    assetId.replaceAll(RegExp(r'[^A-Za-z0-9]'), '_');
+
 class Backup extends HookWidget {
   const Backup({super.key});
 
@@ -42,16 +65,7 @@ class Backup extends HookWidget {
     final continueBackup = useSignal(true);
 
 getAssetCount() async {
-  uploads.clear();
-  var futs = albums.value
-      .map((item) => item.getAssetListRange(start: 0, end: 100000000))
-      .toList();
-  var value = await Future.wait(futs);
-  var values = value.fold([], (prev, el) {
-    prev.addAll(el);
-    return prev;
-  });
-  uploads.addAll(values as List<AssetEntity>);
+  uploads.value = await collectBackupAssets(albums.value);
 }
 
 getData() async {
