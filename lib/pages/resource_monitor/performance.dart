@@ -1,0 +1,264 @@
+import 'dart:async';
+
+import 'package:garden/stores/settings_store.dart';
+import 'package:garden/theme/app_theme.dart';
+import 'package:garden/api/dsm_api.dart';
+import 'package:garden/widgets/bubble_tab_indicator.dart';
+import 'package:garden/widgets/neu_back_button.dart';
+import 'package:garden/widgets/resource_monitor/cpu_tab.dart';
+import 'package:garden/widgets/resource_monitor/memory_tab.dart';
+import 'package:garden/widgets/resource_monitor/network_tab.dart';
+import 'package:garden/widgets/resource_monitor/disk_tab.dart';
+import 'package:garden/widgets/resource_monitor/storage_tab.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:garden/constants/app_constants.dart';
+import 'package:signals_hooks/signals_hooks.dart';
+
+/// 资源监控页面（优化版）
+class Performance extends HookWidget {
+  const Performance({super.key, this.tabIndex = 0});
+  final int tabIndex;
+
+  @override
+  Widget build(BuildContext context) {
+    final tickerProvider = useSingleTickerProvider();
+    final tabController = useMemoized(
+      () => TabController(initialIndex: tabIndex, length: 6, vsync: tickerProvider),
+      const [],
+    );
+    final loading = useSignal(true);
+    final cpus = useSignal<List>([]);
+    final memories = useSignal<List>([]);
+    final networks = useSignal<List>([]);
+    final disks = useSignal<List>([]);
+    final spaces = useSignal<List>([]);
+    final luns = useSignal<List>([]);
+    final maxNetworkSpeed = useSignal(0);
+    final maxDiskReadSpeed = useSignal(0);
+    final maxDiskWriteSpeed = useSignal(0);
+
+    // 图表颜色列表 - 使用主题语义颜色
+    List<Color> chartColors() {
+      final theme = Theme.of(context);
+      final appTheme = theme.extension<AppTheme>();
+      return [
+        appTheme?.errorColor ?? Colors.red,
+        Colors.purpleAccent,
+        Colors.redAccent,
+        appTheme?.successColor ?? Colors.green,
+        appTheme?.warningColor ?? Colors.amber,
+        Colors.orange,
+        Colors.teal,
+        Colors.indigoAccent,
+        Colors.cyanAccent,
+        Colors.yellow,
+        theme.colorScheme.onSurface,
+        Colors.lightGreenAccent,
+        Colors.pinkAccent
+      ];
+    }
+
+    getData() async {
+      late Map data;
+      try {
+        data = await dsmCoreSystemUtilization(
+            ['cpu', 'memory', 'network', 'lun', 'disk', 'space']);
+      } catch (e) {
+        return;
+      }
+      if (!context.mounted) return;
+      loading.value = false;
+      if (cpus.value.length > 30) {
+        cpus.value = List.of(cpus.value)..removeAt(0);
+        disks.value = List.of(disks.value)..removeAt(0);
+        luns.value = List.of(luns.value)..removeAt(0);
+        memories.value = List.of(memories.value)..removeAt(0);
+        networks.value = List.of(networks.value)..removeAt(0);
+        spaces.value = List.of(spaces.value)..removeAt(0);
+      }
+      // 新层返回单个快照，不是复合 result[]；按图表所需结构转换
+      final cpu = data['cpu'];
+      if (cpu is Map) {
+        cpus.value = [
+          ...cpus.value,
+          {
+            'cpu': [
+              {
+                'user': (cpu['user_load'] as num?) ?? 0,
+                'system': ((cpu['system_load'] as num?) ?? 0) +
+                    ((cpu['other_load'] as num?) ?? 0),
+              }
+            ]
+          }
+        ];
+      }
+      final memory = data['memory'];
+      if (memory is Map) {
+        memories.value = [
+          ...memories.value,
+          {
+            'memory_usage_real': (memory['real_usage'] as num?) ?? 0,
+            'memory_swap_cached': (memory['swap_usage'] as num?) ?? 0,
+          }
+        ];
+      }
+      final network = data['network'];
+      if (network is List && network.isNotEmpty) {
+        final total = network.firstWhere(
+          (n) => n is Map && n['device'] == 'total',
+          orElse: () => const <String, dynamic>{},
+        );
+        final download = (total is Map ? total['rx'] : null) as num? ?? 0;
+        final upload = (total is Map ? total['tx'] : null) as num? ?? 0;
+        networks.value = [
+          ...networks.value,
+          {'download': download, 'upload': upload}
+        ];
+        if (download > maxNetworkSpeed.value) {
+          maxNetworkSpeed.value = download.toInt();
+        }
+        if (upload > maxNetworkSpeed.value) {
+          maxNetworkSpeed.value = upload.toInt();
+        }
+      }
+      final disk = data['disk'];
+      if (disk is Map && disk['total'] is Map) {
+        final total = disk['total'] as Map;
+        final read = (total['read_byte'] as num?) ?? 0;
+        final write = (total['write_byte'] as num?) ?? 0;
+        disks.value = [
+          ...disks.value,
+          {'read': read, 'write': write}
+        ];
+        if (read > maxDiskReadSpeed.value) {
+          maxDiskReadSpeed.value = read.toInt();
+        }
+        if (write > maxDiskWriteSpeed.value) {
+          maxDiskWriteSpeed.value = write.toInt();
+        }
+      }
+    }
+
+    useEffect(() {
+      getData();
+      final timer = Timer.periodic(
+          Duration(seconds: settingsStore.refreshDuration.value), (timer) {
+        // getData();
+      });
+      return () {
+        timer.cancel();
+        tabController.dispose();
+      };
+    }, const []);
+
+    return Scaffold(
+      appBar: AppBar(
+        leading: AppBackButton(context),
+        title: const Text("资源监控"),
+      ),
+      body: Column(
+        children: [
+          Card(
+            shape: RoundedRectangleBorder(
+                side: const BorderSide(),
+                borderRadius:
+                    BorderRadius.circular(AppConstants.cardBorderRadius)),
+            margin: const EdgeInsets.symmetric(
+                vertical: AppConstants.paddingSmall,
+                horizontal: AppConstants.paddingLarge),
+            child: TabBar(
+              dividerHeight: 0,
+              isScrollable: false,
+              controller: tabController,
+              indicatorSize: TabBarIndicatorSize.label,
+              labelColor: Theme.brightnessOf(context) == Brightness.dark
+                  ? Colors.white
+                  : Colors.black,
+              unselectedLabelColor: Colors.grey,
+              indicator: const BubbleTabIndicator(),
+              tabs: const [
+                Padding(
+                  padding: EdgeInsets.symmetric(
+                      vertical: AppConstants.paddingSmall,
+                      horizontal: AppConstants.paddingSmall),
+                  child: Text("CPU"),
+                ),
+                Padding(
+                  padding: EdgeInsets.symmetric(
+                      vertical: AppConstants.paddingSmall,
+                      horizontal: AppConstants.paddingSmall),
+                  child: Text("内存"),
+                ),
+                Padding(
+                  padding: EdgeInsets.symmetric(
+                      vertical: AppConstants.paddingSmall,
+                      horizontal: AppConstants.paddingSmall),
+                  child: Text("网络"),
+                ),
+                Padding(
+                  padding: EdgeInsets.symmetric(
+                      vertical: AppConstants.paddingSmall,
+                      horizontal: AppConstants.paddingSmall),
+                  child: Text("磁盘"),
+                ),
+                Padding(
+                  padding: EdgeInsets.symmetric(
+                      vertical: AppConstants.paddingSmall,
+                      horizontal: AppConstants.paddingSmall),
+                  child: Text("存储空间"),
+                ),
+                Padding(
+                  padding: EdgeInsets.symmetric(
+                      vertical: AppConstants.paddingSmall,
+                      horizontal: AppConstants.paddingSmall),
+                  child: Text("LUN"),
+                ),
+              ],
+            ),
+          ),
+          Expanded(
+            child: TabBarView(
+              controller: tabController,
+              children: [
+                CpuTab(
+                  loading: loading.value,
+                  cpus: cpus.value,
+                  colors: chartColors(),
+                ),
+                MemoryTab(
+                  loading: loading.value,
+                  memories: memories.value,
+                  colors: chartColors(),
+                ),
+                NetworkTab(
+                  loading: loading.value,
+                  networks: networks.value,
+                  maxSpeed: maxNetworkSpeed.value,
+                  colors: chartColors(),
+                ),
+                DiskTab(
+                  loading: loading.value,
+                  disks: disks.value,
+                  maxReadSpeed: maxDiskReadSpeed.value,
+                  maxWriteSpeed: maxDiskWriteSpeed.value,
+                  colors: chartColors(),
+                ),
+                StorageTab(
+                  loading: loading.value,
+                  data: spaces.value,
+                  title: "存储空间",
+                ),
+                StorageTab(
+                  loading: loading.value,
+                  data: luns.value,
+                  title: "LUN",
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}

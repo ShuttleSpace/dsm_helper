@@ -1,0 +1,85 @@
+import 'package:flutter/material.dart';
+
+/// 应用主题扩展
+/// 
+/// 定义应用的主题颜色和样式扩展，用于在深色和浅色主题之间切换
+class AppTheme extends ThemeExtension<AppTheme> {
+  static AppTheme of(BuildContext context) {
+    return Theme.of(context).extension<AppTheme>() ?? AppTheme();
+  }
+
+  /// 主色
+  final Color? primaryColor;
+  
+  /// 占位符颜色
+  final Color? placeholderColor;
+  
+  /// 标题颜色
+  final Color? titleColor;
+  
+  /// 进度条颜色
+  final Color? progressColor;
+  
+  /// 成功颜色
+  final Color? successColor;
+  
+  /// 警告颜色
+  final Color? warningColor;
+  
+  /// 错误颜色
+  final Color? errorColor;
+  
+  /// 信息颜色
+  final Color? infoColor;
+  
+  /// 主操作颜色
+  final Color? primaryActionColor;
+  
+  /// 占位符背景色
+  final Color? placeholderBackgroundColor;
+
+  AppTheme({
+    this.primaryColor,
+    this.placeholderColor,
+    this.titleColor,
+    this.progressColor,
+    this.successColor,
+    this.warningColor,
+    this.errorColor,
+    this.infoColor,
+    this.primaryActionColor,
+    this.placeholderBackgroundColor,
+  });
+
+  @override
+  ThemeExtension<AppTheme> copyWith({
+    Color? primaryColor,
+    Color? placeholderColor,
+    Color? titleColor,
+    Color? progressColor,
+    Color? successColor,
+    Color? warningColor,
+    Color? errorColor,
+    Color? infoColor,
+    Color? primaryActionColor,
+    Color? placeholderBackgroundColor,
+  }) {
+    return AppTheme(
+      primaryColor: primaryColor ?? this.primaryColor,
+      placeholderColor: placeholderColor ?? this.placeholderColor,
+      titleColor: titleColor ?? this.titleColor,
+      progressColor: progressColor ?? this.progressColor,
+      successColor: successColor ?? this.successColor,
+      warningColor: warningColor ?? this.warningColor,
+      errorColor: errorColor ?? this.errorColor,
+      infoColor: infoColor ?? this.infoColor,
+      primaryActionColor: primaryActionColor ?? this.primaryActionColor,
+      placeholderBackgroundColor: placeholderBackgroundColor ?? this.placeholderBackgroundColor,
+    );
+  }
+
+  @override
+  AppTheme lerp(ThemeExtension<AppTheme> other, double t) {
+    return this;
+  }
+}

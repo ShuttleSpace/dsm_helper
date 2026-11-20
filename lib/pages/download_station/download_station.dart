@@ -1,0 +1,420 @@
+import 'dart:async';
+import 'package:garden/extensions/int.dart';
+import 'package:garden/util/file_type_util.dart';
+import 'package:garden/util/file_types.dart';
+
+import 'package:garden/pages/download_station/add_task.dart';
+import 'package:garden/pages/download_station/detail.dart';
+import 'package:garden/theme/app_colors.dart';
+import 'package:garden/theme/app_theme.dart';
+import 'package:garden/api/dsm_api.dart';
+import 'package:garden/util/log.dart';
+import 'package:garden/widgets/file_icon.dart';
+import 'package:garden/widgets/animation_progress_bar.dart';
+import 'package:garden/widgets/neu_back_button.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:signals_hooks/signals_hooks.dart';
+
+class DownloadStation extends HookWidget {
+  const DownloadStation({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final loading = useSignal(true);
+    final tasks = useSignal<List>([]);
+    final downloadRate = useSignal(0);
+    final uploadRate = useSignal(0);
+    final pauseLoading = useMapSignal<String, bool>({});
+
+    Future<void> getData() async {
+      try {
+        final result = await dsmDownloadStationOverview();
+        if (!context.mounted) return;
+        for (final item in result) {
+          if (item is! Map || item['success'] != true) continue;
+          final data = item['data'];
+          if (data is! Map) continue;
+          switch (item['api']) {
+            case "SYNO.DownloadStation2.Task":
+              tasks.value = data['task'] ?? [];
+              break;
+            case "SYNO.DownloadStation2.Task.Statistic":
+              downloadRate.value = data['download_rate'] ?? 0;
+              uploadRate.value = data['upload_rate'] ?? 0;
+              break;
+          }
+        }
+      } catch (e) {
+        Log.warn('download station overview: $e');
+      } finally {
+        if (context.mounted) loading.value = false;
+      }
+    }
+
+    useEffect(() {
+      final timer = Timer.periodic(const Duration(seconds: 10), (timer) {
+        getData();
+      });
+      getData();
+      return timer.cancel;
+    }, const []);
+
+  Widget buildDownloadItem(download) {
+    pauseLoading[download['id']] = pauseLoading[download['id']] ?? false;
+    FileTypeEnum fileType = FileTypeUtil.toFileTypeEnum(
+        FileTypeUtil.getFileType(download['title']));
+    return GestureDetector(
+      onTap: () {
+        Navigator.of(context)
+            .push(
+          CupertinoPageRoute(
+            builder: (context) {
+              return DownloadDetail(download['id']);
+            },
+            settings: const RouteSettings(name: "download_detail"),
+          ),
+        )
+            .then((res) {
+          if (res != null && res) {
+            getData();
+          }
+        });
+      },
+      child: Card(
+        shape: RoundedRectangleBorder(
+            side: const BorderSide(), borderRadius: BorderRadius.circular(18)),
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            children: [
+              Row(
+                children: [
+                  FileIcon(fileType),
+                  const SizedBox(
+                    width: 10,
+                  ),
+                  Expanded(
+                    child: Text(
+                      "${download['title']}",
+                      style: const TextStyle(fontSize: 16),
+                      maxLines: 3,
+                    ),
+                  ),
+                  const SizedBox(
+                    width: 10,
+                  ),
+                  SizedBox(
+                    width: 35,
+                    child: download['status'] == 2 ||
+                            download['status'] == 3 ||
+                            download['status'] > 100
+                        ? GestureDetector(
+                            onTap: () async {
+                              pauseLoading[download['id']] = true;
+                              try {
+                                await dsmDownloadStation2TaskAction(
+                                    [download['id']],
+                                    download['status'] == 2 ? "pause" : "resume");
+                                await getData();
+                              } catch (e) {
+                                Log.warn('download task action: $e');
+                              } finally {
+                                pauseLoading[download['id']] = false;
+                              }
+                            },
+                            child: pauseLoading[download['id']] == true
+                                ? const CupertinoActivityIndicator()
+                                : Icon(
+                                    download['status'] == 2
+                                        ? Icons.pause_circle_outline_sharp
+                                        : Icons.play_circle_outline_sharp,
+                                    color: download['status'] == 2
+                                        ? Colors.red
+                                        : Colors.green,
+                                  ),
+                          )
+                        : Container(
+                            // child: Text("${download['status']}"),
+                            ),
+                  ),
+                ],
+              ),
+              const SizedBox(
+                height: 5,
+              ),
+              Row(
+                children: [
+                  Expanded(
+                    flex: 2,
+                    child: Text.rich(
+                      TextSpan(
+                        children: [
+                          if (download['status'] != 5)
+                            TextSpan(
+                              text:
+                                  "${download['additional']['transfer']['size_downloaded'].formatSize()} / ",
+                              style: const TextStyle(
+                                  fontSize: 12, color: Colors.lightBlueAccent),
+                            ),
+                          TextSpan(
+                            text: download['size'].formatSize(),
+                            style: const TextStyle(
+                                fontSize: 12, color: Colors.grey),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  if (download['status'] == 2)
+                    Expanded(
+                      child: Text(
+                        download['additional']['transfer']['speed_download'] > 0
+                            ? (int.parse(((download['size'] -
+                                            download['additional']['transfer']
+                                                ['size_downloaded']) /
+                                        download['additional']['transfer']
+                                            ['speed_download'])
+                                    .ceil()))
+                                .timeRemaining()
+                            : "--:--:--",
+                        style:
+                            const TextStyle(fontSize: 12, color: Colors.grey),
+                        textAlign: TextAlign.start,
+                      ),
+                    ),
+                  Expanded(
+                    child: download['status'] == 1
+                        ? const Text(
+                            "等待中",
+                            style: TextStyle(fontSize: 12, color: Colors.grey),
+                            textAlign: TextAlign.right,
+                          )
+                        : download['status'] == 2
+                            ? Text(
+                                "${download['additional']['transfer']['speed_download'].formatSize()}/s",
+                                style: const TextStyle(
+                                    fontSize: 12,
+                                    color: Colors.lightBlueAccent),
+                                textAlign: TextAlign.right,
+                              )
+                            : download['status'] == 3
+                                ? const Text(
+                                    "已暂停",
+                                    style: TextStyle(
+                                        fontSize: 12, color: Colors.grey),
+                                    textAlign: TextAlign.right,
+                                  )
+                                : download['status'] == 5
+                                    ? const Text(
+                                        "已完成",
+                                        style: TextStyle(
+                                            fontSize: 12, color: Colors.green),
+                                        textAlign: TextAlign.right,
+                                      )
+                                    : download['status'] == 6
+                                        ? const Text(
+                                            "检查中",
+                                            style: TextStyle(
+                                                fontSize: 12,
+                                                color: Colors.grey),
+                                            textAlign: TextAlign.right,
+                                          )
+                                        : download['status'] == 8
+                                            ? const Text(
+                                                "做种中",
+                                                style: TextStyle(
+                                                    fontSize: 12,
+                                                    color: Colors.greenAccent),
+                                                textAlign: TextAlign.right,
+                                              )
+                                            : download['status'] == 11
+                                                ? const Text(
+                                                    "等待中",
+                                                    style: TextStyle(
+                                                        fontSize: 12,
+                                                        color: Colors.blue),
+                                                    textAlign: TextAlign.right,
+                                                  )
+                                                : download['status'] == 12
+                                                    ? const Text(
+                                                        "下载中",
+                                                        style: TextStyle(
+                                                            fontSize: 12,
+                                                            color: Colors.blue),
+                                                        textAlign:
+                                                            TextAlign.right,
+                                                      )
+                                                    : download['status'] == 101
+                                                        ? const Text(
+                                                            "错误",
+                                                            style: TextStyle(
+                                                                fontSize: 12,
+                                                                color:
+                                                                    Colors.red),
+                                                            textAlign:
+                                                                TextAlign.right,
+                                                          )
+                                                        : download['status'] ==
+                                                                105
+                                                            ? const Text(
+                                                                "空间不足",
+                                                                style: TextStyle(
+                                                                    fontSize:
+                                                                        12,
+                                                                    color: Colors
+                                                                        .red),
+                                                                textAlign:
+                                                                    TextAlign
+                                                                        .right,
+                                                              )
+                                                            : download['status'] ==
+                                                                    113
+                                                                ? const Text(
+                                                                    "重复的任务",
+                                                                    style: TextStyle(
+                                                                        fontSize:
+                                                                            12,
+                                                                        color: Colors
+                                                                            .red),
+                                                                    textAlign:
+                                                                        TextAlign
+                                                                            .right,
+                                                                  )
+                                                                : Text(
+                                                                    "代码：${download['status']}",
+                                                                    style: const TextStyle(
+                                                                        fontSize:
+                                                                            12,
+                                                                        color: Colors
+                                                                            .red),
+                                                                    textAlign:
+                                                                        TextAlign
+                                                                            .right,
+                                                                  ),
+                  ),
+                ],
+              ),
+              const SizedBox(
+                height: 2,
+              ),
+              FAProgressBar(
+                backgroundColor: AppColors.greyLight,
+                progressColor: Colors.blue,
+                size: 6,
+                currentValue: download['size'] == 0
+                    ? 0
+                    : (download['additional']['transfer']['size_downloaded'] /
+                            download['size'] *
+                            100)
+                        .ceil(),
+              )
+              // download['status'] == 5
+              //     ? Label("完成", Colors.green)
+              //     : download['status'] == 2
+              //         ? Label(download['size'] == 0 ? "下载中" : "${(download['additional']['transfer']['size_downloaded'] / download['size'] * 100).toStringAsFixed(2)}%", Colors.lightBlueAccent)
+              //         : download['status'] == 3
+              //             ? Label("暂停", Colors.orange)
+              //             : Label("${download['status']}", Colors.red),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+    return Scaffold(
+      appBar: AppBar(
+        leading: AppBackButton(context),
+        title: downloadRate.value > 0 || uploadRate.value > 0
+            ? Row(
+                // mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(
+                    Icons.download_sharp,
+                    size: 20,
+                    color: Colors.lightBlueAccent,
+                  ),
+                  Text(
+                    downloadRate.value.formatSize(),
+                    style: const TextStyle(
+                      color: Colors.lightBlueAccent,
+                    ),
+                  ),
+                  const SizedBox(
+                    width: 10,
+                  ),
+                  const Icon(
+                    Icons.upload_sharp,
+                    size: 20,
+                    color: Colors.orange,
+                  ),
+                  Text(
+                    uploadRate.value.formatSize(),
+                    style: const TextStyle(
+                      color: Colors.orange,
+                    ),
+                  ),
+                ],
+              )
+            : const Text("Download Station"),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 10, top: 8, bottom: 8),
+            child: OutlinedButton(
+              onPressed: () {
+                Navigator.of(context)
+                    .push(
+                  CupertinoPageRoute(
+                    builder: (context) {
+                      return const AddDownloadTask();
+                    },
+                    settings: const RouteSettings(name: "add_download_task"),
+                  ),
+                )
+                    .then((value) {
+                  getData();
+                });
+              },
+              child: const Icon(Icons.add),
+            ),
+          ),
+        ],
+      ),
+      body: loading.value
+          ? const Center(
+              child: CupertinoActivityIndicator(
+                radius: 14,
+              ),
+            )
+          : tasks.value.isNotEmpty
+              ? Column(
+                  children: [
+                    Expanded(
+                      child: ListView.separated(
+                        padding: const EdgeInsets.all(20),
+                        itemBuilder: (context, i) {
+                          return buildDownloadItem(tasks.value[i]);
+                        },
+                        itemCount: tasks.value.length,
+                        separatorBuilder: (context, i) {
+                          return const SizedBox(
+                            height: 20,
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                )
+              : Center(
+                  child: Text(
+                    "暂无下载任务",
+                    style:
+                        TextStyle(color: AppTheme.of(context).placeholderColor),
+                  ),
+                ),
+    );
+  }
+}

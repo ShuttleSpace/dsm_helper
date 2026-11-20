@@ -1,0 +1,52 @@
+{
+  // 使用 IntelliSense 了解相关属性。 
+  // 悬停以查看现有属性的描述。
+  // 欲了解更多信息，请访问: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+  
+    {
+      "name": "garden",
+      "request": "launch",
+      "type": "dart",
+      "program": "lib/main.dart",
+      "args": [
+        "--no-enable-impeller"
+      ]
+    },
+    {
+      "name": "garden (profile mode)",
+      "request": "launch",
+      "type": "dart",
+      "program": "lib/main.dart",
+      "flutterMode": "profile"
+    },
+    {
+      "name": "garden (release mode)",
+      "request": "launch",
+      "program": "lib/main.dart",
+      "type": "dart",
+      "flutterMode": "release"
+    },
+    {
+      "name": "fplayer",
+      "cwd": "fplayer",
+      "request": "launch",
+      "type": "dart"
+    },
+    {
+      "name": "fplayer (profile mode)",
+      "cwd": "fplayer",
+      "request": "launch",
+      "type": "dart",
+      "flutterMode": "profile"
+    },
+    {
+      "name": "fplayer (release mode)",
+      "cwd": "fplayer",
+      "request": "launch",
+      "type": "dart",
+      "flutterMode": "release"
+    }
+  ]
+}
