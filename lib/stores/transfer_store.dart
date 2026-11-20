@@ -35,6 +35,73 @@ class ChunkState {
       );
 }
 
+class TransferStep {
+  const TransferStep({
+    required this.id,
+    required this.localPath,
+    required this.remotePath,
+    this.totalBytes = 0,
+    this.transferredBytes = 0,
+    this.state = TransferState.queued,
+    this.modifyTime,
+    this.errorMessage,
+  });
+
+  final String id;
+  final String localPath;
+  final String remotePath;
+  final int totalBytes;
+  final int transferredBytes;
+  final TransferState state;
+  final DateTime? modifyTime;
+  final String? errorMessage;
+
+  TransferStep copyWith({
+    int? transferredBytes,
+    int? totalBytes,
+    TransferState? state,
+    DateTime? modifyTime,
+    String? errorMessage,
+  }) =>
+      TransferStep(
+        id: id,
+        localPath: localPath,
+        remotePath: remotePath,
+        totalBytes: totalBytes ?? this.totalBytes,
+        transferredBytes: transferredBytes ?? this.transferredBytes,
+        state: state ?? this.state,
+        modifyTime: modifyTime ?? this.modifyTime,
+        errorMessage: errorMessage ?? this.errorMessage,
+      );
+
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'localPath': localPath,
+        'remotePath': remotePath,
+        'totalBytes': totalBytes,
+        'transferredBytes': transferredBytes,
+        'state': state.index,
+        'modifyTime': modifyTime?.millisecondsSinceEpoch,
+        'errorMessage': errorMessage,
+      };
+
+  factory TransferStep.fromJson(Map<String, dynamic> j) {
+    final ms = j['modifyTime'] as num?;
+    return TransferStep(
+      id: j['id'] as String,
+      localPath: j['localPath'] as String,
+      remotePath: j['remotePath'] as String,
+      totalBytes: j['totalBytes'] as int? ?? 0,
+      transferredBytes: j['transferredBytes'] as int? ?? 0,
+      state: TransferState.values[j['state'] as int? ?? 0],
+      modifyTime: ms == null || ms <= 0
+          ? null
+          : DateTime.fromMillisecondsSinceEpoch(ms.toInt()),
+      errorMessage: j['errorMessage'] as String?,
+    );
+  }
+}
+
 class TransferTask {
   const TransferTask({
     required this.id,
@@ -45,6 +112,7 @@ class TransferTask {
     this.transferredBytes = 0,
     this.state = TransferState.queued,
     this.chunks,
+    this.steps,
     this.createdAt,
     this.updatedAt,
     this.speedBytesPerSecond,
@@ -61,6 +129,7 @@ class TransferTask {
   final int transferredBytes;
   final TransferState state;
   final List<ChunkState>? chunks;
+  final List<TransferStep>? steps;
   final DateTime? createdAt;
   final DateTime? updatedAt;
   final double? speedBytesPerSecond;
@@ -73,6 +142,7 @@ class TransferTask {
     int? transferredBytes,
     TransferState? state,
     List<ChunkState>? chunks,
+    List<TransferStep>? steps,
     DateTime? createdAt,
     DateTime? updatedAt,
     double? speedBytesPerSecond,
@@ -90,6 +160,7 @@ class TransferTask {
         transferredBytes: transferredBytes ?? this.transferredBytes,
         state: state ?? this.state,
         chunks: chunks ?? this.chunks,
+        steps: steps ?? this.steps,
         createdAt: createdAt ?? this.createdAt,
         updatedAt: updatedAt ?? this.updatedAt,
         speedBytesPerSecond:
@@ -108,6 +179,7 @@ class TransferTask {
         'transferredBytes': transferredBytes,
         'state': state.index,
         'chunks': chunks?.map((c) => c.toJson()).toList(),
+        if (steps != null) 'steps': steps!.map((s) => s.toJson()).toList(),
         'createdAt': createdAt?.millisecondsSinceEpoch,
         'updatedAt': updatedAt?.millisecondsSinceEpoch,
         'speedBytesPerSecond': speedBytesPerSecond,
@@ -135,6 +207,10 @@ class TransferTask {
       chunks: (j['chunks'] as List?)
           ?.cast<Map<String, dynamic>>()
           .map(ChunkState.fromJson)
+          .toList(),
+      steps: (j['steps'] as List?)
+          ?.cast<Map<String, dynamic>>()
+          .map(TransferStep.fromJson)
           .toList(),
       createdAt: readTime('createdAt'),
       updatedAt: readTime('updatedAt'),
@@ -171,6 +247,103 @@ class TransferStore {
     persist();
   }
 
+  /// 引擎回调可能带的是子步骤 id，先找到它所属的父任务。
+  ({String groupId, TransferStep step})? findStepOwner(String stepId) {
+    for (final t in _tasks.value) {
+      final step = t.steps?.where((s) => s.id == stepId).firstOrNull;
+      if (step != null) return (groupId: t.id, step: step);
+    }
+    return null;
+  }
+
+  void updateStep(
+    String groupId,
+    String stepId, {
+    int? transferred,
+    int? total,
+    TransferState? state,
+    String? errorMessage,
+    double? speedBytesPerSecond,
+    int? etaSeconds,
+    bool forceActive = false,
+    bool resetError = false,
+  }) {
+    final parent = _find(groupId);
+    if (parent?.steps == null) return;
+    final now = DateTime.now();
+    final steps = parent!.steps!.map((s) {
+      if (s.id != stepId) return s;
+      final active = forceActive && s.state == TransferState.queued
+          ? TransferState.active
+          : null;
+      return s.copyWith(
+        transferredBytes: transferred ??
+            (state == TransferState.done ? total ?? s.totalBytes : null),
+        totalBytes: total,
+        state: state ?? active,
+        errorMessage: resetError ? null : errorMessage,
+      );
+    }).toList();
+    _replace(_withSteps(parent, steps,
+        speedBytesPerSecond: speedBytesPerSecond,
+        etaSeconds: etaSeconds,
+        errorMessage: errorMessage,
+        updatedAt: now,
+        resetError: resetError));
+  }
+
+  TransferTask _withSteps(
+    TransferTask parent,
+    List<TransferStep> steps, {
+    double? speedBytesPerSecond,
+    int? etaSeconds,
+    String? errorMessage,
+    DateTime? updatedAt,
+    bool resetError = false,
+  }) {
+    final total = steps.fold<int>(0, (sum, s) => sum + s.totalBytes);
+    final transferred = steps.fold<int>(0, (sum, s) => sum + s.transferredBytes);
+    TransferState state;
+    if (steps.any((s) => s.state == TransferState.error)) {
+      state = TransferState.error;
+    } else if (steps.any((s) =>
+        s.state == TransferState.queued || s.state == TransferState.active)) {
+      state = TransferState.active;
+    } else if (steps.every((s) => s.state == TransferState.done)) {
+      state = TransferState.done;
+    } else if (steps.every((s) => s.state == TransferState.canceled)) {
+      state = TransferState.canceled;
+    } else {
+      state = TransferState.paused;
+    }
+    final errorStep = steps.where((s) => s.state == TransferState.error).firstOrNull;
+    return parent.copyWith(
+      steps: steps,
+      totalBytes: total,
+      transferredBytes: transferred,
+      state: state,
+      speedBytesPerSecond: speedBytesPerSecond,
+      etaSeconds: etaSeconds,
+      errorMessage: errorMessage ?? (resetError ? null : errorStep?.errorMessage),
+      statusCode: errorStep != null ? parent.statusCode : null,
+      updatedAt: updatedAt ?? DateTime.now(),
+      resetError: resetError,
+    );
+  }
+
+  void addStep(String groupId, TransferStep step) {
+    final parent = _find(groupId);
+    if (parent?.steps == null) return;
+    _replace(_withSteps(parent!, [...parent.steps!, step]));
+  }
+
+  void removeStep(String groupId, String stepId) {
+    final parent = _find(groupId);
+    if (parent?.steps == null) return;
+    _replace(_withSteps(
+        parent!, parent.steps!.where((s) => s.id != stepId).toList()));
+  }
+
   void updateProgress(
     String id,
     int transferred,
@@ -178,6 +351,16 @@ class TransferStore {
     double? speedBytesPerSecond,
     int? etaSeconds,
   }) {
+    final owner = findStepOwner(id);
+    if (owner != null) {
+      updateStep(owner.groupId, id,
+          transferred: transferred,
+          total: total,
+          speedBytesPerSecond: speedBytesPerSecond,
+          etaSeconds: etaSeconds,
+          forceActive: true);
+      return;
+    }
     final t = _find(id);
     if (t == null) return;
     _replace(t.copyWith(
@@ -190,12 +373,23 @@ class TransferStore {
   }
 
   void setState(String id, TransferState s) {
+    final owner = findStepOwner(id);
+    if (owner != null) {
+      updateStep(owner.groupId, id, state: s);
+      return;
+    }
     final t = _find(id);
     if (t == null) return;
     _replace(t.copyWith(state: s, updatedAt: DateTime.now()));
   }
 
   void setError(String id, String message, {int? statusCode}) {
+    final owner = findStepOwner(id);
+    if (owner != null) {
+      updateStep(owner.groupId, id,
+          state: TransferState.error, errorMessage: message);
+      return;
+    }
     final t = _find(id);
     if (t == null) return;
     _replace(t.copyWith(
@@ -207,6 +401,11 @@ class TransferStore {
   }
 
   void clearTransferError(String id) {
+    final owner = findStepOwner(id);
+    if (owner != null) {
+      updateStep(owner.groupId, id, resetError: true);
+      return;
+    }
     final t = _find(id);
     if (t == null) return;
     _replace(t.copyWith(resetError: true, updatedAt: DateTime.now()));
