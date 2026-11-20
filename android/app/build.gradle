@@ -1,0 +1,69 @@
+plugins {
+    id "com.android.application"
+    id "kotlin-android"
+    // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
+    id "dev.flutter.flutter-gradle-plugin"
+}
+
+android {
+    namespace = "io.shuttle.garden"
+    compileSdk = flutter.compileSdkVersion
+    ndkVersion = "27.0.12077973"
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
+    }
+
+    defaultConfig {
+        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
+        applicationId = "io.shuttle.garden"
+        // You can update the following values to match your application needs.
+        // For more information, see: https://flutter.dev/to/review-gradle-config.
+        minSdk = flutter.minSdkVersion
+        targetSdk = flutter.targetSdkVersion
+        versionCode = flutter.versionCode
+        versionName = flutter.versionName
+        resourceConfigurations.addAll(["en", "zh"])
+    }
+
+    signingConfigs {
+        release {
+            if (System.getenv("ANDROID_KEYSTORE_BASE64")) {
+                def keystoreFile = file("$buildDir/release.keystore")
+                keystoreFile.parentFile.mkdirs()
+                keystoreFile.bytes = System.getenv("ANDROID_KEYSTORE_BASE64").decodeBase64()
+                storeFile keystoreFile
+                storePassword System.getenv("ANDROID_STORE_PASSWORD")
+                keyAlias System.getenv("ANDROID_KEY_ALIAS")
+                keyPassword System.getenv("ANDROID_KEY_PASSWORD")
+            }
+        }
+    }
+
+    buildTypes {
+        release {
+            // Local builds keep using the debug key when CI signing secrets are absent.
+            signingConfig = System.getenv("ANDROID_KEYSTORE_BASE64") ? signingConfigs.release : signingConfigs.debug
+        }
+    }
+}
+
+kotlin {
+    // 在这里配置 kotlinOptions
+    jvmToolchain(21)
+}
+
+tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
+    kotlinOptions {
+        jvmTarget = "21"
+        // 其他 Kotlin 编译选项...
+    }
+}
+tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile.class).configureEach {
+    jvmTargetValidationMode = org.jetbrains.kotlin.gradle.dsl.jvm.JvmTargetValidationMode.WARNING
+}
+
+flutter {
+    source = "../.."
+}

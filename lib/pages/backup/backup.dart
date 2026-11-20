@@ -1,0 +1,564 @@
+import 'dart:convert';
+import 'package:garden/pages/backup/backup_model.dart';
+import 'package:garden/util/log.dart';
+import 'package:garden/util/ui_util.dart';
+import 'package:garden/util/storage_util.dart';
+import 'package:garden/stores/connection_store.dart';
+import 'dart:io';
+import 'dart:ui';
+
+import 'package:cool_ui/cool_ui.dart';
+import 'package:garden/pages/common/select_ablum.dart';
+import 'package:garden/api/dsm_api.dart';
+import 'package:garden/extensions/datetime.dart';
+import 'package:garden/extensions/string.dart';
+import 'package:garden/util/file_types.dart';
+import 'package:garden/widgets/file_icon.dart';
+import 'package:garden/widgets/label.dart';
+import 'package:garden/widgets/neu_back_button.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:garden/constants/app_constants.dart';
+import 'package:garden/theme/app_colors.dart';
+import 'package:flutter_vibrate/flutter_vibrate.dart';
+import 'package:wechat_assets_picker/wechat_assets_picker.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:signals_hooks/signals_hooks.dart';
+
+import 'package:garden/widgets/folder_picker_sheet.dart';
+class Backup extends HookWidget {
+  const Backup({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final uploads = useListSignal<AssetEntity>([]);
+    final albums = useListSignal<AssetPathEntity>([]);
+    final backupFolder = useSignal("");
+    final lastBackupTime =
+        useSignal<DateTime?>(DateTime.now().add(const Duration(days: -5)));
+    final uploading = useSignal<UploadItem?>(null);
+    // Only read/written from the backup loop, never during build.
+    final cancel = useRef(false);
+    final continueBackup = useSignal(true);
+
+getAssetCount() async {
+  uploads.clear();
+  var futs = albums.value
+      .map((item) => item.getAssetListRange(start: 0, end: 100000000))
+      .toList();
+  var value = await Future.wait(futs);
+  var values = value.fold([], (prev, el) {
+    prev.addAll(el);
+    return prev;
+  });
+  uploads.addAll(values as List<AssetEntity>);
+}
+
+getData() async {
+  String last = await StorageUtil.getString("last_backup_time") ?? '';
+
+  lastBackupTime.value = last.isNotBlank
+      ? DateTime.fromMillisecondsSinceEpoch(int.parse(last))
+      : null;
+  backupFolder.value = await StorageUtil.getString("backup_folder") ?? '';
+  String backupAlbumStr = await StorageUtil.getString("backup_album") ?? '';
+  List backupAlbums = [];
+  if (await PhotoManager.requestPermissionExtend() ==
+      PermissionState.authorized) {
+    if (backupAlbumStr.isNotBlank) {
+      backupAlbums = json.decode(backupAlbumStr);
+
+      List<AssetPathEntity> list = await PhotoManager.getAssetPathList();
+      for (var album in list) {
+        if (backupAlbums.contains(album.id)) {
+          albums.add(album);
+        }
+      }
+    }
+  } else {
+    UiUtil.vibrate(FeedbackType.warning);
+    UiUtil.toast("请先允许${connectionStore.appName}访问相册");
+  }
+
+  getAssetCount();
+  // if (Platform.isAndroid) {
+  //   String last = await HttpUtil.getStorage("last_backup_time");
+  //
+  //   lastBackupTime = last.isNotBlank ? DateTime.fromMillisecondsSinceEpoch(int.parse(last)) : null;
+  //   backupFolder = await HttpUtil.getStorage("backup_folder") ?? "";
+  //   updateState(() {});
+  //   Directory directory = Directory(backupSource);
+  //   List<FileSystemEntity> list = directory.listSync();
+  //   // print(await list.length);
+  //
+  //   list.forEach((element) {
+  //     if (!element.path.split("/").last.startsWith(".")) {
+  //       Directory(element.path).list(recursive: true).listen((event) {
+  //         if (event is File) {
+  //           String ext = event.path.split("/").last.split(".").last;
+  //           if (!["back", "tmp"].contains(ext)) {
+  //             DateTime lastModify = event.lastModifiedSync();
+  //             updateState(() {
+  //               if (lastBackupTime != null) {
+  //                 if (lastModify.isAfter(lastBackupTime)) {
+  //                   uploads.add(UploadItem(event, ext == "mp4" ? UploadFileType.video : UploadFileType.picture, lastModify, fileSize: event.lengthSync()));
+  //                 }
+  //               } else {
+  //                 uploads.add(UploadItem(event, ext == "mp4" ? UploadFileType.video : UploadFileType.picture, lastModify, fileSize: event.lengthSync()));
+  //               }
+  //             });
+  //           }
+  //         }
+  //       });
+  //     }
+  //   });
+  // } else {
+  //
+  // }
+}
+
+Widget buildAlbumLabel(AssetPathEntity album) {
+  return FutureBuilder<int>(
+      future: album.assetCountAsync,
+      builder: (context, snapshot) {
+        return Label(
+          "${album.name} (${snapshot.data})",
+          Colors.lightBlueAccent,
+          fill: true,
+        );
+      });
+  // return Label(
+  //   "${album.name} (${album.assetCountAsync})",
+  //   Colors.lightBlueAccent,
+  //   fill: true,
+  // );
+}
+
+Future<dynamic> onChooseBackupTargetDialog(BuildContext context) {
+  return showFolderPickerSheet(context, filter: ImageFilter.blur());
+}
+
+Future<dynamic> onChooseBackupSourceDialog(BuildContext context) {
+  return showCupertinoModalPopup(
+    context: context,
+    builder: (context) {
+      return SizedBox(
+        width: double.infinity,
+        child: Material(
+        child: Card(
+          shape: RoundedRectangleBorder(
+              side: const BorderSide(),
+              borderRadius: BorderRadius.circular(18)),
+          child: SelectAlbum(
+            multi: true,
+            selected: albums.value,
+          ),
+        ),
+      ),
+      );
+    },
+  );
+}
+
+void onStartBackup() async {
+  if (backupFolder.value.isBlank) {
+    UiUtil.vibrate(FeedbackType.warning);
+    UiUtil.toast("请选择备份目的地");
+    return;
+  }
+  if (albums.value.isEmpty) {
+    UiUtil.vibrate(FeedbackType.warning);
+    UiUtil.toast("请选择备份源");
+    return;
+  }
+  List<AssetEntity> tasks;
+  if (continueBackup.value) {
+    tasks = uploads.value
+        .where((element) =>
+            element.modifiedDateTime.millisecondsSinceEpoch >
+            (lastBackupTime.value?.millisecondsSinceEpoch ?? 0))
+        .toList();
+  } else {
+    tasks = uploads.value;
+  }
+  //对待备份文件进行排序
+  tasks.sort((a, b) {
+    return a.modifiedDateTime.isAtSameMomentAs(b.modifiedDateTime)
+        ? 0
+        : a.modifiedDateTime.isBefore(b.modifiedDateTime)
+            ? -1
+            : 1;
+  });
+  for (int i = 0; i < tasks.length; i++) {
+    if (cancel.value) {
+      cancel.value = false;
+      uploading.value = null;
+      UiUtil.toast("备份任务已暂停");
+      break;
+    }
+    uploading.value = UploadItem(
+        await tasks[i].originFile, tasks[i].modifiedDateTime, tasks[i].type);
+
+    if (uploading.value!.status != UploadStatus.wait) {
+      continue;
+    }
+    //上传文件
+    uploading.value?.status = UploadStatus.running;
+    uploading.notifyListeners();
+    try {
+      await dsmFileStationUploadForPage(
+          backupFolder.value, uploading.value!.file!.path,
+          uploading.value!.cancelToken, (progress, total) {
+        uploading.value!.uploadSize = progress;
+        uploading.value!.fileSize = total;
+        uploading.notifyListeners();
+      });
+    } catch (e) {
+      uploading.value?.status = UploadStatus.failed;
+      uploading.notifyListeners();
+      continue;
+    }
+    if (Platform.isIOS) {
+        // 仅在iOS删除源文件（iOS非真实源文件）
+        uploading.value!.file!.deleteSync();
+      }
+
+      StorageUtil.setString("last_backup_time",
+          uploading.value!.modifyTime!.millisecondsSinceEpoch.toString());
+      lastBackupTime.value = uploading.value!.modifyTime;
+    uploading.value!.status = UploadStatus.complete;
+    uploading.notifyListeners();
+    if (i == tasks.length - 1) {
+      UiUtil.toast("备份已完成");
+      UiUtil.vibrate(FeedbackType.light);
+      uploading.value = null;
+      lastBackupTime.value = DateTime.now();
+    }
+  }
+}
+
+    useEffect(() {
+      getData();
+      return null;
+    }, const []);
+
+    return Scaffold(
+      appBar: AppBar(
+        leading: AppBackButton(context),
+        title: const Text("相册备份"),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 10, top: 8, bottom: 8),
+            child: OutlinedButton(
+              onPressed: () async {
+                var hide = showWeuiLoadingToast(context: context);
+                await PhotoManager.clearFileCache();
+                hide();
+                UiUtil.toast("缓存清理完成");
+              },
+              child: Text(
+                "清理缓存",
+                style: TextStyle(
+                    color: Theme.of(context).textTheme.bodyLarge?.color),
+              ),
+            ),
+          ),
+        ],
+      ),
+      body: ListView(
+        padding: const EdgeInsets.all(20),
+        children: [
+          ...[
+            Card(
+              shape: RoundedRectangleBorder(
+                  side: const BorderSide(),
+                  borderRadius: BorderRadius.circular(18)),
+              child: Padding(
+                padding: const EdgeInsets.all(AppConstants.paddingSmall),
+                child: Stack(
+                  children: [
+                    Container(
+                      width: (MediaQuery.sizeOf(context).width - 40) *
+                          (uploading.value?.uploadSize ??
+                              1 /
+                                  (uploading.value?.fileSize == 0
+                                      ? 1
+                                      : (uploading.value?.fileSize ?? 1))),
+                      height: 70,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        color: Colors.amber[100],
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 20, vertical: 15),
+                      child: Row(
+                        children: [
+                          uploading.value?.type == AssetType.image
+                              ? Image.file(
+                                  uploading.value!.file!,
+                                  height: 40,
+                                  width: 40,
+                                )
+                              : const FileIcon(FileTypeEnum.image),
+                          const SizedBox(
+                            width: 20,
+                          ),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  uploading.value?.file?.path.split("/").last ??
+                                      '[Idle]',
+                                  overflow: TextOverflow.ellipsis,
+                                  maxLines: 2,
+                                  style: const TextStyle(fontSize: 13),
+                                ),
+                                const SizedBox(
+                                  height: 5,
+                                ),
+                                Text(
+                                  uploading.value?.file?.parent.path ?? '[Idle]',
+                                  overflow: TextOverflow.ellipsis,
+                                  maxLines: 1,
+                                  style: const TextStyle(
+                                      fontSize: 12, color: Colors.grey),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(
+              height: 20,
+            ),
+          ],
+          OutlinedButton(
+            onPressed: () => onChooseBackupTargetDialog(context).then((res) {
+              if (res != null && res.length == 1) {
+                backupFolder.value = res[0];
+                StorageUtil.setString("backup_folder", backupFolder.value);
+              }
+            }),
+            child: Row(
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      "备份目的地",
+                      style: TextStyle(fontSize: 12),
+                    ),
+                    Text(
+                      backupFolder.value == ""
+                          ? "请选择目的地"
+                          : backupFolder.value,
+                      style: const TextStyle(fontSize: 16, color: Colors.grey),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(
+            height: 20,
+          ),
+          OutlinedButton(
+            onPressed: () {
+              onChooseBackupSourceDialog(context).then((res) {
+                Log.log("choose backup source dir: $res");
+                if (res != null) {
+                  albums.value = res;
+                  List backupAlbums = albums.value.map((e) => e.id).toList();
+                  StorageUtil.setString(
+                      "backup_album", json.encode(backupAlbums));
+
+                  getAssetCount();
+                }
+              });
+            },
+            child: SizedBox(
+              width: double.infinity,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    "备份源",
+                    style: TextStyle(fontSize: 12),
+                  ),
+                  const SizedBox(
+                    height: 5,
+                  ),
+                  albums.value.isNotEmpty
+                      ? Wrap(
+                          runSpacing: 10,
+                          spacing: 10,
+                          children: albums.value.map(buildAlbumLabel).toList(),
+                        )
+                      : const Text(
+                          "未选择备份源",
+                          style: TextStyle(fontSize: 16, color: Colors.grey),
+                        ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(
+            height: 20,
+          ),
+          GestureDetector(
+            onTap: () {
+              continueBackup.value = true;
+            },
+            child: Card(
+              shape: RoundedRectangleBorder(
+                  side: const BorderSide(),
+                  borderRadius: BorderRadius.circular(18)),
+              child: Padding(
+                padding: const EdgeInsets.all(AppConstants.paddingSmall),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            "继续备份",
+                            style: TextStyle(fontSize: 18),
+                          ),
+                          Text(
+                            lastBackupTime.value != null
+                                ? lastBackupTime.value?.format("Y-m-d H:i:s") ?? ''
+                                : "从未备份过",
+                            style: const TextStyle(
+                                fontSize: 16, color: Colors.grey),
+                          ),
+                          Text(
+                            "${uploads.value.where((AssetEntity upload) => (upload.modifiedDateTime.millisecondsSinceEpoch > (lastBackupTime.value?.millisecondsSinceEpoch ?? 0)) && upload.type == AssetType.image).length}张照片 ${uploads.value.where((upload) => (upload.modifiedDateTime.millisecondsSinceEpoch > (lastBackupTime.value?.millisecondsSinceEpoch ?? 0)) && upload.type == AssetType.video).length}个视频",
+                            style: const TextStyle(
+                                fontSize: 16, color: Colors.grey),
+                          ),
+                        ],
+                      ),
+                    ),
+                    if (continueBackup.value)
+                      const Icon(
+                        CupertinoIcons.checkmark_alt,
+                        color: AppColors.primaryAction,
+                      ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(
+            height: 20,
+          ),
+          GestureDetector(
+            onTap: () {
+              continueBackup.value = false;
+            },
+            child: Card(
+              shape: RoundedRectangleBorder(
+                  side: const BorderSide(),
+                  borderRadius: BorderRadius.circular(18)),
+              child: Padding(
+                padding: const EdgeInsets.all(AppConstants.paddingSmall),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            "全新备份",
+                            style: TextStyle(fontSize: 18),
+                          ),
+                          Text(
+                            "${uploads.where((upload) => upload.type == AssetType.image).length}张照片 ${uploads.where((upload) => upload.type == AssetType.video).length}个视频",
+                            style: const TextStyle(
+                                fontSize: 16, color: Colors.grey),
+                          ),
+                        ],
+                      ),
+                    ),
+                    if (!continueBackup.value)
+                      const Icon(
+                        CupertinoIcons.checkmark_alt,
+                        color: AppColors.primaryAction,
+                      ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(
+            height: 20,
+          ),
+          GestureDetector(
+            onTap: () {
+              UiUtil.toast("暂不支持自动备份");
+            },
+            child: Card(
+              shape: RoundedRectangleBorder(
+                  side: const BorderSide(),
+                  borderRadius: BorderRadius.circular(18)),
+              child: Padding(
+                padding: const EdgeInsets.all(AppConstants.paddingSmall),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            "自动备份",
+                            style: TextStyle(fontSize: 18),
+                          ),
+                          Text(
+                            "打开${connectionStore.appName}后自动从上次备份位置继续备份",
+                            style: const TextStyle(
+                                fontSize: 14, color: Colors.grey),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(
+                      width: 20,
+                      // child: Icon(
+                      //   CupertinoIcons.checkmark_alt,
+                      //   color: AppColors.primaryAction,
+                      // ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(
+            height: 20,
+          ),
+          uploading.value == null
+              ? OutlinedButton(
+                  onPressed: onStartBackup,
+                  child: const Text("开始备份"),
+                )
+              : OutlinedButton(
+                  onPressed: () async {
+                    cancel.value = true;
+                    UiUtil.toast("当前文件上传完成后将暂停任务");
+                  },
+                  child: const Text("暂停备份"),
+                ),
+        ],
+      ),
+    );
+  }
+}

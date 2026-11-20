@@ -1,0 +1,49 @@
+import 'package:garden/util/http_util.dart';
+import 'package:garden/stores/connection_store.dart';
+
+class TeamSpaceSetting {
+  TeamSpaceSetting({
+    this.allowRootFolderPublic,
+    this.enablePerson,
+    this.enabled,
+    this.teamSpaceDisabledByShareFolderDisabled,
+  });
+
+  static Future<TeamSpaceSetting> fetch() async {
+    Map<String, dynamic> data = {
+      "api":
+          '"SYNO.${connectionStore.dsmVersion.value >= 7 ? "Foto" : "Photo"}.Setting.TeamSpace',
+      "method": "get",
+      "version": 1,
+      "_sid": connectionStore.sid,
+    };
+    var res = await HttpUtil.instance.post("entry.cgi", data: data);
+    if (res['success']) {
+      return TeamSpaceSetting.fromJson(res['data']);
+    } else {
+      throw Exception();
+    }
+  }
+
+  TeamSpaceSetting.fromJson(dynamic json) {
+    allowRootFolderPublic = json['allow_root_folder_public'];
+    enablePerson = json['enable_person'];
+    enabled = json['enabled'];
+    teamSpaceDisabledByShareFolderDisabled =
+        json['team_space_disabled_by_share_folder_disabled'];
+  }
+  bool? allowRootFolderPublic;
+  bool? enablePerson;
+  bool? enabled;
+  bool? teamSpaceDisabledByShareFolderDisabled;
+
+  Map<String, dynamic> toJson() {
+    final map = <String, dynamic>{};
+    map['allow_root_folder_public'] = allowRootFolderPublic;
+    map['enable_person'] = enablePerson;
+    map['enabled'] = enabled;
+    map['team_space_disabled_by_share_folder_disabled'] =
+        teamSpaceDisabledByShareFolderDisabled;
+    return map;
+  }
+}

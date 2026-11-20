@@ -1,0 +1,32 @@
+POST /webapi/entry.cgi HTTP/1.1
+Host: 192.168.8.40:5000
+Content-Length: 131
+X-SYNO-TOKEN: cXOLO.EgGjnHU
+X-SYNO-HASH: Iji6XKDrOssP_KHPV82vOUSzPuVLzw.NDY
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36
+DNT: 1
+Content-Type: application/x-www-form-urlencoded; charset=UTF-8
+Accept: */*
+Origin: http://192.168.8.40:5000
+Referer: http://192.168.8.40:5000/
+Accept-Encoding: gzip
+Accept-Language: zh-CN,zh;q=0.9,en;q=0.8
+Cookie: _SSID=0PTgndardwh_YmP9GythTg4QYjIkumDrdRSV9AniDjk; stay_login=1; id=MK-MeppRQh2e4KxjeXBExPnhaSUSxpgjPdgnX3LkJWwrbNQ9a7mJbNYQYuXm1WDo4ZIZZwFWJ4wWty3qFVIAds; did=dLRG8PP4Q6QJYT5krz6oTuiGOf1aSoNN9aQCY9eIVzVIUz-VRssdkX7ZTtwjjUKoVbNk9yPFafB4g-l1H7XH6Q; _CrPoSt=cHJvdG9jb2w9aHR0cDo7IHBvcnQ9NTAwMDsgcGF0aG5hbWU9Lzs%3D; io=Q1lyk_ARiF7AtqSyAAAQ
+
+api=SYNO.Core.CurrentConnection&method=list&version=1&start=0&limit=50&sort=%22time%22&sort_by=%22time%22&sort_direction=%22DESC%22
+
+HTTP/1.1 200 OK
+Server: nginx
+Date: Wed, 11 Feb 2026 02:02:01 GMT
+Content-Type: application/json; charset="UTF-8"
+Transfer-Encoding: chunked
+Connection: close
+Vary: Accept-Encoding
+X-Content-Type-Options: nosniff
+X-XSS-Protection: 1; mode=block
+Cache-Control: max-age=0, no-cache, no-store, must-revalidate
+Pragma: no-cache
+Expires: 0
+Content-Encoding: gzip
+
+{"data":{"items":[{"can_be_kicked":true,"descr":"DiskStation Manager","did":"UAtcQZ_0cA8,YUz4VUA1ou8","first_login_time":"2026/02/10 16:44:04","from":"192.168.8.77","is_amfa":false,"is_current_connected":true,"is_otp_trusted":false,"location":"","pid":1,"protocol":"HTTP/HTTPS","time":"2026/02/11 09:41:58","type":"HTTP/HTTPS","user_agent":"","user_can_be_disabled":true,"who":"humphrey"},{"can_be_kicked":true,"descr":"File Station","did":"4C6ANiEbYoE","first_login_time":"2026/02/08 22:01:49","from":"192.168.8.77","is_amfa":false,"is_current_connected":false,"is_otp_trusted":false,"location":"","pid":1,"protocol":"HTTP/HTTPS","time":"2026/02/08 22:01:49","type":"HTTP/HTTPS","user_agent":"","user_can_be_disabled":true,"who":"humphrey"},{"can_be_kicked":true,"descr":"Secure SignIn Service","did":"a-ahj_dHW9s","first_login_time":"2026/02/06 22:17:04","from":"192.168.8.74","is_amfa":false,"is_current_connected":false,"is_otp_trusted":false,"location":"","pid":1,"protocol":"HTTP/HTTPS","time":"2026/02/06 22:17:04","type":"HTTP/HTTPS","user_agent":"","user_can_be_disabled":true,"who":"humphrey"},{"can_be_kicked":true,"descr":"Synology Drive","did":"kxnmZ7HLo5U","first_login_time":"2025/11/02 17:46:33","from":"192.168.8.63","is_amfa":false,"is_current_connected":false,"is_otp_trusted":false,"location":"","pid":1,"protocol":"HTTP/HTTPS","time":"2025/11/02 17:46:33","type":"HTTP/HTTPS","user_agent":"","user_can_be_disabled":true,"who":"humphrey"},{"can_be_kicked":true,"descr":"Synology Drive","did":"nu-lqYLnrGk","first_login_time":"2024/02/26 12:10:29","from":"192.168.8.10","is_amfa":false,"is_current_connected":false,"is_otp_trusted":false,"location":"","pid":1,"protocol":"HTTP/HTTPS","time":"2024/02/26 12:10:29","type":"HTTP/HTTPS","user_agent":"","user_can_be_disabled":true,"who":"humphrey"}],"systime":"Wed Feb 11 10:02:01 2026\n","total":5},"success":true}
