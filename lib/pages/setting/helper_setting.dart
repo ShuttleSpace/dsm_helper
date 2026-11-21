@@ -143,7 +143,7 @@ class HelperSetting extends HookWidget {
       biometrics.value =
           await StorageUtil.getBool("launch_auth_biometrics") ?? false;
       videoPlayer.value =
-          await StorageUtil.getBool("use_embeed_video_player") ?? false;
+          await StorageUtil.getBool("use_embeed_video_player") ?? true;
       launchAccountPage.value =
           await StorageUtil.getBool('launch_account_page') ?? false;
       canCheckBiometrics.value = await auth.canCheckBiometrics;
@@ -332,9 +332,6 @@ class HelperSetting extends HookWidget {
                   settings: const RouteSettings(name: "player_setting"),
                 ),
               );
-
-              videoPlayer.value = !videoPlayer.value;
-              StorageUtil.setBool("use_embeed_video_player", videoPlayer.value);
             },
           ),
           const SizedBox(

@@ -643,6 +643,8 @@ class Files extends HookWidget {
                 } catch (e) {
                   Log.info("无NFO文件");
                 }
+                final subtitles =
+                    FileTypeUtil.findSiblingSubtitles(files.value, name);
                 if (context.mounted) {
                   // ignore: use_build_context_synchronously
                   Navigator.of(context)
@@ -652,6 +654,7 @@ class Files extends HookWidget {
                       name: file['name'],
                       cover: cover,
                       nfo: nfo,
+                      subtitles: subtitles,
                     );
                   }));
                 }

@@ -1,5 +1,7 @@
 import 'dart:async';
 import 'package:garden/util/log.dart';
+import 'package:garden/util/storage_util.dart';
+import 'package:garden/util/tmdb_util.dart';
 import 'package:garden/util/ui_util.dart';
 import 'package:garden/stores/connection_store.dart';
 import 'dart:convert';
@@ -8,9 +10,11 @@ import 'dart:io';
 import 'package:android_intent_plus/android_intent.dart';
 import 'package:garden/api/dsm_api.filestation.transfer_url.dart';
 import 'package:garden/extensions/string.dart';
+import 'package:garden/util/file_type_util.dart';
 import 'package:garden/services/office_preview.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:extended_image/extended_image.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:garden/constants/app_constants.dart';
@@ -26,12 +30,16 @@ class VideoPlayerPage extends HookWidget {
   final String? cover;
   final String? nfo;
   final bool network;
+
+  /// 同目录下的字幕旁车文件路径（NAS 上的 path），可空。
+  final List<String> subtitles;
   const VideoPlayerPage(
       {super.key,
       required this.url,
       this.name,
       this.cover,
       this.nfo,
+      this.subtitles = const [],
       this.network = true});
 
   @override
@@ -50,6 +58,14 @@ class VideoPlayerPage extends HookWidget {
     final year = useSignal('');
     final actors = useSignal<List>([]);
     final currentSpeed = useSignal(1.0);
+    final subtitleFontSize = useState(16.0);
+    final genres = useSignal('');
+    final directors = useSignal('');
+    final runtime = useSignal('');
+    final rating = useSignal('');
+    final premiered = useSignal('');
+    final poster = useSignal('');
+    final tmdbUsed = useSignal(false);
 
     // 倍速列表
     const Map<String, double> speedList = {
@@ -67,6 +83,23 @@ class VideoPlayerPage extends HookWidget {
           videoAspectRatio.value = event.aspect ?? 1;
         });
         isInitialized.value = true;
+        // 外置字幕：mpv 的 sub-add，多个文件都进轨道列表供用户切换。
+        // 单独 try：字幕加载失败不能当成视频加载失败。
+        try {
+          for (final path in subtitles) {
+            await player.setSubtitleTrack(SubtitleTrack.uri(
+              fbDownloadUrl(
+                baseUri: connectionStore.baseUri.value,
+                path: path,
+                sid: connectionStore.sid.value,
+                mode: 'open',
+              ),
+              title: path.split('/').last,
+            ));
+          }
+        } catch (e) {
+          Log.error("字幕加载异常: $e");
+        }
       } catch (error) {
         Log.error("播放初始化异常: $error");
         UiUtil.toast("视频加载失败：$error，请尝试使用第三方播放器");
@@ -96,8 +129,53 @@ class VideoPlayerPage extends HookWidget {
         date.value = nfoDetail['dateadded'] ?? '';
         actors.value = nfoDetail['actor'] ?? [];
         year.value = nfoDetail['year'] ?? '';
+        genres.value = joinNfoNames(nfoDetail['genre']);
+        directors.value = joinNfoNames(nfoDetail['director']);
+        runtime.value = '${nfoDetail['runtime'] ?? ''}';
+        rating.value = '${nfoDetail['rating'] ?? ''}';
+        premiered.value = '${nfoDetail['premiered'] ?? ''}';
+        poster.value = firstNfoImage(nfoDetail['thumb']);
       } catch (e) {
         Log.error("nfo解析异常: $e");
+      }
+    }
+
+    /// NFO 没提供简介时才去 TMDB 补刮；结果只填空字段，不覆盖 NFO。
+    Future<void> parseTmdb() async {
+      if (description.value.isNotBlank) return;
+      final apiKey = await StorageUtil.getString(tmdbApiKeyStorageKey) ?? '';
+      if (apiKey.isBlank) return;
+      final info = await fetchTmdbInfo(apiKey, name ?? '');
+      if (info == null) {
+        Log.info("TMDB 未查到: $name");
+        return;
+      }
+      if (description.value.isBlank) description.value = info.overview;
+      if (year.value.isBlank) year.value = info.year;
+      if (genres.value.isBlank) genres.value = info.genres;
+      if (runtime.value.isBlank) runtime.value = info.runtime;
+      if (rating.value.isBlank) rating.value = info.rating;
+      if (premiered.value.isBlank) premiered.value = info.premiered;
+      if (poster.value.isBlank) poster.value = info.poster;
+      tmdbUsed.value = true;
+    }
+
+    /// 本地字幕文件交给 mpv 读（file:// URI），编码与格式识别都由 mpv 处理。
+    Future<void> pickLocalSubtitle() async {
+      try {
+        final picked = await FilePicker.platform.pickFiles(
+          type: FileType.custom,
+          allowedExtensions: FileTypeUtil.subtitleExtensions,
+        );
+        final path = picked?.files.single.path;
+        if (path == null) return;
+        final uri = Uri.file(path);
+        await player.setSubtitleTrack(SubtitleTrack.uri(
+          uri.toString(),
+          title: uri.pathSegments.last,
+        ));
+      } catch (e) {
+        Log.error("本地字幕载入异常: $e");
       }
     }
 
@@ -109,18 +187,62 @@ class VideoPlayerPage extends HookWidget {
     }
 
     useEffect(() {
-      parseNfo();
+      StorageUtil.getInt("subtitle_font_size").then((value) {
+        if (value != null) subtitleFontSize.value = value.toDouble();
+      });
+      return null;
+    }, const []);
+
+    useEffect(() {
+      // NFO 先解析，解析不到的字段再由 TMDB 补。
+      parseNfo().then((_) => parseTmdb());
       initializeVideo();
       return () {
         player.dispose();
       };
     }, const []);
 
+    // 封面：本地 fanart/poster 优先，其次 NFO 里的 thumb（多为远程 URL）
+    final posterUrl =
+        (cover != null && cover!.isNotBlank) ? cover! : poster.value;
+
+    Widget infoRow(String label, String value) => Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+          child: Text("$label：$value"),
+        );
+
     return Scaffold(
       appBar: AppBar(
         title: Text(name ?? '视频播放'),
         leading: AppBackButton(context),
         actions: [
+          // 字幕选择：外置字幕（sub-add）和容器内嵌字幕都在这里
+          PopupMenuButton<Object>(
+            tooltip: '字幕',
+            icon: const Icon(Icons.subtitles),
+            onSelected: (value) {
+              if (value is SubtitleTrack) {
+                player.setSubtitleTrack(value);
+              } else {
+                pickLocalSubtitle();
+              }
+            },
+            itemBuilder: (context) => [
+              const PopupMenuItem<Object>(
+                  value: 'local', child: Text('从文件载入字幕…')),
+              PopupMenuItem<Object>(
+                  value: SubtitleTrack.no(), child: const Text('关闭字幕')),
+              ...player.state.tracks.subtitle
+                  .where((e) => e.id != 'auto' && e.id != 'no')
+                  .map((e) => PopupMenuItem<Object>(
+                        value: e,
+                        child: Text(
+                          e.title ?? e.language ?? '字幕 ${e.id}',
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      )),
+            ],
+          ),
           Padding(
             padding:
                 const EdgeInsets.only(left: 0, top: 8, bottom: 8, right: 8),
@@ -163,7 +285,21 @@ class VideoPlayerPage extends HookWidget {
                       children: [
                         AspectRatio(
                           aspectRatio: videoAspectRatio.value,
-                          child: Video(controller: videoController),
+                          child: Video(
+                            controller: videoController,
+                            subtitleViewConfiguration:
+                                SubtitleViewConfiguration(
+                              // 播放区只有屏高 30%，media_kit 默认按 1080p 缩小会让字幕小到看不清，
+                              // 所以关掉缩放，字号直接用设置里的逻辑像素。
+                              textScaler: TextScaler.noScaling,
+                              style: TextStyle(
+                                fontSize: subtitleFontSize.value,
+                                color: Colors.white,
+                                backgroundColor: const Color(0xaa000000),
+                                height: 1.4,
+                              ),
+                            ),
+                          ),
                         ),
                         // 控制面板
                         Visibility(
@@ -261,13 +397,13 @@ class VideoPlayerPage extends HookWidget {
                     height: MediaQuery.sizeOf(context).width * 9 / 16,
                     color: Colors.black,
                     child: Center(
-                      child: cover != null && cover!.isNotBlank
+                      child: posterUrl.isNotBlank
                           ? ExtendedImage.network(
-                              cover!.startsWith("http")
-                                  ? cover!
+                              posterUrl.startsWith("http")
+                                  ? posterUrl
                                   : thumbUrl(
                                       baseUri: connectionStore.baseUri.value,
-                                      path: cover!,
+                                      path: posterUrl,
                                       sid: connectionStore.sid.value,
                                     ),
                             )
@@ -319,6 +455,20 @@ class VideoPlayerPage extends HookWidget {
                         const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
                     child: Text("添加时间：${date.value}"),
                   ),
+                if (genres.value.isNotBlank) infoRow("类型", genres.value),
+                if (directors.value.isNotBlank) infoRow("导演", directors.value),
+                if (runtime.value.isNotBlank)
+                  infoRow("片长", "${runtime.value} 分钟"),
+                if (rating.value.isNotBlank) infoRow("评分", rating.value),
+                if (premiered.value.isNotBlank) infoRow("首播", premiered.value),
+                if (tmdbUsed.value)
+                  const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+                    child: Text(
+                      "部分数据来自 TMDB",
+                      style: TextStyle(color: Colors.grey, fontSize: 12),
+                    ),
+                  ),
                 const SizedBox(
                   height: 20,
                 ),
@@ -335,13 +485,14 @@ class VideoPlayerPage extends HookWidget {
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [
                           Expanded(
-                            child: Text("${e['role']}"),
-                          ),
-                          Expanded(
+                            flex: 2,
                             child: Text("${e['name']}"),
                           ),
                           Expanded(
-                            child: Text("${e['type']}"),
+                            child: Text(
+                              "${e['role'] ?? ''}",
+                              style: const TextStyle(color: Colors.grey),
+                            ),
                           ),
                         ],
                       ),
@@ -355,4 +506,25 @@ class VideoPlayerPage extends HookWidget {
       ),
     );
   }
+}
+
+/// NFO 里的 genre / director 可能是字符串、数组，或带属性的对象数组。
+String joinNfoNames(dynamic value) {
+  if (value == null) return '';
+  final list = value is List ? value : [value];
+  return list
+      .map((e) => e is Map ? '${e['name'] ?? e['\$'] ?? ''}' : '$e')
+      .where((e) => e.isNotBlank)
+      .join('、');
+}
+
+/// NFO 的 thumb 可能是单个 URL、带 aspect 的对象，或本地文件名；这里只取远程图。
+String firstNfoImage(dynamic value) {
+  if (value == null) return '';
+  final list = value is List ? value : [value];
+  for (final e in list) {
+    final url = e is Map ? '${e['\$'] ?? e['value'] ?? ''}' : '$e';
+    if (url.startsWith('http')) return url;
+  }
+  return '';
 }
