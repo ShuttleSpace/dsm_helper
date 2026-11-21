@@ -84,6 +84,27 @@ void main() {
     expect(find.byType(ClipRect), findsNothing);
   });
 
+  testWidgets('scaled label that overflows marquees', (tester) async {
+    await tester.pumpWidget(MaterialApp(
+      home: Scaffold(
+        body: MediaQuery(
+          data: const MediaQueryData(textScaler: TextScaler.linear(1.5)),
+          child: SizedBox(
+            width: 120,
+            child: ApplicationTile(
+              iconAsset: 'assets/applications/docker.png',
+              label: 'Docker',
+              onTap: () {},
+            ),
+          ),
+        ),
+      ),
+    ));
+
+    expect(find.text('Docker'), findsOneWidget);
+    expect(find.byType(ClipRect), findsOneWidget);
+  });
+
   testWidgets('long label marquees in a narrow grid tile', (tester) async {
     await tester.pumpWidget(MaterialApp(
       home: Scaffold(
