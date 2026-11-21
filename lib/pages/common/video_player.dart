@@ -56,6 +56,12 @@ class VideoPlayerPage extends HookWidget {
     final year = useSignal('');
     final actors = useSignal<List>([]);
     final currentSpeed = useSignal(1.0);
+    final genres = useSignal('');
+    final directors = useSignal('');
+    final runtime = useSignal('');
+    final rating = useSignal('');
+    final premiered = useSignal('');
+    final poster = useSignal('');
 
     // 倍速列表
     const Map<String, double> speedList = {
@@ -119,6 +125,12 @@ class VideoPlayerPage extends HookWidget {
         date.value = nfoDetail['dateadded'] ?? '';
         actors.value = nfoDetail['actor'] ?? [];
         year.value = nfoDetail['year'] ?? '';
+        genres.value = joinNfoNames(nfoDetail['genre']);
+        directors.value = joinNfoNames(nfoDetail['director']);
+        runtime.value = '${nfoDetail['runtime'] ?? ''}';
+        rating.value = '${nfoDetail['rating'] ?? ''}';
+        premiered.value = '${nfoDetail['premiered'] ?? ''}';
+        poster.value = firstNfoImage(nfoDetail['thumb']);
       } catch (e) {
         Log.error("nfo解析异常: $e");
       }
@@ -157,6 +169,15 @@ class VideoPlayerPage extends HookWidget {
         player.dispose();
       };
     }, const []);
+
+    // 封面：本地 fanart/poster 优先，其次 NFO 里的 thumb（多为远程 URL）
+    final posterUrl =
+        (cover != null && cover!.isNotBlank) ? cover! : poster.value;
+
+    Widget infoRow(String label, String value) => Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+          child: Text("$label：$value"),
+        );
 
     return Scaffold(
       appBar: AppBar(
@@ -330,13 +351,13 @@ class VideoPlayerPage extends HookWidget {
                     height: MediaQuery.sizeOf(context).width * 9 / 16,
                     color: Colors.black,
                     child: Center(
-                      child: cover != null && cover!.isNotBlank
+                      child: posterUrl.isNotBlank
                           ? ExtendedImage.network(
-                              cover!.startsWith("http")
-                                  ? cover!
+                              posterUrl.startsWith("http")
+                                  ? posterUrl
                                   : thumbUrl(
                                       baseUri: connectionStore.baseUri.value,
-                                      path: cover!,
+                                      path: posterUrl,
                                       sid: connectionStore.sid.value,
                                     ),
                             )
@@ -388,6 +409,12 @@ class VideoPlayerPage extends HookWidget {
                         const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
                     child: Text("添加时间：${date.value}"),
                   ),
+                if (genres.value.isNotBlank) infoRow("类型", genres.value),
+                if (directors.value.isNotBlank) infoRow("导演", directors.value),
+                if (runtime.value.isNotBlank)
+                  infoRow("片长", "${runtime.value} 分钟"),
+                if (rating.value.isNotBlank) infoRow("评分", rating.value),
+                if (premiered.value.isNotBlank) infoRow("首播", premiered.value),
                 const SizedBox(
                   height: 20,
                 ),
@@ -404,13 +431,14 @@ class VideoPlayerPage extends HookWidget {
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [
                           Expanded(
-                            child: Text("${e['role']}"),
-                          ),
-                          Expanded(
+                            flex: 2,
                             child: Text("${e['name']}"),
                           ),
                           Expanded(
-                            child: Text("${e['type']}"),
+                            child: Text(
+                              "${e['role'] ?? ''}",
+                              style: const TextStyle(color: Colors.grey),
+                            ),
                           ),
                         ],
                       ),
@@ -424,4 +452,25 @@ class VideoPlayerPage extends HookWidget {
       ),
     );
   }
+}
+
+/// NFO 里的 genre / director 可能是字符串、数组，或带属性的对象数组。
+String joinNfoNames(dynamic value) {
+  if (value == null) return '';
+  final list = value is List ? value : [value];
+  return list
+      .map((e) => e is Map ? '${e['name'] ?? e['\$'] ?? ''}' : '$e')
+      .where((e) => e.isNotBlank)
+      .join('、');
+}
+
+/// NFO 的 thumb 可能是单个 URL、带 aspect 的对象，或本地文件名；这里只取远程图。
+String firstNfoImage(dynamic value) {
+  if (value == null) return '';
+  final list = value is List ? value : [value];
+  for (final e in list) {
+    final url = e is Map ? '${e['\$'] ?? e['value'] ?? ''}' : '$e';
+    if (url.startsWith('http')) return url;
+  }
+  return '';
 }
