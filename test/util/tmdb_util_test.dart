@@ -89,4 +89,19 @@ void main() {
     expect(parseTmdbDetail(null, 'movie'), isNull);
     expect(parseTmdbDetail({}, 'movie')!.year, '');
   });
+
+  test('TmdbInfo JSON 往返不丢字段', () {
+    const info = TmdbInfo(
+      title: '片名',
+      overview: '简介',
+      year: '2023',
+      genres: '科幻',
+      runtime: '120',
+      rating: '8.1',
+      premiered: '2023-01-01',
+      poster: 'https://image.tmdb.org/t/p/w500/a.jpg',
+    );
+    final back = TmdbInfo.fromJson(info.toJson());
+    expect(back.toJson(), info.toJson());
+  });
 }

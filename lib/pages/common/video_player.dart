@@ -65,6 +65,7 @@ class VideoPlayerPage extends HookWidget {
     final rating = useSignal('');
     final premiered = useSignal('');
     final poster = useSignal('');
+    final tmdbUsed = useSignal(false);
 
     // 倍速列表
     const Map<String, double> speedList = {
@@ -156,6 +157,7 @@ class VideoPlayerPage extends HookWidget {
       if (rating.value.isBlank) rating.value = info.rating;
       if (premiered.value.isBlank) premiered.value = info.premiered;
       if (poster.value.isBlank) poster.value = info.poster;
+      tmdbUsed.value = true;
     }
 
     /// 本地字幕文件交给 mpv 读（file:// URI），编码与格式识别都由 mpv 处理。
@@ -459,6 +461,14 @@ class VideoPlayerPage extends HookWidget {
                   infoRow("片长", "${runtime.value} 分钟"),
                 if (rating.value.isNotBlank) infoRow("评分", rating.value),
                 if (premiered.value.isNotBlank) infoRow("首播", premiered.value),
+                if (tmdbUsed.value)
+                  const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+                    child: Text(
+                      "部分数据来自 TMDB",
+                      style: TextStyle(color: Colors.grey, fontSize: 12),
+                    ),
+                  ),
                 const SizedBox(
                   height: 20,
                 ),
