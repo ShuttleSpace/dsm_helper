@@ -6,7 +6,7 @@ import 'package:oktoast/oktoast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
-  testWidgets('播放器设置：切换第三方播放器、保存 TMDB Key', (tester) async {
+  testWidgets('播放器设置：切换第三方播放器、读字幕字号', (tester) async {
     SharedPreferences.setMockInitialValues(
         {'use_embeed_video_player': false, 'subtitle_font_size': 20});
 
@@ -24,11 +24,7 @@ void main() {
     await tester.pumpAndSettle();
     expect(await StorageUtil.getBool('use_embeed_video_player'), isTrue);
 
-    await tester.enterText(find.byType(TextField), '  abc123  ');
-    await tester.tap(find.text('保存'));
-    await tester.pumpAndSettle();
-    expect(await StorageUtil.getString('tmdb_api_key'), 'abc123');
-    // 排掉 oktoast 的定时器，否则测试以 pending timer 失败
-    await tester.pump(const Duration(seconds: 3));
+    // TMDB Key 挪到多媒体设置了，这里不该再有输入框
+    expect(find.byType(TextField), findsNothing);
   });
 }

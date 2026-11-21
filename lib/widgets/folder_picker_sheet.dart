@@ -11,6 +11,7 @@ import 'package:garden/pages/file/select_folder.dart';
 Future<dynamic> showFolderPickerSheet(
   BuildContext context, {
   ImageFilter? filter,
+  bool multi = false,
 }) {
   return showCupertinoModalPopup(
     context: context,
@@ -24,7 +25,7 @@ Future<dynamic> showFolderPickerSheet(
             side: const BorderSide(),
             borderRadius: BorderRadius.circular(18),
           ),
-          child: const SelectFolder(multi: false),
+          child: SelectFolder(multi: multi),
         ),
       ),
     ),

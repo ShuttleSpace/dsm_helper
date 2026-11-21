@@ -2,8 +2,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:garden/util/storage_util.dart';
-import 'package:garden/util/tmdb_util.dart';
-import 'package:garden/util/ui_util.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:garden/widgets/neu_picker.dart';
 import 'package:garden/widgets/settings/settings_checkbox_tile.dart';
@@ -11,21 +9,16 @@ import 'package:garden/widgets/settings/settings_checkbox_tile.dart';
 /// 可选字幕字号（逻辑像素）
 const List<int> subtitleFontSizes = [12, 14, 16, 18, 20, 24, 28, 32];
 
-/// 视频播放相关设置：第三方播放器开关 + 字幕字号 + TMDB 刮削用的 API Key。
+/// 播放器设置：第三方播放器开关 + 字幕字号（TMDB 的 Key 在多媒体设置里）。
 class PlayerSettingPage extends HookWidget {
   const PlayerSettingPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final controller = useTextEditingController();
-    final showKey = useState(false);
     final externalPlayer = useState(true);
     final subtitleSize = useState(16);
 
     useEffect(() {
-      StorageUtil.getString(tmdbApiKeyStorageKey).then((value) {
-        if (value != null) controller.text = value;
-      });
       // 与 lib/pages/file/file.dart 的取值默认值保持一致
       StorageUtil.getBool("use_embeed_video_player").then((value) {
         externalPlayer.value = value ?? false;
@@ -97,53 +90,6 @@ class PlayerSettingPage extends HookWidget {
                 ),
               ),
             ),
-          ),
-          const SizedBox(height: 20),
-          const Text("TMDB API Key"),
-          const SizedBox(height: 8),
-          Card(
-            shape: RoundedRectangleBorder(
-              side: const BorderSide(),
-              borderRadius: BorderRadius.circular(18),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: TextField(
-                      controller: controller,
-                      obscureText: !showKey.value,
-                      decoration: const InputDecoration(
-                        hintText: "留空则不刮削",
-                        border: InputBorder.none,
-                      ),
-                    ),
-                  ),
-                  IconButton(
-                    onPressed: () => showKey.value = !showKey.value,
-                    icon: Icon(showKey.value
-                        ? Icons.visibility_off
-                        : Icons.visibility),
-                  ),
-                  TextButton(
-                    onPressed: () async {
-                      await StorageUtil.setString(
-                          tmdbApiKeyStorageKey, controller.text.trim());
-                      UiUtil.toast("已保存");
-                    },
-                    child: const Text("保存"),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          const SizedBox(height: 12),
-          const Text(
-            "本地没有 NFO 文件时，用文件名去 TMDB 查简介、类型、评分等信息。"
-            "Key 免费申请：themoviedb.org/settings/api\n"
-            "本产品使用 TMDB API，但未获得 TMDB 认可或认证。",
-            style: TextStyle(color: Colors.grey, fontSize: 12),
           ),
         ],
       ),

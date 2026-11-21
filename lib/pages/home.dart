@@ -210,12 +210,8 @@ class Home extends HookWidget {
                 ),
                 label: "文件",
               ),
-              BottomNavigationBarItem(
-                icon: Image.asset(
-                  "assets/tabbar/media.png",
-                  width: 30,
-                  height: 30,
-                ),
+              const BottomNavigationBarItem(
+                icon: MediaTabIcon(),
                 label: '多媒体',
               ),
               BottomNavigationBarItem(
@@ -237,6 +233,30 @@ class Home extends HookWidget {
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+/// 多媒体 tab 图标：黑框白底 + 橙色播放键，写法跟其余 PNG 图标的尺寸一致；
+/// 深色主题下底色和描边反过来，避免白底在黑底上发光。
+class MediaTabIcon extends StatelessWidget {
+  const MediaTabIcon({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final dark = Theme.of(context).brightness == Brightness.dark;
+    return SizedBox(
+      width: 30,
+      height: 30,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: dark ? Colors.black : Colors.white,
+          border: Border.all(color: scheme.onSurface, width: 2),
+          borderRadius: BorderRadius.circular(7),
+        ),
+        child: const Icon(Icons.play_arrow, size: 18, color: Color(0xFFFF9813)),
       ),
     );
   }

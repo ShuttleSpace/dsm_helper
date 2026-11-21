@@ -1,12 +1,12 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:garden/pages/common/nas_path_picker.dart';
 import 'package:garden/util/media_library.dart';
+import 'package:garden/widgets/folder_picker_sheet.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:signals_hooks/signals_hooks.dart';
 
 /// 媒体库目录管理：加/改/删/清空要扫的 NAS 目录，多媒体页按这些目录建库。
+/// 选目录复用上传时那个 `SelectFolder`（`showFolderPickerSheet`），多选一次性加多个。
 class MediaLibrarySetting extends HookWidget {
   const MediaLibrarySetting({super.key});
 
@@ -19,13 +19,16 @@ class MediaLibrarySetting extends HookWidget {
       return null;
     }, const []);
 
+    Future<List<String>?> pick({bool multi = false}) async {
+      final res = await showFolderPickerSheet(context, multi: multi);
+      if (res is! List || res.isEmpty) return null;
+      return res.map((e) => '$e').toList();
+    }
+
     /// 多选目录，已有的自动去重。
     Future<void> add() async {
-      final picked = await Navigator.of(context).push<List<String>>(
-        CupertinoPageRoute(
-            builder: (_) => const NasPathPicker(multiSelect: true)),
-      );
-      if (picked == null || picked.isEmpty) return;
+      final picked = await pick(multi: true);
+      if (picked == null) return;
       paths.value = {
         ...paths.value,
         ...picked.where((e) => e != '/'),
@@ -33,12 +36,10 @@ class MediaLibrarySetting extends HookWidget {
       await saveMediaLibraryPaths(paths.value);
     }
 
-    /// 点一条 = 改成另一个目录。
+    /// 点一条 = 换成别的目录。
     Future<void> edit(String oldPath) async {
-      final picked = await Navigator.of(context).push<List<String>>(
-        CupertinoPageRoute(builder: (_) => NasPathPicker(initialPath: oldPath)),
-      );
-      if (picked == null || picked.isEmpty) return;
+      final picked = await pick();
+      if (picked == null) return;
       final next = picked.first;
       if (next == '/' || (next != oldPath && paths.value.contains(next))) {
         return;

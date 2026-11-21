@@ -4,6 +4,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:garden/pages/setting/media_library_setting.dart';
 import 'package:garden/util/media_library.dart';
 import 'package:garden/util/storage_util.dart';
+import 'package:garden/util/tmdb_util.dart';
 import 'package:garden/util/ui_util.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:garden/widgets/neu_picker.dart';
@@ -18,6 +19,8 @@ class MediaSetting extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
+    final controller = useTextEditingController();
+    final showKey = useState(false);
     final depth = useState(mediaScanDepth);
     final tmdbPoster = useState(true);
     final pathCount = useState(0);
@@ -27,6 +30,9 @@ class MediaSetting extends HookWidget {
     }
 
     useEffect(() {
+      StorageUtil.getString(tmdbApiKeyStorageKey).then((value) {
+        if (value != null) controller.text = value;
+      });
       loadMediaScanDepth().then((value) => depth.value = value);
       loadMediaUseTmdbPoster().then((value) => tmdbPoster.value = value);
       refreshCount();
@@ -130,7 +136,51 @@ class MediaSetting extends HookWidget {
           const Padding(
             padding: EdgeInsets.only(left: 4, top: 8),
             child: Text(
-              "需要先在 设置 → 播放器设置 里填 TMDB API Key，按文件名查一次并缓存 30 天。",
+              "按文件名去 TMDB 查一次海报并缓存 30 天，下面的 Key 留空就不查。",
+              style: TextStyle(color: Colors.grey, fontSize: 12),
+            ),
+          ),
+          const SizedBox(height: 20),
+          label("TMDB API Key"),
+          const SizedBox(height: 8),
+          card(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: controller,
+                      obscureText: !showKey.value,
+                      decoration: const InputDecoration(
+                        hintText: "留空则不刮削",
+                        border: InputBorder.none,
+                      ),
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: () => showKey.value = !showKey.value,
+                    icon: Icon(showKey.value
+                        ? Icons.visibility_off
+                        : Icons.visibility),
+                  ),
+                  TextButton(
+                    onPressed: () async {
+                      await StorageUtil.setString(
+                          tmdbApiKeyStorageKey, controller.text.trim());
+                      UiUtil.toast("已保存");
+                    },
+                    child: const Text("保存"),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const Padding(
+            padding: EdgeInsets.only(left: 4, top: 8),
+            child: Text(
+              "播放页缺简介/评分时也用它；Key 免费申请：themoviedb.org/settings/api\n"
+              "本产品使用 TMDB API，但未获得 TMDB 认可或认证。",
               style: TextStyle(color: Colors.grey, fontSize: 12),
             ),
           ),
