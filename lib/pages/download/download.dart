@@ -242,6 +242,20 @@ class Download extends HookWidget {
       UiUtil.toast('已取消 ${selectedTasks.length} 项');
     }
 
+    Future<void> batchRetry() async {
+      final targets = selectedTasks
+          .where((t) => t.state == TransferState.error && t.steps == null)
+          .toList();
+      if (targets.isEmpty) {
+        UiUtil.toast('所选任务无需重试');
+        return;
+      }
+      for (final t in targets) {
+        await retryTransferTask(t);
+      }
+      UiUtil.toast('已重试 ${targets.length} 项');
+    }
+
     Future<void> batchRemove() async {
       for (final t in selectedTasks) {
         await transferStore.deleteTask(t);
@@ -257,6 +271,7 @@ class Download extends HookWidget {
           options: [
             BottomOption(title: '暂停', onPressed: batchPause),
             BottomOption(title: '继续', onPressed: batchResume),
+            BottomOption(title: '重试', onPressed: batchRetry),
             BottomOption(
               title: '取消任务',
               onPressed: () => confirmBatch('取消', batchCancel),

@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:garden/pages/setting/media_library_setting.dart';
 import 'package:garden/pages/backup/backup.dart';
 import 'package:garden/pages/login/accounts.dart';
 import 'package:garden/pages/login/confirm_logout.dart';
@@ -364,17 +363,6 @@ class Setting extends HookWidget {
                           return const SelectServer();
                         },
                         settings: const RouteSettings(name: "select_server")),
-                  );
-                },
-              ),
-              SettingButton(
-                name: "媒体库",
-                icon: "movie",
-                onPressed: () {
-                  Navigator.of(context).push(
-                    CupertinoPageRoute(
-                        builder: (context) => const MediaLibrarySetting(),
-                        settings: const RouteSettings(name: "media_library")),
                   );
                 },
               ),

@@ -567,47 +567,53 @@ class TransferList extends HookWidget {
     }
   }
 
-  /// 重试必须先清掉旧记录，否则同一次失败会留下重复任务。
   Future<void> _retry(TransferTask t) async {
-    if (t.steps != null) {
-      UiUtil.toast('请展开任务后重试失败的步骤');
-      return;
-    }
-    final String newId;
-    try {
-      if (t.type == TransferType.upload) {
-        final remoteDir = t.remotePath.substring(
-          0,
-          t.remotePath.lastIndexOf('/'),
-        );
-        newId = await enqueueFileUpload(
-          localPath: t.localPath,
-          remoteDir: remoteDir,
-        );
-      } else {
-        final destDir = await downloadTargetDir();
-        newId = await enqueueFileDownload(
-          remotePath: t.remotePath,
-          destDir: destDir,
-        );
-      }
-    } catch (_) {
-      UiUtil.toast('重试失败，请检查连接');
-      return;
-    }
-    await FileDownloader().cancelTaskWithId(t.id);
-    await FileDownloader().database.deleteRecordWithId(t.id);
-    transferStore.remove(t.id);
-    transferStore.add(TransferTask(
-      id: newId,
-      type: t.type,
-      localPath: t.localPath,
-      remotePath: t.remotePath,
-      state: TransferState.active,
-      createdAt: t.createdAt,
-    ));
-    UiUtil.toast('已重新加入队列');
+    await retryTransferTask(t);
   }
+}
+
+/// 重试必须先清掉旧记录，否则同一次失败会留下重复任务。
+/// 带子步骤的备份父任务不能整体重试，返回 false 并提示展开后重试步骤。
+Future<bool> retryTransferTask(TransferTask t) async {
+  if (t.steps != null) {
+    UiUtil.toast('请展开任务后重试失败的步骤');
+    return false;
+  }
+  final String newId;
+  try {
+    if (t.type == TransferType.upload) {
+      final remoteDir = t.remotePath.substring(
+        0,
+        t.remotePath.lastIndexOf('/'),
+      );
+      newId = await enqueueFileUpload(
+        localPath: t.localPath,
+        remoteDir: remoteDir,
+      );
+    } else {
+      final destDir = await downloadTargetDir();
+      newId = await enqueueFileDownload(
+        remotePath: t.remotePath,
+        destDir: destDir,
+      );
+    }
+  } catch (_) {
+    UiUtil.toast('重试失败，请检查连接');
+    return false;
+  }
+  await FileDownloader().cancelTaskWithId(t.id);
+  await FileDownloader().database.deleteRecordWithId(t.id);
+  transferStore.remove(t.id);
+  transferStore.add(TransferTask(
+    id: newId,
+    type: t.type,
+    localPath: t.localPath,
+    remotePath: t.remotePath,
+    state: TransferState.active,
+    createdAt: t.createdAt,
+  ));
+  UiUtil.toast('已重新加入队列');
+  return true;
 }
 
 class _GroupKey {
