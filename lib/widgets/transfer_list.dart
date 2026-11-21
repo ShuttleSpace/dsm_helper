@@ -252,12 +252,6 @@ class TransferList extends HookWidget {
       margin: const EdgeInsets.only(left: 20, right: 20, bottom: 12),
       padding: const EdgeInsets.all(14),
       onTap: () {
-        if (isParent && !multiSelect) {
-          expanded.value = isExpanded
-              ? expanded.value.where((id) => id != t.id).toSet()
-              : {...expanded.value, t.id};
-          return;
-        }
         if (multiSelect) {
           onSelect?.call(t.id);
         } else {
@@ -298,10 +292,22 @@ class TransferList extends HookWidget {
               ),
               const SizedBox(width: 8),
               if (isParent)
-                Icon(
-                  isExpanded ? Icons.expand_less : Icons.expand_more,
-                  size: 18,
-                  color: theme.placeholderColor,
+                // 整行点击仍打开操作面板（含详情），展开收起走这个箭头。
+                GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onTap: () {
+                    expanded.value = isExpanded
+                        ? expanded.value.where((id) => id != t.id).toSet()
+                        : {...expanded.value, t.id};
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 4),
+                    child: Icon(
+                      isExpanded ? Icons.expand_less : Icons.expand_more,
+                      size: 18,
+                      color: theme.placeholderColor,
+                    ),
+                  ),
                 ),
               Expanded(
                 child: Text(
@@ -615,8 +621,8 @@ void showTransferTaskDetail(BuildContext context, TransferTask task) {
                   : task.errorMessage!),
             row('创建', task.createdAt?.toLocal().toString().substring(0, 19) ?? '--'),
             row('更新', task.updatedAt?.toLocal().toString().substring(0, 19) ?? '--'),
-            row('远程', task.remotePath),
-            row('本地', task.localPath),
+            row('远程', task.remotePath.isEmpty ? '--' : task.remotePath),
+            row('本地', task.localPath.isEmpty ? '--' : task.localPath),
             const SizedBox(height: 4),
             OutlinedButton(
               onPressed: () => Navigator.of(context).pop(),

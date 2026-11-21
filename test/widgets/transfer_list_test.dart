@@ -68,9 +68,20 @@ void main() {
 
     expect(find.textContaining('相册备份'), findsOneWidget);
     expect(find.textContaining('a.jpg'), findsNothing);
-    await tester.tap(find.textContaining('相册备份'));
+    // 整行点击是操作面板，展开靠箭头。
+    await tester.tap(find.byIcon(Icons.expand_more));
     await tester.pump();
     expect(find.textContaining('a.jpg'), findsOneWidget);
+    await tester.tap(find.byIcon(Icons.expand_less));
+    await tester.pump();
+    expect(find.textContaining('a.jpg'), findsNothing);
+
+    await tester.tap(find.textContaining('相册备份'));
+    await tester.pumpAndSettle();
+    expect(find.text('任务操作'), findsOneWidget);
+    await tester.tap(find.text('详情'));
+    await tester.pumpAndSettle();
+    expect(find.text('远程'), findsOneWidget);
 
     expect(transferTaskName(parent), contains('相册备份'));
     expect(transferTaskName(const TransferTask(
