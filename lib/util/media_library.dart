@@ -80,6 +80,41 @@ MediaFolder buildMediaTree(List<MediaItem> items) {
   return root;
 }
 
+/// 播放列表的排序方式。
+enum PlaylistSort { name, date, size, natural }
+
+/// 数字按数值比、其它按字符比，这样 `第2集` 不会排到 `第10集` 后面。
+int naturalCompare(String a, String b) {
+  final reg = RegExp(r'\d+|\D+');
+  final x = reg.allMatches(a).map((e) => e[0]!).toList();
+  final y = reg.allMatches(b).map((e) => e[0]!).toList();
+  for (var i = 0; i < x.length && i < y.length; i++) {
+    final nx = int.tryParse(x[i]);
+    final ny = int.tryParse(y[i]);
+    final c =
+        nx != null && ny != null ? nx.compareTo(ny) : x[i].compareTo(y[i]);
+    if (c != 0) return c;
+  }
+  return x.length.compareTo(y.length);
+}
+
+/// 播放列表排序：文件名 / 日期 / 大小按升序，自然排序只作用于文件名。
+List<MediaItem> sortPlaylist(List<MediaItem> items, PlaylistSort sort) {
+  final indexed = [...items.asMap().entries];
+  indexed.sort((a, b) {
+    final x = a.value;
+    final y = b.value;
+    final c = switch (sort) {
+      PlaylistSort.name => x.displayTitle.compareTo(y.displayTitle),
+      PlaylistSort.date => x.mtime.compareTo(y.mtime),
+      PlaylistSort.size => x.size.compareTo(y.size),
+      PlaylistSort.natural => naturalCompare(x.displayTitle, y.displayTitle),
+    };
+    return c != 0 ? c : a.key.compareTo(b.key);
+  });
+  return [for (final e in indexed) e.value];
+}
+
 /// 按所在目录分组，组的顺序跟传入顺序一致（已经过排序/搜索过滤）。
 Map<String, List<MediaItem>> groupByFolder(List<MediaItem> items) {
   final groups = <String, List<MediaItem>>{};
@@ -105,6 +140,10 @@ class MediaItem {
   final String rating;
   final String genres;
 
+  /// 文件大小（字节）与修改时间（秒），没取到时是 0，播放列表按这两个排序用。
+  final int size;
+  final int mtime;
+
   const MediaItem({
     required this.name,
     required this.path,
@@ -115,6 +154,8 @@ class MediaItem {
     this.year = '',
     this.rating = '',
     this.genres = '',
+    this.size = 0,
+    this.mtime = 0,
   });
 
   /// 显示名：NFO 标题优先，否则去扩展名的文件名。
@@ -132,6 +173,8 @@ class MediaItem {
   MediaItem withCover(String cover) => MediaItem(
         name: name,
         path: path,
+        size: size,
+        mtime: mtime,
         coverPath: cover,
         nfoPath: nfoPath,
         subtitles: subtitles,
@@ -142,6 +185,8 @@ class MediaItem {
       );
 
   MediaItem copyWithNfo(Map detail) => MediaItem(
+        size: size,
+        mtime: mtime,
         name: name,
         path: path,
         coverPath: coverPath,
@@ -200,9 +245,13 @@ Future<List<MediaItem>> scanMediaLibrary(List<String> roots,
         continue;
       }
       final base = name.substring(0, dot);
+      final additional = f['additional'] is Map ? f['additional'] as Map : {};
+      final time = additional['time'] is Map ? additional['time'] as Map : {};
       items.add(MediaItem(
         name: name,
         path: '${f['path']}',
+        size: int.tryParse('${additional['size'] ?? ''}') ?? 0,
+        mtime: int.tryParse('${time['mtime'] ?? ''}') ?? 0,
         coverPath: _pickCover(files, base),
         nfoPath: _pickNfo(files, base),
         subtitles: FileTypeUtil.findSiblingSubtitles(files, base),

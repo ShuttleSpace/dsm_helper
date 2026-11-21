@@ -6,6 +6,32 @@ import 'package:garden/util/media_library.dart';
 import 'package:garden/util/storage_util.dart';
 
 void main() {
+  test('播放列表排序：自然序把第2集排在第10集前面', () {
+    final items = [
+      const MediaItem(name: '剧集 第10集.mkv', path: '/a/10'),
+      const MediaItem(name: '剧集 第2集.mkv', path: '/a/2'),
+      const MediaItem(name: '剧集 第1集.mkv', path: '/a/1'),
+    ];
+    final natural = sortPlaylist(items, PlaylistSort.natural);
+    expect([for (final e in natural) e.name],
+        ['剧集 第1集.mkv', '剧集 第2集.mkv', '剧集 第10集.mkv']);
+    // 纯字符序下 10 会跑到 2 前面
+    final plain = sortPlaylist(items, PlaylistSort.name);
+    expect(plain.first.name, '剧集 第10集.mkv');
+  });
+
+  test('播放列表排序：按日期和大小升序', () {
+    final items = [
+      const MediaItem(name: 'c.mkv', path: '/c', mtime: 300, size: 30),
+      const MediaItem(name: 'a.mkv', path: '/a', mtime: 100, size: 10),
+      const MediaItem(name: 'b.mkv', path: '/b', mtime: 200, size: 20),
+    ];
+    expect([for (final e in sortPlaylist(items, PlaylistSort.date)) e.name],
+        ['a.mkv', 'b.mkv', 'c.mkv']);
+    expect([for (final e in sortPlaylist(items, PlaylistSort.size)) e.name],
+        ['a.mkv', 'b.mkv', 'c.mkv']);
+  });
+
   tearDown(() => dsmFileStationPageRequestForTesting = null);
 
   test('扫库目录：挑出视频并带同目录封面/NFO/字幕，子目录递归', () async {

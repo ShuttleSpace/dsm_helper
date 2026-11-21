@@ -319,50 +319,92 @@ class VideoPlayerPage extends HookWidget {
       );
     }
 
-    /// 播放列表面板：点条目切片，底部一个自动连播开关。
+    /// 播放列表面板：高亮当前播放的，可按文件名 / 日期 / 大小 / 自然序排。
     void showPlaylist() {
+      var sortMode = PlaylistSort.natural;
       showModalBottomSheet(
         context: context,
-        builder: (context) => SafeArea(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              SwitchListTile(
-                value: autoNext.value,
-                title: const Text('自动连播'),
-                onChanged: (value) {
-                  autoNext.value = value;
-                  StorageUtil.setBool("auto_play_next", value);
-                  (context as Element).markNeedsBuild();
-                },
-              ),
-              const Divider(height: 1),
-              Flexible(
-                child: ListView.builder(
-                  shrinkWrap: true,
-                  itemCount: playlist.length,
-                  itemBuilder: (context, i) {
-                    final item = playlist[i];
-                    final current = i == playingIndex.value;
-                    return ListTile(
-                      dense: true,
-                      selected: current,
-                      leading: Icon(current ? Icons.volume_up : Icons.movie),
-                      title: Text(item.displayTitle,
-                          maxLines: 1, overflow: TextOverflow.ellipsis),
-                      subtitle: item.subtitleLine.isBlank
-                          ? null
-                          : Text(item.subtitleLine),
-                      onTap: () {
-                        Navigator.of(context).pop();
-                        if (!current) playEntry(i);
+        builder: (sheetContext) => StatefulBuilder(
+          builder: (sheetContext, setSheetState) {
+            final sorted = sortPlaylist(playlist, sortMode);
+            return SafeArea(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Row(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(left: 16),
+                        child: Text('播放列表 ${playlist.length}',
+                            style: const TextStyle(
+                                fontSize: 13, color: Colors.grey)),
+                      ),
+                      const Spacer(),
+                      PopupMenuButton<PlaylistSort>(
+                        tooltip: '排序',
+                        icon: const Icon(Icons.sort, size: 20),
+                        initialValue: sortMode,
+                        onSelected: (value) =>
+                            setSheetState(() => sortMode = value),
+                        itemBuilder: (context) => const [
+                          PopupMenuItem(
+                              value: PlaylistSort.name, child: Text('按文件名')),
+                          PopupMenuItem(
+                              value: PlaylistSort.date, child: Text('按日期')),
+                          PopupMenuItem(
+                              value: PlaylistSort.size, child: Text('按大小')),
+                          PopupMenuItem(
+                              value: PlaylistSort.natural, child: Text('自然排序')),
+                        ],
+                      ),
+                    ],
+                  ),
+                  SwitchListTile(
+                    value: autoNext.value,
+                    title: const Text('自动连播'),
+                    onChanged: (value) {
+                      autoNext.value = value;
+                      StorageUtil.setBool("auto_play_next", value);
+                      (context as Element).markNeedsBuild();
+                      setSheetState(() {});
+                    },
+                  ),
+                  const Divider(height: 1),
+                  Flexible(
+                    child: ListView.builder(
+                      shrinkWrap: true,
+                      itemCount: sorted.length,
+                      itemBuilder: (context, i) {
+                        final item = sorted[i];
+                        final current = item.path == currentPath.value;
+                        return ListTile(
+                          dense: true,
+                          selected: current,
+                          leading: Icon(current ? Icons.volume_up : Icons.movie,
+                              color: current
+                                  ? Theme.of(context).colorScheme.primary
+                                  : null),
+                          title: Text(item.displayTitle,
+                              maxLines: 1, overflow: TextOverflow.ellipsis),
+                          subtitle: item.subtitleLine.isBlank
+                              ? null
+                              : Text(item.subtitleLine),
+                          onTap: () {
+                            Navigator.of(sheetContext).pop();
+                            if (current) return;
+                            // 列表可能被排过序，切片用原列表的下标
+                            final index =
+                                playlist.indexWhere((e) => e.path == item.path);
+                            if (index >= 0) playEntry(index);
+                          },
+                        );
                       },
-                    );
-                  },
-                ),
+                    ),
+                  ),
+                ],
               ),
-            ],
-          ),
+            );
+          },
         ),
       );
     }

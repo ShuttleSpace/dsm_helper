@@ -668,6 +668,12 @@ class Files extends HookWidget {
                         path: '${element['path']}',
                         subtitles: FileTypeUtil.findSiblingSubtitles(
                             files.value, '${element['name']}'),
+                        size: int.tryParse(
+                                '${element['additional']?['size'] ?? ''}') ??
+                            0,
+                        mtime: int.tryParse(
+                                '${element['additional']?['time']?['mtime'] ?? ''}') ??
+                            0,
                       ),
                 ];
                 if (context.mounted) {
