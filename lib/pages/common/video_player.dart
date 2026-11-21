@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:garden/util/file_type_util.dart';
 import 'package:garden/util/log.dart';
+import 'package:garden/util/media_library.dart';
 import 'package:garden/util/storage_util.dart';
 import 'package:garden/util/nfo_util.dart';
 import 'package:garden/util/tmdb_util.dart';
@@ -34,6 +35,9 @@ class VideoPlayerPage extends HookWidget {
 
   /// 同目录下的字幕旁车文件路径（NAS 上的 path），可空。
   final List<String> subtitles;
+
+  /// NAS 上的视频 path，用来记续播位置；为 null 就不记。
+  final String? mediaPath;
   const VideoPlayerPage(
       {super.key,
       required this.url,
@@ -41,6 +45,7 @@ class VideoPlayerPage extends HookWidget {
       this.cover,
       this.nfo,
       this.subtitles = const [],
+      this.mediaPath,
       this.network = true});
 
   @override
@@ -80,6 +85,9 @@ class VideoPlayerPage extends HookWidget {
       try {
         // 等待 open 完成，失败才能落到下面的 catch（原来未 await 永远不进 catch）。
         await player.open(Media(url), play: true);
+        // 续播：上次看到一半的位置
+        final resume = await resumePosition(mediaPath ?? '');
+        if (resume != null) await player.seek(resume);
         player.stream.videoParams.listen((event) {
           videoAspectRatio.value = event.aspect ?? 1;
         });
@@ -201,6 +209,11 @@ class VideoPlayerPage extends HookWidget {
       parseNfo().then((_) => parseTmdb());
       initializeVideo();
       return () {
+        // 离开时记续播位置（离开页面时 state 还是最后一次的）
+        if (mediaPath != null) {
+          savePlayProgress(mediaPath!, player.state.position,
+              duration: player.state.duration);
+        }
         player.dispose();
       };
     }, const []);

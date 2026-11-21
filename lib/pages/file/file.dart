@@ -667,6 +667,7 @@ class Files extends HookWidget {
                       cover: cover,
                       nfo: nfo,
                       subtitles: subtitles,
+                      mediaPath: '${file['path']}',
                     );
                   }));
                 }

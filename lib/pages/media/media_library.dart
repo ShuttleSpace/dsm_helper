@@ -9,6 +9,8 @@ import 'package:garden/pages/setting/media_library_setting.dart';
 import 'package:garden/stores/connection_store.dart';
 import 'package:garden/util/log.dart';
 import 'package:garden/util/media_library.dart';
+import 'package:garden/util/storage_util.dart';
+import 'package:garden/util/tmdb_util.dart';
 import 'package:garden/util/ui_util.dart';
 import 'package:signals_hooks/signals_hooks.dart';
 
@@ -21,6 +23,10 @@ class MediaLibrary extends HookWidget {
     final items = useSignal<List<MediaItem>>([]);
     final loading = useSignal(false);
     final hasRoots = useSignal<bool?>(null); // null = 还没读设置
+    final query = useSignal('');
+    final sort = useSignal(MediaSort.name);
+    final searching = useState(false);
+    final watching = useSignal<Map<String, dynamic>>({});
 
     Future<void> openPlayer(MediaItem item) async {
       await Navigator.of(context).push(CupertinoPageRoute(builder: (context) {
@@ -35,13 +41,17 @@ class MediaLibrary extends HookWidget {
           cover: item.coverPath,
           nfo: item.nfoPath,
           subtitles: item.subtitles,
+          mediaPath: item.path,
         );
       }));
+      // 回来时续播位置可能变了
+      watching.value = await loadContinueWatching();
     }
 
     Future<void> reload() async {
       final roots = await loadMediaLibraryPaths();
       hasRoots.value = roots.isNotEmpty;
+      watching.value = await loadContinueWatching();
       if (roots.isEmpty) {
         items.value = [];
         return;
@@ -52,8 +62,16 @@ class MediaLibrary extends HookWidget {
         items.value = list;
         loading.value = false;
         // NFO 逐条补，补一条刷一条，先让海报墙出来
+        final apiKey = await StorageUtil.getString(tmdbApiKeyStorageKey) ?? '';
         for (final item in list) {
-          final filled = await fillMediaNfo(item);
+          var filled = await fillMediaNfo(item);
+          // 没本地封面时用 TMDB 的海报（走 tmdb 缓存），没 key 就跳过
+          if (filled.coverPath.isBlank && apiKey.isNotBlank) {
+            final info = await fetchTmdbInfo(apiKey, item.name);
+            if (info != null && info.poster.isNotBlank) {
+              filled = filled.withCover(info.poster);
+            }
+          }
           if (identical(filled, item)) continue;
           items.value = [
             for (final e in items.value) e.path == filled.path ? filled : e
@@ -74,13 +92,50 @@ class MediaLibrary extends HookWidget {
     Future<void> openSetting() async {
       await Navigator.of(context).push(
           CupertinoPageRoute(builder: (_) => const MediaLibrarySetting()));
-      reload();
+      await reload();
     }
+
+    final shown = filterAndSortMediaItems(items.value, query.value, sort.value);
+    // 继续观看：库里有、且看过一半以内的
+    final byPath = {for (final e in items.value) e.path: e};
+    final resumed = [
+      for (final entry in watching.value.entries)
+        if (byPath[entry.key] != null &&
+            entry.value is Map &&
+            ((entry.value as Map)['pos'] as num? ?? 0) > 0)
+          (byPath[entry.key]!, entry.value as Map)
+    ];
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('多媒体'),
+        title: searching.value
+            ? TextField(
+                autofocus: true,
+                decoration: const InputDecoration(
+                    hintText: '搜片名', border: InputBorder.none),
+                onChanged: (v) => query.value = v,
+              )
+            : const Text('多媒体'),
         actions: [
+          IconButton(
+            tooltip: '搜索',
+            icon: Icon(searching.value ? Icons.close : Icons.search),
+            onPressed: () {
+              searching.value = !searching.value;
+              if (!searching.value) query.value = '';
+            },
+          ),
+          PopupMenuButton<MediaSort>(
+            tooltip: '排序',
+            icon: const Icon(Icons.sort),
+            initialValue: sort.value,
+            onSelected: (value) => sort.value = value,
+            itemBuilder: (context) => const [
+              PopupMenuItem(value: MediaSort.name, child: Text('按片名')),
+              PopupMenuItem(value: MediaSort.year, child: Text('按年份')),
+              PopupMenuItem(value: MediaSort.rating, child: Text('按评分')),
+            ],
+          ),
           IconButton(
             tooltip: '刷新',
             icon: const Icon(Icons.refresh),
@@ -95,21 +150,49 @@ class MediaLibrary extends HookWidget {
       ),
       body: hasRoots.value == false
           ? _centerHint('还没有设置媒体库目录', '添加后这里会列出视频（最多往下 3 层）', openSetting)
-          : items.value.isEmpty
+          : shown.isEmpty && resumed.isEmpty
               ? (loading.value
                   ? const Center(child: CircularProgressIndicator())
-                  : _centerHint('库里没找到视频', '检查一下库目录，或点右上角刷新', reload))
-              : GridView.builder(
-                  padding: const EdgeInsets.all(12),
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    mainAxisSpacing: 12,
-                    crossAxisSpacing: 12,
-                    childAspectRatio: 0.62,
-                  ),
-                  itemCount: items.value.length,
-                  itemBuilder: (context, i) =>
-                      _Poster(item: items.value[i], onTap: openPlayer),
+                  : _centerHint(
+                      query.value.isBlank ? '库里没找到视频' : '没搜到「${query.value}」',
+                      '检查一下库目录，或点右上角刷新',
+                      reload))
+              : Column(
+                  children: [
+                    if (resumed.isNotEmpty && query.value.isBlank)
+                      SizedBox(
+                        height: 132,
+                        child: ListView.separated(
+                          scrollDirection: Axis.horizontal,
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 8),
+                          itemCount: resumed.length,
+                          separatorBuilder: (_, __) =>
+                              const SizedBox(width: 10),
+                          itemBuilder: (context, i) => _ResumeCard(
+                            item: resumed[i].$1,
+                            pos: (resumed[i].$2['pos'] as num).toInt(),
+                            dur: (resumed[i].$2['dur'] as num? ?? 0).toInt(),
+                            onTap: () => openPlayer(resumed[i].$1),
+                          ),
+                        ),
+                      ),
+                    Expanded(
+                      child: GridView.builder(
+                        padding: const EdgeInsets.all(12),
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          mainAxisSpacing: 12,
+                          crossAxisSpacing: 12,
+                          childAspectRatio: 0.62,
+                        ),
+                        itemCount: shown.length,
+                        itemBuilder: (context, i) =>
+                            _Poster(item: shown[i], onTap: openPlayer),
+                      ),
+                    ),
+                  ],
                 ),
     );
   }
@@ -133,6 +216,31 @@ class MediaLibrary extends HookWidget {
       );
 }
 
+/// 封面地址：本地封面走缩略图接口，TMDB 海报已经是完整 URL。
+Widget mediaCover(String cover, {double? height}) {
+  if (cover.isBlank) {
+    return Container(
+      height: height,
+      width: double.infinity,
+      color: Colors.grey.withValues(alpha: 0.2),
+      child: const Icon(Icons.movie, size: 40),
+    );
+  }
+  return ExtendedImage.network(
+    cover.startsWith("http")
+        ? cover
+        : thumbUrl(
+            baseUri: connectionStore.baseUri.value,
+            path: cover,
+            sid: connectionStore.sid.value,
+          ),
+    fit: BoxFit.cover,
+    width: double.infinity,
+    height: height,
+    cacheWidth: 600,
+  );
+}
+
 class _Poster extends StatelessWidget {
   final MediaItem item;
   final void Function(MediaItem) onTap;
@@ -141,7 +249,6 @@ class _Poster extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cover = item.coverPath;
     return InkWell(
       onTap: () => onTap(item),
       child: Column(
@@ -150,24 +257,7 @@ class _Poster extends StatelessWidget {
           Expanded(
             child: ClipRRect(
               borderRadius: BorderRadius.circular(12),
-              child: cover.isNotBlank
-                  ? ExtendedImage.network(
-                      cover.startsWith("http")
-                          ? cover
-                          : thumbUrl(
-                              baseUri: connectionStore.baseUri.value,
-                              path: cover,
-                              sid: connectionStore.sid.value,
-                            ),
-                      fit: BoxFit.cover,
-                      width: double.infinity,
-                      cacheWidth: 600,
-                    )
-                  : Container(
-                      width: double.infinity,
-                      color: Colors.grey.withValues(alpha: 0.2),
-                      child: const Icon(Icons.movie, size: 40),
-                    ),
+              child: mediaCover(item.coverPath),
             ),
           ),
           const SizedBox(height: 6),
@@ -185,6 +275,64 @@ class _Poster extends StatelessWidget {
               style: const TextStyle(fontSize: 11, color: Colors.grey),
             ),
         ],
+      ),
+    );
+  }
+}
+
+/// 「继续观看」里的一张小卡：封面 + 进度条 + 剩余时间。
+class _ResumeCard extends StatelessWidget {
+  final MediaItem item;
+  final int pos;
+  final int dur;
+  final VoidCallback onTap;
+
+  const _ResumeCard({
+    required this.item,
+    required this.pos,
+    required this.dur,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final ratio = dur <= 0 ? 0.0 : (pos / dur).clamp(0.0, 1.0);
+    final left = dur - pos;
+    return InkWell(
+      onTap: onTap,
+      child: SizedBox(
+        width: 120,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(10),
+                child: Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    mediaCover(item.coverPath),
+                    Align(
+                      alignment: Alignment.bottomCenter,
+                      child: LinearProgressIndicator(
+                        value: ratio,
+                        minHeight: 3,
+                        backgroundColor: Colors.black26,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(item.displayTitle,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(fontSize: 12)),
+            Text('剩 ${(left / 60).ceil()} 分钟',
+                style: const TextStyle(fontSize: 10, color: Colors.grey)),
+          ],
+        ),
       ),
     );
   }
