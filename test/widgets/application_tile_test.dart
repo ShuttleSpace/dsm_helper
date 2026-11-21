@@ -62,7 +62,70 @@ void main() {
     expect(image.height, 36);
     expect(find.text('Virtual Machine Manager'), findsOneWidget);
     expect(find.text('!'), findsOneWidget);
-    await tester.pumpAndSettle();
+    await tester.pump(const Duration(milliseconds: 100));
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('short label does not marquee', (tester) async {
+    await tester.pumpWidget(MaterialApp(
+      home: Scaffold(
+        body: SizedBox(
+          width: 120,
+          child: ApplicationTile(
+            iconAsset: 'assets/applications/docker.png',
+            label: 'Docker',
+            onTap: () {},
+          ),
+        ),
+      ),
+    ));
+
+    expect(find.text('Docker'), findsOneWidget);
+    expect(find.byType(ClipRect), findsNothing);
+  });
+
+  testWidgets('long label marquees in a narrow grid tile', (tester) async {
+    await tester.pumpWidget(MaterialApp(
+      home: Scaffold(
+        body: SizedBox(
+          width: 88,
+          child: ApplicationTile(
+            iconAsset: 'assets/applications/docker.png',
+            label: 'Virtual Machine Manager with a very long title',
+            onTap: () {},
+          ),
+        ),
+      ),
+    ));
+
+    expect(find.byType(ClipRect), findsOneWidget);
+    final transformFinder = find.descendant(
+      of: find.byType(ClipRect),
+      matching: find.byType(Transform),
+    );
+    final before = tester.widget<Transform>(transformFinder);
+    await tester.pump(const Duration(milliseconds: 500));
+    final after = tester.widget<Transform>(transformFinder);
+    expect(before.transform, isNot(after.transform));
+  });
+
+  testWidgets('long label marquees in list mode without overflow', (tester) async {
+    await tester.pumpWidget(MaterialApp(
+      home: Scaffold(
+        body: SizedBox(
+          width: 200,
+          child: ApplicationTile(
+            iconAsset: 'assets/applications/docker.png',
+            label: 'Virtual Machine Manager with a very long title',
+            onTap: () {},
+            listLayout: true,
+          ),
+        ),
+      ),
+    ));
+
+    expect(find.byType(ClipRect), findsOneWidget);
+    await tester.pump(const Duration(milliseconds: 500));
     expect(tester.takeException(), isNull);
   });
 }
