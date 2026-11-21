@@ -11,6 +11,7 @@ class ApplicationTile extends StatelessWidget {
   final VoidCallback onTap;
   final Widget? badge;
   final bool centerContent;
+  final bool listLayout;
 
   const ApplicationTile({
     super.key,
@@ -19,10 +20,30 @@ class ApplicationTile extends StatelessWidget {
     required this.onTap,
     this.badge,
     this.centerContent = true,
+    this.listLayout = false,
   });
+
+  ApplicationTile copyWith({bool? listLayout}) {
+    return ApplicationTile(
+      key: key,
+      iconAsset: iconAsset,
+      label: label,
+      onTap: onTap,
+      badge: badge,
+      centerContent: centerContent,
+      listLayout: listLayout ?? this.listLayout,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
+    final icon = Image.asset(
+      iconAsset,
+      height: 36,
+      width: 36,
+      fit: BoxFit.contain,
+    );
+
     return GestureDetector(
       onTap: onTap,
       child: Card(
@@ -35,29 +56,39 @@ class ApplicationTile extends StatelessWidget {
           child: Stack(
             children: [
               Align(
-                alignment: centerContent ? Alignment.center : Alignment.topCenter,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Image.asset(
-                      iconAsset,
-                      height: 45,
-                      width: 45,
-                      fit: BoxFit.contain,
-                    ),
-                    const SizedBox(height: 5),
-                    Text(
-                      label,
-                      maxLines: 1,
-                      textAlign: TextAlign.center,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
-                ),
+                alignment:
+                    centerContent ? Alignment.center : Alignment.topCenter,
+                child: listLayout
+                    ? Row(
+                        children: [
+                          icon,
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Text(
+                              label,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
+                      )
+                    : Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          icon,
+                          const SizedBox(height: 5),
+                          Text(
+                            label,
+                            maxLines: 1,
+                            textAlign: TextAlign.center,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
+                      ),
               ),
               if (badge != null)
                 Positioned(
-                  right: 30,
+                  right: listLayout ? 12 : 30,
                   child: badge!,
                 ),
             ],
