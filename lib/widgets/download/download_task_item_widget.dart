@@ -5,7 +5,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_vibrate/flutter_vibrate.dart';
 import 'package:garden/pages/download/download.dart';
-import 'package:garden/theme/app_colors.dart';
 import 'package:garden/util/http_util.dart';
 import 'package:garden/widgets/download/download_action_menu_widget.dart';
 import 'package:garden/widgets/download/download_status_widget.dart';
@@ -49,12 +48,12 @@ class DownloadTaskItemWidget extends StatelessWidget {
     return Padding(
       padding:
           const EdgeInsets.only(top: 10.0, bottom: 10.0, left: 20, right: 20),
-      child: Watch((context) => OutlinedButton(
+      child: Watch((context) => InkWell(
             onLongPress: () {
               UiUtil.vibrate(FeedbackType.light);
               onLongPress();
             },
-            onPressed: () {
+            onTap: () {
               if (multiSelect.value) {
                 if (selectedTasks.value.contains(info)) {
                   final currentTasks = [...selectedTasks.value];
@@ -71,7 +70,11 @@ class DownloadTaskItemWidget extends StatelessWidget {
             },
             child: Row(
               children: [
-                const SizedBox(width: 20),
+                DownloadStatusWidget(
+                  status: info.status ?? TaskStatus.notFound,
+                  progress: info.progress ?? 0,
+                ),
+                const SizedBox(width: 10),
                 _buildFileIcon(context, fileType),
                 const SizedBox(width: 10),
                 Expanded(
@@ -110,19 +113,13 @@ class DownloadTaskItemWidget extends StatelessWidget {
         ),
         const SizedBox(height: 5),
         Text(
-          DateTime.fromMillisecondsSinceEpoch(
-                  info.task.creationTime.secondsSinceEpoch)
-              .format("Y/m/d H:i:s"),
+          info.task.creationTime.format("Y/m/d H:i:s"),
           style: TextStyle(
             fontSize: 12,
             color: Theme.of(context).textTheme.headlineSmall?.color,
           ),
         ),
         const SizedBox(height: 5),
-        DownloadStatusWidget(
-          status: info.status ?? TaskStatus.notFound,
-          progress: info.progress ?? 0,
-        ),
       ],
     );
   }
@@ -142,9 +139,9 @@ class DownloadTaskItemWidget extends StatelessWidget {
             width: 20,
             height: 20,
             child: selectedTasks.value.contains(info)
-                ? const Icon(
+                ? Icon(
                     CupertinoIcons.checkmark_alt,
-                    color: AppColors.primaryAction,
+                    color: Theme.of(context).colorScheme.primary,
                   )
                 : Container(),
           ),

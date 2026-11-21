@@ -2,103 +2,126 @@ import 'dart:async';
 
 import 'package:garden/extensions/color.dart';
 import 'package:garden/pages/control_panel/public_access/edit_ddns.dart';
-import 'package:garden/util/http_util.dart';
+import 'dart:convert';
+import 'package:garden/api/dsm_api.dart';
 import 'package:garden/widgets/bubble_tab_indicator.dart';
 import 'package:garden/widgets/label.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:garden/constants/app_constants.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:signals_hooks/signals_hooks.dart';
 
-class PublicAccess extends StatefulWidget {
+class PublicAccess extends HookWidget {
   const PublicAccess({super.key});
 
   @override
-  PublicAccessState createState() => PublicAccessState();
-}
+  Widget build(BuildContext context) {
+    final tickerProvider = useSingleTickerProvider();
+    final tabController = useMemoized(
+      () => TabController(length: 1, vsync: tickerProvider),
+      const [],
+    );
+    final providers = useSignal<List>([]);
+    final records = useSignal<List>([]);
+    final ips = useSignal<List>([]);
+    final Map statusStr = {
+      "service_ddns_normal": "正常",
+      "service_ddns_error_unknown": "联机失败",
+      "loading": "加载中",
+      "disabled": "已停用",
+    };
 
-class PublicAccessState extends State<PublicAccess>
-    with SingleTickerProviderStateMixin {
-  late TabController _tabController;
-  List providers = [];
-  List records = [];
-  String nextUpdateTime = "";
-  List ips = [];
-  late Timer timer;
-  Map statusStr = {
-    "service_ddns_normal": "正常",
-    "service_ddns_error_unknown": "联机失败",
-    "loading": "加载中",
-    "disabled": "已停用",
-  };
-  @override
-  void initState() {
-    _tabController = TabController(length: 1, vsync: this);
-    getData();
-    timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      getData();
-    });
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    timer.cancel();
-    super.dispose();
-  }
-
-  getData() async {
-    var res = await DsmApi.publicAccessInfo();
-    if (res['success']) {
-      List result = res['data']['result'];
-      for (var item in result) {
-        if (item['success'] == true) {
+    Future<void> getData() async {
+      try {
+        final apis = [
+          {"api": "SYNO.Core.DDNS.Provider", "version": 1, "method": "list"},
+          {"api": "SYNO.Core.DDNS.Record", "version": 1, "method": "list"},
+          {
+            "api": "SYNO.Core.DDNS.ExtIP",
+            "version": 2,
+            "method": "list",
+            "retry": true
+          },
+          {
+            "api": "SYNO.Core.DDNS.Synology",
+            "version": 1,
+            "method": "get_myds_account"
+          },
+        ];
+        final data = await dsmControlPanelPost({
+          "api": 'SYNO.Entry.Request',
+          "method": 'request',
+          "mode": '"parallel"',
+          "compound": jsonEncode(apis),
+          "version": 1,
+        });
+        for (final item in data['result'] ?? []) {
+          if (item is! Map || item['success'] != true) continue;
+          final itemData = item['data'];
+          if (itemData is! Map) continue;
           switch (item['api']) {
             case "SYNO.Core.DDNS.Provider":
-              setState(() {
-                providers = item['data']['providers']
-                    .where((e) =>
-                        e['provider'].startsWith("USER_") || e['url'] == null)
-                    .map((e) {
-                  e['provider'] = e['provider'].replaceAll("USER_", "*");
-                  return e;
-                }).toList();
-                providers.sort((a, b) {
-                  return a['provider'].compareTo(b['provider']);
-                });
-              });
+              providers.value = (itemData['providers'] as List? ?? [])
+                  .where((e) =>
+                      e['provider'].startsWith("USER_") || e['url'] == null)
+                  .map((e) {
+                e['provider'] = e['provider'].replaceAll("USER_", "*");
+                return e;
+              }).toList();
+              providers.value.sort((a, b) =>
+                  a['provider'].compareTo(b['provider']));
               break;
             case "SYNO.Core.DDNS.Record":
-              setState(() {
-                records = item['data']['records'].map((e) {
-                  e['provider'] = e['provider'].replaceAll("USER_", "*");
-                  return e;
-                }).toList();
-                nextUpdateTime = item['data']['next_update_time'];
-              });
+              records.value = (itemData['records'] as List? ?? []).map((e) {
+                e['provider'] = e['provider'].replaceAll("USER_", "*");
+                return e;
+              }).toList();
               break;
             case "SYNO.Core.DDNS.ExtIP":
-              ips = item['data'];
-
+              final rawIps = item['data'];
+              ips.value = rawIps is List ? List<dynamic>.from(rawIps) : <dynamic>[];
               break;
           }
         }
+      } catch (e) {
+        // 旧层失败时保持原状态。
       }
     }
-  }
 
-  Widget _buildDdnsItem(ddns) {
+    useEffect(() {
+      getData();
+      final timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+        getData();
+      });
+      return () {
+        timer.cancel();
+        tabController.dispose();
+      };
+    }, const []);
+
+    Widget buildDdnsItem(ddns) {
     return GestureDetector(
       onTap: () {
         Navigator.of(context).push(CupertinoPageRoute(builder: (context) {
           return EditDdns(
-            providers,
+            providers.value,
             ddns: ddns,
           );
         })).then((value) async {
           if (value != null && value) {
-            await DsmApi.ddnsUpdate(id: ddns['id'].replaceAll("USER_", "*"));
-            getData();
+            try {
+              await dsmControlPanelPost({
+                "api": 'SYNO.Core.DDNS.Record',
+                "method": 'update_ip_address',
+                "version": 1,
+                "id": '"${ddns['id'].replaceAll("USER_", "*")}"',
+              });
+              await getData();
+            } catch (e) {
+              // 旧层忽略失败。
+            }
           }
         });
       },
@@ -157,8 +180,6 @@ class PublicAccessState extends State<PublicAccess>
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         leading: AppBackButton(context),
@@ -171,8 +192,8 @@ class PublicAccessState extends State<PublicAccess>
                 Navigator.of(context)
                     .push(CupertinoPageRoute(builder: (context) {
                   return EditDdns(
-                    providers,
-                    extIp: ips,
+                    providers.value,
+                    extIp: ips.value,
                   );
                 }));
               },
@@ -183,8 +204,17 @@ class PublicAccessState extends State<PublicAccess>
             padding: const EdgeInsets.only(right: 10, top: 8, bottom: 8),
             child: OutlinedButton(
               onPressed: () async {
-                await DsmApi.ddnsUpdate();
-                getData();
+                try {
+                  await dsmControlPanelPost({
+                    "api": 'SYNO.Core.DDNS.Record',
+                    "method": 'update_ip_address',
+                    "version": 1,
+                    "id": '"null"',
+                  });
+                  await getData();
+                } catch (e) {
+                  // 旧层忽略失败。
+                }
               },
               child: const Icon(Icons.refresh),
             ),
@@ -202,7 +232,7 @@ class PublicAccessState extends State<PublicAccess>
             margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
             child: TabBar(
               isScrollable: false,
-              controller: _tabController,
+              controller: tabController,
               indicatorSize: TabBarIndicatorSize.label,
               labelColor: Theme.brightnessOf(context) == Brightness.dark
                   ? Colors.white
@@ -231,13 +261,13 @@ class PublicAccessState extends State<PublicAccess>
           ),
           Expanded(
             child: TabBarView(
-              controller: _tabController,
+              controller: tabController,
               children: [
                 ListView.builder(
                   itemBuilder: (context, i) {
-                    return _buildDdnsItem(records[i]);
+                    return buildDdnsItem(records.value[i]);
                   },
-                  itemCount: records.length,
+                  itemCount: records.value.length,
                 ),
                 // Center(
                 //   child: Text("开发中"),

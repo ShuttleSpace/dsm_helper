@@ -3,250 +3,154 @@ import 'package:garden/util/log.dart';
 import 'package:garden/util/ui_util.dart';
 
 import 'package:garden/theme/app_theme.dart';
-import 'package:garden/util/http_util.dart';
+import 'package:garden/api/dsm_api.dart';
+import 'package:garden/extensions/string.dart';
 import 'package:garden/widgets/bubble_tab_indicator.dart';
 import 'package:garden/widgets/label.dart';
+import 'package:garden/widgets/storage_manager/smart_info_item.dart';
+import 'package:garden/widgets/storage_manager/smart_log_item.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:garden/constants/app_constants.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:garden/theme/app_colors.dart';
+import 'package:signals_hooks/signals_hooks.dart';
 
-class Smart extends StatefulWidget {
+class Smart extends HookWidget {
   final Map disk;
   const Smart(this.disk, {super.key});
-  @override
-  SmartState createState() => SmartState();
-}
-
-class SmartState extends State<Smart> with SingleTickerProviderStateMixin {
-  Timer? timer;
-  late TabController _tabController;
-  bool loading = true;
-  Map history = {};
-  Map overview = {};
-  List smartInfo = [];
-  List logs = [];
-  bool logLoading = true;
-
-  bool testing = false;
-  String remain = "";
-  String quickLast = "";
-  String extendLast = "";
-  List testInfo = [];
-  @override
-  void initState() {
-    _tabController = TabController(length: 4, vsync: this);
-    _tabController.addListener(() {
-      if (_tabController.index == 3 && logLoading) {
-        getLog();
-      }
-    });
-    getData();
-    getSmartLog();
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    timer?.cancel();
-    super.dispose();
-  }
-
-  doSmartTest(String type) async {
-    setState(() {
-      testing = true;
-    });
-    if (timer != null) {
-      return;
-    }
-    var res = await DsmApi.doSmartTest(widget.disk['device'], type);
-    if (res['success']) {
-      getSmartLog();
-      timer = Timer.periodic(const Duration(seconds: 4), (timer) {
-        getSmartLog();
-      });
-    } else {
-      UiUtil.toast("执行检测失败，代码${res['error']['code']}");
-      setState(() {
-        testing = false;
-      });
-    }
-  }
-
-  getLog() async {
-    var res = await DsmApi.diskTestLog(widget.disk['device']);
-    if (res['success']) {
-      setState(() {
-        logLoading = false;
-        logs = res['data']['testLog'];
-      });
-    }
-  }
-
-  getData() async {
-    var res = await DsmApi.smart(widget.disk['device']);
-    if (res['success']) {
-      setState(() {
-        loading = false;
-        history = res['data']['healthInfo']['history'];
-        overview = res['data']['healthInfo']['overview'];
-        smartInfo = res['data']['healthInfo']['smartInfo'];
-      });
-    } else {
-      UiUtil.toast("获取失败");
-    }
-  }
-
-  getSmartLog() async {
-    var res = await DsmApi.smartTestLog(widget.disk['device']);
-    Log.info(res);
-    if (res['success']) {
-      setState(() {
-        quickLast = res['data']['quick_last'];
-        extendLast = res['data']['extend_last'];
-        testInfo = res['data']['testInfo'];
-        testing = res['data']['testInfo'].last['testing'];
-        remain = res['data']['testInfo'].last['remain'];
-        if (!testing) {
-          timer?.cancel();
-        }
-      });
-    }
-  }
-
-  Widget _buildSmartItem(smart) {
-    return Card(
-      shape: RoundedRectangleBorder(
-          side: const BorderSide(), borderRadius: BorderRadius.circular(18)),
-      child: Padding(
-        padding: const EdgeInsets.all(AppConstants.paddingSmall),
-        child: Column(
-          children: [
-            Row(
-              children: [
-                Label(smart['id'], Colors.lightBlueAccent),
-                const SizedBox(
-                  width: 5,
-                ),
-                Label(
-                  smart['status'],
-                  smart['status'] == "OK" ? Colors.green : Colors.red,
-                  fill: true,
-                ),
-                const SizedBox(
-                  width: 5,
-                ),
-                Text(smart['name']),
-              ],
-            ),
-            const SizedBox(
-              height: 5,
-            ),
-            Row(
-              children: [
-                SizedBox(
-                  width: 100,
-                  child: Text.rich(
-                    TextSpan(
-                      children: [
-                        const TextSpan(
-                            text: "现值：",
-                            style: TextStyle(fontWeight: FontWeight.w600)),
-                        TextSpan(text: "${smart['current']}"),
-                      ],
-                    ),
-                  ),
-                ),
-                Text.rich(
-                  TextSpan(
-                    children: [
-                      const TextSpan(
-                          text: "最差值：",
-                          style: TextStyle(fontWeight: FontWeight.w600)),
-                      TextSpan(text: "${smart['worst']}"),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(
-              height: 5,
-            ),
-            Row(
-              children: [
-                SizedBox(
-                  width: 100,
-                  child: Text.rich(
-                    TextSpan(
-                      children: [
-                        const TextSpan(
-                            text: "临界值：",
-                            style: TextStyle(fontWeight: FontWeight.w600)),
-                        TextSpan(text: "${smart['threshold']}"),
-                      ],
-                    ),
-                  ),
-                ),
-                Text.rich(
-                  TextSpan(
-                    children: [
-                      const TextSpan(
-                          text: "原始资料：",
-                          style: TextStyle(fontWeight: FontWeight.w600)),
-                      TextSpan(text: "${smart['raw']}"),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildLogItem(log) {
-    return Card(
-      shape: RoundedRectangleBorder(
-          side: const BorderSide(), borderRadius: BorderRadius.circular(18)),
-      child: Padding(
-        padding: const EdgeInsets.all(AppConstants.paddingSmall),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text("${log['time']}"),
-            const SizedBox(
-              height: 10,
-            ),
-            Row(
-              children: [
-                Label(
-                  log['result'] == "smart_complete" ? "正常" : log['result'],
-                  log['result'] == "smart_complete" ? Colors.green : Colors.red,
-                  fill: true,
-                ),
-                const SizedBox(
-                  width: 10,
-                ),
-                Text(
-                    "${log['test_type'] == "quick" ? "S.M.A.R.T. 快速测试" : log['test_type']}"),
-              ],
-            )
-          ],
-        ),
-      ),
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
+    final timer = useRef<Timer?>(null);
+    final tickerProvider = useSingleTickerProvider();
+    final tabController = useMemoized(
+      () => TabController(length: 4, vsync: tickerProvider),
+      const [],
+    );
+    final loading = useSignal(true);
+    final history = useSignal<Map>({});
+    final overview = useSignal<Map>({});
+    final smartInfo = useSignal<List>([]);
+    final logs = useSignal<List>([]);
+    final logLoading = useSignal(true);
+    final testing = useSignal(false);
+    final remain = useSignal("");
+    final quickLast = useSignal("");
+    final extendLast = useSignal("");
+    final testInfo = useSignal<List>([]);
+
+    getSmartLog() async {
+      try {
+        final data = await dsmControlPanelPost({
+          "device": '"${disk['device']}"',
+          "api": 'SYNO.Core.Storage.Disk',
+          "method": "get_smart_test_log",
+          "version": 1,
+        });
+        Log.info(data);
+        quickLast.value = data['quick_last'] ?? '';
+        extendLast.value = data['extend_last'] ?? '';
+        final infos = (data['testInfo'] as List?) ?? [];
+        testInfo.value = infos;
+        if (infos.isNotEmpty) {
+          testing.value = infos.last['testing'] ?? false;
+          remain.value = infos.last['remain'] ?? '';
+          if (!testing.value) timer.value?.cancel();
+        }
+      } catch (e) {
+        // 旧层失败时静默。
+      }
+    }
+
+    doSmartTest(String type) async {
+      testing.value = true;
+
+      if (timer.value != null) {
+        return;
+      }
+      try {
+        await dsmControlPanelPost({
+          "device": '"${disk['device']}"',
+          "type": '"$type"',
+          "api": 'SYNO.Core.Storage.Disk',
+          "method": "do_smart_test",
+          "version": 1,
+        });
+        getSmartLog();
+        timer.value = Timer.periodic(const Duration(seconds: 4), (unusedTimer) {
+          getSmartLog();
+        });
+      } catch (e) {
+        final code = e is DSMException ? e.code : -1;
+        UiUtil.toast("执行检测失败，代码$code");
+        testing.value = false;
+      }
+    }
+
+    getLog() async {
+      try {
+        final data = await dsmControlPanelPost({
+          "sort_by": '"time"',
+          "sort_direction": '"DESC"',
+          "offset": 0,
+          "limit": 30,
+          "type": '"all"',
+          "device": '"${disk['device']}"',
+          "api": 'SYNO.Core.Storage.Disk',
+          "method": "disk_test_log_get",
+          "version": 1,
+        });
+        logs.value = data['testLog'] ?? [];
+      } catch (e) {
+        // 旧层失败时静默。
+      } finally {
+        logLoading.value = false;
+      }
+    }
+
+    getData() async {
+      try {
+        final data = await dsmControlPanelPost({
+          "device": '"${disk['device']}"',
+          "api": 'SYNO.Storage.CGI.Smart',
+          "method": "get_health_info",
+          "version": 1,
+        });
+        final health = (data['healthInfo'] as Map?) ?? const {};
+        history.value = health['history'] ?? [];
+        overview.value = health['overview'] ?? [];
+        smartInfo.value = health['smartInfo'] ?? [];
+      } catch (e) {
+        UiUtil.toast("获取失败");
+      } finally {
+        loading.value = false;
+      }
+    }
+
+    useEffect(() {
+      void listener() {
+        if (tabController.index == 3 && logLoading.value) {
+          getLog();
+        }
+      }
+
+      tabController.addListener(listener);
+      getData();
+      getSmartLog();
+      return () {
+        timer.value?.cancel();
+        tabController.removeListener(listener);
+        tabController.dispose();
+      };
+    }, const []);
+
     return Scaffold(
       appBar: AppBar(
         leading: AppBackButton(context),
-        title: Text("${widget.disk['name']} 状况信息"),
+        title: Text("${disk['name']} 状况信息"),
       ),
-      body: loading
+      body: loading.value
           ? const Center(
               child: CupertinoActivityIndicator(
                 radius: 14,
@@ -263,7 +167,7 @@ class SmartState extends State<Smart> with SingleTickerProviderStateMixin {
                   child: TabBar(
                     dividerHeight: 0,
                     isScrollable: true,
-                    controller: _tabController,
+                    controller: tabController,
                     indicatorSize: TabBarIndicatorSize.label,
                     labelColor: Theme.brightnessOf(context) == Brightness.dark
                         ? Colors.white
@@ -296,7 +200,7 @@ class SmartState extends State<Smart> with SingleTickerProviderStateMixin {
                 ),
                 Expanded(
                   child: TabBarView(
-                    controller: _tabController,
+                    controller: tabController,
                     children: [
                       ListView(
                         children: [
@@ -313,12 +217,11 @@ class SmartState extends State<Smart> with SingleTickerProviderStateMixin {
                                   CircleAvatar(
                                     radius: 30,
                                     backgroundColor:
-                                        widget.disk['overview_status'] ==
-                                                "normal"
+                                        disk['overview_status'] == "normal"
                                             ? Colors.green
                                             : Colors.red,
                                     child: Icon(
-                                      widget.disk['overview_status'] == "normal"
+                                      disk['overview_status'] == "normal"
                                           ? Icons.check
                                           : Icons.clear,
                                       color: Colors.white,
@@ -334,11 +237,10 @@ class SmartState extends State<Smart> with SingleTickerProviderStateMixin {
                                           CrossAxisAlignment.start,
                                       children: [
                                         Text(
-                                          "${widget.disk['overview_status'] == "normal" ? "正常" : widget.disk['overview_status']}",
+                                          "${disk['overview_status'] == "normal" ? "正常" : disk['overview_status']}",
                                           style: TextStyle(
                                               fontSize: 20,
-                                              color: widget.disk[
-                                                          'overview_status'] ==
+                                              color: disk['overview_status'] ==
                                                       "normal"
                                                   ? Colors.green
                                                   : Colors.red),
@@ -347,7 +249,7 @@ class SmartState extends State<Smart> with SingleTickerProviderStateMixin {
                                           height: 5,
                                         ),
                                         Text(
-                                            "${widget.disk['overview_status'] == "normal" ? "此硬盘的运行状况正常" : widget.disk['overview_status']}"),
+                                            "${disk['overview_status'] == "normal" ? "此硬盘的运行状况正常" : disk['overview_status']}"),
                                       ],
                                     ),
                                   ),
@@ -375,7 +277,7 @@ class SmartState extends State<Smart> with SingleTickerProviderStateMixin {
                                               fontWeight: FontWeight.w600),
                                         ),
                                       ),
-                                      Text("${widget.disk['temp']} 摄氏度"),
+                                      Text("${disk['temp']} 摄氏度"),
                                     ],
                                   ),
                                   const SizedBox(
@@ -391,7 +293,8 @@ class SmartState extends State<Smart> with SingleTickerProviderStateMixin {
                                               fontWeight: FontWeight.w600),
                                         ),
                                       ),
-                                      Text("${overview['poweron'] ?? "-"} 小时"),
+                                      Text(
+                                          "${overview.value['poweron'] ?? "-"} 小时"),
                                     ],
                                   ),
                                   const SizedBox(
@@ -407,7 +310,7 @@ class SmartState extends State<Smart> with SingleTickerProviderStateMixin {
                                               fontWeight: FontWeight.w600),
                                         ),
                                       ),
-                                      Text("${overview['retry']}"),
+                                      Text("${overview.value['retry']}"),
                                     ],
                                   ),
                                   const SizedBox(
@@ -423,7 +326,7 @@ class SmartState extends State<Smart> with SingleTickerProviderStateMixin {
                                               fontWeight: FontWeight.w600),
                                         ),
                                       ),
-                                      Text("${overview['unc']}"),
+                                      Text("${overview.value['unc']}"),
                                     ],
                                   ),
                                   const SizedBox(
@@ -439,7 +342,7 @@ class SmartState extends State<Smart> with SingleTickerProviderStateMixin {
                                               fontWeight: FontWeight.w600),
                                         ),
                                       ),
-                                      Text("${overview['idnf']}"),
+                                      Text("${overview.value['idnf']}"),
                                     ],
                                   ),
                                   const SizedBox(
@@ -456,9 +359,10 @@ class SmartState extends State<Smart> with SingleTickerProviderStateMixin {
                                         ),
                                       ),
                                       Text(
-                                        "${overview['smart'] == "normal" ? "正常" : overview['smart_status']}",
+                                        "${overview.value['smart'] == "normal" ? "正常" : overview.value['smart_status']}",
                                         style: TextStyle(
-                                            color: overview['smart'] == "normal"
+                                            color: overview.value['smart'] ==
+                                                    "normal"
                                                 ? Colors.green
                                                 : Colors.red),
                                       ),
@@ -505,8 +409,8 @@ class SmartState extends State<Smart> with SingleTickerProviderStateMixin {
                                   Row(
                                     children: [
                                       Text(
-                                        quickLast.isNotBlank
-                                            ? quickLast
+                                        quickLast.value.isNotBlank
+                                            ? quickLast.value
                                             : "暂无快速检测结果",
                                         style: TextStyle(
                                             color: AppTheme.of(context)
@@ -515,13 +419,15 @@ class SmartState extends State<Smart> with SingleTickerProviderStateMixin {
                                       const SizedBox(
                                         width: 10,
                                       ),
-                                      if (quickLast.isNotBlank)
+                                      if (quickLast.value.isNotBlank)
                                         Label(
-                                          testInfo.last['quick_error_before'] ==
+                                          testInfo.value.last[
+                                                      'quick_error_before'] ==
                                                   false
                                               ? "正常"
                                               : "错误",
-                                          testInfo.last['quick_error_before'] ==
+                                          testInfo.value.last[
+                                                      'quick_error_before'] ==
                                                   false
                                               ? Colors.green
                                               : Colors.red,
@@ -543,8 +449,8 @@ class SmartState extends State<Smart> with SingleTickerProviderStateMixin {
                                   Row(
                                     children: [
                                       Text(
-                                        extendLast.isNotBlank
-                                            ? extendLast
+                                        extendLast.value.isNotBlank
+                                            ? extendLast.value
                                             : "暂无完整检测结果",
                                         style: TextStyle(
                                             color: AppTheme.of(context)
@@ -553,13 +459,15 @@ class SmartState extends State<Smart> with SingleTickerProviderStateMixin {
                                       const SizedBox(
                                         width: 10,
                                       ),
-                                      if (extendLast.isNotBlank)
+                                      if (extendLast.value.isNotBlank)
                                         Label(
-                                          testInfo.last['quick_error_before'] ==
+                                          testInfo.value.last[
+                                                      'quick_error_before'] ==
                                                   false
                                               ? "正常"
                                               : "错误",
-                                          testInfo.last['quick_error_before'] ==
+                                          testInfo.value.last[
+                                                      'quick_error_before'] ==
                                                   false
                                               ? Colors.green
                                               : Colors.red,
@@ -598,7 +506,7 @@ class SmartState extends State<Smart> with SingleTickerProviderStateMixin {
                                   const SizedBox(
                                     height: 20,
                                   ),
-                                  if (testing) ...[
+                                  if (testing.value) ...[
                                     Card(
                                       shape: RoundedRectangleBorder(
                                           side: const BorderSide(),
@@ -744,16 +652,16 @@ class SmartState extends State<Smart> with SingleTickerProviderStateMixin {
                       ListView.separated(
                         padding: const EdgeInsets.all(20),
                         itemBuilder: (context, i) {
-                          return _buildSmartItem(smartInfo[i]);
+                          return SmartInfoItem(smartInfo.value[i]);
                         },
-                        itemCount: smartInfo.length,
+                        itemCount: smartInfo.value.length,
                         separatorBuilder: (context, i) {
                           return const SizedBox(
                             height: 20,
                           );
                         },
                       ),
-                      logLoading
+                      logLoading.value
                           ? const Center(
                               child: Center(
                                 child: CupertinoActivityIndicator(
@@ -761,18 +669,18 @@ class SmartState extends State<Smart> with SingleTickerProviderStateMixin {
                                 ),
                               ),
                             )
-                          : logs.isNotEmpty
+                          : logs.value.isNotEmpty
                               ? ListView.separated(
                                   padding: const EdgeInsets.all(20),
                                   itemBuilder: (context, i) {
-                                    return _buildLogItem(logs[i]);
+                                    return SmartLogItem(logs.value[i]);
                                   },
                                   separatorBuilder: (context, i) {
                                     return const SizedBox(
                                       height: 20,
                                     );
                                   },
-                                  itemCount: logs.length)
+                                  itemCount: logs.value.length)
                               : Center(
                                   child: Text(
                                     "暂无历史记录",

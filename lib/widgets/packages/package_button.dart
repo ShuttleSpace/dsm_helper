@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:garden/widgets/bottom_confirm_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:garden/constants/app_constants.dart';
 
@@ -80,78 +81,13 @@ class PackageButton extends StatelessWidget {
   void _showStopDialog(BuildContext context) {
     showCupertinoModalPopup(
       context: context,
-      builder: (context) {
-        return Material(
-          color: Colors.transparent,
-          child: Card(
-            shape: RoundedRectangleBorder(
-                side: const BorderSide(),
-                borderRadius: BorderRadius.circular(18)),
-            child: SafeArea(
-              top: false,
-              child: Padding(
-                padding: const EdgeInsets.all(AppConstants.paddingSmall),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: <Widget>[
-                    const Text(
-                      "停用套件",
-                      style: TextStyle(
-                          fontSize: 20, fontWeight: FontWeight.w500),
-                    ),
-                    const SizedBox(
-                      height: 12,
-                    ),
-                    const Text(
-                      "确认要停用此套件？",
-                      style: TextStyle(
-                          fontSize: 20, fontWeight: FontWeight.w400),
-                    ),
-                    const SizedBox(
-                      height: 22,
-                    ),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: OutlinedButton(
-                            onPressed: () async {
-                              Navigator.of(context).pop();
-                              await onStop();
-                            },
-                            child: const Text(
-                              "停用",
-                              style: TextStyle(
-                                  fontSize: 18,
-                                  color: Colors.redAccent),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(
-                          width: 20,
-                        ),
-                        Expanded(
-                          child: OutlinedButton(
-                            onPressed: () async {
-                              Navigator.of(context).pop();
-                            },
-                            child: const Text(
-                              "取消",
-                              style: TextStyle(fontSize: 18),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(
-                      height: 8,
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        );
-      },
+      builder: (context) => BottomConfirmSheet(
+        title: "停用套件",
+        content: "确认要停用此套件？",
+        confirmText: "停用",
+        showTrailingSpace: true,
+        onConfirm: onStop,
+      ),
     );
   }
 }

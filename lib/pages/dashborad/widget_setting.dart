@@ -2,25 +2,21 @@ import 'package:garden/stores/settings_store.dart';
 import 'package:garden/util/log.dart';
 import 'package:garden/util/ui_util.dart';
 import 'package:garden/util/storage_util.dart';
-import 'package:garden/util/http_util.dart';
+import 'package:garden/api/dsm_api.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:garden/constants/app_constants.dart';
 import 'package:garden/theme/app_colors.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:signals_hooks/signals_hooks.dart';
 
-class WidgetSetting extends StatefulWidget {
-  final List widgets;
-  final Map restoreSizePos;
+class WidgetSetting extends HookWidget {
   const WidgetSetting(this.widgets, this.restoreSizePos, {super.key});
-  @override
-  WidgetSettingState createState() => WidgetSettingState();
-}
+  final ReadonlySignal<List> widgets;
+  final ReadonlySignal<Map> restoreSizePos;
 
-class WidgetSettingState extends State<WidgetSetting> {
-  bool showShortcut = true;
-  bool showWallpaper = true;
-  List<String> allWidgets = [
+  static const List<String> allWidgets = [
     // "SYNO.SDS.SystemInfoApp.FileChangeLogWidget",
     "SYNO.SDS.SystemInfoApp.SystemHealthWidget",
     "SYNO.SDS.ResourceMonitor.Widget",
@@ -30,7 +26,7 @@ class WidgetSettingState extends State<WidgetSetting> {
     "SYNO.SDS.SystemInfoApp.FileChangeLogWidget",
     "SYNO.SDS.SystemInfoApp.RecentLogWidget",
   ];
-  Map name = {
+  static const Map<String, dynamic> name = {
     "SYNO.SDS.SystemInfoApp.FileChangeLogWidget": "文件更改日志",
     "SYNO.SDS.SystemInfoApp.RecentLogWidget": "最新日志",
     "SYNO.SDS.TaskScheduler.TaskSchedulerWidget": "计划任务",
@@ -39,44 +35,29 @@ class WidgetSettingState extends State<WidgetSetting> {
     "SYNO.SDS.SystemInfoApp.StorageUsageWidget": "存储",
     "SYNO.SDS.ResourceMonitor.Widget": "资源监控",
   };
-  List showWidgets = [];
-  List selectedWidgets = [];
-  @override
-  void initState() {
-    StorageUtil.getBool("show_shortcut").then((showShortcutStr) {
-      setState(() {
-        if (showShortcutStr != null) {
-          showShortcut = showShortcutStr;
-        } else {
-          showShortcut = true;
-        }
-      });
-    });
-    StorageUtil.getBool("show_wallpaper").then((showWallpaperStr) {
-      setState(() {
-        if (showWallpaperStr != null) {
-          showWallpaper = showWallpaperStr == "1";
-        } else {
-          showWallpaper = true;
-        }
-      });
-    });
-    setState(() {
-      selectedWidgets.addAll(widget.widgets);
-      showWidgets.addAll(widget.widgets);
-    });
-    for (var widget in allWidgets) {
-      if (!showWidgets.contains(widget)) {
-        setState(() {
-          showWidgets.add(widget);
-        });
-      }
-    }
-    super.initState();
-  }
 
   @override
   Widget build(BuildContext context) {
+    final showShortcut = useSignal(true);
+    final showWallpaper = useSignal(true);
+    final showWidgets = useListSignal([]);
+    final selectedWidgets = useListSignal([]);
+
+    useEffect(() {
+      (() async {
+        showWidgets.value =
+            <dynamic>{...widgets.value, ...allWidgets}.toList();
+        selectedWidgets.value = widgets.value;
+        showShortcut.value = await StorageUtil.getBool("show_shortcut") ?? true;
+        showWallpaper.value = await StorageUtil.getBool("show_wallpaper") ?? true;
+      })();
+      return null;
+    }, const []);
+
+    final showWidgetsValue = showWidgets.watch(context);
+    final selectedWidgetsValue = selectedWidgets.watch(context);
+    final showShortcutValue = showShortcut.watch(context);
+    final showWallpaperValue = showWallpaper.watch(context);
     return Scaffold(
       appBar: AppBar(
         leading: AppBackButton(context),
@@ -87,8 +68,8 @@ class WidgetSettingState extends State<WidgetSetting> {
             child: OutlinedButton(
               onPressed: () async {
                 List saveWidgets = [];
-                for (var widget in showWidgets) {
-                  if (selectedWidgets.contains(widget)) {
+                for (var widget in showWidgetsValue) {
+                  if (selectedWidgetsValue.contains(widget)) {
                     saveWidgets.add(widget);
                   }
                 }
@@ -96,15 +77,16 @@ class WidgetSettingState extends State<WidgetSetting> {
                   "SYNO.SDS._Widget.Instance": {"modulelist": saveWidgets},
                   // "restoreSizePos": widget.restoreSizePos
                 };
-                var res = await DsmApi.userSetting(data);
-                if (res['success']) {
+                try {
+                  await dsmCoreUserSettingsApplyForPage(data);
                   UiUtil.toast("保存小组件成功");
                   if (context.mounted) {
                     // ignore: use_build_context_synchronously
                     Navigator.of(context).pop();
                   }
-                } else {
-                  UiUtil.toast("保存小组件失败，代码${res['error']['code']}");
+                } catch (e) {
+                  final code = e is DSMException ? e.code : -1;
+                  UiUtil.toast("保存小组件失败，代码$code");
                 }
               },
               child: Image.asset(
@@ -122,12 +104,8 @@ class WidgetSettingState extends State<WidgetSetting> {
             padding: const EdgeInsets.all(AppConstants.paddingLarge),
             child: GestureDetector(
               onTap: () {
-                setState(() {
-                  setState(() {
-                    showShortcut = !showShortcut;
-                    settingsStore.setShowShortcut(showShortcut);
-                  });
-                });
+                showShortcut.value = !showShortcut.value;
+                settingsStore.setShowShortcut(showShortcut.value);
               },
               child: Card(
                 shape: RoundedRectangleBorder(
@@ -151,7 +129,7 @@ class WidgetSettingState extends State<WidgetSetting> {
                             style: TextStyle(fontSize: 16),
                           ),
                           const Spacer(),
-                          if (showShortcut)
+                          if (showShortcutValue)
                             const Icon(
                               CupertinoIcons.checkmark_alt,
                               color: AppColors.primaryAction,
@@ -168,12 +146,8 @@ class WidgetSettingState extends State<WidgetSetting> {
             padding: const EdgeInsets.symmetric(horizontal: 20.0),
             child: GestureDetector(
               onTap: () {
-                setState(() {
-                  setState(() {
-                    showWallpaper = !showWallpaper;
-                    settingsStore.setShowWallpaper(showWallpaper);
-                  });
-                });
+                showWallpaper.value = !showWallpaper.value;
+                settingsStore.setShowWallpaper(showWallpaper.value);
               },
               child: Card(
                 shape: RoundedRectangleBorder(
@@ -197,7 +171,7 @@ class WidgetSettingState extends State<WidgetSetting> {
                             style: TextStyle(fontSize: 16),
                           ),
                           const Spacer(),
-                          if (showWallpaper)
+                          if (showWallpaperValue)
                             const Icon(
                               CupertinoIcons.checkmark_alt,
                               color: AppColors.primaryAction,
@@ -215,18 +189,16 @@ class WidgetSettingState extends State<WidgetSetting> {
           ),
           Expanded(
             child: ReorderableListView(
-              children: showWidgets.map((widget) {
+              children: showWidgetsValue.map((widget) {
                 return GestureDetector(
                   key: ValueKey(widget),
                   onTap: () {
-                    setState(() {
-                      if (selectedWidgets.contains(widget)) {
-                        selectedWidgets.remove(widget);
-                      } else {
-                        selectedWidgets.add(widget);
-                      }
-                      Log.info(showWidgets);
-                    });
+                    if (selectedWidgetsValue.contains(widget)) {
+                      selectedWidgets.remove(widget);
+                    } else {
+                      selectedWidgets.add(widget);
+                    }
+                    Log.info(showWidgetsValue);
                   },
                   child: Card(
                     shape: RoundedRectangleBorder(
@@ -251,7 +223,7 @@ class WidgetSettingState extends State<WidgetSetting> {
                             child: SizedBox(
                               width: 20,
                               height: 20,
-                              child: selectedWidgets.contains(widget)
+                              child: selectedWidgetsValue.contains(widget)
                                   ? const Icon(
                                       CupertinoIcons.checkmark_alt,
                                       color: AppColors.primaryAction,
@@ -265,14 +237,9 @@ class WidgetSettingState extends State<WidgetSetting> {
                   ),
                 );
               }).toList(),
-              onReorder: (int oldIndex, int newIndex) {
-                if (oldIndex < newIndex) {
-                  newIndex -= 1;
-                }
+              onReorderItem: (int oldIndex, int newIndex) {
                 var child = showWidgets.removeAt(oldIndex);
                 showWidgets.insert(newIndex, child);
-
-                setState(() {});
               },
             ),
           ),

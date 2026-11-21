@@ -59,7 +59,7 @@ class CpuChart extends StatelessWidget {
 
       for (var cpu in cpus) {
         final cpuData = cpu['cpu'] as List;
-        final value = cpuData[i]['user'] + cpuData[i]['system'];
+        final value = ((cpuData[i]['user'] as num) + (cpuData[i]['system'] as num)).toDouble();
         spots.add(FlSpot(spots.length.toDouble(), value));
       }
 

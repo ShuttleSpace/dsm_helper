@@ -1,3 +1,4 @@
+import 'package:garden/api/dsm_api.dart';
 import 'package:garden/pages/security_scan/result_card.dart';
 import 'package:garden/stores/connection_store.dart';
 import 'package:garden/util/http_util.dart';
@@ -8,181 +9,176 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:garden/constants/app_constants.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
-import 'package:signals/signals_flutter.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:signals_hooks/signals_hooks.dart';
 
-class SecurityScan extends StatefulWidget {
+class SecurityScan extends HookWidget {
   const SecurityScan({super.key});
 
   @override
-  SecurityScanState createState() => SecurityScanState();
-}
+  Widget build(BuildContext context) {
+    final tickerProvider = useSingleTickerProvider();
+    final tabController = useMemoized(
+      () => TabController(length: 4, vsync: tickerProvider),
+      const [],
+    );
+    useEffect(() => tabController.dispose, const []);
+    final Map colors = useMemoized(() => {
+          "safe": Colors.green,
+          "risk": Colors.red,
+          "warning": Colors.orange,
+          "info": Colors.orangeAccent,
+          "outOfDate": Colors.amber,
+        }, const []);
+    final Map texts = useMemoized(() => {
+          "safe": {"title": "良好", "content": "DSM 的安全性良好"},
+          "risk": {"title": "有风险", "content": "有安全风险需您注意"},
+          "warning": {"title": "警告", "content": "部分安全保护设置未启用"},
+          "info": {"title": "信息", "content": "信息"},
+          "outOfDate": {"title": "版本过旧", "content": "有软件需更新"},
+          "running": {"title": "正在扫描", "content": "正在进行扫描..."},
+          "stop": {"title": "正在停止", "content": "停止扫描..."},
+          "update": {"title": "正在更新", "content": "正在更新安全数据库..."},
+        }, const []);
+    final Map icons = useMemoized(() => {
+          "safe": Icons.check_circle,
+          "risk": Icons.info,
+          "warning": Icons.info,
+          "info": Icons.info,
+          "outOfDate": Icons.info,
+        }, const []);
+    final Map severities = useMemoized(() => {
+          "risk": 0,
+          "danger": 1,
+          "warning": 2,
+          "outOfDate": 3,
+          "info": 4,
+        }, const []);
+    final Map status = useMemoized(() => {
+          "running": 0,
+          "fail": 1,
+          "pass": 2,
+        }, const []);
 
-class SecurityScanState extends State<SecurityScan>
-    with SingleTickerProviderStateMixin {
-  Map colors = {
-    "safe": Colors.green,
-    "risk": Colors.red,
-    "warning": Colors.orange,
-    "info": Colors.orangeAccent,
-    "outOfDate": Colors.amber,
-  };
-  Map texts = {
-    "safe": {"title": "良好", "content": "DSM 的安全性良好"},
-    "risk": {"title": "有风险", "content": "有安全风险需您注意"},
-    "warning": {"title": "警告", "content": "部分安全保护设置未启用"},
-    "info": {"title": "信息", "content": "信息"},
-    "outOfDate": {"title": "版本过旧", "content": "有软件需更新"},
-    "running": {"title": "正在扫描", "content": "正在进行扫描..."},
-    "stop": {"title": "正在停止", "content": "停止扫描..."},
-    "update": {"title": "正在更新", "content": "正在更新安全数据库..."},
-  };
-  Map icons = {
-    "safe": Icons.check_circle,
-    "risk": Icons.info,
-    "warning": Icons.info,
-    "info": Icons.info,
-    "outOfDate": Icons.info,
-  };
-  Map severities = {
-    "risk": 0,
-    "danger": 1,
-    "warning": 2,
-    "outOfDate": 3,
-    "info": 4,
-  };
-  Map status = {
-    "running": 0,
-    "fail": 1,
-    "pass": 2,
-  };
-  late TabController _tabController;
-  Map ruleItems = {};
-  List rules = [];
-  bool ruleUpdating = true;
-  Map systemItems = {};
-  String lastScanTime = "";
-  String startTime = "";
-  int sysProgress = 0;
-  String sysStatus = "";
-  bool loading = true;
-  @override
-  void initState() {
-    _tabController = TabController(length: 4, vsync: this);
-    getData();
-    super.initState();
-  }
+    final ruleItems = useSignal<Map>({});
+    final rules = useSignal<List>([]);
+    final ruleUpdating = useSignal(true);
+    final systemItems = useSignal<Map>({});
+    final lastScanTime = useSignal("");
+    final startTime = useSignal("");
+    final sysProgress = useSignal(0);
+    final sysStatus = useSignal("");
+    final loading = useSignal(true);
 
-  getData() async {
-    var rule = await DsmApi.securityRule();
-    if (rule['success']) {
-      setState(() {
-        ruleItems = rule['data']['items'];
-        ruleItems.removeWhere((key, value) => value['status'] == "skip");
-        rules = ruleItems.values.toList();
-        for (var element in rules) {
-          element['severity'] = severities[element['severity']];
-          element['status'] = status[element['status']];
-        }
-        rules.sort((v1, v2) {
-          try {
-            if (v1['status'] > v2['status']) {
-              return 1;
-            } else if (v1['status'] < v2['status']) {
-              return -1;
-            } else {
-              if (v1['severity'] > v2['severity']) {
+    useEffect(() {
+      () async {
+        var rule = await dsmCoreSecurityScanStatusRuleGet();
+        if (rule['success']) {
+          ruleItems.value = rule['data']['items'];
+          ruleItems.value.removeWhere((key, value) => value['status'] == "skip");
+          rules.value = ruleItems.value.values.toList();
+          for (var element in rules.value) {
+            element['severity'] = severities[element['severity']];
+            element['status'] = status[element['status']];
+          }
+          rules.value.sort((v1, v2) {
+            try {
+              if (v1['status'] > v2['status']) {
                 return 1;
-              } else if (v1['severity'] < v2['severity']) {
+              } else if (v1['status'] < v2['status']) {
                 return -1;
               } else {
-                return 0;
+                if (v1['severity'] > v2['severity']) {
+                  return 1;
+                } else if (v1['severity'] < v2['severity']) {
+                  return -1;
+                } else {
+                  return 0;
+                }
               }
+            } catch (e) {
+              return 0;
             }
-          } catch (e) {
-            return 0;
-          }
-        });
-        ruleUpdating = rule['data']['isUpdating'];
-      });
-    }
-    var system = await DsmApi.securitySystem();
-    if (system['success']) {
-      setState(() {
-        loading = false;
-        systemItems = system['data']['items'];
-        lastScanTime = system['data']['lastScanTime'];
-        startTime = system['data']['startTime'];
-        sysProgress = system['data']['sysProgress'];
-        sysStatus = system['data']['sysStatus'];
-      });
-    }
-  }
+          });
+          ruleUpdating.value = rule['data']['isUpdating'];
+        }
+        var system = await dsmCoreSecurityScanStatusSystemGet();
+        if (system['success']) {
+          loading.value = false;
+          systemItems.value = system['data']['items'];
+          lastScanTime.value = system['data']['lastScanTime'];
+          startTime.value = system['data']['startTime'];
+          sysProgress.value = system['data']['sysProgress'];
+          sysStatus.value = system['data']['sysStatus'];
+        }
+      }();
+      return null;
+    }, const []);
 
-  String getTitle(String strId, int status) {
-    if (webManagerStrings['rules'][
-            "${strId}_desc_${status == 2 ? "good" : status == 0 ? "running" : "bad"}"] !=
-        null) {
-      return webManagerStrings['rules'][
-          "${strId}_desc_${status == 2 ? "good" : status == 0 ? "running" : "bad"}"];
-    } else {
-      if (connectionStore.strings
-                  .watch(context)['SYNO.SDS.SecurityScan.Instance'] !=
-              null &&
-          connectionStore.strings['SYNO.SDS.SecurityScan.Instance']['rules'] !=
-              null) {
-        return (connectionStore.strings['SYNO.SDS.SecurityScan.Instance']
-                    ['rules'][
-                "${strId}_desc_${status == 2 ? "good" : status == 0 ? "running" : "bad"}"] ??
-            strId);
+    String getTitle(String strId, int? scanStatus) {
+      if (webManagerStrings['rules'][
+              "${strId}_desc_${scanStatus == 2 ? "good" : scanStatus == 0 ? "running" : "bad"}"] !=
+          null) {
+        return webManagerStrings['rules'][
+            "${strId}_desc_${scanStatus == 2 ? "good" : scanStatus == 0 ? "running" : "bad"}"];
       } else {
-        return strId;
+        if (connectionStore.strings
+                    .watch(context)['SYNO.SDS.SecurityScan.Instance'] !=
+                null &&
+            connectionStore.strings['SYNO.SDS.SecurityScan.Instance']
+                    ['rules'] !=
+                null) {
+          return (connectionStore.strings['SYNO.SDS.SecurityScan.Instance']
+                      ['rules'][
+                  "${strId}_desc_${scanStatus == 2 ? "good" : scanStatus == 0 ? "running" : "bad"}"] ??
+              strId);
+        } else {
+          return strId;
+        }
       }
     }
-  }
 
-  List<Widget> _buildItemList() {
-    List<Widget> list = [];
+    List<Widget> buildItemList() {
+      List<Widget> list = [];
 
-    for (var value in rules) {
-      value['strId'] = value['strId'].replaceAll("_v2", "");
-      list.add(Card(
-        shape: RoundedRectangleBorder(
-            side: const BorderSide(), borderRadius: BorderRadius.circular(18)),
-        margin: const EdgeInsets.only(bottom: 20),
-        child: Padding(
-          padding: const EdgeInsets.all(AppConstants.paddingLarge),
-          child: Row(
-            children: [
-              Expanded(
-                child: Text(getTitle(value['strId'], value['status'])),
-              ),
-              value['status'] == 2
-                  ? const Icon(
-                      Icons.check_circle,
-                      color: Colors.green,
-                    )
-                  : value['status'] == 0
-                      ? const CupertinoActivityIndicator()
-                      : const Icon(
-                          Icons.info,
-                          color: Colors.red,
-                        ),
-            ],
+      for (var value in rules.value) {
+        value['strId'] = value['strId'].replaceAll("_v2", "");
+        list.add(Card(
+          shape: RoundedRectangleBorder(
+              side: const BorderSide(), borderRadius: BorderRadius.circular(18)),
+          margin: const EdgeInsets.only(bottom: 20),
+          child: Padding(
+            padding: const EdgeInsets.all(AppConstants.paddingLarge),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Text(getTitle(value['strId'], value['status'])),
+                ),
+                value['status'] == 2
+                    ? const Icon(
+                        Icons.check_circle,
+                        color: Colors.green,
+                      )
+                    : value['status'] == 0
+                        ? const CupertinoActivityIndicator()
+                        : const Icon(
+                            Icons.info,
+                            color: Colors.red,
+                          ),
+              ],
+            ),
           ),
-        ),
-      ));
+        ));
+      }
+      return list;
     }
-    return list;
-  }
 
-  @override
-  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         leading: AppBackButton(context),
         title: const Text("安全顾问"),
       ),
-      body: loading
+      body: loading.value
           ? const Center(
               child: CupertinoActivityIndicator(
                 radius: 14,
@@ -199,7 +195,7 @@ class SecurityScanState extends State<SecurityScan>
                   child: TabBar(
                     dividerHeight: 0,
                     isScrollable: true,
-                    controller: _tabController,
+                    controller: tabController,
                     indicatorSize: TabBarIndicatorSize.label,
                     labelColor: Theme.brightnessOf(context) == Brightness.dark
                         ? Colors.white
@@ -232,7 +228,7 @@ class SecurityScanState extends State<SecurityScan>
                 ),
                 Expanded(
                   child: TabBarView(
-                    controller: _tabController,
+                    controller: tabController,
                     children: [
                       ListView(
                         padding: const EdgeInsets.all(20),
@@ -245,13 +241,13 @@ class SecurityScanState extends State<SecurityScan>
                               padding: const EdgeInsets.all(20),
                               child: Row(
                                 children: [
-                                  sysStatus == "running"
+                                  sysStatus.value == "running"
                                       ? CircularPercentIndicator(
                                           radius: 40,
                                           // progressColor: Colors.lightBlueAccent,
                                           animation: true,
                                           linearGradient: LinearGradient(
-                                            colors: sysProgress < 90
+                                            colors: sysProgress.value < 90
                                                 ? [
                                                     Colors.blue,
                                                     Colors.blueAccent,
@@ -266,19 +262,19 @@ class SecurityScanState extends State<SecurityScan>
                                               CircularStrokeCap.round,
                                           lineWidth: 12,
                                           backgroundColor: Colors.black12,
-                                          percent: sysProgress / 100,
+                                          percent: sysProgress.value / 100,
                                           center: Text(
-                                            "$sysProgress%",
+                                            "${sysProgress.value}%",
                                             style: TextStyle(
-                                                color: sysProgress < 90
+                                                color: sysProgress.value < 90
                                                     ? Colors.blue
                                                     : Colors.red,
                                                 fontSize: 22),
                                           ),
                                         )
                                       : Icon(
-                                          icons[sysStatus],
-                                          color: colors[sysStatus],
+                                          icons[sysStatus.value],
+                                          color: colors[sysStatus.value],
                                           size: 70,
                                         ),
                                   const SizedBox(
@@ -289,27 +285,27 @@ class SecurityScanState extends State<SecurityScan>
                                         CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        texts[sysStatus] != null
-                                            ? texts[sysStatus]['title']
+                                        texts[sysStatus.value] != null
+                                            ? texts[sysStatus.value]['title']
                                             : "未知状态",
                                         style: TextStyle(
                                             fontSize: 20,
-                                            color: colors[sysStatus]),
+                                            color: colors[sysStatus.value]),
                                       ),
                                       Text(
-                                        texts[sysStatus] != null
-                                            ? texts[sysStatus]['content']
+                                        texts[sysStatus.value] != null
+                                            ? texts[sysStatus.value]['content']
                                             : "未知状态",
                                         style: const TextStyle(fontSize: 14),
                                       ),
-                                      if (lastScanTime.isNotBlank)
+                                      if (lastScanTime.value.isNotBlank)
                                         Text(
-                                          "上次扫描：${DateTime.fromMillisecondsSinceEpoch(int.parse(lastScanTime) * 1000).timeAgo}",
+                                          "上次扫描：${DateTime.fromMillisecondsSinceEpoch(int.parse(lastScanTime.value) * 1000).timeAgo}",
                                           style: const TextStyle(fontSize: 14),
                                         )
                                       else
                                         Text(
-                                          "已运行：${(DateTime.now().secondsSinceEpoch - int.parse(startTime)).timeRemaining()}",
+                                          "已运行：${(DateTime.now().secondsSinceEpoch - int.parse(startTime.value)).timeRemaining()}",
                                           style: const TextStyle(fontSize: 14),
                                         ),
                                     ],
@@ -321,16 +317,16 @@ class SecurityScanState extends State<SecurityScan>
                           const SizedBox(
                             height: 20,
                           ),
-                          ResultCard(systemItems['malware']),
-                          ResultCard(systemItems['systemCheck']),
-                          ResultCard(systemItems['userInfo']),
-                          ResultCard(systemItems['network']),
-                          ResultCard(systemItems['update']),
+                          ResultCard(systemItems.value['malware']),
+                          ResultCard(systemItems.value['systemCheck']),
+                          ResultCard(systemItems.value['userInfo']),
+                          ResultCard(systemItems.value['network']),
+                          ResultCard(systemItems.value['update']),
                         ],
                       ),
                       ListView(
                         padding: const EdgeInsets.all(20),
-                        children: _buildItemList(),
+                        children: buildItemList(),
                       ),
                       const Center(
                         child: Text("待开发"),

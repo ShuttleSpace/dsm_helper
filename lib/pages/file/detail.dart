@@ -2,66 +2,84 @@ import 'dart:async';
 import 'package:garden/util/log.dart';
 import 'package:garden/util/ui_util.dart';
 
-import 'package:garden/util/http_util.dart';
+import 'package:garden/api/dsm_api.dart';
+import 'package:garden/extensions/datetime.dart';
+import 'package:garden/extensions/int.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:garden/constants/app_constants.dart';
 import 'package:garden/theme/app_colors.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:signals_hooks/signals_hooks.dart';
+import 'package:garden/hooks/use_file_download.dart';
 
-class FileDetail extends StatefulWidget {
+class FileDetail extends HookWidget {
   final Map file;
   const FileDetail(this.file, {super.key});
-  @override
-  FileDetailState createState() => FileDetailState();
-}
-
-class FileDetailState extends State<FileDetail> {
-  Timer? timer;
-  bool loadingSize = true;
-  int size = 0;
-  int folderCount = 0;
-  int fileCount = 0;
-  @override
-  void initState() {
-    getDirSize();
-    super.initState();
-  }
-
-  @override
-  dispose() {
-    timer?.cancel();
-    super.dispose();
-  }
-
-  getDirSize() async {
-    var task = await DsmApi.dirSizeTask(widget.file['path']);
-    if (task['success']) {
-      timer = Timer.periodic(const Duration(seconds: 1), (timer) async {
-        var result = await DsmApi.dirSizeResult(task['data']['taskid']);
-        Log.info(result);
-        if (result['success'] && result['data']['finished']) {
-          timer.cancel();
-          setState(() {
-            loadingSize = false;
-            size = result['data']['total_size'];
-            folderCount = result['data']['num_dir'];
-            fileCount = result['data']['num_file'];
-          });
-        }
-      });
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
+    final timer = useRef<Timer?>(null);
+    final loadingSize = useSignal(true);
+    final size = useSignal(0);
+    final folderCount = useSignal(0);
+    final fileCount = useSignal(0);
+    final appDownload = useFileDownload(context);
+
+    getDirSize() async {
+      try {
+        final task = await dsmControlPanelPost({
+          "api": '"SYNO.FileStation.DirSize"',
+          "method": '"start"',
+          "version": 1,
+          "path": file['path'],
+        });
+        final taskId = task['taskid'];
+        timer.value = Timer.periodic(const Duration(seconds: 1), (timer) async {
+          try {
+            final result = await dsmControlPanelPost({
+              "api": '"SYNO.FileStation.DirSize"',
+              "method": '"status"',
+              "version": 1,
+              "taskid": taskId,
+            });
+            Log.info(result);
+            if (result['finished'] == true) {
+              timer.cancel();
+              loadingSize.value = false;
+              size.value = result['total_size'] ?? 0;
+              folderCount.value = result['num_dir'] ?? 0;
+              fileCount.value = result['num_file'] ?? 0;
+            }
+          } catch (e) {
+            timer.cancel();
+          }
+        });
+      } catch (e) {
+        loadingSize.value = false;
+      }
+    }
+
+    useEffect(() {
+      getDirSize();
+      return () => timer.value?.cancel();
+    }, const []);
+
     return Scaffold(
       appBar: AppBar(
         leading: AppBackButton(context),
         title: Text(
-          widget.file['name'],
+          file['name'],
         ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.download),
+            tooltip: '下载',
+            onPressed: () => appDownload([file]),
+          ),
+        ],
       ),
       body: ListView(
         children: [
@@ -79,7 +97,7 @@ class FileDetailState extends State<FileDetail> {
                 children: [
                   const Text("名称："),
                   Expanded(
-                    child: Text(widget.file['name']),
+                    child: Text(file['name']),
                   ),
                 ],
               ),
@@ -97,13 +115,13 @@ class FileDetailState extends State<FileDetail> {
                   const Text("位置："),
                   Expanded(
                     child: Text(
-                      widget.file['path'],
+                      file['path'],
                     ),
                   ),
                   OutlinedButton(
                     onPressed: () async {
                       ClipboardData data =
-                          ClipboardData(text: widget.file['path']);
+                          ClipboardData(text: file['path']);
                       Clipboard.setData(data);
                       UiUtil.toast("已复制到剪贴板");
                     },
@@ -133,13 +151,13 @@ class FileDetailState extends State<FileDetail> {
                   const Text("路径："),
                   Expanded(
                     child: Text(
-                      "${widget.file['additional']['real_path']}",
+                      "${file['additional']['real_path']}",
                     ),
                   ),
                   OutlinedButton(
                     onPressed: () async {
                       ClipboardData data = ClipboardData(
-                          text: widget.file['additional']['real_path']);
+                          text: file['additional']['real_path']);
                       Clipboard.setData(data);
                       UiUtil.toast("已复制到剪贴板");
                     },
@@ -167,14 +185,14 @@ class FileDetailState extends State<FileDetail> {
               child: Row(
                 children: [
                   const Text("大小："),
-                  loadingSize
+                  loadingSize.value
                       ? const CupertinoActivityIndicator()
-                      : Text(size.formatSize())
+                      : Text(size.value.formatSize())
                 ],
               ),
             ),
           ),
-          if (widget.file['isdir'])
+          if (file['isdir'])
             Card(
               shape: RoundedRectangleBorder(
                   side: const BorderSide(),
@@ -185,9 +203,10 @@ class FileDetailState extends State<FileDetail> {
                 child: Row(
                   children: [
                     const Text("包含："),
-                    loadingSize
+                    loadingSize.value
                         ? const CupertinoActivityIndicator()
-                        : Text("$folderCount个文件夹，$fileCount个文件")
+                        : Text(
+                            "${folderCount.value}个文件夹，${fileCount.value}个文件")
                   ],
                 ),
               ),
@@ -203,7 +222,7 @@ class FileDetailState extends State<FileDetail> {
                 children: [
                   const Text("创建时间："),
                   Text(DateTime.fromMillisecondsSinceEpoch(
-                          widget.file['additional']['time']['ctime'] * 1000)
+                          file['additional']['time']['ctime'] * 1000)
                       .format("Y-m-d H:i:s"))
                 ],
               ),
@@ -220,7 +239,7 @@ class FileDetailState extends State<FileDetail> {
                 children: [
                   const Text("修改时间："),
                   Text(DateTime.fromMillisecondsSinceEpoch(
-                          widget.file['additional']['time']['mtime'] * 1000)
+                          file['additional']['time']['mtime'] * 1000)
                       .format("Y-m-d H:i:s"))
                 ],
               ),

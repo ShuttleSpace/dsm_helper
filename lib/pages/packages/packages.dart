@@ -1,187 +1,149 @@
-import 'package:garden/extensions/color.dart';
+import 'dart:convert';
+
+import 'package:garden/api/dsm_api.dart';
+import 'package:garden/extensions/context.dart';
+import 'package:garden/extensions/list.dart';
 import 'package:garden/pages/packages/detail.dart';
 import 'package:garden/util/log.dart';
 import 'package:garden/util/ui_util.dart';
 import 'package:garden/util/http_util.dart';
-import 'package:garden/widgets/bubble_tab_indicator.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:garden/widgets/packages/package_card.dart';
 import 'package:garden/widgets/packages/update_package_item.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:signals_hooks/signals_hooks.dart';
 
-class Packages extends StatefulWidget {
+class Packages extends HookWidget {
   final String version;
   const Packages(this.version, {super.key});
-  @override
-  PackagesState createState() => PackagesState();
-}
-
-class PackagesState extends State<Packages> with TickerProviderStateMixin {
-  int packagesVersion = 1;
-  int installedVersion = 1;
-  late TabController _tabController;
-  List banners = [];
-  List others = [];
-  List packages = [];
-  List betas = [];
-
-  List categories = [];
-  List installedPackages = [];
-  List canUpdatePackages = [];
-  List launchedPackages = [];
-
-  List installedPackagesInfo = [];
-
-  List volumes = [];
-  bool loading = false;
-  bool loadingAll = true;
-  bool loadingInstalled = true;
-  bool loadingOthers = true;
-  List get allPackages {
-    return packages + betas + others;
-  }
 
   @override
-  void initState() {
-    String ver = widget.version;
-    int end = ver.indexOf("-");
-    var dsmVersion = ver.substring(4, end);
-    List v = dsmVersion.split(".");
-    if (v[0] == "6" && v[1] == "1") {
-      installedVersion = 1;
-      packagesVersion = 1;
-    } else if (v[0] == "5") {
-      packagesVersion = 1;
-      installedVersion = 1;
-    } else if (v[0] == "6" && v[1] == "2" && v.length == 2) {
-      installedVersion = 1;
-      packagesVersion = 2;
-    } else {
-      packagesVersion = 2;
-      installedVersion = 2;
-    }
-    _tabController = TabController(initialIndex: 1, length: 3, vsync: this);
-    getData();
-    super.initState();
-  }
+  Widget build(BuildContext context) {
+    final packagesVersion = useRef(1);
+    final installedVersion = useRef(1);
+    final tickerProvider = useMemoized(() => _PackageTickerProvider(), const []);
+    final others = useListSignal([]);
+    final packages = useListSignal([]);
+    final betas = useListSignal([]);
+    final categories = useListSignal<Map>([]);
+    final installedPackages = useListSignal([]);
+    final canUpdatePackages = useListSignal([]);
+    final launchedPackages = useListSignal([]);
+    final installedPackagesInfo = useListSignal([]);
+    final volumes = useListSignal([]);
+    final loading = useSignal(false);
+    final loadingAll = useSignal(false);
+    final loadingInstalled = useSignal(true);
+    final loadingOthers = useSignal(true);
+    final useGridLayout = useSignal(false);
+    final showSearchBar = useSignal(false);
+    final searchController = useTextEditingController();
+    final searchKeyword = useSignal('');
 
-  getData() async {
-    var res = await DsmApi.packages(version: packagesVersion);
-    if (res['success']) {
-      setState(() {
-        banners = res['data']['banners'];
-        if (res['data']['packages'] != null) {
-          packages = res['data']['packages'];
-        } else {
-          packages = res['data']['data'];
-        }
-        if (res['data']['beta_packages'] != null) {
-          betas = res['data']['beta_packages'];
-          if (betas.isNotEmpty) {
-            _tabController =
-                TabController(initialIndex: 1, length: 4, vsync: this);
-          }
-        }
-        //
-        categories = res['data']['categories'];
-      });
-      setState(() {
-        loadingAll = false;
-      });
-    } else {
-      UiUtil.toast("数据加载失败");
-      if (context.mounted) {
-        // ignore: use_build_context_synchronously
-        Navigator.of(context).pop();
+    final tabLength = betas.isNotEmpty ? 4 : 3;
+    final tabController = useMemoized(
+      () => TabController(initialIndex: 1, length: tabLength,
+          vsync: tickerProvider),
+      [tabLength],
+    );
+
+    final filteredOthers = useComputed<List>(() {
+      if (searchKeyword.value.isEmpty) return others.value;
+      return others.filter((v) =>
+          v['dname']
+              .toString()
+              .toLowerCase()
+              .contains(searchKeyword.value.toLowerCase()) ||
+          v['desc']
+              .toString()
+              .toLowerCase()
+              .contains(searchKeyword.value.toLowerCase()));
+    });
+    final filteredPackages = useComputed<List>(() {
+      if (searchKeyword.value.isEmpty) return packages.value;
+      return packages.filter((v) =>
+          v['dname']
+              .toString()
+              .toLowerCase()
+              .contains(searchKeyword.value.toLowerCase()) ||
+          v['desc']
+              .toString()
+              .toLowerCase()
+              .contains(searchKeyword.value.toLowerCase()));
+    });
+    final filteredBetas = useComputed<List>(() {
+      if (searchKeyword.value.isEmpty) return betas.value;
+      return betas.filter((v) =>
+          v['dname']
+              .toString()
+              .toLowerCase()
+              .contains(searchKeyword.value.toLowerCase()) ||
+          v['desc']
+              .toString()
+              .toLowerCase()
+              .contains(searchKeyword.value.toLowerCase()));
+    });
+    final filteredinstalledPackages = useComputed<List>(() {
+      if (searchKeyword.value.isEmpty) return installedPackages.value;
+      return installedPackages.filter((v) =>
+          v['dname']
+              .toString()
+              .toLowerCase()
+              .contains(searchKeyword.value.toLowerCase()) ||
+          v['desc']
+              .toString()
+              .toLowerCase()
+              .contains(searchKeyword.value.toLowerCase()));
+    });
+
+    void parseVersion() {
+      String ver = version;
+      int end = ver.indexOf("-");
+      final dsmVersion = ver.substring(4, end);
+      List v = dsmVersion.split(".");
+      if (v[0] == "6" && v[1] == "1") {
+        installedVersion.value = 1;
+        packagesVersion.value = 1;
+      } else if (v[0] == "5") {
+        packagesVersion.value = 1;
+        installedVersion.value = 1;
+      } else if (v[0] == "6" && v[1] == "2" && v.length == 2) {
+        installedVersion.value = 1;
+        packagesVersion.value = 2;
+      } else {
+        packagesVersion.value = 2;
+        installedVersion.value = 2;
       }
-      return;
     }
-    getOthers();
-    // getLaunchedPackages();
-    getInstalledPackages();
-    getVolumes();
-  }
 
-  getVolumes() async {
-    var res = await DsmApi.volumes();
-    if (res['success']) {
-      setState(() {
-        volumes = res['data']['volumes'];
-      });
-    }
-  }
-
-  getOthers() async {
-    Log.info("获取第三方套件");
-    var res = await DsmApi.packages(others: true, version: packagesVersion);
-    Log.info("获取第三方套件end");
-    if (res['success']) {
-      setState(() {
-        if (res['data']['packages'] != null) {
-          others = res['data']['packages'];
-        } else {
-          others = res['data']['data'];
-        }
-        //
-        loadingOthers = false;
-      });
-      calcInstalledPackage();
-    }
-  }
-
-  // getLaunchedPackages() async {
-  //   return;
-  //   launchedPackages = [];
-  //   Log.info("获取运行中套件");
-  //   var res = await Api.launchedPackages();
-  //   Log.info(res);
-  //   Log.info("获取运行中套件end");
-  //   if (res['success']) {
-  //     Map packages = res['data']['packages'];
-  //     packages.forEach((key, value) {
-  //       launchedPackages.add(key);
-  //       setState(() {});
-  //     });
-  //     calcInstalledPackage();
-  //   }
-  // }
-
-  getInstalledPackages() async {
-    installedPackages = [];
-
-    Log.info("获取已安装套件");
-    var res = await DsmApi.installedPackages(version: installedVersion);
-    Log.info("获取已安装套件end");
-    if (res['success']) {
-      setState(() {
-        installedPackagesInfo = res['data']['packages'];
-        loadingInstalled = false;
-      });
-      calcInstalledPackage();
-    } else {
-      Log.info(res);
-      Log.info("获取已安装套件失败");
-    }
-  }
-
-  calcInstalledPackage() {
-    canUpdatePackages = [];
-    for (var installedPackageInfo in installedPackagesInfo) {
-      for (var package in allPackages) {
+    void fixPackage(ListSignal target) {
+      final tmp = target.value;
+      for (final package in tmp) {
         package['installed'] = package['installed'] ?? false;
         package['installed_version'] = package['installed_version'] ?? "";
         package['can_update'] = package['can_update'] ?? false;
         package['launched'] = package['launched'] ?? false;
-        if (installedPackageInfo['id'] == package['id']) {
+        final info = installedPackagesInfo
+            .filter((v) => v['id'] == package['id'])
+            .firstOrNull;
+        if (info != null) {
           package['installed'] = true;
-          package['installed_version'] = installedPackageInfo['version'];
+          package['installed_version'] = info['version'];
           package['can_update'] =
               versionCompare(package['installed_version'], package['version']) <
                   0;
-          package['additional'] = installedPackageInfo['additional'];
+          package['additional'] = info['additional'];
           if (package['installed']) {
-            installedPackages.add(package);
+            final idx =
+                installedPackages.indexWhere((t) => t['id'] == package['id']);
+            if (idx != -1) {
+              installedPackages.replaceRange(idx, idx + 1, [package]);
+            } else {
+              installedPackages.add(package);
+            }
           }
           if (package['can_update']) {
             canUpdatePackages.add(package);
@@ -193,177 +155,319 @@ class PackagesState extends State<Packages> with TickerProviderStateMixin {
             package['launched'] = true;
           }
         }
-        setState(() {});
+      }
+      target.value = tmp;
+    }
+
+    void fixAll() {
+      fixPackage(packages);
+      fixPackage(others);
+      fixPackage(betas);
+    }
+
+    fetchVolumes() async {
+      try {
+        final res = await dsmCoreStorageVolumeList();
+        volumes.value = res['volumes'] ?? [];
+      } on Exception catch (e) {
+        Log.error(e);
       }
     }
-  }
 
-  List<String> getCategoryName(List categoryIds) {
-    List<String> name = [];
-    for (int i = 0; i < categoryIds.length; i++) {
-      for (var category in categories) {
-        if (category['id'] == categoryIds[i]) {
-          name.add(category['dname']);
+    fetchThird() async {
+      try {
+        final res = await dsmCorePackageServerList(
+            blloadothers: true, version: packagesVersion.value);
+        if (res['packages'] != null) {
+          others.value = res['packages'] ?? [];
+        } else {
+          // fixme: res['data']
+          others.value = [];
+        }
+      } on Exception catch (e) {
+        Log.error(e);
+        fixAll();
+      }
+      loadingOthers.value = false;
+    }
+
+    fetchLaunchedPackages() async {
+      launchedPackages.clear();
+      try {
+        final res = await dsmCorePollingData();
+        Map packageMap = res['packages'] ?? {};
+        packageMap.forEach((key, value) {
+          launchedPackages.add(key);
+        });
+        fixAll();
+      } on Exception catch (e) {
+        Log.error(e);
+      }
+    }
+
+    fetchInstalledPackages() async {
+      installedPackages.clear();
+      List<String> additional = [
+        "description",
+        "description_enu",
+        "beta",
+        "distributor",
+        "distributor_url",
+        "maintainer",
+        "maintainer_url",
+        "dsm_apps",
+        "report_beta_url",
+        "support_center",
+        "startable",
+        "installed_info",
+        "support_url",
+        "is_uninstall_pages",
+        "install_type",
+        "autoupdate",
+        "silent_upgrade",
+        "installing_progress",
+        "ctl_uninstall",
+        "status",
+        "url",
+      ];
+      if (installedVersion.value == 2) {
+        additional.add("updated_at");
+      }
+      try {
+        final res = await dsmCorePackageList(
+            additional: jsonEncode(additional),
+            pollingInterval: 15,
+            version: installedVersion.value);
+        installedPackagesInfo.value = res['packages'];
+        loadingInstalled.value = false;
+        fixAll();
+      } on Exception catch (e) {
+        Log.error(e);
+      }
+    }
+
+    fetchData() async {
+      try {
+        loadingAll.value = true;
+        final res =
+            await dsmCorePackageServerList(version: packagesVersion.value);
+        if (res['packages'] != null) {
+          packages.value = res['packages'];
+        } else {
+          // fixme: res['data']
+          packages.value = [];
+        }
+        if (res['beta_packages'] != null) {
+          betas.value = res['beta_packages'];
+        }
+        categories.value = res['categories'] ?? [];
+      } on Exception catch (e) {
+        Log.error(e);
+        if (context.mounted) {
+          // ignore: use_build_context_synchronously
+          Navigator.of(context).pop();
+        }
+        return;
+      }
+      loadingAll.value = false;
+      fetchThird();
+      fetchLaunchedPackages();
+      fetchInstalledPackages();
+      fetchVolumes();
+    }
+
+    List<String> getCategoryName(List categoryIds) {
+      List<String> name = [];
+      for (int i = 0; i < categoryIds.length; i++) {
+        for (final category in categories) {
+          if (category['id'] == categoryIds[i]) {
+            name.add(category['dname']);
+          }
         }
       }
+      return name;
     }
-    return name;
-  }
 
-  // 处理更新套件
-  Future<void> _handleUpdatePackage(Map package, {bool beta = false}) async {
-    Navigator.of(context)
-        .push(CupertinoPageRoute(
-            builder: (context) {
-              return PackageDetail(package, beta: beta, method: "update");
-            },
-            settings: const RouteSettings(name: "package_detail")))
-        .then((_) async {
-      // await getLaunchedPackages();
-      await getInstalledPackages();
-      setState(() {
-        loading = false;
-      });
-    });
-  }
-
-  // 处理安装套件
-  Future<void> _handleInstallPackage(Map package, {bool beta = false}) async {
-    Navigator.of(context)
-        .push(CupertinoPageRoute(
-            builder: (context) {
-              return PackageDetail(package, beta: beta, method: "install");
-            },
-            settings: const RouteSettings(name: "package_detail")))
-        .then((_) async {
-      // await getLaunchedPackages();
-      await getInstalledPackages();
-      setState(() {
-        loading = false;
-      });
-    });
-  }
-
-  // 处理启动套件
-  Future<void> _handleStartPackage(Map package) async {
-    setState(() {
-      loading = true;
-    });
-    var res =
-        await DsmApi.launchPackage(package['id'], package['dsm_apps'], "start");
-    if (res['success']) {
-      UiUtil.toast("已启动");
-      // await getLaunchedPackages();
-      await getInstalledPackages();
-      setState(() {
-        loading = false;
+    // 处理更新套件
+    Future<void> handleUpdatePackage(Map package, {bool beta = false}) async {
+      Navigator.of(context)
+          .push(CupertinoPageRoute(
+              builder: (context) {
+                return PackageDetail(package, beta: beta, method: "update");
+              },
+              settings: const RouteSettings(name: "package_detail")))
+          .then((_) async {
+        // await getLaunchedPackages();
+        await fetchInstalledPackages();
+        loading.value = false;
       });
     }
-  }
 
-  // 处理停止套件
-  Future<void> _handleStopPackage(Map package) async {
-    setState(() {
-      loading = true;
-    });
-    var res =
-        await DsmApi.launchPackage(package['id'], package['dsm_apps'], "stop");
-    if (res['success']) {
-      UiUtil.toast("已停用");
-      // await getLaunchedPackages();
-      await getInstalledPackages();
-      setState(() {
-        loading = false;
+    // 处理安装套件
+    Future<void> handleInstallPackage(Map package, {bool beta = false}) async {
+      Navigator.of(context)
+          .push(CupertinoPageRoute(
+              builder: (context) {
+                return PackageDetail(package, beta: beta, method: "install");
+              },
+              settings: const RouteSettings(name: "package_detail")))
+          .then((_) async {
+        // await getLaunchedPackages();
+        await fetchInstalledPackages();
+        loading.value = false;
       });
     }
-  }
 
-  Widget _buildUpdateItem(update) {
-    return UpdatePackageItem(
-      update: update,
-      onTap: () {
-        Navigator.of(context)
-            .push(CupertinoPageRoute(
-                builder: (context) {
-                  return PackageDetail(update);
-                },
-                settings: const RouteSettings(name: "package_detail")))
-            .then((_) async {
-          // await getLaunchedPackages();
-          await getInstalledPackages();
-          setState(() {
-            loading = false;
+    // 处理启动套件
+    Future<void> handleStartPackage(Map package) async {
+      loading.value = true;
+      try {
+        await dsmCorePackageControlStart(
+            package['id'], jsonEncode(package['dsm_apps']));
+        UiUtil.toast("已启动");
+        await fetchInstalledPackages();
+        loading.value = false;
+      } on Exception catch (e) {
+        Log.error(e);
+      }
+    }
+
+    // 处理停止套件
+    Future<void> handleStopPackage(Map package) async {
+      loading.value = true;
+      try {
+        await dsmCorePackageControlStop(package['id']);
+        UiUtil.toast("已停用");
+        // await getLaunchedPackages();
+        await fetchInstalledPackages();
+        loading.value = false;
+      } on Exception catch (e) {
+        Log.error(e);
+      }
+    }
+
+    Widget buildUpdateItem(update) {
+      return UpdatePackageItem(
+        update: update,
+        onTap: () {
+          Navigator.of(context)
+              .push(CupertinoPageRoute(
+                  builder: (context) {
+                    return PackageDetail(update);
+                  },
+                  settings: const RouteSettings(name: "package_detail")))
+              .then((_) async {
+            // await getLaunchedPackages();
+            await fetchInstalledPackages();
+            loading.value = false;
           });
-        });
-      },
-      onUpdate: () => _handleUpdatePackage(update),
-      onInstall: () => _handleInstallPackage(update),
-      onStart: () => _handleStartPackage(update),
-      onStop: () => _handleStopPackage(update),
-    );
-  }
+        },
+        onUpdate: () => handleUpdatePackage(update),
+        onInstall: () => handleInstallPackage(update),
+        onStart: () => handleStartPackage(update),
+        onStop: () => handleStopPackage(update),
+      );
+    }
 
-  Widget _buildPackageItem(package, bool installed, {bool isBeta = false}) {
-    return PackageCard(
-      package: package,
-      installed: installed,
-      isBeta: isBeta,
-      getCategoryName: getCategoryName,
-      onTap: () {
-        Navigator.of(context)
-            .push(CupertinoPageRoute(
-                builder: (context) {
-                  return PackageDetail(package, beta: isBeta);
-                },
-                settings: const RouteSettings(name: "package_detail")))
-            .then((_) async {
-          // await getLaunchedPackages();
-          await getInstalledPackages();
-          setState(() {
-            loading = false;
+    Widget buildPackageItem(package, bool installed,
+        {bool isBeta = false, bool horizontal = false}) {
+      return PackageCard(
+        package: package,
+        installed: installed,
+        isBeta: isBeta,
+        horizontal: horizontal,
+        getCategoryName: getCategoryName,
+        onTap: () {
+          Navigator.of(context)
+              .push(CupertinoPageRoute(
+                  builder: (context) {
+                    return PackageDetail(package, beta: isBeta);
+                  },
+                  settings: const RouteSettings(name: "package_detail")))
+              .then((_) async {
+            // await getLaunchedPackages();
+            await fetchInstalledPackages();
+            loading.value = false;
           });
-        });
-      },
-      onUpdate: () => _handleUpdatePackage(package, beta: isBeta),
-      onInstall: () => _handleInstallPackage(package, beta: isBeta),
-      onStart: () => _handleStartPackage(package),
-      onStop: () => _handleStopPackage(package),
-    );
-  }
+        },
+        onUpdate: () => handleUpdatePackage(package, beta: isBeta),
+        onInstall: () => handleInstallPackage(package, beta: isBeta),
+        onStart: () => handleStartPackage(package),
+        onStop: () => handleStopPackage(package),
+      );
+    }
 
-  @override
-  Widget build(BuildContext context) {
+    useEffect(() {
+      void listener() {
+        searchKeyword.value = searchController.text;
+      }
+
+      searchController.addListener(listener);
+      parseVersion();
+      fetchData();
+      return () {
+        searchController.removeListener(listener);
+      };
+    }, const []);
+
+    // The tab count changes (3 -> 4) once the beta packages arrive, which
+    // rebuilds the controller; the previous instance must be disposed.
+    useEffect(() {
+      return () {
+        tabController.dispose();
+      };
+    }, [tabController]);
+
     return Scaffold(
       appBar: AppBar(
         leading: AppBackButton(context),
         title: const Text(
           "套件中心",
         ),
+        actions: [
+          Builder(builder: (context) {
+            if (showSearchBar.value) {
+              return SizedBox(
+                width: MediaQuery.sizeOf(context).width / 3,
+                child: TextField(
+                  controller: searchController,
+                ),
+              );
+            }
+            return IconButton(
+                onPressed: () {
+                  showSearchBar.value = true;
+                },
+                icon: const Icon(Icons.search));
+          }),
+          Tooltip(
+            message: '点击切换布局',
+            child: IconButton(
+                onPressed: () {
+                  useGridLayout.value = !useGridLayout.value;
+                },
+                icon: useGridLayout.value
+                    ? const Icon(Icons.grid_view_outlined)
+                    : const Icon(Icons.view_list_outlined)),
+          ),
+          const SizedBox(
+            width: 15,
+          )
+        ],
       ),
       body: Stack(
         children: [
           Column(
             children: [
               Card(
-                shape: RoundedRectangleBorder(
-                    side: const BorderSide(),
-                    borderRadius: BorderRadius.circular(18)),
+                shape: context.roundRectShapeBorder,
                 margin:
                     const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
                 child: TabBar(
                   dividerHeight: 0,
                   isScrollable: true,
-                  controller: _tabController,
+                  controller: tabController,
                   indicatorSize: TabBarIndicatorSize.label,
-                  labelColor: Theme.brightnessOf(context) == Brightness.dark
-                      ? Colors.white
-                      : Colors.black,
-                  unselectedLabelColor: Colors.grey,
-                  indicator: BubbleTabIndicator(
-                    indicatorColor: Theme.of(context).scaffoldBackgroundColor,
-                    shadowColor:
-                        Theme.of(context).scaffoldBackgroundColor.adjust(-20),
-                  ),
                   tabs: [
                     const Padding(
                       padding:
@@ -391,83 +495,127 @@ class PackagesState extends State<Packages> with TickerProviderStateMixin {
               ),
               Expanded(
                 child: TabBarView(
-                  controller: _tabController,
+                  controller: tabController,
                   children: [
-                    Container(
-                      child: loadingInstalled
-                          ? const Center(
-                              child: CupertinoActivityIndicator(
-                                radius: 14,
-                              ),
-                            )
-                          : ListView(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 20, vertical: 20),
-                              children: [
-                                if (canUpdatePackages.isNotEmpty)
-                                  ListView.builder(
-                                    itemBuilder: (content, i) {
-                                      return _buildUpdateItem(
-                                          canUpdatePackages[i]);
-                                    },
-                                    itemCount: canUpdatePackages.length,
-                                    shrinkWrap: true,
-                                    physics:
-                                        const NeverScrollableScrollPhysics(),
-                                  ),
-                                Wrap(
-                                  runSpacing: 20,
-                                  spacing: 20,
-                                  children: installedPackages.map((package) {
-                                    return _buildPackageItem(package, true);
-                                  }).toList(),
+                    Builder(builder: (context) {
+                      if (loadingInstalled.value) {
+                        return const Center(
+                          child: CupertinoActivityIndicator(
+                            radius: 14,
+                          ),
+                        );
+                      } else {
+                        if (useGridLayout.value) {
+                          return GridView(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 20, vertical: 20),
+                            gridDelegate:
+                                const SliverGridDelegateWithFixedCrossAxisCount(
+                                    crossAxisCount: 3, childAspectRatio: 0.36),
+                            children: [
+                              if (canUpdatePackages.isNotEmpty)
+                                ListView.builder(
+                                  itemBuilder: (content, i) {
+                                    return buildUpdateItem(
+                                        canUpdatePackages[i]);
+                                  },
+                                  itemCount: canUpdatePackages.length,
+                                  shrinkWrap: true,
+                                  physics: const NeverScrollableScrollPhysics(),
                                 ),
-                              ],
-                            ),
-                    ),
-                    Container(
-                      child: loadingAll
-                          ? const Center(
-                              child: CupertinoActivityIndicator(
-                                radius: 14,
+                              ...filteredinstalledPackages.value.map((package) {
+                                return buildPackageItem(package, true);
+                              })
+                            ],
+                          );
+                        }
+                        return ListView(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 20, vertical: 20),
+                          children: [
+                            if (canUpdatePackages.isNotEmpty)
+                              ListView.builder(
+                                itemBuilder: (content, i) {
+                                  return buildUpdateItem(canUpdatePackages[i]);
+                                },
+                                itemCount: canUpdatePackages.length,
+                                shrinkWrap: true,
+                                physics: const NeverScrollableScrollPhysics(),
                               ),
-                            )
-                          : ListView(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 20, vertical: 20),
-                              children: [
-                                Wrap(
-                                  runSpacing: 20,
-                                  spacing: 20,
-                                  children: packages.map((package) {
-                                    return _buildPackageItem(package, false);
-                                  }).toList(),
-                                ),
-                              ],
+                            Wrap(
+                              runSpacing: 20,
+                              spacing: 20,
+                              children:
+                                  filteredinstalledPackages.value.map((package) {
+                                return buildPackageItem(package, true,
+                                    horizontal: true);
+                              }).toList(),
                             ),
-                    ),
-                    Container(
-                      child: loadingOthers
-                          ? const Center(
-                              child: CupertinoActivityIndicator(
-                                radius: 14,
-                              ),
-                            )
-                          : ListView(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 20, vertical: 20),
-                              children: [
-                                Wrap(
-                                  runSpacing: 20,
-                                  spacing: 20,
-                                  children: others.map((package) {
-                                    return _buildPackageItem(package, false);
-                                  }).toList(),
-                                ),
-                              ],
-                            ),
-                    ),
-                    if (betas.isNotEmpty)
+                          ],
+                        );
+                      }
+                    }),
+                    Builder(builder: (context) {
+                      if (loadingAll.value) {
+                        return const Center(
+                          child: CupertinoActivityIndicator(
+                            radius: 14,
+                          ),
+                        );
+                      } else {
+                        if (useGridLayout.value) {
+                          return GridView(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 20, vertical: 20),
+                            gridDelegate:
+                                const SliverGridDelegateWithFixedCrossAxisCount(
+                                    crossAxisCount: 3, childAspectRatio: 0.36),
+                            children: filteredPackages.value.map((package) {
+                              return buildPackageItem(package, false);
+                            }).toList(),
+                          );
+                        }
+                        return ListView(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 20, vertical: 20),
+                          children: filteredPackages.value.map((package) {
+                            return buildPackageItem(package, false,
+                                horizontal: true);
+                          }).toList(),
+                        );
+                      }
+                    }),
+                    Builder(builder: (context) {
+                      if (loadingOthers.value) {
+                        return const Center(
+                          child: CupertinoActivityIndicator(
+                            radius: 14,
+                          ),
+                        );
+                      } else {
+                        if (useGridLayout.value) {
+                          return GridView(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 20, vertical: 20),
+                            gridDelegate:
+                                const SliverGridDelegateWithFixedCrossAxisCount(
+                                    crossAxisCount: 3, childAspectRatio: 0.36),
+                            children: filteredOthers.value.map((package) {
+                              return buildPackageItem(package, false);
+                            }).toList(),
+                          );
+                        }
+                        return ListView(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 20, vertical: 20),
+                          children: filteredOthers.value.map((package) {
+                            return buildPackageItem(package, false,
+                                horizontal: true);
+                          }).toList(),
+                        );
+                      }
+                    }),
+                    if (filteredBetas.value.isNotEmpty)
                       ListView(
                         padding: const EdgeInsets.symmetric(
                             horizontal: 20, vertical: 20),
@@ -475,9 +623,9 @@ class PackagesState extends State<Packages> with TickerProviderStateMixin {
                           Wrap(
                             runSpacing: 20,
                             spacing: 20,
-                            children: betas.map((package) {
-                              return _buildPackageItem(package, false,
-                                  isBeta: true);
+                            children: filteredBetas.value.map((package) {
+                              return buildPackageItem(package, false,
+                                  isBeta: true, horizontal: true);
                             }).toList(),
                           ),
                         ],
@@ -487,13 +635,13 @@ class PackagesState extends State<Packages> with TickerProviderStateMixin {
               ),
             ],
           ),
-          if (loading)
+          if (loading.value)
             Container(
               width: MediaQuery.sizeOf(context).width,
               height: MediaQuery.sizeOf(context).height,
               color: Theme.of(context)
                   .scaffoldBackgroundColor
-                  .withValues(alpha: .7),
+                  .withValues(alpha: .4),
               child: const Center(
                 child: CupertinoActivityIndicator(
                   radius: 14,
@@ -504,4 +652,9 @@ class PackagesState extends State<Packages> with TickerProviderStateMixin {
       ),
     );
   }
+}
+
+class _PackageTickerProvider implements TickerProvider {
+  @override
+  Ticker createTicker(TickerCallback onTick) => Ticker(onTick);
 }

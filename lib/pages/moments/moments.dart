@@ -1,159 +1,122 @@
+import 'package:garden/api/dsm_api.dart';
 import 'package:garden/stores/connection_store.dart';
 import 'package:garden/util/log.dart';
-import 'package:garden/util/moments_api.dart';
 import 'package:garden/widgets/moments/moments_content_tab.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/material.dart';
-import 'package:signals/signals_flutter.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:signals_hooks/signals_hooks.dart';
 
-class Moments extends StatefulWidget {
+class Moments extends HookWidget {
   const Moments({super.key});
 
   @override
-  MomentsState createState() => MomentsState();
-}
+  Widget build(BuildContext context) {
+    final currentIndex = useSignal(0);
+    final scrollController = useScrollController();
+    final timeline = useSignal<List>([]);
+    final album = useSignal<List>([]);
+    final recentlyAdd = useSignal<List>([]);
+    final videos = useSignal<List>([]);
+    final shares = useSignal<List>([]);
+    final geocoding = useSignal<List>([]);
+    final general = useSignal<List>([]);
+    final width = MediaQuery.sizeOf(context).width;
+    final double photoWidth = (width - 6) / 4;
+    final double albumWidth = (width - 60) / 2;
+    final loadingTimeline = useSignal(true);
+    final loadingAlbum = useSignal(true);
+    final loadingShares = useSignal(true);
 
-class MomentsState extends State<Moments> {
-  int currentIndex = 0;
-  final ScrollController _scrollController = ScrollController();
-  List timeline = [];
-  List category = [];
-  List album = [];
-  List recentlyAdd = [];
-  List videos = [];
-  List shares = [];
-  List geocoding = [];
-  List general = [];
-  double photoWidth = 0;
-  double albumWidth = 0;
-  bool loadingTimeline = true;
-  bool loadingAlbum = true;
-  bool loadingShares = true;
-
-  @override
-  void initState() {
-    getData();
-    // getCategory();
-    getAlbum();
-    getRecently();
-    getVideos();
-    getShares();
-    if (connectionStore.dsmVersion.watch(context) == 7) {
-      Log.debug("DSM 版本为7");
-      getGeocoding();
-      getGeneral();
-    }
-
-    super.initState();
-  }
-
-  getData() async {
-    var res = await MomentsApi.timeline();
-    if (res['success'] && mounted) {
-      setState(() {
-        timeline = [];
-        if (connectionStore.dsmVersion.watch(context) == 7) {
-          for (var section in res['data']['section']) {
-            timeline.addAll(section['list']);
+    getData() async {
+      var res = await dsmFotoBrowseTimeline();
+      if (context.mounted) {
+        timeline.value = [];
+        if (connectionStore.dsmVersion.value == 7) {
+          for (var section in res['section']) {
+            timeline.value = [...timeline.value, ...section['list']];
           }
         } else {
-          timeline = res['data']['list'];
+          timeline.value = res['list'];
         }
 
-        for (int i = 0; i < timeline.length; i++) {
-          int lines = (timeline[i]['item_count'] / 4).ceil();
+        for (int i = 0; i < timeline.value.length; i++) {
+          int lines = (timeline.value[i]['item_count'] / 4).ceil();
           double height = 40 + lines * photoWidth + (lines - 1) * 2;
-          timeline[i]['position'] = {};
+          timeline.value[i]['position'] = {};
           if (i == 0) {
-            timeline[i]['position']['start'] = 0;
-            timeline[i]['position']['end'] = height;
+            timeline.value[i]['position']['start'] = 0;
+            timeline.value[i]['position']['end'] = height;
           } else {
-            timeline[i]['position']['start'] =
-                timeline[i - 1]['position']['end'];
-            timeline[i]['position']['end'] =
-                timeline[i]['position']['start'] + height;
+            timeline.value[i]['position']['start'] =
+                timeline.value[i - 1]['position']['end'];
+            timeline.value[i]['position']['end'] =
+                timeline.value[i]['position']['start'] + height;
           }
         }
-        setState(() {
-          loadingTimeline = false;
-        });
-      });
+        loadingTimeline.value = false;
+      }
     }
-  }
 
-  getCategory() async {
-    var res = await MomentsApi.category();
-    if (res['success'] && mounted) {
-      setState(() {
-        category = res['data'];
-      });
+    getAlbum() async {
+      var res = await dsmFotoBrowseAlbumListMoments();
+      if (context.mounted) {
+        album.value = res['list'];
+        loadingAlbum.value = false;
+      }
     }
-  }
 
-  getAlbum() async {
-    var res = await MomentsApi.album();
-    if (res['success'] && mounted) {
-      setState(() {
-        album = res['data']['list'];
-        loadingAlbum = false;
-      });
+    getRecently() async {
+      var res =
+          await dsmFotoBrowsePhotoList(category: "RecentlyAdded", limit: 4);
+      if (context.mounted) {
+        recentlyAdd.value = res["list"];
+      }
     }
-  }
 
-  getRecently() async {
-    var res = await MomentsApi.photos(category: "RecentlyAdded", limit: 4);
-    if (res['success'] && mounted) {
-      setState(() {
-        recentlyAdd = res['data']["list"];
-      });
+    getShares() async {
+      var res = await dsmFotoBrowseAlbumListMoments(shared: true, limit: 4);
+      if (context.mounted) {
+        shares.value = res["list"];
+        loadingShares.value = false;
+      }
     }
-  }
 
-  getShares() async {
-    var res = await MomentsApi.album(shared: true, limit: 4);
-    if (res['success'] && mounted) {
-      setState(() {
-        shares = res['data']["list"];
-        loadingShares = false;
-      });
+    getGeocoding() async {
+      var res = await dsmFotoBrowseGeocoding(limit: 4);
+      if (context.mounted) {
+        geocoding.value = res["list"];
+      }
     }
-  }
 
-  getGeocoding() async {
-    var res = await MomentsApi.geocoding(limit: 4);
-    if (res['success'] && mounted) {
-      setState(() {
-        geocoding = res['data']["list"];
-      });
+    getGeneral({bool isTeam = false}) async {
+      var res = await dsmFotoBrowseGeneral(limit: 4, isTeam: isTeam);
+      if (context.mounted) {
+        general.value = res["list"];
+      }
     }
-  }
 
-  getGeneral({bool isTeam = false}) async {
-    var res = await MomentsApi.general(limit: 4, isTeam: isTeam);
-    if (res['success'] && mounted) {
-      setState(() {
-        general = res['data']["list"];
-      });
+    getVideos() async {
+      var res = await dsmFotoBrowsePhotoList(type: "video", limit: 4);
+      if (context.mounted) {
+        videos.value = res["list"];
+      }
     }
-  }
 
-  getVideos() async {
-    var res = await MomentsApi.photos(type: "video", limit: 4);
-    if (res['success'] && mounted) {
-      setState(() {
-        videos = res['data']["list"];
-      });
-    }
-  }
+    useEffect(() {
+      getData();
+      getAlbum();
+      getRecently();
+      getVideos();
+      getShares();
+      if (connectionStore.dsmVersion.value == 7) {
+        Log.debug("DSM 版本为7");
+        getGeocoding();
+        getGeneral();
+      }
+      return null;
+    }, const []);
 
-  void _onTabChanged(int index) {
-    setState(() {
-      currentIndex = index;
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         leading: AppBackButton(context),
@@ -161,33 +124,35 @@ class MomentsState extends State<Moments> {
           enableFilter: false,
           enableSearch: false,
           enabled: false,
-          initialSelection: currentIndex,
+          initialSelection: currentIndex.value,
           dropdownMenuEntries: const [
             DropdownMenuEntry(value: 0, label: '图片'),
             DropdownMenuEntry(value: 1, label: '相册'),
             DropdownMenuEntry(value: 2, label: '共享'),
           ],
           onSelected: (value) {
-            _onTabChanged(value ?? 0);
+            currentIndex.value = value ?? 0;
           },
         ),
       ),
       body: MomentsContentTab(
-        currentIndex: currentIndex,
-        loadingTimeline: loadingTimeline,
-        loadingAlbum: loadingAlbum,
-        loadingShares: loadingShares,
-        timeline: timeline,
-        album: album,
-        shares: shares,
-        geocoding: geocoding,
-        general: general,
-        videos: videos,
-        recentlyAdd: recentlyAdd,
-        scrollController: _scrollController,
+        currentIndex: currentIndex.value,
+        loadingTimeline: loadingTimeline.value,
+        loadingAlbum: loadingAlbum.value,
+        loadingShares: loadingShares.value,
+        timeline: timeline.value,
+        album: album.value,
+        shares: shares.value,
+        geocoding: geocoding.value,
+        general: general.value,
+        videos: videos.value,
+        recentlyAdd: recentlyAdd.value,
+        scrollController: scrollController,
         photoWidth: photoWidth,
         albumWidth: albumWidth,
-        onTabChanged: _onTabChanged,
+        onTabChanged: (index) {
+          currentIndex.value = index;
+        },
       ),
     );
   }

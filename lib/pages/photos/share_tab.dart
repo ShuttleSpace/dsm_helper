@@ -3,38 +3,33 @@ import 'package:garden/pages/photos/album_page.dart';
 import 'package:garden/widgets/cupertino_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:garden/constants/app_constants.dart';
 import 'package:garden/theme/app_colors.dart';
+import 'package:signals_hooks/signals_hooks.dart';
 
-class ShareTab extends StatefulWidget {
+class ShareTab extends HookWidget {
   const ShareTab({super.key});
 
   @override
-  State<ShareTab> createState() => _ShareTabState();
-}
-
-class _ShareTabState extends State<ShareTab> {
-  bool loading = true;
-  List<AlbumModel> albums = [];
-  @override
-  void initState() {
-    getData();
-    super.initState();
-  }
-
-  getData() async {
-    albums = await AlbumModel.fetch(
-        additional: ["thumbnail", "sharing_info"],
-        shared: true,
-        sortBy: 'share_modify_time');
-    setState(() {
-      loading = false;
-    });
-  }
-
-  @override
   Widget build(BuildContext context) {
-    return loading
+    final loading = useSignal(true);
+    final albums = useSignal<List<AlbumModel>>([]);
+
+    getData() async {
+      albums.value = await AlbumModel.fetch(
+          additional: ["thumbnail", "sharing_info"],
+          shared: true,
+          sortBy: 'share_modify_time');
+      loading.value = false;
+    }
+
+    useEffect(() {
+      getData();
+      return null;
+    }, const []);
+
+    return loading.value
         ? const Center(
             child: CupertinoActivityIndicator(
               radius: 14,
@@ -44,7 +39,7 @@ class _ShareTabState extends State<ShareTab> {
             padding: const EdgeInsets.symmetric(
                 horizontal: AppConstants.paddingLarge),
             itemBuilder: (context, i) {
-              AlbumModel e = albums[i];
+              AlbumModel e = albums.value[i];
               return GestureDetector(
                 onTap: () {
                   Navigator.of(context)
@@ -122,7 +117,7 @@ class _ShareTabState extends State<ShareTab> {
                 ),
               );
             },
-            itemCount: albums.length,
+            itemCount: albums.value.length,
           );
   }
 }

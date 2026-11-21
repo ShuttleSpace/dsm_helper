@@ -1,22 +1,21 @@
-import 'package:garden/util/http_util.dart';
+import 'package:garden/api/dsm_api.dart';
 import 'package:garden/util/storage_util.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:garden/constants/app_constants.dart';
 import 'package:garden/theme/app_colors.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:signals_hooks/signals_hooks.dart';
 
-class ConfirmLogout extends StatefulWidget {
+class ConfirmLogout extends HookWidget {
   final bool otpEnable;
   const ConfirmLogout(this.otpEnable, {super.key});
   @override
-  ConfirmLogoutState createState() => ConfirmLogoutState();
-}
-
-class ConfirmLogoutState extends State<ConfirmLogout> {
-  bool forget = false;
-  @override
   Widget build(BuildContext context) {
-    return Material(
+    final forget = useSignal(false);
+    return SizedBox(
+      width: double.infinity,
+      child: Material(
       color: Colors.transparent,
       child: Card(
         shape: RoundedRectangleBorder(
@@ -42,12 +41,10 @@ class ConfirmLogoutState extends State<ConfirmLogout> {
                 const SizedBox(
                   height: 22,
                 ),
-                if (widget.otpEnable) ...[
+                if (otpEnable) ...[
                   GestureDetector(
                     onTap: () {
-                      setState(() {
-                        forget = !forget;
-                      });
+                      forget.value = !forget.value;
                     },
                     child: Card(
                       shape: RoundedRectangleBorder(
@@ -60,7 +57,7 @@ class ConfirmLogoutState extends State<ConfirmLogout> {
                           children: [
                             const Text("取消记住本设备"),
                             const Spacer(),
-                            if (forget)
+                            if (forget.value)
                               const Icon(
                                 CupertinoIcons.checkmark_alt,
                                 color: AppColors.primaryAction,
@@ -79,8 +76,8 @@ class ConfirmLogoutState extends State<ConfirmLogout> {
                     Expanded(
                       child: OutlinedButton(
                         onPressed: () async {
-                          if (forget) {
-                            DsmApi.trustDevice("delete");
+                          if (forget.value) {
+                            dsmCoreTrustDevice('delete').ignore();
                           }
                           StorageUtil.remove("sid");
                           // HttpUtil.removeStorage("smid");
@@ -118,6 +115,7 @@ class ConfirmLogoutState extends State<ConfirmLogout> {
           ),
         ),
       ),
+    ),
     );
   }
 }

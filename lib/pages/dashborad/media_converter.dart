@@ -1,56 +1,53 @@
 import 'dart:async';
 import 'dart:math';
 
-import 'package:garden/util/http_util.dart';
+import 'package:garden/api/dsm_api.dart';
+import 'package:garden/extensions/datetime.dart';
 import 'package:garden/util/log.dart';
 import 'package:garden/widgets/animation_progress_bar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:garden/constants/app_constants.dart';
 import 'package:garden/theme/app_colors.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:signals_hooks/signals_hooks.dart';
 
-class MediaConverter extends StatefulWidget {
+class MediaConverter extends HookWidget {
   final Map converter;
   const MediaConverter(this.converter, {super.key});
-  @override
-  MediaConverterState createState() => MediaConverterState();
-}
-
-class MediaConverterState extends State<MediaConverter> {
-  late Timer timer;
-  Map converter = {};
-  @override
-  void initState() {
-    setState(() {
-      converter = widget.converter;
-    });
-    timer = Timer.periodic(const Duration(seconds: 5), (timer) {
-      getMediaConverter();
-    });
-    getMediaConverter();
-    super.initState();
-  }
-
-  getMediaConverter() async {
-    var res = await DsmApi.mediaConverter("status");
-    if (res['success'] && mounted) {
-      setState(() {
-        converter = res['data'];
-        Log.info("get media converter status $res}");
-      });
-    }
-  }
-
-  @override
-  void dispose() {
-    timer.cancel();
-    Log.info("取消计时器");
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
-    return Material(
+    final converterValue = useSignal<Map>(converter);
+
+    Future<void> getMediaConverter() async {
+      try {
+        final data = await dsmCoreMediaIndexingMediaConverter('status');
+        if (context.mounted) {
+          converterValue.value = data;
+          Log.info("get media converter status $data");
+        }
+      } catch (e) {
+        Log.warn("get media converter failed: $e");
+      }
+    }
+
+    useEffect(() {
+      final timer = Timer.periodic(const Duration(seconds: 5), (timer) {
+        getMediaConverter();
+      });
+      getMediaConverter();
+      return () {
+        timer.cancel();
+        Log.info("取消计时器");
+      };
+    }, const []);
+
+    return SizedBox(
+
+      width: double.infinity,
+
+      child: Material(
       color: Colors.transparent,
       child: Card(
         shape: RoundedRectangleBorder(
@@ -89,7 +86,7 @@ class MediaConverterState extends State<MediaConverter> {
                                   style: TextStyle(
                                       color: Colors.blue, fontSize: 18)),
                               TextSpan(
-                                  text: "共 ${converter['photo_total']} 个图像")
+                                  text: "共 ${converterValue.value['photo_total']} 个图像")
                             ],
                           ),
                         ),
@@ -100,18 +97,18 @@ class MediaConverterState extends State<MediaConverter> {
                           backgroundColor: Colors.transparent,
                           progressColor: Colors.blue,
                           currentValue: max(
-                              converter['photo_remain'] > 0
-                                  ? ((converter['photo_total'] -
-                                              converter['photo_remain']) *
+                              converterValue.value['photo_remain'] > 0
+                                  ? ((converterValue.value['photo_total'] -
+                                              converterValue.value['photo_remain']) *
                                           100 /
-                                          converter['photo_total'])
+                                          converterValue.value['photo_total'])
                                       .ceil()
                                   : 0,
-                              converter['thumb_remain'] > 0
-                                  ? ((converter['thumb_total'] -
-                                              converter['thumb_remain']) *
+                              converterValue.value['thumb_remain'] > 0
+                                  ? ((converterValue.value['thumb_total'] -
+                                              converterValue.value['thumb_remain']) *
                                           100 /
-                                          converter['thumb_total'])
+                                          converterValue.value['thumb_total'])
                                       .ceil()
                                   : 0),
                           displayText: '%',
@@ -139,7 +136,7 @@ class MediaConverterState extends State<MediaConverter> {
                                   text: "视频：",
                                   style: TextStyle(
                                       color: Colors.blue, fontSize: 18)),
-                              TextSpan(text: "共 ${converter['video_total']}个视频")
+                              TextSpan(text: "共 ${converterValue.value['video_total']}个视频")
                             ],
                           ),
                         ),
@@ -149,10 +146,10 @@ class MediaConverterState extends State<MediaConverter> {
                         FAProgressBar(
                           backgroundColor: Colors.transparent,
                           progressColor: Colors.blue,
-                          currentValue: converter['video_total'] > 0
-                              ? (converter['video_remain'] *
+                          currentValue: converterValue.value['video_total'] > 0
+                              ? (converterValue.value['video_remain'] *
                                       100 /
-                                      converter['video_total'])
+                                      converterValue.value['video_total'])
                                   .ceil()
                               : 0,
                           displayText: '%',
@@ -182,15 +179,15 @@ class MediaConverterState extends State<MediaConverter> {
                                         color: Colors.blue, fontSize: 18)),
                                 TextSpan(
                                   text:
-                                      "${converter['status'] == "converting" ? "转换中" : converter['status'] == "paused" ? "已暂停" : converter['status']}",
+                                      "${converterValue.value['status'] == "converting" ? "转换中" : converterValue.value['status'] == "paused" ? "已暂停" : converterValue.value['status']}",
                                 ),
-                                if (converter['resume_time'] > 0)
+                                if (converterValue.value['resume_time'] > 0)
                                   TextSpan(
                                       text:
-                                          " (${DateTime.fromMillisecondsSinceEpoch(converter['resume_time'] * 1000).format("H:i")}恢复)",
+                                          " (${DateTime.fromMillisecondsSinceEpoch(converterValue.value['resume_time'] * 1000).format("H:i")}恢复)",
                                       style:
                                           const TextStyle(color: Colors.grey)),
-                                if (converter['resume_time'] < 0)
+                                if (converterValue.value['resume_time'] < 0)
                                   const TextSpan(
                                       text: " (无限期延迟)",
                                       style: TextStyle(color: Colors.grey)),
@@ -200,16 +197,20 @@ class MediaConverterState extends State<MediaConverter> {
                         ),
                         GestureDetector(
                           onTap: () async {
-                            if (converter['status'] == "paused") {
-                              var res = await DsmApi.mediaConverter("resume");
-                              if (res['success']) {
-                                getMediaConverter();
+                            if (converterValue.value['status'] == "paused") {
+                              try {
+                                await dsmCoreMediaIndexingMediaConverter('resume');
+                                await getMediaConverter();
+                              } catch (e) {
+                                Log.warn("resume media converter failed: $e");
                               }
                             } else {
                               showCupertinoModalPopup(
                                   context: context,
                                   builder: (context) {
-                                    return Material(
+                                    return SizedBox(
+                                      width: double.infinity,
+                                      child: Material(
                                       child: Padding(
                                         padding: const EdgeInsets.all(
                                             AppConstants.paddingLarge),
@@ -318,13 +319,16 @@ class MediaConverterState extends State<MediaConverter> {
                                           ],
                                         ),
                                       ),
+                                    ),
                                     );
                                   }).then((value) async {
                                 if (value != null) {
-                                  var res = await DsmApi.mediaConverter("pause",
-                                      hours: value);
-                                  if (res['success']) {
-                                    getMediaConverter();
+                                  try {
+                                    await dsmCoreMediaIndexingMediaConverter('pause',
+                                        delayHours: value);
+                                    await getMediaConverter();
+                                  } catch (e) {
+                                    Log.warn("pause media converter failed: $e");
                                   }
                                 }
                               });
@@ -335,7 +339,7 @@ class MediaConverterState extends State<MediaConverter> {
                                 side: const BorderSide(),
                                 borderRadius: BorderRadius.circular(18)),
                             child: Icon(
-                              converter['status'] == "paused"
+                              converterValue.value['status'] == "paused"
                                   ? CupertinoIcons.play_arrow_solid
                                   : CupertinoIcons.pause_fill,
                               color: AppColors.primaryAction,
@@ -367,6 +371,8 @@ class MediaConverterState extends State<MediaConverter> {
           ),
         ),
       ),
+    ),
+
     );
   }
 }

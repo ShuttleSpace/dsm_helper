@@ -14,7 +14,9 @@ class DownloadBatchDeleteDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
+    return SizedBox(
+      width: double.infinity,
+      child: Material(
       color: Colors.transparent,
       child: Card(
         shape: RoundedRectangleBorder(
@@ -80,6 +82,7 @@ class DownloadBatchDeleteDialog extends StatelessWidget {
           ),
         ),
       ),
+    ),
     );
   }
 }

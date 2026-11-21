@@ -1,8 +1,9 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 
-class FAProgressBar extends StatefulWidget {
+class FAProgressBar extends HookWidget {
   FAProgressBar({
     super.key,
     this.currentValue = 0,
@@ -41,59 +42,36 @@ class FAProgressBar extends StatefulWidget {
   final TextStyle displayTextStyle;
 
   @override
-  FAProgressBarState createState() => FAProgressBarState();
-}
+  Widget build(BuildContext context) {
+    final controller = useAnimationController(duration: animatedDuration);
+    final currentBegin = useRef(0.0);
+    final currentEnd = useRef(0.0);
+    final animation = useRef<Animation<double>>(
+        Tween<double>(begin: 0, end: 0).animate(controller));
 
-class FAProgressBarState extends State<FAProgressBar>
-    with SingleTickerProviderStateMixin {
-  late Animation<double> _animation;
-  late AnimationController _controller;
-  double _currentBegin = 0;
-  double _currentEnd = 0;
-
-  @override
-  void initState() {
-    _controller =
-        AnimationController(duration: widget.animatedDuration, vsync: this);
-    _animation = Tween<double>(begin: _currentBegin, end: _currentEnd)
-        .animate(_controller);
-    triggerAnimation();
-    super.initState();
-  }
-
-  @override
-  void didUpdateWidget(FAProgressBar oldWidget) {
-    triggerAnimation();
-    super.didUpdateWidget(oldWidget);
-  }
-
-  void triggerAnimation() {
-    setState(() {
-      _currentBegin = _animation.value;
-
-      if (widget.currentValue == 0 || widget.maxValue == 0) {
-        _currentEnd = 0;
+    void triggerAnimation() {
+      currentBegin.value = animation.value.value;
+      if (currentValue == 0 || maxValue == 0) {
+        currentEnd.value = 0;
       } else {
-        _currentEnd = 0.05 + widget.currentValue / widget.maxValue;
+        currentEnd.value = 0.05 + currentValue / maxValue;
       }
+      animation.value = Tween<double>(
+              begin: currentBegin.value, end: currentEnd.value)
+          .animate(controller);
+      controller.reset();
+      controller.forward();
+    }
 
-      _animation = Tween<double>(begin: _currentBegin, end: _currentEnd)
-          .animate(_controller);
-    });
-    _controller.reset();
-    _controller.forward();
-  }
+    useEffect(() {
+      triggerAnimation();
+      return null;
+    }, [currentValue, maxValue]);
 
-  @override
-  Widget build(BuildContext context) => AnimatedProgressBar(
-        animation: _animation,
-        widget: widget,
-      );
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
+    return AnimatedProgressBar(
+      animation: animation.value,
+      widget: this,
+    );
   }
 }
 

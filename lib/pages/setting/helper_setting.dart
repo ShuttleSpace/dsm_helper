@@ -9,74 +9,166 @@ import 'package:flutter_vibrate/flutter_vibrate.dart';
 import 'package:garden/constants/app_constants.dart';
 import 'package:garden/pages/common/gesture_password.dart';
 import 'package:garden/pages/setting/player_setting.dart';
+import 'package:garden/api/dsm_api.dart';
+import 'package:garden/stores/connection_store.dart';
 import 'package:garden/stores/settings_store.dart';
-import 'package:garden/theme/app_colors.dart';
 import 'package:garden/util/storage_util.dart';
 import 'package:garden/util/ui_util.dart';
+import 'package:garden/widgets/bottom_confirm_sheet.dart';
 import 'package:garden/widgets/neu_back_button.dart';
+import 'package:garden/widgets/settings/settings_action_card.dart';
 import 'package:garden/widgets/neu_picker.dart';
+import 'package:garden/widgets/settings/settings_checkbox_tile.dart';
+import 'package:garden/widgets/status_checkbox.dart';
 import 'package:local_auth/error_codes.dart' as auth_error;
 import 'package:local_auth/local_auth.dart';
 import 'package:local_auth_android/local_auth_android.dart';
-import 'package:signals_flutter/signals_flutter.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:signals_hooks/signals_hooks.dart';
 import 'package:local_auth_darwin/local_auth_darwin.dart';
 
-class HelperSetting extends StatefulWidget {
+class HelperSetting extends HookWidget {
   const HelperSetting({super.key});
 
   @override
-  HelperSettingState createState() => HelperSettingState();
-}
+  Widget build(BuildContext context) {
+    final auth = useMemoized(() => LocalAuthentication(), const []);
+    final launchAuth = useSignal(false);
+    final password = useSignal(false);
+    final biometrics = useSignal(false);
+    final canCheckBiometrics = useSignal(false);
+    final videoPlayer = useSignal(false);
+    final launchAccountPage = useSignal(false);
+    final biometricsType = useSignal(BiometricType.fingerprint);
+    final ssh = useSignal(false);
+    final telnet = useSignal(false);
+    final sshLoading = useSignal(true);
+    final sshPort = useSignal('');
+    final shutdowning = useSignal(false);
+    final rebooting = useSignal(false);
 
-class HelperSettingState extends State<HelperSetting> {
-  final LocalAuthentication auth = LocalAuthentication();
-  bool launchAuth = false;
-  bool password = false;
-  bool biometrics = false;
-  bool canCheckBiometrics = false;
-  bool videoPlayer = false;
-  bool launchAccountPage = false;
-  BiometricType biometricsType = BiometricType.fingerprint;
+    final Map<BiometricType, String> biometricTypeName = {
+      BiometricType.face: "FaceId",
+      BiometricType.fingerprint: "指纹",
+      BiometricType.iris: "人脸",
+    };
 
-  Map<BiometricType, String> biometricTypeName = {
-    BiometricType.face: "FaceId",
-    BiometricType.fingerprint: "指纹",
-    BiometricType.iris: "人脸",
-  };
-  @override
-  void initState() {
-    initAuth();
-    super.initState();
-  }
-
-  initAuth() async {
-    launchAuth = await StorageUtil.getBool("launch_auth") ?? false;
-    password = await StorageUtil.getBool("launch_auth_password") ?? false;
-    biometrics = await StorageUtil.getBool("launch_auth_biometrics") ?? false;
-    videoPlayer = await StorageUtil.getBool("use_embeed_video_player") ?? false;
-    launchAccountPage =
-        await StorageUtil.getBool('launch_account_page') ?? false;
-    canCheckBiometrics = await auth.canCheckBiometrics;
-    setState(() {});
-    if (canCheckBiometrics) {
-      List<BiometricType> availableBiometrics =
-          await auth.getAvailableBiometrics();
-      if (Platform.isIOS) {
-        setState(() {
-          if (availableBiometrics.contains(BiometricType.face)) {
-            biometricsType = BiometricType.face;
-          } else if (availableBiometrics.contains(BiometricType.fingerprint)) {
-            biometricsType = BiometricType.fingerprint;
-          } else if (availableBiometrics.contains(BiometricType.iris)) {
-            biometricsType = BiometricType.iris;
-          }
-        });
+    getData() async {
+      try {
+        final data = await dsmCoreTerminalInfoForPage();
+        ssh.value = data['enable_ssh'] ?? false;
+        telnet.value = data['enable_telnet'] ?? false;
+        sshPort.value = (data['ssh_port'] ?? '').toString();
+      } catch (e) {
+        ssh.value = false;
+      } finally {
+        sshLoading.value = false;
       }
     }
-  }
 
-  @override
-  Widget build(BuildContext context) {
+    power(String type, bool force) async {
+      if (type == "shutdown") {
+        shutdowning.value = true;
+      } else {
+        rebooting.value = true;
+      }
+
+      Map<String, dynamic>? errorData;
+      try {
+        await dsmCoreSystemPowerForPage(type, force);
+        UiUtil.toast("已发送指令");
+      } on DSMException catch (e) {
+        errorData = e.rawError;
+        if (e.code != 117) {
+          UiUtil.toast("操作失败，代码：${e.code}");
+        }
+      } catch (_) {}
+
+      if (type == "shutdown") {
+        shutdowning.value = false;
+      } else {
+        rebooting.value = false;
+      }
+
+      if (errorData != null && errorData['code'] == 117) {
+        final rawErrors = errorData['errors'];
+        final errors = rawErrors is Map
+            ? (rawErrors['runningTasks'] as List? ?? [])
+            : <dynamic>[];
+        final msgs = <String>[];
+        for (final error in errors) {
+          final titles = error.toString().split(":");
+          if (titles.length == 3) {
+            msgs.add(
+                connectionStore.strings.value[titles[0]][titles[1]][titles[2]]);
+          }
+        }
+        if (context.mounted) {
+          showCupertinoModalPopup(
+            context: context,
+            builder: (context) => BottomConfirmSheet(
+              title: "系统正在处理下列任务。现在关机可能会导致套件异常或数据丢失。是否确定要继续？",
+              content: msgs.join("\n"),
+              confirmText: "强制${type == "shutdown" ? "关机" : "重启"}",
+              padding: 20,
+              buttonSpacing: 16,
+              showTrailingSpace: true,
+              onConfirm: () => power(type, true),
+            ),
+          );
+        }
+      }
+    }
+
+    void showPowerConfirm(String type) {
+      final isShutdown = type == "shutdown";
+      showCupertinoModalPopup(
+        context: context,
+        builder: (context) => BottomConfirmSheet(
+          title: isShutdown ? "确认关机" : "确认重启",
+          content: isShutdown ? "确认要关闭设备吗？" : "确认要重新启动设备？",
+          confirmText: isShutdown ? "确认关机" : "确认重启",
+          padding: 20,
+          buttonSpacing: 16,
+          showTrailingSpace: true,
+          onConfirm: () => power(type, false),
+        ),
+      );
+    }
+
+    initAuth() async {
+      launchAuth.value = await StorageUtil.getBool("launch_auth") ?? false;
+      password.value =
+          await StorageUtil.getBool("launch_auth_password") ?? false;
+      biometrics.value =
+          await StorageUtil.getBool("launch_auth_biometrics") ?? false;
+      videoPlayer.value =
+          await StorageUtil.getBool("use_embeed_video_player") ?? false;
+      launchAccountPage.value =
+          await StorageUtil.getBool('launch_account_page') ?? false;
+      canCheckBiometrics.value = await auth.canCheckBiometrics;
+
+      if (canCheckBiometrics.value) {
+        List<BiometricType> availableBiometrics =
+            await auth.getAvailableBiometrics();
+        if (Platform.isIOS) {
+          if (availableBiometrics.contains(BiometricType.face)) {
+            biometricsType.value = BiometricType.face;
+          } else if (availableBiometrics.contains(BiometricType.fingerprint)) {
+            biometricsType.value = BiometricType.fingerprint;
+          } else if (availableBiometrics.contains(BiometricType.iris)) {
+            biometricsType.value = BiometricType.iris;
+          }
+        }
+      }
+    }
+
+    useEffect(() {
+      initAuth();
+      getData();
+      return null;
+    }, const []);
+
     return Scaffold(
       appBar: AppBar(
         leading: AppBackButton(context),
@@ -85,17 +177,55 @@ class HelperSettingState extends State<HelperSetting> {
       body: ListView(
         padding: const EdgeInsets.all(20),
         children: [
+          SettingsActionCard(
+            label: "关机",
+            trailing: OutlinedButton(
+              onPressed: () => showPowerConfirm("shutdown"),
+              child: shutdowning.value
+                  ? const CupertinoActivityIndicator(radius: 10)
+                  : const Text("关机", style: TextStyle(color: Colors.redAccent)),
+            ),
+          ),
+          const SizedBox(height: 20),
+          SettingsActionCard(
+            label: "重启",
+            trailing: OutlinedButton(
+              onPressed: () => showPowerConfirm("reboot"),
+              child: rebooting.value
+                  ? const CupertinoActivityIndicator(radius: 10)
+                  : const Text("重启", style: TextStyle(color: Colors.redAccent)),
+            ),
+          ),
+          const SizedBox(height: 20),
+          SettingsActionCard(
+            label: "SSH",
+            trailing: sshLoading.value
+                ? const CupertinoActivityIndicator(radius: 12)
+                : CupertinoSwitch(
+                    value: ssh.value,
+                    onChanged: (v) async {
+                      sshLoading.value = true;
+                      try {
+                        await dsmCoreTerminalSetForPage(
+                            v, telnet.value, sshPort.value);
+                      } catch (e) {
+                        final code = e is DSMException ? e.code : -1;
+                        UiUtil.toast("操作失败，代码：$code");
+                      }
+                      await getData();
+                    },
+                  ),
+          ),
+          const SizedBox(height: 20),
           GestureDetector(
             onTap: () {
-              setState(() {
-                settingsStore
-                    .setVibrateOn(!settingsStore.vibrateOn.watch(context));
-                StorageUtil.setBool(
-                    "vibrate_on", settingsStore.vibrateOn.watch(context));
-                if (settingsStore.vibrateOn.watch(context)) {
-                  UiUtil.vibrate(FeedbackType.light);
-                }
-              });
+              settingsStore
+                  .setVibrateOn(!settingsStore.vibrateOn.watch(context));
+              StorageUtil.setBool(
+                  "vibrate_on", settingsStore.vibrateOn.watch(context));
+              if (settingsStore.vibrateOn.watch(context)) {
+                UiUtil.vibrate(FeedbackType.light);
+              }
             },
             child: Card(
               shape: RoundedRectangleBorder(
@@ -119,11 +249,9 @@ class HelperSettingState extends State<HelperSetting> {
                           style: TextStyle(fontSize: 16),
                         ),
                         const Spacer(),
-                        if (settingsStore.vibrateOn.watch(context))
-                          const Icon(
-                            CupertinoIcons.checkmark_alt,
-                            color: AppColors.primaryAction,
-                          ),
+                        StatusCheckbox(
+                          value: settingsStore.vibrateOn.watch(context),
+                        ),
                       ],
                     ),
                     if (settingsStore.vibrateOn.watch(context))
@@ -136,94 +264,46 @@ class HelperSettingState extends State<HelperSetting> {
                           padding: const EdgeInsets.all(20),
                           child: Column(
                             children: [
-                              GestureDetector(
+                              SettingsCheckboxTile(
+                                label: "基础操作震动",
+                                value:
+                                    settingsStore.vibrateNormal.watch(context),
+                                padding: 8,
                                 onTap: () {
-                                  setState(() {
-                                    settingsStore.setVibrateNormal(
-                                        !settingsStore.vibrateNormal
-                                            .watch(context));
-                                    StorageUtil.setBool(
-                                        "vibrate_warning",
-                                        settingsStore.vibrateNormal
-                                            .watch(context));
-                                    if (settingsStore.vibrateNormal
-                                        .watch(context)) {
-                                      UiUtil.vibrate(FeedbackType.light);
-                                    }
-                                  });
+                                  settingsStore.setVibrateNormal(!settingsStore
+                                      .vibrateNormal
+                                      .watch(context));
+                                  StorageUtil.setBool(
+                                      "vibrate_warning",
+                                      settingsStore.vibrateNormal
+                                          .watch(context));
+                                  if (settingsStore.vibrateNormal
+                                      .watch(context)) {
+                                    UiUtil.vibrate(FeedbackType.light);
+                                  }
                                 },
-                                child: Card(
-                                  shape: RoundedRectangleBorder(
-                                      side: const BorderSide(),
-                                      borderRadius: BorderRadius.circular(18)),
-                                  // margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(
-                                        AppConstants.paddingSmall),
-                                    child: Row(
-                                      children: [
-                                        const Text(
-                                          "基础操作震动",
-                                          style: TextStyle(
-                                              fontSize: 16, height: 1.6),
-                                        ),
-                                        const Spacer(),
-                                        if (settingsStore.vibrateNormal
-                                            .watch(context))
-                                          const Icon(
-                                            CupertinoIcons.checkmark_alt,
-                                            color: AppColors.primaryAction,
-                                          ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
                               ),
                               const SizedBox(
                                 height: 20,
                               ),
-                              GestureDetector(
+                              SettingsCheckboxTile(
+                                label: "敏感操作震动",
+                                value:
+                                    settingsStore.vibrateWarning.watch(context),
+                                padding: 8,
                                 onTap: () {
-                                  setState(() {
-                                    settingsStore.setVibrateWarning(
-                                        !settingsStore.vibrateWarning
-                                            .watch(context));
-                                    StorageUtil.setBool(
-                                        "vibrate_warning",
-                                        settingsStore.vibrateWarning
-                                            .watch(context));
-                                    if (settingsStore.vibrateWarning
-                                        .watch(context)) {
-                                      UiUtil.vibrate(FeedbackType.warning);
-                                    }
-                                  });
+                                  settingsStore.setVibrateWarning(!settingsStore
+                                      .vibrateWarning
+                                      .watch(context));
+                                  StorageUtil.setBool(
+                                      "vibrate_warning",
+                                      settingsStore.vibrateWarning
+                                          .watch(context));
+                                  if (settingsStore.vibrateWarning
+                                      .watch(context)) {
+                                    UiUtil.vibrate(FeedbackType.warning);
+                                  }
                                 },
-                                child: Card(
-                                  shape: RoundedRectangleBorder(
-                                      side: const BorderSide(),
-                                      borderRadius: BorderRadius.circular(18)),
-                                  // margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(
-                                        AppConstants.paddingSmall),
-                                    child: Row(
-                                      children: [
-                                        const Text(
-                                          "敏感操作震动",
-                                          style: TextStyle(
-                                              fontSize: 16, height: 1.6),
-                                        ),
-                                        const Spacer(),
-                                        if (settingsStore.vibrateWarning
-                                            .watch(context))
-                                          const Icon(
-                                            CupertinoIcons.checkmark_alt,
-                                            color: AppColors.primaryAction,
-                                          ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
                               ),
                             ],
                           ),
@@ -237,7 +317,12 @@ class HelperSettingState extends State<HelperSetting> {
           const SizedBox(
             height: 20,
           ),
-          GestureDetector(
+          SettingsCheckboxTile(
+            label: "播放器设置",
+            value: videoPlayer.value,
+            iconAsset: "assets/icons/player.png",
+            iconWidth: 25,
+            padding: 20,
             onTap: () {
               Navigator.of(context).push(
                 MaterialPageRoute(
@@ -247,41 +332,10 @@ class HelperSettingState extends State<HelperSetting> {
                   settings: const RouteSettings(name: "player_setting"),
                 ),
               );
-              setState(() {
-                videoPlayer = !videoPlayer;
-                StorageUtil.setBool("use_embeed_video_player", videoPlayer);
-              });
+
+              videoPlayer.value = !videoPlayer.value;
+              StorageUtil.setBool("use_embeed_video_player", videoPlayer.value);
             },
-            child: Card(
-              shape: RoundedRectangleBorder(
-                  side: const BorderSide(),
-                  borderRadius: BorderRadius.circular(18)),
-              // margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-              child: Padding(
-                padding: const EdgeInsets.all(AppConstants.paddingSmall),
-                child: Row(
-                  children: [
-                    Image.asset(
-                      "assets/icons/player.png",
-                      width: 25,
-                    ),
-                    const SizedBox(
-                      width: 8,
-                    ),
-                    const Text(
-                      "播放器设置",
-                      style: TextStyle(fontSize: 16, height: 1.6),
-                    ),
-                    const Spacer(),
-                    if (videoPlayer)
-                      const Icon(
-                        CupertinoIcons.checkmark_alt,
-                        color: AppColors.primaryAction,
-                      ),
-                  ],
-                ),
-              ),
-            ),
           ),
           const SizedBox(
             height: 20,
@@ -338,53 +392,25 @@ class HelperSettingState extends State<HelperSetting> {
           const SizedBox(
             height: 20,
           ),
-          GestureDetector(
+          SettingsCheckboxTile(
+            label: "启动时默认进入选择账号页面",
+            value: launchAccountPage.value,
+            iconAsset: "assets/icons/change.png",
+            iconWidth: 25,
+            padding: 20,
             onTap: () {
-              setState(() {
-                launchAccountPage = !launchAccountPage;
-                StorageUtil.setBool("launch_account_page", launchAccountPage);
-              });
+              launchAccountPage.value = !launchAccountPage.value;
+              StorageUtil.setBool(
+                  "launch_account_page", launchAccountPage.value);
             },
-            child: Card(
-              shape: RoundedRectangleBorder(
-                  side: const BorderSide(),
-                  borderRadius: BorderRadius.circular(18)),
-              // margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-              child: Padding(
-                padding: const EdgeInsets.all(AppConstants.paddingSmall),
-                child: Row(
-                  children: [
-                    Image.asset(
-                      "assets/icons/change.png",
-                      width: 25,
-                    ),
-                    const SizedBox(
-                      width: 8,
-                    ),
-                    const Text(
-                      "启动时默认进入选择账号页面",
-                      style: TextStyle(fontSize: 16, height: 1.6),
-                    ),
-                    const Spacer(),
-                    if (launchAccountPage)
-                      const Icon(
-                        CupertinoIcons.checkmark_alt,
-                        color: AppColors.primaryAction,
-                      ),
-                  ],
-                ),
-              ),
-            ),
           ),
           const SizedBox(
             height: 20,
           ),
           GestureDetector(
             onTap: () {
-              setState(() {
-                launchAuth = !launchAuth;
-                StorageUtil.setBool("launch_auth", launchAuth);
-              });
+              launchAuth.value = !launchAuth.value;
+              StorageUtil.setBool("launch_auth", launchAuth.value);
             },
             child: Card(
               shape: RoundedRectangleBorder(
@@ -408,14 +434,12 @@ class HelperSettingState extends State<HelperSetting> {
                           style: TextStyle(fontSize: 16),
                         ),
                         const Spacer(),
-                        if (launchAuth)
-                          const Icon(
-                            CupertinoIcons.checkmark_alt,
-                            color: AppColors.primaryAction,
-                          ),
+                        StatusCheckbox(
+                          value: launchAuth.value,
+                        ),
                       ],
                     ),
-                    if (launchAuth)
+                    if (launchAuth.value)
                       Card(
                         shape: RoundedRectangleBorder(
                             side: const BorderSide(),
@@ -425,76 +449,47 @@ class HelperSettingState extends State<HelperSetting> {
                           padding: const EdgeInsets.all(20),
                           child: Column(
                             children: [
-                              GestureDetector(
+                              SettingsCheckboxTile(
+                                label: "图形密码",
+                                value: password.value,
+                                padding: 8,
                                 onTap: () {
-                                  setState(() {
-                                    if (password) {
-                                      setState(() {
-                                        password = false;
+                                  if (password.value) {
+                                    password.value = false;
+                                    StorageUtil.setBool(
+                                        "launch_auth_password", false);
+                                    biometrics.value = false;
+                                    StorageUtil.setBool(
+                                        "launch_auth_biometrics", false);
+                                  } else {
+                                    Navigator.of(context).push(
+                                        CupertinoPageRoute(builder: (context) {
+                                      return const GesturePasswordPage();
+                                    })).then((res) {
+                                      if (res != null && res) {
+                                        password.value = true;
                                         StorageUtil.setBool(
-                                            "launch_auth_password", false);
-                                        biometrics = false;
-                                        StorageUtil.setBool(
-                                            "launch_auth_biometrics", false);
-                                      });
-                                    } else {
-                                      Navigator.of(context).push(
-                                          CupertinoPageRoute(
-                                              builder: (context) {
-                                        return const GesturePasswordPage();
-                                      })).then((res) {
-                                        if (res != null && res) {
-                                          setState(() {
-                                            password = true;
-                                            StorageUtil.setBool(
-                                                "launch_auth_password",
-                                                password);
-                                          });
-                                        }
-                                      });
-                                    }
-                                    // password = !password;
-                                    // HttpUtil.setStorage("launch_password", password ? "1" : "0");
-                                  });
+                                            "launch_auth_password",
+                                            password.value);
+                                      }
+                                    });
+                                  }
+                                  // password.value = !password.value;
+                                  // HttpUtil.setStorage("launch_password", password.value ? "1" : "0");
                                 },
-                                child: Card(
-                                  shape: RoundedRectangleBorder(
-                                      side: const BorderSide(),
-                                      borderRadius: BorderRadius.circular(18)),
-                                  // margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(
-                                        AppConstants.paddingSmall),
-                                    child: Column(
-                                      children: [
-                                        Row(
-                                          children: [
-                                            const Text(
-                                              "图形密码",
-                                              style: TextStyle(
-                                                  fontSize: 16, height: 1.6),
-                                            ),
-                                            const Spacer(),
-                                            if (password)
-                                              const Icon(
-                                                CupertinoIcons.checkmark_alt,
-                                                color: AppColors.primaryAction,
-                                              ),
-                                          ],
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
                               ),
-                              if (canCheckBiometrics) ...[
+                              if (canCheckBiometrics.value) ...[
                                 const SizedBox(
                                   height: 20,
                                 ),
-                                GestureDetector(
+                                SettingsCheckboxTile(
+                                  label:
+                                      "${biometricTypeName[biometricsType.value]}验证",
+                                  value: biometrics.value,
+                                  padding: 8,
                                   onTap: () async {
-                                    if (biometrics == false) {
-                                      if (password == false) {
+                                    if (biometrics.value == false) {
+                                      if (password.value == false) {
                                         UiUtil.vibrate(FeedbackType.warning);
                                         UiUtil.toast("请先开启图形密码后再开启指纹");
                                         return;
@@ -511,7 +506,7 @@ class HelperSettingState extends State<HelperSetting> {
                                               lockOut: "认证失败次数过多，请稍后再试",
                                               goToSettingsButton: "设置",
                                               goToSettingsDescription:
-                                                  "系统未设置${biometricTypeName[biometricsType]}，点击设置按钮前往系统设置页面",
+                                                  "系统未设置${biometricTypeName[biometricsType.value]}，点击设置按钮前往系统设置页面",
                                               cancelButton: "取消",
                                             ),
                                             const AndroidAuthMessages(
@@ -531,12 +526,11 @@ class HelperSettingState extends State<HelperSetting> {
                                           localizedReason: '请触摸指纹传感器',
                                         );
                                         auth.stopAuthentication();
-                                        setState(() {
-                                          biometrics = didAuthenticate;
-                                          StorageUtil.setBool(
-                                              "launch_auth_biometrics",
-                                              biometrics);
-                                        });
+
+                                        biometrics.value = didAuthenticate;
+                                        StorageUtil.setBool(
+                                            "launch_auth_biometrics",
+                                            biometrics.value);
                                       } on PlatformException catch (e) {
                                         if (e.code == auth_error.notAvailable) {
                                           UiUtil.toast("生物验证不可用");
@@ -551,50 +545,17 @@ class HelperSettingState extends State<HelperSetting> {
                                         }
                                       }
                                     } else {
-                                      setState(() {
-                                        biometrics = false;
-                                        StorageUtil.setBool(
-                                            "launch_auth_biometrics",
-                                            biometrics);
-                                      });
+                                      biometrics.value = false;
+                                      StorageUtil.setBool(
+                                          "launch_auth_biometrics",
+                                          biometrics.value);
                                     }
 
-                                    // setState(() {
-                                    //   biometrics = !biometrics;
-                                    //   HttpUtil.setStorage("launch_biometrics", biometrics ? "1" : "0");
-                                    // });
+                                    //
+                                    //   biometrics.value = !biometrics.value;
+                                    //   HttpUtil.setStorage("launch_biometrics", biometrics.value ? "1" : "0");
+                                    //
                                   },
-                                  child: Card(
-                                    shape: RoundedRectangleBorder(
-                                        side: const BorderSide(),
-                                        borderRadius:
-                                            BorderRadius.circular(18)),
-                                    // margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(
-                                          AppConstants.paddingSmall),
-                                      child: Column(
-                                        children: [
-                                          Row(
-                                            children: [
-                                              Text(
-                                                "${biometricTypeName[biometricsType]}验证",
-                                                style: const TextStyle(
-                                                    fontSize: 16, height: 1.6),
-                                              ),
-                                              const Spacer(),
-                                              if (biometrics)
-                                                const Icon(
-                                                  CupertinoIcons.checkmark_alt,
-                                                  color:
-                                                      AppColors.primaryAction,
-                                                ),
-                                            ],
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
                                 ),
                               ],
                             ],
@@ -638,10 +599,8 @@ class HelperSettingState extends State<HelperSetting> {
           ),
           OutlinedButton(
             onPressed: () {
-              setState(() {
-                settingsStore.setDashboardCardCollapseSwitch(
-                    !settingsStore.dashboardCardCollapseSwitch.watch(context));
-              });
+              settingsStore.setDashboardCardCollapseSwitch(
+                  !settingsStore.dashboardCardCollapseSwitch.watch(context));
             },
             // margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
             child: Row(
@@ -655,11 +614,10 @@ class HelperSettingState extends State<HelperSetting> {
                   style: TextStyle(fontSize: 16),
                 ),
                 const Spacer(),
-                if (settingsStore.dashboardCardCollapseSwitch.watch(context))
-                  const Icon(
-                    CupertinoIcons.checkmark_alt,
-                    color: AppColors.primaryAction,
-                  ),
+                StatusCheckbox(
+                  value:
+                      settingsStore.dashboardCardCollapseSwitch.watch(context),
+                ),
               ],
             ),
           ),

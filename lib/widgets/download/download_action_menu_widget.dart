@@ -28,90 +28,106 @@ class DownloadActionMenuWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Material(
       color: Colors.transparent,
-      child: Card(
-        shape: RoundedRectangleBorder(
-            side: const BorderSide(), borderRadius: BorderRadius.circular(18)),
-        child: SafeArea(
-          top: false,
-          child: Padding(
-            padding: const EdgeInsets.all(AppConstants.paddingSmall),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                const Text(
-                  "选择操作",
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
-                ),
-                const SizedBox(
-                  height: 22,
-                ),
-                if (status == TaskStatus.failed)
-                  OutlinedButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                      onRetry();
-                    },
-                    child: const Text(
-                      "重试",
-                      style: TextStyle(fontSize: 18),
-                    ),
+      child: SizedBox(
+        width: double.infinity,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            SafeArea(
+              top: false,
+              child: Card(
+                shape: RoundedRectangleBorder(
+                    side: const BorderSide(),
+                    borderRadius: BorderRadius.circular(18)),
+                child: Padding(
+                  padding: const EdgeInsets.all(AppConstants.paddingSmall),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: <Widget>[
+                      const Text(
+                        "选择操作",
+                        style:
+                            TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(
+                        height: 22,
+                      ),
+                      if (status == TaskStatus.failed)
+                        _buildButton(
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                            onRetry();
+                          },
+                          text: "重试",
+                        ),
+                      if (status == TaskStatus.running)
+                        _buildButton(
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                            onPause();
+                          },
+                          text: "暂停",
+                        ),
+                      if (status == TaskStatus.paused)
+                        _buildButton(
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                            onResume();
+                          },
+                          text: "继续下载",
+                        ),
+                      if ([TaskStatus.paused, TaskStatus.running,
+                          TaskStatus.failed].contains(status))
+                        const SizedBox(
+                          height: 16,
+                        ),
+                      _buildButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                          _showDeleteConfirmDialog(context);
+                        },
+                        text: "删除",
+                        textColor: Colors.redAccent,
+                      ),
+                      const SizedBox(
+                        height: 16,
+                      ),
+                      _buildButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                        text: "取消",
+                      ),
+                      const SizedBox(
+                        height: 8,
+                      ),
+                    ],
                   ),
-                if (status == TaskStatus.running)
-                  OutlinedButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                      onPause();
-                    },
-                    child: const Text(
-                      "暂停",
-                      style: TextStyle(fontSize: 18),
-                    ),
-                  ),
-                if (status == TaskStatus.paused)
-                  OutlinedButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                      onResume();
-                    },
-                    child: const Text(
-                      "继续下载",
-                      style: TextStyle(fontSize: 18),
-                    ),
-                  ),
-                if ([TaskStatus.paused, TaskStatus.running, TaskStatus.failed]
-                    .contains(status))
-                  const SizedBox(
-                    height: 16,
-                  ),
-                OutlinedButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                    _showDeleteConfirmDialog(context);
-                  },
-                  child: const Text(
-                    "删除",
-                    style: TextStyle(fontSize: 18, color: Colors.redAccent),
-                  ),
                 ),
-                const SizedBox(
-                  height: 16,
-                ),
-                OutlinedButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: const Text(
-                    "取消",
-                    style: TextStyle(fontSize: 18),
-                  ),
-                ),
-                const SizedBox(
-                  height: 8,
-                ),
-              ],
+              ),
             ),
-          ),
+          ],
         ),
+      ),
+    );
+  }
+
+  OutlinedButton _buildButton({
+    required VoidCallback onPressed,
+    required String text,
+    Color? textColor,
+  }) {
+    return OutlinedButton(
+      onPressed: onPressed,
+      style: OutlinedButton.styleFrom(
+        foregroundColor: textColor,
+      ),
+      child: Text(
+        text,
+        style: TextStyle(fontSize: 18, color: textColor),
       ),
     );
   }

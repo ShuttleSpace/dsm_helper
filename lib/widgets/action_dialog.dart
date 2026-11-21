@@ -111,74 +111,78 @@ class ActionDialog extends StatelessWidget {
 
     return Material(
       color: Colors.transparent,
-      child: Card(
-        shape: RoundedRectangleBorder(
-          side: BorderSide(
-            color: theme.colorScheme.onSurface.withValues(alpha: .1),
-          ),
-          borderRadius: BorderRadius.circular(18),
-        ),
-        color: theme.colorScheme.surface,
+      child: SizedBox(
+        width: double.infinity,
         child: SafeArea(
           top: false,
-          child: Padding(
-            padding: const EdgeInsets.all(20),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                // 标题
-                Text(
-                  title,
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w500,
-                    color: theme.colorScheme.onSurface,
+          child: Card(
+            shape: RoundedRectangleBorder(
+              side: BorderSide(
+                color: theme.colorScheme.onSurface.withValues(alpha: .1),
+              ),
+              borderRadius: BorderRadius.circular(18),
+            ),
+            color: theme.colorScheme.surface,
+            child: Padding(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: <Widget>[
+                  // 标题
+                  Text(
+                    title,
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w500,
+                      color: theme.colorScheme.onSurface,
+                    ),
+                    textAlign: TextAlign.center,
                   ),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 12),
-                // 消息
-                Text(
-                  message,
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w400,
-                    color: theme.colorScheme.onSurface.withValues(alpha: .8),
+                  const SizedBox(height: 12),
+                  // 消息
+                  Text(
+                    message,
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w400,
+                      color: theme.colorScheme.onSurface.withValues(alpha: .8),
+                    ),
+                    textAlign: TextAlign.center,
                   ),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 22),
-                // 按钮组
-                Row(
-                  children: [
-                    if (showCancel) ...[
+                  const SizedBox(height: 22),
+                  // 按钮组
+                  Row(
+                    children: [
+                      if (showCancel) ...[
+                        Expanded(
+                          child: NeuButton(
+                            text: cancelText,
+                            onPressed: () {
+                              onCancel?.call();
+                              Navigator.of(context).pop();
+                            },
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                      ],
                       Expanded(
                         child: NeuButton(
-                          text: cancelText,
+                          text: confirmText,
                           onPressed: () {
-                            onCancel?.call();
-                            Navigator.of(context).pop();
+                            onConfirm?.call();
                           },
+                          textColor: confirmTextColor ??
+                              (isDanger
+                                  ? theme.colorScheme.error
+                                  : theme.colorScheme.primary),
                         ),
                       ),
-                      const SizedBox(width: 16),
                     ],
-                    Expanded(
-                      child: NeuButton(
-                        text: confirmText,
-                        onPressed: () {
-                          onConfirm?.call();
-                        },
-                        textColor: confirmTextColor ??
-                            (isDanger
-                                ? theme.colorScheme.error
-                                : theme.colorScheme.primary),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 8),
-              ],
+                  ),
+                  const SizedBox(height: 8),
+                ],
+              ),
             ),
           ),
         ),

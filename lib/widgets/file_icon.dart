@@ -39,7 +39,7 @@ class FileIcon extends StatelessWidget {
       Log.info(thumb);
       return network
           ? CupertinoExtendedImage(
-              "${connectionStore.baseUrl}/webapi/entry.cgi?path=${Uri.encodeComponent(thumb)}&size=medium&api=SYNO.FileStation.Thumb&method=get&version=2&_sid=${connectionStore.sid}&animate=true",
+              "${connectionStore.baseUri}/webapi/entry.cgi?path=${Uri.encodeComponent(thumb)}&size=medium&api=SYNO.FileStation.Thumb&method=get&version=2&_sid=${connectionStore.sid}&animate=true",
               width: width,
               height: height,
               fit: fit,
@@ -63,7 +63,7 @@ class FileIcon extends StatelessWidget {
     } else if (fileType == FileTypeEnum.image) {
       return network
           ? CupertinoExtendedImage(
-              "${connectionStore.baseUrl}/webapi/entry.cgi?path=${Uri.encodeComponent(thumb)}&size=small&api=SYNO.FileStation.Thumb&method=get&version=2&_sid=${connectionStore.sid}&animate=true",
+              "${connectionStore.baseUri}/webapi/entry.cgi?path=${Uri.encodeComponent(thumb)}&size=small&api=SYNO.FileStation.Thumb&method=get&version=2&_sid=${connectionStore.sid}&animate=true",
               width: width,
               height: height,
               fit: fit,

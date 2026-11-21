@@ -1,14 +1,9 @@
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/material.dart';
 
-class MonitorSetting extends StatefulWidget {
+class MonitorSetting extends StatelessWidget {
   const MonitorSetting({super.key});
 
-  @override
-  MonitorSettingState createState() => MonitorSettingState();
-}
-
-class MonitorSettingState extends State<MonitorSetting> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(

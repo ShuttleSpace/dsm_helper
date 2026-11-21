@@ -4,6 +4,7 @@ import 'dart:ui';
 
 import 'package:background_downloader/background_downloader.dart';
 import 'package:garden/pages/download/download.dart';
+import 'package:garden/stores/transfer_store.dart';
 import 'package:garden/util/http_util.dart';
 import 'package:flutter/widgets.dart';
 import 'package:garden/util/log.dart';
@@ -16,6 +17,9 @@ class DownloadStateNotifier {
   final multiSelect = signal<bool>(false);
   final downloadPath = signal<String>('');
   final ReceivePort _receiverPort = ReceivePort();
+  // 回调可能早于 runLoop() 的异步列表加载到达；先按 id 存最新值，合并列表时补回。
+  final _latestUpdates = <String, ({TaskStatus? status, int? progress})>{};
+  bool _refreshing = false;
 
   void addSelectedTask(DownloadInfo task) {
     final currentTasks = [...selectedTasks.value];
@@ -46,10 +50,27 @@ class DownloadStateNotifier {
         });
     bindBackgroundIsolate();
     FileDownloader().registerCallbacks(
-      taskStatusCallback: (update) =>
-          downloadCallback(update.task.taskId, status: update.status),
-      taskProgressCallback: (update) =>
-          downloadCallback(update.task.taskId, progress: update.progress),
+      taskStatusCallback: (update) {
+        transferStore.applyTaskStatusUpdate(update);
+        downloadCallback(update.task.taskId, status: update.status);
+      },
+      taskProgressCallback: (update) {
+        final total = update.hasExpectedFileSize ? update.expectedFileSize : -1;
+        if (total > 0) {
+          transferStore.updateProgress(
+            update.task.taskId,
+            (update.progress * total).toInt(),
+            total,
+            speedBytesPerSecond: update.hasNetworkSpeed
+                ? update.networkSpeed * 1024 * 1024
+                : null,
+            etaSeconds: update.hasTimeRemaining
+                ? update.timeRemaining.inSeconds
+                : null,
+          );
+        }
+        downloadCallback(update.task.taskId, progress: update.progress);
+      },
     );
     runLoop();
   }
@@ -66,17 +87,32 @@ class DownloadStateNotifier {
       Log.debug('UI Isolate Callback: $data');
       String id = data[0];
       TaskStatus status = data[1] ?? TaskStatus.notFound;
-      int progress = data[2] ?? 0;
+      // 进度回调传来的是 0~1 的 double，转成百分比 int；状态回调为 null。
+      final num? rawProgress = data[2] as num?;
 
-      if (tasks.value.isNotEmpty) {
-        final updatedTasks = tasks.value.map((task) {
-          if (task.task.taskId == id) {
-            task.status = status;
-            task.progress = progress;
-          }
-          return task;
-        }).toList();
-        tasks.value = updatedTasks;
+      // 详见 registerCallbacks：isolate 通道只有 status + progress，
+      // 完整 update（速度/ETA/错误）已直接写入 transferStore。
+
+      final previous = _latestUpdates[id] ?? (status: null, progress: null);
+      _latestUpdates[id] = (
+        status: status == TaskStatus.notFound ? previous.status : status,
+        progress: rawProgress == null
+            ? previous.progress
+            : (rawProgress * 100).round(),
+      );
+
+      final latest = _latestUpdates[id]!;
+      final index = tasks.value.indexWhere((t) => t.task.taskId == id);
+      if (index >= 0) {
+        final updated = List<DownloadInfo>.of(tasks.value);
+        updated[index]
+          ..status = latest.status ?? updated[index].status
+          ..progress = latest.progress ?? updated[index].progress;
+        tasks.value = updated;
+      } else if (!_refreshing) {
+        // 新任务或回调早于列表加载：拉一次列表把它带进来（_applyTasks 会补最新值）。
+        _refreshing = true;
+        runLoop().whenComplete(() => _refreshing = false);
       }
     });
   }
@@ -85,22 +121,47 @@ class DownloadStateNotifier {
     IsolateNameServer.removePortNameMapping('downloader_send_port');
   }
 
-  runLoop() async {
-    List<Task> downloadTasks = await FileDownloader().allTasks();
-    tasks.value = downloadTasks
-        .takeWhile((t) => t is DownloadTask)
-        .map((e) => DownloadInfo.formTask(e as DownloadTask))
-        .toList();
-    loading.value = false;
-    Log.debug('runLoop: loading= ${loading.value}');
-    // 如果存在下载中任务，每秒刷新一次
-    if (tasks.value
-        .where((task) =>
-            task.status == TaskStatus.running ||
-            task.status == TaskStatus.enqueued ||
-            task.status == TaskStatus.notFound)
-        .isNotEmpty) {
-    } else {}
+  /// 合并「实时任务」(allTasks，进行中) 与「持久记录」(database，含已完成)。
+  /// allTasks() 完成后即移除，已完成项只能从 database 取。
+  void _applyTasks(List<Task> live, List<TaskRecord> records) {
+    final byId = <String, DownloadInfo>{};
+    for (final rec in records) {
+      final t = rec.task;
+      if (t is! DownloadTask) continue;
+      byId[t.taskId] = DownloadInfo.formTask(t)
+        ..status = rec.status
+        ..progress = (rec.progress * 100).round();
+    }
+    for (final t in live) {
+      if (t is! DownloadTask) continue;
+      byId.putIfAbsent(t.taskId, () => DownloadInfo.formTask(t));
+    }
+    for (final info in byId.values) {
+      final latest = _latestUpdates[info.task.taskId];
+      if (latest == null) continue;
+      if (latest.status != null) info.status = latest.status;
+      if (latest.progress != null) info.progress = latest.progress;
+    }
+    tasks.value = byId.values.toList();
+  }
+
+  /// 删除任务：取消活动任务并移除持久记录（已完成项只在 database 里）。
+  Future<void> deleteTask(String id) async {
+    await FileDownloader().cancelTaskWithId(id);
+    await FileDownloader().database.deleteRecordWithId(id);
+    _latestUpdates.remove(id);
+  }
+
+  Future<void> runLoop() async {
+    try {
+      final live = await FileDownloader().allTasks();
+      final records = await FileDownloader()
+          .database
+          .allRecords(group: FileDownloader.defaultGroup);
+      _applyTasks(live, records);
+    } finally {
+      loading.value = false;
+    }
   }
 
   Future<bool> onWillPop() {

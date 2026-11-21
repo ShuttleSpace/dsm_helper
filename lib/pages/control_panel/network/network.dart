@@ -1,111 +1,104 @@
-import 'package:garden/util/http_util.dart';
+import 'package:garden/api/dsm_api.dart';
 import 'package:garden/util/log.dart';
 import 'package:garden/widgets/bubble_tab_indicator.dart';
 import 'package:garden/widgets/expansion_container.dart';
 import 'package:garden/widgets/label.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:garden/widgets/settings/settings_text_field.dart';
 import 'package:flutter/material.dart';
 import 'package:garden/constants/app_constants.dart';
 import 'package:garden/theme/app_colors.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:signals_hooks/signals_hooks.dart';
 
-class Network extends StatefulWidget {
+class Network extends HookWidget {
   const Network({super.key});
 
   @override
-  NetworkState createState() => NetworkState();
-}
+  Widget build(BuildContext context) {
+    final tickerProvider = useSingleTickerProvider();
+    final tabController = useMemoized(
+      () => TabController(length: 5, vsync: tickerProvider),
+      const [],
+    );
+    final serverNameController = useTextEditingController();
+    final dnsPrimaryController = useTextEditingController();
+    final dnsSecondaryController = useTextEditingController();
+    final proxyHttpHostController = useTextEditingController();
+    final proxyHttpPortController = useTextEditingController();
+    final network = useSignal<Map>({});
+    final proxy = useSignal<Map>({});
+    final gateway = useSignal<Map>({});
+    final dsm = useSignal<Map>({});
+    final ethernets = useSignal<List>([]);
+    final pppoes = useSignal<List>([]);
+    final loading = useSignal(true);
 
-class NetworkState extends State<Network> with SingleTickerProviderStateMixin {
-  final TextEditingController _serverNameController = TextEditingController();
-  final TextEditingController _dnsPrimaryController = TextEditingController();
-  final TextEditingController _dnsSecondaryController = TextEditingController();
-  final TextEditingController _proxyHttpHostController =
-      TextEditingController();
-  final TextEditingController _proxyHttpPortController =
-      TextEditingController();
-  late TabController _tabController;
-  Map network = {};
-  Map proxy = {};
-  Map gateway = {};
-  Map dsm = {};
-  List ethernets = [];
-  List pppoes = [];
-  bool loading = true;
-  @override
-  void initState() {
-    _tabController = TabController(length: 5, vsync: this);
-    getData();
-    super.initState();
-  }
-
-  getData() async {
-    var res = await DsmApi.networkStatus();
-    if (res['success']) {
-      setState(() {
-        loading = false;
-      });
-      List result = res['data']['result'];
-      for (var item in result) {
-        if (item['success'] == true) {
-          switch (item['api']) {
-            case "SYNO.Core.Network":
-              setState(() {
+    getData() async {
+      late Map<String, dynamic> data;
+      try {
+        data = await dsmCoreNetworkStatusForPage();
+      } catch (e) {
+        loading.value = false;
+        return;
+      }
+      {
+        loading.value = false;
+        List result = data['result'] ?? [];
+        for (var item in result) {
+          if (item['success'] == true) {
+            switch (item['api']) {
+              case "SYNO.Core.Network":
                 if (item['data'] != null) {
-                  network = item['data'];
-                  _serverNameController.value =
-                      TextEditingValue(text: network['server_name']);
-                  _dnsPrimaryController.value =
-                      TextEditingValue(text: network['dns_primary']);
-                  _dnsSecondaryController.value =
-                      TextEditingValue(text: network['dns_secondary']);
+                  network.value = item['data'];
+                  serverNameController.value =
+                      TextEditingValue(text: network.value['server_name']);
+                  dnsPrimaryController.value =
+                      TextEditingValue(text: network.value['dns_primary']);
+                  dnsSecondaryController.value =
+                      TextEditingValue(text: network.value['dns_secondary']);
                 }
-              });
-              break;
-            case "SYNO.Core.Network.Ethernet":
-              setState(() {
-                ethernets = item['data'];
-              });
-              break;
-            case "SYNO.Core.Network.PPPoE":
-              setState(() {
-                pppoes = item['data'];
-              });
-              break;
-            case "SYNO.Core.Network.Proxy":
-              setState(() {
-                proxy = item['data'];
-                _proxyHttpHostController.value =
-                    TextEditingValue(text: proxy['http_host']);
-                _proxyHttpPortController.value =
-                    TextEditingValue(text: proxy['http_port']);
-              });
-              break;
-            case "SYNO.Core.Network.Router.Gateway.List":
-              setState(() {
-                gateway = item['data'];
-              });
-              break;
-            case "SYNO.Core.Web.DSM":
-              setState(() {
-                dsm = item['data'];
-                Log.info("Web.DSM: $dsm");
-              });
-              break;
+                break;
+              case "SYNO.Core.Network.Ethernet":
+                ethernets.value = item['data'];
+                break;
+              case "SYNO.Core.Network.PPPoE":
+                pppoes.value = item['data'];
+                break;
+              case "SYNO.Core.Network.Proxy":
+                proxy.value = item['data'];
+                proxyHttpHostController.value =
+                    TextEditingValue(text: proxy.value['http_host']);
+                proxyHttpPortController.value =
+                    TextEditingValue(text: proxy.value['http_port']);
+                break;
+              case "SYNO.Core.Network.Router.Gateway.List":
+                gateway.value = item['data'];
+                break;
+              case "SYNO.Core.Web.DSM":
+                dsm.value = item['data'];
+                Log.info("Web.DSM: ${dsm.value}");
+                break;
+            }
           }
         }
       }
     }
-  }
 
-  @override
-  Widget build(BuildContext context) {
+    useEffect(() {
+      getData();
+      return () {
+        tabController.dispose();
+      };
+    }, const []);
+
     return Scaffold(
       appBar: AppBar(
         leading: AppBackButton(context),
         title: const Text("网络"),
       ),
-      body: loading
+      body: loading.value
           ? const Center(
               child: CupertinoActivityIndicator(
                 radius: 14,
@@ -122,7 +115,7 @@ class NetworkState extends State<Network> with SingleTickerProviderStateMixin {
                   child: TabBar(
                     dividerHeight: 0,
                     isScrollable: true,
-                    controller: _tabController,
+                    controller: tabController,
                     indicatorSize: TabBarIndicatorSize.label,
                     labelColor: Theme.brightnessOf(context) == Brightness.dark
                         ? Colors.white
@@ -160,7 +153,7 @@ class NetworkState extends State<Network> with SingleTickerProviderStateMixin {
                 ),
                 Expanded(
                   child: TabBarView(
-                    controller: _tabController,
+                    controller: tabController,
                     children: [
                       ListView(
                         children: [
@@ -189,44 +182,31 @@ class NetworkState extends State<Network> with SingleTickerProviderStateMixin {
                                   const SizedBox(
                                     height: 20,
                                   ),
-                                  Card(
-                                    shape: RoundedRectangleBorder(
-                                        side: const BorderSide(),
-                                        borderRadius:
-                                            BorderRadius.circular(18)),
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(
-                                          AppConstants.paddingSmall),
-                                      child: TextField(
-                                        controller: _serverNameController,
-                                        onChanged: (v) =>
-                                            network['server_name'] = v,
-                                        decoration: const InputDecoration(
-                                          border: InputBorder.none,
-                                          labelText: '系统名称',
-                                        ),
-                                      ),
-                                    ),
+                                  SettingsTextField(
+                                    controller: serverNameController,
+                                    label: "系统名称",
+                                    onChanged: (v) =>
+                                        network.value['server_name'] = v,
                                   ),
                                   const SizedBox(
                                     height: 20,
                                   ),
-                                  Text("默认网关(gateway): ${network['gateway']}"),
+                                  Text(
+                                      "默认网关(gateway): ${network.value['gateway']}"),
                                   const SizedBox(
                                     height: 5,
                                   ),
                                   Text(
-                                      "IPv6默认网关: ${network['v6gateway'] == "" ? "-" : network['v6gateway']}"),
+                                      "IPv6默认网关: ${network.value['v6gateway'] == "" ? "-" : network.value['v6gateway']}"),
                                   const SizedBox(
                                     height: 20,
                                   ),
                                   GestureDetector(
                                     onTap: () {
                                       FocusScope.of(context).unfocus();
-                                      setState(() {
-                                        network['dns_manual'] =
-                                            !network['dns_manual'];
-                                      });
+                                      network.value['dns_manual'] =
+                                          !network.value['dns_manual'];
+                                      network.notifyListeners();
                                     },
                                     child: Card(
                                       shape: RoundedRectangleBorder(
@@ -240,7 +220,7 @@ class NetworkState extends State<Network> with SingleTickerProviderStateMixin {
                                           children: [
                                             const Text("手动配置DNS服务器"),
                                             const Spacer(),
-                                            if (network['dns_manual'])
+                                            if (network.value['dns_manual'])
                                               const Icon(
                                                 CupertinoIcons.checkmark_alt,
                                                 color: AppColors.primaryAction,
@@ -254,48 +234,22 @@ class NetworkState extends State<Network> with SingleTickerProviderStateMixin {
                                   const SizedBox(
                                     height: 20,
                                   ),
-                                  Card(
-                                    shape: RoundedRectangleBorder(
-                                        side: const BorderSide(),
-                                        borderRadius:
-                                            BorderRadius.circular(18)),
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(
-                                          AppConstants.paddingSmall),
-                                      child: TextField(
-                                        controller: _dnsPrimaryController,
-                                        enabled: network['dns_manual'],
-                                        onChanged: (v) =>
-                                            network['dns_primary'] = v,
-                                        decoration: const InputDecoration(
-                                          border: InputBorder.none,
-                                          labelText: '首选DNS服务器',
-                                        ),
-                                      ),
-                                    ),
+                                  SettingsTextField(
+                                    controller: dnsPrimaryController,
+                                    label: "首选DNS服务器",
+                                    onChanged: (v) =>
+                                        network.value['dns_primary'] = v,
+                                    enabled: network.value['dns_manual'],
                                   ),
                                   const SizedBox(
                                     height: 20,
                                   ),
-                                  Card(
-                                    shape: RoundedRectangleBorder(
-                                        side: const BorderSide(),
-                                        borderRadius:
-                                            BorderRadius.circular(18)),
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(
-                                          AppConstants.paddingSmall),
-                                      child: TextField(
-                                        controller: _dnsSecondaryController,
-                                        enabled: network['dns_manual'],
-                                        onChanged: (v) =>
-                                            network['dns_secondary'] = v,
-                                        decoration: const InputDecoration(
-                                          border: InputBorder.none,
-                                          labelText: '备用DNS服务器',
-                                        ),
-                                      ),
-                                    ),
+                                  SettingsTextField(
+                                    controller: dnsSecondaryController,
+                                    label: "备用DNS服务器",
+                                    onChanged: (v) =>
+                                        network.value['dns_secondary'] = v,
+                                    enabled: network.value['dns_manual'],
                                   ),
                                 ],
                               ),
@@ -328,9 +282,9 @@ class NetworkState extends State<Network> with SingleTickerProviderStateMixin {
                                   GestureDetector(
                                     onTap: () {
                                       FocusScope.of(context).unfocus();
-                                      setState(() {
-                                        proxy['enable'] = !proxy['enable'];
-                                      });
+                                      proxy.value['enable'] =
+                                          !proxy.value['enable'];
+                                      proxy.notifyListeners();
                                     },
                                     child: Card(
                                       shape: RoundedRectangleBorder(
@@ -344,7 +298,7 @@ class NetworkState extends State<Network> with SingleTickerProviderStateMixin {
                                           children: [
                                             const Text("手动配置DNS服务器"),
                                             const Spacer(),
-                                            if (proxy['enable'])
+                                            if (proxy.value['enable'])
                                               const Icon(
                                                 CupertinoIcons.checkmark_alt,
                                                 color: AppColors.primaryAction,
@@ -358,48 +312,22 @@ class NetworkState extends State<Network> with SingleTickerProviderStateMixin {
                                   const SizedBox(
                                     height: 20,
                                   ),
-                                  Card(
-                                    shape: RoundedRectangleBorder(
-                                        side: const BorderSide(),
-                                        borderRadius:
-                                            BorderRadius.circular(18)),
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(
-                                          AppConstants.paddingSmall),
-                                      child: TextField(
-                                        controller: _proxyHttpHostController,
-                                        enabled: proxy['enable'],
-                                        onChanged: (v) =>
-                                            proxy['http_host'] = v,
-                                        decoration: const InputDecoration(
-                                          border: InputBorder.none,
-                                          labelText: '地址',
-                                        ),
-                                      ),
-                                    ),
+                                  SettingsTextField(
+                                    controller: proxyHttpHostController,
+                                    label: "地址",
+                                    onChanged: (v) =>
+                                        proxy.value['http_host'] = v,
+                                    enabled: proxy.value['enable'],
                                   ),
                                   const SizedBox(
                                     height: 20,
                                   ),
-                                  Card(
-                                    shape: RoundedRectangleBorder(
-                                        side: const BorderSide(),
-                                        borderRadius:
-                                            BorderRadius.circular(18)),
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(
-                                          AppConstants.paddingSmall),
-                                      child: TextField(
-                                        controller: _proxyHttpPortController,
-                                        enabled: proxy['enable'],
-                                        onChanged: (v) =>
-                                            proxy['http_port'] = v,
-                                        decoration: const InputDecoration(
-                                          border: InputBorder.none,
-                                          labelText: '端口',
-                                        ),
-                                      ),
-                                    ),
+                                  SettingsTextField(
+                                    controller: proxyHttpPortController,
+                                    label: "端口",
+                                    onChanged: (v) =>
+                                        proxy.value['http_port'] = v,
+                                    enabled: proxy.value['enable'],
                                   ),
                                 ],
                               ),
@@ -412,7 +340,7 @@ class NetworkState extends State<Network> with SingleTickerProviderStateMixin {
                       ),
                       ListView(
                         children: [
-                          ...ethernets.map((ethernet) {
+                          ...ethernets.value.map((ethernet) {
                             return Card(
                               shape: RoundedRectangleBorder(
                                   side: const BorderSide(),
@@ -426,7 +354,7 @@ class NetworkState extends State<Network> with SingleTickerProviderStateMixin {
                                     Row(
                                       children: [
                                         Text(
-                                          "局域网${ethernets.indexOf(ethernet) + 1}",
+                                          "局域网${ethernets.value.indexOf(ethernet) + 1}",
                                           style: const TextStyle(
                                               fontSize: 18,
                                               fontWeight: FontWeight.w600),
@@ -534,7 +462,7 @@ class NetworkState extends State<Network> with SingleTickerProviderStateMixin {
                               ),
                             );
                           }),
-                          ...pppoes.map((pppoe) {
+                          ...pppoes.value.map((pppoe) {
                             return Card(
                               shape: RoundedRectangleBorder(
                                   side: const BorderSide(),

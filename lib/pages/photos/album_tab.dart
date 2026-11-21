@@ -11,85 +11,77 @@ import 'package:garden/util/log.dart';
 import 'package:garden/widgets/cupertino_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:garden/constants/app_constants.dart';
 import 'package:garden/theme/app_colors.dart';
+import 'package:signals_hooks/signals_hooks.dart';
 
-class AlbumTab extends StatefulWidget {
+class AlbumTab extends HookWidget {
   const AlbumTab(this.isTeam, {super.key});
   final bool isTeam;
-  @override
-  State<AlbumTab> createState() => AlbumTabState();
-}
-
-class AlbumTabState extends State<AlbumTab> {
-  bool isTeam = false;
-  List<AlbumModel> albums = [];
-  List<PhotoModel> recentlyAdds = [];
-  List<PhotoModel> videos = [];
-  List<GeocodingModel> geocodings = [];
-  List<GeneralTagModel> generalTags = [];
-  double albumWidth = 0;
-  @override
-  void initState() {
-    isTeam = widget.isTeam;
-    getData(isTeam: isTeam);
-    getAlbum();
-    super.initState();
-  }
-
-  getData({bool isTeam = false}) {
-    this.isTeam = isTeam;
-    setState(() {
-      recentlyAdds = [];
-      videos = [];
-      geocodings = [];
-      generalTags = [];
-    });
-    getRecently();
-    getVideos();
-    getGeocoding();
-    getGeneral();
-  }
-
-  getAlbum() async {
-    albums = await AlbumModel.fetch(
-        additional: ["sharing_info", "thumbnail"], limit: 100, isTeam: isTeam);
-    Log.debug("相册：${albums.length}");
-    setState(() {});
-  }
-
-  getRecently() async {
-    recentlyAdds = await PhotoModel.recentlyAdd(
-        limit: 4, isTeam: isTeam, additional: ['thumbnail'], type: 'photo');
-    Log.debug("最近添加：${recentlyAdds.length}");
-    setState(() {});
-  }
-
-  getVideos() async {
-    videos = await PhotoModel.fetch(
-        limit: 4, isTeam: isTeam, additional: ['thumbnail'], type: 'video');
-    Log.debug("视频：${recentlyAdds.length}");
-    setState(() {});
-  }
-
-  getShares() async {}
-  getGeocoding() async {
-    geocodings = await GeocodingModel.fetch(
-        limit: 4, isTeam: isTeam, additional: ['thumbnail']);
-    Log.debug("位置：${recentlyAdds.length}");
-    setState(() {});
-  }
-
-  getGeneral() async {
-    generalTags = await GeneralTagModel.fetch(
-        limit: 4, isTeam: isTeam, additional: ['thumbnail']);
-    Log.debug("标签：${recentlyAdds.length}");
-    setState(() {});
-  }
 
   @override
   Widget build(BuildContext context) {
-    albumWidth = MediaQuery.sizeOf(context).width / 5;
+    final albums = useSignal<List<AlbumModel>>([]);
+    final recentlyAdds = useSignal<List<PhotoModel>>([]);
+    final videos = useSignal<List<PhotoModel>>([]);
+    final geocodings = useSignal<List<GeocodingModel>>([]);
+    final generalTags = useSignal<List<GeneralTagModel>>([]);
+    final albumWidth = MediaQuery.sizeOf(context).width / 5;
+
+    getAlbum() async {
+      albums.value = await AlbumModel.fetch(
+          additional: ["sharing_info", "thumbnail"],
+          limit: 100,
+          isTeam: isTeam);
+      Log.debug("相册：${albums.value.length}");
+    }
+
+    getRecently() async {
+      recentlyAdds.value = await PhotoModel.recentlyAdd(
+          limit: 4, isTeam: isTeam, additional: ['thumbnail'], type: 'photo');
+      Log.debug("最近添加：${recentlyAdds.value.length}");
+    }
+
+    getVideos() async {
+      videos.value = await PhotoModel.fetch(
+          limit: 4, isTeam: isTeam, additional: ['thumbnail'], type: 'video');
+      Log.debug("视频：${videos.value.length}");
+    }
+
+    getGeocoding() async {
+      geocodings.value = await GeocodingModel.fetch(
+          limit: 4, isTeam: isTeam, additional: ['thumbnail']);
+      Log.debug("位置：${geocodings.value.length}");
+    }
+
+    getGeneral() async {
+      generalTags.value = await GeneralTagModel.fetch(
+          limit: 4, isTeam: isTeam, additional: ['thumbnail']);
+      Log.debug("标签：${generalTags.value.length}");
+    }
+
+    getData() {
+      recentlyAdds.value = [];
+      videos.value = [];
+      geocodings.value = [];
+      generalTags.value = [];
+      getRecently();
+      getVideos();
+      getGeocoding();
+      getGeneral();
+    }
+
+    useEffect(() {
+      getAlbum();
+      return null;
+    }, const []);
+
+    useEffect(() {
+      getData();
+      return null;
+    }, [isTeam]);
+
     return ListView(
       padding: const EdgeInsets.all(20),
       children: [
@@ -109,7 +101,7 @@ class AlbumTabState extends State<AlbumTab> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   ThumbnailCard(
-                    geocodings
+                    geocodings.value
                         .takeWhile((t) =>
                             t.additional != null &&
                             t.additional!.thumbnail != null)
@@ -142,7 +134,7 @@ class AlbumTabState extends State<AlbumTab> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   ThumbnailCard(
-                    generalTags
+                    generalTags.value
                         .takeWhile((t) =>
                             t.additional != null &&
                             t.additional!.thumbnail != null)
@@ -167,15 +159,14 @@ class AlbumTabState extends State<AlbumTab> {
               onTap: () {
                 Navigator.of(context)
                     .push(CupertinoPageRoute(builder: (context) {
-                  return TimelinePage(
-                      title: "视频", type: 'video', isTeam: widget.isTeam);
+                  return TimelinePage(title: "视频", type: 'video', isTeam: isTeam);
                 }));
               },
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   ThumbnailCard(
-                    videos
+                    videos.value
                         .takeWhile((t) =>
                             t.additional != null &&
                             t.additional!.thumbnail != null)
@@ -201,14 +192,14 @@ class AlbumTabState extends State<AlbumTab> {
                 Navigator.of(context)
                     .push(CupertinoPageRoute(builder: (context) {
                   return TimelinePage(
-                      title: "最近添加", isTeam: widget.isTeam, recentlyAdd: true);
+                      title: "最近添加", isTeam: isTeam, recentlyAdd: true);
                 }));
               },
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   ThumbnailCard(
-                    recentlyAdds
+                    recentlyAdds.value
                         .takeWhile((t) =>
                             t.additional != null &&
                             t.additional!.thumbnail != null)
@@ -234,7 +225,7 @@ class AlbumTabState extends State<AlbumTab> {
         const SizedBox(
           height: 20,
         ),
-        ...albums.map((e) {
+        ...albums.value.map((e) {
           return GestureDetector(
             onTap: () {
               Navigator.of(context).push(CupertinoPageRoute(builder: (context) {

@@ -1,44 +1,43 @@
 import 'package:garden/theme/app_theme.dart';
 import 'package:garden/util/log.dart';
 import 'package:garden/util/ui_util.dart';
-import 'package:garden/util/http_util.dart';
+import 'package:garden/api/dsm_api.dart';
+import 'package:garden/widgets/name_input_dialog.dart';
+import 'package:garden/util/file_types.dart';
 import 'package:garden/widgets/file_icon.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_vibrate/flutter_vibrate.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:signals_hooks/signals_hooks.dart';
 
-class Favorite extends StatefulWidget {
+class Favorite extends HookWidget {
   final Function callback;
   const Favorite(this.callback, {super.key});
-  @override
-  FavoriteState createState() => FavoriteState();
-}
 
-class FavoriteState extends State<Favorite> {
-  bool favoriteLoading = true;
-  List favorites = [];
   @override
-  void initState() {
-    getData();
-    super.initState();
-  }
+  Widget build(BuildContext context) {
+    final favoriteLoading = useSignal(true);
+    final favorites = useSignal<List>([]);
 
-  getData() async {
-    setState(() {
-      favoriteLoading = true;
-    });
-    var res = await DsmApi.favoriteList();
-    setState(() {
-      favoriteLoading = false;
-    });
-    if (res['success']) {
-      setState(() {
-        favorites = res['data']['favorites'];
-      });
+    getData() async {
+      favoriteLoading.value = true;
+      try {
+        final data = await dsmFileStationFavoriteListForPage();
+        favorites.value = data['favorites'] ?? [];
+      } catch (e) {
+        // 旧层失败时保持空列表。
+      } finally {
+        favoriteLoading.value = false;
+      }
     }
-  }
 
-  Widget _buildFavoriteItem(favorite) {
+    useEffect(() {
+      getData();
+      return null;
+    }, const []);
+
+  Widget buildFavoriteItem(favorite) {
     return Padding(
       padding: const EdgeInsets.only(top: 20.0),
       child: OutlinedButton(
@@ -47,7 +46,7 @@ class FavoriteState extends State<Favorite> {
             UiUtil.toast("文件或目录不存在");
           } else {
             Navigator.of(context).pop(favorite['path']);
-            widget.callback(favorite['path']);
+            callback(favorite['path']);
           }
         },
         child: Padding(
@@ -70,7 +69,9 @@ class FavoriteState extends State<Favorite> {
                   showCupertinoModalPopup(
                     context: context,
                     builder: (context) {
-                      return Material(
+                      return SizedBox(
+                        width: double.infinity,
+                        child: Material(
                         color: Colors.transparent,
                         child: Card(
                           shape: RoundedRectangleBorder(
@@ -104,160 +105,41 @@ class FavoriteState extends State<Favorite> {
                                         child: OutlinedButton(
                                           onPressed: () async {
                                             Log.debug(favorite['path']);
-                                            TextEditingController
-                                                nameController =
-                                                TextEditingController.fromValue(
-                                                    TextEditingValue(
-                                                        text:
-                                                            favorite['name']));
                                             Navigator.of(context).pop();
-                                            String name = "";
                                             showCupertinoDialog(
                                               context: context,
-                                              builder: (context) {
-                                                return Material(
-                                                  color: Colors.transparent,
-                                                  child: Column(
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment
-                                                            .center,
-                                                    children: [
-                                                      Card(
-                                                        shape: RoundedRectangleBorder(
-                                                            side:
-                                                                const BorderSide(),
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .circular(
-                                                                        5)),
-                                                        margin: const EdgeInsets
-                                                            .symmetric(
-                                                            horizontal: 50),
-                                                        child: Padding(
-                                                          padding:
-                                                              const EdgeInsets
-                                                                  .all(20),
-                                                          child: Column(
-                                                            children: [
-                                                              const Text(
-                                                                "重命名",
-                                                                style: TextStyle(
-                                                                    fontSize:
-                                                                        20,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .w500),
-                                                              ),
-                                                              const SizedBox(
-                                                                height: 16,
-                                                              ),
-                                                              Card(
-                                                                shape: RoundedRectangleBorder(
-                                                                    side:
-                                                                        const BorderSide(),
-                                                                    borderRadius:
-                                                                        BorderRadius.circular(
-                                                                            5)),
-                                                                child: Padding(
-                                                                  padding:
-                                                                      const EdgeInsets
-                                                                          .all(
-                                                                          8.0),
-                                                                  child:
-                                                                      TextField(
-                                                                    onChanged:
-                                                                        (v) =>
-                                                                            name =
-                                                                                v,
-                                                                    controller:
-                                                                        nameController,
-                                                                    decoration:
-                                                                        const InputDecoration(
-                                                                      border: InputBorder
-                                                                          .none,
-                                                                      hintText:
-                                                                          "请输入新的名称",
-                                                                      labelText:
-                                                                          "文件名",
-                                                                    ),
-                                                                  ),
-                                                                ),
-                                                              ),
-                                                              const SizedBox(
-                                                                height: 16,
-                                                              ),
-                                                              Row(
-                                                                children: [
-                                                                  Expanded(
-                                                                    child:
-                                                                        OutlinedButton(
-                                                                      onPressed:
-                                                                          () async {
-                                                                        if (name.trim() ==
-                                                                            "") {
-                                                                          UiUtil.toast(
-                                                                              "请输入新文件名");
-                                                                          return;
-                                                                        }
-                                                                        Navigator.of(context)
-                                                                            .pop();
-                                                                        var res = await DsmApi.favoriteRename(
-                                                                            favorite['path'],
-                                                                            name);
-                                                                        if (res[
-                                                                            'success']) {
-                                                                          UiUtil.toast(
-                                                                              "重命名成功");
-                                                                          getData();
-                                                                        } else {
-                                                                          if (res['error']['errors'] != null &&
-                                                                              res['error']['errors'].length > 0 &&
-                                                                              res['error']['errors'][0]['code'] == 414) {
-                                                                            UiUtil.toast("重命名失败：指定的名称已存在");
-                                                                          } else {
-                                                                            UiUtil.toast("重命名失败");
-                                                                          }
-                                                                        }
-                                                                      },
-                                                                      child:
-                                                                          const Text(
-                                                                        "确定",
-                                                                        style: TextStyle(
-                                                                            fontSize:
-                                                                                18),
-                                                                      ),
-                                                                    ),
-                                                                  ),
-                                                                  const SizedBox(
-                                                                    width: 16,
-                                                                  ),
-                                                                  Expanded(
-                                                                    child:
-                                                                        OutlinedButton(
-                                                                      onPressed:
-                                                                          () async {
-                                                                        Navigator.of(context)
-                                                                            .pop();
-                                                                      },
-                                                                      child:
-                                                                          const Text(
-                                                                        "取消",
-                                                                        style: TextStyle(
-                                                                            fontSize:
-                                                                                18),
-                                                                      ),
-                                                                    ),
-                                                                  ),
-                                                                ],
-                                                              )
-                                                            ],
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                );
-                                              },
+                                              builder: (context) =>
+                                                  NameInputDialog(
+                                                title: "重命名",
+                                                onConfirm: (name) async {
+                                                  try {
+                                                    await dsmControlPanelGet({
+                                                      "api":
+                                                          '"SYNO.FileStation.Favorite"',
+                                                      "method": '"edit"',
+                                                      "version": 2,
+                                                      "path": favorite['path'],
+                                                      "name": name,
+                                                      "index": -1,
+                                                    });
+                                                    UiUtil.toast("重命名成功");
+                                                    getData();
+                                                  } catch (e) {
+                                                    final raw = e is DSMException
+                                                        ? e.rawError
+                                                        : null;
+                                                    final errors =
+                                                        raw?['errors'] as List?;
+                                                    if (errors != null &&
+                                                        errors.isNotEmpty &&
+                                                        errors[0]['code'] == 414) {
+                                                      UiUtil.toast("重命名失败：指定的名称已存在");
+                                                    } else {
+                                                      UiUtil.toast("重命名失败");
+                                                    }
+                                                  }
+                                                },
+                                              ),
                                             );
                                           },
                                           child: Column(
@@ -287,7 +169,9 @@ class FavoriteState extends State<Favorite> {
                                             showCupertinoModalPopup(
                                               context: context,
                                               builder: (context) {
-                                                return Material(
+                                                return SizedBox(
+                                                  width: double.infinity,
+                                                  child: Material(
                                                   color: Colors.transparent,
                                                   child: Card(
                                                     shape: RoundedRectangleBorder(
@@ -336,17 +220,17 @@ class FavoriteState extends State<Favorite> {
                                                                     Navigator.of(
                                                                             context)
                                                                         .pop();
-                                                                    var res = await DsmApi
-                                                                        .favoriteDelete(
-                                                                            favorite['path']);
-                                                                    if (res[
-                                                                        'success']) {
+                                                                    try {
+                                                                      await dsmFileStationFavoriteDeleteForPage(
+                                                                          favorite['path']);
                                                                       UiUtil.vibrate(
                                                                           FeedbackType
                                                                               .light);
                                                                       UiUtil.toast(
                                                                           "取消收藏成功");
                                                                       getData();
+                                                                    } catch (e) {
+                                                                      UiUtil.toast("取消收藏失败");
                                                                     }
                                                                   },
                                                                   child:
@@ -390,6 +274,7 @@ class FavoriteState extends State<Favorite> {
                                                       ),
                                                     ),
                                                   ),
+                                                ),
                                                 );
                                               },
                                             );
@@ -430,6 +315,7 @@ class FavoriteState extends State<Favorite> {
                             ),
                           ),
                         ),
+                      ),
                       );
                     },
                   );
@@ -447,13 +333,11 @@ class FavoriteState extends State<Favorite> {
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
     return Container(
       width: MediaQuery.sizeOf(context).width * 0.7,
       height: MediaQuery.sizeOf(context).height,
       color: Theme.of(context).scaffoldBackgroundColor,
-      child: favoriteLoading
+      child: favoriteLoading.value
           ? const Center(
               child: CupertinoActivityIndicator(
                 radius: 14,
@@ -463,16 +347,16 @@ class FavoriteState extends State<Favorite> {
               height: double.infinity,
               color: Theme.of(context).scaffoldBackgroundColor,
               width: MediaQuery.sizeOf(context).width * 0.7,
-              child: favorites.isNotEmpty
+              child: favorites.value.isNotEmpty
                   ? ListView.builder(
                       padding: EdgeInsets.only(
                           left: 20,
                           right: 20,
                           top: MediaQuery.of(context).padding.top),
                       itemBuilder: (context, i) {
-                        return _buildFavoriteItem(favorites[i]);
+                        return buildFavoriteItem(favorites.value[i]);
                       },
-                      itemCount: favorites.length,
+                      itemCount: favorites.value.length,
                     )
                   : Center(
                       child: Text(

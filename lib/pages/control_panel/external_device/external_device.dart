@@ -1,64 +1,62 @@
+import 'package:dio/dio.dart';
+import 'package:garden/extensions/int.dart';
+import 'package:garden/api/dsm_api.dart';
 import 'package:garden/theme/app_theme.dart';
+import 'package:garden/util/log.dart';
 import 'package:garden/util/ui_util.dart';
-import 'package:garden/util/http_util.dart';
 import 'package:garden/widgets/bubble_tab_indicator.dart';
 import 'package:garden/widgets/label.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:garden/constants/app_constants.dart';
-import 'package:garden/theme/app_colors.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:signals_hooks/signals_hooks.dart';
 
-class ExternalDevice extends StatefulWidget {
+class ExternalDevice extends HookWidget {
   const ExternalDevice({super.key});
 
   @override
-  ExternalDeviceState createState() => ExternalDeviceState();
-}
+  Widget build(BuildContext context) {
+    final tickerProvider = useSingleTickerProvider();
+    final tabController = useMemoized(
+      () => TabController(length: 2, vsync: tickerProvider),
+      const [],
+    );
+    final esatas = useListSignal([]);
+    final usbs = useListSignal([]);
+    final loading = useSignal(true);
 
-class ExternalDeviceState extends State<ExternalDevice>
-    with SingleTickerProviderStateMixin {
-  late TabController _tabController;
-  List esatas = [];
-  List usbs = [];
-  bool loading = true;
-  @override
-  void initState() {
-    _tabController = TabController(length: 2, vsync: this);
-    getData();
-    super.initState();
-  }
-
-  getData() async {
-    var res = await DsmApi.externalDevice();
-    if (res['success']) {
-      setState(() {
-        loading = false;
-      });
+    getData() async {
+    try {
+      final res = await dsmCoreExternalDeviceList();
+      loading.value = false;
       List result = res['data']['result'];
       for (var item in result) {
         if (item['success'] == true) {
           switch (item['api']) {
             case "SYNO.Core.ExternalDevice.Storage.eSATA":
-              setState(() {
-                esatas = item['data']['devices'];
-              });
+              esatas.clear();
+              esatas.addAll(item['data']['devices']);
               break;
             case "SYNO.Core.ExternalDevice.Storage.USB":
-              setState(() {
-                usbs = item['data']['devices'];
-              });
+              usbs.clear();
+              usbs.addAll(item['data']['devices']);
               break;
           }
         }
       }
-    } else {
-      UiUtil.toast("获取外接设备失败，code${res['error']['code']}");
+    } on DioException catch (e) {
+      UiUtil.toast('获取外接设备失败, $e');
+      Log.error('获取外接设备失败, $e');
+    } on DSMException catch (e) {
+      UiUtil.toast("获取外接设备失败, $e}");
+      Log.error('获取外接设备失败, $e');
     }
   }
 
-  Widget _buildPartitionItem(partition) {
+  Widget buildPartitionItem(partition) {
     return Card(
       shape: RoundedRectangleBorder(
           side: const BorderSide(), borderRadius: BorderRadius.circular(18)),
@@ -168,17 +166,17 @@ class ExternalDeviceState extends State<ExternalDevice>
                         height: 5,
                       ),
                       Text(
-                          "已用：${(partition['used_size_mb'] * 1024 * 1024).formatSize()}"),
+                          "已用：${((partition['used_size_mb'] as num) * 1024 * 1024).formatSize()}"),
                       const SizedBox(
                         height: 5,
                       ),
                       Text(
-                          "可用：${(partition['total_size_mb'] * 1024 * 1024 - partition['used_size_mb'] * 1024 * 1024).formatSize()}"),
+                          "可用：${(((partition['total_size_mb'] as num) - (partition['used_size_mb'] as num)) * 1024 * 1024).formatSize()}"),
                       const SizedBox(
                         height: 5,
                       ),
                       Text(
-                          "容量：${(partition['total_size_mb'] * 1024 * 1024).formatSize()}"),
+                          "容量：${((partition['total_size_mb'] as num) * 1024 * 1024).formatSize()}"),
                     ],
                   ),
                 )
@@ -190,7 +188,7 @@ class ExternalDeviceState extends State<ExternalDevice>
     );
   }
 
-  Widget _buildESataItem(esata) {
+  Widget buildESataItem(esata) {
     List partitions = esata['partitions'];
     return Card(
       shape: RoundedRectangleBorder(
@@ -227,7 +225,8 @@ class ExternalDeviceState extends State<ExternalDevice>
                 const Spacer(),
                 OutlinedButton(
                   onPressed: () async {
-                    var res = await DsmApi.ejectEsata(esata['dev_id']);
+                    var res = await dsmCoreExternalDeviceEject(
+                        esata['dev_id'], esata['dev_type']);
                     if (res['success']) {
                       UiUtil.toast("设备已退出");
                       getData();
@@ -235,27 +234,32 @@ class ExternalDeviceState extends State<ExternalDevice>
                       UiUtil.toast("设备退出失败，代码${res['error']['code']}");
                     }
                   },
-                  child: const SizedBox(
+                  child: SizedBox(
                     width: 20,
                     height: 20,
                     child: Icon(
                       CupertinoIcons.eject,
-                      color: AppColors.primaryAction,
+                      color: Theme.of(context).colorScheme.primary,
                       size: 16,
                     ),
                   ),
                 ),
               ],
             ),
-            ...partitions.map(_buildPartitionItem),
+            ...partitions.map(buildPartitionItem),
           ],
         ),
       ),
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
+    useEffect(() {
+      getData();
+      return () {
+        tabController.dispose();
+      };
+    }, const []);
+
     return Scaffold(
       appBar: AppBar(
         leading: AppBackButton(context),
@@ -273,7 +277,7 @@ class ExternalDeviceState extends State<ExternalDevice>
               child: TabBar(
                 dividerHeight: 0,
                 isScrollable: false,
-                controller: _tabController,
+                controller: tabController,
                 indicatorSize: TabBarIndicatorSize.label,
                 labelColor: Theme.brightnessOf(context) == Brightness.dark
                     ? Colors.white
@@ -295,9 +299,9 @@ class ExternalDeviceState extends State<ExternalDevice>
           ),
           Expanded(
             child: TabBarView(
-              controller: _tabController,
+              controller: tabController,
               children: [
-                loading
+                loading.value
                     ? const Center(
                         child: CupertinoActivityIndicator(
                           radius: 14,
@@ -307,7 +311,7 @@ class ExternalDeviceState extends State<ExternalDevice>
                         ? ListView.separated(
                             padding: const EdgeInsets.all(20),
                             itemBuilder: (context, i) {
-                              return _buildESataItem((esatas + usbs)[i]);
+                              return buildESataItem((esatas + usbs)[i]);
                             },
                             separatorBuilder: (context, i) {
                               return const SizedBox(

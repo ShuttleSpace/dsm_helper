@@ -1,197 +1,192 @@
 import 'dart:math';
 import 'package:garden/util/log.dart';
+import 'package:garden/widgets/bottom_option_sheet.dart';
+import 'package:garden/widgets/settings/settings_toggle_tile.dart';
 import 'package:garden/util/ui_util.dart';
 
-import 'package:garden/util/http_util.dart';
+import 'package:garden/extensions/int.dart';
+import 'package:garden/api/dsm_api.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:garden/widgets/settings/settings_text_field.dart';
 import 'package:flutter/material.dart';
 import 'package:garden/constants/app_constants.dart';
-import 'package:garden/theme/app_colors.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:signals_hooks/signals_hooks.dart';
 
-class AddSharedFolders extends StatefulWidget {
+class AddSharedFolders extends HookWidget {
   final List volumes;
   final Map? folder;
   const AddSharedFolders(this.volumes, {super.key, this.folder});
-  @override
-  AddSharedFoldersState createState() => AddSharedFoldersState();
-}
-
-class AddSharedFoldersState extends State<AddSharedFolders> {
-  TextEditingController volumeController = TextEditingController();
-  TextEditingController nameController = TextEditingController();
-  TextEditingController descController = TextEditingController();
-  TextEditingController passwordController = TextEditingController();
-  TextEditingController confirmPasswordController = TextEditingController();
-  TextEditingController shareQuotaController = TextEditingController();
-  List<String> units = ["TB", "GB", "MB"];
-  int selectedUnitIndex = 1;
-  TextEditingController unitController = TextEditingController();
-  bool creating = false;
-  String oldName = '';
-  String name = "";
-  String desc = "";
-  int selectedVolumeIndex = 0;
-  bool hidden = false;
-  bool hideUnreadable = false;
-  bool recycleBin = false;
-  bool recycleBinAdminOnly = false;
-  bool enableShareCow = false;
-  bool enableShareCompress = false;
-  bool encryption = false;
-  String password = "";
-  String confirmPassword = "";
-  bool enableShareQuota = false;
-  num shareQuotaUsed = 0;
-  String shareQuota = "";
-  bool loading = false;
-  @override
-  void initState() {
-    if (widget.folder != null) {
-      getFolderDetail(widget.folder?['name']);
-    }
-
-    volumeController.text =
-        "${widget.volumes[selectedVolumeIndex]['display_name']}(可用容量：${int.parse(widget.volumes[selectedVolumeIndex]['size_free_byte']).formatSize()}) - ${widget.volumes[selectedVolumeIndex]['fs_type']}";
-    unitController.text = units[selectedUnitIndex];
-    super.initState();
-  }
-
-  getFolderDetail(String folderName) async {
-    setState(() {
-      loading = true;
-    });
-    var res = await DsmApi.shareDetail(folderName);
-    if (res['success']) {
-      var folder = res['data'];
-      nameController.text = name = oldName = folder['name'];
-      descController.text = desc = folder['desc'];
-      hidden = folder['hidden'];
-      hideUnreadable = folder['hide_unreadable'];
-
-      recycleBin = folder['enable_recycle_bin'];
-      recycleBinAdminOnly = folder['recycle_bin_admin_only'];
-      encryption = folder['encryption'] == 1;
-      if (folder['quota_value'] > 0) {
-        enableShareQuota = true;
-        if (folder['quota_value'] < 1024) {
-          selectedUnitIndex = 2;
-          shareQuota = "${folder['quota_value']}";
-        } else if (folder['quota_value'] < 1024 * 1024) {
-          selectedUnitIndex = 1;
-          shareQuota = "${folder['quota_value'] ~/ 1024}";
-        } else {
-          selectedUnitIndex = 0;
-          shareQuota = "${folder['quota_value'] ~/ (1024 * 1024)}";
-        }
-        unitController.text = units[selectedUnitIndex];
-        shareQuotaController.text = shareQuota;
-      }
-
-      enableShareCow = folder['enable_share_cow'];
-      enableShareCompress = folder['enable_share_compress'];
-
-      shareQuotaUsed = folder['share_quota_used'];
-
-      for (var i = 0; i < widget.volumes.length; i++) {
-        if (widget.volumes[i]['volume_path'] == folder['vol_path']) {
-          selectedVolumeIndex = i;
-          volumeController.text =
-              "${widget.volumes[selectedVolumeIndex]['display_name']}(可用容量：${int.parse(widget.volumes[selectedVolumeIndex]['size_free_byte']).formatSize()}) - ${widget.volumes[selectedVolumeIndex]['fs_type']}";
-          break;
-        }
-      }
-
-      setState(() {
-        loading = false;
-      });
-    } else {
-      if (res['error']['code'] == 402) {
-        UiUtil.toast("此共享文件夹不存在");
-      } else {
-        UiUtil.toast("加载失败，code: ${res['error']['code']}");
-      }
-
-      if (context.mounted) {
-        // ignore: use_build_context_synchronously
-        Navigator.of(context).pop();
-      }
-    }
-  }
-
-  _save() async {
-    FocusScope.of(context).unfocus();
-    Log.info(name);
-    if (name.trim() == "") {
-      UiUtil.toast("请输入共享文件夹名称");
-      return;
-    }
-    if (encryption) {
-      if (password.length < 8) {
-        UiUtil.toast("加密密钥最短为8位");
-        return;
-      }
-      if (password != confirmPassword) {
-        UiUtil.toast("加密密钥和确认密钥不一致");
-        return;
-      }
-    }
-    if (enableShareQuota) {
-      if (shareQuotaController.text.trim() == "") {
-        UiUtil.toast("请输入共享文件夹配额");
-        return;
-      }
-      try {
-        shareQuota =
-            "${int.parse(shareQuotaController.text) * pow(1024, 2 - selectedUnitIndex)}";
-      } catch (e) {
-        UiUtil.toast("共享文件夹配额仅支持输入整数");
-        return;
-      }
-    }
-    setState(() {
-      creating = true;
-    });
-
-    var res = await DsmApi.addSharedFolder(
-      name,
-      widget.volumes[1]['volume_path'],
-      desc,
-      oldName: oldName,
-      encryption: encryption,
-      password: password,
-      recycleBin: recycleBin,
-      recycleBinAdminOnly: recycleBinAdminOnly,
-      hidden: hidden,
-      hideUnreadable: hideUnreadable,
-      enableShareCow: enableShareCow,
-      enableShareQuota: enableShareQuota,
-      enableShareCompress: enableShareCompress,
-      shareQuota: shareQuota,
-      method: widget.folder != null ? 'set' : 'create',
-    );
-
-    setState(() {
-      creating = false;
-    });
-    Log.info(res);
-    if (res['success']) {
-      UiUtil.toast("${widget.folder != null ? '修改' : '新增'}共享文件夹成功");
-      if (context.mounted) {
-        // ignore: use_build_context_synchronously
-        Navigator.of(context).pop(true);
-      }
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
+    final volumeController = useTextEditingController(
+      text:
+          "${volumes[0]['display_name']}(可用容量：${int.parse(volumes[0]['size_free_byte']).formatSize()}) - ${volumes[0]['fs_type']}",
+    );
+    final nameController = useTextEditingController();
+    final descController = useTextEditingController();
+    final passwordController = useTextEditingController();
+    final confirmPasswordController = useTextEditingController();
+    final shareQuotaController = useTextEditingController();
+    const units = ['TB', 'GB', 'MB'];
+    final selectedUnitIndex = useSignal(1);
+    final unitController = useTextEditingController(text: units[1]);
+    final creating = useSignal(false);
+    final oldName = useSignal('');
+    final name = useSignal('');
+    final desc = useSignal('');
+    final selectedVolumeIndex = useSignal(0);
+    final hidden = useSignal(false);
+    final hideUnreadable = useSignal(false);
+    final recycleBin = useSignal(false);
+    final recycleBinAdminOnly = useSignal(false);
+    final enableShareCow = useSignal(false);
+    final enableShareCompress = useSignal(false);
+    final encryption = useSignal(false);
+    final password = useSignal('');
+    final confirmPassword = useSignal('');
+    final enableShareQuota = useSignal(false);
+    final shareQuotaUsed = useSignal<num>(0);
+    final shareQuota = useSignal('');
+    final loading = useSignal(false);
+
+    getFolderDetail(String folderName) async {
+      loading.value = true;
+      late Map<String, dynamic> folder;
+      try {
+        folder = await dsmCoreShareDetailForPage(folderName);
+      } catch (e) {
+        final code = e is DSMException ? e.code : -1;
+        if (code == 402) {
+          UiUtil.toast("此共享文件夹不存在");
+        } else {
+          UiUtil.toast("加载失败，code: $code");
+        }
+        if (context.mounted) {
+          // ignore: use_build_context_synchronously
+          Navigator.of(context).pop();
+        }
+        return;
+      } finally {
+        loading.value = false;
+      }
+      nameController.text = name.value = oldName.value = folder['name'] ?? '';
+      descController.text = desc.value = folder['desc'] ?? '';
+      hidden.value = folder['hidden'] ?? false;
+      hideUnreadable.value = folder['hide_unreadable'] ?? false;
+      recycleBin.value = folder['enable_recycle_bin'] ?? false;
+      recycleBinAdminOnly.value = folder['recycle_bin_admin_only'] ?? false;
+      encryption.value = folder['encryption'] == 1;
+      if ((folder['quota_value'] ?? 0) > 0) {
+        enableShareQuota.value = true;
+        final quota = folder['quota_value'] as int;
+        if (quota < 1024) {
+          selectedUnitIndex.value = 2;
+          shareQuota.value = "$quota";
+        } else if (quota < 1024 * 1024) {
+          selectedUnitIndex.value = 1;
+          shareQuota.value = "${quota ~/ 1024}";
+        } else {
+          selectedUnitIndex.value = 0;
+          shareQuota.value = "${quota ~/ (1024 * 1024)}";
+        }
+        unitController.value =
+            TextEditingValue(text: units[selectedUnitIndex.value]);
+        shareQuotaController.text = shareQuota.value;
+      }
+      enableShareCow.value = folder['enable_share_cow'] ?? false;
+      enableShareCompress.value = folder['enable_share_compress'] ?? false;
+      shareQuotaUsed.value = folder['share_quota_used'] ?? 0;
+      for (var i = 0; i < volumes.length; i++) {
+        if (volumes[i]['volume_path'] == folder['vol_path']) {
+          selectedVolumeIndex.value = i;
+          volumeController.value = TextEditingValue(
+              text:
+                  "${volumes[selectedVolumeIndex.value]['display_name']}(可用容量：${int.parse(volumes[selectedVolumeIndex.value]['size_free_byte']).formatSize()}) - ${volumes[selectedVolumeIndex.value]['fs_type']}");
+          break;
+        }
+      }
+    }
+
+    save() async {
+      FocusScope.of(context).unfocus();
+      Log.info(name.value);
+      if (name.value.trim() == "") {
+        UiUtil.toast("请输入共享文件夹名称");
+        return;
+      }
+      if (encryption.value) {
+        if (password.value.length < 8) {
+          UiUtil.toast("加密密钥最短为8位");
+          return;
+        }
+        if (password.value != confirmPassword.value) {
+          UiUtil.toast("加密密钥和确认密钥不一致");
+          return;
+        }
+      }
+      if (enableShareQuota.value) {
+        if (shareQuotaController.text.trim() == "") {
+          UiUtil.toast("请输入共享文件夹配额");
+          return;
+        }
+        try {
+          shareQuota.value =
+              "${int.parse(shareQuotaController.text) * pow(1024, 2 - selectedUnitIndex.value)}";
+        } catch (e) {
+          UiUtil.toast("共享文件夹配额仅支持输入整数");
+          return;
+        }
+      }
+      creating.value = true;
+      try {
+        await dsmCoreShareAddForPage(
+          name.value,
+          volumes[1]['volume_path'],
+          desc.value,
+          oldName: oldName.value,
+          encryption: encryption.value,
+          password: password.value,
+          recycleBin: recycleBin.value,
+          recycleBinAdminOnly: recycleBinAdminOnly.value,
+          hidden: hidden.value,
+          hideUnreadable: hideUnreadable.value,
+          enableShareCow: enableShareCow.value,
+          enableShareQuota: enableShareQuota.value,
+          enableShareCompress: enableShareCompress.value,
+          shareQuota: shareQuota.value,
+          method: folder != null ? 'set' : 'create',
+        );
+      } catch (e) {
+        creating.value = false;
+        UiUtil.toast("${folder != null ? '修改' : '新增'}共享文件夹失败");
+        return;
+      }
+      creating.value = false;
+      {
+        UiUtil.toast("${folder != null ? '修改' : '新增'}共享文件夹成功");
+        if (context.mounted) {
+          // ignore: use_build_context_synchronously
+          Navigator.of(context).pop(true);
+        }
+      }
+    }
+
+    useEffect(() {
+      if (folder != null) {
+        getFolderDetail(folder?['name']);
+      }
+      return null;
+    }, const []);
+
     return Scaffold(
       appBar: AppBar(
         leading: AppBackButton(context),
         title: Text(
-          "${widget.folder != null ? '修改' : '新增'}共享文件夹",
+          "${folder != null ? '修改' : '新增'}共享文件夹",
         ),
       ),
       body: GestureDetector(
@@ -207,40 +202,18 @@ class AddSharedFoldersState extends State<AddSharedFolders> {
                   const SizedBox(
                     height: 20,
                   ),
-                  Card(
-                    shape: RoundedRectangleBorder(
-                        side: const BorderSide(),
-                        borderRadius: BorderRadius.circular(18)),
-                    child: Padding(
-                      padding: const EdgeInsets.all(AppConstants.paddingSmall),
-                      child: TextField(
-                        controller: nameController,
-                        onChanged: (v) => name = v,
-                        decoration: const InputDecoration(
-                          border: InputBorder.none,
-                          labelText: '名称',
-                        ),
-                      ),
-                    ),
+                  SettingsTextField(
+                    controller: nameController,
+                    label: "名称",
+                    onChanged: (v) => name.value = v,
                   ),
                   const SizedBox(
                     height: 20,
                   ),
-                  Card(
-                    shape: RoundedRectangleBorder(
-                        side: const BorderSide(),
-                        borderRadius: BorderRadius.circular(18)),
-                    child: Padding(
-                      padding: const EdgeInsets.all(AppConstants.paddingSmall),
-                      child: TextField(
-                        controller: descController,
-                        onChanged: (v) => desc = v,
-                        decoration: const InputDecoration(
-                          border: InputBorder.none,
-                          labelText: '描述',
-                        ),
-                      ),
-                    ),
+                  SettingsTextField(
+                    controller: descController,
+                    label: "描述",
+                    onChanged: (v) => desc.value = v,
                   ),
                   const SizedBox(
                     height: 20,
@@ -250,170 +223,62 @@ class AddSharedFoldersState extends State<AddSharedFolders> {
                       FocusScope.of(context).unfocus();
                       showCupertinoModalPopup(
                         context: context,
-                        builder: (context) {
-                          return Material(
-                            color: Colors.transparent,
-                            child: Card(
-                              shape: RoundedRectangleBorder(
-                                  side: const BorderSide(),
-                                  borderRadius: BorderRadius.circular(18)),
-                              child: SafeArea(
-                                top: false,
-                                child: Padding(
-                                  padding: const EdgeInsets.all(20),
-                                  child: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: <Widget>[
-                                      const Text(
-                                        "选择所在位置",
-                                        style: TextStyle(
-                                            fontSize: 20,
-                                            fontWeight: FontWeight.w500),
-                                      ),
-                                      const SizedBox(
-                                        height: 12,
-                                      ),
-                                      ...widget.volumes.map((volume) {
-                                        return Padding(
-                                          padding:
-                                              const EdgeInsets.only(bottom: 20),
-                                          child: OutlinedButton(
-                                            onPressed: () {
-                                              setState(() {
-                                                selectedVolumeIndex = widget
-                                                    .volumes
-                                                    .indexOf(volume);
-                                              });
-                                              volumeController.value =
-                                                  TextEditingValue(
-                                                      text:
-                                                          "${widget.volumes[selectedVolumeIndex]['display_name']}(可用容量：${int.parse(widget.volumes[selectedVolumeIndex]['size_free_byte']).formatSize()}) - ${widget.volumes[selectedVolumeIndex]['fs_type']}");
-                                              Navigator.of(context).pop();
-                                            },
-                                            child: Container(
-                                              padding: const EdgeInsets.only(
-                                                  left: 20),
-                                              width: double.infinity,
-                                              child: Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: [
-                                                  Text(
-                                                      "${volume['display_name']}(可用容量：${int.parse(volume['size_free_byte']).formatSize()}) - ${volume['fs_type']}"),
-                                                  const SizedBox(
-                                                    height: 5,
-                                                  ),
-                                                  Text(
-                                                    "${volume['description']}",
-                                                    style: const TextStyle(
-                                                        color: Colors.grey),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          ),
-                                        );
-                                      }),
-                                      OutlinedButton(
-                                        onPressed: () async {
-                                          Navigator.of(context).pop();
-                                        },
-                                        child: const Text(
-                                          "取消",
-                                          style: TextStyle(fontSize: 18),
-                                        ),
-                                      ),
-                                      const SizedBox(
-                                        height: 8,
-                                      ),
-                                    ],
-                                  ),
-                                ),
+                        builder: (context) => BottomOptionSheet(
+                          title: "选择所在位置",
+                          options: [
+                            for (final volume in volumes)
+                              BottomOption(
+                                title:
+                                    "${volume['display_name']}(可用容量：${int.parse(volume['size_free_byte']).formatSize()}) - ${volume['fs_type']}",
+                                subtitle: "${volume['description']}",
+                                onPressed: () {
+                                  selectedVolumeIndex.value =
+                                      volumes.indexOf(volume);
+                                  volumeController.value = TextEditingValue(
+                                    text:
+                                        "${volumes[selectedVolumeIndex.value]['display_name']}(可用容量：${int.parse(volumes[selectedVolumeIndex.value]['size_free_byte']).formatSize()}) - ${volumes[selectedVolumeIndex.value]['fs_type']}",
+                                  );
+                                },
                               ),
-                            ),
-                          );
-                        },
+                          ],
+                        ),
                       );
                     },
-                    child: Card(
-                      shape: RoundedRectangleBorder(
-                          side: const BorderSide(),
-                          borderRadius: BorderRadius.circular(18)),
-                      child: Padding(
-                        padding:
-                            const EdgeInsets.all(AppConstants.paddingSmall),
-                        child: TextField(
-                          controller: volumeController,
-                          decoration: const InputDecoration(
-                            enabled: false,
-                            border: InputBorder.none,
-                            labelText: "所在位置",
-                          ),
-                        ),
-                      ),
+                    child: SettingsTextField(
+                      controller: volumeController,
+                      label: "所在位置",
+                      enabled: false,
                     ),
                   ),
                   const SizedBox(
                     height: 20,
                   ),
-                  GestureDetector(
+                  SettingsToggleTile(
+                    label: "在“网上邻居”隐藏此共享文件夹",
+                    value: hidden.value,
+                    shape: RoundedRectangleBorder(
+                      side: const BorderSide(),
+                      borderRadius: BorderRadius.circular(18),
+                    ),
                     onTap: () {
                       FocusScope.of(context).unfocus();
-                      setState(() {
-                        hidden = !hidden;
-                      });
+                      hidden.value = !hidden.value;
                     },
-                    child: Card(
-                      shape: RoundedRectangleBorder(
-                          side: const BorderSide(),
-                          borderRadius: BorderRadius.circular(18)),
-                      child: Padding(
-                        padding:
-                            const EdgeInsets.all(AppConstants.paddingSmall),
-                        child: Row(
-                          children: [
-                            const Text("在“网上邻居”隐藏此共享文件夹"),
-                            const Spacer(),
-                            if (hidden)
-                              const Icon(
-                                CupertinoIcons.checkmark_alt,
-                                color: AppColors.primaryAction,
-                              ),
-                          ],
-                        ),
-                      ),
-                    ),
                   ),
                   const SizedBox(
                     height: 20,
                   ),
-                  GestureDetector(
+                  SettingsToggleTile(
+                    label: "对没有权限的用户隐藏子文件夹和文件",
+                    value: hideUnreadable.value,
+                    shape: RoundedRectangleBorder(
+                      side: const BorderSide(),
+                      borderRadius: BorderRadius.circular(18),
+                    ),
                     onTap: () {
                       FocusScope.of(context).unfocus();
-                      setState(() {
-                        hideUnreadable = !hideUnreadable;
-                      });
+                      hideUnreadable.value = !hideUnreadable.value;
                     },
-                    child: Card(
-                      shape: RoundedRectangleBorder(
-                          side: const BorderSide(),
-                          borderRadius: BorderRadius.circular(18)),
-                      child: Padding(
-                        padding:
-                            const EdgeInsets.all(AppConstants.paddingSmall),
-                        child: Row(
-                          children: [
-                            const Text("对没有权限的用户隐藏子文件夹和文件"),
-                            const Spacer(),
-                            if (hideUnreadable)
-                              const Icon(
-                                CupertinoIcons.checkmark_alt,
-                                color: AppColors.primaryAction,
-                              ),
-                          ],
-                        ),
-                      ),
-                    ),
                   ),
                   const SizedBox(
                     height: 20,
@@ -422,38 +287,17 @@ class AddSharedFoldersState extends State<AddSharedFolders> {
                     children: [
                       Expanded(
                         flex: 3,
-                        child: GestureDetector(
+                        child: SettingsToggleTile(
+                          label: "启用回收站",
+                          value: recycleBin.value,
+                          shape: RoundedRectangleBorder(
+                            side: const BorderSide(),
+                            borderRadius: BorderRadius.circular(18),
+                          ),
                           onTap: () {
                             FocusScope.of(context).unfocus();
-                            setState(() {
-                              recycleBin = !recycleBin;
-                            });
+                            recycleBin.value = !recycleBin.value;
                           },
-                          child: Card(
-                            shape: RoundedRectangleBorder(
-                                side: const BorderSide(),
-                                borderRadius: BorderRadius.circular(18)),
-                            child: Padding(
-                              padding: const EdgeInsets.all(
-                                  AppConstants.paddingSmall),
-                              child: Row(
-                                children: [
-                                  const Expanded(
-                                    child: Text(
-                                      "启用回收站",
-                                      overflow: TextOverflow.clip,
-                                      maxLines: 1,
-                                    ),
-                                  ),
-                                  if (recycleBin)
-                                    const Icon(
-                                      CupertinoIcons.checkmark_alt,
-                                      color: AppColors.primaryAction,
-                                    ),
-                                ],
-                              ),
-                            ),
-                          ),
                         ),
                       ),
                       const SizedBox(
@@ -461,40 +305,20 @@ class AddSharedFoldersState extends State<AddSharedFolders> {
                       ),
                       Expanded(
                         flex: 4,
-                        child: GestureDetector(
+                        child: SettingsToggleTile(
+                          label: "只允许管理员访问",
+                          value: recycleBinAdminOnly.value,
+                          shape: RoundedRectangleBorder(
+                            side: const BorderSide(),
+                            borderRadius: BorderRadius.circular(18),
+                          ),
                           onTap: () {
                             FocusScope.of(context).unfocus();
-                            if (recycleBin) {
-                              setState(() {
-                                recycleBinAdminOnly = !recycleBinAdminOnly;
-                              });
+                            if (recycleBin.value) {
+                              recycleBinAdminOnly.value =
+                                  !recycleBinAdminOnly.value;
                             }
                           },
-                          child: Card(
-                            shape: RoundedRectangleBorder(
-                                side: const BorderSide(),
-                                borderRadius: BorderRadius.circular(18)),
-                            child: Padding(
-                              padding: const EdgeInsets.all(
-                                  AppConstants.paddingSmall),
-                              child: Row(
-                                children: [
-                                  const Expanded(
-                                    child: Text(
-                                      "只允许管理员访问",
-                                      overflow: TextOverflow.clip,
-                                      maxLines: 1,
-                                    ),
-                                  ),
-                                  if (recycleBinAdminOnly)
-                                    const Icon(
-                                      CupertinoIcons.checkmark_alt,
-                                      color: AppColors.primaryAction,
-                                    ),
-                                ],
-                              ),
-                            ),
-                          ),
                         ),
                       ),
                     ],
@@ -502,81 +326,41 @@ class AddSharedFoldersState extends State<AddSharedFolders> {
                   const SizedBox(
                     height: 20,
                   ),
-                  GestureDetector(
+                  SettingsToggleTile(
+                    label: "加密共享此文件夹",
+                    value: encryption.value,
+                    shape: RoundedRectangleBorder(
+                      side: const BorderSide(),
+                      borderRadius: BorderRadius.circular(18),
+                    ),
                     onTap: () {
                       FocusScope.of(context).unfocus();
-                      setState(() {
-                        encryption = !encryption;
-                      });
+                      encryption.value = !encryption.value;
                     },
-                    child: Card(
-                      shape: RoundedRectangleBorder(
-                          side: const BorderSide(),
-                          borderRadius: BorderRadius.circular(18)),
-                      child: Padding(
-                        padding:
-                            const EdgeInsets.all(AppConstants.paddingSmall),
-                        child: Row(
-                          children: [
-                            const Text("加密共享此文件夹"),
-                            const Spacer(),
-                            if (encryption)
-                              const Icon(
-                                CupertinoIcons.checkmark_alt,
-                                color: AppColors.primaryAction,
-                              ),
-                          ],
-                        ),
-                      ),
-                    ),
                   ),
-                  if (encryption) ...[
+                  if (encryption.value) ...[
                     const SizedBox(
                       height: 20,
                     ),
                     Row(
                       children: [
                         Expanded(
-                          child: Card(
-                            shape: RoundedRectangleBorder(
-                                side: const BorderSide(),
-                                borderRadius: BorderRadius.circular(18)),
-                            child: Padding(
-                              padding: const EdgeInsets.all(
-                                  AppConstants.paddingSmall),
-                              child: TextField(
-                                onChanged: (v) => password = v,
-                                obscureText: true,
-                                controller: passwordController,
-                                decoration: const InputDecoration(
-                                  border: InputBorder.none,
-                                  labelText: '加密密钥',
-                                ),
-                              ),
-                            ),
+                          child: SettingsTextField(
+                            controller: passwordController,
+                            label: "加密密钥",
+                            onChanged: (v) => password.value = v,
+                            obscureText: true,
                           ),
                         ),
                         const SizedBox(
                           width: 20,
                         ),
                         Expanded(
-                          child: Card(
-                            shape: RoundedRectangleBorder(
-                                side: const BorderSide(),
-                                borderRadius: BorderRadius.circular(18)),
-                            child: Padding(
-                              padding: const EdgeInsets.all(
-                                  AppConstants.paddingSmall),
-                              child: TextField(
-                                onChanged: (v) => confirmPassword = v,
-                                obscureText: true,
-                                controller: confirmPasswordController,
-                                decoration: const InputDecoration(
-                                  border: InputBorder.none,
-                                  labelText: '确认密钥',
-                                ),
-                              ),
-                            ),
+                          child: SettingsTextField(
+                            controller: confirmPasswordController,
+                            label: "确认密钥",
+                            onChanged: (v) => confirmPassword.value = v,
+                            obscureText: true,
                           ),
                         ),
                       ],
@@ -585,110 +369,58 @@ class AddSharedFoldersState extends State<AddSharedFolders> {
                   const SizedBox(
                     height: 20,
                   ),
-                  GestureDetector(
+                  SettingsToggleTile(
+                    label: "启用数据总和检查码以实现高级数据完整性",
+                    value: enableShareCow.value,
+                    shape: RoundedRectangleBorder(
+                      side: const BorderSide(),
+                      borderRadius: BorderRadius.circular(18),
+                    ),
                     onTap: () {
                       FocusScope.of(context).unfocus();
-                      if (widget.volumes[selectedVolumeIndex]['fs_type'] ==
+                      if (volumes[selectedVolumeIndex.value]['fs_type'] ==
                           "btrfs") {
-                        setState(() {
-                          enableShareCow = !enableShareCow;
-                        });
+                        enableShareCow.value = !enableShareCow.value;
                       }
                     },
-                    child: Card(
-                      shape: RoundedRectangleBorder(
-                          side: const BorderSide(),
-                          borderRadius: BorderRadius.circular(18)),
-                      child: Padding(
-                        padding:
-                            const EdgeInsets.all(AppConstants.paddingSmall),
-                        child: Row(
-                          children: [
-                            const Text("启用数据总和检查码以实现高级数据完整性"),
-                            const Spacer(),
-                            if (enableShareCow)
-                              const Icon(
-                                CupertinoIcons.checkmark_alt,
-                                color: AppColors.primaryAction,
-                              ),
-                          ],
-                        ),
-                      ),
-                    ),
                   ),
                   const SizedBox(
                     height: 20,
                   ),
-                  GestureDetector(
+                  SettingsToggleTile(
+                    label: "启用文件压缩",
+                    value: enableShareCompress.value,
+                    shape: RoundedRectangleBorder(
+                      side: const BorderSide(),
+                      borderRadius: BorderRadius.circular(18),
+                    ),
                     onTap: () {
                       FocusScope.of(context).unfocus();
-                      if (widget.volumes[selectedVolumeIndex]['fs_type'] ==
+                      if (volumes[selectedVolumeIndex.value]['fs_type'] ==
                           "btrfs") {
-                        setState(() {
-                          enableShareCompress = !enableShareCompress;
-                        });
+                        enableShareCompress.value = !enableShareCompress.value;
                       }
                     },
-                    child: Card(
-                      shape: RoundedRectangleBorder(
-                          side: const BorderSide(),
-                          borderRadius: BorderRadius.circular(18)),
-                      child: Padding(
-                        padding:
-                            const EdgeInsets.all(AppConstants.paddingSmall),
-                        child: Row(
-                          children: [
-                            const Text("启用文件压缩"),
-                            const Spacer(),
-                            if (enableShareCompress)
-                              const Icon(
-                                CupertinoIcons.checkmark_alt,
-                                color: AppColors.primaryAction,
-                              ),
-                          ],
-                        ),
-                      ),
-                    ),
                   ),
                   const SizedBox(
                     height: 20,
                   ),
-                  GestureDetector(
+                  SettingsToggleTile(
+                    label: "启用共享文件夹配额",
+                    value: enableShareQuota.value,
+                    shape: RoundedRectangleBorder(
+                      side: const BorderSide(),
+                      borderRadius: BorderRadius.circular(18),
+                    ),
                     onTap: () {
                       FocusScope.of(context).unfocus();
-                      if (widget.volumes[selectedVolumeIndex]['fs_type'] ==
+                      if (volumes[selectedVolumeIndex.value]['fs_type'] ==
                           "btrfs") {
-                        setState(() {
-                          enableShareQuota = !enableShareQuota;
-                        });
+                        enableShareQuota.value = !enableShareQuota.value;
                       }
                     },
-                    child: Card(
-                      shape: RoundedRectangleBorder(
-                          side: const BorderSide(),
-                          borderRadius: BorderRadius.circular(18)),
-                      child: Padding(
-                        padding:
-                            const EdgeInsets.all(AppConstants.paddingSmall),
-                        child: Row(
-                          children: [
-                            const Text("启用共享文件夹配额"),
-                            Text(
-                              "(已使用${(shareQuotaUsed * 1024 * 1024).toInt().formatSize()})",
-                              style: const TextStyle(color: Colors.blue),
-                            ),
-                            const Spacer(),
-                            if (enableShareQuota)
-                              const Icon(
-                                CupertinoIcons.checkmark_alt,
-                                color: AppColors.primaryAction,
-                              ),
-                          ],
-                        ),
-                      ),
-                    ),
                   ),
-                  if (enableShareQuota) ...[
+                  if (enableShareQuota.value) ...[
                     const SizedBox(
                       height: 20,
                     ),
@@ -696,25 +428,10 @@ class AddSharedFoldersState extends State<AddSharedFolders> {
                       children: [
                         Expanded(
                           flex: 2,
-                          child: Card(
-                            shape: RoundedRectangleBorder(
-                                side: const BorderSide(),
-                                borderRadius: BorderRadius.circular(18)),
-                            child: Padding(
-                              padding: const EdgeInsets.all(
-                                  AppConstants.paddingSmall),
-                              child: TextField(
-                                onChanged: (v) => shareQuota = v,
-                                inputFormatters: [
-                                  FilteringTextInputFormatter.digitsOnly,
-                                ],
-                                controller: shareQuotaController,
-                                decoration: const InputDecoration(
-                                  border: InputBorder.none,
-                                  labelText: '共享文件夹配额',
-                                ),
-                              ),
-                            ),
+                          child: SettingsTextField(
+                            controller: shareQuotaController,
+                            label: "共享文件夹配额",
+                            onChanged: (v) => shareQuota.value = v,
                           ),
                         ),
                         const SizedBox(
@@ -727,98 +444,29 @@ class AddSharedFoldersState extends State<AddSharedFolders> {
                               FocusScope.of(context).unfocus();
                               showCupertinoModalPopup(
                                 context: context,
-                                builder: (context) {
-                                  return Material(
-                                    color: Colors.transparent,
-                                    child: Card(
-                                      shape: RoundedRectangleBorder(
-                                          side: const BorderSide(),
-                                          borderRadius:
-                                              BorderRadius.circular(5)),
-                                      child: SafeArea(
-                                        top: false,
-                                        child: Padding(
-                                          padding: const EdgeInsets.all(20),
-                                          child: Column(
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: <Widget>[
-                                              const Text(
-                                                "选择单位",
-                                                style: TextStyle(
-                                                    fontSize: 20,
-                                                    fontWeight:
-                                                        FontWeight.w500),
-                                              ),
-                                              const SizedBox(
-                                                height: 12,
-                                              ),
-                                              ...units.map((unit) {
-                                                return Padding(
-                                                  padding:
-                                                      const EdgeInsets.only(
-                                                          bottom: 20),
-                                                  child: OutlinedButton(
-                                                    onPressed: () {
-                                                      setState(() {
-                                                        selectedUnitIndex =
-                                                            units.indexOf(unit);
-                                                      });
-                                                      unitController.value =
-                                                          TextEditingValue(
-                                                              text: units[
-                                                                  selectedUnitIndex]);
-                                                      Navigator.of(context)
-                                                          .pop();
-                                                    },
-                                                    child: SizedBox(
-                                                      width: double.infinity,
-                                                      child: Text(
-                                                        unit,
-                                                        textAlign:
-                                                            TextAlign.center,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                );
-                                              }),
-                                              OutlinedButton(
-                                                onPressed: () async {
-                                                  Navigator.of(context).pop();
-                                                },
-                                                child: const Text(
-                                                  "取消",
-                                                  style:
-                                                      TextStyle(fontSize: 18),
-                                                ),
-                                              ),
-                                              const SizedBox(
-                                                height: 8,
-                                              ),
-                                            ],
-                                          ),
-                                        ),
+                                builder: (context) => BottomOptionSheet(
+                                  title: "选择单位",
+                                  borderRadius: 5,
+                                  optionTextAlign: TextAlign.center,
+                                  options: [
+                                    for (final unit in units)
+                                      BottomOption(
+                                        title: unit,
+                                        onPressed: () {
+                                          selectedUnitIndex.value =
+                                              units.indexOf(unit);
+                                          unitController.value =
+                                              TextEditingValue(text: unit);
+                                        },
                                       ),
-                                    ),
-                                  );
-                                },
+                                  ],
+                                ),
                               );
                             },
-                            child: Card(
-                              shape: RoundedRectangleBorder(
-                                  side: const BorderSide(),
-                                  borderRadius: BorderRadius.circular(18)),
-                              child: Padding(
-                                padding: const EdgeInsets.all(
-                                    AppConstants.paddingSmall),
-                                child: TextField(
-                                  controller: unitController,
-                                  decoration: const InputDecoration(
-                                    enabled: false,
-                                    border: InputBorder.none,
-                                    labelText: "单位",
-                                  ),
-                                ),
-                              ),
+                            child: SettingsTextField(
+                              controller: unitController,
+                              label: "单位",
+                              enabled: false,
                             ),
                           ),
                         ),
@@ -832,8 +480,8 @@ class AddSharedFoldersState extends State<AddSharedFolders> {
               child: Padding(
                 padding: const EdgeInsets.all(20),
                 child: OutlinedButton(
-                  onPressed: _save,
-                  child: creating
+                  onPressed: save,
+                  child: creating.value
                       ? const Center(
                           child: CupertinoActivityIndicator(
                             radius: 13,

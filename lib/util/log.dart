@@ -6,18 +6,13 @@ import 'package:garden/extensions/datetime.dart';
 import 'package:logger/logger.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart';
-
+import 'package:talker_flutter/talker_flutter.dart';
+final kTalker = TalkerFlutter.init();
 class Log {
   static final Logger _logger = Logger(
       printer: HybridPrinter(
         SimplePrinter(),
-        debug: PrettyPrinter(
-            methodCount: 2,
-            errorMethodCount: 8,
-            lineLength: 120,
-            colors: true,
-            printEmojis: true,
-            dateTimeFormat: DateTimeFormat.onlyTimeAndSinceStart),
+        debug: PrettyPrinter(noBoxingByDefault: true, methodCount: 0),
       ),
       output: MultiOutput(
           [ConsoleOutput(), if (!kIsWeb || !kIsWasm) RotateLogOutput()]));

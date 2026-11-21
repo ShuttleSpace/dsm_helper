@@ -1,7 +1,9 @@
 import 'dart:io';
 
 import 'package:device_info_plus/device_info_plus.dart';
+import 'package:garden/extensions/signal.dart';
 import 'package:garden/extensions/string.dart';
+import 'package:garden/stores/connection_store.dart';
 import 'package:garden/util/storage_util.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:path_provider/path_provider.dart';
@@ -66,6 +68,10 @@ class SettingsStore {
 
   void setFirmwareVersion(String value) async {
     _firmwareVersion.value = value;
+    // shortcut: DSM major version parsed from "DSM 7.3.2-..."; connectionStore.dsmVersion
+    // has no other setter, so Photos APIs break (SYNO.Photo.* on DSM 7) without this.
+    final m = RegExp(r'(\d+)').firstMatch(value);
+    if (m != null) connectionStore.setVersion(int.parse(m.group(1)!));
     await StorageUtil.setString("firmware_version", value);
   }
 
@@ -119,8 +125,10 @@ class SettingsStore {
 
   // ==================== Dashboard 设置 ====================
 
-  final _dashboardCardCollapseSwitch = signal<bool>(true);
-  final _dashboardCardCollapseState = signal<Map<String, bool>>({});
+  final _dashboardCardCollapseSwitch =
+      signal<bool>(true, debugLabel: "_dashboardCardCollapseSwitch");
+  final _dashboardCardCollapseState =
+      mapSignal<String, bool>({}, debugLabel: "_dashboardCardCollapseState");
 
   ReadonlySignal<bool> get dashboardCardCollapseSwitch =>
       _dashboardCardCollapseSwitch;
@@ -129,17 +137,25 @@ class SettingsStore {
 
   void setDashboardCardCollapseSwitch(bool value) =>
       _dashboardCardCollapseSwitch.value = value;
-  void setDashboardCardCollapseState(Map<String, bool> value) =>
+  void setDashboardCardCollapseState(
+      {Map<String, bool>? value, (String, bool)? item}) {
+    if (value != null) {
       _dashboardCardCollapseState.value = value;
+    } else if (item != null) {
+      _dashboardCardCollapseState.update1(item.$1, (ov) {
+        return item.$2;
+      });
+    }
+  }
 
   bool isCardItemCollapsed(String itemName) {
     return _dashboardCardCollapseState.value[itemName] ?? false;
   }
 
   void toggleCardItemCollapse(String itemName) {
-    final newState = Map<String, bool>.from(_dashboardCardCollapseState.value);
-    newState[itemName] = !(newState[itemName] ?? false);
-    _dashboardCardCollapseState.value = newState;
+    _dashboardCardCollapseState.update1(itemName, (ov) {
+      return !(ov ?? false);
+    });
   }
 
   // ==================== 下载设置 ====================

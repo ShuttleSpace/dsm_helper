@@ -63,78 +63,82 @@ class ConfirmDialog extends StatelessWidget {
 
     return Material(
       color: Colors.transparent,
-      child: Card(
-        shape: RoundedRectangleBorder(
-          side: const BorderSide(),
-          borderRadius: BorderRadius.circular(18),
-        ),
+      child: SizedBox(
+        width: double.infinity,
         child: SafeArea(
           top: false,
-          child: Padding(
-            padding: const EdgeInsets.all(20),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                Text(
-                  title,
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w500,
-                    color: theme.colorScheme.onSurface,
+          child: Card(
+            shape: RoundedRectangleBorder(
+              side: const BorderSide(),
+              borderRadius: BorderRadius.circular(18),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: <Widget>[
+                  Text(
+                    title,
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w500,
+                      color: theme.colorScheme.onSurface,
+                    ),
+                    textAlign: TextAlign.center,
                   ),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 12),
-                Text(
-                  content,
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w400,
-                    color: theme.colorScheme.onSurface,
+                  const SizedBox(height: 12),
+                  Text(
+                    content,
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w400,
+                      color: theme.colorScheme.onSurface,
+                    ),
+                    textAlign: TextAlign.center,
                   ),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 22),
-                Row(
-                  children: [
-                    if (showCancel) ...[
+                  const SizedBox(height: 22),
+                  Row(
+                    children: [
+                      if (showCancel) ...[
+                        Expanded(
+                          child: OutlinedButton(
+                            onPressed: () {
+                              onCancel?.call();
+                              Navigator.of(context).pop();
+                            },
+                            child: Text(
+                              cancelText,
+                              style: TextStyle(
+                                fontSize: 18,
+                                color: cancelTextColor ??
+                                    theme.colorScheme.onSurface,
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                      ],
                       Expanded(
                         child: OutlinedButton(
                           onPressed: () {
-                            onCancel?.call();
+                            onConfirm?.call();
                             Navigator.of(context).pop();
                           },
                           child: Text(
-                            cancelText,
+                            confirmText,
                             style: TextStyle(
                               fontSize: 18,
-                              color: cancelTextColor ??
-                                  theme.colorScheme.onSurface,
+                              color:
+                                  confirmTextColor ?? theme.colorScheme.primary,
                             ),
                           ),
                         ),
                       ),
-                      const SizedBox(width: 16),
                     ],
-                    Expanded(
-                      child: OutlinedButton(
-                        onPressed: () {
-                          onConfirm?.call();
-                          Navigator.of(context).pop();
-                        },
-                        child: Text(
-                          confirmText,
-                          style: TextStyle(
-                            fontSize: 18,
-                            color:
-                                confirmTextColor ?? theme.colorScheme.primary,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
+                  ),
+                ],
+              ),
             ),
           ),
         ),

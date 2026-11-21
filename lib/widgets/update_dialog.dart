@@ -5,7 +5,6 @@ import 'package:garden/util/http_util.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:package_info_plus/package_info_plus.dart';
-import 'package:wave/config.dart';
 import 'package:wave/wave.dart';
 
 class UpdateDialog extends StatelessWidget {
@@ -19,7 +18,9 @@ class UpdateDialog extends StatelessWidget {
     final cupertinoTheme = CupertinoTheme.of(context);
 
     return Center(
-      child: Material(
+      child: SizedBox(
+        width: double.infinity,
+        child: Material(
         color: Colors.transparent,
         child: SizedBox(
           width: 300,
@@ -216,6 +217,7 @@ class UpdateDialog extends StatelessWidget {
             ],
           ),
         ),
+      ),
       ),
     );
   }

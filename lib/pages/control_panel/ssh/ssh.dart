@@ -1,64 +1,61 @@
-import 'package:garden/util/http_util.dart';
+import 'package:dio/dio.dart';
+import 'package:garden/api/dsm_api.dart';
 import 'package:garden/util/ui_util.dart';
 import 'package:garden/widgets/bubble_tab_indicator.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:garden/constants/app_constants.dart';
-import 'package:garden/theme/app_colors.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_vibrate/flutter_vibrate.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:signals_hooks/signals_hooks.dart';
 
-class SshSetting extends StatefulWidget {
+class SshSetting extends HookWidget {
   const SshSetting({super.key});
 
   @override
-  SshSettingState createState() => SshSettingState();
-}
+  Widget build(BuildContext context) {
+    final tickerProvider = useSingleTickerProvider();
+    final tabController = useMemoized(
+      () => TabController(length: 2, vsync: tickerProvider),
+      const [],
+    );
+    useEffect(() => tabController.dispose, const []);
+    final portController = useTextEditingController();
+    final loading = useSignal(true);
+    final ssh = useSignal(false);
+    final telnet = useSignal(false);
+    final sshPort = useSignal('');
 
-class SshSettingState extends State<SshSetting>
-    with SingleTickerProviderStateMixin {
-  late TabController _tabController;
-  final TextEditingController _portController = TextEditingController();
-  bool loading = true;
-  bool ssh = false;
-  bool telnet = false;
-
-  String sshPort = '';
-  @override
-  void initState() {
-    _tabController = TabController(length: 2, vsync: this);
-    getData();
-    super.initState();
-  }
-
-  getData() async {
-    var res = await DsmApi.terminalInfo();
-    if (res['success']) {
-      setState(() {
-        loading = false;
-        ssh = res['data']['enable_ssh'];
-        telnet = res['data']['enable_telnet'];
-        sshPort = res['data']['ssh_port'].toString();
-        _portController.value = TextEditingValue(text: sshPort);
-      });
-    } else {
-      UiUtil.toast("获取失败，code：${res['error']['code']}");
-      if (context.mounted) {
-        // ignore: use_build_context_synchronously
-        Navigator.of(context).pop();
+    getData() async {
+      try {
+        var data = await dsmCoreTerminalGet();
+        loading.value = false;
+        ssh.value = data['enable_ssh'];
+        telnet.value = data['enable_telnet'];
+        sshPort.value = data['ssh_port'].toString();
+        portController.value = TextEditingValue(text: sshPort.value);
+      } on DSMException catch (e) {
+        UiUtil.toast("获取失败，code：${e.code}");
+        if (context.mounted) Navigator.of(context).pop();
+      } on DioException catch (e) {
+        UiUtil.toast("网络错误：${e.message}");
+        if (context.mounted) Navigator.of(context).pop();
       }
     }
-  }
 
-  @override
-  Widget build(BuildContext context) {
+    useEffect(() {
+      getData();
+      return null;
+    }, const []);
+
     return Scaffold(
       appBar: AppBar(
         leading: AppBackButton(context),
         title: const Text("终端机和SNMP"),
       ),
-      body: loading
+      body: Watch((context) => loading.value
           ? const Center(
               child: CupertinoActivityIndicator(
                 radius: 14,
@@ -75,7 +72,7 @@ class SshSettingState extends State<SshSetting>
                   child: TabBar(
                     dividerHeight: 0,
                     isScrollable: false,
-                    controller: _tabController,
+                    controller: tabController,
                     indicatorSize: TabBarIndicatorSize.label,
                     labelColor: Theme.brightnessOf(context) == Brightness.dark
                         ? Colors.white
@@ -98,17 +95,13 @@ class SshSettingState extends State<SshSetting>
                 ),
                 Expanded(
                   child: TabBarView(
-                    controller: _tabController,
+                    controller: tabController,
                     children: [
                       ListView(
                         padding: const EdgeInsets.all(20),
                         children: [
                           GestureDetector(
-                            onTap: () {
-                              setState(() {
-                                telnet = !telnet;
-                              });
-                            },
+                            onTap: () => telnet.value = !telnet.value,
                             child: Card(
                               shape: RoundedRectangleBorder(
                                   side: const BorderSide(),
@@ -122,25 +115,21 @@ class SshSettingState extends State<SshSetting>
                                       style: TextStyle(fontSize: 16),
                                     ),
                                     const Spacer(),
-                                    if (telnet)
-                                      const Icon(
+                                    if (telnet.value)
+                                      Icon(
                                         CupertinoIcons.checkmark_alt,
-                                        color: AppColors.primaryAction,
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .primary,
                                       ),
                                   ],
                                 ),
                               ),
                             ),
                           ),
-                          const SizedBox(
-                            height: 20,
-                          ),
+                          const SizedBox(height: 20),
                           GestureDetector(
-                            onTap: () {
-                              setState(() {
-                                ssh = !ssh;
-                              });
-                            },
+                            onTap: () => ssh.value = !ssh.value,
                             child: Card(
                               shape: RoundedRectangleBorder(
                                   side: const BorderSide(),
@@ -154,19 +143,19 @@ class SshSettingState extends State<SshSetting>
                                       style: TextStyle(fontSize: 16),
                                     ),
                                     const Spacer(),
-                                    if (ssh)
-                                      const Icon(
+                                    if (ssh.value)
+                                      Icon(
                                         CupertinoIcons.checkmark_alt,
-                                        color: AppColors.primaryAction,
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .primary,
                                       ),
                                   ],
                                 ),
                               ),
                             ),
                           ),
-                          const SizedBox(
-                            height: 20,
-                          ),
+                          const SizedBox(height: 20),
                           Card(
                             shape: RoundedRectangleBorder(
                                 side: const BorderSide(),
@@ -175,9 +164,9 @@ class SshSettingState extends State<SshSetting>
                               padding: const EdgeInsets.all(
                                   AppConstants.paddingSmall),
                               child: TextField(
-                                controller: _portController,
+                                controller: portController,
                                 keyboardType: TextInputType.number,
-                                onChanged: (v) => sshPort = v,
+                                onChanged: (v) => sshPort.value = v,
                                 inputFormatters: [
                                   FilteringTextInputFormatter.digitsOnly,
                                 ],
@@ -188,20 +177,23 @@ class SshSettingState extends State<SshSetting>
                               ),
                             ),
                           ),
-                          const SizedBox(
-                            height: 20,
-                          ),
+                          const SizedBox(height: 20),
                           OutlinedButton(
                             onPressed: () async {
-                              var res = await DsmApi.setTerminal(
-                                  ssh, telnet, sshPort);
-                              if (res['success']) {
+                              try {
+                                await dsmCoreTerminalSet(
+                                  enableSsh: ssh.value,
+                                  enableTelnet: telnet.value,
+                                  sshPort: sshPort.value,
+                                );
                                 UiUtil.vibrate(FeedbackType.light);
                                 UiUtil.toast("应用成功");
-                              } else {
+                              } on DSMException catch (e) {
                                 UiUtil.vibrate(FeedbackType.warning);
-                                UiUtil.toast(
-                                    "应用失败，code：${res['error']['code']}");
+                                UiUtil.toast("应用失败：${e.message}");
+                              } on DioException catch (e) {
+                                UiUtil.vibrate(FeedbackType.warning);
+                                UiUtil.toast("网络错误：${e.message}");
                               }
                             },
                             child: const Text(
@@ -218,7 +210,7 @@ class SshSettingState extends State<SshSetting>
                   ),
                 ),
               ],
-            ),
+            )),
     );
   }
 }

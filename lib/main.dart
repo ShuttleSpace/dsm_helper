@@ -27,13 +27,20 @@ import 'package:media_kit/media_kit.dart';
 import 'package:oktoast/oktoast.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:signals_flutter/signals_flutter.dart';
+import 'package:garden/services/transfer_engine.dart';
+import 'package:garden/stores/transfer_store.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   MediaKit.ensureInitialized();
+  SignalsObserver.instance = LoggingSignalsObserver();
 
   await settingsStore.initialize();
   await connectionStore.initialize();
+  await initTransferEngine();
+  transferStore.listenUpdates();
+  transferStore.startBackupTimeSync(); // app 生命周期内持续写回备份时间
+  await transferStore.resumeUnfinishedOnStartup();
   final autPage = await settingsStore.authPage.value;
   final launchAccountPage = await settingsStore.launchAccountPage.value;
   runApp(MyApp(autPage, launchAccountPage));
@@ -45,18 +52,10 @@ void main() async {
   }
 }
 
-class MyApp extends StatefulWidget {
+class MyApp extends StatelessWidget {
   final bool authPage;
   final bool launchAccountPage;
   const MyApp(this.authPage, this.launchAccountPage, {super.key});
-
-  @override
-  MyAppState createState() => MyAppState();
-}
-
-class MyAppState extends State<MyApp> {
-  DateTime lastPopTime = DateTime.now();
-  // final _canPop = signal(false);
 
   @override
   Widget build(BuildContext context) {
@@ -86,28 +85,13 @@ class MyAppState extends State<MyApp> {
             supportedLocales: const [
               Locale('zh', 'CN'),
             ],
-            home: PopScope(
-                // canPop: _canPop.value,
-                onPopInvokedWithResult: (didPop, result) async {
-                  if (didPop) return;
-                  UiUtil.vibrate(FeedbackType.light);
-                  if (DateTime.now().difference(lastPopTime) >
-                      const Duration(seconds: 2)) {
-                    lastPopTime = DateTime.now();
-                    UiUtil.toast('再按一次退出${connectionStore.appName}');
-                  } else {
-                    lastPopTime = DateTime.now();
-                    // 退出app
-                    SystemNavigator.pop();
-                  }
-                },
-                child: widget.authPage
-                    ? AuthPage(
-                        launchAccountPage: widget.launchAccountPage,
-                      )
-                    : widget.launchAccountPage
-                        ? const Accounts()
-                        : const Login()),
+            home: authPage
+                ? AuthPage(
+                    launchAccountPage: launchAccountPage,
+                  )
+                : launchAccountPage
+                    ? const Accounts()
+                    : const Login(),
             routes: {
               "/login": (BuildContext context) => const Login(),
               "/home": (BuildContext context) => const Home(),

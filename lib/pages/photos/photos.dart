@@ -1,41 +1,28 @@
 import 'package:garden/pages/photos/album_tab.dart';
-import 'package:garden/pages/photos/folder.dart';
 import 'package:garden/pages/photos/photo_tab.dart';
 import 'package:garden/pages/photos/share_tab.dart';
-import 'package:garden/pages/photos/timeline.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:signals_hooks/signals_hooks.dart';
 
-class Photos extends StatefulWidget {
+class Photos extends HookWidget {
   const Photos({super.key});
 
   @override
-  State<Photos> createState() => _PhotosState();
-}
-
-class _PhotosState extends State<Photos> {
-  int currentIndex = 0;
-  bool isTeam = false;
-  bool isTimeline = true;
-  GlobalKey<TimelineState> timelineKey = GlobalKey();
-  GlobalKey<FolderState> folderKey = GlobalKey();
-  GlobalKey<AlbumTabState> albumTabKey = GlobalKey();
-  @override
-  void initState() {
-    // 获取
-    super.initState();
-  }
-
-  @override
   Widget build(BuildContext context) {
+    final currentIndex = useSignal(0);
+    final isTeam = useSignal(false);
+    final isTimeline = useSignal(true);
     final menuW = MediaQuery.sizeOf(context).width / 5;
+
     return Scaffold(
       appBar: AppBar(
         leading: AppBackButton(context),
         title: DropdownMenu(
           width: menuW,
-          initialSelection: currentIndex,
+          initialSelection: currentIndex.value,
           enableSearch: false,
           enableFilter: false,
           textAlign: TextAlign.center,
@@ -48,13 +35,11 @@ class _PhotosState extends State<Photos> {
             DropdownMenuEntry(value: 2, label: '共享'),
           ],
           onSelected: (value) {
-            setState(() {
-              currentIndex = value ?? 0;
-            });
+            currentIndex.value = value ?? 0;
           },
         ),
         actions: [
-          if (currentIndex != 2)
+          if (currentIndex.value != 2)
             Padding(
               padding: const EdgeInsets.only(right: 10, top: 8, bottom: 8),
               child: OutlinedButton(
@@ -62,7 +47,9 @@ class _PhotosState extends State<Photos> {
                   showCupertinoModalPopup(
                     context: context,
                     builder: (context) {
-                      return Material(
+                      return SizedBox(
+                        width: double.infinity,
+                        child: Material(
                         color: Colors.transparent,
                         child: Card(
                           shape: RoundedRectangleBorder(
@@ -77,45 +64,25 @@ class _PhotosState extends State<Photos> {
                                 children: <Widget>[
                                   OutlinedButton(
                                     onPressed: () async {
-                                      setState(() {
-                                        isTeam = !isTeam;
-                                      });
-                                      if (isTimeline) {
-                                        timelineKey.currentState
-                                            ?.getData(isTeam: isTeam);
-                                      } else {
-                                        folderKey.currentState
-                                            ?.getData(isTeam: isTeam);
-                                      }
-                                      albumTabKey.currentState
-                                          ?.getData(isTeam: isTeam);
+                                      isTeam.value = !isTeam.value;
                                       Navigator.of(context).pop();
                                     },
                                     child: Text(
-                                      "切换到${isTeam ? '个人空间' : '共享空间'}",
+                                      "切换到${isTeam.value ? '个人空间' : '共享空间'}",
                                       style: const TextStyle(fontSize: 18),
                                     ),
                                   ),
                                   const SizedBox(
                                     height: 16,
                                   ),
-                                  if (currentIndex == 0) ...[
+                                  if (currentIndex.value == 0) ...[
                                     OutlinedButton(
                                       onPressed: () async {
                                         Navigator.of(context).pop();
-                                        setState(() {
-                                          isTimeline = !isTimeline;
-                                        });
-                                        if (isTimeline) {
-                                          timelineKey.currentState
-                                              ?.getData(isTeam: isTeam);
-                                        } else {
-                                          folderKey.currentState
-                                              ?.getData(isTeam: isTeam);
-                                        }
+                                        isTimeline.value = !isTimeline.value;
                                       },
                                       child: Text(
-                                        "切换到${isTimeline ? '文件夹' : '时间线'}视图",
+                                        "切换到${isTimeline.value ? '文件夹' : '时间线'}视图",
                                         style: const TextStyle(fontSize: 18),
                                       ),
                                     ),
@@ -140,6 +107,7 @@ class _PhotosState extends State<Photos> {
                             ),
                           ),
                         ),
+                      ),
                       );
                     },
                   );
@@ -157,16 +125,14 @@ class _PhotosState extends State<Photos> {
         children: [
           Expanded(
             child: IndexedStack(
-              index: currentIndex,
+              index: currentIndex.value,
               children: [
                 PhotoTab(
-                  isTeam,
-                  isTimeline,
-                  timelineKey: timelineKey,
-                  folderKey: folderKey,
+                  isTeam.value,
+                  isTimeline.value,
                 ),
                 AlbumTab(
-                  isTeam,
+                  isTeam.value,
                 ),
                 const ShareTab(),
               ],

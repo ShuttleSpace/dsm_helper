@@ -1,291 +1,162 @@
+import 'package:garden/api/dsm_api.dart';
 import 'package:garden/util/http_util.dart';
 import 'package:garden/util/log.dart';
 import 'package:garden/widgets/bubble_tab_indicator.dart';
 import 'package:garden/widgets/dashboard/volume_card.dart';
-import 'package:garden/widgets/label.dart';
 import 'package:garden/widgets/neu_back_button.dart';
+import 'package:garden/widgets/system_info/dev_item.dart';
+import 'package:garden/widgets/system_info/disk_item.dart';
+import 'package:garden/widgets/system_info/nif_item.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:garden/constants/app_constants.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:signals_hooks/signals_hooks.dart';
 
-class SystemInfo extends StatefulWidget {
-  final int index;
-  final Map system;
-  final List volumes;
-  final List disks;
-  const SystemInfo(this.index, this.system, this.volumes, this.disks,
+class SystemInfo extends HookWidget {
+  const SystemInfo(
+      this.index, this.systemData, this.storageVolumes, this.storageDisks,
       {super.key});
-  @override
-  SystemInfoState createState() => SystemInfoState();
-}
-
-class SystemInfoState extends State<SystemInfo>
-    with SingleTickerProviderStateMixin {
-  late TabController _tabController;
-  List usbDev = [];
-  List nifs = [];
-  List volumes = [];
-  List disks = [];
-  Map network = {};
-  bool loadingDisks = false;
-  @override
-  void initState() {
-    _tabController =
-        TabController(initialIndex: widget.index, length: 6, vsync: this);
-    setState(() {
-      usbDev = widget.system['usb_dev'];
-    });
-
-    getData();
-    if (widget.volumes.isNotEmpty || widget.disks.isNotEmpty) {
-      setState(() {
-        volumes = widget.volumes;
-        disks = widget.disks;
-      });
-    } else {
-      setState(() {
-        loadingDisks = true;
-      });
-      getDisks();
-    }
-    super.initState();
-  }
-
-  getData() async {
-    var res = await DsmApi.networkInfo();
-    if (res['success']) {
-      setState(() {
-        network = res['data'];
-        nifs = network['nif'];
-      });
-      Log.log("get networkInfo: $network");
-    }
-  }
-
-  getDisks() async {
-    var res = await DsmApi.storage();
-    if (res['success']) {
-      setState(() {
-        loadingDisks = false;
-        volumes = res['data']['volumes'];
-        volumes.sort((a, b) {
-          return a['num_id'].compareTo(b['num_id']);
-        });
-        disks = res['data']['disks'];
-      });
-    }
-  }
-
-  Widget _buildNifItem(nif) {
-    return Card(
-      shape: RoundedRectangleBorder(
-          side: const BorderSide(), borderRadius: BorderRadius.circular(18)),
-      margin: const EdgeInsets.only(top: 20, left: 20, right: 20),
-      child: Padding(
-        padding: const EdgeInsets.all(AppConstants.paddingSmall),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(top: 20, left: 20),
-              child: Text(
-                "局域网 ${nifs.indexOf(nif) + 1}",
-                style:
-                    const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
-              ),
-            ),
-            Card(
-              shape: RoundedRectangleBorder(
-                  side: const BorderSide(),
-                  borderRadius: BorderRadius.circular(18)),
-              margin: const EdgeInsets.only(top: 20, left: 20, right: 20),
-              child: Padding(
-                padding: const EdgeInsets.all(AppConstants.paddingSmall),
-                child: Row(
-                  children: [
-                    const Expanded(
-                      child: Text(
-                        "MAC 地址",
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                    Expanded(
-                      flex: 2,
-                      child: Text(
-                        "${nif['mac']}",
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            Card(
-              shape: RoundedRectangleBorder(
-                  side: const BorderSide(),
-                  borderRadius: BorderRadius.circular(18)),
-              margin: const EdgeInsets.only(top: 20, left: 20, right: 20),
-              child: Padding(
-                padding: const EdgeInsets.all(AppConstants.paddingSmall),
-                child: Row(
-                  children: [
-                    const Expanded(
-                      flex: 1,
-                      child: Text(
-                        "IP 地址",
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                    Expanded(
-                      flex: 2,
-                      child: Text(
-                        "${nif['addr']}",
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            Card(
-              shape: RoundedRectangleBorder(
-                  side: const BorderSide(),
-                  borderRadius: BorderRadius.circular(18)),
-              margin: const EdgeInsets.only(top: 20, left: 20, right: 20),
-              child: Padding(
-                padding: const EdgeInsets.all(AppConstants.paddingSmall),
-                child: Row(
-                  children: [
-                    const Expanded(
-                      flex: 1,
-                      child: Text(
-                        "子网掩码",
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                    Expanded(
-                      flex: 2,
-                      child: Text(
-                        "${nif['mask']}",
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            const SizedBox(
-              height: 20,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildDevItem(dev) {
-    return Card(
-      shape: RoundedRectangleBorder(
-          side: const BorderSide(), borderRadius: BorderRadius.circular(18)),
-      margin: const EdgeInsets.only(top: 20, left: 20, right: 20),
-      child: Padding(
-        padding: const EdgeInsets.all(AppConstants.paddingSmall),
-        child: Row(
-          children: [
-            Expanded(
-              child: Text(
-                dev['cls'] == "hub" ? "USB集线器" : dev['cls'],
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-            Expanded(
-              flex: 2,
-              child: Text(
-                "${dev['product']}${dev['producer']}",
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildDiskItem(disk) {
-    return Card(
-      shape: RoundedRectangleBorder(
-          side: const BorderSide(), borderRadius: BorderRadius.circular(18)),
-      margin: const EdgeInsets.only(top: 20, left: 20, right: 20),
-      child: Padding(
-        padding: const EdgeInsets.all(AppConstants.paddingSmall),
-        child: Row(
-          children: [
-            Card(
-              shape: RoundedRectangleBorder(
-                  side: const BorderSide(),
-                  borderRadius: BorderRadius.circular(18)),
-              margin: const EdgeInsets.all(10),
-              child: Padding(
-                padding: const EdgeInsets.all(AppConstants.paddingSmall),
-                child: Image.asset(
-                  disk['isSsd']
-                      ? "assets/icons/ssd.png"
-                      : "assets/icons/hdd.png",
-                  width: 40,
-                ),
-              ),
-            ),
-            const SizedBox(
-              width: 10,
-            ),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Text(
-                        "${disk['longName']}",
-                        style: const TextStyle(fontWeight: FontWeight.w600),
-                      ),
-                      const SizedBox(
-                        width: 5,
-                      ),
-                      Label(
-                        disk['overview_status'] == "normal"
-                            ? "正常"
-                            : disk['overview_status'],
-                        disk['overview_status'] == "normal"
-                            ? Colors.green
-                            : Colors.red,
-                        fill: true,
-                      ),
-                    ],
-                  ),
-                  const SizedBox(
-                    height: 5,
-                  ),
-                  Text("${disk['vendor'].trim()} ${disk['model'].trim()}"),
-                  const SizedBox(
-                    height: 5,
-                  ),
-                  Row(
-                    children: [
-                      Text(int.parse(disk['size_total']).formatSize()),
-                      Text("  ${disk['temp']}℃"),
-                    ],
-                  ),
-                ],
-              ),
-            )
-          ],
-        ),
-      ),
-    );
-  }
+  final int index;
+  final ReadonlySignal<Map> systemData;
+  final ReadonlySignal<List> storageVolumes;
+  final ReadonlySignal<List> storageDisks;
 
   @override
   Widget build(BuildContext context) {
+    final tickerProvider = useSingleTickerProvider();
+    final tabController = useMemoized(
+      () =>
+          TabController(initialIndex: index, length: 6, vsync: tickerProvider),
+      const [],
+    );
+    final usbDev = useComputed(() => systemData['usb_dev'] ?? 0);
+    final nifs = useListSignal([]);
+    final volumes = useFutureSignal<List>(() async {
+      if (storageVolumes.isNotEmpty) {
+        return Future.value(storageVolumes.value);
+      }
+      final res = await dsmStorageCGIStorageLoadInfo();
+      final d = res['volumes'];
+      d.sort((a, b) {
+        return a['num_id'].compareTo(b['num_id']);
+      });
+      return Future.value(d);
+    });
+    final disks = useFutureSignal<List>(() async {
+      if (storageDisks.isNotEmpty) {
+        return Future.value(storageDisks.value);
+      }
+      final res = await dsmStorageCGIStorageLoadInfo();
+      return Future.value(res['disks']);
+    });
+    final network = useMapSignal({});
+
+    getData() async {
+      try {
+        final res = await dsmCoreNetworkGet();
+        network.value = res;
+        nifs.value = network['nif'] ?? [];
+      } catch (e) {
+        Log.error('dsmCoreNetworkGet: $e');
+      }
+    }
+
+    Widget buildVolume() {
+      return switch (volumes.value) {
+        AsyncData(:final value) => Card(
+            margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+            child: Padding(
+              padding: const EdgeInsets.all(AppConstants.paddingSmall),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Padding(
+                    padding: EdgeInsets.only(left: 20, top: 20),
+                    child: Text(
+                      "存储空间",
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+                    ),
+                  ),
+                  ...value.map((volume) => VolumeCard(volume: volume)),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                ],
+              ),
+            ),
+          ),
+        AsyncError(:final error) => Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text('Oops! $error'),
+              const SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: () => volumes.reload(),
+                child: const Text('Retry'),
+              ),
+            ],
+          ),
+        _ => const Center(
+            child: CupertinoActivityIndicator(
+              radius: 14,
+            ),
+          )
+      };
+    }
+
+    Widget buildDisk() {
+      return switch (disks.value) {
+        AsyncData(:final value) => Card(
+            margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+            child: Padding(
+              padding: const EdgeInsets.all(AppConstants.paddingSmall),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Padding(
+                    padding: EdgeInsets.only(left: 20, top: 20),
+                    child: Text(
+                      "硬盘",
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+                    ),
+                  ),
+                  ...value.map((disk) => SystemDiskItem(disk)),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                ],
+              ),
+            ),
+          ),
+        AsyncError(:final error) => Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text('Oops! $error'),
+              const SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: () => disks.reload(),
+                child: const Text('Retry'),
+              ),
+            ],
+          ),
+        _ => const Center(
+            child: CupertinoActivityIndicator(
+              radius: 14,
+            ),
+          )
+      };
+    }
+
+    useEffect(() {
+      getData();
+      return () {
+        tabController.dispose();
+      };
+    }, const []);
+
     return Scaffold(
       appBar: AppBar(
         leading: AppBackButton(context),
@@ -303,7 +174,7 @@ class SystemInfoState extends State<SystemInfo>
             child: TabBar(
               dividerHeight: 0,
               isScrollable: true,
-              controller: _tabController,
+              controller: tabController,
               indicatorSize: TabBarIndicatorSize.label,
               labelColor: Theme.brightnessOf(context) == Brightness.dark
                   ? Colors.white
@@ -340,7 +211,7 @@ class SystemInfoState extends State<SystemInfo>
           ),
           Expanded(
             child: TabBarView(
-              controller: _tabController,
+              controller: tabController,
               children: [
                 ListView(
                   padding: const EdgeInsets.symmetric(vertical: 20),
@@ -384,7 +255,7 @@ class SystemInfoState extends State<SystemInfo>
                                     Expanded(
                                       flex: 2,
                                       child: Text(
-                                        "${widget.system['serial']}",
+                                        "${systemData['serial']}",
                                         overflow: TextOverflow.ellipsis,
                                       ),
                                     ),
@@ -412,7 +283,7 @@ class SystemInfoState extends State<SystemInfo>
                                     Expanded(
                                       flex: 2,
                                       child: Text(
-                                        "${widget.system['model']}",
+                                        "${systemData['model']}",
                                         overflow: TextOverflow.ellipsis,
                                       ),
                                     ),
@@ -440,7 +311,7 @@ class SystemInfoState extends State<SystemInfo>
                                     Expanded(
                                       flex: 2,
                                       child: Text(
-                                        "${widget.system['cpu_vendor']} ${widget.system['cpu_family']} ${widget.system['cpu_series']}",
+                                        "${systemData['cpu_vendor']} ${systemData['cpu_family']} ${systemData['cpu_series']}",
                                         overflow: TextOverflow.ellipsis,
                                       ),
                                     ),
@@ -468,7 +339,7 @@ class SystemInfoState extends State<SystemInfo>
                                     Expanded(
                                       flex: 2,
                                       child: Text(
-                                        "${widget.system['cpu_cores']}核 @ ${(widget.system['cpu_clock_speed'] / 1000).toStringAsFixed(2)}GHz",
+                                        "${systemData['cpu_cores']}核 @ ${(systemData['cpu_clock_speed'] / 1000).toStringAsFixed(2)}GHz",
                                         overflow: TextOverflow.ellipsis,
                                       ),
                                     ),
@@ -496,7 +367,7 @@ class SystemInfoState extends State<SystemInfo>
                                     Expanded(
                                       flex: 2,
                                       child: Text(
-                                        "${widget.system['ram_size']}MB",
+                                        "${systemData['ram_size']}MB",
                                         overflow: TextOverflow.ellipsis,
                                       ),
                                     ),
@@ -524,7 +395,7 @@ class SystemInfoState extends State<SystemInfo>
                                     Expanded(
                                       flex: 2,
                                       child: Text(
-                                        "${widget.system['firmware_ver']}",
+                                        "${systemData['firmware_ver']}",
                                         overflow: TextOverflow.ellipsis,
                                       ),
                                     ),
@@ -552,7 +423,7 @@ class SystemInfoState extends State<SystemInfo>
                                     Expanded(
                                       flex: 2,
                                       child: Text(
-                                        "${widget.system['time']}",
+                                        "${systemData['time']}",
                                         overflow: TextOverflow.ellipsis,
                                       ),
                                     ),
@@ -580,7 +451,7 @@ class SystemInfoState extends State<SystemInfo>
                                     Expanded(
                                       flex: 2,
                                       child: Text(
-                                        parseOpTime(widget.system['up_time']),
+                                        parseOpTime(systemData['up_time']),
                                         overflow: TextOverflow.ellipsis,
                                       ),
                                     ),
@@ -588,7 +459,7 @@ class SystemInfoState extends State<SystemInfo>
                                 ),
                               ),
                             ),
-                            if (widget.system['sys_temp'] != null)
+                            if (systemData['sys_temp'] != null)
                               Card(
                                 shape: RoundedRectangleBorder(
                                     side: const BorderSide(),
@@ -609,16 +480,15 @@ class SystemInfoState extends State<SystemInfo>
                                       Expanded(
                                         flex: 2,
                                         child: Text(
-                                          "${widget.system['sys_temp']}℃ ${widget.system['temperature_warning'] == null ? (widget.system['sys_temp'] > 80 ? "警告" : "正常") : (widget.system['temperature_warning'] ? "警告" : "正常")}",
+                                          "${systemData['sys_temp']}℃ ${systemData['temperature_warning'] == null ? (systemData['sys_temp'] > 80 ? "警告" : "正常") : (systemData['temperature_warning'] ? "警告" : "正常")}",
                                           style: TextStyle(
-                                              color: widget.system[
+                                              color: systemData[
                                                           'temperature_warning'] ==
                                                       null
-                                                  ? (widget.system['sys_temp'] >
-                                                          80
+                                                  ? (systemData['sys_temp'] > 80
                                                       ? Colors.red
                                                       : Colors.green)
-                                                  : (widget.system[
+                                                  : (systemData[
                                                           'temperature_warning']
                                                       ? Colors.red
                                                       : Colors.green)),
@@ -676,7 +546,7 @@ class SystemInfoState extends State<SystemInfo>
                                     Expanded(
                                       flex: 2,
                                       child: Text(
-                                        "${widget.system['ntp_server']} ${widget.system['enabled_ntp'] ? "" : "(暂未启用)"}",
+                                        "${systemData['ntp_server']} ${systemData['enabled_ntp'] == true ? "" : "(暂未启用)"}",
                                         overflow: TextOverflow.ellipsis,
                                       ),
                                     ),
@@ -705,7 +575,7 @@ class SystemInfoState extends State<SystemInfo>
                                     Expanded(
                                       flex: 2,
                                       child: Text(
-                                        "${widget.system['time_zone_desc']}",
+                                        "${systemData['time_zone_desc']}",
                                         overflow: TextOverflow.ellipsis,
                                       ),
                                     ),
@@ -720,7 +590,7 @@ class SystemInfoState extends State<SystemInfo>
                         ),
                       ),
                     ),
-                    if (usbDev.isNotEmpty)
+                    if (usbDev.value.isNotEmpty)
                       Card(
                         margin:
                             const EdgeInsets.only(top: 20, left: 20, right: 20),
@@ -739,7 +609,7 @@ class SystemInfoState extends State<SystemInfo>
                                       fontWeight: FontWeight.w600),
                                 ),
                               ),
-                              ...usbDev.map(_buildDevItem),
+                              ...usbDev.value.map((dev) => UsbDeviceItem(dev)),
                               const SizedBox(
                                 height: 20,
                               ),
@@ -878,72 +748,12 @@ class SystemInfoState extends State<SystemInfo>
                         ),
                       ),
                     ),
-                    ...nifs.map(_buildNifItem),
+                    ...nifs.map(
+                        (nif) => NetworkInterfaceItem(nif, nifs.indexOf(nif))),
                   ],
                 ),
-                loadingDisks
-                    ? const Center(
-                        child: CupertinoActivityIndicator(
-                          radius: 14,
-                        ),
-                      )
-                    : ListView(
-                        children: [
-                          Card(
-                            margin: const EdgeInsets.symmetric(
-                                horizontal: 20, vertical: 15),
-                            child: Padding(
-                              padding: const EdgeInsets.all(
-                                  AppConstants.paddingSmall),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  const Padding(
-                                    padding: EdgeInsets.only(left: 20, top: 20),
-                                    child: Text(
-                                      "存储空间",
-                                      style: TextStyle(
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.w600),
-                                    ),
-                                  ),
-                                  ...volumes.map(
-                                      (volume) => VolumeCard(volume: volume)),
-                                  const SizedBox(
-                                    height: 20,
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                          Card(
-                            margin: const EdgeInsets.symmetric(
-                                horizontal: 20, vertical: 15),
-                            child: Padding(
-                              padding: const EdgeInsets.all(
-                                  AppConstants.paddingSmall),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  const Padding(
-                                    padding: EdgeInsets.only(left: 20, top: 20),
-                                    child: Text(
-                                      "硬盘",
-                                      style: TextStyle(
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.w600),
-                                    ),
-                                  ),
-                                  ...disks.map(_buildDiskItem),
-                                  const SizedBox(
-                                    height: 20,
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
+                Expanded(child: buildVolume()),
+                Expanded(child: buildDisk()),
                 const Center(
                   child: Text("待开发"),
                 ),

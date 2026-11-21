@@ -1,5 +1,6 @@
 import 'package:garden/stores/connection_store.dart';
 import 'package:flutter/material.dart';
+import 'package:garden/extensions/context.dart';
 import 'package:garden/widgets/cupertino_image.dart';
 import 'package:garden/widgets/packages/package_button.dart';
 import 'package:signals/signals_flutter.dart';
@@ -27,14 +28,13 @@ class UpdatePackageItem extends StatelessWidget {
   Widget build(BuildContext context) {
     String thumbnailUrl = update['thumbnail'].last;
     if (!thumbnailUrl.startsWith("http")) {
-      thumbnailUrl = connectionStore.baseUrl.watch(context) + thumbnailUrl;
+      thumbnailUrl = connectionStore.baseUri.watch(context) + thumbnailUrl;
     }
 
     return GestureDetector(
       onTap: onTap,
       child: Card(
-        shape: RoundedRectangleBorder(
-            side: const BorderSide(), borderRadius: BorderRadius.circular(18)),
+        shape: context.stadiumShapeBorder,
         margin: const EdgeInsets.only(bottom: 20),
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),

@@ -1,4 +1,3 @@
-import 'package:garden/models/shortcut_item_model.dart';
 import 'package:garden/stores/connection_store.dart';
 import 'package:garden/pages/common/browser.dart';
 import 'package:garden/pages/control_panel/control_panel.dart';
@@ -14,6 +13,7 @@ import 'package:garden/pages/virtual_machine/virtual_machine.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:garden/constants/app_constants.dart';
+import 'package:signals_flutter/signals_flutter.dart';
 
 import '../photos/photos.dart';
 
@@ -31,19 +31,23 @@ List supportedShortcuts = [
 ];
 
 class ShortcutList extends StatelessWidget {
-  final List<ShortcutItemModel> shortcutItems;
-  final BuildContext context;
-  final Map system;
-  final List volumes;
-  final List disks;
-  final Map appNotify;
-  final List? validAppViewOrder;
-  const ShortcutList(this.shortcutItems, this.system, this.volumes, this.disks,
-      this.appNotify, this.context,
+  const ShortcutList(this.shortcutItems, this.systemData, this.storageVolumes,
+      this.storageDisks, this.appNotify,
       {super.key, this.validAppViewOrder});
-
+  final ReadonlySignal<List<Map>> shortcutItems;
+  final ReadonlySignal<Map> systemData;
+  final ReadonlySignal<List> storageVolumes;
+  final ReadonlySignal<List> storageDisks;
+  final ReadonlySignal<Map> appNotify;
+  final ReadonlySignal<List>? validAppViewOrder;
   @override
   Widget build(BuildContext ctx) {
+    final shortcutItemsValue = shortcutItems.watch(ctx);
+    final appNotifyValue = appNotify.watch(ctx);
+    final systemValue = systemData.watch(ctx);
+    final storageVolumesValue = storageVolumes.watch(ctx);
+    final storageDisksValue = storageDisks.watch(ctx);
+    final validAppViewOrderValue = validAppViewOrder?.watch(ctx);
     return Card(
       shape: RoundedRectangleBorder(
           side: const BorderSide(), borderRadius: BorderRadius.circular(18)),
@@ -53,15 +57,29 @@ class ShortcutList extends StatelessWidget {
         child: ListView.builder(
           scrollDirection: Axis.horizontal,
           itemBuilder: (ctx, i) {
-            return _buildShortcutItem(context, shortcutItems[i]);
+            return _buildShortcutItem(
+                ctx,
+                shortcutItemsValue[i],
+                systemValue,
+                storageVolumesValue,
+                storageDisksValue,
+                appNotifyValue,
+                validAppViewOrderValue);
           },
-          itemCount: shortcutItems.length,
+          itemCount: shortcutItemsValue.length,
         ),
       ),
     );
   }
 
-  Widget _buildShortcutItem(BuildContext context, ShortcutItemModel shortcut) {
+  Widget _buildShortcutItem(
+      BuildContext context,
+      Map shortcut,
+      Map systemValue,
+      List storageVolumesValue,
+      List storageDisksValue,
+      Map appNotifyValue,
+      List? validAppViewOrderValue) {
     String icon = "";
     String name = "";
     int unread = 0;
@@ -71,15 +89,15 @@ class ShortcutList extends StatelessWidget {
       ),
     );
     String routerName = '';
-    switch (shortcut.className) {
+    switch (shortcut['className']) {
       case "SYNO.SDS.PkgManApp.Instance":
         icon =
             "assets/applications/${connectionStore.dsmVersion}/package_center.png";
         name = "套件中心";
         page = Packages('DSM ${connectionStore.dsmVersion}.0-10049');
         routerName = "packages";
-        if (appNotify['SYNO.SDS.PkgManApp.Instance'] != null) {
-          unread = appNotify['SYNO.SDS.PkgManApp.Instance']['unread'];
+        if (appNotifyValue['SYNO.SDS.PkgManApp.Instance'] != null) {
+          unread = appNotifyValue['SYNO.SDS.PkgManApp.Instance']['unread'];
         }
         break;
       case "SYNO.SDS.AdminCenter.Application":
@@ -87,15 +105,13 @@ class ShortcutList extends StatelessWidget {
             "assets/applications/${connectionStore.dsmVersion}/control_panel.png";
         name = "控制面板";
         page = ControlPanel(
-            system,
-            volumes,
-            disks,
-            appNotify['SYNO.SDS.AdminCenter.Application'] != null
-                ? appNotify['SYNO.SDS.AdminCenter.Application']['fn']
-                : null);
+            systemValue.toSignal(),
+            storageVolumesValue.toSignal(),
+            storageDisksValue.toSignal(),
+            appNotifyValue.toSignal());
         routerName = "control_panel";
-        if (appNotify['SYNO.SDS.AdminCenter.Application'] != null) {
-          unread = appNotify['SYNO.SDS.AdminCenter.Application']['unread'];
+        if (appNotifyValue['SYNO.SDS.AdminCenter.Application'] != null) {
+          unread = appNotifyValue['SYNO.SDS.AdminCenter.Application']['unread'];
         }
         break;
       case "SYNO.SDS.StorageManager.Instance":
@@ -106,7 +122,7 @@ class ShortcutList extends StatelessWidget {
         routerName = "storage_manager";
         break;
       case "SYNO.SDS.Docker.Application":
-        if (validAppViewOrder
+        if (validAppViewOrderValue
                 ?.contains("SYNO.SDS.ContainerManager.Application") ==
             true) {
           icon = "assets/applications/container_manager.png";
@@ -123,17 +139,17 @@ class ShortcutList extends StatelessWidget {
         routerName = "docker";
         break;
       case "SYNO.SDS.Docker.ContainerDetail.Instance":
-        if (validAppViewOrder
+        if (validAppViewOrderValue
                 ?.contains("SYNO.SDS.ContainerManager.Application") ==
             true) {
           icon = "assets/applications/container_manager.png";
         } else {
           icon = "assets/applications/docker.png";
         }
-        name = "${shortcut.param?.data?.name}";
-        if (shortcut.type == 'url') {
+        name = "${shortcut['param']?['data']?['name']}";
+        if (shortcut['type'] == 'url') {
           page = Browser(
-            url: shortcut.url ?? '',
+            url: shortcut['url'] ?? '',
             title: name,
           );
           routerName = "browser";

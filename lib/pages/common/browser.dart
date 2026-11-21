@@ -1,58 +1,54 @@
 import 'package:garden/util/log.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:signals_hooks/signals_hooks.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
-class Browser extends StatefulWidget {
+class Browser extends HookWidget {
   final String url;
   final String? title;
   const Browser({super.key, required this.url, this.title});
-  @override
-  BrowserState createState() => BrowserState();
-}
 
-class BrowserState extends State<Browser> {
-  final WebViewController _webviewController = WebViewController();
   @override
-  void initState() {
-    _webviewController
-      ..loadRequest(Uri.parse(widget.url))
-      ..setJavaScriptMode(JavaScriptMode.unrestricted)
-      ..setNavigationDelegate(
-        NavigationDelegate(
-          onPageStarted: (url) {
-            //TODO 检查是否需要授权
-            Log.info("onPageStarted");
-          },
-          onPageFinished: (_) {
-            Log.info("onPageFinished");
-            setState(() {});
-          },
-          onWebResourceError: (WebResourceError error) {
-            Log.info('''
+  Widget build(BuildContext context) {
+    final refresh = useSignal(0);
+    final webviewController = useMemoized(() {
+      return WebViewController()
+        ..loadRequest(Uri.parse(url))
+        ..setJavaScriptMode(JavaScriptMode.unrestricted)
+        ..setNavigationDelegate(
+          NavigationDelegate(
+            onPageStarted: (url) {
+              //TODO 检查是否需要授权
+              Log.info("onPageStarted");
+            },
+            onPageFinished: (_) {
+              Log.info("onPageFinished");
+              refresh.value++;
+            },
+            onWebResourceError: (WebResourceError error) {
+              Log.info('''
 Page resource error:
   code: ${error.errorCode}
   description: ${error.description}
   errorType: ${error.errorType}
   isForMainFrame: ${error.isForMainFrame}
           ''');
-          },
-        ),
-      );
-    super.initState();
-  }
+            },
+          ),
+        );
+    }, const []);
 
-  @override
-  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         leading: AppBackButton(context),
         title: FutureBuilder<String?>(
-          future: _webviewController.platform.getTitle(),
+          future: webviewController.platform.getTitle(),
           builder: (context, snapshot) {
             if (snapshot.hasData) {
-              return Text(snapshot.data ?? widget.title ?? "加载中……");
+              return Text(snapshot.data ?? title ?? "加载中……");
             } else {
               return const SizedBox();
             }
@@ -63,8 +59,7 @@ Page resource error:
             padding: const EdgeInsets.only(right: 10, top: 8, bottom: 8),
             child: OutlinedButton(
               onPressed: () {
-                launchUrlString(widget.url,
-                    mode: LaunchMode.externalApplication);
+                launchUrlString(url, mode: LaunchMode.externalApplication);
               },
               child: Image.asset(
                 "assets/icons/browser.png",
@@ -79,7 +74,7 @@ Page resource error:
         children: [
           Expanded(
             child: WebViewWidget(
-              controller: _webviewController,
+              controller: webviewController,
             ),
           ),
           SafeArea(
@@ -88,14 +83,14 @@ Page resource error:
               child: Row(
                 children: <Widget>[
                   FutureBuilder<bool>(
-                    future: _webviewController.canGoBack(),
+                    future: webviewController.canGoBack(),
                     builder: (context, shot) {
                       bool canGoBack = shot.data ?? false;
                       return OutlinedButton(
                         onPressed: canGoBack
                             ? () async {
-                                await _webviewController.goBack();
-                                setState(() {});
+                                await webviewController.goBack();
+                                refresh.value++;
                               }
                             : null,
                         child: Icon(
@@ -110,14 +105,14 @@ Page resource error:
                     width: 10,
                   ),
                   FutureBuilder<bool>(
-                    future: _webviewController.canGoForward(),
+                    future: webviewController.canGoForward(),
                     builder: (context, shot) {
                       bool canGoForward = shot.data ?? false;
                       return OutlinedButton(
                         onPressed: canGoForward
                             ? () async {
-                                await _webviewController.goForward();
-                                setState(() {});
+                                await webviewController.goForward();
+                                refresh.value++;
                               }
                             : null,
                         child: Icon(
@@ -143,7 +138,7 @@ Page resource error:
                   ),
                   OutlinedButton(
                     onPressed: () {
-                      _webviewController.reload();
+                      webviewController.reload();
                     },
                     child: const Icon(
                       Icons.replay,

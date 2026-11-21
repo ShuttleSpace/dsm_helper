@@ -105,7 +105,7 @@ class FileListItem extends StatelessWidget {
                         children: [
                           Hero(
                             tag:
-                                "${connectionStore.baseUrl}/webapi/entry.cgi?path=${Uri.encodeComponent(path)}&size=original&api=SYNO.FileStation.Thumb&method=get&version=2&_sid=${connectionStore.sid}&animate=true",
+                                "${connectionStore.baseUri}/webapi/entry.cgi?path=${Uri.encodeComponent(path)}&size=original&api=SYNO.FileStation.Thumb&method=get&version=2&_sid=${connectionStore.sid}&animate=true",
                             child: FileIcon(
                               file['isdir'] ? FileTypeEnum.folder : fileType,
                               thumb: file['path'],
@@ -142,7 +142,7 @@ class FileListItem extends StatelessWidget {
                   ),
                   Hero(
                     tag:
-                        "${connectionStore.baseUrl}/webapi/entry.cgi?path=${Uri.encodeComponent(path)}&size=thumb&api=NEU_FILE_THUMB&method=get&version=1&_sid=${connectionStore.sid}&animate=true",
+                        "${connectionStore.baseUri}/webapi/entry.cgi?path=${Uri.encodeComponent(path)}&size=thumb&api=NEU_FILE_THUMB&method=get&version=1&_sid=${connectionStore.sid}&animate=true",
                     child: FileIcon(
                       file['isdir'] ? FileTypeEnum.folder : fileType,
                       thumb: file['path'],

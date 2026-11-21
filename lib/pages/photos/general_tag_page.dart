@@ -4,41 +4,36 @@ import 'package:garden/widgets/neu_back_button.dart';
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:signals_hooks/signals_hooks.dart';
 
-class GeneralTagPage extends StatefulWidget {
+class GeneralTagPage extends HookWidget {
   const GeneralTagPage(this.isTeam, {super.key});
   final bool isTeam;
-  @override
-  State<GeneralTagPage> createState() => _GeneralTagPageState();
-}
-
-class _GeneralTagPageState extends State<GeneralTagPage> {
-  bool loading = true;
-  double photoWidth = 0;
-
-  List<GeneralTagModel> tags = [];
-  @override
-  void initState() {
-    getData();
-    super.initState();
-  }
-
-  Future getData() async {
-    tags = await GeneralTagModel.fetch(
-        additional: ['thumbnail'], isTeam: widget.isTeam);
-    setState(() {
-      loading = false;
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
+    final loading = useSignal(true);
+    final photoWidth = useSignal(0.0);
+    final tags = useSignal<List<GeneralTagModel>>([]);
+
+    Future getData() async {
+      tags.value = await GeneralTagModel.fetch(
+          additional: ['thumbnail'], isTeam: isTeam);
+      loading.value = false;
+    }
+
+    useEffect(() {
+      getData();
+      return null;
+    }, const []);
+
     return Scaffold(
       appBar: AppBar(
         leading: AppBackButton(context),
         title: const Text("标签"),
       ),
-      body: loading
+      body: loading.value
           ? const Center(
               child: CupertinoActivityIndicator(
                 radius: 14,
@@ -49,28 +44,28 @@ class _GeneralTagPageState extends State<GeneralTagPage> {
               child: Wrap(
                 runSpacing: 20,
                 spacing: 20,
-                children: tags.map((tag) {
+                children: tags.value.map((tag) {
                   return GestureDetector(
                     onTap: () {
                       Navigator.of(context)
                           .push(CupertinoPageRoute(builder: (context) {
                         return TimelinePage(
                           title: tag.name ?? '',
-                          isTeam: widget.isTeam,
+                          isTeam: isTeam,
                           generalTagId: tag.id ?? 0,
                         );
                       }));
                     },
                     child: SizedBox(
-                      width: photoWidth,
+                      width: photoWidth.value,
                       child: Column(
                         children: [
                           ExtendedImage.network(
                             tag.additional!.thumbnail?.thumbUrl(
-                                    size: 'sm', isTeam: widget.isTeam) ??
+                                    size: 'sm', isTeam: isTeam) ??
                                 '',
-                            width: photoWidth,
-                            height: photoWidth,
+                            width: photoWidth.value,
+                            height: photoWidth.value,
                             shape: BoxShape.rectangle,
                             fit: BoxFit.cover,
                             borderRadius: BorderRadius.circular(10),

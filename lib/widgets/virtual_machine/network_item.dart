@@ -23,7 +23,7 @@ class NetworkItem extends StatelessWidget {
             color: Colors.blue,
           ),
           Text(
-            "${int.parse((network['tx'])).formatSize()}/S",
+            "${int.parse((network['tx'] ?? 0).toString()).formatSize()}/S",
             style: const TextStyle(color: Colors.blue),
           ),
           const Spacer(),
@@ -32,7 +32,7 @@ class NetworkItem extends StatelessWidget {
             color: Colors.green,
           ),
           Text(
-            "${int.parse(network['rx']).formatSize()}/S",
+            "${int.parse((network['rx'] ?? 0).toString()).formatSize()}/S",
             style: const TextStyle(color: Colors.green),
           ),
         ],

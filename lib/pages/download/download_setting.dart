@@ -10,16 +10,11 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:garden/constants/app_constants.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:signals/signals_flutter.dart';
+import 'package:signals_hooks/signals_hooks.dart';
 
-class DownloadSetting extends StatefulWidget {
+class DownloadSetting extends StatelessWidget {
   const DownloadSetting({super.key});
 
-  @override
-  DownloadSettingState createState() => DownloadSettingState();
-}
-
-class DownloadSettingState extends State<DownloadSetting> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -64,11 +59,8 @@ class DownloadSettingState extends State<DownloadSetting> {
                     },
                   ).then((res) {
                     if (res != null && res.length == 1) {
-                      setState(() {
-                        settingsStore.setDownloadSavePath(res[0].path);
-                        StorageUtil.setString(
-                            "download_save_path", res[0].path);
-                      });
+                      settingsStore.setDownloadSavePath(res[0].path);
+                      StorageUtil.setString("download_save_path", res[0].path);
                     }
                   });
                 }

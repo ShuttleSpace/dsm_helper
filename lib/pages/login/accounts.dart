@@ -9,150 +9,59 @@ import 'package:garden/stores/connection_store.dart';
 import 'package:garden/util/http_util.dart';
 import 'package:garden/util/log.dart';
 import 'package:garden/util/storage_util.dart';
+import 'package:garden/extensions/context.dart';
 import 'package:garden/util/ui_util.dart';
 import 'package:garden/widgets/label.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
-import 'package:signals/signals_flutter.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:signals_hooks/signals_hooks.dart';
 
-class Accounts extends StatefulWidget {
+class Accounts extends HookWidget {
   const Accounts({super.key});
 
   @override
-  AccountsState createState() => AccountsState();
-}
+  Widget build(BuildContext context) {
+    final servers = useListSignal<MapSignal<String, dynamic>>([]);
+    final visible = useSignal(false);
+    final timer = useSignal<Timer?>(null);
 
-class AccountsState extends State<Accounts> with SignalsMixin {
-  late final servers = createListSignal([]);
-  late final visible = createSignal(false);
-
-  Timer? timer;
-  @override
-  void initState() {
-    getData();
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    timer?.cancel();
-    super.dispose();
-  }
-
-  getData() async {
-    String serverString = await StorageUtil.getString("servers") ?? '';
-    if (serverString.isNotBlank) {
-      servers.value = json.decode(serverString);
-      getServerInfo();
+  loadServers() async {
+    final result = await StorageUtil.getString("servers") ?? '';
+    if (result.isNotBlank) {
+      servers.value = (json.decode(result) as List)
+          .map((e) => MapSignal(Map<String, dynamic>.from(e)))
+          .toList();
+      timer.value ??= Timer.periodic(const Duration(seconds: 5), (timer) {
+        // _fetchData();
+      });
     }
-  }
-
-  getServerInfo() async {
-    timer ??= Timer.periodic(const Duration(seconds: 5), (timer) {
-      getServerInfo();
-    });
-    final list = List.from(servers.value);
-    for (var server in list) {
-      server['loading'] = server['loading'] ?? true;
-      server['is_login'] = server['is_login'] ?? false;
-      server['base_url'] = server['base_url'] ??
-          "${server['https'] ? "https" : "http"}://${server['host']}:${server['port']}/";
-      if (server['is_login']) {
-        await refreshServerInfo(server);
-      } else {
-        //仅首次重新登录
-        if (server['loading']) {
-          String host = server['base_url'];
-          final checkLogin = await DsmApi.shareList(
-              sid: server['sid'],
-              checkSsl: server['check_ssl'],
-              cookie: server['smid'],
-              host: host);
-          if (checkLogin['success']) {
-            server['is_login'] = true;
-            //获取系统信息
-            await refreshServerInfo(server);
-          } else {
-            //登录失败，尝试重新登录
-            final res = await DsmApi.login(
-                host: host,
-                account: server['account'],
-                password: server['password'],
-                otpCode: "",
-                rememberDevice: false,
-                cookie: server['smid']);
-            Log.info("accounts: login: $res");
-            if (res['success']) {
-              server['is_login'] = true;
-              server['sid'] = res['data']['sid'];
-              await refreshServerInfo(server);
-            } else {
-              server['loading'] = false;
-              server['error'] = '登录失败';
-            }
-          }
-        }
-      }
-    }
-    servers.value = list;
-    await saveServers();
   }
 
   saveServers() async {
-    List accounts = [];
-    for (var server in servers.value) {
-      accounts.add({
-        "https": server['https'],
-        "host": server['host'],
-        "base_url": server['base_url'],
-        "port": server['port'],
-        "account": server['account'] ?? '',
-        "note": server['note'],
-        "remember_password": server['remember_password'],
-        "password": server['password'],
-        "auto_login": server['auto_login'],
-        "check_ssl": server['check_ssl'],
-        "cookie": server['cookie'],
-        "sid": server['sid'],
-      });
-    }
-    StorageUtil.setString("servers", json.encode(accounts));
-  }
-
-  refreshServerInfo(server) async {
-    var res = await DsmApi.utilization(
-        sid: server['sid'],
-        checkSsl: server['check_ssl'],
-        cookie: server['smid'],
-        host: "${server['base_url']}");
-    Log.info("accounts: serverInfo: $res");
-    if (res['success']) {
-      if (!mounted) {
-        return;
-      }
-      server['cpu'] =
-          (res['data']['cpu']['user_load'] + res['data']['cpu']['system_load']);
-      server['ram'] = res['data']['memory']['real_usage'];
-      if (res['data']['network'].length > 0) {
-        server['rx'] = res['data']['network'][0]['rx'];
-        server['tx'] = res['data']['network'][0]['tx'];
-      }
-      if (res['data']['disk']['total'] != null) {
-        server['read'] = res['data']['disk']['total']['read_byte'];
-        server['write'] = res['data']['disk']['total']['write_byte'];
-      }
-      server['loading'] = false;
-    } else if (res['error']['code'] == 105) {
-      server['loading'] = false;
-      server['error'] = "权限不足，无法获取资源监控信息";
-    } else {
-      server['loading'] = false;
-      server['error'] = '获取资源监控信息失败';
+    if (servers.isNotEmpty) {
+      await StorageUtil.setString(
+          "servers",
+          json.encode(servers.value
+              .map((e) => {
+                    "https": e['https'],
+                    "host": e['host'],
+                    "base_url": e['base_url'],
+                    "port": e['port'],
+                    "account": e['account'] ?? '',
+                    "note": e['note'],
+                    "remember_password": e['remember_password'],
+                    "password": e['password'],
+                    "auto_login": e['auto_login'],
+                    "check_ssl": e['check_ssl'],
+                    "cookie": e['cookie'],
+                    "sid": e['sid'],
+                  })
+              .toList()));
     }
   }
 
-  Widget _buildServerItem(server) {
-    server['loading'] = server['loading'] ?? true;
+  Widget buildServerItem(MapSignal server) {
     server['cpu'] = server['cpu'] ?? 0.0;
     server['ram'] = server['ram'] ?? 0.0;
     server['tx'] = server['tx'] ?? 0.0;
@@ -164,9 +73,9 @@ class AccountsState extends State<Accounts> with SignalsMixin {
         Log.info(server);
         if (server['is_login']) {
           connectionStore.setAccount("${server['account']}");
-          connectionStore.setBaseUrl("${server['base_url']}");
+          connectionStore.setBaseUri("${server['base_url']}");
           connectionStore.setCheckSsl(server['check_ssl']);
-          StorageUtil.setString("base_url", connectionStore.baseUrl.value);
+          StorageUtil.setString("base_url", connectionStore.baseUri.value);
 
           StorageUtil.setBool("https", server['https'] ? true : false);
           StorageUtil.setString("host", server['host']);
@@ -196,8 +105,7 @@ class AccountsState extends State<Accounts> with SignalsMixin {
         }
       },
       child: Card(
-        shape: RoundedRectangleBorder(
-            side: const BorderSide(), borderRadius: BorderRadius.circular(18)),
+        shape: context.stadiumShapeBorder,
         child: Padding(
           padding: const EdgeInsets.all(20),
           child: Row(
@@ -206,280 +114,38 @@ class AccountsState extends State<Accounts> with SignalsMixin {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                children: [
-                                  if (server['note'] != null &&
-                                      server['note'] != "") ...[
-                                    Label("${server['note']}", Colors.blue),
-                                    const SizedBox(
-                                      width: 5,
-                                    ),
-                                  ],
-                                  Text(
-                                    "${visible.value ? server['account'] : "*****"}",
-                                    style: const TextStyle(fontSize: 18),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(
-                                height: 5,
-                              ),
-                              Row(
-                                children: [
-                                  if (server['https'])
-                                    const Icon(
-                                      Icons.lock,
-                                      color: Colors.green,
-                                      size: 12,
-                                    ),
-                                  Text(
-                                    "${visible.value ? server['host'] : "*****"}",
-                                    style: const TextStyle(color: Colors.grey),
-                                  ),
-                                ],
-                              )
-                            ],
-                          ),
-                        ),
-                        if (server['loading'])
-                          const CupertinoActivityIndicator()
-                        else if (!server['is_login'])
-                          const Label("失效", Colors.red),
-                        const SizedBox(
-                          width: 10,
-                        ),
-                        OutlinedButton(
-                          onPressed: () {
-                            Log.info(server);
-                            server['action'] = "edit";
-                            Navigator.of(context)
-                                .push(CupertinoPageRoute(builder: (context) {
-                              return Login(server: server);
-                            }));
-                          },
-                          child: Image.asset(
-                            "assets/icons/edit.png",
-                            width: 20,
-                          ),
-                        ),
-                        const SizedBox(
-                          width: 10,
-                        ),
-                        OutlinedButton(
-                          onPressed: () {
-                            setState(() {
-                              servers.remove(server);
-                            });
-
-                            saveServers();
-                            UiUtil.toast("删除成功");
-                          },
-                          child: Image.asset(
-                            "assets/icons/delete.png",
-                            width: 20,
-                          ),
-                        ),
-                      ],
+                    _AccountInfo(
+                      server,
+                      visible: visible,
+                      onDelete: (v) async {
+                        servers.remove(server);
+                        await saveServers();
+                        UiUtil.toast('删除成功!');
+                      },
+                      onEdit: (v) => {
+                        server['action'] = "edit",
+                        Navigator.of(context).push(CupertinoPageRoute(
+                            builder: (context) => Login(server: server)))
+                      },
                     ),
-                    if (server['error'] == null)
+                    if (server.select((val) => val['error']).watch(context) ==
+                        null)
                       Row(
                         children: [
-                          Column(
-                            children: [
-                              Card(
-                                shape: RoundedRectangleBorder(
-                                    side: const BorderSide(),
-                                    borderRadius: BorderRadius.circular(18)),
-                                margin:
-                                    const EdgeInsets.only(top: 10, right: 10),
-                                child: Padding(
-                                  padding: const EdgeInsets.all(
-                                      AppConstants.paddingSmall),
-                                  child: CircularPercentIndicator(
-                                    radius: 30,
-                                    // progressColor: Colors.lightBlueAccent,
-                                    animation: true,
-                                    linearGradient: LinearGradient(
-                                      colors: server['cpu'] <= 90
-                                          ? [
-                                              Colors.blue,
-                                              Colors.blueAccent,
-                                            ]
-                                          : [
-                                              Colors.red,
-                                              Colors.orangeAccent,
-                                            ],
-                                    ),
-                                    animateFromLastPercent: true,
-                                    circularStrokeCap: CircularStrokeCap.round,
-                                    lineWidth: 8,
-                                    backgroundColor: Colors.black12,
-                                    percent: server['cpu'] / 100,
-                                    center: server['loading']
-                                        ? const CupertinoActivityIndicator()
-                                        : Text(
-                                            "${server['cpu']}%",
-                                            style: TextStyle(
-                                                color: server['cpu'] <= 90
-                                                    ? Colors.blue
-                                                    : Colors.red,
-                                                fontSize: 16),
-                                          ),
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(
-                                height: 10,
-                              ),
-                              const Text("CPU"),
-                            ],
-                          ),
-                          Column(
-                            children: [
-                              Card(
-                                shape: RoundedRectangleBorder(
-                                    side: const BorderSide(),
-                                    borderRadius: BorderRadius.circular(18)),
-                                margin:
-                                    const EdgeInsets.only(top: 10, right: 10),
-                                child: Padding(
-                                  padding: const EdgeInsets.all(
-                                      AppConstants.paddingSmall),
-                                  child: CircularPercentIndicator(
-                                    radius: 30,
-                                    // progressColor: Colors.lightBlueAccent,
-                                    animation: true,
-                                    linearGradient: LinearGradient(
-                                      colors: server['ram'] <= 90
-                                          ? [
-                                              Colors.blue,
-                                              Colors.blueAccent,
-                                            ]
-                                          : [
-                                              Colors.red,
-                                              Colors.orangeAccent,
-                                            ],
-                                    ),
-                                    animateFromLastPercent: true,
-                                    circularStrokeCap: CircularStrokeCap.round,
-                                    lineWidth: 8,
-                                    backgroundColor: Colors.black12,
-                                    percent: server['ram'] / 100,
-                                    center: server['loading']
-                                        ? const CupertinoActivityIndicator()
-                                        : Text(
-                                            "${server['ram']}%",
-                                            style: TextStyle(
-                                                color: server['ram'] <= 90
-                                                    ? Colors.blue
-                                                    : Colors.red,
-                                                fontSize: 16),
-                                          ),
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(
-                                height: 10,
-                              ),
-                              const Text("RAM"),
-                            ],
-                          ),
-                          Expanded(
-                            child: Column(
-                              children: [
-                                SizedBox(
-                                  height: 85,
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          const Icon(
-                                            Icons.upload_sharp,
-                                            color: Colors.blue,
-                                            size: 16,
-                                          ),
-                                          Text(
-                                            server['loading']
-                                                ? "-"
-                                                : "${(int.parse(server['tx'])).formatSize(fixed: 0)}/S",
-                                            style: const TextStyle(
-                                                color: Colors.blue,
-                                                fontSize: 12),
-                                          ),
-                                        ],
-                                      ),
-                                      const SizedBox(
-                                        height: 10,
-                                      ),
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          const Icon(
-                                            Icons.download_sharp,
-                                            color: Colors.green,
-                                            size: 16,
-                                          ),
-                                          Text(
-                                            server['loading']
-                                                ? "-"
-                                                : "${(int.parse(server['rx'])).formatSize(fixed: 0)}/S",
-                                            style: const TextStyle(
-                                                color: Colors.green,
-                                                fontSize: 12),
-                                          ),
-                                        ],
-                                      )
-                                    ],
-                                  ),
-                                ),
-                                const Text("网络"),
-                              ],
-                            ),
-                          ),
-                          Expanded(
-                            child: Column(
-                              children: [
-                                SizedBox(
-                                  height: 85,
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Text(
-                                        "R:${server['loading'] ? "-" : "${(int.parse(server['read'])).formatSize(fixed: 0)}/S"}",
-                                        style: const TextStyle(
-                                            color: Colors.blue, fontSize: 12),
-                                      ),
-                                      const SizedBox(
-                                        height: 10,
-                                      ),
-                                      Text(
-                                        "W:${server['loading'] ? "-" : "${(int.parse(server['write'])).formatSize(fixed: 0)}/S"}",
-                                        style: const TextStyle(
-                                            color: Colors.green, fontSize: 12),
-                                      )
-                                    ],
-                                  ),
-                                ),
-                                const Text("磁盘"),
-                              ],
-                            ),
-                          ),
+                          _ServerCpu(server),
+                          _ServerRam(server),
+                          _ServerNetwork(server),
+                          _ServerDisk(server),
                         ],
                       )
                     else
                       SizedBox(
                         height: 108,
-                        child: Center(child: Text(server['error'])),
+                        child: Center(
+                            child: Text(server
+                                    .select((val) => val['error'])
+                                    .watch(context) ??
+                                '')),
                       ),
                   ],
                 ),
@@ -491,8 +157,14 @@ class AccountsState extends State<Accounts> with SignalsMixin {
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
+    useEffect(() {
+      loadServers();
+      return () {
+        timer.value?.cancel();
+        timer.value = null;
+      };
+    }, const []);
+
     return Scaffold(
       appBar: AppBar(
         leading: AppBackButton(context),
@@ -527,7 +199,7 @@ class AccountsState extends State<Accounts> with SignalsMixin {
                     type: "add",
                   );
                 })).then((_) {
-                  getData();
+                  loadServers();
                 });
                 return;
               },
@@ -539,7 +211,7 @@ class AccountsState extends State<Accounts> with SignalsMixin {
       body: ListView.separated(
         padding: const EdgeInsets.all(20),
         itemBuilder: (context, i) {
-          return _buildServerItem(servers.value[i]);
+          return buildServerItem(servers.value[i]);
         },
         itemCount: servers.value.length,
         separatorBuilder: (context, i) {
@@ -548,6 +220,297 @@ class AccountsState extends State<Accounts> with SignalsMixin {
           );
         },
       ),
+    );
+  }
+}
+
+class _ServerDisk extends StatelessWidget {
+  const _ServerDisk(this.server);
+  final ReadonlySignal<Map> server;
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      child: Column(
+        children: [
+          SizedBox(
+            height: 85,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  "R:${server['loading'] ? "-" : "${(int.parse(server['read'])).formatSize(fixed: 0)}/S"}",
+                  style: const TextStyle(color: Colors.blue, fontSize: 12),
+                ),
+                const SizedBox(
+                  height: 10,
+                ),
+                Text(
+                  "W:${server['loading'] ? "-" : "${(int.parse(server['write'])).formatSize(fixed: 0)}/S"}",
+                  style: const TextStyle(color: Colors.green, fontSize: 12),
+                )
+              ],
+            ),
+          ),
+          const Text("磁盘"),
+        ],
+      ),
+    );
+  }
+}
+
+class _ServerNetwork extends StatelessWidget {
+  const _ServerNetwork(this.server);
+  final ReadonlySignal<Map> server;
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      child: Column(
+        children: [
+          SizedBox(
+            height: 85,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(
+                      Icons.upload_sharp,
+                      color: Colors.blue,
+                      size: 16,
+                    ),
+                    Text(
+                      server['loading']
+                          ? "-"
+                          : "${(int.parse(server['tx'])).formatSize(fixed: 0)}/S",
+                      style: const TextStyle(color: Colors.blue, fontSize: 12),
+                    ),
+                  ],
+                ),
+                const SizedBox(
+                  height: 10,
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(
+                      Icons.download_sharp,
+                      color: Colors.green,
+                      size: 16,
+                    ),
+                    Text(
+                      server['loading']
+                          ? "-"
+                          : "${(int.parse(server['rx'])).formatSize(fixed: 0)}/S",
+                      style: const TextStyle(color: Colors.green, fontSize: 12),
+                    ),
+                  ],
+                )
+              ],
+            ),
+          ),
+          const Text("网络"),
+        ],
+      ),
+    );
+  }
+}
+
+class _ServerRam extends StatelessWidget {
+  const _ServerRam(this.server);
+  final ReadonlySignal<Map> server;
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Card(
+          shape: RoundedRectangleBorder(
+              side: const BorderSide(),
+              borderRadius: BorderRadius.circular(18)),
+          margin: const EdgeInsets.only(top: 10, right: 10),
+          child: Padding(
+            padding: const EdgeInsets.all(AppConstants.paddingSmall),
+            child: CircularPercentIndicator(
+              radius: 30,
+              // progressColor: Colors.lightBlueAccent,
+              animation: true,
+              linearGradient: LinearGradient(
+                colors: server['ram'] <= 90
+                    ? [
+                        Colors.blue,
+                        Colors.blueAccent,
+                      ]
+                    : [
+                        Colors.red,
+                        Colors.orangeAccent,
+                      ],
+              ),
+              animateFromLastPercent: true,
+              circularStrokeCap: CircularStrokeCap.round,
+              lineWidth: 8,
+              backgroundColor: Colors.black12,
+              percent: server['ram'] / 100,
+              center: server['loading']
+                  ? const CupertinoActivityIndicator()
+                  : Text(
+                      "${server['ram']}%",
+                      style: TextStyle(
+                          color: server['ram'] <= 90 ? Colors.blue : Colors.red,
+                          fontSize: 16),
+                    ),
+            ),
+          ),
+        ),
+        const SizedBox(
+          height: 10,
+        ),
+        const Text("RAM"),
+      ],
+    );
+  }
+}
+
+class _ServerCpu extends StatelessWidget {
+  const _ServerCpu(this.server);
+  final ReadonlySignal<Map> server;
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Card(
+          shape: RoundedRectangleBorder(
+              side: const BorderSide(),
+              borderRadius: BorderRadius.circular(18)),
+          margin: const EdgeInsets.only(top: 10, right: 10),
+          child: Padding(
+            padding: const EdgeInsets.all(AppConstants.paddingSmall),
+            child: CircularPercentIndicator(
+              radius: 30,
+              // progressColor: Colors.lightBlueAccent,
+              animation: true,
+              linearGradient: LinearGradient(
+                colors: server['cpu'] <= 90
+                    ? [
+                        Colors.blue,
+                        Colors.blueAccent,
+                      ]
+                    : [
+                        Colors.red,
+                        Colors.orangeAccent,
+                      ],
+              ),
+              animateFromLastPercent: true,
+              circularStrokeCap: CircularStrokeCap.round,
+              lineWidth: 8,
+              backgroundColor: Colors.black12,
+              percent: server['cpu'] / 100,
+              center: server['loading']
+                  ? const CupertinoActivityIndicator()
+                  : Text(
+                      "${server['cpu']}%",
+                      style: TextStyle(
+                          color: server['cpu'] <= 90 ? Colors.blue : Colors.red,
+                          fontSize: 16),
+                    ),
+            ),
+          ),
+        ),
+        const SizedBox(
+          height: 10,
+        ),
+        const Text("CPU"),
+      ],
+    );
+  }
+}
+
+class _AccountInfo extends StatelessWidget {
+  const _AccountInfo(this.server,
+      {required this.visible, required this.onEdit, required this.onDelete});
+  final ReadonlySignal<Map> server;
+  final ReadonlySignal<bool> visible;
+  final ValueChanged<Map> onEdit;
+  final ValueChanged<Map> onDelete;
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  if (server['note'] != null && server['note'] != "") ...[
+                    Label("${server['note']}", Colors.blue),
+                    const SizedBox(
+                      width: 5,
+                    ),
+                  ],
+                  Text(
+                    "${visible.value ? server['account'] : "*****"}",
+                    style: const TextStyle(fontSize: 18),
+                  ),
+                ],
+              ),
+              const SizedBox(
+                height: 5,
+              ),
+              Row(
+                children: [
+                  if (server['https'])
+                    const Icon(
+                      Icons.lock,
+                      color: Colors.green,
+                      size: 12,
+                    ),
+                  Text(
+                    "${visible.value ? server['host'] : "*****"}",
+                    style: const TextStyle(color: Colors.grey),
+                  ),
+                ],
+              )
+            ],
+          ),
+        ),
+        if (server['loading'])
+          const CupertinoActivityIndicator()
+        else if (!server['is_login'])
+          const Label("失效", Colors.red),
+        const SizedBox(
+          width: 10,
+        ),
+        OutlinedButton(
+          onPressed: () {
+            onEdit(server.value);
+            // Log.info(server);
+            // server['action'] = "edit";
+            // Navigator.of(context).push(CupertinoPageRoute(builder: (context) {
+            //   return Login(server: server);
+            // }));
+          },
+          child: Image.asset(
+            "assets/icons/edit.png",
+            width: 20,
+          ),
+        ),
+        const SizedBox(
+          width: 10,
+        ),
+        OutlinedButton(
+          onPressed: () {
+            onDelete(server.value);
+            // servers.remove(server);
+            // saveServers();
+            // UiUtil.toast("删除成功");
+          },
+          child: Image.asset(
+            "assets/icons/delete.png",
+            width: 20,
+          ),
+        ),
+      ],
     );
   }
 }

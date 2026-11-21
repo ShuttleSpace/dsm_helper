@@ -1,77 +1,67 @@
 import 'dart:async';
+import 'package:garden/extensions/int.dart';
 import 'package:garden/util/file_type_util.dart';
+import 'package:garden/util/file_types.dart';
 
 import 'package:garden/pages/download_station/add_task.dart';
 import 'package:garden/pages/download_station/detail.dart';
 import 'package:garden/theme/app_colors.dart';
 import 'package:garden/theme/app_theme.dart';
-import 'package:garden/util/http_util.dart';
+import 'package:garden/api/dsm_api.dart';
+import 'package:garden/util/log.dart';
 import 'package:garden/widgets/file_icon.dart';
 import 'package:garden/widgets/animation_progress_bar.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:signals_hooks/signals_hooks.dart';
 
-class DownloadStation extends StatefulWidget {
+class DownloadStation extends HookWidget {
   const DownloadStation({super.key});
 
   @override
-  DownloadStationState createState() => DownloadStationState();
-}
+  Widget build(BuildContext context) {
+    final loading = useSignal(true);
+    final tasks = useSignal<List>([]);
+    final downloadRate = useSignal(0);
+    final uploadRate = useSignal(0);
+    final pauseLoading = useMapSignal<String, bool>({});
 
-class DownloadStationState extends State<DownloadStation> {
-  bool loading = true;
-  late Timer timer;
-  List tasks = [];
-  int downloadRate = 0;
-  int uploadRate = 0;
-  Map<String, bool> pauseLoading = {};
-  @override
-  void initState() {
-    timer = Timer.periodic(const Duration(seconds: 10), (timer) {
-      getData();
-    });
-    getData();
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    timer.cancel();
-    super.dispose();
-  }
-
-  getData() async {
-    var res = await DsmApi.downloadStationInfo();
-    if (!mounted) {
-      return;
-    }
-    setState(() {
-      loading = false;
-    });
-    if (res['success']) {
-      List result = res['data']['result'];
-      for (var item in result) {
-        if (item['success'] == true) {
+    Future<void> getData() async {
+      try {
+        final result = await dsmDownloadStationOverview();
+        if (!context.mounted) return;
+        for (final item in result) {
+          if (item is! Map || item['success'] != true) continue;
+          final data = item['data'];
+          if (data is! Map) continue;
           switch (item['api']) {
             case "SYNO.DownloadStation2.Task":
-              setState(() {
-                tasks = item['data']['task'];
-              });
+              tasks.value = data['task'] ?? [];
               break;
             case "SYNO.DownloadStation2.Task.Statistic":
-              setState(() {
-                downloadRate = item['data']['download_rate'];
-                uploadRate = item['data']['upload_rate'];
-              });
+              downloadRate.value = data['download_rate'] ?? 0;
+              uploadRate.value = data['upload_rate'] ?? 0;
               break;
           }
         }
+      } catch (e) {
+        Log.warn('download station overview: $e');
+      } finally {
+        if (context.mounted) loading.value = false;
       }
     }
-  }
 
-  Widget _buildDownloadItem(download) {
+    useEffect(() {
+      final timer = Timer.periodic(const Duration(seconds: 10), (timer) {
+        getData();
+      });
+      getData();
+      return timer.cancel;
+    }, const []);
+
+  Widget buildDownloadItem(download) {
     pauseLoading[download['id']] = pauseLoading[download['id']] ?? false;
     FileTypeEnum fileType = FileTypeUtil.toFileTypeEnum(
         FileTypeUtil.getFileType(download['title']));
@@ -122,17 +112,16 @@ class DownloadStationState extends State<DownloadStation> {
                             download['status'] > 100
                         ? GestureDetector(
                             onTap: () async {
-                              setState(() {
-                                pauseLoading[download['id']] = true;
-                              });
-                              var res = await DsmApi.downloadTaskAction(
-                                  [download['id']],
-                                  download['status'] == 2 ? "pause" : "resume");
-                              setState(() {
+                              pauseLoading[download['id']] = true;
+                              try {
+                                await dsmDownloadStation2TaskAction(
+                                    [download['id']],
+                                    download['status'] == 2 ? "pause" : "resume");
+                                await getData();
+                              } catch (e) {
+                                Log.warn('download task action: $e');
+                              } finally {
                                 pauseLoading[download['id']] = false;
-                              });
-                              if (res['success']) {
-                                getData();
                               }
                             },
                             child: pauseLoading[download['id']] == true
@@ -335,12 +324,10 @@ class DownloadStationState extends State<DownloadStation> {
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         leading: AppBackButton(context),
-        title: downloadRate > 0 || uploadRate > 0
+        title: downloadRate.value > 0 || uploadRate.value > 0
             ? Row(
                 // mainAxisAlignment: MainAxisAlignment.center,
                 mainAxisSize: MainAxisSize.min,
@@ -351,7 +338,7 @@ class DownloadStationState extends State<DownloadStation> {
                     color: Colors.lightBlueAccent,
                   ),
                   Text(
-                    downloadRate.formatSize(),
+                    downloadRate.value.formatSize(),
                     style: const TextStyle(
                       color: Colors.lightBlueAccent,
                     ),
@@ -365,7 +352,7 @@ class DownloadStationState extends State<DownloadStation> {
                     color: Colors.orange,
                   ),
                   Text(
-                    uploadRate.formatSize(),
+                    uploadRate.value.formatSize(),
                     style: const TextStyle(
                       color: Colors.orange,
                     ),
@@ -396,22 +383,22 @@ class DownloadStationState extends State<DownloadStation> {
           ),
         ],
       ),
-      body: loading
+      body: loading.value
           ? const Center(
               child: CupertinoActivityIndicator(
                 radius: 14,
               ),
             )
-          : tasks.isNotEmpty
+          : tasks.value.isNotEmpty
               ? Column(
                   children: [
                     Expanded(
                       child: ListView.separated(
                         padding: const EdgeInsets.all(20),
                         itemBuilder: (context, i) {
-                          return _buildDownloadItem(tasks[i]);
+                          return buildDownloadItem(tasks.value[i]);
                         },
-                        itemCount: tasks.length,
+                        itemCount: tasks.value.length,
                         separatorBuilder: (context, i) {
                           return const SizedBox(
                             height: 20,

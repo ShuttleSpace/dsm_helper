@@ -4,41 +4,53 @@ import 'package:flutter/material.dart';
 import 'package:garden/constants/app_constants.dart';
 import 'package:garden/theme/app_colors.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:signals_hooks/signals_hooks.dart';
 
-class AddPowerTask extends StatefulWidget {
+class AddPowerTask extends HookWidget {
   final String title;
   final Map? task;
   const AddPowerTask(this.title, {super.key, this.task});
-  @override
-  AddPowerTaskState createState() => AddPowerTaskState();
-}
-
-class AddPowerTaskState extends State<AddPowerTask> {
-  Map task = {
-    "enabled": true,
-    "hour": 0,
-    "min": 0,
-    "weekdays": "0,1,2,3,4,5,6",
-    "type": "power_on",
-  };
-  List<String> weekdays = ["0", "1", "2", "3", "4", "5", "6"];
-
-  @override
-  void initState() {
-    if (widget.task != null) {
-      setState(() {
-        task = widget.task!;
-      });
-    }
-    super.initState();
-  }
 
   @override
   Widget build(BuildContext context) {
+    // An existing task map is edited in place and shared with the page that
+    // opened this one (same as the original initState assignment).
+    final taskValue = useSignal<Map>(task ??
+        {
+          "enabled": true,
+          "hour": 0,
+          "min": 0,
+          "weekdays": "0,1,2,3,4,5,6",
+          "type": "power_on",
+        });
+    final weekdays =
+        useSignal<List<String>>(["0", "1", "2", "3", "4", "5", "6"]);
+
+    // Weekday toggles mutate the list in place; writing a new list keeps the
+    // signal notifying (the old code relied on setState).
+    void toggleWeekday(String day) {
+      final list = List.of(weekdays.value);
+      if (list.contains(day)) {
+        list.remove(day);
+      } else {
+        list.add(day);
+      }
+      list.sort((a, b) {
+        return a.compareTo(b);
+      });
+      weekdays.value = list;
+      // The map instance is shared with the page that opened this one, so it
+      // is mutated in place (the original code did the same) and the signal is
+      // notified explicitly to rebuild.
+      taskValue.value['weekdays'] = list.join(",");
+      taskValue.notifyListeners();
+    }
+
     return Scaffold(
       appBar: AppBar(
         leading: AppBackButton(context),
-        title: Text(widget.title),
+        title: Text(title),
       ),
       body: ListView(
         padding: const EdgeInsets.all(20),
@@ -64,9 +76,8 @@ class AddPowerTaskState extends State<AddPowerTask> {
                       Expanded(
                         child: GestureDetector(
                           onTap: () {
-                            setState(() {
-                              task['type'] = "power_on";
-                            });
+                            taskValue.value['type'] = "power_on";
+                            taskValue.notifyListeners();
                           },
                           child: Card(
                             shape: RoundedRectangleBorder(
@@ -79,7 +90,7 @@ class AddPowerTaskState extends State<AddPowerTask> {
                                 children: [
                                   const Text("开机"),
                                   const Spacer(),
-                                  if (task['type'] == "power_on")
+                                  if (taskValue.value['type'] == "power_on")
                                     const Icon(
                                       CupertinoIcons.checkmark_alt,
                                       color: AppColors.primaryAction,
@@ -96,9 +107,8 @@ class AddPowerTaskState extends State<AddPowerTask> {
                       Expanded(
                         child: GestureDetector(
                           onTap: () {
-                            setState(() {
-                              task['type'] = "power_off";
-                            });
+                            taskValue.value['type'] = "power_off";
+                            taskValue.notifyListeners();
                           },
                           child: Card(
                             shape: RoundedRectangleBorder(
@@ -111,7 +121,7 @@ class AddPowerTaskState extends State<AddPowerTask> {
                                 children: [
                                   const Text("关机"),
                                   const Spacer(),
-                                  if (task['type'] == "power_off")
+                                  if (taskValue.value['type'] == "power_off")
                                     const Icon(
                                       CupertinoIcons.checkmark_alt,
                                       color: AppColors.primaryAction,
@@ -152,17 +162,7 @@ class AddPowerTaskState extends State<AddPowerTask> {
                       Expanded(
                         child: GestureDetector(
                           onTap: () {
-                            setState(() {
-                              if (weekdays.contains("0")) {
-                                weekdays.remove("0");
-                              } else {
-                                weekdays.add("0");
-                              }
-                              weekdays.sort((a, b) {
-                                return a.compareTo(b);
-                              });
-                              task['weekdays'] = weekdays.join(",");
-                            });
+                            toggleWeekday("0");
                           },
                           child: Card(
                             shape: RoundedRectangleBorder(
@@ -175,7 +175,7 @@ class AddPowerTaskState extends State<AddPowerTask> {
                                 children: [
                                   const Text("日"),
                                   const Spacer(),
-                                  if (weekdays.contains("0"))
+                                  if (weekdays.value.contains("0"))
                                     const Icon(
                                       CupertinoIcons.checkmark_alt,
                                       color: AppColors.primaryAction,
@@ -192,17 +192,7 @@ class AddPowerTaskState extends State<AddPowerTask> {
                       Expanded(
                         child: GestureDetector(
                           onTap: () {
-                            setState(() {
-                              if (weekdays.contains("1")) {
-                                weekdays.remove("1");
-                              } else {
-                                weekdays.add("1");
-                              }
-                              weekdays.sort((a, b) {
-                                return a.compareTo(b);
-                              });
-                              task['weekdays'] = weekdays.join(",");
-                            });
+                            toggleWeekday("1");
                           },
                           child: Card(
                             shape: RoundedRectangleBorder(
@@ -215,7 +205,7 @@ class AddPowerTaskState extends State<AddPowerTask> {
                                 children: [
                                   const Text("一"),
                                   const Spacer(),
-                                  if (weekdays.contains("1"))
+                                  if (weekdays.value.contains("1"))
                                     const Icon(
                                       CupertinoIcons.checkmark_alt,
                                       color: AppColors.primaryAction,
@@ -232,17 +222,7 @@ class AddPowerTaskState extends State<AddPowerTask> {
                       Expanded(
                         child: GestureDetector(
                           onTap: () {
-                            setState(() {
-                              if (weekdays.contains("2")) {
-                                weekdays.remove("2");
-                              } else {
-                                weekdays.add("2");
-                              }
-                              weekdays.sort((a, b) {
-                                return a.compareTo(b);
-                              });
-                              task['weekdays'] = weekdays.join(",");
-                            });
+                            toggleWeekday("2");
                           },
                           child: Card(
                             shape: RoundedRectangleBorder(
@@ -255,7 +235,7 @@ class AddPowerTaskState extends State<AddPowerTask> {
                                 children: [
                                   const Text("二"),
                                   const Spacer(),
-                                  if (weekdays.contains("2"))
+                                  if (weekdays.value.contains("2"))
                                     const Icon(
                                       CupertinoIcons.checkmark_alt,
                                       color: AppColors.primaryAction,
@@ -272,17 +252,7 @@ class AddPowerTaskState extends State<AddPowerTask> {
                       Expanded(
                         child: GestureDetector(
                           onTap: () {
-                            setState(() {
-                              if (weekdays.contains("3")) {
-                                weekdays.remove("3");
-                              } else {
-                                weekdays.add("3");
-                              }
-                              weekdays.sort((a, b) {
-                                return a.compareTo(b);
-                              });
-                              task['weekdays'] = weekdays.join(",");
-                            });
+                            toggleWeekday("3");
                           },
                           child: Card(
                             shape: RoundedRectangleBorder(
@@ -295,7 +265,7 @@ class AddPowerTaskState extends State<AddPowerTask> {
                                 children: [
                                   const Text("三"),
                                   const Spacer(),
-                                  if (weekdays.contains("3"))
+                                  if (weekdays.value.contains("3"))
                                     const Icon(
                                       CupertinoIcons.checkmark_alt,
                                       color: AppColors.primaryAction,
@@ -316,17 +286,7 @@ class AddPowerTaskState extends State<AddPowerTask> {
                       Expanded(
                         child: GestureDetector(
                           onTap: () {
-                            setState(() {
-                              if (weekdays.contains("4")) {
-                                weekdays.remove("4");
-                              } else {
-                                weekdays.add("4");
-                              }
-                              weekdays.sort((a, b) {
-                                return a.compareTo(b);
-                              });
-                              task['weekdays'] = weekdays.join(",");
-                            });
+                            toggleWeekday("4");
                           },
                           child: Card(
                             shape: RoundedRectangleBorder(
@@ -339,7 +299,7 @@ class AddPowerTaskState extends State<AddPowerTask> {
                                 children: [
                                   const Text("四"),
                                   const Spacer(),
-                                  if (weekdays.contains("4"))
+                                  if (weekdays.value.contains("4"))
                                     const Icon(
                                       CupertinoIcons.checkmark_alt,
                                       color: AppColors.primaryAction,
@@ -356,17 +316,7 @@ class AddPowerTaskState extends State<AddPowerTask> {
                       Expanded(
                         child: GestureDetector(
                           onTap: () {
-                            setState(() {
-                              if (weekdays.contains("5")) {
-                                weekdays.remove("5");
-                              } else {
-                                weekdays.add("5");
-                              }
-                              weekdays.sort((a, b) {
-                                return a.compareTo(b);
-                              });
-                              task['weekdays'] = weekdays.join(",");
-                            });
+                            toggleWeekday("5");
                           },
                           child: Card(
                             shape: RoundedRectangleBorder(
@@ -379,7 +329,7 @@ class AddPowerTaskState extends State<AddPowerTask> {
                                 children: [
                                   const Text("五"),
                                   const Spacer(),
-                                  if (weekdays.contains("5"))
+                                  if (weekdays.value.contains("5"))
                                     const Icon(
                                       CupertinoIcons.checkmark_alt,
                                       color: AppColors.primaryAction,
@@ -396,17 +346,7 @@ class AddPowerTaskState extends State<AddPowerTask> {
                       Expanded(
                         child: GestureDetector(
                           onTap: () {
-                            setState(() {
-                              if (weekdays.contains("6")) {
-                                weekdays.remove("6");
-                              } else {
-                                weekdays.add("6");
-                              }
-                              weekdays.sort((a, b) {
-                                return a.compareTo(b);
-                              });
-                              task['weekdays'] = weekdays.join(",");
-                            });
+                            toggleWeekday("6");
                           },
                           child: Card(
                             shape: RoundedRectangleBorder(
@@ -419,7 +359,7 @@ class AddPowerTaskState extends State<AddPowerTask> {
                                 children: [
                                   const Text("六"),
                                   const Spacer(),
-                                  if (weekdays.contains("6"))
+                                  if (weekdays.value.contains("6"))
                                     const Icon(
                                       CupertinoIcons.checkmark_alt,
                                       color: AppColors.primaryAction,
@@ -467,13 +407,16 @@ class AddPowerTaskState extends State<AddPowerTask> {
                             DatePicker.showTimePicker(
                               context,
                               currentTime: DateTime(
-                                  2021, 01, 01, task['hour'], task['min']),
+                                  2021,
+                                  01,
+                                  01,
+                                  taskValue.value['hour'],
+                                  taskValue.value['min']),
                               showSecondsColumn: false,
                               onConfirm: (time) {
-                                setState(() {
-                                  task['hour'] = time.hour;
-                                  task['min'] = time.minute;
-                                });
+                                taskValue.value['hour'] = time.hour;
+                                taskValue.value['min'] = time.minute;
+                                taskValue.notifyListeners();
                               },
                               locale: LocaleType.zh,
                             );
@@ -488,7 +431,7 @@ class AddPowerTaskState extends State<AddPowerTask> {
                               child: Row(
                                 children: [
                                   Text(
-                                      "${task['hour'].toString().padLeft(2, "0")}:${task['min'].toString().padLeft(2, "0")}"),
+                                      "${taskValue.value['hour'].toString().padLeft(2, "0")}:${taskValue.value['min'].toString().padLeft(2, "0")}"),
                                   const Spacer(),
                                   const Icon(
                                     CupertinoIcons.right_chevron,
@@ -511,7 +454,7 @@ class AddPowerTaskState extends State<AddPowerTask> {
           ),
           OutlinedButton(
             onPressed: () {
-              Navigator.of(context).pop(task);
+              Navigator.of(context).pop(taskValue.value);
             },
             child: const Text(
               ' 确定 ',

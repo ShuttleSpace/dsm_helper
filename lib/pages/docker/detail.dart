@@ -1,9 +1,10 @@
+import 'package:garden/api/dsm_api.dart';
 import 'package:garden/util/ui_util.dart';
-import 'package:garden/util/http_util.dart';
 import 'package:garden/widgets/bubble_tab_indicator.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:garden/widgets/docker/container_basic_info.dart';
 import 'package:garden/widgets/docker/container_ports.dart';
 import 'package:garden/widgets/docker/container_volumes.dart';
@@ -13,112 +14,114 @@ import 'package:garden/widgets/docker/container_envs.dart';
 import 'package:garden/widgets/docker/container_processes.dart';
 import 'package:garden/widgets/docker/log_date_selector.dart';
 import 'package:garden/widgets/docker/log_list.dart';
+import 'package:signals_hooks/signals_hooks.dart';
 
-class ContainerDetail extends StatefulWidget {
+class ContainerDetail extends HookWidget {
   final String name;
   const ContainerDetail(this.name, {super.key});
-  @override
-  ContainerDetailState createState() => ContainerDetailState();
-}
-
-class ContainerDetailState extends State<ContainerDetail>
-    with SingleTickerProviderStateMixin {
-  late TabController _tabController;
-  final ScrollController _scrollController = ScrollController();
-  bool loading = true;
-  List ports = [];
-  List networks = [];
-  List links = [];
-  List envs = [];
-  String cmd = "";
-  List volumes = [];
-  int memory = 0;
-  double memoryPercent = 0;
-  int cpuPriority = 0;
-  String status = "";
-  int upTime = 0;
-  Map shortcut = {};
-  List logDates = [];
-  List logs = [];
-  String selectedDate = "";
-  List processes = [];
-  @override
-  void initState() {
-    _tabController = TabController(length: 3, vsync: this);
-    getData();
-    super.initState();
-  }
-
-  getData() async {
-    var res = await DsmApi.dockerDetail(widget.name, "get");
-    if (res['success']) {
-      setState(() {
-        loading = false;
-        ports = res['data']['profile']['port_bindings'];
-        networks = res['data']['profile']['network'];
-        volumes = res['data']['profile']['volume_bindings'];
-        envs = res['data']['profile']['env_variables'];
-        memory = res['data']['profile']['memory_limit'];
-        shortcut = res['data']['profile']['shortcut'];
-        cpuPriority = res['data']['profile']['cpu_priority'];
-        links = res['data']['profile']['links'];
-        memoryPercent = res['data']['details']['memoryPercent'] * 1.0;
-
-        upTime = res['data']['details']['up_time'];
-        status = res['data']['details']['status'];
-        cmd = res['data']['details']['exe_cmd'];
-      });
-
-      var process = await DsmApi.dockerDetail(widget.name, "get_process");
-      if (process['success']) {
-        setState(() {
-          processes = process['data']['processes'];
-        });
-      }
-      getLogDates();
-    } else {
-      UiUtil.toast("获取详情失败");
-    }
-  }
-
-  getLogDates() async {
-    var res = await DsmApi.dockerLog(widget.name, "get_date_list");
-    if (res['success']) {
-      setState(() {
-        logDates = res['data']['dates'];
-        if (logDates.isNotEmpty) {
-          selectedDate = logDates[0];
-        }
-      });
-
-      getLog();
-    }
-  }
-
-  getLog() async {
-    var log = await DsmApi.dockerLog(widget.name, "get", date: selectedDate);
-    if (log['success']) {
-      setState(() {
-        logs = log['data']['logs'];
-      });
-    }
-  }
-
-  void _onDateSelected(String date) {
-    setState(() {
-      selectedDate = date;
-    });
-    getLog();
-  }
 
   @override
   Widget build(BuildContext context) {
+    final tickerProvider = useSingleTickerProvider();
+    final tabController = useMemoized(
+      () => TabController(length: 3, vsync: tickerProvider),
+      const [],
+    );
+    final scrollController = useScrollController();
+    final loading = useSignal(true);
+    final ports = useSignal<List>([]);
+    final networks = useSignal<List>([]);
+    final links = useSignal<List>([]);
+    final envs = useSignal<List>([]);
+    final cmd = useSignal("");
+    final volumes = useSignal<List>([]);
+    final memory = useSignal(0);
+    final memoryPercent = useSignal(0.0);
+    final cpuPriority = useSignal(0);
+    final status = useSignal("");
+    final upTime = useSignal(0);
+    final shortcut = useSignal<Map>({});
+    final logDates = useSignal<List>([]);
+    final logs = useSignal<List>([]);
+    final selectedDate = useSignal("");
+    final processes = useSignal<List>([]);
+
+    Future<void> getLog() async {
+      try {
+        final data = await dsmDockerContainerLog(name, "get",
+            date: selectedDate.value);
+        logs.value = data['logs'] ?? [];
+      } catch (e) {
+        // 旧层在日志失败时静默返回；保持行为不变。
+      }
+    }
+
+    Future<void> getLogDates() async {
+      try {
+        final data = await dsmDockerContainerLog(name, "get_date_list");
+        logDates.value = data['dates'] ?? [];
+        if (logDates.value.isNotEmpty) {
+          selectedDate.value = logDates.value[0];
+        }
+        await getLog();
+      } catch (e) {
+        // 同上，旧层静默失败。
+      }
+    }
+
+    Future<void> getData() async {
+      late Map data;
+      try {
+        data = await dsmDockerContainerDetail(name, "get");
+      } catch (e) {
+        UiUtil.toast("获取详情失败");
+        return;
+      }
+
+      loading.value = false;
+      final profile = data['profile'] as Map? ?? const {};
+      final details = data['details'] as Map? ?? const {};
+      ports.value = profile['port_bindings'] ?? [];
+      networks.value = profile['network'] ?? [];
+      volumes.value = profile['volume_bindings'] ?? [];
+      envs.value = profile['env_variables'] ?? [];
+      memory.value = profile['memory_limit'] ?? 0;
+      shortcut.value = profile['shortcut'] ?? {};
+      cpuPriority.value = profile['cpu_priority'] ?? 0;
+      links.value = profile['links'] ?? [];
+      memoryPercent.value = (details['memoryPercent'] ?? 0) * 1.0;
+
+      upTime.value = details['up_time'] ?? 0;
+      status.value = details['status'] ?? '';
+      cmd.value = details['exe_cmd'] ?? '';
+
+      try {
+        final processData = await dsmDockerContainerProcesses(name);
+        processes.value = processData['processes'] ?? [];
+      } catch (e) {
+        // 进程列表失败不影响详情展示（旧层同样静默跳过）。
+      }
+      await getLogDates();
+    }
+
+    void onDateSelected(String date) {
+      selectedDate.value = date;
+      getLog();
+    }
+
+    useEffect(() {
+      getData();
+      return () {
+        tabController.dispose();
+      };
+    }, const []);
+
     return Scaffold(
       appBar: AppBar(
         leading: AppBackButton(context),
-        title: Text(widget.name),
+        title: Text(name),
       ),
-      body: loading
+      body: loading.value
           ? const Center(
               child: CupertinoActivityIndicator(
                 radius: 14,
@@ -135,7 +138,7 @@ class ContainerDetailState extends State<ContainerDetail>
                   child: TabBar(
                     dividerHeight: 0,
                     isScrollable: false,
-                    controller: _tabController,
+                    controller: tabController,
                     indicatorSize: TabBarIndicatorSize.label,
                     labelColor: Theme.brightnessOf(context) == Brightness.dark
                         ? Colors.white
@@ -163,35 +166,35 @@ class ContainerDetailState extends State<ContainerDetail>
                 ),
                 Expanded(
                   child: TabBarView(
-                    controller: _tabController,
+                    controller: tabController,
                     children: [
                       ListView(
                         children: [
                           ContainerBasicInfo(
-                            upTime: upTime,
-                            shortcut: shortcut,
-                            cpuPriority: cpuPriority,
-                            memory: memory,
-                            cmd: cmd,
+                            upTime: upTime.value,
+                            shortcut: shortcut.value,
+                            cpuPriority: cpuPriority.value,
+                            memory: memory.value,
+                            cmd: cmd.value,
                           ),
-                          ContainerPorts(ports: ports),
-                          ContainerVolumes(volumes: volumes),
-                          ContainerLinks(links: links),
-                          ContainerNetworks(networks: networks),
-                          ContainerEnvs(envs: envs),
+                          ContainerPorts(ports: ports.value),
+                          ContainerVolumes(volumes: volumes.value),
+                          ContainerLinks(links: links.value),
+                          ContainerNetworks(networks: networks.value),
+                          ContainerEnvs(envs: envs.value),
                         ],
                       ),
-                      ContainerProcesses(processes: processes),
+                      ContainerProcesses(processes: processes.value),
                       Row(
                         children: [
                           LogDateSelector(
-                            logDates: logDates,
-                            selectedDate: selectedDate,
-                            onDateSelected: _onDateSelected,
+                            logDates: logDates.value,
+                            selectedDate: selectedDate.value,
+                            onDateSelected: onDateSelected,
                           ),
                           LogList(
-                            logs: logs,
-                            scrollController: _scrollController,
+                            logs: logs.value,
+                            scrollController: scrollController,
                           ),
                         ],
                       ),

@@ -1,5 +1,7 @@
-import 'package:garden/util/http_util.dart';
+import 'package:garden/api/dsm_api.dart';
+import 'package:garden/extensions/int.dart';
 import 'package:garden/util/file_type_util.dart';
+import 'package:garden/util/file_types.dart';
 import 'package:garden/util/ui_util.dart';
 import 'package:garden/widgets/file_icon.dart';
 import 'package:garden/widgets/neu_back_button.dart';
@@ -7,55 +9,50 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:garden/constants/app_constants.dart';
 import 'package:garden/theme/app_colors.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:signals_hooks/signals_hooks.dart';
 
-class SelectFile extends StatefulWidget {
+class SelectFile extends HookWidget {
   final List listId;
   final String destination;
   const SelectFile(this.listId, this.destination, {super.key});
-  @override
-  SelectFileState createState() => SelectFileState();
-}
 
-class SelectFileState extends State<SelectFile> {
-  String title = "";
-  List files = [];
-  List selectedFiles = [];
-  int size = 0;
   @override
-  void initState() {
-    getData();
-    super.initState();
-  }
+  Widget build(BuildContext context) {
+    final title = useSignal("");
+    final files = useSignal<List>([]);
+    final selectedFiles = useListSignal([]);
+    final size = useSignal(0);
 
-  getData() async {
-    var res = await DsmApi.downloadFileList(widget.listId[0]);
-    if (res['success']) {
-      setState(() {
-        title = res['data']['title'];
-        files = res['data']['files'];
-        for (var element in files) {
+    Future<void> getData() async {
+      try {
+        final data = await dsmDownloadStation2TaskListGet(listId[0]);
+        title.value = data['title'] ?? '';
+        files.value = data['files'] ?? [];
+        for (final element in files.value) {
           selectedFiles.add(element['index']);
         }
-        size = res['data']['size'];
-      });
-    } else {
-      UiUtil.toast("获取文件列表失败，代码${res['error']['code']}");
+        size.value = data['size'] ?? 0;
+      } catch (e) {
+        final code = e is DSMException ? e.code : -1;
+        UiUtil.toast("获取文件列表失败，代码$code");
+      }
     }
-  }
 
-  Widget _buildFileItem(file) {
+    useEffect(() {
+      getData();
+      return null;
+    }, const []);
+
+  Widget buildFileItem(file) {
     FileTypeEnum fileType =
         FileTypeUtil.toFileTypeEnum(FileTypeUtil.getFileType(file['name']));
     return GestureDetector(
       onTap: () {
         if (selectedFiles.contains(file['index'])) {
-          setState(() {
-            selectedFiles.remove(file['index']);
-          });
+          selectedFiles.remove(file['index']);
         } else {
-          setState(() {
-            selectedFiles.add(file['index']);
-          });
+          selectedFiles.add(file['index']);
         }
       },
       child: Card(
@@ -125,8 +122,6 @@ class SelectFileState extends State<SelectFile> {
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         leading: AppBackButton(context),
@@ -148,12 +143,12 @@ class SelectFileState extends State<SelectFile> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(title),
+                  Text(title.value),
                   const SizedBox(
                     height: 10,
                   ),
                   Text(
-                    size.formatSize(),
+                    size.value.formatSize(),
                     style: const TextStyle(fontSize: 12, color: Colors.grey),
                   ),
                 ],
@@ -217,9 +212,9 @@ class SelectFileState extends State<SelectFile> {
               padding: const EdgeInsets.symmetric(
                   horizontal: AppConstants.paddingLarge),
               itemBuilder: (context, i) {
-                return _buildFileItem(files[i]);
+                return buildFileItem(files.value[i]);
               },
-              itemCount: files.length,
+              itemCount: files.value.length,
               separatorBuilder: (context, i) {
                 return const SizedBox(
                   height: 20,
@@ -232,15 +227,18 @@ class SelectFileState extends State<SelectFile> {
             child: OutlinedButton(
               onPressed: () async {
                 if (selectedFiles.isNotEmpty) {
-                  var res = await DsmApi.downloadCreate(
-                      widget.listId[0], widget.destination, selectedFiles);
-                  if (res['success']) {
+                  try {
+                    await dsmDownloadStation2TaskListPollingDownload(
+                        listId[0], destination, selectedFiles.value);
                     UiUtil.toast("下载任务创建成功");
                     if (context.mounted) {
                       // ignore: use_build_context_synchronously
                       Navigator.of(context).pop();
                       Navigator.of(context).pop();
                     }
+                  } catch (e) {
+                    final code = e is DSMException ? e.code : -1;
+                    UiUtil.toast("下载任务创建失败，代码$code");
                   }
                 } else {
                   UiUtil.toast("请选择要下载的文件");

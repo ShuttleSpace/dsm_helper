@@ -2,84 +2,73 @@ import 'package:garden/theme/app_theme.dart';
 import 'package:garden/util/file_type_util.dart';
 import 'package:garden/util/log.dart';
 import 'package:garden/util/ui_util.dart';
+import 'package:garden/widgets/name_input_dialog.dart';
 import 'package:garden/stores/connection_store.dart';
-import 'package:garden/util/http_util.dart';
+import 'package:garden/api/dsm_api.dart';
+import 'package:garden/extensions/datetime.dart';
+import 'package:garden/extensions/int.dart';
+import 'package:garden/util/file_types.dart';
 import 'package:garden/widgets/file_icon.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:garden/constants/app_constants.dart';
-import 'package:garden/theme/app_colors.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:signals_hooks/signals_hooks.dart';
 
-class SelectFolder extends StatefulWidget {
+class SelectFolder extends HookWidget {
   final bool multi;
   final bool folder;
   const SelectFolder({super.key, this.multi = false, this.folder = true});
-  @override
-  SelectFolderState createState() => SelectFolderState();
-}
 
-class SelectFolderState extends State<SelectFolder> {
-  final ScrollController _scrollController = ScrollController();
-  List paths = ["/"];
-  List files = [];
-  List selectedFiles = [];
-  bool loading = true;
-  bool success = true;
-  String msg = "";
   @override
-  void initState() {
-    getShareList();
-    super.initState();
-  }
+  Widget build(BuildContext context) {
+    final scrollController = useScrollController();
+    final paths = useListSignal<String>(["/"]);
+    final files = useSignal<List>([]);
+    final selectedFiles = useListSignal([]);
+    final loading = useSignal(true);
+    final success = useSignal(true);
+    final msg = useSignal("");
 
-  getShareList() async {
-    setState(() {
-      loading = true;
-    });
-    var res = await DsmApi.shareList();
-    setState(() {
-      success = res['success'];
-    });
-    if (res['success']) {
-      setState(() {
-        loading = false;
-        files = res['data']['shares'];
-      });
+  setPaths(String path) {
+    if (path == "/") {
+      paths.value = ["/"];
     } else {
-      if (loading) {
-        setState(() {
-          loading = false;
-          msg = res['msg'] ?? "加载失败，code:${res['error']['code']}";
-        });
-      }
+      List<String> items = path.split("/");
+      items[0] = "/";
+      paths.value = items;
     }
   }
 
-  refresh() {
-    String path = paths.join("/").substring(1);
-    goPath(path);
+  Future<void> getShareList() async {
+    loading.value = true;
+    try {
+      final data = await dsmFileStationListShareForPage();
+      files.value = data['shares'] ?? [];
+      success.value = true;
+    } catch (e) {
+      success.value = false;
+      msg.value = e is DSMException
+          ? '加载失败，code:${e.code}${e.message.toString().isNotEmpty ? '：${e.message}' : ''}'
+          : '加载失败：$e';
+    } finally {
+      loading.value = false;
+    }
   }
 
-  getFileList(String path) async {
-    setState(() {
-      loading = true;
-    });
-    var res = await DsmApi.fileList(path);
-    setState(() {
-      success = res['success'];
-    });
-    if (res['success']) {
-      setState(() {
-        loading = false;
-        files = res['data']['files'];
-      });
-    } else {
-      if (loading) {
-        setState(() {
-          loading = false;
-          msg = res['msg'] ?? "加载失败，code:${res['error']['code']}";
-        });
-      }
+  Future<void> getFileList(String path) async {
+    loading.value = true;
+    try {
+      final data = await dsmFileStationListForPage(path);
+      files.value = data['files'] ?? [];
+      success.value = true;
+    } catch (e) {
+      success.value = false;
+      msg.value = e is DSMException
+          ? '加载失败，code:${e.code}${e.message.toString().isNotEmpty ? '：${e.message}' : ''}'
+          : '加载失败：$e';
+    } finally {
+      loading.value = false;
     }
   }
 
@@ -90,26 +79,17 @@ class SelectFolderState extends State<SelectFolder> {
     } else {
       await getFileList(path);
     }
-    double offset = _scrollController.position.maxScrollExtent;
-    _scrollController.animateTo(offset,
+    double offset = scrollController.position.maxScrollExtent;
+    scrollController.animateTo(offset,
         duration: const Duration(milliseconds: 200), curve: Curves.ease);
   }
 
-  setPaths(String path) {
-    if (path == "/") {
-      setState(() {
-        paths = ["/"];
-      });
-    } else {
-      List<String> items = path.split("/");
-      items[0] = "/";
-      setState(() {
-        paths = items;
-      });
-    }
+  refresh() {
+    String path = paths.value.join("/").substring(1);
+    goPath(path);
   }
 
-  Widget _buildPathItem(BuildContext context, int index) {
+  Widget buildPathItem(BuildContext context, int index) {
     return Container(
       margin: index == 0 ? const EdgeInsets.only(left: 20) : null,
       padding:
@@ -121,7 +101,7 @@ class SelectFolderState extends State<SelectFolder> {
           if (index == 0) {
             path = "/";
           } else {
-            items = paths.getRange(1, index + 1).toList().cast();
+            items = paths.value.getRange(1, index + 1).toList().cast();
             path = "/${items.join("/")}";
           }
           goPath(path);
@@ -132,14 +112,14 @@ class SelectFolderState extends State<SelectFolder> {
                 size: 16,
               )
             : Text(
-                paths[index],
+                paths.value[index],
                 style: const TextStyle(fontSize: 12),
               ),
       ),
     );
   }
 
-  Widget _buildFileItem(file) {
+  Widget buildFileItem(file) {
     FileTypeEnum fileType =
         FileTypeUtil.toFileTypeEnum(FileTypeUtil.getFileType(file['name']));
     String path = file['path'];
@@ -149,7 +129,7 @@ class SelectFolderState extends State<SelectFolder> {
         opacity: 1,
         child: OutlinedButton(
           onPressed: () async {
-            if (widget.multi) {
+            if (multi) {
             } else {
               if (file['isdir']) {
                 goPath(file['path']);
@@ -164,7 +144,7 @@ class SelectFolderState extends State<SelectFolder> {
               ),
               Hero(
                 tag:
-                    "${connectionStore.baseUrl}/webapi/entry.cgi?path=${Uri.encodeComponent(path)}&size=original&api=SYNO.FileStation.Thumb&method=get&version=2&_sid=${connectionStore.sid}&animate=true",
+                    "${connectionStore.baseUri}/webapi/entry.cgi?path=${Uri.encodeComponent(path)}&size=original&api=SYNO.FileStation.Thumb&method=get&version=2&_sid=${connectionStore.sid}&animate=true",
                 child: FileIcon(
                   file['isdir'] ? FileTypeEnum.folder : fileType,
                   thumb: file['path'],
@@ -203,28 +183,21 @@ class SelectFolderState extends State<SelectFolder> {
               const SizedBox(
                 width: 10,
               ),
-              OutlinedButton(
-                onPressed: () {
-                  setState(() {
-                    if (widget.multi) {
-                      if (selectedFiles.contains(file['path'])) {
-                        selectedFiles.remove(file['path']);
-                      } else {
-                        selectedFiles.add(file['path']);
-                      }
+              Checkbox(
+                value: selectedFiles.contains(file['path']),
+                onChanged: (_) {
+                  if (multi) {
+                    if (selectedFiles.contains(file['path'])) {
+                      selectedFiles.remove(file['path']);
                     } else {
-                      selectedFiles = [file['path']];
+                      selectedFiles.add(file['path']);
                     }
-                  });
+                  } else {
+                    selectedFiles.value = [file['path']];
+                  }
                 },
-                child: SizedBox(
-                  child: selectedFiles.contains(file['path'])
-                      ? const Icon(
-                          CupertinoIcons.checkmark_alt,
-                          color: AppColors.primaryAction,
-                        )
-                      : null,
-                ),
+                materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                visualDensity: VisualDensity.compact,
               ),
             ],
           ),
@@ -234,17 +207,15 @@ class SelectFolderState extends State<SelectFolder> {
   }
 
   Future<bool> onWillPop(i, r) {
-    setState(() {
-      selectedFiles = [];
-    });
-    if (paths.length > 1) {
-      paths.removeLast();
+    selectedFiles.clear();
+    if (paths.value.length > 1) {
+      paths.value.removeLast();
       String path = "";
 
-      if (paths.length == 1) {
+      if (paths.value.length == 1) {
         path = "/";
       } else {
-        path = paths.join("/").substring(1);
+        path = paths.value.join("/").substring(1);
       }
       Log.debug(path);
       goPath(path);
@@ -254,11 +225,16 @@ class SelectFolderState extends State<SelectFolder> {
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
+  useEffect(() {
+    getShareList();
+    return null;
+  }, const []);
+
     return PopScope(
       onPopInvokedWithResult: onWillPop,
-      child: Material(
+      child: SizedBox(
+        width: double.infinity,
+        child: Material(
         color: Theme.of(context).scaffoldBackgroundColor,
         child: SafeArea(
           top: false,
@@ -274,9 +250,9 @@ class SelectFolderState extends State<SelectFolder> {
                     children: [
                       Expanded(
                         child: ListView.separated(
-                          controller: _scrollController,
-                          itemBuilder: _buildPathItem,
-                          itemCount: paths.length,
+                          controller: scrollController,
+                          itemBuilder: buildPathItem,
+                          itemCount: paths.value.length,
                           scrollDirection: Axis.horizontal,
                           separatorBuilder: (context, i) {
                             return Container(
@@ -289,150 +265,43 @@ class SelectFolderState extends State<SelectFolder> {
                           },
                         ),
                       ),
-                      if (paths.length > 1)
+                      if (paths.value.length > 1)
                         Container(
                           padding: const EdgeInsets.symmetric(
                               vertical: AppConstants.paddingSmall + 2),
                           child: OutlinedButton(
                             onPressed: () {
-                              String name = "";
                               showCupertinoDialog(
                                   context: context,
-                                  builder: (context) {
-                                    return Material(
-                                      color: Colors.transparent,
-                                      child: Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          Card(
-                                            shape: RoundedRectangleBorder(
-                                                side: const BorderSide(),
-                                                borderRadius:
-                                                    BorderRadius.circular(5)),
-                                            margin: const EdgeInsets.symmetric(
-                                                horizontal: 50),
-                                            child: Padding(
-                                              padding: const EdgeInsets.all(20),
-                                              child: Column(
-                                                children: [
-                                                  const Text(
-                                                    "新建文件夹",
-                                                    style: TextStyle(
-                                                        fontSize: 20,
-                                                        fontWeight:
-                                                            FontWeight.w500),
-                                                  ),
-                                                  const SizedBox(
-                                                    height: 16,
-                                                  ),
-                                                  Card(
-                                                    shape: RoundedRectangleBorder(
-                                                        side:
-                                                            const BorderSide(),
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(5)),
-                                                    child: Padding(
-                                                      padding:
-                                                          const EdgeInsets.all(
-                                                              8.0),
-                                                      child: TextField(
-                                                        onChanged: (v) =>
-                                                            name = v,
-                                                        decoration:
-                                                            const InputDecoration(
-                                                          border:
-                                                              InputBorder.none,
-                                                          hintText: "请输入文件夹名",
-                                                          labelText: "文件夹名",
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  ),
-                                                  const SizedBox(
-                                                    height: 20,
-                                                  ),
-                                                  Row(
-                                                    children: [
-                                                      Expanded(
-                                                        child: OutlinedButton(
-                                                          onPressed: () async {
-                                                            if (name.trim() ==
-                                                                "") {
-                                                              UiUtil.toast(
-                                                                  "请输入文件夹名");
-                                                              return;
-                                                            }
-                                                            Navigator.of(
-                                                                    context)
-                                                                .pop();
-                                                            String path = paths
-                                                                .join("/")
-                                                                .substring(1);
-                                                            var res = await DsmApi
-                                                                .createFolder(
-                                                                    path, name);
-                                                            if (res[
-                                                                'success']) {
-                                                              UiUtil.toast(
-                                                                  "文件夹创建成功");
-                                                              refresh();
-                                                            } else {
-                                                              if (res['error'][
-                                                                          'errors'] !=
-                                                                      null &&
-                                                                  res['error']['errors']
-                                                                          .length >
-                                                                      0 &&
-                                                                  res['error']['errors']
-                                                                              [
-                                                                              0]
-                                                                          [
-                                                                          'code'] ==
-                                                                      414) {
-                                                                UiUtil.toast(
-                                                                    "文件夹创建失败：指定的名称已存在");
-                                                              } else {
-                                                                UiUtil.toast(
-                                                                    "文件夹创建失败");
-                                                              }
-                                                            }
-                                                          },
-                                                          child: const Text(
-                                                            "确定",
-                                                            style: TextStyle(
-                                                                fontSize: 18),
-                                                          ),
-                                                        ),
-                                                      ),
-                                                      const SizedBox(
-                                                        width: 16,
-                                                      ),
-                                                      Expanded(
-                                                        child: OutlinedButton(
-                                                          onPressed: () async {
-                                                            Navigator.of(
-                                                                    context)
-                                                                .pop();
-                                                          },
-                                                          child: const Text(
-                                                            "取消",
-                                                            style: TextStyle(
-                                                                fontSize: 18),
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  )
-                                                ],
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    );
-                                  });
+                                  builder: (context) => NameInputDialog(
+                                    title: "新建文件夹",
+                                    labelText: "文件夹名",
+                                    hintText: "请输入文件夹名",
+                                    emptyMessage: "请输入文件夹名",
+                                    onConfirm: (name) async {
+                                      String path = paths.value
+                                          .join("/")
+                                          .substring(1);
+                                      try {
+                                        await dsmFileStationCreateFolderForPage(
+                                            path, name);
+                                        UiUtil.toast("文件夹创建成功");
+                                        refresh();
+                                      } catch (e) {
+                                        final raw = e is DSMException
+                                            ? e.rawError
+                                            : null;
+                                        final errors = raw?['errors'] as List?;
+                                        if (errors != null &&
+                                            errors.isNotEmpty &&
+                                            errors[0]['code'] == 414) {
+                                          UiUtil.toast("文件夹创建失败：指定的名称已存在");
+                                        } else {
+                                          UiUtil.toast("文件夹创建失败");
+                                        }
+                                      }
+                                    },
+                                  ));
                             },
                             child: const Text(
                               "新建",
@@ -449,11 +318,11 @@ class SelectFolderState extends State<SelectFolder> {
                         child: OutlinedButton(
                           onPressed: () {
                             if (selectedFiles.isNotEmpty) {
-                              Navigator.of(context).pop(selectedFiles);
+                              Navigator.of(context).pop(selectedFiles.value);
                             } else {
-                              if (paths.length > 1) {
+                              if (paths.value.length > 1) {
                                 Navigator.of(context)
-                                    .pop([paths.join("/").substring(1)]);
+                                    .pop([paths.value.join("/").substring(1)]);
                               } else {
                                 UiUtil.toast("无法选择根目录");
                               }
@@ -472,26 +341,28 @@ class SelectFolderState extends State<SelectFolder> {
                   ),
                 ),
                 Expanded(
-                  child: loading
+                  child: loading.value
                       ? const Center(
                           child: CupertinoActivityIndicator(
                             radius: 14,
                           ),
                         )
-                      : success
+                      : success.value
                           ? ListView(
                               padding: EdgeInsets.only(
-                                  bottom: selectedFiles.isNotEmpty ? 140 : 20),
-                              children: files
+                                  bottom: selectedFiles.value.isNotEmpty
+                                      ? 140
+                                      : 20),
+                              children: files.value
                                   .where((file) => file['isdir'])
-                                  .map(_buildFileItem)
+                                  .map(buildFileItem)
                                   .toList(),
                             )
                           : Center(
                               child: Column(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  Text(msg),
+                                  Text(msg.value),
                                   const SizedBox(
                                     height: 20,
                                   ),
@@ -500,7 +371,7 @@ class SelectFolderState extends State<SelectFolder> {
                                     child: OutlinedButton(
                                       onPressed: () {
                                         String path =
-                                            paths.join("/").substring(1);
+                                            paths.value.join("/").substring(1);
                                         goPath(path);
                                       },
                                       child: const Text(
@@ -517,6 +388,7 @@ class SelectFolderState extends State<SelectFolder> {
             ),
           ),
         ),
+      ),
       ),
     );
   }

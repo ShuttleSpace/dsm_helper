@@ -7,118 +7,126 @@ import 'package:garden/util/http_util.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:signals_hooks/signals_hooks.dart';
 import 'add_server.dart';
 import 'ssh.dart';
 
-class SelectServer extends StatefulWidget {
+class SelectServer extends HookWidget {
   const SelectServer({super.key});
 
   @override
-  SelectServerState createState() => SelectServerState();
-}
+  Widget build(BuildContext context) {
+    final loading = useSignal(true);
+    final servers = useSignal<List>([]);
 
-class SelectServerState extends State<SelectServer> {
-  bool loading = true;
-  List servers = [];
-  @override
-  void initState() {
-    getData();
-    super.initState();
-  }
+    Future<void> createCurrentServer() async {
+      final host = await StorageUtil.getString("host") ?? '';
+      if (host.isBlank) return;
+      final server = {
+        "host": host,
+        "port": "22",
+        "account": await StorageUtil.getString("account") ?? '',
+        "password": await StorageUtil.getString("password") ?? '',
+      };
+      servers.value = [server];
+      await StorageUtil.setString("terminal_servers", jsonEncode(servers.value));
+    }
 
-  getData() async {
-    String str = await StorageUtil.getString("terminal_servers") ?? '';
-    setState(() {
-      loading = false;
+    getData() async {
+      String str = await StorageUtil.getString("terminal_servers") ?? '';
       if (str.isNotBlank) {
-        servers = json.decode(str);
-      } else {
-        servers = [];
+        servers.value = json.decode(str);
       }
-    });
-    Log.info(servers);
-  }
+      if (servers.value.isEmpty) {
+        await createCurrentServer();
+      }
+      loading.value = false;
+      Log.info(servers.value);
+    }
 
-  Widget _buildServerItem(int index) {
-    var server = servers[index];
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 20),
-      child: OutlinedButton(
-        onPressed: () async {
-          Navigator.of(context).push(CupertinoPageRoute(
-              builder: (context) {
-                return Ssh(server['host'], server['port'], server['account'],
-                    server['password']);
-              },
-              settings: const RouteSettings(name: "ssh_client")));
-        },
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-          child: Row(
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "${server['account']}",
-                      style: const TextStyle(fontSize: 18),
-                    ),
-                    const SizedBox(
-                      height: 5,
-                    ),
-                    Text(
-                      "${server['host']}:${server['port']}",
-                      style: const TextStyle(fontSize: 16, color: Colors.grey),
-                    ),
-                  ],
-                ),
-              ),
-              OutlinedButton(
-                onPressed: () {
-                  Navigator.of(context)
-                      .push(CupertinoPageRoute(
-                          builder: (context) {
-                            return AddServer(index: index);
-                          },
-                          settings:
-                              const RouteSettings(name: "add_ssh_server")))
-                      .then((value) {
-                    getData();
-                  });
+    Widget buildServerItem(int index) {
+      var server = servers.value[index];
+      return Padding(
+        padding: const EdgeInsets.only(bottom: 20),
+        child: OutlinedButton(
+          onPressed: () async {
+            Navigator.of(context).push(CupertinoPageRoute(
+                builder: (context) {
+                  return Ssh(server['host'], server['port'], server['account'],
+                      server['password']);
                 },
-                child: Image.asset(
-                  "assets/icons/edit.png",
-                  width: 20,
+                settings: const RouteSettings(name: "ssh_client")));
+          },
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "${server['account']}",
+                        style: const TextStyle(fontSize: 18),
+                      ),
+                      const SizedBox(
+                        height: 5,
+                      ),
+                      Text(
+                        "${server['host']}:${server['port']}",
+                        style: const TextStyle(
+                            fontSize: 16, color: Colors.grey),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-              const SizedBox(
-                width: 10,
-              ),
-              OutlinedButton(
-                onPressed: () {
-                  setState(() {
-                    servers.remove(server);
-                  });
+                OutlinedButton(
+                  onPressed: () {
+                    Navigator.of(context)
+                        .push(CupertinoPageRoute(
+                            builder: (context) {
+                              return AddServer(index: index);
+                            },
+                            settings:
+                                const RouteSettings(name: "add_ssh_server")))
+                        .then((value) {
+                      getData();
+                    });
+                  },
+                  child: Image.asset(
+                    "assets/icons/edit.png",
+                    width: 20,
+                  ),
+                ),
+                const SizedBox(
+                  width: 10,
+                ),
+                OutlinedButton(
+                  onPressed: () {
+                    servers.value = List.of(servers.value)..remove(server);
 
-                  StorageUtil.setString(
-                      "terminal_servers", jsonEncode(servers));
-                  UiUtil.toast("删除成功");
-                },
-                child: Image.asset(
-                  "assets/icons/delete.png",
-                  width: 20,
+                    StorageUtil.setString(
+                        "terminal_servers", jsonEncode(servers.value));
+                    UiUtil.toast("删除成功");
+                  },
+                  child: Image.asset(
+                    "assets/icons/delete.png",
+                    width: 20,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
-      ),
-    );
-  }
+      );
+    }
 
-  @override
-  Widget build(BuildContext context) {
+    useEffect(() {
+      getData();
+      return null;
+    }, const []);
+
     return Scaffold(
       appBar: AppBar(
         leading: AppBackButton(context),
@@ -143,19 +151,19 @@ class SelectServerState extends State<SelectServer> {
           )
         ],
       ),
-      body: loading
+      body: loading.value
           ? const Center(
               child: CupertinoActivityIndicator(
                 radius: 14,
               ),
             )
-          : servers.isNotEmpty
+          : servers.value.isNotEmpty
               ? ListView.builder(
                   padding: const EdgeInsets.all(20),
                   itemBuilder: (context, i) {
-                    return _buildServerItem(i);
+                    return buildServerItem(i);
                   },
-                  itemCount: servers.length,
+                  itemCount: servers.value.length,
                 )
               : Center(
                   child: Column(

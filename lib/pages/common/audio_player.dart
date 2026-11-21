@@ -7,11 +7,12 @@ import 'package:garden/theme/app_theme.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:garden/constants/app_constants.dart';
 import 'package:media_kit/media_kit.dart';
-import 'package:signals/signals_flutter.dart';
+import 'package:signals_hooks/signals_hooks.dart';
 
-class AudioPlayer extends StatefulWidget {
+class AudioPlayer extends HookWidget {
   const AudioPlayer({
     super.key,
     required this.name,
@@ -21,76 +22,61 @@ class AudioPlayer extends StatefulWidget {
   final String url;
 
   @override
-  State<AudioPlayer> createState() => _AudioPlayerState();
-}
+  Widget build(BuildContext context) {
+    final player =
+        useMemoized(() => settingsStore.player.value ?? Player(), const []);
+    final stateController = useMemoized(
+        () => StreamController<PlayerStateX>.broadcast(), const []);
 
-class _AudioPlayerState extends State<AudioPlayer> {
-  late Player _player;
-  String title = "";
-  late StreamController<PlayerStateX> _stateController;
-  late StreamSubscription<bool> _playingSubscription;
-  late StreamSubscription<bool> _completedSubscription;
-  late StreamSubscription<bool> _bufferSubscription;
-
-  @override
-  void initState() {
-    _player = settingsStore.player.watch(context) ?? Player();
-    settingsStore.setPlayer(_player);
-    title = widget.name;
-
-    // 初始化状态控制器
-    _stateController = StreamController<PlayerStateX>.broadcast();
-
-    // 监听播放状态
-    _playingSubscription = _player.stream.playing.listen((isPlaying) {
-      if (isPlaying) {
-        _stateController.add(PlayerStateX.playing);
-      } else {
-        _stateController.add(PlayerStateX.paused);
-      }
-    });
-
-    // 监听播放完成
-    _completedSubscription = _player.stream.completed.listen((isCompleted) {
-      if (isCompleted) {
-        _stateController.add(PlayerStateX.completed);
-      }
-    });
-
-    _bufferSubscription = _player.stream.buffering.listen((isBuffering) {
-      if (isBuffering) {
-        _stateController.add(PlayerStateX.buffering);
-      }
-    });
-
-    // 设置音频源
-    if (settingsStore.audioUrl.value != widget.url) {
-      settingsStore.setAudioUrl(widget.url, title);
-      _setSource();
+    Future<void> setSource() async {
+      await player.open(Media(url));
     }
 
-    super.initState();
-  }
+    useEffect(() {
+      settingsStore.setPlayer(player);
 
-  @override
-  void dispose() {
-    _playingSubscription.cancel();
-    _completedSubscription.cancel();
-    _stateController.close();
-    _bufferSubscription.cancel();
-    super.dispose();
-  }
+      // 监听播放状态
+      final playingSubscription = player.stream.playing.listen((isPlaying) {
+        if (isPlaying) {
+          stateController.add(PlayerStateX.playing);
+        } else {
+          stateController.add(PlayerStateX.paused);
+        }
+      });
 
-  Future<void> _setSource() async {
-    await _player.open(Media(widget.url));
-  }
+      // 监听播放完成
+      final completedSubscription =
+          player.stream.completed.listen((isCompleted) {
+        if (isCompleted) {
+          stateController.add(PlayerStateX.completed);
+        }
+      });
 
-  @override
-  Widget build(BuildContext context) {
+      final bufferSubscription =
+          player.stream.buffering.listen((isBuffering) {
+        if (isBuffering) {
+          stateController.add(PlayerStateX.buffering);
+        }
+      });
+
+      // 设置音频源
+      if (settingsStore.audioUrl.value != url) {
+        settingsStore.setAudioUrl(url, name);
+        setSource();
+      }
+
+      return () {
+        playingSubscription.cancel();
+        completedSubscription.cancel();
+        stateController.close();
+        bufferSubscription.cancel();
+      };
+    }, const []);
+
     return Scaffold(
       appBar: AppBar(
         leading: AppBackButton(context),
-        title: Text(title),
+        title: Text(name),
       ),
       body: SafeArea(
         child: Column(
@@ -110,18 +96,18 @@ class _AudioPlayerState extends State<AudioPlayer> {
                   ),
                 ),
                 const SizedBox(height: 20),
-                Text(title),
+                Text(name),
               ],
             ),
             const SizedBox(height: 20),
             ControlButtons(
-              player: _player,
-              stateController: _stateController,
+              player: player,
+              stateController: stateController,
             ),
             SeekBar(
-              player: _player,
+              player: player,
               onChangeEnd: (newPosition) {
-                _player.seek(newPosition);
+                player.seek(newPosition);
               },
             ),
           ],
@@ -270,7 +256,7 @@ class ControlButtons extends StatelessWidget {
   }
 }
 
-class SeekBar extends StatefulWidget {
+class SeekBar extends HookWidget {
   final Player player;
   final ValueChanged<Duration>? onChanged;
   final ValueChanged<Duration>? onChangeEnd;
@@ -283,7 +269,107 @@ class SeekBar extends StatefulWidget {
   });
 
   @override
-  SeekBarState createState() => SeekBarState();
+  Widget build(BuildContext context) {
+    final dragValue = useSignal<double?>(null);
+    final sliderThemeData =
+        SliderTheme.of(context).copyWith(trackHeight: 2.0);
+
+    String formatDuration(Duration duration) {
+      String twoDigits(int n) => n.toString().padLeft(2, '0');
+      final hours = duration.inHours;
+      final minutes = duration.inMinutes.remainder(60);
+      final seconds = duration.inSeconds.remainder(60);
+
+      if (hours > 0) {
+        return '$hours:${twoDigits(minutes)}:${twoDigits(seconds)}';
+      } else {
+        return '${twoDigits(minutes)}:${twoDigits(seconds)}';
+      }
+    }
+
+    return Stack(
+      children: [
+        // 缓冲进度条（背景）
+        SliderTheme(
+          data: sliderThemeData.copyWith(
+            thumbShape: HiddenThumbComponentShape(),
+            activeTrackColor: Colors.blue.shade100,
+            inactiveTrackColor: Colors.grey.shade300,
+          ),
+          child: ExcludeSemantics(
+            child: StreamBuilder<Duration>(
+              stream: player.stream.buffer,
+              builder: (context, snapshot) {
+                final Duration duration = player.state.duration;
+                final Duration bufferedPosition =
+                    snapshot.data ?? Duration.zero;
+                return Slider(
+                  min: 0.0,
+                  max: duration.inMilliseconds.toDouble(),
+                  value: bufferedPosition.inMilliseconds.toDouble(),
+                  onChanged: null, // 缓冲进度不可交互
+                );
+              },
+            ),
+          ),
+        ),
+
+        // 播放进度条（可交互）
+        StreamBuilder<Duration>(
+          stream: player.stream.position,
+          builder: (context, snapshot) {
+            final Duration duration = player.state.duration;
+            final Duration position = snapshot.data ?? Duration.zero;
+            final Duration remaining = duration - position;
+
+            return Column(
+              children: [
+                Slider(
+                  min: 0.0,
+                  max: duration.inMilliseconds.toDouble(),
+                  value: min(
+                    dragValue.value ?? position.inMilliseconds.toDouble(),
+                    duration.inMilliseconds.toDouble(),
+                  ),
+                  onChanged: (value) {
+                    dragValue.value = value;
+                    onChanged?.call(Duration(milliseconds: value.round()));
+                  },
+                  onChangeEnd: (value) {
+                    onChangeEnd?.call(Duration(milliseconds: value.round()));
+                    dragValue.value = null;
+                  },
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: AppConstants.paddingLarge),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        formatDuration(position),
+                        style: TextStyle(
+                          color: AppTheme.of(context).placeholderColor,
+                          fontSize: 12,
+                        ),
+                      ),
+                      Text(
+                        formatDuration(remaining),
+                        style: TextStyle(
+                          color: AppTheme.of(context).placeholderColor,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            );
+          },
+        ),
+      ],
+    );
+  }
 }
 
 class HiddenThumbComponentShape extends SliderComponentShape {
@@ -305,122 +391,4 @@ class HiddenThumbComponentShape extends SliderComponentShape {
     required double textScaleFactor,
     required Size sizeWithOverflow,
   }) {}
-}
-
-class SeekBarState extends State<SeekBar> {
-  double? _dragValue;
-  SliderThemeData? _sliderThemeData;
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-
-    _sliderThemeData = SliderTheme.of(context).copyWith(
-      trackHeight: 2.0,
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        // 缓冲进度条（背景）
-        SliderTheme(
-          data: _sliderThemeData?.copyWith(
-                thumbShape: HiddenThumbComponentShape(),
-                activeTrackColor: Colors.blue.shade100,
-                inactiveTrackColor: Colors.grey.shade300,
-              ) ??
-              const SliderThemeData(),
-          child: ExcludeSemantics(
-            child: StreamBuilder<Duration>(
-              stream: widget.player.stream.buffer,
-              builder: (context, snapshot) {
-                final Duration duration = widget.player.state.duration;
-                final Duration bufferedPosition =
-                    snapshot.data ?? Duration.zero;
-                return Slider(
-                  min: 0.0,
-                  max: duration.inMilliseconds.toDouble(),
-                  value: bufferedPosition.inMilliseconds.toDouble(),
-                  onChanged: null, // 缓冲进度不可交互
-                );
-              },
-            ),
-          ),
-        ),
-
-        // 播放进度条（可交互）
-        StreamBuilder<Duration>(
-          stream: widget.player.stream.position,
-          builder: (context, snapshot) {
-            final Duration duration = widget.player.state.duration;
-            final Duration position = snapshot.data ?? Duration.zero;
-            final Duration remaining = duration - position;
-
-            return Column(
-              children: [
-                Slider(
-                  min: 0.0,
-                  max: duration.inMilliseconds.toDouble(),
-                  value: min(
-                    _dragValue ?? position.inMilliseconds.toDouble(),
-                    duration.inMilliseconds.toDouble(),
-                  ),
-                  onChanged: (value) {
-                    setState(() {
-                      _dragValue = value;
-                    });
-                    widget.onChanged
-                        ?.call(Duration(milliseconds: value.round()));
-                  },
-                  onChangeEnd: (value) {
-                    widget.onChangeEnd
-                        ?.call(Duration(milliseconds: value.round()));
-                    _dragValue = null;
-                  },
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: AppConstants.paddingLarge),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        _formatDuration(position),
-                        style: TextStyle(
-                          color: AppTheme.of(context).placeholderColor,
-                          fontSize: 12,
-                        ),
-                      ),
-                      Text(
-                        _formatDuration(remaining),
-                        style: TextStyle(
-                          color: AppTheme.of(context).placeholderColor,
-                          fontSize: 12,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            );
-          },
-        ),
-      ],
-    );
-  }
-
-  String _formatDuration(Duration duration) {
-    String twoDigits(int n) => n.toString().padLeft(2, '0');
-    final hours = duration.inHours;
-    final minutes = duration.inMinutes.remainder(60);
-    final seconds = duration.inSeconds.remainder(60);
-
-    if (hours > 0) {
-      return '$hours:${twoDigits(minutes)}:${twoDigits(seconds)}';
-    } else {
-      return '${twoDigits(minutes)}:${twoDigits(seconds)}';
-    }
-  }
 }

@@ -1,30 +1,17 @@
 import 'package:flutter/material.dart';
 
-class AppBackButton extends StatefulWidget {
+class AppBackButton extends StatelessWidget {
   final BuildContext context;
   final Color? color;
   final Color? iconColor;
   final double bevel;
   const AppBackButton(this.context,
       {super.key, this.color, this.iconColor, this.bevel = 5.0});
-  @override
-  AppBackButtonState createState() => AppBackButtonState();
-}
-
-class AppBackButtonState extends State<AppBackButton> {
-  ModalRoute<dynamic>? parentRoute;
-  bool canPop = false;
-  @override
-  void initState() {
-    parentRoute = ModalRoute.of(widget.context);
-    setState(() {
-      canPop = parentRoute?.canPop == true;
-    });
-    super.initState();
-  }
 
   @override
   Widget build(BuildContext context) {
+    final parentRoute = ModalRoute.of(this.context);
+    final canPop = parentRoute?.canPop == true;
     return canPop
         ? Padding(
             padding: const EdgeInsets.only(left: 10, top: 8, bottom: 8),
@@ -35,7 +22,7 @@ class AppBackButtonState extends State<AppBackButton> {
               icon: Icon(
                 Icons.arrow_back_ios_outlined,
                 size: 22,
-                color: widget.iconColor,
+                color: iconColor,
               ),
             ),
           )

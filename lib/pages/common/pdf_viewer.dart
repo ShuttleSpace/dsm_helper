@@ -5,17 +5,40 @@ class PdfViewer extends StatefulWidget {
   final String url;
   final String name;
   const PdfViewer(this.url, this.name, {super.key});
+
   @override
-  PdfViewerState createState() => PdfViewerState();
+  State<PdfViewer> createState() => _PdfViewerState();
 }
 
-class PdfViewerState extends State<PdfViewer> {
+class _PdfViewerState extends State<PdfViewer> {
+  String? _error;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: Text(widget.name),
-        ),
-        body: SfPdfViewer.network(widget.url));
+      appBar: AppBar(
+        title: Text(widget.name),
+      ),
+      body: Stack(
+        children: [
+          SfPdfViewer.network(
+            widget.url,
+            onDocumentLoadFailed: (details) => setState(
+                () => _error = '预览失败：${details.error} ${details.description}'),
+          ),
+          if (_error != null)
+            Center(
+              child: Padding(
+                padding: const EdgeInsets.all(20),
+                child: Text(
+                  _error!,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(color: Colors.red),
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
   }
 }

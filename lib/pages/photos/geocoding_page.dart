@@ -4,48 +4,45 @@ import 'package:garden/widgets/neu_back_button.dart';
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:garden/constants/app_constants.dart';
+import 'package:signals_hooks/signals_hooks.dart';
 
-class GeocodingPage extends StatefulWidget {
+class GeocodingPage extends HookWidget {
   const GeocodingPage(this.isTeam, {super.key});
   final bool isTeam;
-  @override
-  State<GeocodingPage> createState() => _GeocodingPageState();
-}
-
-class _GeocodingPageState extends State<GeocodingPage> {
-  bool loading = true;
-  double photoWidth = 0;
-  List<GeocodingModel> geocodings = [];
-  Map<String, List<GeocodingModel>> geocodingGroups = {};
-  @override
-  void initState() {
-    getData();
-    super.initState();
-  }
-
-  Future getData() async {
-    geocodings = await GeocodingModel.fetch(
-        additional: ['thumbnail'], isTeam: widget.isTeam);
-    for (var element in geocodings) {
-      if (geocodingGroups[element.country] == null) {
-        geocodingGroups[element.country ?? ''] = [];
-      }
-      geocodingGroups[element.country]?.add(element);
-    }
-    setState(() {
-      loading = false;
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
+    final loading = useSignal(true);
+    final geocodingGroups = useSignal<Map<String, List<GeocodingModel>>>({});
+    final double photoWidth = (MediaQuery.sizeOf(context).width - 6) / 4;
+
+    Future getData() async {
+      final geocodings = await GeocodingModel.fetch(
+          additional: ['thumbnail'], isTeam: isTeam);
+      final groups = <String, List<GeocodingModel>>{};
+      for (var element in geocodings) {
+        if (groups[element.country] == null) {
+          groups[element.country ?? ''] = [];
+        }
+        groups[element.country]?.add(element);
+      }
+      geocodingGroups.value = groups;
+      loading.value = false;
+    }
+
+    useEffect(() {
+      getData();
+      return null;
+    }, const []);
+
     return Scaffold(
       appBar: AppBar(
         leading: AppBackButton(context),
         title: const Text("位置"),
       ),
-      body: loading
+      body: loading.value
           ? const Center(
               child: CupertinoActivityIndicator(
                 radius: 14,
@@ -56,7 +53,7 @@ class _GeocodingPageState extends State<GeocodingPage> {
                   horizontal: AppConstants.paddingLarge),
               itemBuilder: (context, i) {
                 MapEntry<String, List<GeocodingModel>> entry =
-                    geocodingGroups.entries.toList()[i];
+                    geocodingGroups.value.entries.toList()[i];
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -75,7 +72,7 @@ class _GeocodingPageState extends State<GeocodingPage> {
                                 .push(CupertinoPageRoute(builder: (context) {
                               return TimelinePage(
                                   title: geocoding.name ?? '',
-                                  isTeam: widget.isTeam,
+                                  isTeam: isTeam,
                                   geocodingId: geocoding.id?.toInt() ?? 0);
                             }));
                           },
@@ -85,7 +82,7 @@ class _GeocodingPageState extends State<GeocodingPage> {
                               children: [
                                 ExtendedImage.network(
                                   geocoding.additional?.thumbnail?.thumbUrl(
-                                          size: 'sm', isTeam: widget.isTeam) ??
+                                          size: 'sm', isTeam: isTeam) ??
                                       '',
                                   width: photoWidth,
                                   height: photoWidth,
@@ -113,7 +110,7 @@ class _GeocodingPageState extends State<GeocodingPage> {
                   ],
                 );
               },
-              itemCount: geocodingGroups.length,
+              itemCount: geocodingGroups.value.length,
             ),
     );
   }

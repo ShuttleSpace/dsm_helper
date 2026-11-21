@@ -12,36 +12,39 @@ import 'package:garden/pages/security_scan/security_scan.dart';
 import 'package:garden/pages/storage_manager/storage_manager.dart';
 import 'package:garden/pages/virtual_machine/virtual_machine.dart';
 import 'package:garden/constants/app_constants.dart';
+import 'package:garden/widgets/application_tile.dart';
 import 'package:garden/widgets/badge.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart' hide Badge;
+import 'package:signals_flutter/signals_flutter.dart';
 
 class ApplicationList extends StatelessWidget {
-  final List applications;
-  final Map system;
-  final List volumes;
-  final List disks;
-  final Map appNotify;
   const ApplicationList(
       this.applications, this.system, this.volumes, this.disks, this.appNotify,
       {super.key});
-
+  final ReadonlySignal<List> applications;
+  final ReadonlySignal<Map> system;
+  final ReadonlySignal<List> volumes;
+  final ReadonlySignal<List> disks;
+  final ReadonlySignal<Map> appNotify;
   @override
   Widget build(BuildContext context) {
     return Container(
       width: MediaQuery.sizeOf(context).width * 0.8,
       color: Theme.of(context).scaffoldBackgroundColor,
       child: SafeArea(
-        child: ListView(
-          padding:
-              const EdgeInsets.symmetric(horizontal: AppConstants.paddingLarge),
-          children: [
-            Wrap(
-              spacing: 20,
-              runSpacing: 20,
-              children: _buildApplicationList(context),
-            ),
-          ],
+        child: Watch(
+          (_) => ListView(
+            padding: const EdgeInsets.symmetric(
+                horizontal: AppConstants.paddingLarge),
+            children: [
+              Wrap(
+                spacing: 20,
+                runSpacing: 20,
+                children: _buildApplicationList(context),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -49,70 +52,36 @@ class ApplicationList extends StatelessWidget {
 
   List<Widget> _buildApplicationList(BuildContext context) {
     List<Widget> apps = [];
-    for (var application in applications) {
+    for (var application in applications.value) {
       switch (application) {
         case "SYNO.SDS.AdminCenter.Application":
           apps.add(
-            GestureDetector(
+            ApplicationTile(
+              iconAsset:
+                  "assets/applications/${connectionStore.dsmVersion}/control_panel.png",
+              label: "控制面板",
               onTap: () {
                 Navigator.of(context).pop();
                 Navigator.of(context).push(CupertinoPageRoute(
                     builder: (context) {
-                      return ControlPanel(
-                          system,
-                          volumes,
-                          disks,
-                          appNotify['SYNO.SDS.AdminCenter.Application'] == null
-                              ? null
-                              : appNotify['SYNO.SDS.AdminCenter.Application']
-                                  ['fn']);
+                      return ControlPanel(system, volumes, disks, appNotify);
                     },
                     settings: const RouteSettings(name: "control_panel")));
               },
-              child: Card(
-                shape: RoundedRectangleBorder(
-                    side: const BorderSide(),
-                    borderRadius: BorderRadius.circular(18)),
-                child: Padding(
-                  padding: const EdgeInsets.all(AppConstants.paddingSmall),
-                  child: Stack(
-                    children: [
-                      Align(
-                        alignment: Alignment.center,
-                        child: Column(
-                          children: [
-                            Image.asset(
-                              "assets/applications/${connectionStore.dsmVersion}/control_panel.png",
-                              height: 45,
-                              width: 45,
-                              fit: BoxFit.contain,
-                            ),
-                            const SizedBox(
-                              height: 5,
-                            ),
-                            const Text("控制面板"),
-                          ],
-                        ),
-                      ),
-                      if (appNotify['SYNO.SDS.AdminCenter.Application'] != null)
-                        Positioned(
-                          right: 30,
-                          child: Badge(
-                            appNotify['SYNO.SDS.AdminCenter.Application']
-                                ['unread'],
-                            size: 20,
-                          ),
-                        ),
-                    ],
-                  ),
-                ),
+              badge: Badge(
+                appNotify['SYNO.SDS.AdminCenter.Application']['unread'],
+                size: 20,
               ),
             ),
           );
           break;
+
         case "SYNO.SDS.PkgManApp.Instance":
           apps.add(
-            GestureDetector(
+            ApplicationTile(
+              iconAsset:
+                  "assets/applications/${connectionStore.dsmVersion}/package_center.png",
+              label: "套件中心",
               onTap: () {
                 Navigator.of(context).pop();
                 Navigator.of(context).push(CupertinoPageRoute(
@@ -121,49 +90,20 @@ class ApplicationList extends StatelessWidget {
                     },
                     settings: const RouteSettings(name: "packages")));
               },
-              child: Card(
-                shape: RoundedRectangleBorder(
-                    side: const BorderSide(),
-                    borderRadius: BorderRadius.circular(18)),
-                child: Padding(
-                  padding: const EdgeInsets.all(AppConstants.paddingSmall),
-                  child: Stack(
-                    children: [
-                      Align(
-                        alignment: Alignment.center,
-                        child: Column(
-                          children: [
-                            Image.asset(
-                              "assets/applications/${connectionStore.dsmVersion}/package_center.png",
-                              height: 45,
-                              width: 45,
-                              fit: BoxFit.contain,
-                            ),
-                            const SizedBox(
-                              height: 5,
-                            ),
-                            const Text("套件中心"),
-                          ],
-                        ),
-                      ),
-                      if (appNotify['SYNO.SDS.PkgManApp.Instance'] != null)
-                        Positioned(
-                          right: 30,
-                          child: Badge(
-                            appNotify['SYNO.SDS.PkgManApp.Instance']['unread'],
-                            size: 20,
-                          ),
-                        ),
-                    ],
-                  ),
-                ),
+              badge: Badge(
+                appNotify['SYNO.SDS.PkgManApp.Instance']['unread'],
+                size: 20,
               ),
             ),
           );
           break;
+
         case "SYNO.SDS.ResourceMonitor.Instance":
           apps.add(
-            GestureDetector(
+            ApplicationTile(
+              iconAsset:
+                  "assets/applications/${connectionStore.dsmVersion}/resource_monitor.png",
+              label: "资源监控",
               onTap: () {
                 Navigator.of(context).pop();
                 Navigator.of(context).push(CupertinoPageRoute(
@@ -172,34 +112,16 @@ class ApplicationList extends StatelessWidget {
                     },
                     settings: const RouteSettings(name: "resource_monitor")));
               },
-              child: Card(
-                shape: RoundedRectangleBorder(
-                    side: const BorderSide(),
-                    borderRadius: BorderRadius.circular(18)),
-                child: Padding(
-                  padding: const EdgeInsets.all(AppConstants.paddingSmall),
-                  child: Column(
-                    children: [
-                      Image.asset(
-                        "assets/applications/${connectionStore.dsmVersion}/resource_monitor.png",
-                        height: 45,
-                        width: 45,
-                        fit: BoxFit.contain,
-                      ),
-                      const SizedBox(
-                        height: 5,
-                      ),
-                      const Text("资源监控"),
-                    ],
-                  ),
-                ),
-              ),
             ),
           );
           break;
+
         case "SYNO.SDS.StorageManager.Instance":
           apps.add(
-            GestureDetector(
+            ApplicationTile(
+              iconAsset:
+                  "assets/applications/${connectionStore.dsmVersion}/storage_manager.png",
+              label: "存储空间管理员",
               onTap: () {
                 Navigator.of(context).pop();
                 Navigator.of(context).push(CupertinoPageRoute(
@@ -208,34 +130,16 @@ class ApplicationList extends StatelessWidget {
                     },
                     settings: const RouteSettings(name: "storage_manager")));
               },
-              child: Card(
-                shape: RoundedRectangleBorder(
-                    side: const BorderSide(),
-                    borderRadius: BorderRadius.circular(18)),
-                child: Padding(
-                  padding: const EdgeInsets.all(AppConstants.paddingSmall),
-                  child: Column(
-                    children: [
-                      Image.asset(
-                        "assets/applications/${connectionStore.dsmVersion}/storage_manager.png",
-                        height: 45,
-                        width: 45,
-                        fit: BoxFit.contain,
-                      ),
-                      const SizedBox(
-                        height: 5,
-                      ),
-                      const Text("存储空间管理员"),
-                    ],
-                  ),
-                ),
-              ),
             ),
           );
           break;
+
         case "SYNO.SDS.LogCenter.Instance":
           apps.add(
-            GestureDetector(
+            ApplicationTile(
+              iconAsset:
+                  "assets/applications/${connectionStore.dsmVersion}/log_center.png",
+              label: "日志中心",
               onTap: () {
                 Navigator.of(context).pop();
                 Navigator.of(context).push(CupertinoPageRoute(
@@ -244,34 +148,16 @@ class ApplicationList extends StatelessWidget {
                     },
                     settings: const RouteSettings(name: "log_center")));
               },
-              child: Card(
-                shape: RoundedRectangleBorder(
-                    side: const BorderSide(),
-                    borderRadius: BorderRadius.circular(18)),
-                child: Padding(
-                  padding: const EdgeInsets.all(AppConstants.paddingSmall),
-                  child: Column(
-                    children: [
-                      Image.asset(
-                        "assets/applications/${connectionStore.dsmVersion}/log_center.png",
-                        height: 45,
-                        width: 45,
-                        fit: BoxFit.contain,
-                      ),
-                      const SizedBox(
-                        height: 5,
-                      ),
-                      const Text("日志中心"),
-                    ],
-                  ),
-                ),
-              ),
             ),
           );
           break;
+
         case "SYNO.SDS.SecurityScan.Instance":
           apps.add(
-            GestureDetector(
+            ApplicationTile(
+              iconAsset:
+                  "assets/applications/${connectionStore.dsmVersion}/security_scan.png",
+              label: "安全顾问",
               onTap: () {
                 Navigator.of(context).pop();
                 Navigator.of(context).push(
@@ -282,50 +168,19 @@ class ApplicationList extends StatelessWidget {
                       settings: const RouteSettings(name: "security_scan")),
                 );
               },
-              child: Card(
-                shape: RoundedRectangleBorder(
-                    side: const BorderSide(),
-                    borderRadius: BorderRadius.circular(18)),
-                child: Padding(
-                  padding: const EdgeInsets.all(AppConstants.paddingSmall),
-                  child: Stack(
-                    children: [
-                      Align(
-                        alignment: Alignment.center,
-                        child: Column(
-                          children: [
-                            Image.asset(
-                              "assets/applications/${connectionStore.dsmVersion}/security_scan.png",
-                              height: 45,
-                              width: 45,
-                              fit: BoxFit.contain,
-                            ),
-                            const SizedBox(
-                              height: 5,
-                            ),
-                            const Text("安全顾问"),
-                          ],
-                        ),
-                      ),
-                      if (appNotify['SYNO.SDS.SecurityScan.Instance'] != null)
-                        Positioned(
-                          right: 30,
-                          child: Badge(
-                            appNotify['SYNO.SDS.SecurityScan.Instance']
-                                ['unread'],
-                            size: 20,
-                          ),
-                        ),
-                    ],
-                  ),
-                ),
+              badge: Badge(
+                appNotify['SYNO.SDS.SecurityScan.Instance']['unread'],
+                size: 20,
               ),
             ),
           );
           break;
+
         case "SYNO.SDS.XLPan.Application":
           apps.add(
-            GestureDetector(
+            ApplicationTile(
+              iconAsset: "assets/applications/xunlei.png",
+              label: "迅雷",
               onTap: () {
                 Navigator.of(context).push(
                   CupertinoPageRoute(builder: (context) {
@@ -336,34 +191,16 @@ class ApplicationList extends StatelessWidget {
                   }),
                 );
               },
-              child: Card(
-                shape: RoundedRectangleBorder(
-                    side: const BorderSide(),
-                    borderRadius: BorderRadius.circular(18)),
-                child: Padding(
-                  padding: const EdgeInsets.all(AppConstants.paddingSmall),
-                  child: Column(
-                    children: [
-                      Image.asset(
-                        "assets/applications/xunlei.png",
-                        height: 45,
-                        width: 45,
-                        fit: BoxFit.contain,
-                      ),
-                      const SizedBox(
-                        height: 5,
-                      ),
-                      const Text("迅雷"),
-                    ],
-                  ),
-                ),
-              ),
             ),
           );
           break;
+
         case "SYNO.SDS.Virtualization.Application":
           apps.add(
-            GestureDetector(
+            ApplicationTile(
+              iconAsset:
+                  "assets/applications/${connectionStore.dsmVersion}/virtual_machine.png",
+              label: "Virtual Machine Manager",
               onTap: () {
                 Navigator.of(context).pop();
                 Navigator.of(context).push(CupertinoPageRoute(
@@ -374,39 +211,15 @@ class ApplicationList extends StatelessWidget {
                       const RouteSettings(name: "virtual_machine_manager"),
                 ));
               },
-              child: Card(
-                shape: RoundedRectangleBorder(
-                    side: const BorderSide(),
-                    borderRadius: BorderRadius.circular(18)),
-                child: Padding(
-                  padding: const EdgeInsets.all(AppConstants.paddingSmall),
-                  child: Column(
-                    children: [
-                      Image.asset(
-                        "assets/applications/${connectionStore.dsmVersion}/virtual_machine.png",
-                        height: 45,
-                        width: 45,
-                        fit: BoxFit.contain,
-                      ),
-                      const SizedBox(
-                        height: 5,
-                      ),
-                      const Text(
-                        "Virtual Machine Manager",
-                        maxLines: 1,
-                        textAlign: TextAlign.center,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
-                  ),
-                ),
-              ),
             ),
           );
           break;
+
         case "SYNO.SDS.Docker.Application":
           apps.add(
-            GestureDetector(
+            ApplicationTile(
+              iconAsset: "assets/applications/docker.png",
+              label: "Docker",
               onTap: () {
                 Navigator.of(context).pop();
                 Navigator.of(context).push(CupertinoPageRoute(
@@ -416,39 +229,15 @@ class ApplicationList extends StatelessWidget {
                   settings: const RouteSettings(name: "docker"),
                 ));
               },
-              child: Card(
-                shape: RoundedRectangleBorder(
-                    side: const BorderSide(),
-                    borderRadius: BorderRadius.circular(18)),
-                child: Padding(
-                  padding: const EdgeInsets.all(AppConstants.paddingSmall),
-                  child: Column(
-                    children: [
-                      Image.asset(
-                        "assets/applications/docker.png",
-                        height: 45,
-                        width: 45,
-                        fit: BoxFit.contain,
-                      ),
-                      const SizedBox(
-                        height: 5,
-                      ),
-                      const Text(
-                        "Docker",
-                        maxLines: 1,
-                        textAlign: TextAlign.center,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
-                  ),
-                ),
-              ),
             ),
           );
           break;
+
         case "SYNO.SDS.ContainerManager.Application":
           apps.add(
-            GestureDetector(
+            ApplicationTile(
+              iconAsset: "assets/applications/container_manager.png",
+              label: "Container Manager",
               onTap: () {
                 Navigator.of(context).pop();
                 Navigator.of(context).push(CupertinoPageRoute(
@@ -458,40 +247,15 @@ class ApplicationList extends StatelessWidget {
                   settings: const RouteSettings(name: "Container Manager"),
                 ));
               },
-              child: Card(
-                shape: RoundedRectangleBorder(
-                    side: const BorderSide(),
-                    borderRadius: BorderRadius.circular(18)),
-                child: Column(
-                  children: [
-                    Column(
-                      children: [
-                        Image.asset(
-                          "assets/applications/container_manager.png",
-                          height: 45,
-                          width: 45,
-                          fit: BoxFit.contain,
-                        ),
-                        const SizedBox(
-                          height: 5,
-                        ),
-                        const Text(
-                          "Container Manager",
-                          maxLines: 1,
-                          textAlign: TextAlign.center,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
             ),
           );
           break;
+
         case "SYNO.SDS.DownloadStation.Application":
           apps.add(
-            GestureDetector(
+            ApplicationTile(
+              iconAsset: "assets/applications/download_station.png",
+              label: "Download Station",
               onTap: () {
                 Navigator.of(context).pop();
                 Navigator.of(context).push(CupertinoPageRoute(
@@ -501,39 +265,15 @@ class ApplicationList extends StatelessWidget {
                   settings: const RouteSettings(name: "download_station"),
                 ));
               },
-              child: Card(
-                shape: RoundedRectangleBorder(
-                    side: const BorderSide(),
-                    borderRadius: BorderRadius.circular(18)),
-                child: Padding(
-                  padding: const EdgeInsets.all(AppConstants.paddingSmall),
-                  child: Column(
-                    children: [
-                      Image.asset(
-                        "assets/applications/download_station.png",
-                        height: 45,
-                        width: 45,
-                        fit: BoxFit.contain,
-                      ),
-                      const SizedBox(
-                        height: 5,
-                      ),
-                      const Text(
-                        "Download Station",
-                        maxLines: 1,
-                        textAlign: TextAlign.center,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
-                  ),
-                ),
-              ),
             ),
           );
           break;
+
         case "SYNO.Photo.AppInstance":
           apps.add(
-            GestureDetector(
+            ApplicationTile(
+              iconAsset: "assets/applications/6/moments.png",
+              label: "Moments",
               onTap: () {
                 Navigator.of(context).pop();
                 Navigator.of(context).push(CupertinoPageRoute(
@@ -543,39 +283,15 @@ class ApplicationList extends StatelessWidget {
                   settings: const RouteSettings(name: "moments"),
                 ));
               },
-              child: Card(
-                shape: RoundedRectangleBorder(
-                    side: const BorderSide(),
-                    borderRadius: BorderRadius.circular(18)),
-                child: Padding(
-                  padding: const EdgeInsets.all(AppConstants.paddingSmall),
-                  child: Column(
-                    children: [
-                      Image.asset(
-                        "assets/applications/6/moments.png",
-                        height: 45,
-                        width: 45,
-                        fit: BoxFit.contain,
-                      ),
-                      const SizedBox(
-                        height: 5,
-                      ),
-                      const Text(
-                        "Moments",
-                        maxLines: 1,
-                        textAlign: TextAlign.center,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
-                  ),
-                ),
-              ),
             ),
           );
           break;
+
         case "SYNO.Foto.AppInstance":
           apps.add(
-            GestureDetector(
+            ApplicationTile(
+              iconAsset: "assets/applications/7/synology_photos.png",
+              label: "Synology Photos",
               onTap: () {
                 Navigator.of(context).pop();
                 Navigator.of(context).push(CupertinoPageRoute(
@@ -585,33 +301,6 @@ class ApplicationList extends StatelessWidget {
                   settings: const RouteSettings(name: "photos"),
                 ));
               },
-              child: Card(
-                shape: RoundedRectangleBorder(
-                    side: const BorderSide(),
-                    borderRadius: BorderRadius.circular(18)),
-                child: Padding(
-                  padding: const EdgeInsets.all(AppConstants.paddingSmall),
-                  child: Column(
-                    children: [
-                      Image.asset(
-                        "assets/applications/7/synology_photos.png",
-                        height: 45,
-                        width: 45,
-                        fit: BoxFit.contain,
-                      ),
-                      const SizedBox(
-                        height: 5,
-                      ),
-                      const Text(
-                        "Synology Photos",
-                        maxLines: 1,
-                        textAlign: TextAlign.center,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
-                  ),
-                ),
-              ),
             ),
           );
           break;

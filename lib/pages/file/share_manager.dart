@@ -1,42 +1,49 @@
 import 'package:garden/pages/file/share.dart';
 import 'package:garden/util/file_type_util.dart';
-import 'package:garden/util/http_util.dart';
-import 'package:garden/util/log.dart';
+import 'package:garden/api/dsm_api.dart';
+import 'package:garden/util/file_types.dart';
 import 'package:garden/widgets/file_icon.dart';
 import 'package:garden/widgets/label.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:garden/constants/app_constants.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:signals_hooks/signals_hooks.dart';
 
-class ShareManager extends StatefulWidget {
+class ShareManager extends HookWidget {
   const ShareManager({super.key});
 
   @override
-  ShareManagerState createState() => ShareManagerState();
-}
+  Widget build(BuildContext context) {
+    final links = useSignal<List>([]);
+    final loading = useSignal(true);
 
-class ShareManagerState extends State<ShareManager> {
-  List links = [];
-  bool loading = true;
-  @override
-  void initState() {
-    getData();
-    super.initState();
-  }
-
-  getData() async {
-    var res = await DsmApi.listShare();
-    Log.info(res);
-    if (res['success']) {
-      setState(() {
-        loading = false;
-        links = res['data']['links'];
-      });
+    getData() async {
+      try {
+        final data = await dsmControlPanelPost({
+          "offset": 0,
+          "limit": 100,
+          "filter_type":
+              "SYNO.SDS.App.FileStation3.Instance,SYNO.SDS.App.SharingUpload.Application",
+          "api": '"SYNO.FileStation.Sharing"',
+          "method": '"list"',
+          "version": 3,
+        });
+        links.value = data['links'] ?? [];
+      } catch (e) {
+        // 旧层失败时保持空列表。
+      } finally {
+        loading.value = false;
+      }
     }
-  }
 
-  Widget _buildLinkItem(link) {
+    useEffect(() {
+      getData();
+      return null;
+    }, const []);
+
+  Widget buildLinkItem(link) {
     FileTypeEnum fileType =
         FileTypeUtil.toFileTypeEnum(FileTypeUtil.getFileType(link['path']));
     return Padding(
@@ -53,9 +60,7 @@ class ShareManagerState extends State<ShareManager> {
                   },
                   settings: const RouteSettings(name: "share")))
               .then((res) {
-            setState(() {
-              loading = true;
-            });
+            loading.value = true;
             getData();
           });
         },
@@ -118,8 +123,6 @@ class ShareManagerState extends State<ShareManager> {
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         leading: AppBackButton(context),
@@ -127,7 +130,7 @@ class ShareManagerState extends State<ShareManager> {
           "共享链接管理",
         ),
       ),
-      body: loading
+      body: loading.value
           ? const Center(
               child: CupertinoActivityIndicator(
                 radius: 14,
@@ -136,9 +139,9 @@ class ShareManagerState extends State<ShareManager> {
           : ListView.builder(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
               itemBuilder: (context, i) {
-                return _buildLinkItem(links[i]);
+                return buildLinkItem(links.value[i]);
               },
-              itemCount: links.length,
+              itemCount: links.value.length,
             ),
     );
   }

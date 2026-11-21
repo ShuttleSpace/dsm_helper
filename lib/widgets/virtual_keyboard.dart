@@ -1,22 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:xterm/xterm.dart';
-import 'package:signals_flutter/signals_flutter.dart';
+import 'package:signals_hooks/signals_hooks.dart';
 
 import 'terminal_button.dart';
 
-class VirtualKeyboardView extends StatefulWidget {
+class VirtualKeyboardView extends HookWidget {
   const VirtualKeyboardView(this.keyboard, this.terminal, {super.key});
 
   final VirtualKeyboard keyboard;
   final Terminal terminal;
 
   @override
-  State<VirtualKeyboardView> createState() => _VirtualKeyboardViewState();
-}
-
-class _VirtualKeyboardViewState extends State<VirtualKeyboardView> {
-  @override
   Widget build(BuildContext context) {
+    final rebuild = useSignal(0);
     return Container(
       color: Colors.black,
       padding: const EdgeInsets.symmetric(horizontal: 10),
@@ -29,20 +26,23 @@ class _VirtualKeyboardViewState extends State<VirtualKeyboardView> {
               Row(
                 children: [
                   TerminalButton(
+                    width: 36,
                     onPressed: () {
-                      widget.terminal.keyInput(TerminalKey.escape);
+                      terminal.keyInput(TerminalKey.escape);
                     },
                     child: const Text("ESC"),
                   ),
                   TerminalButton(
+                    width: 36,
                     onPressed: () {
-                      widget.terminal.onOutput?.call('/');
+                      terminal.onOutput?.call('/');
                     },
                     child: const Text("/"),
                   ),
                   TerminalButton(
+                    width: 36,
                     onPressed: () {
-                      widget.terminal.keyInput(TerminalKey.arrowUp);
+                      terminal.keyInput(TerminalKey.arrowUp);
                     },
                     child: Icon(
                       Icons.keyboard_arrow_up,
@@ -54,8 +54,9 @@ class _VirtualKeyboardViewState extends State<VirtualKeyboardView> {
                   ),
                   const Spacer(),
                   TerminalButton(
+                    width: 36,
                     onPressed: () {
-                      widget.terminal.keyInput(TerminalKey.home);
+                      terminal.keyInput(TerminalKey.home);
                     },
                     child: const Text(
                       "INS",
@@ -63,8 +64,9 @@ class _VirtualKeyboardViewState extends State<VirtualKeyboardView> {
                     ),
                   ),
                   TerminalButton(
+                    width: 36,
                     onPressed: () {
-                      widget.terminal.keyInput(TerminalKey.insert);
+                      terminal.keyInput(TerminalKey.insert);
                     },
                     child: const Text(
                       "HOME",
@@ -72,8 +74,9 @@ class _VirtualKeyboardViewState extends State<VirtualKeyboardView> {
                     ),
                   ),
                   TerminalButton(
+                    width: 36,
                     onPressed: () {
-                      widget.terminal.keyInput(TerminalKey.pageUp);
+                      terminal.keyInput(TerminalKey.pageUp);
                     },
                     child: const Text(
                       "PGUP",
@@ -85,15 +88,17 @@ class _VirtualKeyboardViewState extends State<VirtualKeyboardView> {
               Row(
                 children: [
                   TerminalButton(
+                    width: 36,
                     onPressed: () {
-                      widget.terminal.keyInput(TerminalKey.tab);
+                      terminal.keyInput(TerminalKey.tab);
                     },
                     child: const Text("TAB"),
                   ),
                   // 左
                   TerminalButton(
+                    width: 36,
                     onPressed: () {
-                      widget.terminal.keyInput(TerminalKey.arrowLeft);
+                      terminal.keyInput(TerminalKey.arrowLeft);
                     },
                     child: Icon(
                       Icons.keyboard_arrow_left,
@@ -102,8 +107,9 @@ class _VirtualKeyboardViewState extends State<VirtualKeyboardView> {
                   ),
                   // //下
                   TerminalButton(
+                    width: 36,
                     onPressed: () {
-                      widget.terminal.keyInput(TerminalKey.arrowDown);
+                      terminal.keyInput(TerminalKey.arrowDown);
                     },
                     child: Icon(
                       Icons.keyboard_arrow_down,
@@ -112,8 +118,9 @@ class _VirtualKeyboardViewState extends State<VirtualKeyboardView> {
                   ),
                   // // 右
                   TerminalButton(
+                    width: 36,
                     onPressed: () {
-                      widget.terminal.keyInput(TerminalKey.arrowRight);
+                      terminal.keyInput(TerminalKey.arrowRight);
                     },
                     child: Icon(
                       Icons.keyboard_arrow_right,
@@ -122,47 +129,50 @@ class _VirtualKeyboardViewState extends State<VirtualKeyboardView> {
                   ),
                   const Spacer(),
                   TerminalButton(
+                    width: 36,
                     onPressed: () {
-                      setState(() {
-                        widget.keyboard.ctrl = !widget.keyboard.ctrl;
-                      });
+                      keyboard.ctrl = !keyboard.ctrl;
+                      rebuild.value++;
                     },
-                    active: widget.keyboard.ctrl,
+                    active: keyboard.ctrl,
                     child: const Text("Ctrl"),
                   ),
                   TerminalButton(
+                    width: 36,
                     onPressed: () {
-                      setState(() {
-                        widget.keyboard.alt = !widget.keyboard.alt;
-                      });
+                      keyboard.alt = !keyboard.alt;
+                      rebuild.value++;
                     },
-                    active: widget.keyboard.alt,
+                    active: keyboard.alt,
                     child: const Text("Alt"),
                   ),
                   TerminalButton(
+                    width: 36,
                     onPressed: () {
-                      setState(() {
-                        widget.keyboard.shift = !widget.keyboard.shift;
-                      });
+                      keyboard.shift = !keyboard.shift;
+                      rebuild.value++;
                     },
-                    active: widget.keyboard.shift,
+                    active: keyboard.shift,
                     child: const Text("Shift"),
                   ),
                   TerminalButton(
+                    width: 36,
                     onPressed: () {
-                      widget.terminal.keyInput(TerminalKey.delete);
+                      terminal.keyInput(TerminalKey.delete);
                     },
                     child: const Text("DEL"),
                   ),
                   TerminalButton(
+                    width: 36,
                     onPressed: () {
-                      widget.terminal.keyInput(TerminalKey.end);
+                      terminal.keyInput(TerminalKey.end);
                     },
                     child: const Text("END"),
                   ),
                   TerminalButton(
+                    width: 36,
                     onPressed: () {
-                      widget.terminal.keyInput(TerminalKey.pageDown);
+                      terminal.keyInput(TerminalKey.pageDown);
                     },
                     child: const Text(
                       "PGDN",

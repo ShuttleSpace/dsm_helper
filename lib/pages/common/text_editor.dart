@@ -1,87 +1,68 @@
-import 'package:draggable_scrollbar/draggable_scrollbar.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_highlight/flutter_highlight.dart';
 import 'package:flutter_highlight/themes/github.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 
-class TextEditor extends StatefulWidget {
+class TextEditor extends HookWidget {
   final String fileName;
   final String content;
   const TextEditor({super.key, required this.fileName, required this.content});
-  @override
-  TextEditorState createState() => TextEditorState();
-}
 
-class TextEditorState extends State<TextEditor> {
-  final ScrollController _scrollController = ScrollController();
-  late String language;
-  @override
-  void initState() {
-    String ext = widget.fileName.split(".").last;
+  String detectLanguage() {
+    String ext = fileName.split(".").last;
     switch (ext) {
       case "py":
-        language = "python";
-        break;
+        return "python";
       case "php":
-        language = "php";
-        break;
+        return "php";
       case "html":
-        language = "html";
-        break;
+        return "html";
       case "xml":
-        language = "xml";
-        break;
+        return "xml";
       case "txt":
-        language = "plaintext";
-        break;
+        return "plaintext";
       case "sql":
-        language = "sql";
-        break;
+        return "sql";
       case "sh":
-        language = "shell";
-        break;
+        return "shell";
       case "json":
-        language = "json";
-        break;
+        return "json";
       case "css":
-        language = "css";
-        break;
+        return "css";
       case "scss":
-        language = "scss";
-        break;
+        return "scss";
       case "java":
-        language = "java";
-        break;
+        return "java";
       case "js":
-        language = "javascript";
-        break;
+        return "javascript";
       case "kt":
-        language = "kotlin";
-        break;
+        return "kotlin";
       case "md":
-        language = "markdown";
-        break;
+        return "markdown";
       default:
-        language = "plaintext";
+        return "plaintext";
     }
-    super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
+    final scrollController = useScrollController();
+    final language = useMemoized(detectLanguage, const []);
+
     return Scaffold(
       appBar: AppBar(
         leading: AppBackButton(context),
         title: const Text("查看文件"),
       ),
-      body: DraggableScrollbar.semicircle(
-        controller: _scrollController,
+      body: Scrollbar(
+        controller: scrollController,
         child: ListView(
-          controller: _scrollController,
+          controller: scrollController,
           children: [
             HighlightView(
               // The original code to be highlighted
-              widget.content,
+              content,
 
               // Specify language
               // It is recommended to give it a value for performance

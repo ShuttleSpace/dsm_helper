@@ -1,3 +1,4 @@
+import 'package:garden/extensions/context.dart';
 import 'package:garden/pages/control_panel/external_device/external_device.dart';
 import 'package:garden/stores/connection_store.dart';
 import 'package:garden/pages/control_panel/file_service/file_service.dart';
@@ -11,27 +12,26 @@ import 'package:garden/pages/control_panel/update_reset/update_reset.dart';
 import 'package:garden/pages/control_panel/user_groups/user_group.dart';
 import 'package:garden/pages/control_panel/users/users.dart';
 import 'package:garden/constants/app_constants.dart';
+import 'package:garden/stores/settings_store.dart';
 import 'package:garden/widgets/badge.dart';
 import 'package:garden/widgets/control_panel_item.dart';
 import 'package:garden/widgets/neu_back_button.dart';
-import 'package:signals_flutter/signals_flutter.dart';
+
+import 'package:signals_hooks/signals_hooks.dart';
 
 import 'shared_folders/shared_folders.dart';
 import 'package:garden/pages/control_panel/info/info.dart';
 import 'package:flutter/material.dart' hide Badge;
 
-class ControlPanel extends StatefulWidget {
-  final Map system;
-  final List volumes;
-  final List disks;
-  final Map notify;
-  const ControlPanel(this.system, this.volumes, this.disks, this.notify,
+class ControlPanel extends StatelessWidget {
+  const ControlPanel(
+      this.systemData, this.storageVolumes, this.storageDisks, this.appNotify,
       {super.key});
-  @override
-  ControlPanelState createState() => ControlPanelState();
-}
+  final ReadonlySignal<Map<dynamic, dynamic>> systemData;
+  final ReadonlySignal<List<dynamic>> storageVolumes;
+  final ReadonlySignal<List<dynamic>> storageDisks;
+  final ReadonlySignal<Map<dynamic, dynamic>> appNotify;
 
-class ControlPanelState extends State<ControlPanel> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -44,9 +44,7 @@ class ControlPanelState extends State<ControlPanel> {
       body: ListView(
         children: [
           Card(
-            shape: RoundedRectangleBorder(
-                side: const BorderSide(),
-                borderRadius: BorderRadius.circular(18)),
+            shape: context.roundRectShapeBorder,
             margin: const EdgeInsets.only(top: 20, left: 20, right: 20),
             child: Padding(
               padding: const EdgeInsets.all(AppConstants.paddingSmall),
@@ -54,7 +52,7 @@ class ControlPanelState extends State<ControlPanel> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Padding(
-                    padding: EdgeInsets.only(top: 20, left: 20, bottom: 20),
+                    padding: EdgeInsets.all(20),
                     child: Text(
                       "文件共享",
                       style:
@@ -99,34 +97,11 @@ class ControlPanelState extends State<ControlPanel> {
                             targetPage: const UserGroups(),
                             routeName: "user_groups",
                           ),
-                        // NeuCard(
-                        //   width: (MediaQuery.sizeOf(context).width - 120) / 3,
-                        //   height: (MediaQuery.sizeOf(context).width - 120) / 3,
-                        //   curveType: CurveType.flat,
-                        //   decoration: NeumorphicDecoration(
-                        //     color: Theme.of(context).scaffoldBackgroundColor,
-                        //     borderRadius: BorderRadius.circular(20),
-                        //   ),
-                        //   bevel: 20,
-                        //   child: Column(
-                        //     mainAxisAlignment: MainAxisAlignment.center,
-                        //     children: [
-                        //       Image.asset(
-                        //         "assets/control_panel/${HttpUtil.version}/ldap.png",
-                        //         height: 30,
-                        //         width: 30,
-                        //         fit: BoxFit.contain,
-                        //       ),
-                        //       SizedBox(
-                        //         height: 5,
-                        //       ),
-                        //       Text(
-                        //         "域/LDAP",
-                        //         style: TextStyle(fontSize: 12),
-                        //       ),
-                        //     ],
-                        //   ),
-                        // ),
+                        ControlPanelItem(
+                            title: "域/LDAP",
+                            iconPath:
+                                "assets/control_panel/${settingsStore.dsmApiVersion}/ldap.png",
+                            targetPage: const UserGroups())
                       ],
                     ),
                   ),
@@ -138,9 +113,7 @@ class ControlPanelState extends State<ControlPanel> {
             ),
           ),
           Card(
-            shape: RoundedRectangleBorder(
-                side: const BorderSide(),
-                borderRadius: BorderRadius.circular(18)),
+            shape: context.roundRectShapeBorder,
             margin: const EdgeInsets.only(top: 20, left: 20, right: 20),
             child: Padding(
               padding: const EdgeInsets.all(AppConstants.paddingSmall),
@@ -162,35 +135,12 @@ class ControlPanelState extends State<ControlPanel> {
                       spacing: 20,
                       runSpacing: 20,
                       children: [
-                        // if (HttpUtil.version < 7)
-                        //   NeuCard(
-                        //     width: (MediaQuery.sizeOf(context).width - 120) / 3,
-                        //     height: (MediaQuery.sizeOf(context).width - 120) / 3,
-                        //     curveType: CurveType.convex,
-                        //     decoration: NeumorphicDecoration(
-                        //       color: Theme.of(context).scaffoldBackgroundColor,
-                        //       borderRadius: BorderRadius.circular(20),
-                        //     ),
-                        //     bevel: 20,
-                        //     child: Column(
-                        //       mainAxisAlignment: MainAxisAlignment.center,
-                        //       children: [
-                        //         Image.asset(
-                        //           "assets/control_panel/${HttpUtil.version}/quickconnect.png",
-                        //           height: 30,
-                        //           width: 30,
-                        //           fit: BoxFit.contain,
-                        //         ),
-                        //         SizedBox(
-                        //           height: 5,
-                        //         ),
-                        //         Text(
-                        //           "Quick Connect",
-                        //           style: TextStyle(fontSize: 12),
-                        //         ),
-                        //       ],
-                        //     ),
-                        //   ),
+                        if (settingsStore.dsmApiVersion < 7)
+                          ControlPanelItem(
+                              title: "Quick Connect",
+                              iconPath:
+                                  "assets/control_panel/${settingsStore.dsmApiVersion}/quickconnect.png",
+                              targetPage: const UserGroups()),
                         ControlPanelItem(
                           title: "外部访问",
                           iconPath:
@@ -205,92 +155,22 @@ class ControlPanelState extends State<ControlPanel> {
                           targetPage: const Network(),
                           routeName: "network",
                         ),
-                        // if (HttpUtil.version < 7)
-                        //   NeuCard(
-                        //     width: (MediaQuery.sizeOf(context).width - 120) / 3,
-                        //     height: (MediaQuery.sizeOf(context).width - 120) / 3,
-                        //     curveType: CurveType.convex,
-                        //     decoration: NeumorphicDecoration(
-                        //       color: Theme.of(context).scaffoldBackgroundColor,
-                        //       borderRadius: BorderRadius.circular(20),
-                        //     ),
-                        //     bevel: 20,
-                        //     child: Column(
-                        //       mainAxisAlignment: MainAxisAlignment.center,
-                        //       children: [
-                        //         Image.asset(
-                        //           "assets/control_panel/${HttpUtil.version}/dhcp_server.png",
-                        //           height: 30,
-                        //           width: 30,
-                        //           fit: BoxFit.contain,
-                        //         ),
-                        //         SizedBox(
-                        //           height: 5,
-                        //         ),
-                        //         Text(
-                        //           "DHCP Server",
-                        //           style: TextStyle(fontSize: 12),
-                        //         ),
-                        //       ],
-                        //     ),
-                        //   ),
-                        // if (HttpUtil.version < 7)
-                        //   NeuCard(
-                        //     width: (MediaQuery.sizeOf(context).width - 120) / 3,
-                        //     height: (MediaQuery.sizeOf(context).width - 120) / 3,
-                        //     curveType: CurveType.convex,
-                        //     decoration: NeumorphicDecoration(
-                        //       color: Theme.of(context).scaffoldBackgroundColor,
-                        //       borderRadius: BorderRadius.circular(20),
-                        //     ),
-                        //     bevel: 20,
-                        //     child: Column(
-                        //       mainAxisAlignment: MainAxisAlignment.center,
-                        //       children: [
-                        //         Image.asset(
-                        //           "assets/control_panel/6/wireless.png",
-                        //           height: 30,
-                        //           width: 30,
-                        //           fit: BoxFit.contain,
-                        //         ),
-                        //         SizedBox(
-                        //           height: 5,
-                        //         ),
-                        //         Text(
-                        //           "无线",
-                        //           style: TextStyle(fontSize: 12),
-                        //         ),
-                        //       ],
-                        //     ),
-                        //   ),
-                        // NeuCard(
-                        //   width: (MediaQuery.sizeOf(context).width - 120) / 3,
-                        //   height: (MediaQuery.sizeOf(context).width - 120) / 3,
-                        //   curveType: CurveType.convex,
-                        //   decoration: NeumorphicDecoration(
-                        //     color: Theme.of(context).scaffoldBackgroundColor,
-                        //     borderRadius: BorderRadius.circular(20),
-                        //   ),
-                        //   bevel: 20,
-                        //   child: Column(
-                        //     mainAxisAlignment: MainAxisAlignment.center,
-                        //     children: [
-                        //       Image.asset(
-                        //         "assets/control_panel/${HttpUtil.version}/security.png",
-                        //         height: 30,
-                        //         width: 30,
-                        //         fit: BoxFit.contain,
-                        //       ),
-                        //       SizedBox(
-                        //         height: 5,
-                        //       ),
-                        //       Text(
-                        //         "安全性",
-                        //         style: TextStyle(fontSize: 12),
-                        //       ),
-                        //     ],
-                        //   ),
-                        // ),
+                        if (settingsStore.dsmApiVersion < 7)
+                          ControlPanelItem(
+                              title: "DHCP Server",
+                              iconPath:
+                                  "assets/control_panel/${settingsStore.dsmApiVersion}/dhcp_server.png",
+                              targetPage: const UserGroups()),
+                        if (settingsStore.dsmApiVersion < 7)
+                          const ControlPanelItem(
+                              title: "无线",
+                              iconPath: "assets/control_panel/6/wireless.png",
+                              targetPage: UserGroups()),
+                        ControlPanelItem(
+                            title: "安全性",
+                            iconPath:
+                                "assets/control_panel/${settingsStore.dsmApiVersion}/security.png",
+                            targetPage: const UserGroups()),
                         if (connectionStore.dsmVersion >= 7)
                           ControlPanelItem(
                             title: "终端机和SNMP",
@@ -338,94 +218,27 @@ class ControlPanelState extends State<ControlPanel> {
                           title: "信息中心",
                           iconPath:
                               "assets/control_panel/${connectionStore.dsmVersion}/info_center.png",
-                          targetPage: SystemInfo(
-                              0, widget.system, widget.volumes, widget.disks),
+                          targetPage: SystemInfo(0, systemData,
+                              storageVolumes, storageDisks),
                           routeName: "system_info_all",
                         ),
-                        // NeuCard(
-                        //   width: (MediaQuery.sizeOf(context).width - 120) / 3,
-                        //   height: (MediaQuery.sizeOf(context).width - 120) / 3,
-                        //   curveType: CurveType.flat,
-                        //   decoration: NeumorphicDecoration(
-                        //     color: Theme.of(context).scaffoldBackgroundColor,
-                        //     borderRadius: BorderRadius.circular(20),
-                        //   ),
-                        //   bevel: 20,
-                        //   child: Column(
-                        //     mainAxisAlignment: MainAxisAlignment.center,
-                        //     children: [
-                        //       Image.asset(
-                        //         "assets/control_panel/${HttpUtil.version}/login_style.png",
-                        //         height: 30,
-                        //         width: 30,
-                        //         fit: BoxFit.contain,
-                        //       ),
-                        //       SizedBox(
-                        //         height: 5,
-                        //       ),
-                        //       Text(
-                        //         HttpUtil.version < 7 ? "主题样式" : "登录门户",
-                        //         style: TextStyle(fontSize: 12),
-                        //       ),
-                        //     ],
-                        //   ),
-                        // ),
-                        // NeuCard(
-                        //   width: (MediaQuery.sizeOf(context).width - 120) / 3,
-                        //   height: (MediaQuery.sizeOf(context).width - 120) / 3,
-                        //   curveType: CurveType.flat,
-                        //   decoration: NeumorphicDecoration(
-                        //     color: Theme.of(context).scaffoldBackgroundColor,
-                        //     borderRadius: BorderRadius.circular(20),
-                        //   ),
-                        //   bevel: 20,
-                        //   child: Column(
-                        //     mainAxisAlignment: MainAxisAlignment.center,
-                        //     children: [
-                        //       Image.asset(
-                        //         "assets/control_panel/${HttpUtil.version}/region.png",
-                        //         height: 30,
-                        //         width: 30,
-                        //         fit: BoxFit.contain,
-                        //       ),
-                        //       SizedBox(
-                        //         height: 5,
-                        //       ),
-                        //       Text(
-                        //         "区域选项",
-                        //         style: TextStyle(fontSize: 12),
-                        //       ),
-                        //     ],
-                        //   ),
-                        // ),
-                        // NeuCard(
-                        //   width: (MediaQuery.sizeOf(context).width - 120) / 3,
-                        //   height: (MediaQuery.sizeOf(context).width - 120) / 3,
-                        //   curveType: CurveType.flat,
-                        //   decoration: NeumorphicDecoration(
-                        //     color: Theme.of(context).scaffoldBackgroundColor,
-                        //     borderRadius: BorderRadius.circular(20),
-                        //   ),
-                        //   bevel: 20,
-                        //   child: Column(
-                        //     mainAxisAlignment: MainAxisAlignment.center,
-                        //     children: [
-                        //       Image.asset(
-                        //         "assets/control_panel/${HttpUtil.version}/notifications.png",
-                        //         height: 30,
-                        //         width: 30,
-                        //         fit: BoxFit.contain,
-                        //       ),
-                        //       SizedBox(
-                        //         height: 5,
-                        //       ),
-                        //       Text(
-                        //         "通知设置",
-                        //         style: TextStyle(fontSize: 12),
-                        //       ),
-                        //     ],
-                        //   ),
-                        // ),
+                        ControlPanelItem(
+                            title: settingsStore.dsmApiVersion < 7
+                                ? "主题样式"
+                                : "登录门户",
+                            iconPath:
+                                "assets/control_panel/${settingsStore.dsmApiVersion}/login_style.png",
+                            targetPage: const UserGroups()),
+                        ControlPanelItem(
+                            title: "区域选项",
+                            iconPath:
+                                "assets/control_panel/${settingsStore.dsmApiVersion}/region.png",
+                            targetPage: const UserGroups()),
+                        ControlPanelItem(
+                            title: "通知设置",
+                            iconPath:
+                                "assets/control_panel/${settingsStore.dsmApiVersion}/notifications.png",
+                            targetPage: const UserGroups()),
                         if (connectionStore.dsmVersion < 7)
                           ControlPanelItem(
                             title: "任务计划",
@@ -457,10 +270,10 @@ class ControlPanelState extends State<ControlPanel> {
                               targetPage: const UpdateReset(),
                               routeName: "update_and_reset",
                             ),
-                            if (widget.notify[
+                            if (appNotify[
                                         'SYNO.SDS.AdminCenter.Update_Reset.Main'] !=
                                     null &&
-                                widget.notify[
+                                appNotify[
                                             'SYNO.SDS.AdminCenter.Update_Reset.Main']
                                         ['unread'] !=
                                     null)
@@ -468,7 +281,7 @@ class ControlPanelState extends State<ControlPanel> {
                                 top: 8,
                                 right: 8,
                                 child: Badge(
-                                  widget.notify[
+                                  appNotify[
                                           'SYNO.SDS.AdminCenter.Update_Reset.Main']
                                       ['unread'],
                                   size: 20,
@@ -511,96 +324,32 @@ class ControlPanelState extends State<ControlPanel> {
                       spacing: 20,
                       runSpacing: 20,
                       children: [
-                        // if (HttpUtil.version >= 7)
-                        //   NeuCard(
-                        //     width: (MediaQuery.sizeOf(context).width - 120) / 3,
-                        //     height: (MediaQuery.sizeOf(context).width - 120) / 3,
-                        //     curveType: CurveType.flat,
-                        //     decoration: NeumorphicDecoration(
-                        //       color: Theme.of(context).scaffoldBackgroundColor,
-                        //       borderRadius: BorderRadius.circular(20),
-                        //     ),
-                        //     bevel: 20,
-                        //     child: Column(
-                        //       mainAxisAlignment: MainAxisAlignment.center,
-                        //       children: [
-                        //         Image.asset(
-                        //           "assets/control_panel/${HttpUtil.version}/synology_account.png",
-                        //           height: 30,
-                        //           width: 30,
-                        //           fit: BoxFit.contain,
-                        //         ),
-                        //         SizedBox(
-                        //           height: 5,
-                        //         ),
-                        //         Text(
-                        //           "Synology 账户",
-                        //           maxLines: 1,
-                        //           overflow: TextOverflow.clip,
-                        //           style: TextStyle(fontSize: 12),
-                        //         ),
-                        //       ],
-                        //     ),
-                        //   ),
-                        // NeuCard(
-                        //   width: (MediaQuery.sizeOf(context).width - 120) / 3,
-                        //   height: (MediaQuery.sizeOf(context).width - 120) / 3,
-                        //   curveType: CurveType.flat,
-                        //   decoration: NeumorphicDecoration(
-                        //     color: Theme.of(context).scaffoldBackgroundColor,
-                        //     borderRadius: BorderRadius.circular(20),
-                        //   ),
-                        //   bevel: 20,
-                        //   child: Column(
-                        //     mainAxisAlignment: MainAxisAlignment.center,
-                        //     children: [
-                        //       Image.asset(
-                        //         "assets/control_panel/${HttpUtil.version}/privilege.png",
-                        //         height: 30,
-                        //         width: 30,
-                        //         fit: BoxFit.contain,
-                        //       ),
-                        //       SizedBox(
-                        //         height: 5,
-                        //       ),
-                        //       Text(
-                        //         HttpUtil.version < 7 ? "权限" : "应用程序权限",
-                        //         style: TextStyle(fontSize: 12),
-                        //       ),
-                        //     ],
-                        //   ),
-                        // ),
-                        // if (HttpUtil.version < 7)
-                        //   NeuCard(
-                        //     width: (MediaQuery.sizeOf(context).width - 120) / 3,
-                        //     height: (MediaQuery.sizeOf(context).width - 120) / 3,
-                        //     curveType: CurveType.flat,
-                        //     decoration: NeumorphicDecoration(
-                        //       color: Theme.of(context).scaffoldBackgroundColor,
-                        //       borderRadius: BorderRadius.circular(20),
-                        //     ),
-                        //     bevel: 20,
-                        //     child: Column(
-                        //       mainAxisAlignment: MainAxisAlignment.center,
-                        //       children: [
-                        //         Image.asset(
-                        //           "assets/control_panel/${HttpUtil.version}/portal.png",
-                        //           height: 30,
-                        //           width: 30,
-                        //           fit: BoxFit.contain,
-                        //         ),
-                        //         SizedBox(
-                        //           height: 5,
-                        //         ),
-                        //         Text(
-                        //           "应用程序门户",
-                        //           maxLines: 1,
-                        //           overflow: TextOverflow.clip,
-                        //           style: TextStyle(fontSize: 12),
-                        //         ),
-                        //       ],
-                        //     ),
-                        //   ),
+                        if (settingsStore.dsmApiVersion >= 7)
+                          ControlPanelItem(
+                              title: "Synology 账户",
+                              iconPath:
+                                  "assets/control_panel/${settingsStore.dsmApiVersion}/synology_account.png",
+                              targetPage: const UserGroups()),
+                        ControlPanelItem(
+                            title: settingsStore.dsmApiVersion < 7
+                                ? "权限"
+                                : "应用程序权限",
+                            iconPath:
+                                "assets/control_panel/${settingsStore.dsmApiVersion}/privilege.png",
+                            targetPage: const UserGroups()),
+                        if (settingsStore.dsmApiVersion < 7)
+                          ControlPanelItem(
+                              title: settingsStore.dsmApiVersion < 7
+                                  ? "权限"
+                                  : "应用程序权限",
+                              iconPath:
+                                  "assets/control_panel/${settingsStore.dsmApiVersion}/privilege.png",
+                              targetPage: const UserGroups()),
+                        ControlPanelItem(
+                            title: "应用程序门户",
+                            iconPath:
+                                "assets/control_panel/${settingsStore.dsmApiVersion}/portal.png",
+                            targetPage: const UserGroups()),
                         ControlPanelItem(
                           title: "索引服务",
                           iconPath:

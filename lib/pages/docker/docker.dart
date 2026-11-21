@@ -1,6 +1,6 @@
+import 'package:garden/api/dsm_api.dart';
 import 'package:garden/pages/docker/detail.dart';
 import 'package:garden/util/ui_util.dart';
-import 'package:garden/util/http_util.dart';
 import 'package:garden/util/log.dart';
 import 'package:garden/widgets/action_dialog.dart';
 import 'package:garden/widgets/animation_progress_bar.dart';
@@ -10,161 +10,149 @@ import 'package:garden/widgets/docker/image_item.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:garden/constants/app_constants.dart';
+import 'package:signals_hooks/signals_hooks.dart';
 
-class Docker extends StatefulWidget {
+class Docker extends HookWidget {
   final String title;
   const Docker({super.key, this.title = 'Docker'});
-  @override
-  DockerState createState() => DockerState();
-}
-
-class DockerState extends State<Docker> with SingleTickerProviderStateMixin {
-  late TabController _tabController;
-  List containers = [];
-  List images = [];
-  List registries = [];
-  Map<String, bool> powerLoading = {};
-  Map utilization = {};
-  bool containerLoading = true;
-  bool imageLoading = true;
-
-  @override
-  void initState() {
-    _tabController = TabController(length: 3, vsync: this);
-    getContainer();
-    getImage();
-    super.initState();
-  }
-
-  getContainer() async {
-    var res = await DsmApi.dockerContainerInfo();
-    setState(() {
-      containerLoading = false;
-    });
-    if (res['success']) {
-      List result = res['data']['result'];
-      for (var item in result) {
-        if (item['success'] == true) {
-          switch (item['api']) {
-            case "SYNO.Core.System.Utilization":
-              setState(() {
-                utilization = item['data'];
-              });
-              break;
-            case "SYNO.Docker.Container":
-              setState(() {
-                containers = item['data']['containers'];
-                containers.sort((a, b) {
-                  return a['name'].compareTo(b['name']);
-                });
-              });
-              break;
-            case "SYNO.Docker.Container.Resource":
-              List resources = item['data']['resources'];
-              for (var resource in resources) {
-                for (var container in containers) {
-                  if (resource['name'] == container['name']) {
-                    setState(() {
-                      container['cpu'] = resource['cpu'];
-                      container['memory'] = resource['memory'];
-                      container['memoryPercent'] = resource['memoryPercent'];
-                    });
-                  }
-                }
-              }
-              break;
-          }
-        }
-      }
-    }
-  }
-
-  getImage() async {
-    var res = await DsmApi.dockerImageInfo();
-    Log.info(res);
-    setState(() {
-      imageLoading = false;
-    });
-    if (res['success']) {
-      List result = res['data']['result'];
-      for (var item in result) {
-        if (item['success'] == true) {
-          switch (item['api']) {
-            case "SYNO.Docker.Image":
-              setState(() {
-                images = item['data']['images'];
-                images.sort((a, b) {
-                  return a['repository'].compareTo(b['repository']);
-                });
-              });
-              break;
-            case "SYNO.Docker.Registry":
-              setState(() {
-                registries = item['data']['registries'];
-              });
-              break;
-          }
-        }
-      }
-    }
-  }
-
-  power(container, String action, {bool preserveProfile = false}) async {
-    if (action == "signal" || action == "delete") {
-      final message = action == "signal"
-          ? "是否确定要强制停止容器？所有未保存的数据将丢失！"
-          : preserveProfile
-              ? "容器 ${container['name']} 将被清除。清除后，容器中的所有数据将丢失。是否确定继续？"
-              : "容器 ${container['name']} 将被删除。删除后，容器中的所有数据将丢失。是否确定继续？";
-
-      final confirmed = await ActionDialog.show(
-        context: context,
-        title: "确认操作",
-        message: message,
-        confirmText: "确认",
-        isDanger: true,
-      );
-
-      if (confirmed == true) {
-        setState(() {
-          powerLoading[container['id']] = true;
-        });
-        var res = await DsmApi.dockerPower(container['name'], action,
-            preserveProfile: preserveProfile);
-        if (res['success']) {
-          UiUtil.toast("请求发送成功");
-          getContainer();
-        } else {
-          UiUtil.toast("请求发送失败，代码：${res['error']['code']}");
-        }
-        setState(() {
-          powerLoading[container['id']] = false;
-        });
-      }
-    } else {
-      setState(() {
-        powerLoading[container['id']] = true;
-      });
-      var res = await DsmApi.dockerPower(container['name'], action);
-      if (res['success']) {
-        UiUtil.toast("请求发送成功");
-        getContainer();
-      } else {
-        UiUtil.toast("请求发送失败，代码：${res['error']['code']}");
-      }
-      setState(() {
-        powerLoading[container['id']] = false;
-      });
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
+    final tickerProvider = useSingleTickerProvider();
+    final tabController = useMemoized(
+      () => TabController(length: 3, vsync: tickerProvider),
+      const [],
+    );
+    final containers = useSignal<List>([]);
+    final images = useSignal<List>([]);
+    final registries = useSignal<List>([]);
+    final powerLoading = useSignal<Map>({});
+    final utilization = useSignal<Map>({});
+    final containerLoading = useSignal(true);
+    final imageLoading = useSignal(true);
+
+    Future<void> getContainer() async {
+      try {
+        final result = await dsmDockerContainerOverview();
+        for (final item in result) {
+          if (item is! Map || item['success'] != true) continue;
+          final data = item['data'];
+          if (data is! Map) continue;
+          switch (item['api']) {
+            case "SYNO.Core.System.Utilization":
+              utilization.value = data;
+              break;
+            case "SYNO.Docker.Container":
+              containers.value = data['containers'] ?? [];
+              containers.value.sort((a, b) {
+                return a['name'].compareTo(b['name']);
+              });
+              break;
+            case "SYNO.Docker.Container.Resource":
+              final resources = data['resources'] ?? [];
+              for (final resource in resources) {
+                for (final container in containers.value) {
+                  if (resource['name'] == container['name']) {
+                    container['cpu'] = resource['cpu'];
+                    container['memory'] = resource['memory'];
+                    container['memoryPercent'] = resource['memoryPercent'];
+                  }
+                }
+              }
+              containers.value = List.of(containers.value);
+              break;
+          }
+        }
+      } catch (e) {
+        // 旧层在此处静默失败；保持行为不变。
+        Log.warn('docker containers: $e');
+      } finally {
+        containerLoading.value = false;
+      }
+    }
+
+    Future<void> getImage() async {
+      try {
+        final result = await dsmDockerImageOverview();
+        Log.info(result);
+        for (final item in result) {
+          if (item is! Map || item['success'] != true) continue;
+          final data = item['data'];
+          if (data is! Map) continue;
+          switch (item['api']) {
+            case "SYNO.Docker.Image":
+              images.value = data['images'] ?? [];
+              images.value.sort((a, b) {
+                return a['repository'].compareTo(b['repository']);
+              });
+              break;
+            case "SYNO.Docker.Registry":
+              registries.value = data['registries'] ?? [];
+              break;
+          }
+        }
+      } catch (e) {
+        Log.warn('docker images: $e');
+      } finally {
+        imageLoading.value = false;
+      }
+    }
+
+    Future<void> sendPowerAction(container, String action,
+        {bool preserveProfile = false}) async {
+      powerLoading.value = {...powerLoading.value, container['id']: true};
+      try {
+        await dsmDockerContainerAction(container['name'], action,
+            preserveProfile: preserveProfile);
+        UiUtil.toast("请求发送成功");
+        await getContainer();
+      } catch (e) {
+        final code = e is DSMException ? e.code : -1;
+        UiUtil.toast("请求发送失败，代码：$code");
+      } finally {
+        powerLoading.value = {...powerLoading.value, container['id']: false};
+      }
+    }
+
+    power(container, String action, {bool preserveProfile = false}) async {
+      if (action == "signal" || action == "delete") {
+        final message = action == "signal"
+            ? "是否确定要强制停止容器？所有未保存的数据将丢失！"
+            : preserveProfile
+                ? "容器 ${container['name']} 将被清除。清除后，容器中的所有数据将丢失。是否确定继续？"
+                : "容器 ${container['name']} 将被删除。删除后，容器中的所有数据将丢失。是否确定继续？";
+
+        final confirmed = await ActionDialog.show(
+          context: context,
+          title: "确认操作",
+          message: message,
+          confirmText: "确认",
+          isDanger: true,
+        );
+
+        if (confirmed == true) {
+          await sendPowerAction(container, action,
+              preserveProfile: preserveProfile);
+        }
+      } else {
+        await sendPowerAction(container, action);
+      }
+    }
+
+    useEffect(() {
+      getContainer();
+      getImage();
+      return () {
+        tabController.dispose();
+      };
+    }, const []);
+
     return Scaffold(
       appBar: AppBar(
         leading: AppBackButton(context),
-        title: Text(widget.title),
+        title: Text(title),
       ),
       body: Column(
         children: [
@@ -176,7 +164,7 @@ class DockerState extends State<Docker> with SingleTickerProviderStateMixin {
             child: TabBar(
               dividerHeight: 0,
               isScrollable: false,
-              controller: _tabController,
+              controller: tabController,
               indicatorSize: TabBarIndicatorSize.label,
               labelColor: Theme.brightnessOf(context) == Brightness.dark
                   ? Colors.white
@@ -201,9 +189,9 @@ class DockerState extends State<Docker> with SingleTickerProviderStateMixin {
           ),
           Expanded(
             child: TabBarView(
-              controller: _tabController,
+              controller: tabController,
               children: [
-                containerLoading
+                containerLoading.value
                     ? const Center(
                         child: CupertinoActivityIndicator(
                           radius: 14,
@@ -251,9 +239,10 @@ class DockerState extends State<Docker> with SingleTickerProviderStateMixin {
                                           changeColorValue: 90,
                                           changeProgressColor: Colors.red,
                                           progressColor: Colors.blue,
-                                          currentValue: utilization['cpu']
+                                          currentValue: utilization.value['cpu']
                                                   ['user_load'] +
-                                              utilization['cpu']['system_load'],
+                                              utilization.value['cpu']
+                                                  ['system_load'],
                                           displayText: '%',
                                         ),
                                       ],
@@ -300,8 +289,8 @@ class DockerState extends State<Docker> with SingleTickerProviderStateMixin {
                                           changeColorValue: 90,
                                           changeProgressColor: Colors.red,
                                           progressColor: Colors.blue,
-                                          currentValue: utilization['memory']
-                                              ['real_usage'],
+                                          currentValue: utilization
+                                              .value['memory']['real_usage'],
                                           displayText: '%',
                                         ),
                                       ],
@@ -314,10 +303,11 @@ class DockerState extends State<Docker> with SingleTickerProviderStateMixin {
                           const SizedBox(
                             height: 20,
                           ),
-                          ...containers.map((container) => ContainerItem(
+                          ...containers.value.map((container) => ContainerItem(
                                 container: container,
                                 isLoading:
-                                    powerLoading[container['id']] ?? false,
+                                    powerLoading.value[container['id']] ??
+                                        false,
                                 onTap: () {
                                   Navigator.of(context).push(CupertinoPageRoute(
                                       builder: (context) {
@@ -335,7 +325,7 @@ class DockerState extends State<Docker> with SingleTickerProviderStateMixin {
                               )),
                         ],
                       ),
-                imageLoading
+                imageLoading.value
                     ? const Center(
                         child: CupertinoActivityIndicator(
                           radius: 14,
@@ -344,14 +334,14 @@ class DockerState extends State<Docker> with SingleTickerProviderStateMixin {
                     : ListView.separated(
                         padding: const EdgeInsets.all(20),
                         itemBuilder: (context, i) {
-                          return ImageItem(image: images[i]);
+                          return ImageItem(image: images.value[i]);
                         },
                         separatorBuilder: (context, i) {
                           return const SizedBox(
                             height: 20,
                           );
                         },
-                        itemCount: images.length),
+                        itemCount: images.value.length),
                 const Center(
                   child: Text("开发中"),
                 ),

@@ -42,7 +42,7 @@ class ImageItem extends StatelessWidget {
                   width: 10,
                 ),
                 Label(
-                    (int.parse(image['size']))
+                    (int.parse((image['size'] ?? 0).toString()))
                         .formatSize(fixed: 0, format: 1000),
                     Theme.of(context).primaryColor),
               ],

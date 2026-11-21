@@ -55,7 +55,11 @@ extension StringExt on String {
 
 Future<String> downloadTargetDir() async {
   if (Platform.isAndroid) {
-    return settingsStore.downloadSavePath.value;
+    final path = settingsStore.downloadSavePath.value;
+    if (path.isNotEmpty) return path;
+    // 未设置下载目录时回落到应用私有 Download，避免空目录导致入队失败
+    final dir = await getApplicationDocumentsDirectory();
+    return "${dir.path}${Platform.pathSeparator}Download";
   }
   final directory = await getApplicationDocumentsDirectory();
   return "${directory.path}${Platform.pathSeparator}Download";
@@ -73,7 +77,9 @@ int versionCompare(String v1, String v2) {
     buildNumber2 = version2[1];
   }
   // 对比 build
-  return int.parse(buildNumber1).compareTo(int.parse(buildNumber2));
+  int b1 = int.tryParse(buildNumber1) ?? 0;
+  int b2 = int.tryParse(buildNumber2) ?? 0;
+  return b1.compareTo(b2);
 }
 
 /// 解析运行时间
