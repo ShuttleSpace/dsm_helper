@@ -212,7 +212,7 @@ class Home extends HookWidget {
               ),
               BottomNavigationBarItem(
                 icon: Image.asset(
-                  "assets/icons/movie.png",
+                  "assets/tabbar/media.png",
                   width: 30,
                   height: 30,
                 ),

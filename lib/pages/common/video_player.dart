@@ -169,12 +169,13 @@ class VideoPlayerPage extends HookWidget {
 
     /// 在 NAS 上挑字幕文件；和同名字幕一样走 fbDownloadUrl，交给 mpv 读。
     Future<void> pickSubtitle() async {
-      final path = await Navigator.of(context).push<String>(
+      final picked = await Navigator.of(context).push<List<String>>(
         CupertinoPageRoute(
             builder: (_) => const NasPathPicker(
                 fileExtensions: FileTypeUtil.subtitleExtensions)),
       );
-      if (path == null || path.isEmpty) return;
+      if (picked == null || picked.isEmpty) return;
+      final path = picked.first;
       try {
         await player.setSubtitleTrack(SubtitleTrack.uri(
           fbDownloadUrl(

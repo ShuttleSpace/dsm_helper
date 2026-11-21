@@ -6,7 +6,7 @@ import 'package:garden/util/media_library.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:signals_hooks/signals_hooks.dart';
 
-/// 媒体库目录管理：加/删要扫的 NAS 目录，多媒体页按这些目录建库。
+/// 媒体库目录管理：加/改/删/清空要扫的 NAS 目录，多媒体页按这些目录建库。
 class MediaLibrarySetting extends HookWidget {
   const MediaLibrarySetting({super.key});
 
@@ -19,17 +19,43 @@ class MediaLibrarySetting extends HookWidget {
       return null;
     }, const []);
 
+    /// 多选目录，已有的自动去重。
     Future<void> add() async {
-      final path = await Navigator.of(context).push<String>(
-        CupertinoPageRoute(builder: (_) => const NasPathPicker()),
+      final picked = await Navigator.of(context).push<List<String>>(
+        CupertinoPageRoute(
+            builder: (_) => const NasPathPicker(multiSelect: true)),
       );
-      if (path == null || paths.value.contains(path)) return;
-      paths.value = [...paths.value, path];
+      if (picked == null || picked.isEmpty) return;
+      paths.value = {
+        ...paths.value,
+        ...picked.where((e) => e != '/'),
+      }.toList();
+      await saveMediaLibraryPaths(paths.value);
+    }
+
+    /// 点一条 = 改成另一个目录。
+    Future<void> edit(String oldPath) async {
+      final picked = await Navigator.of(context).push<List<String>>(
+        CupertinoPageRoute(builder: (_) => NasPathPicker(initialPath: oldPath)),
+      );
+      if (picked == null || picked.isEmpty) return;
+      final next = picked.first;
+      if (next == '/' || (next != oldPath && paths.value.contains(next))) {
+        return;
+      }
+      paths.value = [
+        for (final e in paths.value) e == oldPath ? next : e,
+      ];
       await saveMediaLibraryPaths(paths.value);
     }
 
     Future<void> remove(String path) async {
       paths.value = paths.value.where((e) => e != path).toList();
+      await saveMediaLibraryPaths(paths.value);
+    }
+
+    Future<void> clear() async {
+      paths.value = [];
       await saveMediaLibraryPaths(paths.value);
     }
 
@@ -39,27 +65,47 @@ class MediaLibrarySetting extends HookWidget {
         leading: AppBackButton(context),
         actions: [
           IconButton(
-            tooltip: '添加目录',
+            tooltip: '添加目录（可多选）',
             icon: const Icon(Icons.add),
             onPressed: add,
           ),
+          if (paths.value.isNotEmpty)
+            IconButton(
+              tooltip: '清空',
+              icon: const Icon(Icons.delete_sweep_outlined),
+              onPressed: clear,
+            ),
         ],
       ),
       body: paths.value.isEmpty
           ? const Center(
               child: Text(
-                '还没有目录，点右上角 + 选一个 NAS 目录',
+                '还没有目录，点右上角 + 选 NAS 上的目录（可多选）',
                 style: TextStyle(color: Colors.grey, fontSize: 13),
               ),
             )
           : ListView.separated(
-              itemCount: paths.value.length,
+              itemCount: paths.value.length + 1,
               separatorBuilder: (_, __) => const Divider(height: 1),
               itemBuilder: (context, i) {
-                final path = paths.value[i];
+                if (i == 0) {
+                  return Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
+                    child: Text(
+                      '共 ${paths.value.length} 个目录，点一条可以改，右侧 × 删除',
+                      style: const TextStyle(color: Colors.grey, fontSize: 12),
+                    ),
+                  );
+                }
+                final path = paths.value[i - 1];
                 return ListTile(
                   leading: const Icon(Icons.folder),
                   title: Text(path, overflow: TextOverflow.ellipsis),
+                  subtitle: Text(
+                    path.split('/').where((e) => e.isNotEmpty).last,
+                    style: const TextStyle(fontSize: 11, color: Colors.grey),
+                  ),
+                  onTap: () => edit(path),
                   trailing: IconButton(
                     tooltip: '移除',
                     icon: const Icon(Icons.close),

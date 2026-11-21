@@ -18,6 +18,18 @@ const String mediaLibraryPathsStorageKey = 'media_library_paths';
 /// 扫库的最大深度，库目录自身算第 0 层。
 const int mediaScanDepth = 3;
 
+/// 扫库深度的设置键（用户可调 1..5）。
+const String mediaScanDepthStorageKey = 'media_scan_depth';
+
+Future<int> loadMediaScanDepth() async =>
+    await StorageUtil.getInt(mediaScanDepthStorageKey) ?? mediaScanDepth;
+
+/// 本地没有封面时用 TMDB 海报补上，默认开。
+const String mediaUseTmdbPosterStorageKey = 'media_use_tmdb_poster';
+
+Future<bool> loadMediaUseTmdbPoster() async =>
+    await StorageUtil.getBool(mediaUseTmdbPosterStorageKey) ?? true;
+
 /// 媒体库里的一条视频，封面/NFO/字幕都取自它所在目录。
 class MediaItem {
   final String name;
@@ -96,7 +108,8 @@ Future<void> saveMediaLibraryPaths(List<String> paths) =>
 
 /// 广度优先扫库目录，收集视频及其同目录的封面/NFO/字幕。
 /// 单个目录失败只记日志，不影响其它目录。
-Future<List<MediaItem>> scanMediaLibrary(List<String> roots) async {
+Future<List<MediaItem>> scanMediaLibrary(List<String> roots,
+    {int maxDepth = mediaScanDepth}) async {
   final items = <MediaItem>[];
   final queue = roots.map((e) => (e, 0)).toList();
   while (queue.isNotEmpty) {
@@ -112,7 +125,7 @@ Future<List<MediaItem>> scanMediaLibrary(List<String> roots) async {
       Log.error("扫库目录失败 $dir: $e");
       continue;
     }
-    if (depth < mediaScanDepth) {
+    if (depth < maxDepth) {
       for (final f in files.where((e) => e['isdir'] == true)) {
         queue.add(('${f['path']}', depth + 1));
       }
@@ -241,6 +254,15 @@ Future<void> _writeNfoCache(Map<String, dynamic> cache) async {
   } catch (e) {
     Log.error("NFO 缓存写入失败: $e");
   }
+}
+
+/// 清空 NFO 缓存，返回清掉的条数。
+Future<int> clearNfoCache() async {
+  final file = await _nfoCacheFile();
+  if (file == null) return 0;
+  final cache = await _readNfoCache();
+  await _writeNfoCache({});
+  return cache.length;
 }
 
 /// 过期和不认识的条目丢掉，超过上限按 ts 淘汰最旧（纯函数，便于测试）。

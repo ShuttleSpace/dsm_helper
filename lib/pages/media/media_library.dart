@@ -5,7 +5,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:garden/api/dsm_api.filestation.transfer_url.dart';
 import 'package:garden/extensions/string.dart';
 import 'package:garden/pages/common/video_player.dart';
-import 'package:garden/pages/setting/media_library_setting.dart';
+import 'package:garden/pages/media/media_setting.dart';
 import 'package:garden/stores/connection_store.dart';
 import 'package:garden/util/log.dart';
 import 'package:garden/util/media_library.dart';
@@ -27,6 +27,7 @@ class MediaLibrary extends HookWidget {
     final sort = useSignal(MediaSort.name);
     final searching = useState(false);
     final watching = useSignal<Map<String, dynamic>>({});
+    final depth = useSignal(mediaScanDepth);
 
     Future<void> openPlayer(MediaItem item) async {
       await Navigator.of(context).push(CupertinoPageRoute(builder: (context) {
@@ -50,6 +51,8 @@ class MediaLibrary extends HookWidget {
 
     Future<void> reload() async {
       final roots = await loadMediaLibraryPaths();
+      depth.value = await loadMediaScanDepth();
+      final useTmdbPoster = await loadMediaUseTmdbPoster();
       hasRoots.value = roots.isNotEmpty;
       watching.value = await loadContinueWatching();
       if (roots.isEmpty) {
@@ -58,7 +61,7 @@ class MediaLibrary extends HookWidget {
       }
       loading.value = true;
       try {
-        final list = await scanMediaLibrary(roots);
+        final list = await scanMediaLibrary(roots, maxDepth: depth.value);
         items.value = list;
         loading.value = false;
         // NFO 逐条补，补一条刷一条，先让海报墙出来
@@ -66,7 +69,7 @@ class MediaLibrary extends HookWidget {
         for (final item in list) {
           var filled = await fillMediaNfo(item);
           // 没本地封面时用 TMDB 的海报（走 tmdb 缓存），没 key 就跳过
-          if (filled.coverPath.isBlank && apiKey.isNotBlank) {
+          if (filled.coverPath.isBlank && useTmdbPoster && apiKey.isNotBlank) {
             final info = await fetchTmdbInfo(apiKey, item.name);
             if (info != null && info.poster.isNotBlank) {
               filled = filled.withCover(info.poster);
@@ -90,8 +93,8 @@ class MediaLibrary extends HookWidget {
     }, const []);
 
     Future<void> openSetting() async {
-      await Navigator.of(context).push(
-          CupertinoPageRoute(builder: (_) => const MediaLibrarySetting()));
+      await Navigator.of(context)
+          .push(CupertinoPageRoute(builder: (_) => const MediaSetting()));
       await reload();
     }
 
@@ -142,14 +145,15 @@ class MediaLibrary extends HookWidget {
             onPressed: reload,
           ),
           IconButton(
-            tooltip: '库目录',
-            icon: const Icon(Icons.folder_open),
+            tooltip: '多媒体设置',
+            icon: const Icon(Icons.settings_outlined),
             onPressed: openSetting,
           ),
         ],
       ),
       body: hasRoots.value == false
-          ? _centerHint('还没有设置媒体库目录', '添加后这里会列出视频（最多往下 3 层）', openSetting)
+          ? _centerHint(
+              '还没有设置媒体库目录', '添加后这里会列出视频（最多往下 ${depth.value} 层）', openSetting)
           : shown.isEmpty && resumed.isEmpty
               ? (loading.value
                   ? const Center(child: CircularProgressIndicator())

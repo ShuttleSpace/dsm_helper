@@ -2,6 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:garden/api/dsm_api.dart';
 import 'package:garden/util/media_library.dart';
+import 'package:garden/util/storage_util.dart';
 
 void main() {
   tearDown(() => dsmFileStationPageRequestForTesting = null);
@@ -23,11 +24,7 @@ void main() {
                   'path': '/video/poster.jpg',
                   'isdir': false
                 },
-                {
-                  'name': '电影A.jpg',
-                  'path': '/video/电影A.jpg',
-                  'isdir': false
-                },
+                {'name': '电影A.jpg', 'path': '/video/电影A.jpg', 'isdir': false},
                 {'name': '说明.txt', 'path': '/video/说明.txt', 'isdir': false},
                 {'name': 'S2', 'path': '/video/S2', 'isdir': true},
               ]
@@ -148,5 +145,16 @@ void main() {
           duration: const Duration(minutes: 100));
     }
     expect((await loadContinueWatching()).length, continueWatchingLimit);
+  });
+
+  test('多媒体设置：深度默认 3 层、TMDB 补封面默认开，改完能读回', () async {
+    SharedPreferences.setMockInitialValues({});
+    expect(await loadMediaScanDepth(), 3);
+    expect(await loadMediaUseTmdbPoster(), true);
+
+    await StorageUtil.setInt(mediaScanDepthStorageKey, 5);
+    await StorageUtil.setBool(mediaUseTmdbPosterStorageKey, false);
+    expect(await loadMediaScanDepth(), 5);
+    expect(await loadMediaUseTmdbPoster(), false);
   });
 }
