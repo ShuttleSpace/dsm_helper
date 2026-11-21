@@ -40,7 +40,7 @@ void main() {
 
     expect(find.byType(Wrap), findsNothing);
     expect(find.byIcon(Icons.view_list_outlined), findsOneWidget);
-    expect(find.byType(Row), findsWidgets);
+    expect(find.byType(Row), findsNWidgets(3)); // toggle + two list tiles
     expect(find.byType(ApplicationTile), findsNWidgets(2));
     expect(
         tester
@@ -63,5 +63,31 @@ void main() {
         find.byWidgetPredicate(
             (widget) => widget is SizedBox && widget.width == 88),
         findsNWidgets(2));
+  });
+
+  testWidgets('ApplicationList rebuilds tiles when applications change',
+      (tester) async {
+    final applications = signal<List>(['SYNO.SDS.Docker.Application']);
+    await tester.pumpWidget(MaterialApp(
+      home: Scaffold(
+        body: ApplicationList(
+          applications,
+          signal<Map>({}),
+          signal<List>([]),
+          signal<List>([]),
+          signal<Map>({}),
+        ),
+      ),
+    ));
+
+    expect(find.byType(ApplicationTile), findsOneWidget);
+
+    applications.value = [
+      'SYNO.SDS.Docker.Application',
+      'SYNO.SDS.XLPan.Application',
+    ];
+    await tester.pump();
+
+    expect(find.byType(ApplicationTile), findsNWidgets(2));
   });
 }

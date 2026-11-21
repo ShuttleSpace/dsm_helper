@@ -31,49 +31,51 @@ class ApplicationList extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final useGridLayout = useSignal(true);
-    final tiles = _buildApplicationList(context);
     return Container(
       width: MediaQuery.sizeOf(context).width * 0.8,
       color: Theme.of(context).scaffoldBackgroundColor,
       child: SafeArea(
         child: Watch(
-          (_) => ListView(
-            padding: const EdgeInsets.symmetric(
-                horizontal: AppConstants.paddingLarge),
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  Tooltip(
-                    message: '点击切换布局',
-                    child: IconButton(
-                      onPressed: () =>
-                          useGridLayout.value = !useGridLayout.value,
-                      icon: useGridLayout.value
-                          ? const Icon(Icons.grid_view_outlined)
-                          : const Icon(Icons.view_list_outlined),
+          (_) {
+            final tiles = _buildApplicationList(context);
+            return ListView(
+              padding: const EdgeInsets.symmetric(
+                  horizontal: AppConstants.paddingLarge),
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    Tooltip(
+                      message: '点击切换布局',
+                      child: IconButton(
+                        onPressed: () =>
+                            useGridLayout.value = !useGridLayout.value,
+                        icon: useGridLayout.value
+                            ? const Icon(Icons.grid_view_outlined)
+                            : const Icon(Icons.view_list_outlined),
+                      ),
                     ),
-                  ),
-                ],
-              ),
-              useGridLayout.value
-                  ? Wrap(
-                      spacing: 12,
-                      runSpacing: 12,
-                      children: tiles
-                          .map((tile) => SizedBox(width: 88, child: tile))
-                          .toList(),
-                    )
-                  : Column(
-                      children: tiles
-                          .map((tile) => SizedBox(
-                                width: double.infinity,
-                                child: tile.copyWith(listLayout: true),
-                              ))
-                          .toList(),
-                    ),
-            ],
-          ),
+                  ],
+                ),
+                useGridLayout.value
+                    ? Wrap(
+                        spacing: 12,
+                        runSpacing: 12,
+                        children: tiles
+                            .map((tile) => SizedBox(width: 88, child: tile))
+                            .toList(),
+                      )
+                    : Column(
+                        children: tiles
+                            .map((tile) => SizedBox(
+                                  width: double.infinity,
+                                  child: tile.copyWith(listLayout: true),
+                                ))
+                            .toList(),
+                      ),
+              ],
+            );
+          },
         ),
       ),
     );
