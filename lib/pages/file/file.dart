@@ -7,6 +7,7 @@ import 'package:garden/extensions/string.dart';
 import 'package:garden/services/office_preview.dart';
 import 'package:garden/stores/settings_store.dart';
 import 'package:garden/util/file_type_util.dart';
+import 'package:garden/util/media_library.dart';
 import 'package:garden/util/ui_util.dart';
 import 'package:garden/util/storage_util.dart';
 import 'package:flutter/foundation.dart';
@@ -657,6 +658,18 @@ class Files extends HookWidget {
                 }
                 final subtitles =
                     FileTypeUtil.findSiblingSubtitles(files.value, name);
+                // 同目录的视频排成播放列表，支持上一个/下一个/自动连播
+                final playlist = [
+                  for (final element in files.value)
+                    if (FileTypeUtil.getFileType('${element['name']}') ==
+                        "movie")
+                      MediaItem(
+                        name: '${element['name']}',
+                        path: '${element['path']}',
+                        subtitles: FileTypeUtil.findSiblingSubtitles(
+                            files.value, '${element['name']}'),
+                      ),
+                ];
                 if (context.mounted) {
                   // ignore: use_build_context_synchronously
                   Navigator.of(context)
@@ -668,6 +681,7 @@ class Files extends HookWidget {
                       nfo: nfo,
                       subtitles: subtitles,
                       mediaPath: '${file['path']}',
+                      playlist: playlist,
                     );
                   }));
                 }

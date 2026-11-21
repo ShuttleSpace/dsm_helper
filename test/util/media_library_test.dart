@@ -1,3 +1,4 @@
+import 'package:garden/pages/media/play_history.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:garden/api/dsm_api.dart';
@@ -171,5 +172,46 @@ void main() {
     expect(await loadMediaViewMode(), MediaViewMode.poster);
     await saveMediaViewMode(MediaViewMode.folder);
     expect(await loadMediaViewMode(), MediaViewMode.folder);
+  });
+
+  test('文件树：按路径折出目录，同名目录合并，总数含子目录', () {
+    const items = [
+      MediaItem(name: 'a.mkv', path: '/video/电影/a.mkv'),
+      MediaItem(name: 'b.mkv', path: '/video/电影/2024/b.mkv'),
+      MediaItem(name: 'c.mkv', path: '/video/电影/c.mkv'),
+      MediaItem(name: 'd.mkv', path: '/tv/d.mkv'),
+    ];
+    final root = buildMediaTree(items);
+    expect(root.folders.map((e) => e.name), ['video', 'tv']);
+    final video = root.folders.first;
+    expect(video.total, 3);
+    final movie = video.folders.first;
+    expect(movie.path, '/video/电影');
+    expect(movie.videos.map((e) => e.name), ['a.mkv', 'c.mkv']);
+    expect(movie.folders.single.path, '/video/电影/2024');
+    expect(root.folders.last.videos.single.name, 'd.mkv');
+  });
+
+  test('播放历史：坏数据丢掉、按时间倒序、进度和看完判定', () {
+    final records = parsePlayHistory({
+      '/a.mkv': {'pos': 100, 'dur': 200, 'ts': 1000},
+      '/b.mkv': {'pos': 995, 'dur': 1000, 'ts': 3000},
+      '/bad.mkv': {'pos': 'x'},
+      '/c.mkv': 'not a map',
+    });
+    expect(records.map((e) => e.path), ['/b.mkv', '/a.mkv']);
+    expect(records.first.name, 'b');
+    expect(records.first.finished, isTrue);
+    expect(records.last.progress, 0.5);
+    expect(records.last.remaining, const Duration(seconds: 100));
+    expect(parsePlayHistory(null), isEmpty);
+  });
+
+  test('时长文案：秒 / 分钟 / 小时', () {
+    expect(formatPlayDuration(const Duration(seconds: 30)), '30 秒');
+    expect(formatPlayDuration(const Duration(minutes: 45)), '45 分钟');
+    expect(formatPlayDuration(const Duration(hours: 2)), '2 小时');
+    expect(
+        formatPlayDuration(const Duration(hours: 1, minutes: 5)), '1 小时 5 分钟');
   });
 }

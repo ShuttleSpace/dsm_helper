@@ -18,7 +18,15 @@ import 'package:signals_hooks/signals_hooks.dart';
 class SelectFolder extends HookWidget {
   final bool multi;
   final bool folder;
-  const SelectFolder({super.key, this.multi = false, this.folder = true});
+
+  /// 非空时额外列出这些扩展名的文件（单选模式下点文件直接返回它），
+  /// 字幕、下载种子这类「挑一个文件」的入口复用它，不必另写一个浏览页。
+  final List<String> fileExtensions;
+  const SelectFolder(
+      {super.key,
+      this.multi = false,
+      this.folder = true,
+      this.fileExtensions = const []});
 
   @override
   Widget build(BuildContext context) {
@@ -355,7 +363,13 @@ class SelectFolder extends HookWidget {
                                         ? 140
                                         : 20),
                                 children: files.value
-                                    .where((file) => file['isdir'])
+                                    .where((file) =>
+                                        file['isdir'] ||
+                                        fileExtensions.contains(
+                                            '${file['name']}'
+                                                .split('.')
+                                                .last
+                                                .toLowerCase()))
                                     .map(buildFileItem)
                                     .toList(),
                               )

@@ -247,17 +247,24 @@ class MediaTabIcon extends StatelessWidget {
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final dark = Theme.of(context).brightness == Brightness.dark;
-    // 其余 tab 的 PNG 墨迹约占 30px 的 80%，这里跟着缩，不然看着比它们大一圈
+    // 占位跟其它 tab 一样是 30px（否则文字基线错位），图标本体缩到 PNG 墨迹的 80%
     return SizedBox(
-      width: 24,
-      height: 24,
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          color: dark ? Colors.black : Colors.white,
-          border: Border.all(color: scheme.onSurface, width: 1.5),
-          borderRadius: BorderRadius.circular(6),
+      width: 30,
+      height: 30,
+      child: Center(
+        child: SizedBox(
+          width: 24,
+          height: 24,
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              color: dark ? Colors.black : Colors.white,
+              border: Border.all(color: scheme.onSurface, width: 1.5),
+              borderRadius: BorderRadius.circular(6),
+            ),
+            child: const Icon(Icons.play_arrow,
+                size: 14, color: Color(0xFFFF9813)),
+          ),
         ),
-        child: const Icon(Icons.play_arrow, size: 14, color: Color(0xFFFF9813)),
       ),
     );
   }

@@ -30,19 +30,55 @@ const String mediaUseTmdbPosterStorageKey = 'media_use_tmdb_poster';
 Future<bool> loadMediaUseTmdbPoster() async =>
     await StorageUtil.getBool(mediaUseTmdbPosterStorageKey) ?? true;
 
-/// 海报墙的展示风格：平铺海报 / 按所在目录分组。
-enum MediaViewMode { poster, folder }
+/// 海报墙的展示风格：平铺海报 / 按目录分段 / 文件树。
+enum MediaViewMode { poster, folder, tree }
 
 const String mediaViewModeStorageKey = 'media_view_mode';
 
-Future<MediaViewMode> loadMediaViewMode() async =>
-    (await StorageUtil.getString(mediaViewModeStorageKey)) == 'folder'
-        ? MediaViewMode.folder
-        : MediaViewMode.poster;
+Future<MediaViewMode> loadMediaViewMode() async {
+  final raw = await StorageUtil.getString(mediaViewModeStorageKey);
+  return MediaViewMode.values
+      .firstWhere((e) => e.name == raw, orElse: () => MediaViewMode.poster);
+}
 
-Future<void> saveMediaViewMode(MediaViewMode mode) => StorageUtil.setString(
-    mediaViewModeStorageKey,
-    mode == MediaViewMode.folder ? 'folder' : 'poster');
+Future<void> saveMediaViewMode(MediaViewMode mode) =>
+    StorageUtil.setString(mediaViewModeStorageKey, mode.name);
+
+/// 折成目录树用的一层目录。
+class MediaFolder {
+  final String name;
+  final String path;
+  final List<MediaFolder> folders = [];
+  final List<MediaItem> videos = [];
+
+  MediaFolder(this.name, this.path);
+
+  /// 这一支下面一共多少部片（含子目录）。
+  int get total =>
+      videos.length + folders.fold(0, (sum, folder) => sum + folder.total);
+}
+
+/// 把平铺的片子按 NAS 路径折成目录树，根节点的名字是空的。
+MediaFolder buildMediaTree(List<MediaItem> items) {
+  final root = MediaFolder('', '/');
+  for (final item in items) {
+    final parts = item.path.split('/').where((e) => e.isNotEmpty).toList();
+    var node = root;
+    for (var i = 0; i < parts.length - 1; i++) {
+      final path = '/${parts.take(i + 1).join('/')}';
+      final matches = node.folders.where((e) => e.path == path);
+      if (matches.isNotEmpty) {
+        node = matches.first;
+      } else {
+        final folder = MediaFolder(parts[i], path);
+        node.folders.add(folder);
+        node = folder;
+      }
+    }
+    node.videos.add(item);
+  }
+  return root;
+}
 
 /// 按所在目录分组，组的顺序跟传入顺序一致（已经过排序/搜索过滤）。
 Map<String, List<MediaItem>> groupByFolder(List<MediaItem> items) {
@@ -376,7 +412,105 @@ Future<void> savePlayProgress(String path, Duration position,
     all.remove(key);
   }
   await StorageUtil.setString(continueWatchingStorageKey, jsonEncode(all));
+  // 播完的片子会从续播列表里删掉，但历史要留着（统计用）
+  if (position.inSeconds >= 5) {
+    await _appendPlayHistory(path, {
+      'pos': position.inSeconds,
+      'dur': duration.inSeconds,
+      'ts': DateTime.now().millisecondsSinceEpoch,
+    });
+  }
 }
+
+const String playHistoryStorageKey = 'play_history';
+const int playHistoryLimit = 200;
+
+/// 一条播放记录。
+class PlayRecord {
+  final String path;
+  final int pos;
+  final int dur;
+  final int ts;
+
+  const PlayRecord(
+      {required this.path,
+      required this.pos,
+      required this.dur,
+      required this.ts});
+
+  /// 没存片名，用文件名顶上。
+  String get name {
+    final base = path.split('/').last;
+    final dot = base.lastIndexOf('.');
+    return dot > 0 ? base.substring(0, dot) : base;
+  }
+
+  double get progress => dur <= 0 ? 0 : (pos / dur).clamp(0.0, 1.0);
+  bool get finished => progress >= 0.95;
+  Duration get duration => Duration(seconds: dur);
+  Duration get remaining => Duration(seconds: (dur - pos).clamp(0, dur));
+  DateTime get watchedAt => DateTime.fromMillisecondsSinceEpoch(ts);
+}
+
+/// 历史是 path → {pos,dur,ts}；坏数据丢掉，按时间倒序。
+List<PlayRecord> parsePlayHistory(dynamic raw) {
+  if (raw is! Map) return const [];
+  final records = <PlayRecord>[];
+  for (final entry in raw.entries) {
+    final value = entry.value;
+    if (value is! Map) continue;
+    // 存的是 JSON，类型不对就当坏数据丢掉
+    final pos = value['pos'] is num ? (value['pos'] as num).toInt() : null;
+    final dur = value['dur'] is num ? (value['dur'] as num).toInt() : null;
+    final ts = value['ts'] is num ? (value['ts'] as num).toInt() : null;
+    if (pos == null || dur == null || ts == null || dur <= 0) continue;
+    records.add(PlayRecord(path: '${entry.key}', pos: pos, dur: dur, ts: ts));
+  }
+  records.sort((a, b) => b.ts.compareTo(a.ts));
+  return records;
+}
+
+Future<List<PlayRecord>> loadPlayHistory() async {
+  try {
+    return parsePlayHistory(
+        jsonDecode(await StorageUtil.getString(playHistoryStorageKey) ?? '{}'));
+  } catch (e) {
+    Log.error("播放历史解析异常: $e");
+    return const [];
+  }
+}
+
+Future<void> _appendPlayHistory(String path, Map<String, dynamic> entry) async {
+  try {
+    final raw =
+        jsonDecode(await StorageUtil.getString(playHistoryStorageKey) ?? '{}');
+    final all = raw is Map ? Map<String, dynamic>.from(raw) : {};
+    all[path] = entry;
+    for (final record in parsePlayHistory(all).skip(playHistoryLimit)) {
+      all.remove(record.path);
+    }
+    await StorageUtil.setString(playHistoryStorageKey, jsonEncode(all));
+  } catch (e) {
+    Log.error("播放历史写入异常: $e");
+  }
+}
+
+Future<void> removePlayHistory(String path) async {
+  final all = await loadPlayHistory();
+  final keep = {
+    for (final e in all)
+      if (e.path != path) e.path: e
+  };
+  await StorageUtil.setString(
+      playHistoryStorageKey,
+      jsonEncode({
+        for (final e in keep.values)
+          e.path: {'pos': e.pos, 'dur': e.dur, 'ts': e.ts}
+      }));
+}
+
+Future<void> clearPlayHistory() =>
+    StorageUtil.setString(playHistoryStorageKey, '{}');
 
 /// 某条已看到的位置（用于海报上的进度条和续播），没看过返回 null。
 Future<Duration?> resumePosition(String path) async {

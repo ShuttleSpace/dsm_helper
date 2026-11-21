@@ -12,6 +12,7 @@ Future<dynamic> showFolderPickerSheet(
   BuildContext context, {
   ImageFilter? filter,
   bool multi = false,
+  List<String> fileExtensions = const [],
 }) {
   return showCupertinoModalPopup(
     context: context,
@@ -25,7 +26,7 @@ Future<dynamic> showFolderPickerSheet(
             side: const BorderSide(),
             borderRadius: BorderRadius.circular(18),
           ),
-          child: SelectFolder(multi: multi),
+          child: SelectFolder(multi: multi, fileExtensions: fileExtensions),
         ),
       ),
     ),

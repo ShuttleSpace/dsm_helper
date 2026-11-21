@@ -17,6 +17,7 @@ class PlayerSettingPage extends HookWidget {
   Widget build(BuildContext context) {
     final externalPlayer = useState(true);
     final subtitleSize = useState(16);
+    final autoNext = useState(true);
 
     useEffect(() {
       // 与 lib/pages/file/file.dart 的取值默认值保持一致
@@ -26,6 +27,8 @@ class PlayerSettingPage extends HookWidget {
       StorageUtil.getInt("subtitle_font_size").then((value) {
         if (value != null) subtitleSize.value = value;
       });
+      StorageUtil.getBool("auto_play_next")
+          .then((value) => autoNext.value = value ?? true);
       return null;
     }, const []);
 
@@ -55,6 +58,18 @@ class PlayerSettingPage extends HookWidget {
               "仅 Android 生效：打开视频时交给系统里能播的 App；关掉用内置播放器。",
               style: TextStyle(color: Colors.grey, fontSize: 12),
             ),
+          ),
+          const SizedBox(height: 20),
+          SettingsCheckboxTile(
+            label: "自动连播下一集",
+            value: autoNext.value,
+            iconAsset: "assets/icons/movie.png",
+            iconWidth: 25,
+            padding: 20,
+            onTap: () {
+              autoNext.value = !autoNext.value;
+              StorageUtil.setBool("auto_play_next", autoNext.value);
+            },
           ),
           const SizedBox(height: 20),
           GestureDetector(

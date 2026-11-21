@@ -6,6 +6,7 @@ import 'package:garden/api/dsm_api.filestation.transfer_url.dart';
 import 'package:garden/extensions/string.dart';
 import 'package:garden/pages/common/video_player.dart';
 import 'package:garden/pages/media/media_setting.dart';
+import 'package:garden/pages/media/play_history.dart';
 import 'package:garden/stores/connection_store.dart';
 import 'package:garden/util/log.dart';
 import 'package:garden/util/media_library.dart';
@@ -30,6 +31,7 @@ class MediaLibrary extends HookWidget {
     final depth = useSignal(mediaScanDepth);
     final viewMode = useSignal(MediaViewMode.poster);
 
+    final shown = filterAndSortMediaItems(items.value, query.value, sort.value);
     Future<void> openPlayer(MediaItem item) async {
       await Navigator.of(context).push(CupertinoPageRoute(builder: (context) {
         return VideoPlayerPage(
@@ -44,6 +46,7 @@ class MediaLibrary extends HookWidget {
           nfo: item.nfoPath,
           subtitles: item.subtitles,
           mediaPath: item.path,
+          playlist: shown,
         );
       }));
       // 回来时续播位置可能变了
@@ -100,7 +103,6 @@ class MediaLibrary extends HookWidget {
       await reload();
     }
 
-    final shown = filterAndSortMediaItems(items.value, query.value, sort.value);
     // 继续观看：库里有、且看过一半以内的
     final byPath = {for (final e in items.value) e.path: e};
     final resumed = [
@@ -123,6 +125,15 @@ class MediaLibrary extends HookWidget {
             : const Text('多媒体'),
         actions: [
           IconButton(
+            tooltip: '播放历史',
+            icon: const Icon(Icons.history),
+            onPressed: () async {
+              await Navigator.of(context).push(
+                  CupertinoPageRoute(builder: (_) => const PlayHistoryPage()));
+              watching.value = await loadContinueWatching();
+            },
+          ),
+          IconButton(
             tooltip: '搜索',
             icon: Icon(searching.value ? Icons.close : Icons.search),
             onPressed: () {
@@ -130,17 +141,19 @@ class MediaLibrary extends HookWidget {
               if (!searching.value) query.value = '';
             },
           ),
-          IconButton(
-            tooltip: viewMode.value == MediaViewMode.poster ? '按文件夹看' : '按海报看',
-            icon: Icon(viewMode.value == MediaViewMode.poster
-                ? Icons.folder_outlined
-                : Icons.grid_view),
-            onPressed: () {
-              viewMode.value = viewMode.value == MediaViewMode.poster
-                  ? MediaViewMode.folder
-                  : MediaViewMode.poster;
-              saveMediaViewMode(viewMode.value);
+          PopupMenuButton<MediaViewMode>(
+            tooltip: '展示风格',
+            icon: const Icon(Icons.view_agenda_outlined),
+            initialValue: viewMode.value,
+            onSelected: (value) {
+              viewMode.value = value;
+              saveMediaViewMode(value);
             },
+            itemBuilder: (context) => const [
+              PopupMenuItem(value: MediaViewMode.poster, child: Text('海报墙')),
+              PopupMenuItem(value: MediaViewMode.folder, child: Text('按文件夹分段')),
+              PopupMenuItem(value: MediaViewMode.tree, child: Text('文件树')),
+            ],
           ),
           PopupMenuButton<MediaSort>(
             tooltip: '排序',
@@ -196,9 +209,24 @@ class MediaLibrary extends HookWidget {
                         ),
                       ),
                     Expanded(
-                      child: viewMode.value == MediaViewMode.poster
-                          ? _grid(shown, openPlayer)
-                          : _folderList(shown, openPlayer),
+                      child: switch (viewMode.value) {
+                        MediaViewMode.poster => _grid(shown, openPlayer),
+                        MediaViewMode.folder => _folderList(shown, openPlayer),
+                        MediaViewMode.tree => ListView(
+                            padding: const EdgeInsets.symmetric(vertical: 8),
+                            children: [
+                              for (final folder
+                                  in buildMediaTree(shown).folders)
+                                _TreeFolder(
+                                    folder: folder,
+                                    level: 0,
+                                    onOpen: openPlayer),
+                              for (final item in buildMediaTree(shown).videos)
+                                _TreeFile(
+                                    item: item, level: 0, onOpen: openPlayer),
+                            ],
+                          ),
+                      },
                     ),
                   ],
                 ),
@@ -388,6 +416,103 @@ class _ResumeCard extends StatelessWidget {
                 style: const TextStyle(fontSize: 12)),
             Text('剩 ${(left / 60).ceil()} 分钟',
                 style: const TextStyle(fontSize: 10, color: Colors.grey)),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// 文件树里的一层目录：点一下展开/收起，向下递归。
+class _TreeFolder extends HookWidget {
+  final MediaFolder folder;
+  final int level;
+  final void Function(MediaItem) onOpen;
+
+  const _TreeFolder(
+      {required this.folder, required this.level, required this.onOpen});
+
+  @override
+  Widget build(BuildContext context) {
+    // 第一层默认展开，深层的收着，免得一进来滚一屏
+    final open = useState(level < 1);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        InkWell(
+          onTap: () => open.value = !open.value,
+          child: Padding(
+            padding: EdgeInsets.only(
+                left: 12.0 * level + 12, top: 10, bottom: 10, right: 12),
+            child: Row(
+              children: [
+                Icon(
+                  open.value ? Icons.folder_open : Icons.folder_outlined,
+                  size: 18,
+                  color: Colors.grey,
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(folder.name,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(fontSize: 13)),
+                ),
+                Text("${folder.total}",
+                    style: const TextStyle(fontSize: 11, color: Colors.grey)),
+              ],
+            ),
+          ),
+        ),
+        if (open.value) ...[
+          for (final child in folder.folders)
+            _TreeFolder(folder: child, level: level + 1, onOpen: onOpen),
+          for (final item in folder.videos)
+            _TreeFile(item: item, level: level + 1, onOpen: onOpen),
+        ],
+      ],
+    );
+  }
+}
+
+/// 文件树里的一个视频：缩略图（刮削到的封面）当文件图标。
+class _TreeFile extends StatelessWidget {
+  final MediaItem item;
+  final int level;
+  final void Function(MediaItem) onOpen;
+
+  const _TreeFile(
+      {required this.item, required this.level, required this.onOpen});
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: () => onOpen(item),
+      child: Padding(
+        padding: EdgeInsets.only(
+            left: 12.0 * level + 12, top: 6, bottom: 6, right: 12),
+        child: Row(
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(4),
+              child: SizedBox(
+                  width: 48, height: 32, child: mediaCover(item.coverPath)),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(item.displayTitle,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(fontSize: 13)),
+                  if (item.subtitleLine.isNotBlank)
+                    Text(item.subtitleLine,
+                        style:
+                            const TextStyle(fontSize: 11, color: Colors.grey)),
+                ],
+              ),
+            ),
           ],
         ),
       ),

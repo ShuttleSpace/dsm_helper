@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:garden/pages/media/play_history.dart';
 import 'package:garden/pages/setting/media_library_setting.dart';
 import 'package:garden/util/media_library.dart';
 import 'package:garden/util/storage_util.dart';
@@ -88,6 +89,23 @@ class MediaSetting extends HookWidget {
               style: TextStyle(color: Colors.grey, fontSize: 12),
             ),
           ),
+          GestureDetector(
+            onTap: () => Navigator.of(context).push(
+                CupertinoPageRoute(builder: (_) => const PlayHistoryPage())),
+            child: card(
+              child: const Padding(
+                padding: EdgeInsets.all(20),
+                child: Row(
+                  children: [
+                    Text("播放历史与统计"),
+                    Spacer(),
+                    Icon(Icons.chevron_right),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 12),
           const SizedBox(height: 20),
           label("扫描深度"),
           const SizedBox(height: 8),

@@ -14,7 +14,7 @@ import 'package:android_intent_plus/android_intent.dart';
 import 'package:garden/api/dsm_api.filestation.transfer_url.dart';
 import 'package:garden/extensions/string.dart';
 import 'package:garden/services/office_preview.dart';
-import 'package:garden/pages/common/nas_path_picker.dart';
+import 'package:garden/widgets/folder_picker_sheet.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/cupertino.dart';
@@ -38,6 +38,9 @@ class VideoPlayerPage extends HookWidget {
 
   /// NAS 上的视频 path，用来记续播位置；为 null 就不记。
   final String? mediaPath;
+
+  /// 同一个列表里的其它片子，用来上一个/下一个和自动连播。
+  final List<MediaItem> playlist;
   const VideoPlayerPage(
       {super.key,
       required this.url,
@@ -46,6 +49,7 @@ class VideoPlayerPage extends HookWidget {
       this.nfo,
       this.subtitles = const [],
       this.mediaPath,
+      this.playlist = const [],
       this.network = true});
 
   @override
@@ -72,6 +76,16 @@ class VideoPlayerPage extends HookWidget {
     final premiered = useSignal('');
     final poster = useSignal('');
     final tmdbUsed = useSignal(false);
+    // 播放列表切换时这几项要跟着变，所以不能只读构造参数
+    final currentName = useSignal(name ?? '');
+    final currentUrl = useSignal(url);
+    final currentCover = useSignal(cover ?? '');
+    final currentNfo = useSignal(nfo);
+    final currentSubtitles = useSignal<List<String>>(subtitles);
+    final currentPath = useSignal(mediaPath);
+    final playingIndex =
+        useSignal(playlist.indexWhere((e) => e.path == (mediaPath ?? '')));
+    final autoNext = useState(true);
 
     // 倍速列表
     const Map<String, double> speedList = {
@@ -81,21 +95,19 @@ class VideoPlayerPage extends HookWidget {
       "0.5": 0.5,
     };
 
-    Future<void> initializeVideo() async {
+    /// 打开当前这一部：开播、续播定位、挂外置字幕。切换列表时复用。
+    Future<void> openCurrent() async {
       try {
         // 等待 open 完成，失败才能落到下面的 catch（原来未 await 永远不进 catch）。
-        await player.open(Media(url), play: true);
+        await player.open(Media(currentUrl.value), play: true);
         // 续播：上次看到一半的位置
-        final resume = await resumePosition(mediaPath ?? '');
+        final resume = await resumePosition(currentPath.value ?? '');
         if (resume != null) await player.seek(resume);
-        player.stream.videoParams.listen((event) {
-          videoAspectRatio.value = event.aspect ?? 1;
-        });
         isInitialized.value = true;
         // 外置字幕：mpv 的 sub-add，多个文件都进轨道列表供用户切换。
         // 单独 try：字幕加载失败不能当成视频加载失败。
         try {
-          for (final path in subtitles) {
+          for (final path in currentSubtitles.value) {
             await player.setSubtitleTrack(SubtitleTrack.uri(
               fbDownloadUrl(
                 baseUri: connectionStore.baseUri.value,
@@ -120,7 +132,7 @@ class VideoPlayerPage extends HookWidget {
       player.setPitch(speed);
     }
 
-    parseNfo() async {
+    parseNfo(String? nfo) async {
       if (nfo == null) return;
       try {
         final nfoUrl = fbDownloadUrl(
@@ -152,7 +164,7 @@ class VideoPlayerPage extends HookWidget {
       if (description.value.isNotBlank) return;
       final apiKey = await StorageUtil.getString(tmdbApiKeyStorageKey) ?? '';
       if (apiKey.isBlank) return;
-      final info = await fetchTmdbInfo(apiKey, name ?? '');
+      final info = await fetchTmdbInfo(apiKey, currentName.value);
       if (info == null) {
         Log.info("TMDB 未查到: $name");
         return;
@@ -167,15 +179,56 @@ class VideoPlayerPage extends HookWidget {
       tmdbUsed.value = true;
     }
 
-    /// 在 NAS 上挑字幕文件；和同名字幕一样走 fbDownloadUrl，交给 mpv 读。
-    Future<void> pickSubtitle() async {
-      final picked = await Navigator.of(context).push<List<String>>(
-        CupertinoPageRoute(
-            builder: (_) => const NasPathPicker(
-                fileExtensions: FileTypeUtil.subtitleExtensions)),
+    /// 在 NAS 上挑字幕文件；复用上传时那个文件选择器（只列字幕扩展名）。
+    void resetMeta() {
+      description.value = '';
+      date.value = '';
+      year.value = '';
+      actors.value = [];
+      genres.value = '';
+      directors.value = '';
+      runtime.value = '';
+      rating.value = '';
+      premiered.value = '';
+      poster.value = '';
+      tmdbUsed.value = false;
+    }
+
+    /// 上一层记下进度，再换成列表里的第 i 部。
+    Future<void> playEntry(int i) async {
+      if (i < 0 || i >= playlist.length) return;
+      final item = playlist[i];
+      if (currentPath.value != null && item.path != currentPath.value) {
+        await savePlayProgress(currentPath.value!, player.state.position,
+            duration: player.state.duration);
+      }
+      playingIndex.value = i;
+      currentName.value = item.name;
+      currentPath.value = item.path;
+      currentCover.value = item.coverPath;
+      currentNfo.value = item.nfoPath;
+      currentSubtitles.value = item.subtitles;
+      currentUrl.value = fbDownloadUrl(
+        baseUri: connectionStore.baseUri.value,
+        path: item.path,
+        sid: connectionStore.sid.value,
+        mode: 'open',
       );
-      if (picked == null || picked.isEmpty) return;
-      final path = picked.first;
+      resetMeta();
+      await openCurrent();
+      parseNfo(currentNfo.value).then((_) => parseTmdb());
+    }
+
+    bool hasNext() =>
+        playingIndex.value >= 0 && playingIndex.value + 1 < playlist.length;
+
+    Future<void> pickSubtitle() async {
+      final picked = await showFolderPickerSheet(
+        context,
+        fileExtensions: FileTypeUtil.subtitleExtensions,
+      );
+      if (picked is! List || picked.isEmpty) return;
+      final path = '${picked.first}';
       try {
         await player.setSubtitleTrack(SubtitleTrack.uri(
           fbDownloadUrl(
@@ -189,6 +242,54 @@ class VideoPlayerPage extends HookWidget {
       } catch (e) {
         Log.error("字幕载入异常: $e");
       }
+    }
+
+    /// 播放列表面板：点条目切片，底部一个自动连播开关。
+    void showPlaylist() {
+      showModalBottomSheet(
+        context: context,
+        builder: (context) => SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              SwitchListTile(
+                value: autoNext.value,
+                title: const Text('自动连播'),
+                onChanged: (value) {
+                  autoNext.value = value;
+                  StorageUtil.setBool("auto_play_next", value);
+                  (context as Element).markNeedsBuild();
+                },
+              ),
+              const Divider(height: 1),
+              Flexible(
+                child: ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: playlist.length,
+                  itemBuilder: (context, i) {
+                    final item = playlist[i];
+                    final current = i == playingIndex.value;
+                    return ListTile(
+                      dense: true,
+                      selected: current,
+                      leading: Icon(current ? Icons.volume_up : Icons.movie),
+                      title: Text(item.displayTitle,
+                          maxLines: 1, overflow: TextOverflow.ellipsis),
+                      subtitle: item.subtitleLine.isBlank
+                          ? null
+                          : Text(item.subtitleLine),
+                      onTap: () {
+                        Navigator.of(context).pop();
+                        if (!current) playEntry(i);
+                      },
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
     }
 
     String formatDuration(Duration duration) {
@@ -206,13 +307,28 @@ class VideoPlayerPage extends HookWidget {
     }, const []);
 
     useEffect(() {
+      // 自动连播开关：默认开
+      StorageUtil.getBool("auto_play_next").then((value) {
+        if (value != null) autoNext.value = value;
+      });
+      final aspectSub = player.stream.videoParams.listen((event) {
+        videoAspectRatio.value = event.aspect ?? 1;
+      });
+      // 自动连播：这一部放完就开列表里的下一部
+      final completedSub = player.stream.completed.listen((done) {
+        if (done && autoNext.value && hasNext()) {
+          playEntry(playingIndex.value + 1);
+        }
+      });
       // NFO 先解析，解析不到的字段再由 TMDB 补。
-      parseNfo().then((_) => parseTmdb());
-      initializeVideo();
+      parseNfo(currentNfo.value).then((_) => parseTmdb());
+      openCurrent();
       return () {
+        aspectSub.cancel();
+        completedSub.cancel();
         // 离开时记续播位置（离开页面时 state 还是最后一次的）
-        if (mediaPath != null) {
-          savePlayProgress(mediaPath!, player.state.position,
+        if (currentPath.value != null) {
+          savePlayProgress(currentPath.value!, player.state.position,
               duration: player.state.duration);
         }
         player.dispose();
@@ -221,7 +337,7 @@ class VideoPlayerPage extends HookWidget {
 
     // 封面：本地 fanart/poster 优先，其次 NFO 里的 thumb（多为远程 URL）
     final posterUrl =
-        (cover != null && cover!.isNotBlank) ? cover! : poster.value;
+        currentCover.value.isNotBlank ? currentCover.value : poster.value;
 
     Widget infoRow(String label, String value) => Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
@@ -230,9 +346,29 @@ class VideoPlayerPage extends HookWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(name ?? '视频播放'),
+        title: Text(currentName.value.isNotBlank ? currentName.value : '视频播放'),
         leading: AppBackButton(context),
         actions: [
+          if (playlist.isNotEmpty) ...[
+            IconButton(
+              tooltip: '上一个',
+              icon: const Icon(Icons.skip_previous),
+              onPressed: playingIndex.value > 0
+                  ? () => playEntry(playingIndex.value - 1)
+                  : null,
+            ),
+            IconButton(
+              tooltip: '下一个',
+              icon: const Icon(Icons.skip_next),
+              onPressed:
+                  hasNext() ? () => playEntry(playingIndex.value + 1) : null,
+            ),
+          ],
+          if (playlist.isNotEmpty)
+            IconButton(
+                tooltip: '播放列表',
+                icon: const Icon(Icons.playlist_play),
+                onPressed: showPlaylist),
           // 字幕选择：外置字幕（sub-add）和容器内嵌字幕都在这里
           PopupMenuButton<Object>(
             tooltip: '字幕',
@@ -266,16 +402,23 @@ class VideoPlayerPage extends HookWidget {
             child: OutlinedButton(
               onPressed: () async {
                 player.pause();
-                if (Platform.isAndroid) {
-                  AndroidIntent intent = AndroidIntent(
-                    action: 'action_view',
-                    data: url,
-                    arguments: {},
-                    type: "video/*",
-                  );
-                  await intent.launch();
-                } else {
-                  launchUrlString("vlc://$url");
+                try {
+                  if (Platform.isAndroid) {
+                    await AndroidIntent(
+                      action: 'action_view',
+                      data: url,
+                      arguments: {},
+                      type: "video/*",
+                    ).launch();
+                  } else {
+                    // vlc:// 没人接的时候 launchUrlString 只返回 false，不抛异常，
+                    // 原来没人看返回值，按钮就像坏了。
+                    final ok = await launchUrlString("vlc://$url");
+                    if (!ok) UiUtil.toast("没找到 VLC，装了才能用外部播放器");
+                  }
+                } catch (e) {
+                  Log.error("外部播放器调用失败: $e");
+                  UiUtil.toast("外部播放器调用失败，继续用内置播放器");
                 }
               },
               child: Image.asset(
@@ -439,7 +582,7 @@ class VideoPlayerPage extends HookWidget {
                     style: const TextStyle(color: Colors.grey, fontSize: 12),
                   ),
                 ),
-                if (nfo != null)
+                if (currentNfo.value != null)
                   const Padding(
                     padding: EdgeInsets.symmetric(
                         horizontal: AppConstants.paddingLarge),
