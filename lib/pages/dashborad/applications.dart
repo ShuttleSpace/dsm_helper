@@ -16,9 +16,10 @@ import 'package:garden/widgets/application_tile.dart';
 import 'package:garden/widgets/badge.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart' hide Badge;
-import 'package:signals_flutter/signals_flutter.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:signals_hooks/signals_hooks.dart';
 
-class ApplicationList extends StatelessWidget {
+class ApplicationList extends HookWidget {
   const ApplicationList(
       this.applications, this.system, this.volumes, this.disks, this.appNotify,
       {super.key});
@@ -29,6 +30,8 @@ class ApplicationList extends StatelessWidget {
   final ReadonlySignal<Map> appNotify;
   @override
   Widget build(BuildContext context) {
+    final useGridLayout = useSignal(true);
+    final tiles = _buildApplicationList(context);
     return Container(
       width: MediaQuery.sizeOf(context).width * 0.8,
       color: Theme.of(context).scaffoldBackgroundColor,
@@ -38,11 +41,37 @@ class ApplicationList extends StatelessWidget {
             padding: const EdgeInsets.symmetric(
                 horizontal: AppConstants.paddingLarge),
             children: [
-              Wrap(
-                spacing: 20,
-                runSpacing: 20,
-                children: _buildApplicationList(context),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Tooltip(
+                    message: '点击切换布局',
+                    child: IconButton(
+                      onPressed: () =>
+                          useGridLayout.value = !useGridLayout.value,
+                      icon: useGridLayout.value
+                          ? const Icon(Icons.grid_view_outlined)
+                          : const Icon(Icons.view_list_outlined),
+                    ),
+                  ),
+                ],
               ),
+              useGridLayout.value
+                  ? Wrap(
+                      spacing: 12,
+                      runSpacing: 12,
+                      children: tiles
+                          .map((tile) => SizedBox(width: 88, child: tile))
+                          .toList(),
+                    )
+                  : Column(
+                      children: tiles
+                          .map((tile) => SizedBox(
+                                width: double.infinity,
+                                child: tile.copyWith(listLayout: true),
+                              ))
+                          .toList(),
+                    ),
             ],
           ),
         ),
@@ -50,8 +79,8 @@ class ApplicationList extends StatelessWidget {
     );
   }
 
-  List<Widget> _buildApplicationList(BuildContext context) {
-    List<Widget> apps = [];
+  List<ApplicationTile> _buildApplicationList(BuildContext context) {
+    List<ApplicationTile> apps = [];
     for (var application in applications.value) {
       switch (application) {
         case "SYNO.SDS.AdminCenter.Application":
