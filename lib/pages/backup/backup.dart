@@ -128,6 +128,32 @@ Future<TransferTask> startBackup({
 String remoteDir(String backupFolder, String filename) =>
     backupFolder.endsWith('/') ? '$backupFolder$filename' : '$backupFolder/$filename';
 
+/// 已有未完成的备份父任务时不再入队，避免重复上传。
+bool hasPendingBackupTask(Iterable<TransferTask> tasks) => tasks.any((t) =>
+    t.steps != null &&
+    (t.state == TransferState.queued || t.state == TransferState.active));
+
+/// 自动备份的决策层：不可用时返回 null，不抛异常、不提示。
+Future<TransferTask?> startAutoBackup({
+  required bool enabled,
+  required String backupFolder,
+  required List<AssetEntity> uploads,
+  required DateTime? lastBackupTime,
+  required bool hasPendingBackup,
+  required Future<String> Function(String cachePath, String remoteDir) enqueue,
+  required Directory cacheRoot,
+}) async {
+  if (!enabled || backupFolder.isBlank || hasPendingBackup) return null;
+  final assets = backupPendingAssets(uploads, lastBackupTime, true);
+  if (assets.isEmpty) return null;
+  return startBackup(
+    backupFolder: backupFolder,
+    assets: assets,
+    enqueue: enqueue,
+    cacheRoot: cacheRoot,
+  );
+}
+
 class Backup extends HookWidget {
   const Backup({super.key});
 

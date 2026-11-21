@@ -78,6 +78,98 @@ void main() {
     expect(after.errorMessage, contains('offline'));
     transferStore.remove(parent.id);
   });
+
+test('hasPendingBackupTask true only for stepped queued/active tasks', () {
+  final queued = TransferTask(
+    id: 'b1',
+    type: TransferType.upload,
+    localPath: '',
+    remotePath: '/p',
+    state: TransferState.queued,
+    steps: const [],
+  );
+  final plain = TransferTask(
+    id: 'u1',
+    type: TransferType.upload,
+    localPath: '/a.jpg',
+    remotePath: '/p/a.jpg',
+    state: TransferState.active,
+  );
+  final done = queued.copyWith(state: TransferState.done);
+  expect(hasPendingBackupTask([queued]), isTrue);
+  expect(hasPendingBackupTask([plain]), isFalse);
+  expect(hasPendingBackupTask([done]), isFalse);
+});
+
+test('startAutoBackup skips when disabled, no folder, pending task or nothing new',
+    () async {
+  final cacheRoot = await Directory.systemTemp.createTemp('auto_backup_test_');
+  addTearDown(() => cacheRoot.deleteSync(recursive: true));
+  final source = File('${cacheRoot.path}/new.jpg')..writeAsStringSync('photo');
+  final asset = FakeAsset('new', DateTime(2026, 2, 1), sourceFile: source);
+  final enqueue = (String cachePath, String remoteDir) async => 'auto1';
+
+  expect(
+      await startAutoBackup(
+          enabled: false,
+          backupFolder: '/photos',
+          uploads: [asset],
+          lastBackupTime: null,
+          hasPendingBackup: false,
+          enqueue: enqueue,
+          cacheRoot: cacheRoot),
+      isNull);
+  expect(
+      await startAutoBackup(
+          enabled: true,
+          backupFolder: '',
+          uploads: [asset],
+          lastBackupTime: null,
+          hasPendingBackup: false,
+          enqueue: enqueue,
+          cacheRoot: cacheRoot),
+      isNull);
+  expect(
+      await startAutoBackup(
+          enabled: true,
+          backupFolder: '/photos',
+          uploads: [asset],
+          lastBackupTime: null,
+          hasPendingBackup: true,
+          enqueue: enqueue,
+          cacheRoot: cacheRoot),
+      isNull);
+  expect(
+      await startAutoBackup(
+          enabled: true,
+          backupFolder: '/photos',
+          uploads: [asset],
+          lastBackupTime: DateTime(2026, 3, 1),
+          hasPendingBackup: false,
+          enqueue: enqueue,
+          cacheRoot: cacheRoot),
+      isNull);
+  expect(transferStore.tasks.value.any((t) => t.id.startsWith('backup_')), isFalse);
+});
+
+test('startAutoBackup creates parent task when eligible', () async {
+  final cacheRoot = await Directory.systemTemp.createTemp('auto_backup_test_');
+  addTearDown(() => cacheRoot.deleteSync(recursive: true));
+  final source = File('${cacheRoot.path}/new.jpg')..writeAsStringSync('photo');
+  final asset = FakeAsset('new', DateTime(2026, 2, 1), sourceFile: source);
+  final parent = await startAutoBackup(
+    enabled: true,
+    backupFolder: '/photos',
+    uploads: [asset],
+    lastBackupTime: DateTime(2026, 1, 1),
+    hasPendingBackup: false,
+    enqueue: (cachePath, remoteDir) async => 'auto1',
+    cacheRoot: cacheRoot,
+  );
+  expect(parent!.steps!.single.id, 'auto1');
+  expect(parent.remotePath, '/photos');
+  transferStore.remove(parent.id);
+});
 }
 
 class FakeAsset extends AssetEntity {
