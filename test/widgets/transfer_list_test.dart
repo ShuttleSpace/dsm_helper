@@ -92,6 +92,45 @@ void main() {
     )), 'file.txt');
   });
 
+  testWidgets('step row opens its own sheet with actions and detail',
+      (tester) async {
+    const parent = TransferTask(
+      id: 'backup_widget_2',
+      type: TransferType.upload,
+      localPath: '',
+      remotePath: '/photos',
+      state: TransferState.error,
+      steps: [
+        TransferStep(
+          id: 's2',
+          localPath: '/c/b.jpg',
+          remotePath: '/photos/b.jpg',
+          totalBytes: 100,
+          transferredBytes: 0,
+          state: TransferState.error,
+          errorMessage: '网络中断',
+        ),
+      ],
+    );
+    transferStore.add(parent);
+    addTearDown(() => transferStore.remove(parent.id));
+
+    await tester.pumpWidget(const MaterialApp(
+      home: Scaffold(body: TransferList(type: TransferType.upload)),
+    ));
+    await tester.tap(find.byIcon(Icons.expand_more));
+    await tester.pump();
+    await tester.tap(find.textContaining('b.jpg'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('重试'), findsOneWidget);
+    expect(find.text('暂停'), findsNothing); // 已失败，无可暂停
+    await tester.tap(find.text('详情'));
+    await tester.pumpAndSettle();
+    expect(find.text('网络中断'), findsOneWidget);
+    expect(find.text('拍摄'), findsOneWidget);
+  });
+
   test('retryTransferStep re-enqueues with a fresh id and clears progress', () async {
     final step = TransferStep(
       id: 'old',

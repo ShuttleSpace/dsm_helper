@@ -352,35 +352,34 @@ class TransferList extends HookWidget {
           ],
           if (isParent && isExpanded) ...[
             const SizedBox(height: 8),
-            ...t.steps!.map((s) => Padding(
-                  padding: const EdgeInsets.only(top: 6, left: 8),
-                  child: Row(
-                    children: [
-                      Icon(
-                        s.state == TransferState.done
-                            ? Icons.check_circle_outline
-                            : s.state == TransferState.error
-                                ? Icons.error_outline
-                                : Icons.radio_button_unchecked,
-                        size: 14,
-                        color: _stateColor(context, s.state),
-                      ),
-                      const SizedBox(width: 6),
-                      Expanded(
-                        child: Text(
-                          '${s.remotePath.split('/').last}  ${s.transferredBytes.formatSize()}/${s.totalBytes.formatSize()}',
-                          style: TextStyle(
-                              fontSize: 12, color: theme.titleColor),
-                          overflow: TextOverflow.ellipsis,
+            ...t.steps!.map((s) => InkWell(
+                  onTap: () => _showStepActions(context, t, s),
+                  child: Padding(
+                    padding: const EdgeInsets.only(top: 6, left: 8),
+                    child: Row(
+                      children: [
+                        Icon(
+                          s.state == TransferState.done
+                              ? Icons.check_circle_outline
+                              : s.state == TransferState.error
+                                  ? Icons.error_outline
+                                  : Icons.radio_button_unchecked,
+                          size: 14,
+                          color: _stateColor(context, s.state),
                         ),
-                      ),
-                      if (s.errorMessage != null && s.errorMessage!.isNotEmpty)
-                        IconButton(
-                          icon: const Icon(Icons.replay, size: 16),
-                          tooltip: '重试该步骤',
-                          onPressed: () => _retryStep(context, t, s),
+                        const SizedBox(width: 6),
+                        Expanded(
+                          child: Text(
+                            '${s.remotePath.split('/').last}  ${s.transferredBytes.formatSize()}/${s.totalBytes.formatSize()}',
+                            style: TextStyle(
+                                fontSize: 12, color: theme.titleColor),
+                            overflow: TextOverflow.ellipsis,
+                          ),
                         ),
-                    ],
+                        Icon(Icons.chevron_right,
+                            size: 14, color: theme.placeholderColor),
+                      ],
+                    ),
                   ),
                 )),
           ],
@@ -398,6 +397,53 @@ class TransferList extends HookWidget {
         ],
       ),
     );
+  }
+
+  void _showStepActions(
+    BuildContext context,
+    TransferTask parent,
+    TransferStep step,
+  ) {
+    final isUpload = parent.type == TransferType.upload;
+    final canRetry = step.state == TransferState.paused ||
+        step.state == TransferState.error ||
+        step.state == TransferState.canceled;
+    final options = <BottomOption>[
+      if (step.state == TransferState.active ||
+          step.state == TransferState.queued)
+        BottomOption(title: '暂停', onPressed: () => _pauseStep(step)),
+      // 上传步骤的引擎暂停/继续不可靠，继续统一走重新入队。
+      if (canRetry)
+        BottomOption(
+          title: step.state == TransferState.paused && !isUpload ? '继续' : '重试',
+          onPressed: () => _retryStep(context, parent, step),
+        ),
+      if (step.state == TransferState.active ||
+          step.state == TransferState.queued ||
+          step.state == TransferState.paused)
+        BottomOption(title: '取消', onPressed: () => _cancelStep(step)),
+      BottomOption(
+        title: '详情',
+        onPressed: () => showTransferStepDetail(context, step),
+      ),
+    ];
+    showCupertinoModalPopup(
+      context: context,
+      builder: (context) => BottomOptionSheet(
+        title: step.remotePath.split('/').last,
+        options: options,
+      ),
+    );
+  }
+
+  Future<void> _pauseStep(TransferStep step) async {
+    await transferStore.pauseTask(step.id);
+    UiUtil.toast('已暂停该步骤');
+  }
+
+  Future<void> _cancelStep(TransferStep step) async {
+    await transferStore.cancelTask(step.id);
+    UiUtil.toast('已取消该步骤');
   }
 
   void _showActions(BuildContext context, TransferTask t) {
@@ -570,6 +616,77 @@ class _GroupKey {
 }
 
 /// 传输任务详情面板：只展示可读信息，不展示响应体或临时分片路径。
+void showTransferStepDetail(BuildContext context, TransferStep step) {
+  final theme = AppTheme.of(context);
+  showCupertinoModalPopup(
+    context: context,
+    builder: (context) => BottomSheetCard(
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              step.remotePath.split('/').last,
+              style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w500,
+                  color: theme.titleColor),
+            ),
+            const SizedBox(height: 16),
+            _detailRow(context, '状态', TransferList._stateText(step.state)),
+            _detailRow(context, '大小', step.totalBytes.formatSize()),
+            _detailRow(context, '已传',
+                '${step.transferredBytes.formatSize()} · ${_stepPct(step)}%'),
+            if (step.errorMessage != null && step.errorMessage!.isNotEmpty)
+              _detailRow(context, '原因', step.errorMessage!),
+            _detailRow(
+                context,
+                '拍摄',
+                step.modifyTime?.toLocal().toString().substring(0, 19) ?? '--'),
+            _detailRow(context, '远程', step.remotePath),
+            _detailRow(context, '本地', step.localPath),
+            const SizedBox(height: 4),
+            OutlinedButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('关闭'),
+            ),
+          ],
+        ),
+      ),
+    ),
+  );
+}
+
+int _stepPct(TransferStep step) => step.totalBytes <= 0
+    ? 0
+    : (step.transferredBytes / step.totalBytes * 100).round();
+
+Widget _detailRow(BuildContext context, String label, String value) {
+  final theme = AppTheme.of(context);
+  return Padding(
+    padding: const EdgeInsets.only(bottom: 10),
+    child: Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SizedBox(
+          width: 56,
+          child: Text(label,
+              style: TextStyle(fontSize: 13, color: theme.placeholderColor)),
+        ),
+        Expanded(
+          child: Text(
+            value,
+            style: TextStyle(fontSize: 13, color: theme.titleColor),
+            maxLines: 3,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
+      ],
+    ),
+  );
+}
+
 void showTransferTaskDetail(BuildContext context, TransferTask task) {
   final theme = AppTheme.of(context);
   Widget row(String label, String value) => Padding(
