@@ -31,6 +31,7 @@ class ApplicationList extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final useGridLayout = useSignal(true);
+    const tileGap = 12.0;
     return Container(
       width: MediaQuery.sizeOf(context).width * 0.8,
       color: Theme.of(context).scaffoldBackgroundColor,
@@ -57,22 +58,29 @@ class ApplicationList extends HookWidget {
                     ),
                   ],
                 ),
-                useGridLayout.value
-                    ? Wrap(
-                        spacing: 12,
-                        runSpacing: 12,
-                        children: tiles
-                            .map((tile) => SizedBox(width: 88, child: tile))
-                            .toList(),
-                      )
-                    : Column(
-                        children: tiles
-                            .map((tile) => SizedBox(
-                                  width: double.infinity,
-                                  child: tile.copyWith(listLayout: true),
-                                ))
-                            .toList(),
-                      ),
+                LayoutBuilder(
+                  builder: (context, constraints) => useGridLayout.value
+                      ? Wrap(
+                          spacing: tileGap,
+                          runSpacing: tileGap,
+                          children: tiles
+                              .map((tile) => SizedBox(
+                                    width:
+                                        (constraints.maxWidth - 2 * tileGap) /
+                                            3,
+                                    child: tile,
+                                  ))
+                              .toList(),
+                        )
+                      : Column(
+                          children: tiles
+                              .map((tile) => SizedBox(
+                                    width: double.infinity,
+                                    child: tile.copyWith(listLayout: true),
+                                  ))
+                              .toList(),
+                        ),
+                ),
               ],
             );
           },
