@@ -375,7 +375,12 @@ class Download extends HookWidget {
           ? const Center(child: CupertinoActivityIndicator())
           : Column(
               children: [
-                TabBar(controller: tabController, tabs: tabs),
+                TabBar(
+                  controller: tabController,
+                  tabs: tabs,
+                  isScrollable: true,
+                  tabAlignment: TabAlignment.center,
+                ),
                 Expanded(
                   child: TabBarView(
                     controller: tabController,

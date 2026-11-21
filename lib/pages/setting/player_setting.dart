@@ -28,7 +28,7 @@ class PlayerSettingPage extends HookWidget {
       });
       // 与 lib/pages/file/file.dart 的取值默认值保持一致
       StorageUtil.getBool("use_embeed_video_player").then((value) {
-        externalPlayer.value = value ?? true;
+        externalPlayer.value = value ?? false;
       });
       StorageUtil.getInt("subtitle_font_size").then((value) {
         if (value != null) subtitleSize.value = value;
@@ -55,6 +55,13 @@ class PlayerSettingPage extends HookWidget {
               StorageUtil.setBool(
                   "use_embeed_video_player", externalPlayer.value);
             },
+          ),
+          const Padding(
+            padding: EdgeInsets.only(left: 4, top: 8),
+            child: Text(
+              "仅 Android 生效：打开视频时交给系统里能播的 App；关掉用内置播放器。",
+              style: TextStyle(color: Colors.grey, fontSize: 12),
+            ),
           ),
           const SizedBox(height: 20),
           GestureDetector(

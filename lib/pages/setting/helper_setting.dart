@@ -143,7 +143,7 @@ class HelperSetting extends HookWidget {
       biometrics.value =
           await StorageUtil.getBool("launch_auth_biometrics") ?? false;
       videoPlayer.value =
-          await StorageUtil.getBool("use_embeed_video_player") ?? true;
+          await StorageUtil.getBool("use_embeed_video_player") ?? false;
       launchAccountPage.value =
           await StorageUtil.getBool('launch_account_page') ?? false;
       canCheckBiometrics.value = await auth.canCheckBiometrics;
