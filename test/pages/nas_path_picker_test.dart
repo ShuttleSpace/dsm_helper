@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:garden/api/dsm_api.dart';
-import 'package:garden/pages/common/subtitle_picker.dart';
+import 'package:garden/util/file_type_util.dart';
+import 'package:garden/pages/common/nas_path_picker.dart';
 
 void main() {
   tearDown(() => dsmFileStationPageRequestForTesting = null);
 
   testWidgets('只在 NAS 目录里列目录与字幕，选中后返回 path', (tester) async {
     dsmFileStationPageRequestForTesting = (String endpoint,
-        {Map<String, dynamic>? data, Map<String, dynamic>? queryParameters}) async {
+        {Map<String, dynamic>? data,
+        Map<String, dynamic>? queryParameters}) async {
       final method = data?['method'];
       if (method == '"list_share"') {
         return {
@@ -38,7 +40,9 @@ void main() {
         builder: (context) => TextButton(
           onPressed: () async {
             picked = await Navigator.of(context).push<String>(
-              MaterialPageRoute(builder: (_) => const SubtitlePicker()),
+              MaterialPageRoute(
+                  builder: (_) => const NasPathPicker(
+                      fileExtensions: FileTypeUtil.subtitleExtensions)),
             );
           },
           child: const Text('open'),
@@ -65,6 +69,6 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(picked, '/video/电影.srt');
-    expect(find.byType(SubtitlePicker), findsNothing);
+    expect(find.byType(NasPathPicker), findsNothing);
   });
 }

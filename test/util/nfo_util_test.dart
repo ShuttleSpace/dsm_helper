@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:garden/pages/common/video_player.dart';
+import 'package:garden/util/nfo_util.dart';
 
 void main() {
   test('joinNfoNames 兼容字符串 / 数组 / 带属性的对象数组', () {

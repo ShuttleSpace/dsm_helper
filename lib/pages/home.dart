@@ -5,6 +5,7 @@ import 'package:garden/util/ui_util.dart';
 import 'package:garden/stores/connection_store.dart';
 import 'dart:io';
 
+import 'package:garden/pages/media/media_library.dart';
 import 'package:garden/pages/backup/backup.dart';
 import 'package:garden/pages/download/download.dart';
 import 'package:garden/pages/download/download_state.dart';
@@ -106,7 +107,7 @@ class Home extends HookWidget {
           return;
         }
         value = filesOnWillPop.value?.call() ?? Future.value(false);
-      } else if (navIndex.value == 2) {
+      } else if (navIndex.value == 3) {
         value = DownloadStateInherited.of(context)?.notifier.onWillPop() ??
             Future.value(false);
       }
@@ -175,6 +176,7 @@ class Home extends HookWidget {
                 Files(
                     filesDrawerOpen: filesDrawerOpen,
                     filesOnWillPop: filesOnWillPop),
+                const MediaLibrary(),
                 Download(key: UniqueKey()),
                 const Setting(),
               ],
@@ -207,6 +209,14 @@ class Home extends HookWidget {
                   height: 30,
                 ),
                 label: "文件",
+              ),
+              BottomNavigationBarItem(
+                icon: Image.asset(
+                  "assets/icons/movie.png",
+                  width: 30,
+                  height: 30,
+                ),
+                label: '多媒体',
               ),
               BottomNavigationBarItem(
                 icon: Image.asset(

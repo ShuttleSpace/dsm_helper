@@ -1,6 +1,8 @@
 import 'dart:async';
+import 'package:garden/util/file_type_util.dart';
 import 'package:garden/util/log.dart';
 import 'package:garden/util/storage_util.dart';
+import 'package:garden/util/nfo_util.dart';
 import 'package:garden/util/tmdb_util.dart';
 import 'package:garden/util/ui_util.dart';
 import 'package:garden/stores/connection_store.dart';
@@ -11,7 +13,7 @@ import 'package:android_intent_plus/android_intent.dart';
 import 'package:garden/api/dsm_api.filestation.transfer_url.dart';
 import 'package:garden/extensions/string.dart';
 import 'package:garden/services/office_preview.dart';
-import 'package:garden/pages/common/subtitle_picker.dart';
+import 'package:garden/pages/common/nas_path_picker.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/cupertino.dart';
@@ -22,7 +24,6 @@ import 'package:media_kit/media_kit.dart';
 import 'package:media_kit_video/media_kit_video.dart';
 import 'package:signals_hooks/signals_hooks.dart';
 import 'package:url_launcher/url_launcher_string.dart';
-import 'package:xml2json/xml2json.dart';
 
 class VideoPlayerPage extends HookWidget {
   final String? name;
@@ -114,7 +115,6 @@ class VideoPlayerPage extends HookWidget {
     parseNfo() async {
       if (nfo == null) return;
       try {
-        final myTransformer = Xml2Json();
         final nfoUrl = fbDownloadUrl(
           baseUri: connectionStore.baseUri.value,
           path: nfo!,
@@ -122,9 +122,8 @@ class VideoPlayerPage extends HookWidget {
           mode: 'open',
         );
         final bytes = await fetchFileBytes(nfoUrl);
-        myTransformer.parse(utf8.decode(bytes));
-        var json = jsonDecode(myTransformer.toParker());
-        var nfoDetail = json['episodedetails'] ?? json['movie'];
+        final nfoDetail = parseNfoDetail(utf8.decode(bytes));
+        if (nfoDetail == null) return;
         description.value = nfoDetail['plot'] ?? '';
         date.value = nfoDetail['dateadded'] ?? '';
         actors.value = nfoDetail['actor'] ?? [];
@@ -163,7 +162,9 @@ class VideoPlayerPage extends HookWidget {
     /// 在 NAS 上挑字幕文件；和同名字幕一样走 fbDownloadUrl，交给 mpv 读。
     Future<void> pickSubtitle() async {
       final path = await Navigator.of(context).push<String>(
-        CupertinoPageRoute(builder: (_) => const SubtitlePicker()),
+        CupertinoPageRoute(
+            builder: (_) => const NasPathPicker(
+                fileExtensions: FileTypeUtil.subtitleExtensions)),
       );
       if (path == null || path.isEmpty) return;
       try {
@@ -508,25 +509,4 @@ class VideoPlayerPage extends HookWidget {
       ),
     );
   }
-}
-
-/// NFO 里的 genre / director 可能是字符串、数组，或带属性的对象数组。
-String joinNfoNames(dynamic value) {
-  if (value == null) return '';
-  final list = value is List ? value : [value];
-  return list
-      .map((e) => e is Map ? '${e['name'] ?? e['\$'] ?? ''}' : '$e')
-      .where((e) => e.isNotBlank)
-      .join('、');
-}
-
-/// NFO 的 thumb 可能是单个 URL、带 aspect 的对象，或本地文件名；这里只取远程图。
-String firstNfoImage(dynamic value) {
-  if (value == null) return '';
-  final list = value is List ? value : [value];
-  for (final e in list) {
-    final url = e is Map ? '${e['\$'] ?? e['value'] ?? ''}' : '$e';
-    if (url.startsWith('http')) return url;
-  }
-  return '';
 }

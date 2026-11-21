@@ -7,9 +7,14 @@ import 'package:garden/util/ui_util.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:signals_hooks/signals_hooks.dart';
 
-/// 在 NAS 上挑一个字幕文件，返回它的 path；放弃选择时返回 null。
-class SubtitlePicker extends HookWidget {
-  const SubtitlePicker({super.key});
+/// 在 NAS 上挑一个目录或文件，返回它的 path；放弃选择时返回 null。
+///
+/// [fileExtensions] 为空时只能选目录（右上角「选这个目录」），否则目录照常进，
+/// 额外列出这些扩展名的文件供点选。
+class NasPathPicker extends HookWidget {
+  final List<String> fileExtensions;
+
+  const NasPathPicker({super.key, this.fileExtensions = const []});
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +34,7 @@ class SubtitlePicker extends HookWidget {
             .map((e) => Map<String, dynamic>.from(e))
             .where((e) =>
                 e['isdir'] == true ||
-                FileTypeUtil.subtitleExtensions
+                fileExtensions
                     .contains('${e['name']}'.split('.').last.toLowerCase()))
             .toList()
           // 目录排前面
@@ -81,7 +86,7 @@ class SubtitlePicker extends HookWidget {
                 final isDir = e['isdir'] == true;
                 return ListTile(
                   leading: Icon(
-                    isDir ? Icons.folder : Icons.subtitles,
+                    isDir ? Icons.folder : Icons.insert_drive_file,
                     color: isDir ? null : Theme.of(context).colorScheme.primary,
                   ),
                   title: Text("${e['name']}", overflow: TextOverflow.ellipsis),
