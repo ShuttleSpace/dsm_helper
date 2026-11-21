@@ -8,9 +8,11 @@ import 'dart:io';
 import 'package:android_intent_plus/android_intent.dart';
 import 'package:garden/api/dsm_api.filestation.transfer_url.dart';
 import 'package:garden/extensions/string.dart';
+import 'package:garden/util/file_type_util.dart';
 import 'package:garden/services/office_preview.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:extended_image/extended_image.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:garden/constants/app_constants.dart';
@@ -26,12 +28,16 @@ class VideoPlayerPage extends HookWidget {
   final String? cover;
   final String? nfo;
   final bool network;
+
+  /// 同目录下的字幕旁车文件路径（NAS 上的 path），可空。
+  final List<String> subtitles;
   const VideoPlayerPage(
       {super.key,
       required this.url,
       this.name,
       this.cover,
       this.nfo,
+      this.subtitles = const [],
       this.network = true});
 
   @override
@@ -67,6 +73,23 @@ class VideoPlayerPage extends HookWidget {
           videoAspectRatio.value = event.aspect ?? 1;
         });
         isInitialized.value = true;
+        // 外置字幕：mpv 的 sub-add，多个文件都进轨道列表供用户切换。
+        // 单独 try：字幕加载失败不能当成视频加载失败。
+        try {
+          for (final path in subtitles) {
+            await player.setSubtitleTrack(SubtitleTrack.uri(
+              fbDownloadUrl(
+                baseUri: connectionStore.baseUri.value,
+                path: path,
+                sid: connectionStore.sid.value,
+                mode: 'open',
+              ),
+              title: path.split('/').last,
+            ));
+          }
+        } catch (e) {
+          Log.error("字幕加载异常: $e");
+        }
       } catch (error) {
         Log.error("播放初始化异常: $error");
         UiUtil.toast("视频加载失败：$error，请尝试使用第三方播放器");
@@ -101,6 +124,25 @@ class VideoPlayerPage extends HookWidget {
       }
     }
 
+    /// 本地字幕文件交给 mpv 读（file:// URI），编码与格式识别都由 mpv 处理。
+    Future<void> pickLocalSubtitle() async {
+      try {
+        final picked = await FilePicker.platform.pickFiles(
+          type: FileType.custom,
+          allowedExtensions: FileTypeUtil.subtitleExtensions,
+        );
+        final path = picked?.files.single.path;
+        if (path == null) return;
+        final uri = Uri.file(path);
+        await player.setSubtitleTrack(SubtitleTrack.uri(
+          uri.toString(),
+          title: uri.pathSegments.last,
+        ));
+      } catch (e) {
+        Log.error("本地字幕载入异常: $e");
+      }
+    }
+
     String formatDuration(Duration duration) {
       String twoDigits(int n) => n.toString().padLeft(2, '0');
       final minutes = twoDigits(duration.inMinutes.remainder(60));
@@ -121,6 +163,33 @@ class VideoPlayerPage extends HookWidget {
         title: Text(name ?? '视频播放'),
         leading: AppBackButton(context),
         actions: [
+          // 字幕选择：外置字幕（sub-add）和容器内嵌字幕都在这里
+          PopupMenuButton<Object>(
+            tooltip: '字幕',
+            icon: const Icon(Icons.subtitles),
+            onSelected: (value) {
+              if (value is SubtitleTrack) {
+                player.setSubtitleTrack(value);
+              } else {
+                pickLocalSubtitle();
+              }
+            },
+            itemBuilder: (context) => [
+              const PopupMenuItem<Object>(
+                  value: 'local', child: Text('从文件载入字幕…')),
+              PopupMenuItem<Object>(
+                  value: SubtitleTrack.no(), child: const Text('关闭字幕')),
+              ...player.state.tracks.subtitle
+                  .where((e) => e.id != 'auto' && e.id != 'no')
+                  .map((e) => PopupMenuItem<Object>(
+                        value: e,
+                        child: Text(
+                          e.title ?? e.language ?? '字幕 ${e.id}',
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      )),
+            ],
+          ),
           Padding(
             padding:
                 const EdgeInsets.only(left: 0, top: 8, bottom: 8, right: 8),

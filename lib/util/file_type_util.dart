@@ -23,6 +23,8 @@ class FileTypeUtil {
     "mp3", "wma", "wav", "mid", "midi", "ape", "flac", "aac", "m4a", "ogg"
   ];
   
+  static const List<String> subtitleExtensions = ["srt", "ass", "ssa", "vtt", "sub"];
+
   static const List<String> psExtensions = ["psd", "ai", "eps"];
   
   static const List<String> htmlExtensions = ["html", "htm", "xml", "json"];
@@ -86,6 +88,20 @@ class FileTypeUtil {
   /// 判断是否为音频
   static bool isAudio(String fileName) {
     return getFileType(fileName) == 'music';
+  }
+
+  /// 视频的同名字幕旁车文件：`movie.srt`、`movie.zh.ass` 都算。
+  static List<String> findSiblingSubtitles(List files, String baseName) {
+    final prefix = '${baseName.toLowerCase()}.';
+    final result = <String>[];
+    for (final e in files) {
+      final name = (e['name'] as String?)?.toLowerCase();
+      if (name == null || !name.startsWith(prefix)) continue;
+      if (subtitleExtensions.contains(name.split('.').last)) {
+        result.add(e['path'] as String);
+      }
+    }
+    return result;
   }
   
   /// 判断是否为压缩包
