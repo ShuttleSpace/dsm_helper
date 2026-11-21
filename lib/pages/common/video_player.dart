@@ -22,6 +22,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:garden/constants/app_constants.dart';
 import 'package:media_kit/media_kit.dart';
+import 'package:media_kit_video/media_kit_video_controls/media_kit_video_controls.dart';
 import 'package:media_kit_video/media_kit_video.dart';
 import 'package:signals_hooks/signals_hooks.dart';
 import 'package:url_launcher/url_launcher_string.dart';
@@ -377,6 +378,34 @@ class VideoPlayerPage extends HookWidget {
           visualDensity: VisualDensity.compact,
         );
 
+    // 中间那排按钮：上一个 / 播放暂停 / 下一个 / 播放列表，都在同一行
+    MaterialVideoControlsThemeData controlsTheme() =>
+        MaterialVideoControlsThemeData(
+          primaryButtonBar: [
+            const Spacer(flex: 2),
+            _overlayButton(
+              Icons.skip_previous,
+              '上一个',
+              playingIndex.value > 0
+                  ? () => playEntry(playingIndex.value - 1)
+                  : null,
+            ),
+            const Spacer(),
+            const MaterialPlayOrPauseButton(iconSize: 56.0),
+            const Spacer(),
+            _overlayButton(
+              Icons.skip_next,
+              '下一个',
+              hasNext() ? () => playEntry(playingIndex.value + 1) : null,
+            ),
+            if (playlist.isNotEmpty) ...[
+              const Spacer(),
+              _overlayButton(Icons.playlist_play, '播放列表', showPlaylist),
+            ],
+            const Spacer(flex: 2),
+          ],
+        );
+
     String formatDuration(Duration duration) {
       String twoDigits(int n) => n.toString().padLeft(2, '0');
       final minutes = twoDigits(duration.inMinutes.remainder(60));
@@ -441,266 +470,251 @@ class VideoPlayerPage extends HookWidget {
           ),
         ],
       ),
-      body: Column(
-        children: [
-          // 视频播放区域
-          Container(
-            color: Theme.brightnessOf(context) == Brightness.dark
-                ? Colors.white
-                : Colors.black,
-            child: isInitialized.value
-                ? ConstrainedBox(
-                    constraints: BoxConstraints(
-                        maxHeight: MediaQuery.sizeOf(context).height * 0.3),
-                    child: Stack(
-                      alignment: Alignment.center,
-                      children: [
-                        AspectRatio(
-                          aspectRatio: videoAspectRatio.value,
-                          child: Video(
-                            controller: videoController,
-                            subtitleViewConfiguration:
-                                SubtitleViewConfiguration(
-                              // 播放区只有屏高 30%，media_kit 默认按 1080p 缩小会让字幕小到看不清，
-                              // 所以关掉缩放，字号直接用设置里的逻辑像素。
-                              textScaler: TextScaler.noScaling,
-                              style: TextStyle(
-                                fontSize: subtitleFontSize.value,
-                                color: Colors.white,
-                                backgroundColor: const Color(0xaa000000),
-                                height: 1.4,
-                              ),
-                            ),
-                          ),
-                        ),
-                        // 控制面板
-                        Visibility(
-                          visible: false,
-                          child: Positioned(
-                            bottom: 0,
-                            left: 0,
-                            right: 0,
-                            child: Container(
-                              color: Colors.black54,
-                              padding: const EdgeInsets.symmetric(
-                                vertical: 10,
-                              ),
-                              child: Column(
-                                children: [
-                                  const SizedBox(height: 10),
-                                  // 控制按钮
-                                  Row(
-                                    children: [
-                                      // 播放/暂停按钮
-                                      IconButton(
-                                        onPressed: () {
-                                          player.playOrPause();
-                                        },
-                                        icon: Icon(
-                                          player.state.playing
-                                              ? Icons.pause
-                                              : Icons.play_arrow,
-                                          color: Colors.white,
-                                        ),
-                                      ),
-                                      // 时间显示
-                                      Text(
-                                        "${formatDuration(player.state.position)} / ${formatDuration(player.state.duration)}",
-                                        style: const TextStyle(
-                                            color: Colors.white),
-                                      ),
-                                      const Spacer(),
-                                      // 倍速按钮
-                                      PopupMenuButton<double>(
-                                        icon: Row(
-                                          children: [
-                                            Text(
-                                              "${currentSpeed.value}x",
-                                              style: const TextStyle(
-                                                  color: Colors.white),
-                                            ),
-                                            const Icon(
-                                              Icons.speed,
-                                              color: Colors.white,
-                                              size: 16,
-                                            ),
-                                          ],
-                                        ),
-                                        onSelected: (double speed) {
-                                          changeSpeed(speed);
-                                        },
-                                        itemBuilder: (BuildContext context) {
-                                          return speedList.entries.map((entry) {
-                                            return PopupMenuItem<double>(
-                                              value: entry.value,
-                                              child: Text(entry.key),
-                                            );
-                                          }).toList();
-                                        },
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                        GestureDetector(
-                          onHorizontalDragUpdate: (details) {
-                            Log.log(
-                                "detail: ${details.delta.dx.toInt() / MediaQuery.devicePixelRatioOf(context)}");
-                            player.seek(Duration(
-                                milliseconds:
-                                    player.state.position.inMilliseconds +
-                                        (details.delta.dx.toInt() /
-                                                MediaQuery.devicePixelRatioOf(
-                                                    context))
-                                            .toInt()));
-                          },
-                          onVerticalDragUpdate: (details) => {
-                            // TODO: volume & brightness
-                          },
-                        ),
-                        // 播放列表的控制放在视频画面上，和进度条、全屏按钮在一起
-                        if (playlist.isNotEmpty)
-                          Positioned(
-                            top: 6,
-                            right: 6,
-                            child: Row(
-                              children: [
-                                _overlayButton(
-                                  Icons.skip_previous,
-                                  '上一个',
-                                  playingIndex.value > 0
-                                      ? () => playEntry(playingIndex.value - 1)
-                                      : null,
-                                ),
-                                _overlayButton(
-                                  Icons.skip_next,
-                                  '下一个',
-                                  hasNext()
-                                      ? () => playEntry(playingIndex.value + 1)
-                                      : null,
-                                ),
-                                _overlayButton(
-                                    Icons.playlist_play, '播放列表', showPlaylist),
-                              ],
-                            ),
-                          ),
-                      ],
-                    ),
-                  )
-                : Container(
-                    width: double.infinity,
-                    height: MediaQuery.sizeOf(context).width * 9 / 16,
-                    color: Colors.black,
-                    child: Center(
-                      child: posterUrl.isNotBlank
-                          ? ExtendedImage.network(
-                              posterUrl.startsWith("http")
-                                  ? posterUrl
-                                  : thumbUrl(
-                                      baseUri: connectionStore.baseUri.value,
-                                      path: posterUrl,
-                                      sid: connectionStore.sid.value,
-                                    ),
-                            )
-                          : const CircularProgressIndicator(),
-                    ),
-                  ),
-          ),
-          Expanded(
-            child: ListView(
-              children: [
-                Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-                  child: Text(
-                    "注意：视频播放器目前使用官方库，如遇到黑屏、无声、卡顿等任何问题，请点击右上角按钮使用第三方播放器播放！${Platform.isIOS ? '(仅支持vlc player，请确保已安装)' : ''}",
-                    style: const TextStyle(color: Colors.grey, fontSize: 12),
-                  ),
-                ),
-                if (currentNfo.value != null)
-                  const Padding(
-                    padding: EdgeInsets.symmetric(
-                        horizontal: AppConstants.paddingLarge),
-                    child: Text("以下信息来源于同文件夹下NFO文件，仅做参考："),
-                  ),
-                const SizedBox(
-                  height: 20,
-                ),
-                if (description.value.isNotBlank)
-                  Padding(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-                    child: Text(description.value),
-                  ),
-                const SizedBox(
-                  height: 10,
-                ),
-                if (year.value.isNotBlank)
-                  Padding(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-                    child: Text("年份：${year.value}"),
-                  ),
-                const SizedBox(
-                  height: 10,
-                ),
-                if (date.value.isNotBlank)
-                  Padding(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-                    child: Text("添加时间：${date.value}"),
-                  ),
-                if (genres.value.isNotBlank) infoRow("类型", genres.value),
-                if (directors.value.isNotBlank) infoRow("导演", directors.value),
-                if (runtime.value.isNotBlank)
-                  infoRow("片长", "${runtime.value} 分钟"),
-                if (rating.value.isNotBlank) infoRow("评分", rating.value),
-                if (premiered.value.isNotBlank) infoRow("首播", premiered.value),
-                if (tmdbUsed.value)
-                  const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-                    child: Text(
-                      "部分数据来自 TMDB",
-                      style: TextStyle(color: Colors.grey, fontSize: 12),
-                    ),
-                  ),
-                const SizedBox(
-                  height: 20,
-                ),
-                if (actors.value.isNotEmpty) ...[
-                  const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-                    child: Text("演员表："),
-                  ),
-                  ...actors.value.map(
-                    (e) => Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 20, vertical: 5),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+      body: MaterialVideoControlsTheme(
+        normal: controlsTheme(),
+        fullscreen: controlsTheme(),
+        child: Column(
+          children: [
+            // 视频播放区域
+            Container(
+              color: Theme.brightnessOf(context) == Brightness.dark
+                  ? Colors.white
+                  : Colors.black,
+              child: isInitialized.value
+                  ? ConstrainedBox(
+                      constraints: BoxConstraints(
+                          maxHeight: MediaQuery.sizeOf(context).height * 0.3),
+                      child: Stack(
+                        alignment: Alignment.center,
                         children: [
-                          Expanded(
-                            flex: 2,
-                            child: Text("${e['name']}"),
-                          ),
-                          Expanded(
-                            child: Text(
-                              "${e['role'] ?? ''}",
-                              style: const TextStyle(color: Colors.grey),
+                          AspectRatio(
+                            aspectRatio: videoAspectRatio.value,
+                            child: Video(
+                              controller: videoController,
+                              // 统一用 Material 控制条，桌面端也用同一套，按钮位置才一致
+                              controls: MaterialVideoControls,
+                              subtitleViewConfiguration:
+                                  SubtitleViewConfiguration(
+                                // 播放区只有屏高 30%，media_kit 默认按 1080p 缩小会让字幕小到看不清，
+                                // 所以关掉缩放，字号直接用设置里的逻辑像素。
+                                textScaler: TextScaler.noScaling,
+                                style: TextStyle(
+                                  fontSize: subtitleFontSize.value,
+                                  color: Colors.white,
+                                  backgroundColor: const Color(0xaa000000),
+                                  height: 1.4,
+                                ),
+                              ),
                             ),
+                          ),
+                          // 控制面板
+                          Visibility(
+                            visible: false,
+                            child: Positioned(
+                              bottom: 0,
+                              left: 0,
+                              right: 0,
+                              child: Container(
+                                color: Colors.black54,
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 10,
+                                ),
+                                child: Column(
+                                  children: [
+                                    const SizedBox(height: 10),
+                                    // 控制按钮
+                                    Row(
+                                      children: [
+                                        // 播放/暂停按钮
+                                        IconButton(
+                                          onPressed: () {
+                                            player.playOrPause();
+                                          },
+                                          icon: Icon(
+                                            player.state.playing
+                                                ? Icons.pause
+                                                : Icons.play_arrow,
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                        // 时间显示
+                                        Text(
+                                          "${formatDuration(player.state.position)} / ${formatDuration(player.state.duration)}",
+                                          style: const TextStyle(
+                                              color: Colors.white),
+                                        ),
+                                        const Spacer(),
+                                        // 倍速按钮
+                                        PopupMenuButton<double>(
+                                          icon: Row(
+                                            children: [
+                                              Text(
+                                                "${currentSpeed.value}x",
+                                                style: const TextStyle(
+                                                    color: Colors.white),
+                                              ),
+                                              const Icon(
+                                                Icons.speed,
+                                                color: Colors.white,
+                                                size: 16,
+                                              ),
+                                            ],
+                                          ),
+                                          onSelected: (double speed) {
+                                            changeSpeed(speed);
+                                          },
+                                          itemBuilder: (BuildContext context) {
+                                            return speedList.entries
+                                                .map((entry) {
+                                              return PopupMenuItem<double>(
+                                                value: entry.value,
+                                                child: Text(entry.key),
+                                              );
+                                            }).toList();
+                                          },
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                          GestureDetector(
+                            onHorizontalDragUpdate: (details) {
+                              Log.log(
+                                  "detail: ${details.delta.dx.toInt() / MediaQuery.devicePixelRatioOf(context)}");
+                              player.seek(Duration(
+                                  milliseconds:
+                                      player.state.position.inMilliseconds +
+                                          (details.delta.dx.toInt() /
+                                                  MediaQuery.devicePixelRatioOf(
+                                                      context))
+                                              .toInt()));
+                            },
+                            onVerticalDragUpdate: (details) => {
+                              // TODO: volume & brightness
+                            },
                           ),
                         ],
                       ),
+                    )
+                  : Container(
+                      width: double.infinity,
+                      height: MediaQuery.sizeOf(context).width * 9 / 16,
+                      color: Colors.black,
+                      child: Center(
+                        child: posterUrl.isNotBlank
+                            ? ExtendedImage.network(
+                                posterUrl.startsWith("http")
+                                    ? posterUrl
+                                    : thumbUrl(
+                                        baseUri: connectionStore.baseUri.value,
+                                        path: posterUrl,
+                                        sid: connectionStore.sid.value,
+                                      ),
+                              )
+                            : const CircularProgressIndicator(),
+                      ),
+                    ),
+            ),
+            Expanded(
+              child: ListView(
+                children: [
+                  Padding(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+                    child: Text(
+                      "注意：视频播放器目前使用官方库，如遇到黑屏、无声、卡顿等任何问题，请点击右上角按钮使用第三方播放器播放！${Platform.isIOS ? '(仅支持vlc player，请确保已安装)' : ''}",
+                      style: const TextStyle(color: Colors.grey, fontSize: 12),
                     ),
                   ),
+                  if (currentNfo.value != null)
+                    const Padding(
+                      padding: EdgeInsets.symmetric(
+                          horizontal: AppConstants.paddingLarge),
+                      child: Text("以下信息来源于同文件夹下NFO文件，仅做参考："),
+                    ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  if (description.value.isNotBlank)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 20, vertical: 5),
+                      child: Text(description.value),
+                    ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  if (year.value.isNotBlank)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 20, vertical: 5),
+                      child: Text("年份：${year.value}"),
+                    ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  if (date.value.isNotBlank)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 20, vertical: 5),
+                      child: Text("添加时间：${date.value}"),
+                    ),
+                  if (genres.value.isNotBlank) infoRow("类型", genres.value),
+                  if (directors.value.isNotBlank)
+                    infoRow("导演", directors.value),
+                  if (runtime.value.isNotBlank)
+                    infoRow("片长", "${runtime.value} 分钟"),
+                  if (rating.value.isNotBlank) infoRow("评分", rating.value),
+                  if (premiered.value.isNotBlank)
+                    infoRow("首播", premiered.value),
+                  if (tmdbUsed.value)
+                    const Padding(
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+                      child: Text(
+                        "部分数据来自 TMDB",
+                        style: TextStyle(color: Colors.grey, fontSize: 12),
+                      ),
+                    ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  if (actors.value.isNotEmpty) ...[
+                    const Padding(
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+                      child: Text("演员表："),
+                    ),
+                    ...actors.value.map(
+                      (e) => Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 20, vertical: 5),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          children: [
+                            Expanded(
+                              flex: 2,
+                              child: Text("${e['name']}"),
+                            ),
+                            Expanded(
+                              child: Text(
+                                "${e['role'] ?? ''}",
+                                style: const TextStyle(color: Colors.grey),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
                 ],
-              ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
