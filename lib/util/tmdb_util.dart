@@ -1,0 +1,132 @@
+import 'package:dio/dio.dart';
+import 'package:garden/extensions/string.dart';
+
+/// TMDB API key 存在本地的键名。免费注册：https://www.themoviedb.org/settings/api
+const String tmdbApiKeyStorageKey = 'tmdb_api_key';
+
+const String _tmdbHost = 'https://api.themoviedb.org/3';
+const String _tmdbImageHost = 'https://image.tmdb.org/t/p/w500';
+
+/// 刮削结果，字段刻意与 NFO 对齐，播放页复用同一套展示。
+class TmdbInfo {
+  final String title;
+  final String overview;
+  final String year;
+  final String genres;
+  final String runtime;
+  final String rating;
+  final String premiered;
+  final String poster;
+
+  const TmdbInfo({
+    this.title = '',
+    this.overview = '',
+    this.year = '',
+    this.genres = '',
+    this.runtime = '',
+    this.rating = '',
+    this.premiered = '',
+    this.poster = '',
+  });
+}
+
+/// 从文件名猜查询用的片名与年份：`流浪地球2.2023.1080p.BluRay.x264.mkv` → (流浪地球2, 2023)。
+///
+/// 规则只做两件事：去掉扩展名，从第一个 19xx/20xx 处截断并当作年份；其余分隔符换空格。
+({String title, String year}) guessTitleFromFileName(String fileName) {
+  var text = fileName.split('/').last;
+  final dot = text.lastIndexOf('.');
+  if (dot > 0) text = text.substring(0, dot);
+  var year = '';
+  final match = RegExp(r'(?:^|\D)((?:19|20)\d{2})(?!\d)').firstMatch(text);
+  if (match != null) {
+    final start = match.start + match.group(0)!.length - match.group(1)!.length;
+    final before = _cleanName(text.substring(0, start));
+    // `1917.mkv` 这种片名本身是年份的不截断。
+    if (before.isNotBlank) {
+      year = match.group(1)!;
+      text = before;
+    }
+  }
+  return (title: _cleanName(text), year: year);
+}
+
+String _cleanName(String text) => text
+    .replaceAll(RegExp(r'[._\-\[\]()]'), ' ')
+    .replaceAll(RegExp(r'\s+'), ' ')
+    .trim();
+
+/// 从 `search/multi` 结果里挑一条：优先年份匹配且有条目简介的 movie / tv。
+({int id, String mediaType})? pickSearchHit(dynamic json, String year) {
+  if (json is! Map) return null;
+  final results = json['results'];
+  if (results is! List) return null;
+  ({int id, String mediaType})? fallback;
+  for (final item in results) {
+    if (item is! Map) continue;
+    final mediaType = '${item['media_type'] ?? ''}';
+    if (mediaType != 'movie' && mediaType != 'tv') continue;
+    final id = item['id'];
+    if (id is! int) continue;
+    final date = '${item['release_date'] ?? item['first_air_date'] ?? ''}';
+    final hit = (id: id, mediaType: mediaType);
+    if (year.isNotBlank && date.startsWith(year)) return hit;
+    fallback ??= hit;
+  }
+  return fallback;
+}
+
+/// 把 `/{media_type}/{id}` 的详情转成展示字段。
+TmdbInfo? parseTmdbDetail(dynamic json, String mediaType) {
+  if (json is! Map) return null;
+  final genres = json['genres'];
+  final runtime = mediaType == 'tv'
+      ? (json['episode_run_time'] is List &&
+              (json['episode_run_time'] as List).isNotEmpty
+          ? json['episode_run_time'][0]
+          : '')
+      : (json['runtime'] ?? '');
+  final posterPath = '${json['poster_path'] ?? ''}';
+  final date = '${json['release_date'] ?? json['first_air_date'] ?? ''}';
+  return TmdbInfo(
+    title: '${json['title'] ?? json['name'] ?? ''}',
+    overview: '${json['overview'] ?? ''}',
+    year: date.length >= 4 ? date.substring(0, 4) : '',
+    genres: genres is List
+        ? genres
+            .map((e) => e is Map ? '${e['name'] ?? ''}' : '')
+            .where((e) => e.isNotBlank)
+            .join('、')
+        : '',
+    runtime: '$runtime',
+    rating: '${json['vote_average'] ?? ''}',
+    premiered: date,
+    poster: posterPath.startsWith('/') ? '$_tmdbImageHost$posterPath' : '',
+  );
+}
+
+/// 查 TMDB：`search/multi` 找片 → 取详情。没有 key、没查到、网络失败都返回 null。
+Future<TmdbInfo?> fetchTmdbInfo(String apiKey, String fileName) async {
+  if (apiKey.isBlank) return null;
+  final query = guessTitleFromFileName(fileName);
+  if (query.title.isBlank) return null;
+  final dio = Dio(BaseOptions(
+    connectTimeout: const Duration(seconds: 10),
+    receiveTimeout: const Duration(seconds: 10),
+  ));
+  try {
+    final search = await dio.get('$_tmdbHost/search/multi', queryParameters: {
+      'api_key': apiKey,
+      'language': 'zh-CN',
+      'query': query.title,
+      'include_adult': 'false',
+    });
+    final hit = pickSearchHit(search.data, query.year);
+    if (hit == null) return null;
+    final detail = await dio.get('$_tmdbHost/${hit.mediaType}/${hit.id}',
+        queryParameters: {'api_key': apiKey, 'language': 'zh-CN'});
+    return parseTmdbDetail(detail.data, hit.mediaType);
+  } catch (e) {
+    return null;
+  }
+}

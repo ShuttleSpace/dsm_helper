@@ -1,5 +1,7 @@
 import 'dart:async';
 import 'package:garden/util/log.dart';
+import 'package:garden/util/storage_util.dart';
+import 'package:garden/util/tmdb_util.dart';
 import 'package:garden/util/ui_util.dart';
 import 'package:garden/stores/connection_store.dart';
 import 'dart:convert';
@@ -56,6 +58,7 @@ class VideoPlayerPage extends HookWidget {
     final year = useSignal('');
     final actors = useSignal<List>([]);
     final currentSpeed = useSignal(1.0);
+    final subtitleFontSize = useState(16.0);
     final genres = useSignal('');
     final directors = useSignal('');
     final runtime = useSignal('');
@@ -136,6 +139,25 @@ class VideoPlayerPage extends HookWidget {
       }
     }
 
+    /// NFO 没提供简介时才去 TMDB 补刮；结果只填空字段，不覆盖 NFO。
+    Future<void> parseTmdb() async {
+      if (description.value.isNotBlank) return;
+      final apiKey = await StorageUtil.getString(tmdbApiKeyStorageKey) ?? '';
+      if (apiKey.isBlank) return;
+      final info = await fetchTmdbInfo(apiKey, name ?? '');
+      if (info == null) {
+        Log.info("TMDB 未查到: $name");
+        return;
+      }
+      if (description.value.isBlank) description.value = info.overview;
+      if (year.value.isBlank) year.value = info.year;
+      if (genres.value.isBlank) genres.value = info.genres;
+      if (runtime.value.isBlank) runtime.value = info.runtime;
+      if (rating.value.isBlank) rating.value = info.rating;
+      if (premiered.value.isBlank) premiered.value = info.premiered;
+      if (poster.value.isBlank) poster.value = info.poster;
+    }
+
     /// 本地字幕文件交给 mpv 读（file:// URI），编码与格式识别都由 mpv 处理。
     Future<void> pickLocalSubtitle() async {
       try {
@@ -163,7 +185,15 @@ class VideoPlayerPage extends HookWidget {
     }
 
     useEffect(() {
-      parseNfo();
+      StorageUtil.getInt("subtitle_font_size").then((value) {
+        if (value != null) subtitleFontSize.value = value.toDouble();
+      });
+      return null;
+    }, const []);
+
+    useEffect(() {
+      // NFO 先解析，解析不到的字段再由 TMDB 补。
+      parseNfo().then((_) => parseTmdb());
       initializeVideo();
       return () {
         player.dispose();
@@ -253,7 +283,21 @@ class VideoPlayerPage extends HookWidget {
                       children: [
                         AspectRatio(
                           aspectRatio: videoAspectRatio.value,
-                          child: Video(controller: videoController),
+                          child: Video(
+                            controller: videoController,
+                            subtitleViewConfiguration:
+                                SubtitleViewConfiguration(
+                              // 播放区只有屏高 30%，media_kit 默认按 1080p 缩小会让字幕小到看不清，
+                              // 所以关掉缩放，字号直接用设置里的逻辑像素。
+                              textScaler: TextScaler.noScaling,
+                              style: TextStyle(
+                                fontSize: subtitleFontSize.value,
+                                color: Colors.white,
+                                backgroundColor: const Color(0xaa000000),
+                                height: 1.4,
+                              ),
+                            ),
+                          ),
                         ),
                         // 控制面板
                         Visibility(
