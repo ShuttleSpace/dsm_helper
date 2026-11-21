@@ -5,6 +5,7 @@ import 'package:garden/util/ui_util.dart';
 import 'package:garden/stores/connection_store.dart';
 import 'dart:io';
 
+import 'package:garden/pages/backup/backup.dart';
 import 'package:garden/pages/download/download.dart';
 import 'package:garden/pages/download/download_state.dart';
 import 'package:garden/pages/file/file.dart';
@@ -153,6 +154,11 @@ class Home extends HookWidget {
         checkAuth();
       }
     });
+
+    useEffect(() {
+      runAutoBackup();
+      return null;
+    }, const []);
 
     return PopScope(
       // 交给 onWillPop 统一判定：文件页先回上一级，根目录下才走退出确认。

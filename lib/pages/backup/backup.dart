@@ -128,6 +128,48 @@ Future<TransferTask> startBackup({
 String remoteDir(String backupFolder, String filename) =>
     backupFolder.endsWith('/') ? '$backupFolder$filename' : '$backupFolder/$filename';
 
+bool _autoBackupRan = false;
+
+/// 冷启动一次：读配置、解析相册、调用 startAutoBackup。不可用时静默返回 null。
+Future<TransferTask?> runAutoBackup() async {
+  if (_autoBackupRan) return null;
+  _autoBackupRan = true;
+  if (!(await StorageUtil.getBool('auto_backup') ?? false)) return null;
+  final backupFolder = await StorageUtil.getString('backup_folder') ?? '';
+  if (backupFolder.isBlank) return null;
+  final albumStr = await StorageUtil.getString('backup_album') ?? '';
+  if (albumStr.isBlank) return null;
+  final ids = (json.decode(albumStr) as List).cast<String>().toSet();
+  if (await PhotoManager.requestPermissionExtend() !=
+      PermissionState.authorized) {
+    return null;
+  }
+  final albums = (await PhotoManager.getAssetPathList())
+      .where((a) => ids.contains(a.id))
+      .toList();
+  if (albums.isEmpty) return null;
+  final uploads = await collectBackupAssets(albums);
+  final last = await StorageUtil.getString('last_backup_time') ?? '';
+  final docs = await getApplicationDocumentsDirectory();
+  try {
+    return await startAutoBackup(
+      enabled: true,
+      backupFolder: backupFolder,
+      uploads: uploads,
+      lastBackupTime: last.isNotBlank
+          ? DateTime.fromMillisecondsSinceEpoch(int.parse(last))
+          : null,
+      hasPendingBackup: hasPendingBackupTask(transferStore.tasks.value),
+      enqueue: (cachePath, remoteDir) =>
+          enqueueFileUpload(localPath: cachePath, remoteDir: remoteDir),
+      cacheRoot: Directory('${docs.path}/backup_cache'),
+    );
+  } on BackupEnqueueIncomplete catch (e) {
+    Log.info('auto backup skipped: $e');
+    return null;
+  }
+}
+
 /// 已有未完成的备份父任务时不再入队，避免重复上传。
 bool hasPendingBackupTask(Iterable<TransferTask> tasks) => tasks.any((t) =>
     t.steps != null &&
@@ -165,6 +207,7 @@ class Backup extends HookWidget {
     final lastBackupTime =
         useSignal<DateTime?>(DateTime.now().add(const Duration(days: -5)));
     final continueBackup = useSignal(true);
+    final autoBackup = useSignal(false);
 
 getAssetCount() async {
   uploads.value = await collectBackupAssets(albums.value);
@@ -177,6 +220,7 @@ getData() async {
       ? DateTime.fromMillisecondsSinceEpoch(int.parse(last))
       : null;
   backupFolder.value = await StorageUtil.getString("backup_folder") ?? '';
+  autoBackup.value = await StorageUtil.getBool('auto_backup') ?? false;
   String backupAlbumStr = await StorageUtil.getString("backup_album") ?? '';
   List backupAlbums = [];
   if (await PhotoManager.requestPermissionExtend() ==
@@ -510,7 +554,8 @@ void onStartBackup() async {
           ),
           GestureDetector(
             onTap: () {
-              UiUtil.toast("暂不支持自动备份");
+              autoBackup.value = !autoBackup.value;
+              StorageUtil.setBool('auto_backup', autoBackup.value);
             },
             child: Card(
               shape: RoundedRectangleBorder(
@@ -536,13 +581,11 @@ void onStartBackup() async {
                         ],
                       ),
                     ),
-                    const SizedBox(
-                      width: 20,
-                      // child: Icon(
-                      //   CupertinoIcons.checkmark_alt,
-                      //   color: AppColors.primaryAction,
-                      // ),
-                    ),
+                    if (autoBackup.value)
+                      const Icon(
+                        CupertinoIcons.checkmark_alt,
+                        color: AppColors.primaryAction,
+                      ),
                   ],
                 ),
               ),
