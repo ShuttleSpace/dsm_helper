@@ -139,32 +139,54 @@ Future<TransferTask?> runAutoBackup() async {
   if (backupFolder.isBlank) return null;
   final albumStr = await StorageUtil.getString('backup_album') ?? '';
   if (albumStr.isBlank) return null;
-  final ids = (json.decode(albumStr) as List).cast<String>().toSet();
+  final Set<String> ids;
+  try {
+    ids = (json.decode(albumStr) as List).cast<String>().toSet();
+  } catch (e) {
+    Log.info('auto backup skipped: bad backup_album $e');
+    return null;
+  }
   if (await PhotoManager.requestPermissionExtend() !=
       PermissionState.authorized) {
+    Log.info('auto backup skipped: photo permission not authorized');
     return null;
   }
   final albums = (await PhotoManager.getAssetPathList())
       .where((a) => ids.contains(a.id))
       .toList();
-  if (albums.isEmpty) return null;
+  if (albums.isEmpty) {
+    Log.info('auto backup skipped: saved albums not found');
+    return null;
+  }
   final uploads = await collectBackupAssets(albums);
   final last = await StorageUtil.getString('last_backup_time') ?? '';
   final docs = await getApplicationDocumentsDirectory();
+  final existing =
+      transferStore.tasks.value.where((t) => t.steps != null).map((e) => e.id).toSet();
   try {
     return await startAutoBackup(
       enabled: true,
       backupFolder: backupFolder,
       uploads: uploads,
       lastBackupTime: last.isNotBlank
-          ? DateTime.fromMillisecondsSinceEpoch(int.parse(last))
+          ? DateTime.fromMillisecondsSinceEpoch(int.tryParse(last) ?? 0)
           : null,
       hasPendingBackup: hasPendingBackupTask(transferStore.tasks.value),
       enqueue: (cachePath, remoteDir) =>
           enqueueFileUpload(localPath: cachePath, remoteDir: remoteDir),
+      cancelEnqueued: (stepId) async {
+        await FileDownloader().cancelTaskWithId(stepId);
+        await FileDownloader().database.deleteRecordWithId(stepId);
+      },
       cacheRoot: Directory('${docs.path}/backup_cache'),
     );
   } on BackupEnqueueIncomplete catch (e) {
+    // 本次新建的失败父任务不留痕，否则每次启动都会多一条“入队未完成”。
+    for (final t in transferStore.tasks.value
+        .where((t) => t.steps != null && !existing.contains(t.id))
+        .toList()) {
+      await transferStore.deleteTask(t);
+    }
     Log.info('auto backup skipped: $e');
     return null;
   }
@@ -173,7 +195,9 @@ Future<TransferTask?> runAutoBackup() async {
 /// 已有未完成的备份父任务时不再入队，避免重复上传。
 bool hasPendingBackupTask(Iterable<TransferTask> tasks) => tasks.any((t) =>
     t.steps != null &&
-    (t.state == TransferState.queued || t.state == TransferState.active));
+    (t.state == TransferState.queued ||
+        t.state == TransferState.active ||
+        t.state == TransferState.paused));
 
 /// 自动备份的决策层：不可用时返回 null，不抛异常、不提示。
 Future<TransferTask?> startAutoBackup({
@@ -184,6 +208,7 @@ Future<TransferTask?> startAutoBackup({
   required bool hasPendingBackup,
   required Future<String> Function(String cachePath, String remoteDir) enqueue,
   required Directory cacheRoot,
+  Future<void> Function(String stepId)? cancelEnqueued,
 }) async {
   if (!enabled || backupFolder.isBlank || hasPendingBackup) return null;
   final assets = backupPendingAssets(uploads, lastBackupTime, true);
@@ -193,6 +218,7 @@ Future<TransferTask?> startAutoBackup({
     assets: assets,
     enqueue: enqueue,
     cacheRoot: cacheRoot,
+    cancelEnqueued: cancelEnqueued,
   );
 }
 
@@ -329,6 +355,11 @@ void onStartBackup() async {
   if (albums.value.isEmpty) {
     UiUtil.vibrate(FeedbackType.warning);
     UiUtil.toast("请选择备份源");
+    return;
+  }
+  if (hasPendingBackupTask(transferStore.tasks.value)) {
+    UiUtil.vibrate(FeedbackType.warning);
+    UiUtil.toast("已有未完成的备份任务");
     return;
   }
   final tasks =

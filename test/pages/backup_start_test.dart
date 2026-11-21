@@ -96,9 +96,11 @@ test('hasPendingBackupTask true only for stepped queued/active tasks', () {
     state: TransferState.active,
   );
   final done = queued.copyWith(state: TransferState.done);
+  final paused = queued.copyWith(state: TransferState.paused);
   expect(hasPendingBackupTask([queued]), isTrue);
   expect(hasPendingBackupTask([plain]), isFalse);
   expect(hasPendingBackupTask([done]), isFalse);
+  expect(hasPendingBackupTask([paused]), isTrue);
 });
 
 test('startAutoBackup skips when disabled, no folder, pending task or nothing new',
@@ -169,6 +171,45 @@ test('startAutoBackup creates parent task when eligible', () async {
   expect(parent!.steps!.single.id, 'auto1');
   expect(parent.remotePath, '/photos');
   transferStore.remove(parent.id);
+});
+
+test('startAutoBackup cancels already-enqueued steps when a later one fails',
+    () async {
+  final cacheRoot = await Directory.systemTemp.createTemp('auto_backup_test_');
+  addTearDown(() => cacheRoot.deleteSync(recursive: true));
+  final first = File('${cacheRoot.path}/first.jpg')..writeAsStringSync('photo');
+  final second = File('${cacheRoot.path}/second.jpg')
+    ..writeAsStringSync('photo');
+  final canceled = <String>[];
+  await expectLater(
+    () => startAutoBackup(
+      enabled: true,
+      backupFolder: '/photos',
+      uploads: [
+        FakeAsset('a', DateTime(2026, 1, 1), sourceFile: first),
+        FakeAsset('b', DateTime(2026, 1, 2), sourceFile: second),
+      ],
+      lastBackupTime: null,
+      hasPendingBackup: false,
+      cacheRoot: cacheRoot,
+      enqueue: (cachePath, remoteDir) async {
+        if (cachePath.endsWith('/first.jpg')) return 'auto1';
+        throw Exception('offline');
+      },
+      cancelEnqueued: (id) async => canceled.add(id),
+    ),
+    throwsA(isA<BackupEnqueueIncomplete>()),
+  );
+  expect(canceled, ['auto1']);
+  for (final t in transferStore.tasks.value.where((t) => t.steps != null)) {
+    transferStore.remove(t.id);
+  }
+});
+
+test('runAutoBackup does nothing when the switch is off', () async {
+  SharedPreferences.setMockInitialValues({'auto_backup': false});
+  expect(await runAutoBackup(), isNull);
+  expect(transferStore.tasks.value.where((t) => t.steps != null), isEmpty);
 });
 }
 
