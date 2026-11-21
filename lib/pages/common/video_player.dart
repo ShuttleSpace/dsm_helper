@@ -244,6 +244,80 @@ class VideoPlayerPage extends HookWidget {
       }
     }
 
+    /// 交给系统里的播放器（Android）或 VLC，失败要说一声。
+    Future<void> openExternal() async {
+      player.pause();
+      try {
+        if (Platform.isAndroid) {
+          await AndroidIntent(
+            action: 'action_view',
+            data: currentUrl.value,
+            arguments: {},
+            type: "video/*",
+          ).launch();
+        } else {
+          // vlc:// 没人接时 launchUrlString 只返回 false，不抛异常，不看返回值按钮就像坏了
+          final ok = await launchUrlString("vlc://${currentUrl.value}");
+          if (!ok) UiUtil.toast("没找到 VLC，装了才能用外部播放器");
+        }
+      } catch (e) {
+        Log.error("外部播放器调用失败: $e");
+        UiUtil.toast("外部播放器调用失败，继续用内置播放器");
+      }
+    }
+
+    /// 播放器设置：字幕和外部播放器统一放一个 sheet，标题栏只留一个按钮。
+    void showSettings() {
+      final tracks = player.state.tracks.subtitle
+          .where((e) => e.id != 'auto' && e.id != 'no')
+          .toList();
+      showModalBottomSheet(
+        context: context,
+        builder: (sheetContext) => SafeArea(
+          child: ListView(
+            shrinkWrap: true,
+            children: [
+              ListTile(
+                leading: const Icon(Icons.file_open_outlined),
+                title: const Text('选择 NAS 上的字幕…'),
+                onTap: () {
+                  Navigator.of(sheetContext).pop();
+                  pickSubtitle();
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.subtitles_off_outlined),
+                title: const Text('关闭字幕'),
+                onTap: () {
+                  Navigator.of(sheetContext).pop();
+                  player.setSubtitleTrack(SubtitleTrack.no());
+                },
+              ),
+              for (final track in tracks)
+                ListTile(
+                  leading: const Icon(Icons.subtitles),
+                  title: Text(track.title ?? track.language ?? '字幕 ${track.id}',
+                      overflow: TextOverflow.ellipsis),
+                  onTap: () {
+                    Navigator.of(sheetContext).pop();
+                    player.setSubtitleTrack(track);
+                  },
+                ),
+              const Divider(),
+              ListTile(
+                leading: const Icon(Icons.open_in_new),
+                title: const Text('用第三方播放器打开'),
+                onTap: () async {
+                  Navigator.of(sheetContext).pop();
+                  await openExternal();
+                },
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
     /// 播放列表面板：点条目切片，底部一个自动连播开关。
     void showPlaylist() {
       showModalBottomSheet(
@@ -291,6 +365,17 @@ class VideoPlayerPage extends HookWidget {
         ),
       );
     }
+
+    Widget _overlayButton(IconData icon, String tooltip, VoidCallback? onTap) =>
+        IconButton(
+          tooltip: tooltip,
+          onPressed: onTap,
+          icon: Icon(icon, color: Colors.white, size: 22),
+          style: IconButton.styleFrom(backgroundColor: Colors.black38),
+          padding: EdgeInsets.zero,
+          constraints: const BoxConstraints(minWidth: 34, minHeight: 34),
+          visualDensity: VisualDensity.compact,
+        );
 
     String formatDuration(Duration duration) {
       String twoDigits(int n) => n.toString().padLeft(2, '0');
@@ -349,83 +434,10 @@ class VideoPlayerPage extends HookWidget {
         title: Text(currentName.value.isNotBlank ? currentName.value : '视频播放'),
         leading: AppBackButton(context),
         actions: [
-          if (playlist.isNotEmpty) ...[
-            IconButton(
-              tooltip: '上一个',
-              icon: const Icon(Icons.skip_previous),
-              onPressed: playingIndex.value > 0
-                  ? () => playEntry(playingIndex.value - 1)
-                  : null,
-            ),
-            IconButton(
-              tooltip: '下一个',
-              icon: const Icon(Icons.skip_next),
-              onPressed:
-                  hasNext() ? () => playEntry(playingIndex.value + 1) : null,
-            ),
-          ],
-          if (playlist.isNotEmpty)
-            IconButton(
-                tooltip: '播放列表',
-                icon: const Icon(Icons.playlist_play),
-                onPressed: showPlaylist),
-          // 字幕选择：外置字幕（sub-add）和容器内嵌字幕都在这里
-          PopupMenuButton<Object>(
-            tooltip: '字幕',
-            icon: const Icon(Icons.subtitles),
-            onSelected: (value) {
-              if (value is SubtitleTrack) {
-                player.setSubtitleTrack(value);
-              } else {
-                pickSubtitle();
-              }
-            },
-            itemBuilder: (context) => [
-              const PopupMenuItem<Object>(
-                  value: 'local', child: Text('选择 NAS 上的字幕…')),
-              PopupMenuItem<Object>(
-                  value: SubtitleTrack.no(), child: const Text('关闭字幕')),
-              ...player.state.tracks.subtitle
-                  .where((e) => e.id != 'auto' && e.id != 'no')
-                  .map((e) => PopupMenuItem<Object>(
-                        value: e,
-                        child: Text(
-                          e.title ?? e.language ?? '字幕 ${e.id}',
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      )),
-            ],
-          ),
-          Padding(
-            padding:
-                const EdgeInsets.only(left: 0, top: 8, bottom: 8, right: 8),
-            child: OutlinedButton(
-              onPressed: () async {
-                player.pause();
-                try {
-                  if (Platform.isAndroid) {
-                    await AndroidIntent(
-                      action: 'action_view',
-                      data: url,
-                      arguments: {},
-                      type: "video/*",
-                    ).launch();
-                  } else {
-                    // vlc:// 没人接的时候 launchUrlString 只返回 false，不抛异常，
-                    // 原来没人看返回值，按钮就像坏了。
-                    final ok = await launchUrlString("vlc://$url");
-                    if (!ok) UiUtil.toast("没找到 VLC，装了才能用外部播放器");
-                  }
-                } catch (e) {
-                  Log.error("外部播放器调用失败: $e");
-                  UiUtil.toast("外部播放器调用失败，继续用内置播放器");
-                }
-              },
-              child: Image.asset(
-                "assets/icons/player.png",
-                width: 20,
-              ),
-            ),
+          IconButton(
+            tooltip: '设置',
+            icon: const Icon(Icons.settings_outlined),
+            onPressed: showSettings,
           ),
         ],
       ),
@@ -548,7 +560,33 @@ class VideoPlayerPage extends HookWidget {
                           onVerticalDragUpdate: (details) => {
                             // TODO: volume & brightness
                           },
-                        )
+                        ),
+                        // 播放列表的控制放在视频画面上，和进度条、全屏按钮在一起
+                        if (playlist.isNotEmpty)
+                          Positioned(
+                            top: 6,
+                            right: 6,
+                            child: Row(
+                              children: [
+                                _overlayButton(
+                                  Icons.skip_previous,
+                                  '上一个',
+                                  playingIndex.value > 0
+                                      ? () => playEntry(playingIndex.value - 1)
+                                      : null,
+                                ),
+                                _overlayButton(
+                                  Icons.skip_next,
+                                  '下一个',
+                                  hasNext()
+                                      ? () => playEntry(playingIndex.value + 1)
+                                      : null,
+                                ),
+                                _overlayButton(
+                                    Icons.playlist_play, '播放列表', showPlaylist),
+                              ],
+                            ),
+                          ),
                       ],
                     ),
                   )

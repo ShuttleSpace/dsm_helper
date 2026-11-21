@@ -7,6 +7,7 @@ import 'package:garden/extensions/string.dart';
 import 'package:garden/pages/common/video_player.dart';
 import 'package:garden/pages/media/media_setting.dart';
 import 'package:garden/pages/media/play_history.dart';
+import 'package:garden/widgets/file/file_list_item.dart';
 import 'package:garden/stores/connection_store.dart';
 import 'package:garden/util/log.dart';
 import 'package:garden/util/media_library.dart';
@@ -103,6 +104,91 @@ class MediaLibrary extends HookWidget {
       await reload();
     }
 
+    /// 标题栏只留搜索和这里：历史、风格、排序、刷新都塞进一个 sheet。
+    void showMore() {
+      showModalBottomSheet(
+        context: context,
+        builder: (sheetContext) => SafeArea(
+          child: ListView(
+            shrinkWrap: true,
+            children: [
+              ListTile(
+                leading: const Icon(Icons.refresh),
+                title: const Text('刷新'),
+                onTap: () {
+                  Navigator.of(sheetContext).pop();
+                  reload();
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.history),
+                title: const Text('播放历史'),
+                onTap: () async {
+                  Navigator.of(sheetContext).pop();
+                  await Navigator.of(context).push(CupertinoPageRoute(
+                      builder: (_) => const PlayHistoryPage()));
+                  watching.value = await loadContinueWatching();
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.settings_outlined),
+                title: const Text('多媒体设置'),
+                onTap: () {
+                  Navigator.of(sheetContext).pop();
+                  openSetting();
+                },
+              ),
+              const Divider(),
+              const Padding(
+                padding: EdgeInsets.only(left: 16, top: 8, bottom: 4),
+                child: Text('展示风格',
+                    style: TextStyle(fontSize: 12, color: Colors.grey)),
+              ),
+              for (final mode in MediaViewMode.values)
+                ListTile(
+                  dense: true,
+                  title: Text(const {
+                    MediaViewMode.poster: '海报墙',
+                    MediaViewMode.folder: '按文件夹分段',
+                    MediaViewMode.tree: '文件树',
+                  }[mode]!),
+                  trailing: viewMode.value == mode
+                      ? const Icon(Icons.check, size: 18)
+                      : null,
+                  onTap: () {
+                    Navigator.of(sheetContext).pop();
+                    viewMode.value = mode;
+                    saveMediaViewMode(mode);
+                  },
+                ),
+              const Divider(),
+              const Padding(
+                padding: EdgeInsets.only(left: 16, top: 8, bottom: 4),
+                child: Text('排序',
+                    style: TextStyle(fontSize: 12, color: Colors.grey)),
+              ),
+              for (final value in MediaSort.values)
+                ListTile(
+                  dense: true,
+                  title: Text(const {
+                    MediaSort.name: '按片名',
+                    MediaSort.year: '按年份',
+                    MediaSort.rating: '按评分',
+                  }[value]!),
+                  trailing: sort.value == value
+                      ? const Icon(Icons.check, size: 18)
+                      : null,
+                  onTap: () {
+                    Navigator.of(sheetContext).pop();
+                    sort.value = value;
+                  },
+                ),
+            ],
+          ),
+        ),
+      );
+    }
+
     // 继续观看：库里有、且看过一半以内的
     final byPath = {for (final e in items.value) e.path: e};
     final resumed = [
@@ -125,56 +211,17 @@ class MediaLibrary extends HookWidget {
             : const Text('多媒体'),
         actions: [
           IconButton(
-            tooltip: '播放历史',
-            icon: const Icon(Icons.history),
-            onPressed: () async {
-              await Navigator.of(context).push(
-                  CupertinoPageRoute(builder: (_) => const PlayHistoryPage()));
-              watching.value = await loadContinueWatching();
-            },
-          ),
-          IconButton(
-            tooltip: '搜索',
+            tooltip: searching.value ? '关闭搜索' : '搜索',
             icon: Icon(searching.value ? Icons.close : Icons.search),
             onPressed: () {
               searching.value = !searching.value;
               if (!searching.value) query.value = '';
             },
           ),
-          PopupMenuButton<MediaViewMode>(
-            tooltip: '展示风格',
-            icon: const Icon(Icons.view_agenda_outlined),
-            initialValue: viewMode.value,
-            onSelected: (value) {
-              viewMode.value = value;
-              saveMediaViewMode(value);
-            },
-            itemBuilder: (context) => const [
-              PopupMenuItem(value: MediaViewMode.poster, child: Text('海报墙')),
-              PopupMenuItem(value: MediaViewMode.folder, child: Text('按文件夹分段')),
-              PopupMenuItem(value: MediaViewMode.tree, child: Text('文件树')),
-            ],
-          ),
-          PopupMenuButton<MediaSort>(
-            tooltip: '排序',
-            icon: const Icon(Icons.sort),
-            initialValue: sort.value,
-            onSelected: (value) => sort.value = value,
-            itemBuilder: (context) => const [
-              PopupMenuItem(value: MediaSort.name, child: Text('按片名')),
-              PopupMenuItem(value: MediaSort.year, child: Text('按年份')),
-              PopupMenuItem(value: MediaSort.rating, child: Text('按评分')),
-            ],
-          ),
           IconButton(
-            tooltip: '刷新',
-            icon: const Icon(Icons.refresh),
-            onPressed: reload,
-          ),
-          IconButton(
-            tooltip: '多媒体设置',
-            icon: const Icon(Icons.settings_outlined),
-            onPressed: openSetting,
+            tooltip: '更多',
+            icon: const Icon(Icons.more_horiz),
+            onPressed: showMore,
           ),
         ],
       ),
@@ -423,7 +470,7 @@ class _ResumeCard extends StatelessWidget {
   }
 }
 
-/// 文件树里的一层目录：点一下展开/收起，向下递归。
+/// 文件树里的一层目录：复用文件 tab 的 FileListItem，点一下展开/收起。
 class _TreeFolder extends HookWidget {
   final MediaFolder folder;
   final int level;
@@ -436,31 +483,33 @@ class _TreeFolder extends HookWidget {
   Widget build(BuildContext context) {
     // 第一层默认展开，深层的收着，免得一进来滚一屏
     final open = useState(level < 1);
+    void toggle() => open.value = !open.value;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        InkWell(
-          onTap: () => open.value = !open.value,
-          child: Padding(
-            padding: EdgeInsets.only(
-                left: 12.0 * level + 12, top: 10, bottom: 10, right: 12),
-            child: Row(
-              children: [
-                Icon(
-                  open.value ? Icons.folder_open : Icons.folder_outlined,
-                  size: 18,
-                  color: Colors.grey,
+        Padding(
+          padding: EdgeInsets.only(left: 20.0 * level),
+          child: Row(
+            children: [
+              Expanded(
+                child: FileListItem(
+                  file: {
+                    'name': folder.name,
+                    'path': folder.path,
+                    'isdir': true,
+                  },
+                  remote: false,
+                  iconMode: false,
+                  multiSelect: false,
+                  selected: false,
+                  onAction: toggle,
+                  onTap: toggle,
                 ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(folder.name,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(fontSize: 13)),
-                ),
-                Text("${folder.total}",
-                    style: const TextStyle(fontSize: 11, color: Colors.grey)),
-              ],
-            ),
+              ),
+              Text("${folder.total}",
+                  style: const TextStyle(fontSize: 11, color: Colors.grey)),
+              const SizedBox(width: 8),
+            ],
           ),
         ),
         if (open.value) ...[
@@ -474,7 +523,7 @@ class _TreeFolder extends HookWidget {
   }
 }
 
-/// 文件树里的一个视频：缩略图（刮削到的封面）当文件图标。
+/// 文件树里的一个视频：同样是 FileListItem，缩略图位置塞刮削到的封面。
 class _TreeFile extends StatelessWidget {
   final MediaItem item;
   final int level;
@@ -485,36 +534,26 @@ class _TreeFile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () => onOpen(item),
-      child: Padding(
-        padding: EdgeInsets.only(
-            left: 12.0 * level + 12, top: 6, bottom: 6, right: 12),
-        child: Row(
-          children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(4),
-              child: SizedBox(
-                  width: 48, height: 32, child: mediaCover(item.coverPath)),
-            ),
-            const SizedBox(width: 10),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(item.displayTitle,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(fontSize: 13)),
-                  if (item.subtitleLine.isNotBlank)
-                    Text(item.subtitleLine,
-                        style:
-                            const TextStyle(fontSize: 11, color: Colors.grey)),
-                ],
-              ),
-            ),
-          ],
-        ),
+    // FileListItem 把 file['path'] 当缩略图去问 NAS，TMDB 的 http 封面用不了，退回视频本身
+    final cover =
+        item.coverPath.isNotBlank && !item.coverPath.startsWith('http')
+            ? item.coverPath
+            : item.path;
+    return Padding(
+      padding: EdgeInsets.only(left: 20.0 * level),
+      child: FileListItem(
+        file: {
+          'name': item.name,
+          'path': cover,
+          'isdir': false,
+          'additional': {'size': 0},
+        },
+        remote: false,
+        iconMode: false,
+        multiSelect: false,
+        selected: false,
+        onAction: () => onOpen(item),
+        onTap: () => onOpen(item),
       ),
     );
   }
