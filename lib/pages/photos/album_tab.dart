@@ -41,11 +41,16 @@ class AlbumTab extends HookWidget {
     final albumWidth = MediaQuery.sizeOf(context).width / 5;
 
     getAlbum() async {
-      albums.value = await AlbumModel.fetch(
-          additional: ["sharing_info", "thumbnail"],
-          limit: 100,
-          isTeam: isTeam);
-      Log.debug("相册：${albums.value.length}");
+      // 刷新失败不得让调用方误判为写入失败，这里自行吞掉并记日志
+      try {
+        albums.value = await AlbumModel.fetch(
+            additional: ["sharing_info", "thumbnail"],
+            limit: 100,
+            isTeam: isTeam);
+        Log.debug("相册：${albums.value.length}");
+      } catch (e) {
+        Log.error("相册加载失败: $e");
+      }
     }
 
     getRecently() async {
