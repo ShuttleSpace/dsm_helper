@@ -30,6 +30,31 @@ const String mediaUseTmdbPosterStorageKey = 'media_use_tmdb_poster';
 Future<bool> loadMediaUseTmdbPoster() async =>
     await StorageUtil.getBool(mediaUseTmdbPosterStorageKey) ?? true;
 
+/// 海报墙的展示风格：平铺海报 / 按所在目录分组。
+enum MediaViewMode { poster, folder }
+
+const String mediaViewModeStorageKey = 'media_view_mode';
+
+Future<MediaViewMode> loadMediaViewMode() async =>
+    (await StorageUtil.getString(mediaViewModeStorageKey)) == 'folder'
+        ? MediaViewMode.folder
+        : MediaViewMode.poster;
+
+Future<void> saveMediaViewMode(MediaViewMode mode) => StorageUtil.setString(
+    mediaViewModeStorageKey,
+    mode == MediaViewMode.folder ? 'folder' : 'poster');
+
+/// 按所在目录分组，组的顺序跟传入顺序一致（已经过排序/搜索过滤）。
+Map<String, List<MediaItem>> groupByFolder(List<MediaItem> items) {
+  final groups = <String, List<MediaItem>>{};
+  for (final item in items) {
+    final slash = item.path.lastIndexOf('/');
+    final dir = slash > 0 ? item.path.substring(0, slash) : '/';
+    (groups[dir] ??= []).add(item);
+  }
+  return groups;
+}
+
 /// 媒体库里的一条视频，封面/NFO/字幕都取自它所在目录。
 class MediaItem {
   final String name;

@@ -157,4 +157,19 @@ void main() {
     expect(await loadMediaScanDepth(), 5);
     expect(await loadMediaUseTmdbPoster(), false);
   });
+
+  test('按文件夹分组：目录做键，组内保持传入顺序', () async {
+    const items = [
+      MediaItem(name: 'b.mkv', path: '/video/电影/b.mkv'),
+      MediaItem(name: 'a.mkv', path: '/video/a.mkv'),
+      MediaItem(name: 'c.mkv', path: '/tv/剧/c.mkv'),
+      MediaItem(name: 'd.mkv', path: '/video/电影/d.mkv'),
+    ];
+    final groups = groupByFolder(items);
+    expect(groups.keys.toList(), ['/video/电影', '/video', '/tv/剧']);
+    expect(groups['/video/电影']!.map((e) => e.name), ['b.mkv', 'd.mkv']);
+    expect(await loadMediaViewMode(), MediaViewMode.poster);
+    await saveMediaViewMode(MediaViewMode.folder);
+    expect(await loadMediaViewMode(), MediaViewMode.folder);
+  });
 }

@@ -28,6 +28,7 @@ class MediaLibrary extends HookWidget {
     final searching = useState(false);
     final watching = useSignal<Map<String, dynamic>>({});
     final depth = useSignal(mediaScanDepth);
+    final viewMode = useSignal(MediaViewMode.poster);
 
     Future<void> openPlayer(MediaItem item) async {
       await Navigator.of(context).push(CupertinoPageRoute(builder: (context) {
@@ -52,6 +53,7 @@ class MediaLibrary extends HookWidget {
     Future<void> reload() async {
       final roots = await loadMediaLibraryPaths();
       depth.value = await loadMediaScanDepth();
+      viewMode.value = await loadMediaViewMode();
       final useTmdbPoster = await loadMediaUseTmdbPoster();
       hasRoots.value = roots.isNotEmpty;
       watching.value = await loadContinueWatching();
@@ -128,6 +130,18 @@ class MediaLibrary extends HookWidget {
               if (!searching.value) query.value = '';
             },
           ),
+          IconButton(
+            tooltip: viewMode.value == MediaViewMode.poster ? '按文件夹看' : '按海报看',
+            icon: Icon(viewMode.value == MediaViewMode.poster
+                ? Icons.folder_outlined
+                : Icons.grid_view),
+            onPressed: () {
+              viewMode.value = viewMode.value == MediaViewMode.poster
+                  ? MediaViewMode.folder
+                  : MediaViewMode.poster;
+              saveMediaViewMode(viewMode.value);
+            },
+          ),
           PopupMenuButton<MediaSort>(
             tooltip: '排序',
             icon: const Icon(Icons.sort),
@@ -182,22 +196,61 @@ class MediaLibrary extends HookWidget {
                         ),
                       ),
                     Expanded(
-                      child: GridView.builder(
-                        padding: const EdgeInsets.all(12),
-                        gridDelegate:
-                            const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2,
-                          mainAxisSpacing: 12,
-                          crossAxisSpacing: 12,
-                          childAspectRatio: 0.62,
-                        ),
-                        itemCount: shown.length,
-                        itemBuilder: (context, i) =>
-                            _Poster(item: shown[i], onTap: openPlayer),
-                      ),
+                      child: viewMode.value == MediaViewMode.poster
+                          ? _grid(shown, openPlayer)
+                          : _folderList(shown, openPlayer),
                     ),
                   ],
                 ),
+    );
+  }
+
+  /// 一个可滚的网格；文件夹分组时嵌在 ListView 里，所以 shrinkWrap。
+  Widget _grid(List<MediaItem> list, void Function(MediaItem) onTap,
+          {bool shrink = false}) =>
+      GridView.builder(
+        padding: shrink ? EdgeInsets.zero : const EdgeInsets.all(12),
+        shrinkWrap: shrink,
+        physics: shrink ? const NeverScrollableScrollPhysics() : null,
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          mainAxisSpacing: 12,
+          crossAxisSpacing: 12,
+          childAspectRatio: 0.62,
+        ),
+        itemCount: list.length,
+        itemBuilder: (context, i) => _Poster(item: list[i], onTap: onTap),
+      );
+
+  /// 按所在 NAS 目录分段。shortcut: 每段整段构建，几千部片会卡，真要上量再换 CustomScrollView。
+  Widget _folderList(List<MediaItem> list, void Function(MediaItem) onTap) {
+    final groups = groupByFolder(list);
+    return ListView(
+      padding: const EdgeInsets.fromLTRB(12, 8, 12, 12),
+      children: [
+        for (final entry in groups.entries) ...[
+          Padding(
+            padding: const EdgeInsets.only(top: 8, bottom: 8),
+            child: Row(
+              children: [
+                const Icon(Icons.folder_outlined, size: 16),
+                const SizedBox(width: 6),
+                Expanded(
+                  child: Text(
+                    entry.key,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                        fontSize: 12, fontWeight: FontWeight.w500),
+                  ),
+                ),
+                Text("${entry.value.length}",
+                    style: const TextStyle(fontSize: 11, color: Colors.grey)),
+              ],
+            ),
+          ),
+          _grid(entry.value, onTap, shrink: true),
+        ],
+      ],
     );
   }
 
