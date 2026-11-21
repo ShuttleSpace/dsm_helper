@@ -10,11 +10,11 @@ import 'dart:io';
 import 'package:android_intent_plus/android_intent.dart';
 import 'package:garden/api/dsm_api.filestation.transfer_url.dart';
 import 'package:garden/extensions/string.dart';
-import 'package:garden/util/file_type_util.dart';
 import 'package:garden/services/office_preview.dart';
+import 'package:garden/pages/common/subtitle_picker.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:extended_image/extended_image.dart';
-import 'package:file_picker/file_picker.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:garden/constants/app_constants.dart';
@@ -160,22 +160,24 @@ class VideoPlayerPage extends HookWidget {
       tmdbUsed.value = true;
     }
 
-    /// 本地字幕文件交给 mpv 读（file:// URI），编码与格式识别都由 mpv 处理。
-    Future<void> pickLocalSubtitle() async {
+    /// 在 NAS 上挑字幕文件；和同名字幕一样走 fbDownloadUrl，交给 mpv 读。
+    Future<void> pickSubtitle() async {
+      final path = await Navigator.of(context).push<String>(
+        CupertinoPageRoute(builder: (_) => const SubtitlePicker()),
+      );
+      if (path == null || path.isEmpty) return;
       try {
-        final picked = await FilePicker.platform.pickFiles(
-          type: FileType.custom,
-          allowedExtensions: FileTypeUtil.subtitleExtensions,
-        );
-        final path = picked?.files.single.path;
-        if (path == null) return;
-        final uri = Uri.file(path);
         await player.setSubtitleTrack(SubtitleTrack.uri(
-          uri.toString(),
-          title: uri.pathSegments.last,
+          fbDownloadUrl(
+            baseUri: connectionStore.baseUri.value,
+            path: path,
+            sid: connectionStore.sid.value,
+            mode: 'open',
+          ),
+          title: path.split('/').last,
         ));
       } catch (e) {
-        Log.error("本地字幕载入异常: $e");
+        Log.error("字幕载入异常: $e");
       }
     }
 
@@ -224,12 +226,12 @@ class VideoPlayerPage extends HookWidget {
               if (value is SubtitleTrack) {
                 player.setSubtitleTrack(value);
               } else {
-                pickLocalSubtitle();
+                pickSubtitle();
               }
             },
             itemBuilder: (context) => [
               const PopupMenuItem<Object>(
-                  value: 'local', child: Text('从文件载入字幕…')),
+                  value: 'local', child: Text('选择 NAS 上的字幕…')),
               PopupMenuItem<Object>(
                   value: SubtitleTrack.no(), child: const Text('关闭字幕')),
               ...player.state.tracks.subtitle
