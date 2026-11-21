@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:garden/constants/app_constants.dart';
 
 /// 应用抽屉中的应用图标卡片。
@@ -64,10 +65,9 @@ class ApplicationTile extends StatelessWidget {
                           icon,
                           const SizedBox(width: 12),
                           Expanded(
-                            child: Text(
-                              label,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
+                            child: _MarqueeText(
+                              label: label,
+                              textAlign: TextAlign.start,
                             ),
                           ),
                         ],
@@ -77,11 +77,9 @@ class ApplicationTile extends StatelessWidget {
                         children: [
                           icon,
                           const SizedBox(height: 5),
-                          Text(
-                            label,
-                            maxLines: 1,
+                          _MarqueeText(
+                            label: label,
                             textAlign: TextAlign.center,
-                            overflow: TextOverflow.ellipsis,
                           ),
                         ],
                       ),
@@ -94,6 +92,81 @@ class ApplicationTile extends StatelessWidget {
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _MarqueeText extends StatelessWidget {
+  const _MarqueeText({
+    super.key,
+    required this.label,
+    required this.textAlign,
+  });
+
+  final String label;
+  final TextAlign textAlign;
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final painter = TextPainter(
+          text: TextSpan(
+            text: label,
+            style: DefaultTextStyle.of(context).style,
+          ),
+          textScaler: MediaQuery.textScalerOf(context),
+          textDirection: Directionality.of(context),
+          maxLines: 1,
+        )..layout();
+        final overflow = painter.width - constraints.maxWidth;
+        if (overflow <= 1) {
+          return Text(
+            label,
+            maxLines: 1,
+            textAlign: textAlign,
+            overflow: TextOverflow.ellipsis,
+          );
+        }
+        return _ScrollingText(label: label, overflow: overflow);
+      },
+    );
+  }
+}
+
+class _ScrollingText extends HookWidget {
+  const _ScrollingText({
+    required this.label,
+    required this.overflow,
+  });
+
+  final String label;
+  final double overflow;
+
+  @override
+  Widget build(BuildContext context) {
+    final ticker = useSingleTickerProvider();
+    final controller = useMemoized(
+      () => AnimationController(
+        vsync: ticker,
+        duration: const Duration(seconds: 4),
+      ),
+      [ticker],
+    );
+    useEffect(() {
+      controller.repeat(reverse: true);
+      return controller.dispose;
+    }, [controller]);
+
+    return ClipRect(
+      child: AnimatedBuilder(
+        animation: controller,
+        builder: (context, child) => Transform.translate(
+          offset: Offset(-controller.value * overflow, 0),
+          child: child,
+        ),
+        child: Text(label, maxLines: 1, softWrap: false),
       ),
     );
   }
