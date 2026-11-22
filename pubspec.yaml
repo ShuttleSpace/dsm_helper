@@ -15,7 +15,7 @@ publish_to: "none" # Remove this line if you wish to publish to pub.dev
 # In iOS, build-name is used as CFBundleShortVersionString while build-number used as CFBundleVersion.
 # Read more about iOS versioning at
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
-version: 0.0.146+148
+version: 0.0.147+149
 
 environment:
   sdk: ">=3.5.0 <4.0.0"
@@ -102,7 +102,6 @@ dependencies:
     git: https://gitee.com/dsm_bay/flutter_sharing_intent.git
   webview_flutter: 4.10.0
   extended_text: ^15.0.2 #15.0.0 起支持 Flutter 3.22+
-  # just_audio: 0.9.46
   rxdart: ^0.28.0
   flutter_floating: ^1.0.8
   # video_player: ^2.9.5
@@ -135,6 +134,9 @@ dependencies:
   #  x5_webview: ^0.2.4
   talker: ^5.1.15
   talker_flutter: ^5.1.15
+  audio_metadata_reader: ^1.8.1
+  audio_service: ^0.18.19
+  just_audio: ^0.10.6
 dev_dependencies:
   flutter_test:
     sdk: flutter

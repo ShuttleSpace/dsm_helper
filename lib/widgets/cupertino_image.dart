@@ -5,6 +5,11 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:signals_flutter/signals_flutter.dart';
 
+/// 缩略图 URL 里带着每次登录都会变的 `_sid`，直接拿 URL 当磁盘缓存 key 会永远未命中。
+/// 剔掉 `_sid` 后剩下的部分（unitId + cache_key + size）服务器侧就会跟着图片变化。
+String thumbnailCacheKey(String url) =>
+    keyToMd5(url.replaceAll(RegExp(r'[?&]_sid=[^&]*'), ''));
+
 class CupertinoExtendedImage extends StatelessWidget {
   final String url;
   final BoxFit? fit;
@@ -27,6 +32,9 @@ class CupertinoExtendedImage extends StatelessWidget {
   Widget build(BuildContext context) {
     return ExtendedImage.network(
       url,
+      cacheKey: thumbnailCacheKey(url),
+      // 叠加上磁盘缓存：默认 key 是整条 URL 的 md5，带 _sid，重登后全量重下。
+      cacheMaxAge: const Duration(days: 30),
       fit: fit,
       width: width,
       height: height,

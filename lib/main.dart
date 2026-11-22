@@ -14,7 +14,10 @@ import 'package:garden/stores/settings_store.dart';
 import 'package:garden/theme/light_theme.dart';
 import 'package:garden/theme/dark_theme.dart';
 import 'package:garden/util/http_util.dart';
+import 'package:audio_service/audio_service.dart';
 import 'package:garden/util/log.dart';
+import 'package:garden/util/music_audio_handler.dart';
+import 'package:garden/util/music_player_controller.dart';
 import 'package:garden/util/storage_util.dart';
 import 'package:garden/util/ui_util.dart';
 import 'package:garden/widgets/keyboard_dismisser.dart';
@@ -39,7 +42,11 @@ void main() async {
   await connectionStore.initialize();
   await initTransferEngine();
   transferStore.listenUpdates();
+  transferStore.startBackupTimeSync(); // app 生命周期内持续写回备份时间
   await transferStore.resumeUnfinishedOnStartup();
+  await _initAudioService();
+  // 缩略图磁盘缓存没有容量上限，顺手清掉 30 天没碰过的（cacheMaxAge 同值）。
+  unawaited(clearDiskCachedImages(duration: const Duration(days: 30)));
   final autPage = await settingsStore.authPage.value;
   final launchAccountPage = await settingsStore.launchAccountPage.value;
   runApp(MyApp(autPage, launchAccountPage));
@@ -48,6 +55,23 @@ void main() async {
     SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
     ));
+  }
+}
+
+/// 通知栏/后台播放：只有支持的平台才初始化，失败不影响正常使用。
+Future<void> _initAudioService() async {
+  if (!(Platform.isAndroid || Platform.isIOS || Platform.isMacOS)) return;
+  try {
+    await AudioService.init(
+      builder: () => MusicAudioHandler(musicController),
+      config: const AudioServiceConfig(
+        androidNotificationChannelId: 'fit.flutter.garden.music',
+        androidNotificationChannelName: '音乐播放',
+        androidNotificationOngoing: true,
+      ),
+    );
+  } catch (e) {
+    Log.error("通知栏播放初始化失败: $e");
   }
 }
 

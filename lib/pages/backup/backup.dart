@@ -1,5 +1,8 @@
 import 'dart:convert';
-import 'package:garden/pages/backup/backup_model.dart';
+import 'package:background_downloader/background_downloader.dart';
+import 'package:garden/stores/transfer_store.dart';
+import 'package:garden/services/transfer_upload.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:garden/util/log.dart';
 import 'package:garden/util/ui_util.dart';
 import 'package:garden/util/storage_util.dart';
@@ -9,11 +12,8 @@ import 'dart:ui';
 
 import 'package:cool_ui/cool_ui.dart';
 import 'package:garden/pages/common/select_ablum.dart';
-import 'package:garden/api/dsm_api.dart';
 import 'package:garden/extensions/datetime.dart';
 import 'package:garden/extensions/string.dart';
-import 'package:garden/util/file_types.dart';
-import 'package:garden/widgets/file_icon.dart';
 import 'package:garden/widgets/label.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:flutter/cupertino.dart';
@@ -26,6 +26,202 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:signals_hooks/signals_hooks.dart';
 
 import 'package:garden/widgets/folder_picker_sheet.dart';
+
+/// 把多个相册的资产展平并按 id 去重。
+Future<List<AssetEntity>> collectBackupAssets(
+  Iterable<AssetPathEntity> albums, {
+  Future<List<AssetEntity>> Function(AssetPathEntity) fetch = _defaultAssetFetch,
+}) async {
+  final result = <AssetEntity>[];
+  final ids = <String>{};
+  for (final album in albums) {
+    for (final asset in await fetch(album)) {
+      if (ids.add(asset.id)) result.add(asset);
+    }
+  }
+  return result;
+}
+
+Future<List<AssetEntity>> _defaultAssetFetch(AssetPathEntity album) =>
+    album.getAssetListRange(start: 0, end: 100000000);
+
+/// iOS 的 asset id 含 "/"，不能直接当目录名。
+String backupCacheDirName(String assetId) =>
+    assetId.replaceAll(RegExp(r'[^A-Za-z0-9]'), '_');
+
+class BackupEnqueueIncomplete implements Exception {
+  BackupEnqueueIncomplete(this.message);
+  final String message;
+
+  @override
+  String toString() => message;
+}
+
+/// 按 modification time 过滤并排序待备份资产。
+List<AssetEntity> backupPendingAssets(
+  List<AssetEntity> uploads,
+  DateTime? lastBackupTime,
+  bool continueBackup,
+) {
+  final since = lastBackupTime?.millisecondsSinceEpoch ?? 0;
+  final result = uploads
+      .where((a) =>
+          !continueBackup || a.modifiedDateTime.millisecondsSinceEpoch > since)
+      .toList();
+  result.sort((a, b) => a.modifiedDateTime.compareTo(b.modifiedDateTime));
+  return result;
+}
+
+/// 把每张照片作为一个子步骤入队，整体作为一条父任务。
+Future<TransferTask> startBackup({
+  required String backupFolder,
+  required List<AssetEntity> assets,
+  required Future<String> Function(String cachePath, String remoteDir) enqueue,
+  required Directory cacheRoot,
+  Future<void> Function(String stepId)? cancelEnqueued,
+}) async {
+  final parent = TransferTask(
+    id: 'backup_${DateTime.now().microsecondsSinceEpoch}',
+    type: TransferType.upload,
+    localPath: '',
+    remotePath: backupFolder,
+    state: TransferState.queued,
+    steps: const [],
+  );
+  transferStore.add(parent);
+  final enqueued = <String>[];
+  for (final asset in assets) {
+    try {
+      final file = await asset.originFile;
+      if (file == null) throw const FileSystemException('asset file missing');
+      final dir = Directory('${cacheRoot.path}/${backupCacheDirName(asset.id)}')
+        ..createSync(recursive: true);
+      final filename = file.path.split(Platform.pathSeparator).last;
+      final cachePath = '${dir.path}${Platform.pathSeparator}$filename';
+      await file.copy(cachePath);
+      File(cachePath).setLastModifiedSync(asset.modifiedDateTime);
+      final taskId = await enqueue(cachePath, backupFolder);
+      enqueued.add(taskId);
+      transferStore.addStep(parent.id, TransferStep(
+        id: taskId,
+        localPath: cachePath,
+        remotePath: remoteDir(backupFolder, filename),
+        state: TransferState.active,
+        modifyTime: asset.modifiedDateTime,
+      ));
+    } catch (e) {
+      for (final stepId in enqueued) {
+        await cancelEnqueued?.call(stepId);
+        transferStore.setError(stepId, '备份入队未完成: $e');
+      }
+      transferStore.setError(parent.id, '备份入队未完成: $e', manual: true);
+      throw BackupEnqueueIncomplete('备份入队未完成: $e');
+    }
+  }
+  if (transferStore.tasks.value.firstWhere((t) => t.id == parent.id).steps!.isEmpty) {
+    transferStore.setError(parent.id, '没有可备份的文件', manual: true);
+    throw BackupEnqueueIncomplete('没有可备份的文件');
+  }
+  return transferStore.tasks.value.firstWhere((t) => t.id == parent.id);
+}
+
+String remoteDir(String backupFolder, String filename) =>
+    backupFolder.endsWith('/') ? '$backupFolder$filename' : '$backupFolder/$filename';
+
+bool _autoBackupRan = false;
+
+/// 冷启动一次：读配置、解析相册、调用 startAutoBackup。不可用时静默返回 null。
+Future<TransferTask?> runAutoBackup() async {
+  if (_autoBackupRan) return null;
+  _autoBackupRan = true;
+  if (!(await StorageUtil.getBool('auto_backup') ?? false)) return null;
+  final backupFolder = await StorageUtil.getString('backup_folder') ?? '';
+  if (backupFolder.isBlank) return null;
+  final albumStr = await StorageUtil.getString('backup_album') ?? '';
+  if (albumStr.isBlank) return null;
+  final Set<String> ids;
+  try {
+    ids = (json.decode(albumStr) as List).cast<String>().toSet();
+  } catch (e) {
+    Log.info('auto backup skipped: bad backup_album $e');
+    return null;
+  }
+  if (await PhotoManager.requestPermissionExtend() !=
+      PermissionState.authorized) {
+    Log.info('auto backup skipped: photo permission not authorized');
+    return null;
+  }
+  final albums = (await PhotoManager.getAssetPathList())
+      .where((a) => ids.contains(a.id))
+      .toList();
+  if (albums.isEmpty) {
+    Log.info('auto backup skipped: saved albums not found');
+    return null;
+  }
+  final uploads = await collectBackupAssets(albums);
+  final last = await StorageUtil.getString('last_backup_time') ?? '';
+  final docs = await getApplicationDocumentsDirectory();
+  final existing =
+      transferStore.tasks.value.where((t) => t.steps != null).map((e) => e.id).toSet();
+  try {
+    return await startAutoBackup(
+      enabled: true,
+      backupFolder: backupFolder,
+      uploads: uploads,
+      lastBackupTime: last.isNotBlank
+          ? DateTime.fromMillisecondsSinceEpoch(int.tryParse(last) ?? 0)
+          : null,
+      hasPendingBackup: hasPendingBackupTask(transferStore.tasks.value),
+      enqueue: (cachePath, remoteDir) =>
+          enqueueFileUpload(localPath: cachePath, remoteDir: remoteDir),
+      cancelEnqueued: (stepId) async {
+        await FileDownloader().cancelTaskWithId(stepId);
+        await FileDownloader().database.deleteRecordWithId(stepId);
+      },
+      cacheRoot: Directory('${docs.path}/backup_cache'),
+    );
+  } on BackupEnqueueIncomplete catch (e) {
+    // 本次新建的失败父任务不留痕，否则每次启动都会多一条“入队未完成”。
+    for (final t in transferStore.tasks.value
+        .where((t) => t.steps != null && !existing.contains(t.id))
+        .toList()) {
+      await transferStore.deleteTask(t);
+    }
+    Log.info('auto backup skipped: $e');
+    return null;
+  }
+}
+
+/// 已有未完成的备份父任务时不再入队，避免重复上传。
+bool hasPendingBackupTask(Iterable<TransferTask> tasks) => tasks.any((t) =>
+    t.steps != null &&
+    (t.state == TransferState.queued ||
+        t.state == TransferState.active ||
+        t.state == TransferState.paused));
+
+/// 自动备份的决策层：不可用时返回 null，不抛异常、不提示。
+Future<TransferTask?> startAutoBackup({
+  required bool enabled,
+  required String backupFolder,
+  required List<AssetEntity> uploads,
+  required DateTime? lastBackupTime,
+  required bool hasPendingBackup,
+  required Future<String> Function(String cachePath, String remoteDir) enqueue,
+  required Directory cacheRoot,
+  Future<void> Function(String stepId)? cancelEnqueued,
+}) async {
+  if (!enabled || backupFolder.isBlank || hasPendingBackup) return null;
+  final assets = backupPendingAssets(uploads, lastBackupTime, true);
+  if (assets.isEmpty) return null;
+  return startBackup(
+    backupFolder: backupFolder,
+    assets: assets,
+    enqueue: enqueue,
+    cacheRoot: cacheRoot,
+    cancelEnqueued: cancelEnqueued,
+  );
+}
+
 class Backup extends HookWidget {
   const Backup({super.key});
 
@@ -36,22 +232,11 @@ class Backup extends HookWidget {
     final backupFolder = useSignal("");
     final lastBackupTime =
         useSignal<DateTime?>(DateTime.now().add(const Duration(days: -5)));
-    final uploading = useSignal<UploadItem?>(null);
-    // Only read/written from the backup loop, never during build.
-    final cancel = useRef(false);
     final continueBackup = useSignal(true);
+    final autoBackup = useSignal(false);
 
 getAssetCount() async {
-  uploads.clear();
-  var futs = albums.value
-      .map((item) => item.getAssetListRange(start: 0, end: 100000000))
-      .toList();
-  var value = await Future.wait(futs);
-  var values = value.fold([], (prev, el) {
-    prev.addAll(el);
-    return prev;
-  });
-  uploads.addAll(values as List<AssetEntity>);
+  uploads.value = await collectBackupAssets(albums.value);
 }
 
 getData() async {
@@ -61,6 +246,7 @@ getData() async {
       ? DateTime.fromMillisecondsSinceEpoch(int.parse(last))
       : null;
   backupFolder.value = await StorageUtil.getString("backup_folder") ?? '';
+  autoBackup.value = await StorageUtil.getBool('auto_backup') ?? false;
   String backupAlbumStr = await StorageUtil.getString("backup_album") ?? '';
   List backupAlbums = [];
   if (await PhotoManager.requestPermissionExtend() ==
@@ -171,69 +357,36 @@ void onStartBackup() async {
     UiUtil.toast("请选择备份源");
     return;
   }
-  List<AssetEntity> tasks;
-  if (continueBackup.value) {
-    tasks = uploads.value
-        .where((element) =>
-            element.modifiedDateTime.millisecondsSinceEpoch >
-            (lastBackupTime.value?.millisecondsSinceEpoch ?? 0))
-        .toList();
-  } else {
-    tasks = uploads.value;
+  if (hasPendingBackupTask(transferStore.tasks.value)) {
+    UiUtil.vibrate(FeedbackType.warning);
+    UiUtil.toast("已有未完成的备份任务");
+    return;
   }
-  //对待备份文件进行排序
-  tasks.sort((a, b) {
-    return a.modifiedDateTime.isAtSameMomentAs(b.modifiedDateTime)
-        ? 0
-        : a.modifiedDateTime.isBefore(b.modifiedDateTime)
-            ? -1
-            : 1;
-  });
-  for (int i = 0; i < tasks.length; i++) {
-    if (cancel.value) {
-      cancel.value = false;
-      uploading.value = null;
-      UiUtil.toast("备份任务已暂停");
-      break;
-    }
-    uploading.value = UploadItem(
-        await tasks[i].originFile, tasks[i].modifiedDateTime, tasks[i].type);
-
-    if (uploading.value!.status != UploadStatus.wait) {
-      continue;
-    }
-    //上传文件
-    uploading.value?.status = UploadStatus.running;
-    uploading.notifyListeners();
-    try {
-      await dsmFileStationUploadForPage(
-          backupFolder.value, uploading.value!.file!.path,
-          uploading.value!.cancelToken, (progress, total) {
-        uploading.value!.uploadSize = progress;
-        uploading.value!.fileSize = total;
-        uploading.notifyListeners();
-      });
-    } catch (e) {
-      uploading.value?.status = UploadStatus.failed;
-      uploading.notifyListeners();
-      continue;
-    }
-    if (Platform.isIOS) {
-        // 仅在iOS删除源文件（iOS非真实源文件）
-        uploading.value!.file!.deleteSync();
-      }
-
-      StorageUtil.setString("last_backup_time",
-          uploading.value!.modifyTime!.millisecondsSinceEpoch.toString());
-      lastBackupTime.value = uploading.value!.modifyTime;
-    uploading.value!.status = UploadStatus.complete;
-    uploading.notifyListeners();
-    if (i == tasks.length - 1) {
-      UiUtil.toast("备份已完成");
-      UiUtil.vibrate(FeedbackType.light);
-      uploading.value = null;
-      lastBackupTime.value = DateTime.now();
-    }
+  final tasks =
+      backupPendingAssets(uploads.value, lastBackupTime.value, continueBackup.value);
+  if (tasks.isEmpty) {
+    UiUtil.vibrate(FeedbackType.warning);
+    UiUtil.toast("没有需要备份的文件");
+    return;
+  }
+  final docs = await getApplicationDocumentsDirectory();
+  try {
+    final parent = await startBackup(
+      backupFolder: backupFolder.value,
+      assets: tasks,
+      cacheRoot: Directory('${docs.path}/backup_cache'),
+      enqueue: (cachePath, remoteDir) =>
+          enqueueFileUpload(localPath: cachePath, remoteDir: remoteDir),
+      cancelEnqueued: (stepId) async {
+        await FileDownloader().cancelTaskWithId(stepId);
+        await FileDownloader().database.deleteRecordWithId(stepId);
+      },
+    );
+    UiUtil.vibrate(FeedbackType.light);
+    UiUtil.toast("已创建备份任务（${parent.steps!.length} 个文件），请到传输页查看");
+  } on BackupEnqueueIncomplete catch (e) {
+    UiUtil.vibrate(FeedbackType.warning);
+    UiUtil.toast(e.message);
   }
 }
 
@@ -268,78 +421,6 @@ void onStartBackup() async {
       body: ListView(
         padding: const EdgeInsets.all(20),
         children: [
-          ...[
-            Card(
-              shape: RoundedRectangleBorder(
-                  side: const BorderSide(),
-                  borderRadius: BorderRadius.circular(18)),
-              child: Padding(
-                padding: const EdgeInsets.all(AppConstants.paddingSmall),
-                child: Stack(
-                  children: [
-                    Container(
-                      width: (MediaQuery.sizeOf(context).width - 40) *
-                          (uploading.value?.uploadSize ??
-                              1 /
-                                  (uploading.value?.fileSize == 0
-                                      ? 1
-                                      : (uploading.value?.fileSize ?? 1))),
-                      height: 70,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
-                        color: Colors.amber[100],
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 20, vertical: 15),
-                      child: Row(
-                        children: [
-                          uploading.value?.type == AssetType.image
-                              ? Image.file(
-                                  uploading.value!.file!,
-                                  height: 40,
-                                  width: 40,
-                                )
-                              : const FileIcon(FileTypeEnum.image),
-                          const SizedBox(
-                            width: 20,
-                          ),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  uploading.value?.file?.path.split("/").last ??
-                                      '[Idle]',
-                                  overflow: TextOverflow.ellipsis,
-                                  maxLines: 2,
-                                  style: const TextStyle(fontSize: 13),
-                                ),
-                                const SizedBox(
-                                  height: 5,
-                                ),
-                                Text(
-                                  uploading.value?.file?.parent.path ?? '[Idle]',
-                                  overflow: TextOverflow.ellipsis,
-                                  maxLines: 1,
-                                  style: const TextStyle(
-                                      fontSize: 12, color: Colors.grey),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            const SizedBox(
-              height: 20,
-            ),
-          ],
           OutlinedButton(
             onPressed: () => onChooseBackupTargetDialog(context).then((res) {
               if (res != null && res.length == 1) {
@@ -504,7 +585,8 @@ void onStartBackup() async {
           ),
           GestureDetector(
             onTap: () {
-              UiUtil.toast("暂不支持自动备份");
+              autoBackup.value = !autoBackup.value;
+              StorageUtil.setBool('auto_backup', autoBackup.value);
             },
             child: Card(
               shape: RoundedRectangleBorder(
@@ -530,13 +612,11 @@ void onStartBackup() async {
                         ],
                       ),
                     ),
-                    const SizedBox(
-                      width: 20,
-                      // child: Icon(
-                      //   CupertinoIcons.checkmark_alt,
-                      //   color: AppColors.primaryAction,
-                      // ),
-                    ),
+                    if (autoBackup.value)
+                      const Icon(
+                        CupertinoIcons.checkmark_alt,
+                        color: AppColors.primaryAction,
+                      ),
                   ],
                 ),
               ),
@@ -545,18 +625,10 @@ void onStartBackup() async {
           const SizedBox(
             height: 20,
           ),
-          uploading.value == null
-              ? OutlinedButton(
-                  onPressed: onStartBackup,
-                  child: const Text("开始备份"),
-                )
-              : OutlinedButton(
-                  onPressed: () async {
-                    cancel.value = true;
-                    UiUtil.toast("当前文件上传完成后将暂停任务");
-                  },
-                  child: const Text("暂停备份"),
-                ),
+          OutlinedButton(
+            onPressed: onStartBackup,
+            child: const Text("开始备份"),
+          ),
         ],
       ),
     );

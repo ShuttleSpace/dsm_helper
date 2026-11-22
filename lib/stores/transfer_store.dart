@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:background_downloader/background_downloader.dart';
 import 'package:garden/util/storage_util.dart';
@@ -35,6 +36,73 @@ class ChunkState {
       );
 }
 
+class TransferStep {
+  const TransferStep({
+    required this.id,
+    required this.localPath,
+    required this.remotePath,
+    this.totalBytes = 0,
+    this.transferredBytes = 0,
+    this.state = TransferState.queued,
+    this.modifyTime,
+    this.errorMessage,
+  });
+
+  final String id;
+  final String localPath;
+  final String remotePath;
+  final int totalBytes;
+  final int transferredBytes;
+  final TransferState state;
+  final DateTime? modifyTime;
+  final String? errorMessage;
+
+  TransferStep copyWith({
+    int? transferredBytes,
+    int? totalBytes,
+    TransferState? state,
+    DateTime? modifyTime,
+    String? errorMessage,
+  }) =>
+      TransferStep(
+        id: id,
+        localPath: localPath,
+        remotePath: remotePath,
+        totalBytes: totalBytes ?? this.totalBytes,
+        transferredBytes: transferredBytes ?? this.transferredBytes,
+        state: state ?? this.state,
+        modifyTime: modifyTime ?? this.modifyTime,
+        errorMessage: errorMessage ?? this.errorMessage,
+      );
+
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'localPath': localPath,
+        'remotePath': remotePath,
+        'totalBytes': totalBytes,
+        'transferredBytes': transferredBytes,
+        'state': state.index,
+        'modifyTime': modifyTime?.millisecondsSinceEpoch,
+        'errorMessage': errorMessage,
+      };
+
+  factory TransferStep.fromJson(Map<String, dynamic> j) {
+    final ms = j['modifyTime'] as num?;
+    return TransferStep(
+      id: j['id'] as String,
+      localPath: j['localPath'] as String,
+      remotePath: j['remotePath'] as String,
+      totalBytes: j['totalBytes'] as int? ?? 0,
+      transferredBytes: j['transferredBytes'] as int? ?? 0,
+      state: TransferState.values[j['state'] as int? ?? 0],
+      modifyTime: ms == null || ms <= 0
+          ? null
+          : DateTime.fromMillisecondsSinceEpoch(ms.toInt()),
+      errorMessage: j['errorMessage'] as String?,
+    );
+  }
+}
+
 class TransferTask {
   const TransferTask({
     required this.id,
@@ -45,12 +113,14 @@ class TransferTask {
     this.transferredBytes = 0,
     this.state = TransferState.queued,
     this.chunks,
+    this.steps,
     this.createdAt,
     this.updatedAt,
     this.speedBytesPerSecond,
     this.etaSeconds,
     this.errorMessage,
     this.statusCode,
+    this.enqueueFailed = false,
   });
 
   final String id;
@@ -61,24 +131,29 @@ class TransferTask {
   final int transferredBytes;
   final TransferState state;
   final List<ChunkState>? chunks;
+  final List<TransferStep>? steps;
   final DateTime? createdAt;
   final DateTime? updatedAt;
   final double? speedBytesPerSecond;
   final int? etaSeconds;
   final String? errorMessage;
   final int? statusCode;
+  /// 入队阶段失败：后续子步骤回调不能再把父任务改成完成。
+  final bool enqueueFailed;
 
   TransferTask copyWith({
     int? totalBytes,
     int? transferredBytes,
     TransferState? state,
     List<ChunkState>? chunks,
+    List<TransferStep>? steps,
     DateTime? createdAt,
     DateTime? updatedAt,
     double? speedBytesPerSecond,
     int? etaSeconds,
     String? errorMessage,
     int? statusCode,
+    bool? enqueueFailed,
     bool resetError = false,
   }) =>
       TransferTask(
@@ -90,6 +165,7 @@ class TransferTask {
         transferredBytes: transferredBytes ?? this.transferredBytes,
         state: state ?? this.state,
         chunks: chunks ?? this.chunks,
+        steps: steps ?? this.steps,
         createdAt: createdAt ?? this.createdAt,
         updatedAt: updatedAt ?? this.updatedAt,
         speedBytesPerSecond:
@@ -97,6 +173,7 @@ class TransferTask {
         etaSeconds: resetError ? null : etaSeconds ?? this.etaSeconds,
         errorMessage: resetError ? null : errorMessage ?? this.errorMessage,
         statusCode: resetError ? null : statusCode ?? this.statusCode,
+        enqueueFailed: resetError ? false : enqueueFailed ?? this.enqueueFailed,
       );
 
   Map<String, dynamic> toJson() => {
@@ -108,12 +185,14 @@ class TransferTask {
         'transferredBytes': transferredBytes,
         'state': state.index,
         'chunks': chunks?.map((c) => c.toJson()).toList(),
+        if (steps != null) 'steps': steps!.map((s) => s.toJson()).toList(),
         'createdAt': createdAt?.millisecondsSinceEpoch,
         'updatedAt': updatedAt?.millisecondsSinceEpoch,
         'speedBytesPerSecond': speedBytesPerSecond,
         'etaSeconds': etaSeconds,
         'errorMessage': errorMessage,
         'statusCode': statusCode,
+        'enqueueFailed': enqueueFailed,
       };
 
   factory TransferTask.fromJson(Map<String, dynamic> j) {
@@ -136,12 +215,17 @@ class TransferTask {
           ?.cast<Map<String, dynamic>>()
           .map(ChunkState.fromJson)
           .toList(),
+      steps: (j['steps'] as List?)
+          ?.cast<Map<String, dynamic>>()
+          .map(TransferStep.fromJson)
+          .toList(),
       createdAt: readTime('createdAt'),
       updatedAt: readTime('updatedAt'),
       speedBytesPerSecond: (j['speedBytesPerSecond'] as num?)?.toDouble(),
       etaSeconds: j['etaSeconds'] as int?,
       errorMessage: j['errorMessage'] as String?,
       statusCode: j['statusCode'] as int?,
+      enqueueFailed: j['enqueueFailed'] as bool? ?? false,
     );
   }
 }
@@ -171,6 +255,113 @@ class TransferStore {
     persist();
   }
 
+  /// 引擎回调可能带的是子步骤 id，先找到它所属的父任务。
+  ({String groupId, TransferStep step})? findStepOwner(String stepId) {
+    for (final t in _tasks.value) {
+      final step = t.steps?.where((s) => s.id == stepId).firstOrNull;
+      if (step != null) return (groupId: t.id, step: step);
+    }
+    return null;
+  }
+
+  void updateStep(
+    String groupId,
+    String stepId, {
+    int? transferred,
+    int? total,
+    TransferState? state,
+    String? errorMessage,
+    double? speedBytesPerSecond,
+    int? etaSeconds,
+    bool forceActive = false,
+    bool resetError = false,
+  }) {
+    final parent = _find(groupId);
+    if (parent?.steps == null) return;
+    final now = DateTime.now();
+    final steps = parent!.steps!.map((s) {
+      if (s.id != stepId) return s;
+      final active = forceActive && s.state == TransferState.queued
+          ? TransferState.active
+          : null;
+      return s.copyWith(
+        transferredBytes: transferred ??
+            (state == TransferState.done ? total ?? s.totalBytes : null),
+        totalBytes: total,
+        state: state ?? active,
+        errorMessage: resetError ? null : errorMessage,
+      );
+    }).toList();
+    _replace(_withSteps(parent, steps,
+        stickyError: !resetError,
+        speedBytesPerSecond: speedBytesPerSecond,
+        etaSeconds: etaSeconds,
+        errorMessage: errorMessage,
+        updatedAt: now,
+        resetError: resetError));
+  }
+
+  TransferTask _withSteps(
+    TransferTask parent,
+    List<TransferStep> steps, {
+    // 入队失败等人工标记的错误不能被后续子步骤回调冲掉。
+    bool stickyError = false,
+    double? speedBytesPerSecond,
+    int? etaSeconds,
+    String? errorMessage,
+    DateTime? updatedAt,
+    bool resetError = false,
+  }) {
+    final total = steps.fold<int>(0, (sum, s) => sum + s.totalBytes);
+    final transferred = steps.fold<int>(0, (sum, s) => sum + s.transferredBytes);
+    TransferState state;
+    if (steps.any((s) => s.state == TransferState.error)) {
+      state = TransferState.error;
+    } else if (steps.any((s) =>
+        s.state == TransferState.queued || s.state == TransferState.active)) {
+      state = TransferState.active;
+    } else if (steps.every((s) => s.state == TransferState.done)) {
+      state = TransferState.done;
+    } else if (steps.every((s) => s.state == TransferState.canceled)) {
+      state = TransferState.canceled;
+    } else {
+      state = TransferState.paused;
+    }
+    final errorStep = steps.where((s) => s.state == TransferState.error).firstOrNull;
+    final effectiveError =
+        (stickyError && parent.state == TransferState.error) ||
+            (parent.enqueueFailed && !resetError);
+    return parent.copyWith(
+      steps: steps,
+      totalBytes: total,
+      transferredBytes: transferred,
+      state: effectiveError ? TransferState.error : state,
+      speedBytesPerSecond: speedBytesPerSecond,
+      etaSeconds: etaSeconds,
+      errorMessage: effectiveError
+          ? (parent.errorMessage ?? errorMessage ?? errorStep?.errorMessage)
+          : (errorMessage ?? (resetError ? null : errorStep?.errorMessage)),
+      statusCode: effectiveError || errorStep != null ? parent.statusCode : null,
+      updatedAt: updatedAt ?? DateTime.now(),
+      resetError: resetError,
+    );
+  }
+
+  void addStep(String groupId, TransferStep step, {bool stickyError = false}) {
+    final parent = _find(groupId);
+    if (parent?.steps == null) return;
+    _replace(_withSteps(parent!, [...parent.steps!, step],
+        stickyError: stickyError));
+  }
+
+  void removeStep(String groupId, String stepId) {
+    final parent = _find(groupId);
+    if (parent?.steps == null) return;
+    _replace(_withSteps(
+        parent!, parent.steps!.where((s) => s.id != stepId).toList(),
+        stickyError: true));
+  }
+
   void updateProgress(
     String id,
     int transferred,
@@ -178,6 +369,16 @@ class TransferStore {
     double? speedBytesPerSecond,
     int? etaSeconds,
   }) {
+    final owner = findStepOwner(id);
+    if (owner != null) {
+      updateStep(owner.groupId, id,
+          transferred: transferred,
+          total: total,
+          speedBytesPerSecond: speedBytesPerSecond,
+          etaSeconds: etaSeconds,
+          forceActive: true);
+      return;
+    }
     final t = _find(id);
     if (t == null) return;
     _replace(t.copyWith(
@@ -190,23 +391,48 @@ class TransferStore {
   }
 
   void setState(String id, TransferState s) {
+    final owner = findStepOwner(id);
+    if (owner != null) {
+      updateStep(owner.groupId, id, state: s);
+      return;
+    }
     final t = _find(id);
     if (t == null) return;
     _replace(t.copyWith(state: s, updatedAt: DateTime.now()));
   }
 
-  void setError(String id, String message, {int? statusCode}) {
+  /// 返回父任务中每个需要清理的引擎任务 id：有子步骤时是步骤 id。
+  List<String> engineTaskIds(String id) {
+    final t = _find(id);
+    if (t?.steps != null) return t!.steps!.map((s) => s.id).toList();
+    return [id];
+  }
+
+  void setError(String id, String message,
+      {int? statusCode, bool manual = false}) {
+    final owner = findStepOwner(id);
+    if (owner != null) {
+      updateStep(owner.groupId, id,
+          state: TransferState.error, errorMessage: message);
+      return;
+    }
     final t = _find(id);
     if (t == null) return;
     _replace(t.copyWith(
       state: TransferState.error,
       errorMessage: message,
       statusCode: statusCode,
+      enqueueFailed: manual ? true : null,
       updatedAt: DateTime.now(),
     ));
   }
 
   void clearTransferError(String id) {
+    final owner = findStepOwner(id);
+    if (owner != null) {
+      updateStep(owner.groupId, id, resetError: true);
+      return;
+    }
     final t = _find(id);
     if (t == null) return;
     _replace(t.copyWith(resetError: true, updatedAt: DateTime.now()));
@@ -217,8 +443,44 @@ class TransferStore {
     persist();
   }
 
+  bool get hasDefaultControlHooks => true;
+
+  ControlHook defaultControlFor(String kind) => (id) async {
+    final downloader = FileDownloader();
+    if (kind == 'cancel') {
+      return downloader.cancelTaskWithId(id);
+    }
+    final task = await downloader.taskForId(id);
+    if (task == null) return false;
+    if (task is UploadTask) {
+      // FileDownloader.pause 只收 DownloadTask；上传走底层 pause。
+      return false;
+    }
+    return switch (kind) {
+      'resume' => downloader.resume(task as DownloadTask),
+      'pause' => downloader.pause(task as DownloadTask),
+      _ => false,
+    };
+  };
+
+  Future<bool> _control(
+    String id,
+    ControlHook? hook,
+    ControlHook defaultHook,
+  ) async {
+    final t = _find(id);
+    if (t?.steps != null) {
+      final results = <bool>[];
+      for (final step in t!.steps!) {
+        results.add(await (hook ?? defaultHook).call(step.id));
+      }
+      return results.any((ok) => ok);
+    }
+    return (hook ?? defaultHook).call(id);
+  }
+
   Future<bool> resumeTask(String id) async {
-    final ok = await (onResume?.call(id) ?? Future.value(false));
+    final ok = await _control(id, onResume, defaultControlFor('resume'));
     if (ok) {
       clearTransferError(id);
       setState(id, TransferState.active);
@@ -227,17 +489,47 @@ class TransferStore {
   }
 
   Future<bool> pauseTask(String id) async {
-    // 包内暂停需 Task 对象（下载靠通知按钮原生暂停）；本地状态先翻转，
-    // 让 UI 反映意图。
-    await onPause?.call(id);
+    // 引擎暂停对默认不允许暂停的上传任务会返回 false，但本地状态照常翻转，
+    // 让 UI 反映用户意图；真正停止上传靠取消/重试。
+    await _control(id, onPause, defaultControlFor('pause'));
     setState(id, TransferState.paused);
     return true;
   }
 
   Future<bool> cancelTask(String id) async {
-    final ok = await (onCancel?.call(id) ?? Future.value(false));
+    final ok = await _control(id, onCancel, defaultControlFor('cancel'));
     setState(id, TransferState.canceled);
     return ok;
+  }
+
+  /// 删除父任务所有子步骤的本地缓存文件。
+  void deleteTransferCache(String groupId) {
+    final parent = _find(groupId);
+    if (parent?.steps == null) return;
+    for (final step in parent!.steps!) {
+      final file = File(step.localPath);
+      if (file.existsSync()) {
+        try {
+          file.deleteSync();
+        } catch (_) {}
+      }
+      final dir = file.parent;
+      if (dir.existsSync()) {
+        try {
+          dir.deleteSync();
+        } catch (_) {}
+      }
+    }
+  }
+
+  /// 一处完成引擎记录、缓存和本地记录的清理。
+  Future<void> deleteTask(TransferTask t) async {
+    for (final id in t.steps == null ? [t.id] : t.steps!.map((s) => s.id)) {
+      await FileDownloader().cancelTaskWithId(id);
+      await FileDownloader().database.deleteRecordWithId(id);
+    }
+    deleteTransferCache(t.id);
+    remove(t.id);
   }
 
   void remove(String id) {
@@ -260,6 +552,30 @@ class TransferStore {
     }
     final list = (jsonDecode(raw) as List).cast<Map<String, dynamic>>();
     _tasks.value = list.map(TransferTask.fromJson).toList();
+  }
+
+  /// 备份父任务完成时推进 last_backup_time，只向前推进；app 生命周期内只需调用一次。
+  void Function() startBackupTimeSync() {
+    final subscription = tasks.toStream().listen((all) async {
+      DateTime? latest;
+      for (final t in all) {
+        if (t.steps == null || t.state != TransferState.done) continue;
+        for (final s in t.steps!) {
+          final time = s.modifyTime;
+          if (time != null && (latest == null || time.isAfter(latest))) {
+            latest = time;
+          }
+        }
+      }
+      if (latest == null) return;
+      final stored =
+          int.tryParse(await StorageUtil.getString('last_backup_time') ?? '') ?? 0;
+      if (latest.millisecondsSinceEpoch > stored) {
+        await StorageUtil.setString(
+            'last_backup_time', latest.millisecondsSinceEpoch.toString());
+      }
+    });
+    return subscription.cancel;
   }
 
   /// app 启动时恢复未完成传输（依赖引擎自身的持久化队列续传）。

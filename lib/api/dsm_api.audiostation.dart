@@ -170,3 +170,37 @@ Future<Map> dsmAudioStationRemotePlayerControl(
   }
   return res['data'] ?? {};
 }
+
+/// 歌曲列表：NAS 已经把整库的 ID3 标签索引好了（`song_tag` / `song_audio`），
+/// 比自己拉文件解析标签省事得多，代价是 NAS 上得装 Audio Station。
+/// [library] 只有 `all` / `personal` 两个值；传别的（比如 `shared`）会回 1022。
+///
+/// 走 Audio Station 自己的 `AudioStation/song.cgi`：这个接口在 entry.cgi 上没有
+/// 挂上（回 102 Invalid API or method name），但其它 AudioStation 接口能走 entry.cgi，
+/// 所以两个都试一遍。
+Future<Map> dsmAudioStationSongList(
+    {String library = 'all',
+    int limit = 5000,
+    int offset = 0,
+    String sortBy = 'title',
+    String sortDirection = 'asc',
+    String endpoint = 'webapi/AudioStation/song.cgi',
+    CancelToken? cancelToken}) async {
+  final data = _dsmApiRequestData(
+      api: 'SYNO.AudioStation.Song', method: 'list', version: 3)
+    ..addAll({
+      'library': library,
+      'limit': limit,
+      'offset': offset,
+      'sort_by': sortBy,
+      'sort_direction': sortDirection,
+      // 必须是裸逗号列表，写成 JSON 数组会被忽略（回不出 additional）
+      'additional': 'song_tag,song_audio',
+    });
+  final res =
+      await _httpGet(endpoint, queryParameters: data, cancelToken: cancelToken);
+  if (res['success'] != true) {
+    throw DSMException.fromMap(res);
+  }
+  return res['data'] ?? {};
+}

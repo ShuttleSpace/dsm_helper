@@ -1,13 +1,17 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 import 'package:garden/api/dsm_api.dart';
 import 'package:garden/api/dsm_api.filestation.transfer_url.dart';
 import 'package:garden/extensions/string.dart';
 import 'package:garden/services/office_preview.dart';
 import 'package:garden/stores/settings_store.dart';
 import 'package:garden/util/file_type_util.dart';
+import 'package:garden/util/list_cache.dart';
+import 'package:garden/util/media_library.dart';
 import 'package:garden/util/ui_util.dart';
 import 'package:garden/util/storage_util.dart';
+import 'package:flutter/foundation.dart';
 import 'package:garden/stores/connection_store.dart';
 import 'package:android_intent_plus/android_intent.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
@@ -113,15 +117,23 @@ class Files extends HookWidget {
     }
 
     Future<void> getFileList(String path) async {
+      final cacheKey =
+          'files|$path|${sortBy.value}|${sortDirection.value}';
+      final cached = await ListCache.read(cacheKey) as List?;
+      if (cached != null) {
+        // 先显示上次的目录内容，再后台刷新，避免每次进目录都白屏。
+        files.value = cached;
+        success.value = true;
+      }
       loading.value = true;
       try {
         final data = await dsmFileStationListForPage(path,
             sortBy: sortBy.value, sortDirection: sortDirection.value);
         files.value = data['files'] ?? [];
         success.value = true;
-        Log.info(files.value);
+        unawaited(ListCache.write(cacheKey, files.value));
       } catch (e) {
-        success.value = false;
+        success.value = cached != null;
         msg.value = connectionStore.notVisitorAccount.value
             ? '暂无文件'
             : '加载失败，code:${_dsmErrorCode(e)}';
@@ -131,6 +143,11 @@ class Files extends HookWidget {
     }
 
     getShareList() async {
+      final cached = await ListCache.read('files|@shares') as List?;
+      if (cached != null) {
+        files.value = cached;
+        success.value = true;
+      }
       String listTypeStr = await StorageUtil.getString("file_list_type") ?? '';
 
       if (listTypeStr.isNotBlank) {
@@ -147,8 +164,9 @@ class Files extends HookWidget {
         final data = await dsmFileStationListShareForPage();
         files.value = data['shares'] ?? [];
         success.value = true;
+        unawaited(ListCache.write('files|@shares', files.value));
       } catch (e) {
-        success.value = false;
+        success.value = cached != null;
         msg.value = '加载失败，code:${_dsmErrorCode(e)}';
       } finally {
         loading.value = false;
@@ -584,8 +602,11 @@ class Files extends HookWidget {
               ));
               break;
             case FileTypeEnum.movie:
-              bool useEmbeedVideoPlayer =
-                  await StorageUtil.getBool("use_embeed_video_player") ?? true;
+              // android_intent 只有 Android 有实现，其它平台调用会抛异常、点了没反应。
+              final preferExternalPlayer = !kIsWeb &&
+                  Platform.isAndroid &&
+                  (await StorageUtil.getBool("use_embeed_video_player") ??
+                      false);
               String url = fbDownloadUrl(
                   baseUri: connectionStore.baseUri.value,
                   path: file['path'],
@@ -598,15 +619,22 @@ class Files extends HookWidget {
               // 调用vlc player
               // launchUrlString("vlc://$url");
               // return;
-              if (useEmbeedVideoPlayer) {
-                AndroidIntent intent = AndroidIntent(
-                  action: 'action_view',
-                  data: url,
-                  arguments: {},
-                  type: "video/*",
-                );
-                await intent.launch();
-              } else {
+              var openedExternally = false;
+              if (preferExternalPlayer) {
+                try {
+                  await AndroidIntent(
+                    action: 'action_view',
+                    data: url,
+                    arguments: {},
+                    type: "video/*",
+                  ).launch();
+                  openedExternally = true;
+                } catch (e) {
+                  // 常见于没有能播视频的 App：退回内置播放器，别让点击没反应。
+                  Log.error("外部播放器调用失败，改用内置播放器: $e");
+                }
+              }
+              if (!openedExternally) {
                 // 获取封面
                 String name = file['name'];
                 name = name.substring(0, name.lastIndexOf('.'));
@@ -643,6 +671,26 @@ class Files extends HookWidget {
                 } catch (e) {
                   Log.info("无NFO文件");
                 }
+                final subtitles =
+                    FileTypeUtil.findSiblingSubtitles(files.value, name);
+                // 同目录的视频排成播放列表，支持上一个/下一个/自动连播
+                final playlist = [
+                  for (final element in files.value)
+                    if (FileTypeUtil.getFileType('${element['name']}') ==
+                        "movie")
+                      MediaItem(
+                        name: '${element['name']}',
+                        path: '${element['path']}',
+                        subtitles: FileTypeUtil.findSiblingSubtitles(
+                            files.value, '${element['name']}'),
+                        size: int.tryParse(
+                                '${element['additional']?['size'] ?? ''}') ??
+                            0,
+                        mtime: int.tryParse(
+                                '${element['additional']?['time']?['mtime'] ?? ''}') ??
+                            0,
+                      ),
+                ];
                 if (context.mounted) {
                   // ignore: use_build_context_synchronously
                   Navigator.of(context)
@@ -652,6 +700,9 @@ class Files extends HookWidget {
                       name: file['name'],
                       cover: cover,
                       nfo: nfo,
+                      subtitles: subtitles,
+                      mediaPath: '${file['path']}',
+                      playlist: playlist,
                     );
                   }));
                 }

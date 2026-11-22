@@ -5,6 +5,8 @@ import 'package:garden/util/ui_util.dart';
 import 'package:garden/stores/connection_store.dart';
 import 'dart:io';
 
+import 'package:garden/pages/media/media_library.dart';
+import 'package:garden/pages/backup/backup.dart';
 import 'package:garden/pages/download/download.dart';
 import 'package:garden/pages/download/download_state.dart';
 import 'package:garden/pages/file/file.dart';
@@ -105,7 +107,7 @@ class Home extends HookWidget {
           return;
         }
         value = filesOnWillPop.value?.call() ?? Future.value(false);
-      } else if (navIndex.value == 2) {
+      } else if (navIndex.value == 3) {
         value = DownloadStateInherited.of(context)?.notifier.onWillPop() ??
             Future.value(false);
       }
@@ -154,6 +156,11 @@ class Home extends HookWidget {
       }
     });
 
+    useEffect(() {
+      runAutoBackup();
+      return null;
+    }, const []);
+
     return PopScope(
       // 交给 onWillPop 统一判定：文件页先回上一级，根目录下才走退出确认。
       canPop: false,
@@ -169,6 +176,7 @@ class Home extends HookWidget {
                 Files(
                     filesDrawerOpen: filesDrawerOpen,
                     filesOnWillPop: filesOnWillPop),
+                const MediaLibrary(),
                 Download(key: UniqueKey()),
                 const Setting(),
               ],
@@ -202,6 +210,10 @@ class Home extends HookWidget {
                 ),
                 label: "文件",
               ),
+              const BottomNavigationBarItem(
+                icon: MediaTabIcon(),
+                label: '多媒体',
+              ),
               BottomNavigationBarItem(
                 icon: Image.asset(
                   "assets/tabbar/save.png",
@@ -219,6 +231,38 @@ class Home extends HookWidget {
                 label: '设置',
               ),
             ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// 多媒体 tab 图标：黑框白底 + 橙色播放键，写法跟其余 PNG 图标的尺寸一致；
+/// 深色主题下底色和描边反过来，避免白底在黑底上发光。
+class MediaTabIcon extends StatelessWidget {
+  const MediaTabIcon({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final dark = Theme.of(context).brightness == Brightness.dark;
+    // 占位跟其它 tab 一样是 30px（否则文字基线错位），图标本体缩到 PNG 墨迹的 80%
+    return SizedBox(
+      width: 30,
+      height: 30,
+      child: Center(
+        child: SizedBox(
+          width: 24,
+          height: 24,
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              color: dark ? Colors.black : Colors.white,
+              border: Border.all(color: scheme.onSurface, width: 1.5),
+              borderRadius: BorderRadius.circular(6),
+            ),
+            child: const Icon(Icons.play_arrow,
+                size: 14, color: Color(0xFFFF9813)),
           ),
         ),
       ),

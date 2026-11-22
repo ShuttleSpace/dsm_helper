@@ -147,66 +147,66 @@ class Setting extends HookWidget {
           return SizedBox(
             width: double.infinity,
             child: Material(
-            color: Colors.transparent,
-            child: Card(
-              shape: RoundedRectangleBorder(
-                  side: const BorderSide(),
-                  borderRadius: BorderRadius.circular(18)),
-              child: SafeArea(
-                top: false,
-                child: Padding(
-                  padding: const EdgeInsets.all(6),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: <Widget>[
-                      const Text(
-                        "主题颜色",
-                        style: TextStyle(
-                            fontSize: 20, fontWeight: FontWeight.w500),
-                      ),
-                      const SizedBox(
-                        height: 12,
-                      ),
-                      const Row(
-                        children: [
-                          Expanded(
-                            child: ThemeButton("assets/light.png", 0, "亮色"),
-                          ),
-                          SizedBox(
-                            width: 16,
-                          ),
-                          Expanded(
-                            child: ThemeButton("assets/dark.png", 1, "暗色"),
-                          ),
-                          SizedBox(
-                            width: 16,
-                          ),
-                          Expanded(
-                            child: ThemeButton("assets/auto.png", 2, "跟随系统"),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(
-                        height: 20,
-                      ),
-                      OutlinedButton(
-                        onPressed: () async {
-                          Navigator.of(context).pop();
-                        },
-                        child: const Text(
-                          "取消",
-                          style: TextStyle(fontSize: 18),
+              color: Colors.transparent,
+              child: Card(
+                shape: RoundedRectangleBorder(
+                    side: const BorderSide(),
+                    borderRadius: BorderRadius.circular(18)),
+                child: SafeArea(
+                  top: false,
+                  child: Padding(
+                    padding: const EdgeInsets.all(6),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: <Widget>[
+                        const Text(
+                          "主题颜色",
+                          style: TextStyle(
+                              fontSize: 20, fontWeight: FontWeight.w500),
                         ),
-                      ),
-                      const SizedBox(
-                        height: 8,
-                      ),
-                    ],
+                        const SizedBox(
+                          height: 12,
+                        ),
+                        const Row(
+                          children: [
+                            Expanded(
+                              child: ThemeButton("assets/light.png", 0, "亮色"),
+                            ),
+                            SizedBox(
+                              width: 16,
+                            ),
+                            Expanded(
+                              child: ThemeButton("assets/dark.png", 1, "暗色"),
+                            ),
+                            SizedBox(
+                              width: 16,
+                            ),
+                            Expanded(
+                              child: ThemeButton("assets/auto.png", 2, "跟随系统"),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(
+                          height: 20,
+                        ),
+                        OutlinedButton(
+                          onPressed: () async {
+                            Navigator.of(context).pop();
+                          },
+                          child: const Text(
+                            "取消",
+                            style: TextStyle(fontSize: 18),
+                          ),
+                        ),
+                        const SizedBox(
+                          height: 8,
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
           );
         },
       );

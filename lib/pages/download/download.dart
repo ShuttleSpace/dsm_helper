@@ -111,9 +111,7 @@ class Download extends HookWidget {
 
     Future<void> clearTasks(Iterable<TransferTask> targets) async {
       for (final t in targets) {
-        await FileDownloader().cancelTaskWithId(t.id);
-        await FileDownloader().database.deleteRecordWithId(t.id);
-        transferStore.remove(t.id);
+        await transferStore.deleteTask(t);
       }
     }
 
@@ -244,10 +242,23 @@ class Download extends HookWidget {
       UiUtil.toast('已取消 ${selectedTasks.length} 项');
     }
 
+    Future<void> batchRetry() async {
+      final targets = selectedTasks
+          .where((t) => t.state == TransferState.error && t.steps == null)
+          .toList();
+      if (targets.isEmpty) {
+        UiUtil.toast('所选任务无需重试');
+        return;
+      }
+      for (final t in targets) {
+        await retryTransferTask(t);
+      }
+      UiUtil.toast('已重试 ${targets.length} 项');
+    }
+
     Future<void> batchRemove() async {
       for (final t in selectedTasks) {
-        transferStore.remove(t.id);
-        await FileDownloader().database.deleteRecordWithId(t.id);
+        await transferStore.deleteTask(t);
       }
       UiUtil.toast('已移除 ${selectedTasks.length} 项');
     }
@@ -260,6 +271,7 @@ class Download extends HookWidget {
           options: [
             BottomOption(title: '暂停', onPressed: batchPause),
             BottomOption(title: '继续', onPressed: batchResume),
+            BottomOption(title: '重试', onPressed: batchRetry),
             BottomOption(
               title: '取消任务',
               onPressed: () => confirmBatch('取消', batchCancel),
@@ -378,7 +390,12 @@ class Download extends HookWidget {
           ? const Center(child: CupertinoActivityIndicator())
           : Column(
               children: [
-                TabBar(controller: tabController, tabs: tabs),
+                TabBar(
+                  controller: tabController,
+                  tabs: tabs,
+                  isScrollable: true,
+                  tabAlignment: TabAlignment.center,
+                ),
                 Expanded(
                   child: TabBarView(
                     controller: tabController,

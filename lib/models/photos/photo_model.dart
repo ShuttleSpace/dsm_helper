@@ -123,7 +123,12 @@ class PhotoModel {
   }
 
   String thumbUrl({String size = 'sm', bool isTeam = false}) {
-    return '${connectionStore.baseUri}/webapi/entry.cgi?id=${additional!.thumbnail?.unitId}&cache_key="${additional?.thumbnail?.cacheKey}"&type="unit"&size="$size"&api="SYNO.Foto${isTeam ? 'Team' : ''}.Thumbnail"&method="get"&version=1&_sid=${connectionStore.sid}';
+    // 视频的 thumbnail 可能没有 unit_id/cache_key（DSM 版本差异），退回用 item id，
+    // 否则会请求 id=null 的缩略图， ExtendedImage 拿不到图片。
+    final unitId = additional?.thumbnail?.unitId ?? id;
+    final cacheKey = additional?.thumbnail?.cacheKey;
+    final cacheKeyParam = cacheKey != null ? 'cache_key="$cacheKey"&' : '';
+    return '${connectionStore.baseUri}/webapi/entry.cgi?id=$unitId&${cacheKeyParam}type="unit"&size="$size"&api="SYNO.Foto${isTeam ? 'Team' : ''}.Thumbnail"&method="get"&version=1&_sid=${connectionStore.sid}';
   }
 
   PhotoModel copyWith({

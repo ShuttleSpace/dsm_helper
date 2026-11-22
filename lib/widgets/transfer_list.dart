@@ -50,7 +50,8 @@ List<TransferTask> filterTransferTasks({
     if (state != null && t.state != state) return false;
     if (keyword.isEmpty) return true;
     return t.remotePath.toLowerCase().contains(keyword) ||
-        t.localPath.toLowerCase().contains(keyword);
+        t.localPath.toLowerCase().contains(keyword) ||
+        transferTaskName(t).toLowerCase().contains(keyword);
   }).toList();
 
   int compare(TransferTask a, TransferTask b) => switch (sort) {
@@ -70,6 +71,27 @@ List<TransferTask> filterTransferTasks({
 }
 
 String _nameOf(TransferTask t) => t.remotePath.split('/').last;
+
+String transferTaskName(TransferTask t) =>
+    t.steps == null ? _nameOf(t) : '相册备份（${t.steps!.length} 个文件）';
+
+/// 重试单个备份子步骤：重新入队并返回一个全新的干净步骤。
+Future<TransferStep> retryTransferStep(
+  TransferStep step,
+  Future<String> Function(String localPath, String remoteDir) enqueue,
+) async {
+  final newId = await enqueue(
+    step.localPath,
+    step.remotePath.substring(0, step.remotePath.lastIndexOf('/')),
+  );
+  return TransferStep(
+    id: newId,
+    localPath: step.localPath,
+    remotePath: step.remotePath,
+    state: TransferState.active,
+    modifyTime: step.modifyTime,
+  );
+}
 
 int _progressOf(TransferTask t) => t.state == TransferState.done
     ? 100
@@ -134,6 +156,7 @@ class TransferList extends HookWidget {
   @override
   Widget build(BuildContext context) {
     useExistingSignal(transferStore.tasks).watch(context);
+    final expanded = useState<Set<String>>({});
     final filtered = filterTransferTasks(
       tab: tab,
       type: type,
@@ -183,7 +206,7 @@ class TransferList extends HookWidget {
             ),
           );
         }
-        return _buildRow(context, row as TransferTask);
+        return _buildRow(context, row as TransferTask, expanded);
       },
     );
   }
@@ -215,9 +238,11 @@ class TransferList extends HookWidget {
     ];
   }
 
-  Widget _buildRow(BuildContext context, TransferTask t) {
+  Widget _buildRow(BuildContext context, TransferTask t, ValueNotifier<Set<String>> expanded) {
     final theme = AppTheme.of(context);
-    final name = _nameOf(t);
+    final name = transferTaskName(t);
+    final isParent = t.steps != null;
+    final isExpanded = expanded.value.contains(t.id);
     final pct = _progressOf(t);
     final selected = selectedIds.contains(t.id);
     final stateText = _stateText(t.state);
@@ -266,6 +291,24 @@ class TransferList extends HookWidget {
                 color: AppColors.infoOf(context),
               ),
               const SizedBox(width: 8),
+              if (isParent)
+                // 整行点击仍打开操作面板（含详情），展开收起走这个箭头。
+                GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onTap: () {
+                    expanded.value = isExpanded
+                        ? expanded.value.where((id) => id != t.id).toSet()
+                        : {...expanded.value, t.id};
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 4),
+                    child: Icon(
+                      isExpanded ? Icons.expand_less : Icons.expand_more,
+                      size: 18,
+                      color: theme.placeholderColor,
+                    ),
+                  ),
+                ),
               Expanded(
                 child: Text(
                   name,
@@ -307,6 +350,39 @@ class TransferList extends HookWidget {
               displayText: '%',
             ),
           ],
+          if (isParent && isExpanded) ...[
+            const SizedBox(height: 8),
+            ...t.steps!.map((s) => InkWell(
+                  onTap: () => _showStepActions(context, t, s),
+                  child: Padding(
+                    padding: const EdgeInsets.only(top: 6, left: 8),
+                    child: Row(
+                      children: [
+                        Icon(
+                          s.state == TransferState.done
+                              ? Icons.check_circle_outline
+                              : s.state == TransferState.error
+                                  ? Icons.error_outline
+                                  : Icons.radio_button_unchecked,
+                          size: 14,
+                          color: _stateColor(context, s.state),
+                        ),
+                        const SizedBox(width: 6),
+                        Expanded(
+                          child: Text(
+                            '${s.remotePath.split('/').last}  ${s.transferredBytes.formatSize()}/${s.totalBytes.formatSize()}',
+                            style: TextStyle(
+                                fontSize: 12, color: theme.titleColor),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        Icon(Icons.chevron_right,
+                            size: 14, color: theme.placeholderColor),
+                      ],
+                    ),
+                  ),
+                )),
+          ],
           if (t.errorMessage != null && t.errorMessage!.isNotEmpty) ...[
             const SizedBox(height: 8),
             Text(
@@ -323,13 +399,62 @@ class TransferList extends HookWidget {
     );
   }
 
-  void _showActions(BuildContext context, TransferTask t) {
+  void _showStepActions(
+    BuildContext context,
+    TransferTask parent,
+    TransferStep step,
+  ) {
+    final isUpload = parent.type == TransferType.upload;
+    final canRetry = step.state == TransferState.paused ||
+        step.state == TransferState.error ||
+        step.state == TransferState.canceled;
     final options = <BottomOption>[
-      if (t.state == TransferState.active)
+      if (step.state == TransferState.active ||
+          step.state == TransferState.queued)
+        BottomOption(title: '暂停', onPressed: () => _pauseStep(step)),
+      // 上传步骤的引擎暂停/继续不可靠，继续统一走重新入队。
+      if (canRetry)
+        BottomOption(
+          title: step.state == TransferState.paused && !isUpload ? '继续' : '重试',
+          onPressed: () => _retryStep(context, parent, step),
+        ),
+      if (step.state == TransferState.active ||
+          step.state == TransferState.queued ||
+          step.state == TransferState.paused)
+        BottomOption(title: '取消', onPressed: () => _cancelStep(step)),
+      BottomOption(
+        title: '详情',
+        onPressed: () => showTransferStepDetail(context, step),
+      ),
+    ];
+    showCupertinoModalPopup(
+      context: context,
+      builder: (context) => BottomOptionSheet(
+        title: step.remotePath.split('/').last,
+        options: options,
+      ),
+    );
+  }
+
+  Future<void> _pauseStep(TransferStep step) async {
+    await transferStore.pauseTask(step.id);
+    UiUtil.toast('已暂停该步骤');
+  }
+
+  Future<void> _cancelStep(TransferStep step) async {
+    await transferStore.cancelTask(step.id);
+    UiUtil.toast('已取消该步骤');
+  }
+
+  void _showActions(BuildContext context, TransferTask t) {
+    final isBackup = t.steps != null;
+    final options = <BottomOption>[
+      if (t.state == TransferState.active && !isBackup)
         BottomOption(title: '暂停', onPressed: () => _pause(t)),
-      if (t.state == TransferState.paused || t.state == TransferState.error)
+      if ((t.state == TransferState.paused || t.state == TransferState.error) &&
+          !isBackup)
         BottomOption(title: '继续', onPressed: () => _resume(t)),
-      if (t.state == TransferState.error)
+      if (t.state == TransferState.error && !isBackup)
         BottomOption(title: '重试', onPressed: () => _retry(t)),
       if (t.state != TransferState.done && t.state != TransferState.canceled)
         BottomOption(
@@ -418,49 +543,77 @@ class TransferList extends HookWidget {
   }
 
   Future<bool> _remove(String id) async {
-    transferStore.remove(id);
-    await FileDownloader().database.deleteRecordWithId(id);
+    final t = transferStore.tasks.value.where((e) => e.id == id).firstOrNull;
+    if (t != null) await transferStore.deleteTask(t);
     UiUtil.toast('已移除');
     return true;
   }
 
-  /// 重试必须先清掉旧记录，否则同一次失败会留下重复任务。
-  Future<void> _retry(TransferTask t) async {
-    final String newId;
+  Future<void> _retryStep(
+    BuildContext context,
+    TransferTask parent,
+    TransferStep step,
+  ) async {
     try {
-      if (t.type == TransferType.upload) {
-        final remoteDir = t.remotePath.substring(
-          0,
-          t.remotePath.lastIndexOf('/'),
-        );
-        newId = await enqueueFileUpload(
-          localPath: t.localPath,
-          remoteDir: remoteDir,
-        );
-      } else {
-        final destDir = await downloadTargetDir();
-        newId = await enqueueFileDownload(
-          remotePath: t.remotePath,
-          destDir: destDir,
-        );
-      }
+      final fresh = await retryTransferStep(
+          step, (path, dir) => enqueueFileUpload(localPath: path, remoteDir: dir));
+      await FileDownloader().cancelTaskWithId(step.id);
+      await FileDownloader().database.deleteRecordWithId(step.id);
+      transferStore.removeStep(parent.id, step.id);
+      transferStore.addStep(parent.id, fresh);
+      UiUtil.toast('已重新加入队列');
     } catch (_) {
       UiUtil.toast('重试失败，请检查连接');
-      return;
     }
-    await FileDownloader().cancelTaskWithId(t.id);
-    await FileDownloader().database.deleteRecordWithId(t.id);
-    transferStore.remove(t.id);
-    transferStore.add(TransferTask(
-      id: newId,
-      type: t.type,
-      localPath: t.localPath,
-      remotePath: t.remotePath,
-      state: TransferState.active,
-      createdAt: t.createdAt,
-    ));
-    UiUtil.toast('已重新加入队列');
   }
+
+  Future<void> _retry(TransferTask t) async {
+    await retryTransferTask(t);
+  }
+}
+
+/// 重试必须先清掉旧记录，否则同一次失败会留下重复任务。
+/// 带子步骤的备份父任务不能整体重试，返回 false 并提示展开后重试步骤。
+Future<bool> retryTransferTask(TransferTask t) async {
+  if (t.steps != null) {
+    UiUtil.toast('请展开任务后重试失败的步骤');
+    return false;
+  }
+  final String newId;
+  try {
+    if (t.type == TransferType.upload) {
+      final remoteDir = t.remotePath.substring(
+        0,
+        t.remotePath.lastIndexOf('/'),
+      );
+      newId = await enqueueFileUpload(
+        localPath: t.localPath,
+        remoteDir: remoteDir,
+      );
+    } else {
+      final destDir = await downloadTargetDir();
+      newId = await enqueueFileDownload(
+        remotePath: t.remotePath,
+        destDir: destDir,
+      );
+    }
+  } catch (_) {
+    UiUtil.toast('重试失败，请检查连接');
+    return false;
+  }
+  await FileDownloader().cancelTaskWithId(t.id);
+  await FileDownloader().database.deleteRecordWithId(t.id);
+  transferStore.remove(t.id);
+  transferStore.add(TransferTask(
+    id: newId,
+    type: t.type,
+    localPath: t.localPath,
+    remotePath: t.remotePath,
+    state: TransferState.active,
+    createdAt: t.createdAt,
+  ));
+  UiUtil.toast('已重新加入队列');
+  return true;
 }
 
 class _GroupKey {
@@ -469,6 +622,77 @@ class _GroupKey {
 }
 
 /// 传输任务详情面板：只展示可读信息，不展示响应体或临时分片路径。
+void showTransferStepDetail(BuildContext context, TransferStep step) {
+  final theme = AppTheme.of(context);
+  showCupertinoModalPopup(
+    context: context,
+    builder: (context) => BottomSheetCard(
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              step.remotePath.split('/').last,
+              style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w500,
+                  color: theme.titleColor),
+            ),
+            const SizedBox(height: 16),
+            _detailRow(context, '状态', TransferList._stateText(step.state)),
+            _detailRow(context, '大小', step.totalBytes.formatSize()),
+            _detailRow(context, '已传',
+                '${step.transferredBytes.formatSize()} · ${_stepPct(step)}%'),
+            if (step.errorMessage != null && step.errorMessage!.isNotEmpty)
+              _detailRow(context, '原因', step.errorMessage!),
+            _detailRow(
+                context,
+                '拍摄',
+                step.modifyTime?.toLocal().toString().substring(0, 19) ?? '--'),
+            _detailRow(context, '远程', step.remotePath),
+            _detailRow(context, '本地', step.localPath),
+            const SizedBox(height: 4),
+            OutlinedButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('关闭'),
+            ),
+          ],
+        ),
+      ),
+    ),
+  );
+}
+
+int _stepPct(TransferStep step) => step.totalBytes <= 0
+    ? 0
+    : (step.transferredBytes / step.totalBytes * 100).round();
+
+Widget _detailRow(BuildContext context, String label, String value) {
+  final theme = AppTheme.of(context);
+  return Padding(
+    padding: const EdgeInsets.only(bottom: 10),
+    child: Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SizedBox(
+          width: 56,
+          child: Text(label,
+              style: TextStyle(fontSize: 13, color: theme.placeholderColor)),
+        ),
+        Expanded(
+          child: Text(
+            value,
+            style: TextStyle(fontSize: 13, color: theme.titleColor),
+            maxLines: 3,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
+      ],
+    ),
+  );
+}
+
 void showTransferTaskDetail(BuildContext context, TransferTask task) {
   final theme = AppTheme.of(context);
   Widget row(String label, String value) => Padding(
@@ -502,7 +726,7 @@ void showTransferTaskDetail(BuildContext context, TransferTask task) {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              _nameOf(task),
+              transferTaskName(task),
               style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w500,
@@ -520,8 +744,8 @@ void showTransferTaskDetail(BuildContext context, TransferTask task) {
                   : task.errorMessage!),
             row('创建', task.createdAt?.toLocal().toString().substring(0, 19) ?? '--'),
             row('更新', task.updatedAt?.toLocal().toString().substring(0, 19) ?? '--'),
-            row('远程', task.remotePath),
-            row('本地', task.localPath),
+            row('远程', task.remotePath.isEmpty ? '--' : task.remotePath),
+            row('本地', task.localPath.isEmpty ? '--' : task.localPath),
             const SizedBox(height: 4),
             OutlinedButton(
               onPressed: () => Navigator.of(context).pop(),

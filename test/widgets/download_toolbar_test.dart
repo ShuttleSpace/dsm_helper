@@ -68,6 +68,7 @@ void main() {
 
     await tester.tap(find.byIcon(Icons.more_vert));
     await tester.pumpAndSettle();
+    expect(find.text('重试'), findsOneWidget);
     await tester.tap(find.text('取消任务'));
     await tester.pumpAndSettle();
 

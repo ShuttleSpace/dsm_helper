@@ -15,28 +15,14 @@ class Photos extends HookWidget {
     final currentIndex = useSignal(0);
     final isTeam = useSignal(false);
     final isTimeline = useSignal(true);
-    final menuW = MediaQuery.sizeOf(context).width / 5;
 
     return Scaffold(
       appBar: AppBar(
         leading: AppBackButton(context),
-        title: DropdownMenu(
-          width: menuW,
-          initialSelection: currentIndex.value,
-          enableSearch: false,
-          enableFilter: false,
-          textAlign: TextAlign.center,
-          textStyle: const TextStyle(fontSize: 12),
-          inputDecorationTheme:
-              const InputDecorationTheme(border: InputBorder.none),
-          dropdownMenuEntries: const [
-            DropdownMenuEntry(value: 0, label: '图片'),
-            DropdownMenuEntry(value: 1, label: '相册'),
-            DropdownMenuEntry(value: 2, label: '共享'),
-          ],
-          onSelected: (value) {
-            currentIndex.value = value ?? 0;
-          },
+        title: buildPhotosMenu(
+          context,
+          currentIndex.value,
+          (value) => currentIndex.value = value,
         ),
         actions: [
           if (currentIndex.value != 2)
@@ -142,4 +128,33 @@ class Photos extends HookWidget {
       ),
     );
   }
+}
+
+/// 顶部下拉框：宽度要放得下两个汉字，否则「图片/相册/共享」被截断。
+DropdownMenu<int> buildPhotosMenu(
+  BuildContext context,
+  int selected,
+  ValueChanged<int> onSelected,
+) {
+  final width = MediaQuery.sizeOf(context).width;
+  return DropdownMenu<int>(
+    width: (width / 5).clamp(84.0, 120.0),
+    initialSelection: selected,
+    enableSearch: false,
+    enableFilter: false,
+    textAlign: TextAlign.center,
+    textStyle: const TextStyle(fontSize: 12),
+    inputDecorationTheme: const InputDecorationTheme(
+      border: InputBorder.none,
+      isDense: true,
+      contentPadding: EdgeInsets.zero,
+    ),
+    trailingIcon: const Icon(Icons.arrow_drop_down, size: 18),
+    dropdownMenuEntries: const [
+      DropdownMenuEntry(value: 0, label: '图片'),
+      DropdownMenuEntry(value: 1, label: '相册'),
+      DropdownMenuEntry(value: 2, label: '共享'),
+    ],
+    onSelected: (value) => onSelected(value ?? 0),
+  );
 }

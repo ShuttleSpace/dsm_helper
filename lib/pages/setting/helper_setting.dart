@@ -332,9 +332,6 @@ class HelperSetting extends HookWidget {
                   settings: const RouteSettings(name: "player_setting"),
                 ),
               );
-
-              videoPlayer.value = !videoPlayer.value;
-              StorageUtil.setBool("use_embeed_video_player", videoPlayer.value);
             },
           ),
           const SizedBox(

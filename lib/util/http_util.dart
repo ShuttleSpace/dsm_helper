@@ -14,6 +14,25 @@ export 'package:garden/extensions/string.dart';
 
 export 'file_types.dart';
 
+final _httpClient = HttpClient();
+
+extension DioExtension on Dio {
+  /// 不要在这里设 findProxy：`_httpClient` 是全局共享的，设一次就一直粘着，
+  /// 曾经把代理写死在这里，导致每个请求先去连一个不存在的代理再回退 DIRECT。
+  _createHttpClient({BadCertificateCallback? callback}) {
+    if (httpClientAdapter is IOHttpClientAdapter) {
+      (httpClientAdapter as IOHttpClientAdapter).createHttpClient = () {
+        if (callback != null) {
+          _httpClient.badCertificateCallback = callback;
+        }
+        return _httpClient;
+      };
+    } else {
+      Log.warn(
+          "DioExtension.badCertificateCallback: httpClientAdapter is not IOHttpClientAdapter");
+    }
+  }
+}
 // FileTypeEnum 和 UploadStatus 已移至 file_types.dart
 
 /// HTTP 请求工具类
@@ -50,16 +69,10 @@ class HttpUtil {
         connectTimeout: Duration(seconds: timeout),
       ),
     );
-    //忽略Https校验
-    // TODO: support proxy
-    if (!(checkSsl ?? connectionStore.checkSsl.value)) {
-      (dio.httpClientAdapter as IOHttpClientAdapter).createHttpClient = () {
-        return HttpClient()
-          ..badCertificateCallback = (cert, host, port) {
-            return true;
-          };
-      };
-    }
+    dio._createHttpClient(
+        callback: (cert, host, port) {
+          return !(checkSsl ?? connectionStore.checkSsl.value);
+        });
 
     Response response;
     try {
@@ -165,14 +178,10 @@ class HttpUtil {
       responseHeader: false,
       logPrint: Log.debug,
     ));
-    if (!(checkSsl ?? connectionStore.checkSsl.value)) {
-      (dio.httpClientAdapter as IOHttpClientAdapter).createHttpClient = () {
-        return HttpClient()
-          ..badCertificateCallback = (cert, host, port) {
-            return true;
-          };
-      };
-    }
+    dio._createHttpClient(
+        callback: (cert, host, port) {
+          return !(checkSsl ?? connectionStore.checkSsl.value);
+        });
     Response response;
     try {
       // Log.debug(
@@ -218,15 +227,10 @@ class HttpUtil {
       ),
     );
     // TODO: support proxy
-    //忽略Https校验
-    if (!connectionStore.checkSsl.value) {
-      (dio.httpClientAdapter as IOHttpClientAdapter).createHttpClient = () {
-        return HttpClient()
-          ..badCertificateCallback = (cert, host, port) {
-            return true;
-          };
-      };
-    }
+    dio._createHttpClient(
+        callback: (cert, host, port) {
+          return !(connectionStore.checkSsl.value);
+        });
     FormData formData = FormData.fromMap(data);
     Response response;
     try {
@@ -263,6 +267,10 @@ class HttpUtil {
     Response response;
 
     try {
+      dio._createHttpClient(
+          callback: (cert, host, port) {
+            return !(connectionStore.checkSsl.value);
+          });
       response = await dio.download(
           url, tempPath + Platform.pathSeparator + saveName,
           deleteOnError: true,

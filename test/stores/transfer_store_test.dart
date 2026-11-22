@@ -1,8 +1,10 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:background_downloader/background_downloader.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:garden/stores/transfer_store.dart';
+import 'package:garden/util/storage_util.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
@@ -26,6 +28,36 @@ void main() {
       final json = task.toJson();
       final restored = TransferTask.fromJson(json);
       expect(restored.toJson(), json);
+    });
+
+    test('parent with steps roundtrips JSON and legacy task has null steps', () {
+      final parent = TransferTask(
+        id: 'backup_1',
+        type: TransferType.upload,
+        localPath: '',
+        remotePath: '/photos',
+        state: TransferState.active,
+        steps: [
+          TransferStep(
+            id: 'step1',
+            localPath: '/cache/a.jpg',
+            remotePath: '/photos/a.jpg',
+            totalBytes: 100,
+            transferredBytes: 40,
+            state: TransferState.active,
+            modifyTime: DateTime(2026, 1, 2, 3, 4, 5),
+          ),
+        ],
+      );
+      expect(TransferTask.fromJson(parent.toJson()).toJson(), parent.toJson());
+      final legacy = TransferTask.fromJson({
+        'id': 'old',
+        'type': 1,
+        'localPath': '/l',
+        'remotePath': '/r',
+        'state': 0,
+      });
+      expect(legacy.steps, isNull);
     });
 
     test('fromJson tolerates missing optional fields', () {
@@ -143,6 +175,204 @@ void main() {
       expect(store.tasks.value.first.state, TransferState.active);
       store.applyTaskStatus('t2', TaskStatus.failed);
       expect(store.tasks.value.first.state, TransferState.error);
+    });
+  });
+
+  group('step callback routing', () {
+    TransferStep stepOf(TransferTask t, String id) =>
+        t.steps!.firstWhere((s) => s.id == id);
+
+    TransferStore seededStore() {
+      final store = TransferStore();
+      store.add(const TransferTask(
+        id: 'backup_1',
+        type: TransferType.upload,
+        localPath: '',
+        remotePath: '/photos',
+        state: TransferState.queued,
+        steps: [
+          TransferStep(
+            id: 's1',
+            localPath: '/c/a',
+            remotePath: '/photos/a',
+            totalBytes: 100,
+            state: TransferState.queued,
+          ),
+          TransferStep(
+            id: 's2',
+            localPath: '/c/b',
+            remotePath: '/photos/b',
+            totalBytes: 200,
+            state: TransferState.queued,
+          ),
+        ],
+      ));
+      return store;
+    }
+
+    test('engine callbacks routed by step id aggregate to parent', () {
+      final store = seededStore();
+      store.updateProgress('s1', 50, 100,
+          speedBytesPerSecond: 1.5, etaSeconds: 7);
+      var parent = store.tasks.value.first;
+      expect(stepOf(parent, 's1').transferredBytes, 50);
+      expect(parent.transferredBytes, 50);
+      expect(parent.totalBytes, 300);
+      expect(parent.state, TransferState.active);
+      expect(parent.speedBytesPerSecond, 1.5);
+
+      store.applyTaskStatus('s2', TaskStatus.complete);
+      parent = store.tasks.value.first;
+      expect(stepOf(parent, 's2').state, TransferState.done);
+
+      store.updateProgress('s2', 200, 200);
+      store.applyTaskStatus('s1', TaskStatus.complete);
+      parent = store.tasks.value.first;
+      expect(parent.state, TransferState.done);
+      expect(parent.transferredBytes, 300);
+    });
+
+    test('setError on step id marks step and parent error', () {
+      final store = seededStore();
+      store.setError('s2', '上传失败', statusCode: 503);
+      final parent = store.tasks.value.first;
+      expect(stepOf(parent, 's2').state, TransferState.error);
+      expect(stepOf(parent, 's2').errorMessage, '上传失败');
+      expect(stepOf(parent, 's1').state, TransferState.queued);
+      expect(parent.state, TransferState.error);
+      expect(parent.errorMessage, '上传失败');
+    });
+  });
+
+  group('engine controls', () {
+    const parent = TransferTask(
+      id: 'backup_1',
+      type: TransferType.upload,
+      localPath: '',
+      remotePath: '/photos',
+      state: TransferState.active,
+      steps: [
+        TransferStep(
+          id: 's1',
+          localPath: '/c/a',
+          remotePath: '/photos/a',
+          totalBytes: 1,
+          state: TransferState.active,
+        ),
+        TransferStep(
+          id: 's2',
+          localPath: '/c/b',
+          remotePath: '/photos/b',
+          totalBytes: 1,
+          state: TransferState.active,
+        ),
+      ],
+    );
+
+    test('control hooks receive step ids, not only the parent id', () async {
+      final resumed = <String>[];
+      final paused = <String>[];
+      final canceled = <String>[];
+      final store = TransferStore(
+        onResume: (id) async {
+          resumed.add(id);
+          return true;
+        },
+        onPause: (id) async {
+          paused.add(id);
+          return true;
+        },
+        onCancel: (id) async {
+          canceled.add(id);
+          return true;
+        },
+      );
+      store.add(parent);
+
+      await store.resumeTask('backup_1');
+      expect(resumed, ['s1', 's2']);
+      await store.pauseTask('backup_1');
+      expect(paused, ['s1', 's2']);
+      expect(store.tasks.value.first.state, TransferState.paused);
+      await store.cancelTask('backup_1');
+      expect(canceled, ['s1', 's2']);
+      expect(store.tasks.value.first.state, TransferState.canceled);
+    });
+
+    test('default engine controls exist when no hooks are injected', () {
+      final store = TransferStore();
+      expect(store.hasDefaultControlHooks, isTrue);
+      expect(store.defaultControlFor('s1'), isNotNull);
+    });
+  });
+
+  group('cleanup and completion time', () {
+    test('deleteTransferCache removes step files and their directories', () async {
+      final dir = await Directory.systemTemp.createTemp('transfer_cache_');
+      addTearDown(() {
+        if (dir.existsSync()) dir.deleteSync(recursive: true);
+      });
+      final file = File('${dir.path}/a.jpg')..writeAsStringSync('x');
+      final store = TransferStore();
+      store.add(TransferTask(
+        id: 'backup_1',
+        type: TransferType.upload,
+        localPath: '',
+        remotePath: '/photos',
+        steps: [
+          TransferStep(
+              id: 's1',
+              localPath: file.path,
+              remotePath: '/photos/a.jpg'),
+        ],
+      ));
+      expect(store.engineTaskIds('backup_1'), ['s1']);
+      store.deleteTransferCache('backup_1');
+      expect(file.existsSync(), isFalse);
+      expect(dir.existsSync(), isFalse);
+    });
+
+    test('startBackupTimeSync persists max modifyTime, never moves backwards',
+        () async {
+      SharedPreferences.setMockInitialValues({});
+      await StorageUtil.setString('last_backup_time', '500');
+      final store = TransferStore();
+      final stop = store.startBackupTimeSync();
+      store.add(TransferTask(
+        id: 'b1',
+        type: TransferType.upload,
+        localPath: '',
+        remotePath: '/photos',
+        state: TransferState.done,
+        steps: [
+          TransferStep(
+              id: 's1',
+              localPath: '/c/a',
+              remotePath: '/photos/a',
+              modifyTime: DateTime.fromMillisecondsSinceEpoch(1000)),
+        ],
+      ));
+      await Future<void>.delayed(Duration.zero);
+      expect(await StorageUtil.getString('last_backup_time'), '1000');
+
+      store.remove('b1');
+      store.add(TransferTask(
+        id: 'b2',
+        type: TransferType.upload,
+        localPath: '',
+        remotePath: '/photos',
+        state: TransferState.done,
+        steps: [
+          TransferStep(
+              id: 's2',
+              localPath: '/c/b',
+              remotePath: '/photos/b',
+              modifyTime: DateTime.fromMillisecondsSinceEpoch(700)),
+        ],
+      ));
+      await Future<void>.delayed(Duration.zero);
+      expect(await StorageUtil.getString('last_backup_time'), '1000');
+      stop();
     });
   });
 

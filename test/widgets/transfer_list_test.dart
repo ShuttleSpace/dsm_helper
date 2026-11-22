@@ -17,6 +17,11 @@ void main() {
     '${Directory.current.path}/lib/widgets/transfer_list.dart',
   ).readAsStringSync();
 
+  test('backup parent hides unsupported upload controls', () {
+    expect(source, contains('if (t.state == TransferState.active && !isBackup)'));
+    expect(source, contains('if (t.state == TransferState.error && !isBackup)'));
+  });
+
   test('card actions live in tap sheet, not inline buttons', () {
     expect(source, contains('_showActions(context, t)'));
     expect(source, contains('BottomOptionSheet('));
@@ -34,6 +39,145 @@ void main() {
     expect(source, contains('AppTheme.of(context).titleColor'));
     expect(source, contains('AppColors.infoOf(context)'));
     expect(source, contains('AppColors.successOf(context)'));
+  });
+
+  testWidgets('parent backup task expands to show steps', (tester) async {
+    final parent = TransferTask(
+      id: 'backup_widget_1',
+      type: TransferType.upload,
+      localPath: '',
+      remotePath: '/photos',
+      state: TransferState.active,
+      steps: [
+        TransferStep(
+          id: 's1',
+          localPath: '/c/a.jpg',
+          remotePath: '/photos/a.jpg',
+          totalBytes: 100,
+          transferredBytes: 50,
+          state: TransferState.active,
+        ),
+      ],
+    );
+    transferStore.add(parent);
+    addTearDown(() => transferStore.remove(parent.id));
+
+    await tester.pumpWidget(const MaterialApp(
+      home: Scaffold(body: TransferList(type: TransferType.upload)),
+    ));
+
+    expect(find.textContaining('相册备份'), findsOneWidget);
+    expect(find.textContaining('a.jpg'), findsNothing);
+    // 整行点击是操作面板，展开靠箭头。
+    await tester.tap(find.byIcon(Icons.expand_more));
+    await tester.pump();
+    expect(find.textContaining('a.jpg'), findsOneWidget);
+    await tester.tap(find.byIcon(Icons.expand_less));
+    await tester.pump();
+    expect(find.textContaining('a.jpg'), findsNothing);
+
+    await tester.tap(find.textContaining('相册备份'));
+    await tester.pumpAndSettle();
+    expect(find.text('任务操作'), findsOneWidget);
+    await tester.tap(find.text('详情'));
+    await tester.pumpAndSettle();
+    expect(find.text('远程'), findsOneWidget);
+
+    expect(transferTaskName(parent), contains('相册备份'));
+    expect(transferTaskName(const TransferTask(
+      id: 'x',
+      type: TransferType.upload,
+      localPath: '/l',
+      remotePath: '/remote/file.txt',
+    )), 'file.txt');
+  });
+
+  testWidgets('step row opens its own sheet with actions and detail',
+      (tester) async {
+    const parent = TransferTask(
+      id: 'backup_widget_2',
+      type: TransferType.upload,
+      localPath: '',
+      remotePath: '/photos',
+      state: TransferState.error,
+      steps: [
+        TransferStep(
+          id: 's2',
+          localPath: '/c/b.jpg',
+          remotePath: '/photos/b.jpg',
+          totalBytes: 100,
+          transferredBytes: 0,
+          state: TransferState.error,
+          errorMessage: '网络中断',
+        ),
+      ],
+    );
+    transferStore.add(parent);
+    addTearDown(() => transferStore.remove(parent.id));
+
+    await tester.pumpWidget(const MaterialApp(
+      home: Scaffold(body: TransferList(type: TransferType.upload)),
+    ));
+    await tester.tap(find.byIcon(Icons.expand_more));
+    await tester.pump();
+    await tester.tap(find.textContaining('b.jpg'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('重试'), findsOneWidget);
+    expect(find.text('暂停'), findsNothing); // 已失败，无可暂停
+    await tester.tap(find.text('详情'));
+    await tester.pumpAndSettle();
+    expect(find.text('网络中断'), findsOneWidget);
+    expect(find.text('拍摄'), findsOneWidget);
+  });
+
+  test('retryTransferStep re-enqueues with a fresh id and clears progress', () async {
+    final step = TransferStep(
+      id: 'old',
+      localPath: '/cache/a.jpg',
+      remotePath: '/photos/a.jpg',
+      totalBytes: 100,
+      transferredBytes: 70,
+      state: TransferState.error,
+      errorMessage: 'offline',
+    );
+    final retried = await retryTransferStep(step, (localPath, remoteDir) async {
+      expect(localPath, '/cache/a.jpg');
+      expect(remoteDir, '/photos');
+      return 'new';
+    });
+    expect(retried.id, 'new');
+    expect(retried.localPath, '/cache/a.jpg');
+    expect(retried.remotePath, '/photos/a.jpg');
+    expect(retried.state, TransferState.active);
+    expect(retried.transferredBytes, 0);
+    expect(retried.errorMessage, isNull);
+  });
+
+  test('deleteTransferCache removes cached files of every step', () async {
+    final cache = await Directory.systemTemp.createTemp('transfer_cache_');
+    addTearDown(() {
+      if (cache.existsSync()) cache.deleteSync(recursive: true);
+    });
+    final file = File('${cache.path}/a.jpg')..writeAsStringSync('x');
+    final parent = TransferTask(
+      id: 'backup_cache_cleanup',
+      type: TransferType.upload,
+      localPath: '',
+      remotePath: '/photos',
+      steps: [
+        TransferStep(
+          id: 's1',
+          localPath: file.path,
+          remotePath: '/photos/a.jpg',
+        ),
+      ],
+    );
+    transferStore.add(parent);
+    addTearDown(() => transferStore.remove(parent.id));
+
+    transferStore.deleteTransferCache(parent.id);
+    expect(file.existsSync(), isFalse);
   });
 
   testWidgets('done task hides progress; upload hides download-only stats', (tester) async {
