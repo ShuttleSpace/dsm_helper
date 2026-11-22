@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:garden/api/dsm_api.dart';
+
 import 'package:garden/models/photos/album_model.dart';
 import 'package:garden/models/photos/general_tag_model.dart';
 import 'package:garden/models/photos/geocoding_model.dart';
@@ -8,6 +11,7 @@ import 'package:garden/pages/photos/general_tag_page.dart';
 import 'package:garden/pages/photos/geocoding_page.dart';
 import 'package:garden/pages/photos/timeline_page.dart';
 import 'package:garden/pages/photos/widgets/thumbnail_card.dart';
+import 'package:garden/util/list_cache.dart';
 import 'package:garden/util/log.dart';
 import 'package:garden/util/ui_util.dart';
 import 'package:garden/widgets/bottom_action_sheet.dart';
@@ -41,12 +45,19 @@ class AlbumTab extends HookWidget {
     final albumWidth = MediaQuery.sizeOf(context).width / 5;
 
     getAlbum() async {
+      final cacheKey = 'photos|albums|$isTeam';
+      final cached = await ListCache.read(cacheKey) as List?;
+      if (cached != null && cached.isNotEmpty) {
+        albums.value = [for (final e in cached) AlbumModel.fromJson(e)];
+      }
       // 刷新失败不得让调用方误判为写入失败，这里自行吞掉并记日志
       try {
         albums.value = await AlbumModel.fetch(
             additional: ["sharing_info", "thumbnail"],
             limit: 100,
             isTeam: isTeam);
+        unawaited(
+            ListCache.write(cacheKey, [for (final a in albums.value) a.toJson()]));
         Log.debug("相册：${albums.value.length}");
       } catch (e) {
         Log.error("相册加载失败: $e");
