@@ -6,6 +6,7 @@ import 'package:garden/extensions/string.dart';
 import 'package:garden/pages/media/music_player_page.dart';
 import 'package:garden/util/log.dart';
 import 'package:garden/util/music_library.dart';
+import 'package:garden/widgets/embedded_cover.dart';
 import 'package:garden/util/music_player_controller.dart';
 import 'package:garden/util/ui_util.dart';
 import 'package:signals_hooks/signals_hooks.dart';
@@ -124,27 +125,8 @@ class MediaMusic extends HookWidget {
   }
 }
 
-Widget _cover(MusicSong song, double size) => ClipRRect(
-      borderRadius: BorderRadius.circular(6),
-      child: ExtendedImage.network(
-        musicCoverUrl(song),
-        width: size,
-        height: size,
-        fit: BoxFit.cover,
-        cacheWidth: (size * 3).toInt(),
-        clearMemoryCacheIfFailed: true,
-        loadStateChanged: (state) =>
-            state.extendedImageLoadState == LoadState.completed
-                ? null
-                : Container(
-                    width: size,
-                    height: size,
-                    color: Colors.black12,
-                    child: Icon(Icons.music_note,
-                        size: size * 0.5, color: Colors.grey),
-                  ),
-      ),
-    );
+Widget _cover(MusicSong song, double size) =>
+    EmbeddedCover(song: song, size: size);
 
 class _MiniPlayer extends StatelessWidget {
   final MusicPlayerController controller;

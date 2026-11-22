@@ -3,6 +3,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:garden/extensions/string.dart';
 import 'package:garden/util/media_library.dart';
 import 'package:garden/util/music_library.dart';
+import 'package:garden/widgets/embedded_cover.dart';
 import 'package:garden/util/music_player_controller.dart';
 import 'package:garden/widgets/neu_back_button.dart';
 import 'package:signals_hooks/signals_hooks.dart';
@@ -107,15 +108,8 @@ class MusicPlayerPage extends HookWidget {
     );
   }
 
-  Widget _cover(MusicSong song) => Image.network(
-        musicCoverUrl(song),
-        fit: BoxFit.cover,
-        errorBuilder: (context, error, stack) => Container(
-          color: Colors.black12,
-          child: const Center(
-              child: Icon(Icons.music_note, size: 64, color: Colors.grey)),
-        ),
-      );
+  Widget _cover(MusicSong song) =>
+      EmbeddedCover(song: song, size: 240, radius: 12);
 
   void showPlaylist(BuildContext context, MusicPlayerController controller) {
     showModalBottomSheet(

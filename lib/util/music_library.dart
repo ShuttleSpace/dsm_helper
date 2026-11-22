@@ -131,13 +131,6 @@ Future<List<MusicSong>> loadMusicLibrary({List<String> dirs = const []}) async {
   throw lastError ?? 'Audio Station 取歌失败';
 }
 
-/// 歌曲封面直链（Audio Station 按歌曲 id 给图）。
-String musicCoverUrl(MusicSong song) => audioCoverUrl(
-      baseUri: connectionStore.baseUri.value,
-      id: song.id,
-      sid: connectionStore.sid.value,
-    );
-
 /// 时长文案：`3:07` / `1:02:05`。
 String formatSongDuration(Duration duration) {
   final hours = duration.inHours;
