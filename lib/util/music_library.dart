@@ -112,15 +112,23 @@ List<MusicSong> parseMusicSongs(dynamic data, List<String> dirs) {
 
 /// 拉整库（或指定目录下的）歌。没有 Audio Station 会抛 DSMException。
 Future<List<MusicSong>> loadMusicLibrary({List<String> dirs = const []}) async {
-  Map data;
-  try {
-    data = await dsmAudioStationSongList();
-  } catch (e) {
-    // 有些 DSM 只认 personal，all 会报 1022
-    Log.info("Audio Station(all) 取歌失败，改试 personal: $e");
-    data = await dsmAudioStationSongList(library: 'personal');
+  Object? lastError;
+  // 1) Audio Station 自己的 cgi 2) entry.cgi 3) entry.cgi + personal
+  for (final attempt in const [
+    (endpoint: 'webapi/AudioStation/song.cgi', library: 'all'),
+    (endpoint: 'webapi/entry.cgi', library: 'all'),
+    (endpoint: 'webapi/entry.cgi', library: 'personal'),
+  ]) {
+    try {
+      final data = await dsmAudioStationSongList(
+          endpoint: attempt.endpoint, library: attempt.library);
+      return parseMusicSongs(data, dirs);
+    } catch (e) {
+      Log.info("取歌失败 ${attempt.endpoint} ${attempt.library}: $e");
+      lastError = e;
+    }
   }
-  return parseMusicSongs(data, dirs);
+  throw lastError ?? 'Audio Station 取歌失败';
 }
 
 /// 歌曲封面直链（Audio Station 按歌曲 id 给图）。
