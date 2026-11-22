@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -10,6 +12,7 @@ import 'package:garden/pages/media/media_music.dart';
 import 'package:garden/pages/media/play_history.dart';
 import 'package:garden/widgets/file/file_list_item.dart';
 import 'package:garden/stores/connection_store.dart';
+import 'package:garden/util/list_cache.dart';
 import 'package:garden/util/log.dart';
 import 'package:garden/util/media_library.dart';
 import 'package:garden/util/music_player_controller.dart';
@@ -78,6 +81,17 @@ class MediaLibrary extends HookWidget {
         items.value = [];
         return;
       }
+      // 先摆上次的快照，再后台扫（stale-while-revalidate）
+      final cacheKey = 'media|videos|${roots.join(',')}|${depth.value}';
+      if (items.value.isEmpty) {
+        final snapshot = await ListCache.read(cacheKey);
+        if (snapshot is List) {
+          items.value = [
+            for (final e in snapshot)
+              if (e is Map) MediaItem.fromJson(Map<String, dynamic>.from(e))
+          ];
+        }
+      }
       loading.value = true;
       try {
         final list = await scanMediaLibrary(roots, maxDepth: depth.value);
@@ -99,6 +113,9 @@ class MediaLibrary extends HookWidget {
             for (final e in items.value) e.path == filled.path ? filled : e
           ];
         }
+        // NFO 补完再落快照，下次打开就有简介和封面
+        unawaited(ListCache.write(
+            cacheKey, [for (final e in items.value) e.toJson()]));
       } catch (e) {
         Log.error("扫媒体库失败: $e");
         UiUtil.toast("扫媒体库失败：$e");

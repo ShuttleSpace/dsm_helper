@@ -240,4 +240,32 @@ void main() {
     expect(
         formatPlayDuration(const Duration(hours: 1, minutes: 5)), '1 小时 5 分钟');
   });
+
+  test('快照 JSON 往返不丢字段', () {
+    const item = MediaItem(
+      name: 'a.mkv',
+      path: '/v/a.mkv',
+      coverPath: '/v/a-poster.jpg',
+      nfoPath: '/v/a.nfo',
+      subtitles: ['/v/a.srt'],
+      title: '片名',
+      year: '2020',
+      rating: '7.5',
+      genres: '剧情',
+      size: 1234,
+      mtime: 99,
+    );
+    final back = MediaItem.fromJson(item.toJson());
+    expect(back.name, item.name);
+    expect(back.path, item.path);
+    expect(back.coverPath, item.coverPath);
+    expect(back.nfoPath, item.nfoPath);
+    expect(back.subtitles, item.subtitles);
+    expect(back.title, item.title);
+    expect(back.year, item.year);
+    expect(back.rating, item.rating);
+    expect(back.genres, item.genres);
+    expect(back.size, item.size);
+    expect(back.mtime, item.mtime);
+  });
 }

@@ -44,6 +44,24 @@ class MusicSong {
     this.seconds = 0,
   });
 
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'path': path,
+        'title': title,
+        'artist': artist,
+        'album': album,
+        'seconds': seconds,
+      };
+
+  factory MusicSong.fromJson(Map<String, dynamic> json) => MusicSong(
+        id: '${json['id'] ?? ''}',
+        path: '${json['path'] ?? ''}',
+        title: '${json['title'] ?? ''}',
+        artist: '${json['artist'] ?? ''}',
+        album: '${json['album'] ?? ''}',
+        seconds: (json['seconds'] as num?)?.toInt() ?? 0,
+      );
+
   /// 副行：艺人 · 专辑，空的不出现。
   String get subtitleLine =>
       [artist, album].where((e) => e.isNotBlank && e != 'null').join(' · ');

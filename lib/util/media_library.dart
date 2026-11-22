@@ -158,6 +158,36 @@ class MediaItem {
     this.mtime = 0,
   });
 
+  Map<String, dynamic> toJson() => {
+        'name': name,
+        'path': path,
+        'coverPath': coverPath,
+        'nfoPath': nfoPath,
+        'subtitles': subtitles,
+        'title': title,
+        'year': year,
+        'rating': rating,
+        'genres': genres,
+        'size': size,
+        'mtime': mtime,
+      };
+
+  factory MediaItem.fromJson(Map<String, dynamic> json) => MediaItem(
+        name: '${json['name'] ?? ''}',
+        path: '${json['path'] ?? ''}',
+        coverPath: '${json['coverPath'] ?? ''}',
+        nfoPath: '${json['nfoPath'] ?? ''}',
+        subtitles: [
+          for (final e in (json['subtitles'] as List? ?? const [])) '$e'
+        ],
+        title: '${json['title'] ?? ''}',
+        year: '${json['year'] ?? ''}',
+        rating: '${json['rating'] ?? ''}',
+        genres: '${json['genres'] ?? ''}',
+        size: (json['size'] as num?)?.toInt() ?? 0,
+        mtime: (json['mtime'] as num?)?.toInt() ?? 0,
+      );
+
   /// 显示名：NFO 标题优先，否则去扩展名的文件名。
   String get displayTitle {
     if (title.isNotBlank) return title;

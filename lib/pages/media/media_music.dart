@@ -1,9 +1,12 @@
+import 'dart:async';
+
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:garden/extensions/string.dart';
 import 'package:garden/pages/media/music_player_page.dart';
+import 'package:garden/util/list_cache.dart';
 import 'package:garden/util/log.dart';
 import 'package:garden/util/music_library.dart';
 import 'package:garden/widgets/embedded_cover.dart';
@@ -24,11 +27,25 @@ class MediaMusic extends HookWidget {
     final sort = useSignal(MusicSort.title);
 
     Future<void> reload() async {
-      loading.value = true;
       failed.value = '';
+      final dirs = await loadMusicLibraryPaths();
+      // 先摆上次的快照，再后台拉（stale-while-revalidate）
+      final cacheKey = 'media|music|${dirs.join(',')}';
+      if (songs.value.isEmpty) {
+        final snapshot = await ListCache.read(cacheKey);
+        if (snapshot is List) {
+          songs.value = [
+            for (final e in snapshot)
+              if (e is Map) MusicSong.fromJson(Map<String, dynamic>.from(e))
+          ];
+        }
+      }
+      loading.value = true;
       try {
-        final dirs = await loadMusicLibraryPaths();
-        songs.value = await loadMusicLibrary(dirs: dirs);
+        final list = await loadMusicLibrary(dirs: dirs);
+        songs.value = list;
+        unawaited(
+            ListCache.write(cacheKey, [for (final e in list) e.toJson()]));
       } catch (e) {
         Log.error("拉音乐库失败: $e");
         failed.value = '$e';
@@ -61,7 +78,7 @@ class MediaMusic extends HookWidget {
       final sorted = sortMusicSongs(songs.value, sort.value);
       return Column(
         children: [
-          if (loading.value)
+          if (loading.value && sorted.isEmpty)
             const Expanded(child: Center(child: CircularProgressIndicator()))
           else if (sorted.isEmpty)
             Expanded(

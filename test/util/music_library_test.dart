@@ -80,4 +80,21 @@ void main() {
       expect(indexAfterComplete(0, 0, MusicPlayMode.loop), isNull);
     });
   });
+
+  test('快照 JSON 往返不丢字段', () {
+    const song = MusicSong(
+        id: 'music_1',
+        path: '/m/a.mp3',
+        title: '歌',
+        artist: '人',
+        album: '集',
+        seconds: 211);
+    final back = MusicSong.fromJson(song.toJson());
+    expect(back.id, song.id);
+    expect(back.path, song.path);
+    expect(back.title, song.title);
+    expect(back.artist, song.artist);
+    expect(back.album, song.album);
+    expect(back.seconds, song.seconds);
+  });
 }
