@@ -74,6 +74,10 @@ class MusicPlayerController {
     );
   }
 
+  /// 点一下切到下一个模式（顺序 → 列表循环 → 单曲 → 单曲循环）。
+  Future<void> cyclePlayMode() => setPlayMode(MusicPlayMode
+      .values[(playMode.value.index + 1) % MusicPlayMode.values.length]);
+
   Future<void> setPlayMode(MusicPlayMode mode) async {
     playMode.value = mode;
     await StorageUtil.setString(musicPlayModeStorageKey, mode.name);

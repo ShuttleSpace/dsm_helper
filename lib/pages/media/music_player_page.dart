@@ -119,17 +119,11 @@ class MusicPlayerPage extends HookWidget {
         MusicPlayMode.singleLoop => Icons.repeat_one,
       };
 
-  Widget _playModeButton(MusicPlayerController controller) =>
-      PopupMenuButton<MusicPlayMode>(
+  Widget _playModeButton(MusicPlayerController controller) => IconButton(
         tooltip: musicPlayModeLabel(controller.playMode.value),
-        initialValue: controller.playMode.value,
         iconSize: 26,
         icon: Icon(_modeIcon(controller.playMode.value)),
-        onSelected: controller.setPlayMode,
-        itemBuilder: (context) => [
-          for (final mode in MusicPlayMode.values)
-            PopupMenuItem(value: mode, child: Text(musicPlayModeLabel(mode))),
-        ],
+        onPressed: controller.cyclePlayMode,
       );
 
   Widget _cover(MusicSong song) =>
