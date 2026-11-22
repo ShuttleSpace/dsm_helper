@@ -18,10 +18,7 @@ double controlBarMinWidth({required bool compact}) =>
 bool needsCompactControls(double surfaceWidth) =>
     controlBarMinWidth(compact: false) > surfaceWidth;
 
-/// 底部条：media_kit 自带左 16 / 右 8 外边距，全屏键算 40px，窄屏再多一个 40px 的更多菜单。
-/// 竖屏 9:16 视频在 360x800 屏上播放区只有 135px，三个 34px 按钮塞进去必然溢出。
-double bottomBarMinWidth({required bool compact}) =>
-    24 + 40 + (compact ? 40 : 0);
-
-bool fitsCompactBottomBar(double surfaceWidth) =>
-    bottomBarMinWidth(compact: true) <= surfaceWidth;
+/// 窄屏把三个导航按钮放进底部条，平分剩余宽度（扣掉 media_kit 的左 16 / 右 8
+/// 外边距和全屏键按最宽 48 算），图标按分到的槽位缩小，所以按钮永远不会溢出。
+double compactNavIconSize(double surfaceWidth) =>
+    (((surfaceWidth - 24 - 48) / 3) * 0.8).clamp(12.0, 22.0);
