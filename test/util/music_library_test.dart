@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:garden/util/music_library.dart';
+import 'package:garden/util/music_player_controller.dart';
 
 void main() {
   test('解析歌曲：标签取 song_tag，时长取 song_audio，没标题回退文件名', () {
@@ -58,5 +59,25 @@ void main() {
     expect(formatSongDuration(const Duration(seconds: 7)), '0:07');
     expect(formatSongDuration(const Duration(minutes: 3, seconds: 7)), '3:07');
     expect(formatSongDuration(const Duration(hours: 1, seconds: 5)), '1:00:05');
+  });
+
+  group('放完之后转到哪首', () {
+    test('顺序播放到最后一首就停', () {
+      expect(indexAfterComplete(0, 3, MusicPlayMode.sequential), 1);
+      expect(indexAfterComplete(2, 3, MusicPlayMode.sequential), isNull);
+    });
+
+    test('列表循环回到第一首', () {
+      expect(indexAfterComplete(2, 3, MusicPlayMode.loop), 0);
+    });
+
+    test('单曲播放停下，单曲循环留在原地', () {
+      expect(indexAfterComplete(1, 3, MusicPlayMode.single), isNull);
+      expect(indexAfterComplete(1, 3, MusicPlayMode.singleLoop), 1);
+    });
+
+    test('空列表不炸', () {
+      expect(indexAfterComplete(0, 0, MusicPlayMode.loop), isNull);
+    });
   });
 }

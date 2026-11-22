@@ -137,58 +137,92 @@ class _MiniPlayer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     return Material(
-      color: Theme.of(context).colorScheme.surfaceContainerHighest,
+      color: scheme.surfaceContainerHighest,
+      // 和列表拉开层次，不然迷你条看着像列表的最后一行
+      elevation: 8,
+      shadowColor: Colors.black54,
       child: InkWell(
         onTap: () => Navigator.of(context).push(CupertinoPageRoute(
             builder: (_) => MusicPlayerPage(controller: controller))),
-        child: SizedBox(
-          height: 62,
-          child: Row(
-            children: [
-              const SizedBox(width: 10),
-              _cover(song, 42),
-              const SizedBox(width: 10),
-              Expanded(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(song.title,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(fontSize: 13)),
-                    Text(
-                      song.subtitleLine.isBlank ? '未知艺人' : song.subtitleLine,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(fontSize: 11, color: Colors.grey),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            _progress(),
+            SizedBox(
+              height: 62,
+              child: Row(
+                children: [
+                  const SizedBox(width: 10),
+                  _cover(song, 42),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(song.title,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(fontSize: 13)),
+                        Text(
+                          song.subtitleLine.isBlank
+                              ? '未知艺人'
+                              : song.subtitleLine,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style:
+                              const TextStyle(fontSize: 11, color: Colors.grey),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
+                  ),
+                  IconButton(
+                    tooltip: '上一首',
+                    icon: const Icon(Icons.skip_previous),
+                    onPressed: controller.hasPrev ? controller.prev : null,
+                  ),
+                  StreamBuilder<bool>(
+                    stream: controller.player.stream.playing,
+                    initialData: controller.player.state.playing,
+                    builder: (context, snapshot) => IconButton(
+                      tooltip: snapshot.data == true ? '暂停' : '播放',
+                      icon: Icon(snapshot.data == true
+                          ? Icons.pause_circle_filled
+                          : Icons.play_circle_fill),
+                      iconSize: 32,
+                      onPressed: controller.toggle,
+                    ),
+                  ),
+                  IconButton(
+                    tooltip: '下一首',
+                    icon: const Icon(Icons.skip_next),
+                    onPressed: controller.hasNext ? controller.next : null,
+                  ),
+                  const SizedBox(width: 4),
+                ],
               ),
-              StreamBuilder<bool>(
-                stream: controller.player.stream.playing,
-                initialData: controller.player.state.playing,
-                builder: (context, snapshot) => IconButton(
-                  tooltip: snapshot.data == true ? '暂停' : '播放',
-                  icon: Icon(snapshot.data == true
-                      ? Icons.pause_circle_filled
-                      : Icons.play_circle_fill),
-                  iconSize: 32,
-                  onPressed: controller.toggle,
-                ),
-              ),
-              IconButton(
-                tooltip: '下一首',
-                icon: const Icon(Icons.skip_next),
-                onPressed: controller.hasNext ? controller.next : null,
-              ),
-              const SizedBox(width: 4),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
   }
+
+  Widget _progress() => StreamBuilder<Duration>(
+        stream: controller.player.stream.position,
+        builder: (context, snapshot) {
+          final total = controller.duration.inMilliseconds;
+          final value = total <= 0
+              ? 0.0
+              : ((snapshot.data ?? controller.position).inMilliseconds / total)
+                  .clamp(0.0, 1.0);
+          return LinearProgressIndicator(
+            value: value,
+            minHeight: 2,
+            backgroundColor: Colors.black12,
+          );
+        },
+      );
 }

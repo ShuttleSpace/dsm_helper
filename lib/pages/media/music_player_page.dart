@@ -100,6 +100,8 @@ class MusicPlayerPage extends HookWidget {
                     icon: const Icon(Icons.skip_next),
                     onPressed: controller.hasNext ? controller.next : null,
                   ),
+                  const SizedBox(width: 16),
+                  _playModeButton(controller),
                 ],
               ),
               const SizedBox(height: 24),
@@ -109,6 +111,26 @@ class MusicPlayerPage extends HookWidget {
       );
     });
   }
+
+  static IconData _modeIcon(MusicPlayMode mode) => switch (mode) {
+        MusicPlayMode.sequential => Icons.trending_flat,
+        MusicPlayMode.loop => Icons.repeat,
+        MusicPlayMode.single => Icons.looks_one,
+        MusicPlayMode.singleLoop => Icons.repeat_one,
+      };
+
+  Widget _playModeButton(MusicPlayerController controller) =>
+      PopupMenuButton<MusicPlayMode>(
+        tooltip: musicPlayModeLabel(controller.playMode.value),
+        initialValue: controller.playMode.value,
+        iconSize: 26,
+        icon: Icon(_modeIcon(controller.playMode.value)),
+        onSelected: controller.setPlayMode,
+        itemBuilder: (context) => [
+          for (final mode in MusicPlayMode.values)
+            PopupMenuItem(value: mode, child: Text(musicPlayModeLabel(mode))),
+        ],
+      );
 
   Widget _cover(MusicSong song) =>
       EmbeddedCover(song: song, size: 240, radius: 12);
