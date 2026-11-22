@@ -45,6 +45,8 @@ void main() async {
   transferStore.startBackupTimeSync(); // app 生命周期内持续写回备份时间
   await transferStore.resumeUnfinishedOnStartup();
   await _initAudioService();
+  // 缩略图磁盘缓存没有容量上限，顺手清掉 30 天没碰过的（cacheMaxAge 同值）。
+  unawaited(clearDiskCachedImages(duration: const Duration(days: 30)));
   final autPage = await settingsStore.authPage.value;
   final launchAccountPage = await settingsStore.launchAccountPage.value;
   runApp(MyApp(autPage, launchAccountPage));

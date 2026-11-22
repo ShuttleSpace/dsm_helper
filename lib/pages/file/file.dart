@@ -7,6 +7,7 @@ import 'package:garden/extensions/string.dart';
 import 'package:garden/services/office_preview.dart';
 import 'package:garden/stores/settings_store.dart';
 import 'package:garden/util/file_type_util.dart';
+import 'package:garden/util/list_cache.dart';
 import 'package:garden/util/media_library.dart';
 import 'package:garden/util/ui_util.dart';
 import 'package:garden/util/storage_util.dart';
@@ -116,15 +117,23 @@ class Files extends HookWidget {
     }
 
     Future<void> getFileList(String path) async {
+      final cacheKey =
+          'files|$path|${sortBy.value}|${sortDirection.value}';
+      final cached = await ListCache.read(cacheKey) as List?;
+      if (cached != null) {
+        // 先显示上次的目录内容，再后台刷新，避免每次进目录都白屏。
+        files.value = cached;
+        success.value = true;
+      }
       loading.value = true;
       try {
         final data = await dsmFileStationListForPage(path,
             sortBy: sortBy.value, sortDirection: sortDirection.value);
         files.value = data['files'] ?? [];
         success.value = true;
-        Log.info(files.value);
+        unawaited(ListCache.write(cacheKey, files.value));
       } catch (e) {
-        success.value = false;
+        success.value = cached != null;
         msg.value = connectionStore.notVisitorAccount.value
             ? '暂无文件'
             : '加载失败，code:${_dsmErrorCode(e)}';
@@ -134,6 +143,11 @@ class Files extends HookWidget {
     }
 
     getShareList() async {
+      final cached = await ListCache.read('files|@shares') as List?;
+      if (cached != null) {
+        files.value = cached;
+        success.value = true;
+      }
       String listTypeStr = await StorageUtil.getString("file_list_type") ?? '';
 
       if (listTypeStr.isNotBlank) {
@@ -150,8 +164,9 @@ class Files extends HookWidget {
         final data = await dsmFileStationListShareForPage();
         files.value = data['shares'] ?? [];
         success.value = true;
+        unawaited(ListCache.write('files|@shares', files.value));
       } catch (e) {
-        success.value = false;
+        success.value = cached != null;
         msg.value = '加载失败，code:${_dsmErrorCode(e)}';
       } finally {
         loading.value = false;
