@@ -24,6 +24,10 @@ void main() {
     await tester.pumpAndSettle();
     expect(await StorageUtil.getBool('media_use_tmdb_poster'), isFalse);
 
+    // 多了「音乐目录」一张卡片，Key 输入框被顶出首屏，ListView 懒加载所以要滚过去
+    await tester.dragUntilVisible(find.byType(TextField), find.byType(ListView),
+        const Offset(0, -120));
+    await tester.pumpAndSettle();
     await tester.enterText(find.byType(TextField), '  abc123  ');
     await tester.tap(find.text('保存'));
     await tester.pumpAndSettle();

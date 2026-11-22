@@ -4,6 +4,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:garden/pages/media/play_history.dart';
 import 'package:garden/pages/setting/media_library_setting.dart';
 import 'package:garden/util/media_library.dart';
+import 'package:garden/util/music_library.dart';
 import 'package:garden/util/storage_util.dart';
 import 'package:garden/util/tmdb_util.dart';
 import 'package:garden/util/ui_util.dart';
@@ -25,9 +26,11 @@ class MediaSetting extends HookWidget {
     final depth = useState(mediaScanDepth);
     final tmdbPoster = useState(true);
     final pathCount = useState(0);
+    final musicCount = useState(0);
 
     Future<void> refreshCount() async {
       pathCount.value = (await loadMediaLibraryPaths()).length;
+      musicCount.value = (await loadMusicLibraryPaths()).length;
     }
 
     useEffect(() {
@@ -86,6 +89,34 @@ class MediaSetting extends HookWidget {
             padding: EdgeInsets.only(left: 4, top: 8),
             child: Text(
               "多媒体页只扫这些 NAS 目录下的视频，同目录的封面、NFO、字幕会一起带出来。",
+              style: TextStyle(color: Colors.grey, fontSize: 12),
+            ),
+          ),
+          GestureDetector(
+            onTap: () async {
+              await Navigator.of(context).push(CupertinoPageRoute(
+                  builder: (_) => const MediaLibrarySetting(music: true)));
+              await refreshCount();
+            },
+            child: card(
+              child: Padding(
+                padding: const EdgeInsets.all(20),
+                child: Row(
+                  children: [
+                    const Text("音乐目录"),
+                    const Spacer(),
+                    Text("${musicCount.value} 个",
+                        style: const TextStyle(color: Colors.grey)),
+                    const Icon(Icons.chevron_right),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          const Padding(
+            padding: EdgeInsets.only(left: 4, top: 8),
+            child: Text(
+              "音乐走 NAS 的 Audio Station 索引（标签、封面都现成的）；目录留空就显示整个音乐库。",
               style: TextStyle(color: Colors.grey, fontSize: 12),
             ),
           ),

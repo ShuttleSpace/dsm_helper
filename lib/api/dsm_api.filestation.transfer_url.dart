@@ -54,3 +54,21 @@ String uploadEntryUrl({
       '&version=$version'
       '&SynoToken=$synoToken';
 }
+
+/// 歌曲封面直链：`SYNO.AudioStation.Cover`（Audio Station 自己存的封面/内嵌图）。
+String audioCoverUrl({
+  required String baseUri,
+  required String id,
+  required String sid,
+  int version = 1,
+  String size = 'medium',
+}) {
+  final base = baseUri.replaceFirst(RegExp(r'/+$'), '');
+  return '$base/webapi/entry.cgi'
+      '?api=SYNO.AudioStation.Cover'
+      '&method=getcover'
+      '&version=$version'
+      '&id=${Uri.encodeComponent(id)}'
+      '&size=$size'
+      '&_sid=$sid';
+}

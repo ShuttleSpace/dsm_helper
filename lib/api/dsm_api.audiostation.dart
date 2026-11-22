@@ -170,3 +170,30 @@ Future<Map> dsmAudioStationRemotePlayerControl(
   }
   return res['data'] ?? {};
 }
+
+/// 歌曲列表：NAS 已经把整库的 ID3 标签索引好了（`song_tag` / `song_audio`），
+/// 比自己拉文件解析标签省事得多，代价是 NAS 上得装 Audio Station。
+Future<Map> dsmAudioStationSongList(
+    {String library = 'shared',
+    int limit = 5000,
+    int offset = 0,
+    String sortBy = 'title',
+    String sortDirection = 'asc',
+    CancelToken? cancelToken}) async {
+  final data = _dsmApiRequestData(
+      api: 'SYNO.AudioStation.Song', method: 'list', version: 3)
+    ..addAll({
+      'library': library,
+      'limit': limit,
+      'offset': offset,
+      'sort_by': sortBy,
+      'sort_direction': sortDirection,
+      'additional': '["song_tag","song_audio"]',
+    });
+  final res = await _httpGet(_entryCGI,
+      queryParameters: data, cancelToken: cancelToken);
+  if (res['success'] != true) {
+    throw DSMException.fromMap(res);
+  }
+  return res['data'] ?? {};
+}

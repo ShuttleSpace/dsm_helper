@@ -6,11 +6,13 @@ import 'package:garden/api/dsm_api.filestation.transfer_url.dart';
 import 'package:garden/extensions/string.dart';
 import 'package:garden/pages/common/video_player.dart';
 import 'package:garden/pages/media/media_setting.dart';
+import 'package:garden/pages/media/media_music.dart';
 import 'package:garden/pages/media/play_history.dart';
 import 'package:garden/widgets/file/file_list_item.dart';
 import 'package:garden/stores/connection_store.dart';
 import 'package:garden/util/log.dart';
 import 'package:garden/util/media_library.dart';
+import 'package:garden/util/music_player_controller.dart';
 import 'package:garden/util/storage_util.dart';
 import 'package:garden/util/tmdb_util.dart';
 import 'package:garden/util/ui_util.dart';
@@ -31,6 +33,18 @@ class MediaLibrary extends HookWidget {
     final watching = useSignal<Map<String, dynamic>>({});
     final depth = useSignal(mediaScanDepth);
     final viewMode = useSignal(MediaViewMode.poster);
+
+    // 视频 / 音乐二级 tab；滑动切换也要让标题栏跟着变，所以自己听一下
+    final tab = useTabController(initialLength: 2);
+    final tabIndex = useState(0);
+    // 播放器挂在页面这一层，切 tab 不会把正在放的歌掐了
+    final music = useMemoized(() => MusicPlayerController(), const []);
+    useEffect(() {
+      void onChange() => tabIndex.value = tab.index;
+      tab.addListener(onChange);
+      return () => tab.removeListener(onChange);
+    }, [tab]);
+    useEffect(() => () => music.dispose(), const []);
 
     final shown = filterAndSortMediaItems(items.value, query.value, sort.value);
     Future<void> openPlayer(MediaItem item) async {
@@ -210,73 +224,92 @@ class MediaLibrary extends HookWidget {
               )
             : const Text('多媒体'),
         actions: [
-          IconButton(
-            tooltip: searching.value ? '关闭搜索' : '搜索',
-            icon: Icon(searching.value ? Icons.close : Icons.search),
-            onPressed: () {
-              searching.value = !searching.value;
-              if (!searching.value) query.value = '';
-            },
-          ),
+          if (tabIndex.value == 0)
+            IconButton(
+              tooltip: searching.value ? '关闭搜索' : '搜索',
+              icon: Icon(searching.value ? Icons.close : Icons.search),
+              onPressed: () {
+                searching.value = !searching.value;
+                if (!searching.value) query.value = '';
+              },
+            ),
           IconButton(
             tooltip: '更多',
             icon: const Icon(Icons.more_horiz),
             onPressed: showMore,
           ),
         ],
+        bottom: TabBar(
+          controller: tab,
+          tabs: const [Tab(text: '视频'), Tab(text: '音乐')],
+        ),
       ),
-      body: hasRoots.value == false
-          ? _centerHint(
-              '还没有设置媒体库目录', '添加后这里会列出视频（最多往下 ${depth.value} 层）', openSetting)
-          : shown.isEmpty && resumed.isEmpty
-              ? (loading.value
-                  ? const Center(child: CircularProgressIndicator())
-                  : _centerHint(
-                      query.value.isBlank ? '库里没找到视频' : '没搜到「${query.value}」',
-                      '检查一下库目录，或点右上角刷新',
-                      reload))
-              : Column(
-                  children: [
-                    if (resumed.isNotEmpty && query.value.isBlank)
-                      SizedBox(
-                        height: 132,
-                        child: ListView.separated(
-                          scrollDirection: Axis.horizontal,
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 12, vertical: 8),
-                          itemCount: resumed.length,
-                          separatorBuilder: (_, __) =>
-                              const SizedBox(width: 10),
-                          itemBuilder: (context, i) => _ResumeCard(
-                            item: resumed[i].$1,
-                            pos: (resumed[i].$2['pos'] as num).toInt(),
-                            dur: (resumed[i].$2['dur'] as num? ?? 0).toInt(),
-                            onTap: () => openPlayer(resumed[i].$1),
+      body: TabBarView(
+        controller: tab,
+        children: [
+          hasRoots.value == false
+              ? _centerHint('还没有设置媒体库目录', '添加后这里会列出视频（最多往下 ${depth.value} 层）',
+                  openSetting)
+              : shown.isEmpty && resumed.isEmpty
+                  ? (loading.value
+                      ? const Center(child: CircularProgressIndicator())
+                      : _centerHint(
+                          query.value.isBlank
+                              ? '库里没找到视频'
+                              : '没搜到「${query.value}」',
+                          '检查一下库目录，或点右上角刷新',
+                          reload))
+                  : Column(
+                      children: [
+                        if (resumed.isNotEmpty && query.value.isBlank)
+                          SizedBox(
+                            height: 132,
+                            child: ListView.separated(
+                              scrollDirection: Axis.horizontal,
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 12, vertical: 8),
+                              itemCount: resumed.length,
+                              separatorBuilder: (_, __) =>
+                                  const SizedBox(width: 10),
+                              itemBuilder: (context, i) => _ResumeCard(
+                                item: resumed[i].$1,
+                                pos: (resumed[i].$2['pos'] as num).toInt(),
+                                dur:
+                                    (resumed[i].$2['dur'] as num? ?? 0).toInt(),
+                                onTap: () => openPlayer(resumed[i].$1),
+                              ),
+                            ),
                           ),
+                        Expanded(
+                          child: switch (viewMode.value) {
+                            MediaViewMode.poster => _grid(shown, openPlayer),
+                            MediaViewMode.folder =>
+                              _folderList(shown, openPlayer),
+                            MediaViewMode.tree => ListView(
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 8),
+                                children: [
+                                  for (final folder
+                                      in buildMediaTree(shown).folders)
+                                    _TreeFolder(
+                                        folder: folder,
+                                        level: 0,
+                                        onOpen: openPlayer),
+                                  for (final item
+                                      in buildMediaTree(shown).videos)
+                                    _TreeFile(
+                                        item: item,
+                                        level: 0,
+                                        onOpen: openPlayer),
+                                ],
+                              ),
+                          },
                         ),
-                      ),
-                    Expanded(
-                      child: switch (viewMode.value) {
-                        MediaViewMode.poster => _grid(shown, openPlayer),
-                        MediaViewMode.folder => _folderList(shown, openPlayer),
-                        MediaViewMode.tree => ListView(
-                            padding: const EdgeInsets.symmetric(vertical: 8),
-                            children: [
-                              for (final folder
-                                  in buildMediaTree(shown).folders)
-                                _TreeFolder(
-                                    folder: folder,
-                                    level: 0,
-                                    onOpen: openPlayer),
-                              for (final item in buildMediaTree(shown).videos)
-                                _TreeFile(
-                                    item: item, level: 0, onOpen: openPlayer),
-                            ],
-                          ),
-                      },
+                      ],
                     ),
-                  ],
-                ),
+          MediaMusic(controller: music),
+        ],
+      ),
     );
   }
 
