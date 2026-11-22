@@ -460,7 +460,8 @@ class VideoPlayerPage extends HookWidget {
                 onPrevious: playingIndex.value > 0
                     ? () => playEntry(playingIndex.value - 1)
                     : null,
-                onNext: hasNext() ? () => playEntry(playingIndex.value + 1) : null,
+                onNext:
+                    hasNext() ? () => playEntry(playingIndex.value + 1) : null,
                 onPlaylist: playlist.isEmpty ? null : showPlaylist,
               ),
             )
@@ -527,9 +528,9 @@ class VideoPlayerPage extends HookWidget {
           child: Text("$label：$value"),
         );
 
-    // 竖屏视频被 30% 屏高约束压得很窄，控制条按钮得按真实宽度决定放哪。
-    final surfaceWidth = playerSurfaceWidth(
-        MediaQuery.sizeOf(context), videoAspectRatio.value);
+    // 播放容器始终满宽（竖屏视频靠 contain 留黑边），控制条才有整屏宽度可用。
+    final screen = MediaQuery.sizeOf(context);
+    final surfaceWidth = screen.width;
 
     return Scaffold(
       appBar: AppBar(
@@ -556,29 +557,26 @@ class VideoPlayerPage extends HookWidget {
                   ? Colors.white
                   : Colors.black,
               child: isInitialized.value
-                  ? ConstrainedBox(
-                      constraints: BoxConstraints(
-                          maxHeight: MediaQuery.sizeOf(context).height * 0.3),
+                  ? SizedBox(
+                      width: double.infinity,
+                      height: playerAreaHeight(screen, videoAspectRatio.value),
                       child: Stack(
                         alignment: Alignment.center,
                         children: [
-                          AspectRatio(
-                            aspectRatio: videoAspectRatio.value,
-                            child: Video(
-                              controller: videoController,
-                              // 统一用 Material 控制条，桌面端也用同一套，按钮位置才一致
-                              controls: MaterialVideoControls,
-                              subtitleViewConfiguration:
-                                  SubtitleViewConfiguration(
-                                // 播放区只有屏高 30%，media_kit 默认按 1080p 缩小会让字幕小到看不清，
-                                // 所以关掉缩放，字号直接用设置里的逻辑像素。
-                                textScaler: TextScaler.noScaling,
-                                style: TextStyle(
-                                  fontSize: subtitleFontSize.value,
-                                  color: Colors.white,
-                                  backgroundColor: const Color(0xaa000000),
-                                  height: 1.4,
-                                ),
+                          Video(
+                            controller: videoController,
+                            // 统一用 Material 控制条，桌面端也用同一套，按钮位置才一致
+                            controls: MaterialVideoControls,
+                            subtitleViewConfiguration:
+                                SubtitleViewConfiguration(
+                              // 播放区只有屏高 30%，media_kit 默认按 1080p 缩小会让字幕小到看不清，
+                              // 所以关掉缩放，字号直接用设置里的逻辑像素。
+                              textScaler: TextScaler.noScaling,
+                              style: TextStyle(
+                                fontSize: subtitleFontSize.value,
+                                color: Colors.white,
+                                backgroundColor: const Color(0xaa000000),
+                                height: 1.4,
                               ),
                             ),
                           ),

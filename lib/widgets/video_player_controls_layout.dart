@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
 
-/// 竖屏视频被压到屏高 30%，宽度可能只有 135px；控制条按钮不能全挤进去。
-/// 这些纯函数给测试和播放器共用，避免复制约束数字。
-double playerSurfaceWidth(Size screen, double aspectRatio) {
+/// 播放区高度：宽度永远占满屏幕，高度取「屏高 30%」和「按宽高比算出的高度」
+/// 里小的那个。
+///
+/// 以前是把 [AspectRatio] 塞进 `maxHeight: 屏高 * 0.3` 的约束里，竖屏 9:16
+/// 视频在 360x800 屏上宽度只剩 135px，控制条按钮直接溢出；现在容器满宽，
+/// 视频自己用 contain 居中留黑边，控制条有整屏宽度。
+double playerAreaHeight(Size screen, double aspectRatio) {
+  final byWidth = screen.width / aspectRatio;
   final maxHeight = screen.height * 0.3;
-  final byHeight = maxHeight * aspectRatio;
-  return byHeight <= screen.width ? byHeight : screen.width;
+  return byWidth <= maxHeight ? byWidth : maxHeight;
 }
-
-/// 9:16 的竖屏缩略图/封面高度与屏高一致，宽度同上面的 30% 约束。
-double coverSurfaceWidth(Size screen) => playerSurfaceWidth(screen, 9 / 16);
 
 /// 标准条：上一个/下一个/播放列表 3 个 34px 按钮 + 56px 播放键 = 158px。
 double controlBarMinWidth({required bool compact}) =>

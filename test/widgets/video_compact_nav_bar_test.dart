@@ -7,24 +7,22 @@ import 'package:garden/widgets/video_player_controls_layout.dart';
 /// 竖屏 9:16 视频在 360x800 屏上播放区只有 135px，固定宽度按钮会溢出，
 /// 所以三个导航按钮用 Expanded 平分，图标跟着缩。
 void main() {
-  const portraitScreen = Size(360, 800);
-  final surface = playerSurfaceWidth(portraitScreen, 9 / 16);
-  final iconSize = compactNavIconSize(surface);
+  const width = 140.0;
+  final iconSize = compactNavIconSize(width);
 
-  test('竖屏 9:16 走紧凑布局，图标落在可读范围内', () {
-    expect(surface, closeTo(135, 0.5));
-    expect(needsCompactControls(surface), isTrue);
+  test('竖屏容器满宽，只有窄窗口才走紧凑布局', () {
+    expect(needsCompactControls(360), isFalse);
+    expect(needsCompactControls(158), isFalse);
+    expect(needsCompactControls(width), isTrue);
     expect(iconSize, inInclusiveRange(12, 22));
-    // 旧布局：24 + 3*34 + 40 = 166 > 135，这就是之前 RenderFlex overflowed 的来源。
-    expect(24 + 3 * 34 + 40, greaterThan(surface));
   });
 
-  testWidgets('135px 播放区里平分按钮不溢出，且三个槽一样宽', (tester) async {
+  testWidgets('窄播放区里平分按钮不溢出，且三个槽一样宽', (tester) async {
     await tester.pumpWidget(MaterialApp(
       home: Scaffold(
         body: Center(
           child: SizedBox(
-            width: surface,
+            width: width,
             child: Container(
               color: Colors.black,
               padding: const EdgeInsets.only(left: 16, right: 8),
@@ -53,9 +51,8 @@ void main() {
 
     expect(tester.takeException(), isNull);
 
-    final slots = tester
-        .widgetList<IconButton>(find.byType(IconButton))
-        .toList();
+    final slots =
+        tester.widgetList<IconButton>(find.byType(IconButton)).toList();
     expect(slots.length, 3);
     final widths = tester
         .renderObjectList<RenderBox>(find.descendant(
@@ -76,7 +73,7 @@ void main() {
       home: Scaffold(
         body: Center(
           child: SizedBox(
-            width: 111,
+            width: 111.0,
             child: VideoCompactNavBar(iconSize: 16, onPrevious: () {}),
           ),
         ),
