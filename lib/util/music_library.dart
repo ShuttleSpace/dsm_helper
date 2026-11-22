@@ -112,7 +112,14 @@ List<MusicSong> parseMusicSongs(dynamic data, List<String> dirs) {
 
 /// 拉整库（或指定目录下的）歌。没有 Audio Station 会抛 DSMException。
 Future<List<MusicSong>> loadMusicLibrary({List<String> dirs = const []}) async {
-  final data = await dsmAudioStationSongList();
+  Map data;
+  try {
+    data = await dsmAudioStationSongList();
+  } catch (e) {
+    // 有些 DSM 只认 personal，all 会报 1022
+    Log.info("Audio Station(all) 取歌失败，改试 personal: $e");
+    data = await dsmAudioStationSongList(library: 'personal');
+  }
   return parseMusicSongs(data, dirs);
 }
 

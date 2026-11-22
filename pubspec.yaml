@@ -135,6 +135,7 @@ dependencies:
   #  x5_webview: ^0.2.4
   talker: ^5.1.15
   talker_flutter: ^5.1.15
+  audio_metadata_reader: ^1.8.1
 dev_dependencies:
   flutter_test:
     sdk: flutter
