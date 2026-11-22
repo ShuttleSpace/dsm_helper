@@ -82,8 +82,8 @@ class MusicPlayerPage extends HookWidget {
                   ),
                   const SizedBox(width: 16),
                   StreamBuilder<bool>(
-                    stream: controller.player.stream.playing,
-                    initialData: controller.player.state.playing,
+                    stream: controller.player.playingStream,
+                    initialData: controller.player.playing,
                     builder: (context, snapshot) => IconButton(
                       tooltip: snapshot.data == true ? '暂停' : '播放',
                       iconSize: 64,
@@ -176,10 +176,10 @@ class _ProgressBar extends HookWidget {
   Widget build(BuildContext context) {
     final dragging = useRef<double?>(null);
     return StreamBuilder<Duration>(
-      stream: controller.player.stream.position,
-      initialData: controller.player.state.position,
+      stream: controller.player.positionStream,
+      initialData: controller.player.position,
       builder: (context, posSnapshot) {
-        final duration = controller.player.state.duration;
+        final duration = controller.duration;
         final total = duration.inMilliseconds;
         final raw =
             (dragging.value ?? posSnapshot.data!.inMilliseconds.toDouble())

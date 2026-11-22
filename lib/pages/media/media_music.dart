@@ -184,8 +184,8 @@ class _MiniPlayer extends StatelessWidget {
                     onPressed: controller.hasPrev ? controller.prev : null,
                   ),
                   StreamBuilder<bool>(
-                    stream: controller.player.stream.playing,
-                    initialData: controller.player.state.playing,
+                    stream: controller.player.playingStream,
+                    initialData: controller.player.playing,
                     builder: (context, snapshot) => IconButton(
                       tooltip: snapshot.data == true ? '暂停' : '播放',
                       icon: Icon(snapshot.data == true
@@ -211,7 +211,7 @@ class _MiniPlayer extends StatelessWidget {
   }
 
   Widget _progress() => StreamBuilder<Duration>(
-        stream: controller.player.stream.position,
+        stream: controller.player.positionStream,
         builder: (context, snapshot) {
           final total = controller.duration.inMilliseconds;
           final value = total <= 0

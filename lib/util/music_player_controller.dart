@@ -5,7 +5,7 @@ import 'package:garden/stores/connection_store.dart';
 import 'package:garden/util/log.dart';
 import 'package:garden/util/music_library.dart';
 import 'package:garden/util/storage_util.dart';
-import 'package:media_kit/media_kit.dart';
+import 'package:just_audio/just_audio.dart';
 import 'package:signals/signals.dart';
 
 /// 播放模式：顺序（放完列表就停）/ 列表循环 / 单曲（放完停）/ 单曲循环。
@@ -31,22 +31,28 @@ int? indexAfterComplete(int index, int length, MusicPlayMode mode) {
   };
 }
 
-/// 音乐的播放状态：列表、当前下标、一个常驻 Player。
+/// 音乐的播放状态：列表、当前下标、一个常驻 AudioPlayer。
 ///
-/// 列表体和全屏播放页共用同一个实例，两边都自己订阅 `player.stream.*`，
+/// 音乐走 just_audio（ExoPlayer / AVPlayer），不用 media_kit：libmpv 在 Android 上
+/// 出过 `Could not open/initialize audio device -> no sound.`，音频不是它的强项。
+///
+/// 列表体和全屏播放页共用同一个实例，两边都自己订阅 `player.xxxStream`，
 /// 只有这里的队列/下标是需要共享的部分。
 class MusicPlayerController {
-  // 建 Player 就会碰 media_kit 原生库，所以等真正要播的时候再建
-  Player? _player;
-  Player get player => _player ??= _createPlayer();
+  // 建音频引擎要碰原生库，等真正要播的时候再建
+  AudioPlayer? _player;
+  AudioPlayer get player => _player ??= _createPlayer();
 
-  // 每次访问 `.player` 都挂监听的话，completed 会被触发 N 次，歌会一路跳到最后一首
-  Player _createPlayer() {
-    final created = Player();
-    created.stream.completed.listen((completed) {
-      if (completed) _onCompleted();
+  // 每次访问 `.player` 都挂监听的话，完成事件会被处理 N 次，歌会一路跳到最后一首
+  AudioPlayer _createPlayer() {
+    final created = AudioPlayer();
+    created.processingStateStream.listen((state) {
+      if (state == ProcessingState.completed) _onCompleted();
     });
-    created.stream.error.listen((error) => Log.error("音乐播放失败: $error"));
+    created.playbackEventStream.listen(
+      (_) {},
+      onError: (Object error, StackTrace stack) => Log.error("音乐播放失败: $error"),
+    );
     return created;
   }
 
@@ -97,7 +103,9 @@ class MusicPlayerController {
     index.value = i;
     _opening = true;
     try {
-      await player.open(Media(_urlOf(list[i])));
+      await player.setUrl(_urlOf(list[i]));
+      // play() 的 future 要等整首放完才结束，不能 await
+      unawaited(player.play());
     } catch (e) {
       Log.error("音乐打开失败: $e");
     } finally {
@@ -115,13 +123,14 @@ class MusicPlayerController {
     await play(songs.value, index.value - 1);
   }
 
-  Future<void> toggle() => player.playOrPause();
+  Future<void> toggle() =>
+      player.playing ? player.pause() : player.play().then((_) {});
 
   Future<void> seek(Duration position) => player.seek(position);
 
-  Duration get position => player.state.position;
+  Duration get position => player.position;
 
-  Duration get duration => player.state.duration;
+  Duration get duration => player.duration ?? Duration.zero;
 
   String _urlOf(MusicSong song) => fbDownloadUrl(
         baseUri: connectionStore.baseUri.value,
