@@ -16,6 +16,7 @@ import 'package:garden/extensions/string.dart';
 import 'package:garden/services/office_preview.dart';
 import 'package:garden/widgets/folder_picker_sheet.dart';
 import 'package:garden/widgets/neu_back_button.dart';
+import 'package:garden/widgets/video_player_controls_layout.dart';
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -167,7 +168,7 @@ class VideoPlayerPage extends HookWidget {
       if (apiKey.isBlank) return;
       final info = await fetchTmdbInfo(apiKey, currentName.value);
       if (info == null) {
-        Log.info("TMDB 未查到: $name");
+        Log.info("TMDB 未查到: $currentName");
         return;
       }
       if (description.value.isBlank) description.value = info.overview;
@@ -420,33 +421,45 @@ class VideoPlayerPage extends HookWidget {
           visualDensity: VisualDensity.compact,
         );
 
-    // 中间那排按钮：上一个 / 播放暂停 / 下一个 / 播放列表，都在同一行
-    MaterialVideoControlsThemeData controlsTheme() =>
-        MaterialVideoControlsThemeData(
-          primaryButtonBar: [
-            const Spacer(flex: 2),
-            _overlayButton(
-              Icons.skip_previous,
-              '上一个',
-              playingIndex.value > 0
-                  ? () => playEntry(playingIndex.value - 1)
-                  : null,
-            ),
+    // 中间那排按钮：上一个 / 播放暂停 / 下一个 / 播放列表，都在同一行。
+    // 竖屏视频被压到屏高 30% 后很窄，只留播放键，其余移到下面那排。
+    MaterialVideoControlsThemeData controlsTheme({required bool compact}) {
+      final skipPrevious = _overlayButton(
+        Icons.skip_previous,
+        '上一个',
+        playingIndex.value > 0 ? () => playEntry(playingIndex.value - 1) : null,
+      );
+      final skipNext = _overlayButton(
+        Icons.skip_next,
+        '下一个',
+        hasNext() ? () => playEntry(playingIndex.value + 1) : null,
+      );
+      final playlistButton =
+          _overlayButton(Icons.playlist_play, '播放列表', showPlaylist);
+      return MaterialVideoControlsThemeData(
+        primaryButtonBar: [
+          const Spacer(flex: 2),
+          if (!compact) skipPrevious,
+          const Spacer(),
+          const MaterialPlayOrPauseButton(iconSize: 56.0),
+          const Spacer(),
+          if (!compact) skipNext,
+          if (!compact && playlist.isNotEmpty) ...[
             const Spacer(),
-            const MaterialPlayOrPauseButton(iconSize: 56.0),
-            const Spacer(),
-            _overlayButton(
-              Icons.skip_next,
-              '下一个',
-              hasNext() ? () => playEntry(playingIndex.value + 1) : null,
-            ),
-            if (playlist.isNotEmpty) ...[
-              const Spacer(),
-              _overlayButton(Icons.playlist_play, '播放列表', showPlaylist),
-            ],
-            const Spacer(flex: 2),
+            playlistButton,
           ],
-        );
+          const Spacer(flex: 2),
+        ],
+        bottomButtonBar: [
+          const Spacer(),
+          if (compact) skipPrevious,
+          if (compact) skipNext,
+          if (compact && playlist.isNotEmpty) playlistButton,
+          const Spacer(),
+          MaterialFullscreenButton(),
+        ],
+      );
+    }
 
     String formatDuration(Duration duration) {
       String twoDigits(int n) => n.toString().padLeft(2, '0');
@@ -494,6 +507,10 @@ class VideoPlayerPage extends HookWidget {
     // 封面：本地 fanart/poster 优先，其次 NFO 里的 thumb（多为远程 URL）
     final posterUrl =
         currentCover.value.isNotBlank ? currentCover.value : poster.value;
+    // Foto 缩略图带每次登录变的 _sid，沿用列表页那套剔除 _sid 的磁盘缓存 key。
+    final posterCacheKey = posterUrl.startsWith("http")
+        ? keyToMd5(posterUrl.replaceAll(RegExp(r'[?&]_sid=[^&]*'), ''))
+        : null;
 
     Widget infoRow(String label, String value) => Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
@@ -513,8 +530,10 @@ class VideoPlayerPage extends HookWidget {
         ],
       ),
       body: MaterialVideoControlsTheme(
-        normal: controlsTheme(),
-        fullscreen: controlsTheme(),
+        normal: controlsTheme(
+            compact: needsCompactControls(playerSurfaceWidth(
+                MediaQuery.sizeOf(context), videoAspectRatio.value))),
+        fullscreen: controlsTheme(compact: false),
         child: Column(
           children: [
             // 视频播放区域
@@ -655,6 +674,7 @@ class VideoPlayerPage extends HookWidget {
                                         path: posterUrl,
                                         sid: connectionStore.sid.value,
                                       ),
+                                cacheKey: posterCacheKey,
                               )
                             : const CircularProgressIndicator(),
                       ),

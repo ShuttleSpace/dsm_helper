@@ -132,29 +132,118 @@ class MusicPlayerPage extends HookWidget {
   void showPlaylist(BuildContext context, MusicPlayerController controller) {
     showModalBottomSheet(
       context: context,
-      builder: (sheetContext) => SafeArea(
-        child: ListView.builder(
-          shrinkWrap: true,
-          itemCount: controller.songs.value.length,
-          itemBuilder: (context, i) {
-            final item = controller.songs.value[i];
-            final current = i == controller.index.value;
-            return ListTile(
-              dense: true,
-              selected: current,
-              leading: Icon(current ? Icons.volume_up : Icons.music_note),
-              title: Text(item.title,
-                  maxLines: 1, overflow: TextOverflow.ellipsis),
-              subtitle: item.subtitleLine.isBlank
-                  ? null
-                  : Text(item.subtitleLine,
-                      maxLines: 1, overflow: TextOverflow.ellipsis),
-              onTap: () {
-                Navigator.of(sheetContext).pop();
-                if (!current) controller.play(controller.songs.value, i);
-              },
-            );
-          },
+      isScrollControlled: true,
+      builder: (_) => _MusicPlaylistSheet(controller: controller),
+    );
+  }
+}
+
+/// 播放列表弹层：打开时定位到正在播的那首，可切排序。
+class _MusicPlaylistSheet extends StatefulWidget {
+  final MusicPlayerController controller;
+  const _MusicPlaylistSheet({required this.controller});
+
+  @override
+  State<_MusicPlaylistSheet> createState() => _MusicPlaylistSheetState();
+}
+
+class _MusicPlaylistSheetState extends State<_MusicPlaylistSheet> {
+  // 固定行高，才能在打开时算出该滚到哪
+  static const double _rowHeight = 64;
+
+  MusicSort sortMode = MusicSort.title;
+  late final ScrollController scroll;
+
+  MusicPlayerController get controller => widget.controller;
+
+  List<MusicSong> get sorted =>
+      sortMusicSongs(controller.songs.value, sortMode);
+
+  int get currentIndex {
+    final path = controller.current?.path;
+    return sorted.indexWhere((e) => e.path == path);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    scroll = ScrollController(initialScrollOffset: _offsetFor(currentIndex));
+  }
+
+  @override
+  void dispose() {
+    scroll.dispose();
+    super.dispose();
+  }
+
+  // 让当前那首停在靠上三分之一处，前后都能看到
+  double _offsetFor(int i) => i <= 2 ? 0 : (i - 2) * _rowHeight;
+
+  void _changeSort(MusicSort mode) {
+    setState(() => sortMode = mode);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!scroll.hasClients) return;
+      final max = scroll.position.maxScrollExtent;
+      scroll.jumpTo(_offsetFor(currentIndex).clamp(0.0, max));
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final songs = sorted;
+    final current = currentIndex;
+    return SafeArea(
+      child: SizedBox(
+        height: MediaQuery.sizeOf(context).height * 0.5,
+        child: Column(
+          children: [
+            Row(
+              children: [
+                const SizedBox(width: 16),
+                Text('播放列表 ${songs.length}',
+                    style: const TextStyle(fontSize: 13, color: Colors.grey)),
+                const Spacer(),
+                PopupMenuButton<MusicSort>(
+                  tooltip: '排序',
+                  icon: const Icon(Icons.sort, size: 20),
+                  initialValue: sortMode,
+                  onSelected: _changeSort,
+                  itemBuilder: (_) => const [
+                    PopupMenuItem(value: MusicSort.title, child: Text('按歌曲名')),
+                    PopupMenuItem(value: MusicSort.artist, child: Text('按歌手')),
+                    PopupMenuItem(value: MusicSort.album, child: Text('按专辑')),
+                  ],
+                ),
+              ],
+            ),
+            Expanded(
+              child: ListView.builder(
+                controller: scroll,
+                itemExtent: _rowHeight,
+                itemCount: songs.length,
+                itemBuilder: (context, i) {
+                  final item = songs[i];
+                  final isCurrent = i == current;
+                  return ListTile(
+                    dense: true,
+                    selected: isCurrent,
+                    leading:
+                        Icon(isCurrent ? Icons.volume_up : Icons.music_note),
+                    title: Text(item.title,
+                        maxLines: 1, overflow: TextOverflow.ellipsis),
+                    subtitle: item.subtitleLine.isBlank
+                        ? null
+                        : Text(item.subtitleLine,
+                            maxLines: 1, overflow: TextOverflow.ellipsis),
+                    onTap: () {
+                      Navigator.of(context).pop();
+                      if (!isCurrent) controller.play(songs, i);
+                    },
+                  );
+                },
+              ),
+            ),
+          ],
         ),
       ),
     );
