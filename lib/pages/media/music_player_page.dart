@@ -16,96 +16,98 @@ class MusicPlayerPage extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final song = controller.current;
     final scheme = Theme.of(context).colorScheme;
-    if (song == null) {
-      return Scaffold(appBar: AppBar(leading: AppBackButton(context)));
-    }
-    return Scaffold(
-      appBar: AppBar(
-        leading: AppBackButton(context),
-        title: Text(song.album.isBlank ? '正在播放' : song.album),
-        actions: [
-          IconButton(
-            tooltip: '播放列表',
-            icon: const Icon(Icons.queue_music),
-            onPressed: () => showPlaylist(context, controller),
-          ),
-        ],
-      ),
-      body: SafeArea(
-        child: Column(
-          children: [
-            const Spacer(),
-            AspectRatio(
-              aspectRatio: 1,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 32),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(12),
-                  child: _cover(song),
+    return Watch((context) {
+      final song = controller.current;
+      if (song == null) {
+        return Scaffold(appBar: AppBar(leading: AppBackButton(context)));
+      }
+      return Scaffold(
+        appBar: AppBar(
+          leading: AppBackButton(context),
+          title: Text(song.album.isBlank ? '正在播放' : song.album),
+          actions: [
+            IconButton(
+              tooltip: '播放列表',
+              icon: const Icon(Icons.queue_music),
+              onPressed: () => showPlaylist(context, controller),
+            ),
+          ],
+        ),
+        body: SafeArea(
+          child: Column(
+            children: [
+              const Spacer(),
+              AspectRatio(
+                aspectRatio: 1,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 32),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(12),
+                    child: _cover(song),
+                  ),
                 ),
               ),
-            ),
-            const SizedBox(height: 24),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 32),
-              child: Column(
-                children: [
-                  Text(song.title,
-                      maxLines: 2,
-                      textAlign: TextAlign.center,
+              const SizedBox(height: 24),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 32),
+                child: Column(
+                  children: [
+                    Text(song.title,
+                        maxLines: 2,
+                        textAlign: TextAlign.center,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(fontSize: 18)),
+                    const SizedBox(height: 6),
+                    Text(
+                      song.subtitleLine.isBlank ? '未知艺人' : song.subtitleLine,
+                      maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(fontSize: 18)),
-                  const SizedBox(height: 6),
-                  Text(
-                    song.subtitleLine.isBlank ? '未知艺人' : song.subtitleLine,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(fontSize: 12, color: scheme.outline),
+                      style: TextStyle(fontSize: 12, color: scheme.outline),
+                    ),
+                  ],
+                ),
+              ),
+              const Spacer(),
+              _ProgressBar(controller: controller),
+              const SizedBox(height: 8),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  IconButton(
+                    tooltip: '上一首',
+                    iconSize: 34,
+                    icon: const Icon(Icons.skip_previous),
+                    onPressed: controller.hasPrev ? controller.prev : null,
+                  ),
+                  const SizedBox(width: 16),
+                  StreamBuilder<bool>(
+                    stream: controller.player.stream.playing,
+                    initialData: controller.player.state.playing,
+                    builder: (context, snapshot) => IconButton(
+                      tooltip: snapshot.data == true ? '暂停' : '播放',
+                      iconSize: 64,
+                      icon: Icon(snapshot.data == true
+                          ? Icons.pause_circle_filled
+                          : Icons.play_circle_fill),
+                      onPressed: controller.toggle,
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  IconButton(
+                    tooltip: '下一首',
+                    iconSize: 34,
+                    icon: const Icon(Icons.skip_next),
+                    onPressed: controller.hasNext ? controller.next : null,
                   ),
                 ],
               ),
-            ),
-            const Spacer(),
-            _ProgressBar(controller: controller),
-            const SizedBox(height: 8),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                IconButton(
-                  tooltip: '上一首',
-                  iconSize: 34,
-                  icon: const Icon(Icons.skip_previous),
-                  onPressed: controller.hasPrev ? controller.prev : null,
-                ),
-                const SizedBox(width: 16),
-                StreamBuilder<bool>(
-                  stream: controller.player.stream.playing,
-                  initialData: controller.player.state.playing,
-                  builder: (context, snapshot) => IconButton(
-                    tooltip: snapshot.data == true ? '暂停' : '播放',
-                    iconSize: 64,
-                    icon: Icon(snapshot.data == true
-                        ? Icons.pause_circle_filled
-                        : Icons.play_circle_fill),
-                    onPressed: controller.toggle,
-                  ),
-                ),
-                const SizedBox(width: 16),
-                IconButton(
-                  tooltip: '下一首',
-                  iconSize: 34,
-                  icon: const Icon(Icons.skip_next),
-                  onPressed: controller.hasNext ? controller.next : null,
-                ),
-              ],
-            ),
-            const SizedBox(height: 24),
-          ],
+              const SizedBox(height: 24),
+            ],
+          ),
         ),
-      ),
-    );
+      );
+    });
   }
 
   Widget _cover(MusicSong song) =>

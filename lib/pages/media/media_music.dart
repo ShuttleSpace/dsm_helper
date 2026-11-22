@@ -43,10 +43,7 @@ class MediaMusic extends HookWidget {
       return null;
     }, const []);
 
-    final sorted = sortMusicSongs(songs.value, sort.value);
-    final current = controller.current;
-
-    Widget row(MusicSong song, int i) => ListTile(
+    Widget row(MusicSong song, int i, List<MusicSong> queue) => ListTile(
           leading: _cover(song, 44),
           title: Text(song.title, maxLines: 1, overflow: TextOverflow.ellipsis),
           subtitle: song.subtitleLine.isBlank
@@ -55,73 +52,78 @@ class MediaMusic extends HookWidget {
                   maxLines: 1, overflow: TextOverflow.ellipsis),
           trailing: Text(formatSongDuration(song.duration),
               style: const TextStyle(fontSize: 11, color: Colors.grey)),
-          selected: song.path == current?.path,
-          onTap: () => controller.play(sorted, i),
+          selected: song.path == controller.current?.path,
+          onTap: () => controller.play(queue, i),
         );
 
-    return Column(
-      children: [
-        if (loading.value)
-          const Expanded(child: Center(child: CircularProgressIndicator()))
-        else if (sorted.isEmpty)
-          Expanded(
-            child: Center(
-              child: Padding(
-                padding: const EdgeInsets.all(24),
-                child: Text(
-                  failed.value.isBlank
-                      ? '没有歌。到「多媒体设置 → 音乐目录」里选一下目录，\n或者 NAS 上先装 Audio Station。'
-                      : '拉不到音乐库：${failed.value}',
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(fontSize: 13, color: Colors.grey),
-                ),
-              ),
-            ),
-          )
-        else
-          Expanded(
-            child: Column(
-              children: [
-                Row(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.only(left: 16),
-                      child: Text('共 ${sorted.length} 首',
-                          style: const TextStyle(
-                              fontSize: 12, color: Colors.grey)),
-                    ),
-                    const Spacer(),
-                    PopupMenuButton<MusicSort>(
-                      tooltip: '排序',
-                      icon: const Icon(Icons.sort, size: 20),
-                      initialValue: sort.value,
-                      onSelected: (value) => sort.value = value,
-                      itemBuilder: (context) => const [
-                        PopupMenuItem(
-                            value: MusicSort.title, child: Text('按歌名')),
-                        PopupMenuItem(
-                            value: MusicSort.artist, child: Text('按艺人')),
-                        PopupMenuItem(
-                            value: MusicSort.album, child: Text('按专辑')),
-                      ],
-                    ),
-                  ],
-                ),
-                Expanded(
-                  child: RefreshIndicator(
-                    onRefresh: reload,
-                    child: ListView.builder(
-                      itemCount: sorted.length,
-                      itemBuilder: (context, i) => row(sorted[i], i),
-                    ),
+    // controller 里的队列/下标是 signal，必须在 Watch 里读才会重建
+    return Watch((context) {
+      final sorted = sortMusicSongs(songs.value, sort.value);
+      return Column(
+        children: [
+          if (loading.value)
+            const Expanded(child: Center(child: CircularProgressIndicator()))
+          else if (sorted.isEmpty)
+            Expanded(
+              child: Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(24),
+                  child: Text(
+                    failed.value.isBlank
+                        ? '没有歌。到「多媒体设置 → 音乐目录」里选一下目录，\n或者 NAS 上先装 Audio Station。'
+                        : '拉不到音乐库：${failed.value}',
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(fontSize: 13, color: Colors.grey),
                   ),
                 ),
-              ],
+              ),
+            )
+          else
+            Expanded(
+              child: Column(
+                children: [
+                  Row(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(left: 16),
+                        child: Text('共 ${sorted.length} 首',
+                            style: const TextStyle(
+                                fontSize: 12, color: Colors.grey)),
+                      ),
+                      const Spacer(),
+                      PopupMenuButton<MusicSort>(
+                        tooltip: '排序',
+                        icon: const Icon(Icons.sort, size: 20),
+                        initialValue: sort.value,
+                        onSelected: (value) => sort.value = value,
+                        itemBuilder: (context) => const [
+                          PopupMenuItem(
+                              value: MusicSort.title, child: Text('按歌名')),
+                          PopupMenuItem(
+                              value: MusicSort.artist, child: Text('按艺人')),
+                          PopupMenuItem(
+                              value: MusicSort.album, child: Text('按专辑')),
+                        ],
+                      ),
+                    ],
+                  ),
+                  Expanded(
+                    child: RefreshIndicator(
+                      onRefresh: reload,
+                      child: ListView.builder(
+                        itemCount: sorted.length,
+                        itemBuilder: (context, i) => row(sorted[i], i, sorted),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
-        if (current != null) _MiniPlayer(controller: controller, song: current),
-      ],
-    );
+          if (controller.current != null)
+            _MiniPlayer(controller: controller, song: controller.current!),
+        ],
+      );
+    });
   }
 }
 

@@ -37,7 +37,7 @@ class TimelineModel {
     // }
     Log.log("timeline fetch data: $data");
     var res = await HttpUtil.instance.post("entry.cgi", data: data);
-    Log.log("timeline fetch response: $res");
+    // 别把整份时间线写进日志：一次 log 要把整个图库 JSON 串化两遍并落盘。
     if (res['success']) {
       List data = res['data']['section'];
       List<TimelineModel> timeline = [];

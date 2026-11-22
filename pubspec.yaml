@@ -136,6 +136,7 @@ dependencies:
   talker: ^5.1.15
   talker_flutter: ^5.1.15
   audio_metadata_reader: ^1.8.1
+  audio_service: ^0.18.19
 dev_dependencies:
   flutter_test:
     sdk: flutter

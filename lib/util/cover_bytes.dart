@@ -1,6 +1,8 @@
+import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:dio/dio.dart';
+import 'package:path_provider/path_provider.dart';
 
 import 'package:garden/api/dsm_api.filestation.transfer_url.dart';
 import 'package:garden/stores/connection_store.dart';
@@ -16,14 +18,52 @@ Future<Uint8List?> loadEmbeddedCover(MusicSong song) async {
   final path = song.path;
   if (_cache.containsKey(path)) return _cache[path];
   _cache[path] = null; // 占位，避免同一帧里重复发请求
-  final cover = await _fetchCover(fbDownloadUrl(
-    baseUri: connectionStore.baseUri.value,
-    path: path,
-    sid: connectionStore.sid.value,
-    mode: 'open',
-  ));
+  var cover = await _readCache(path);
+  if (cover == null) {
+    cover = await _fetchCover(fbDownloadUrl(
+      baseUri: connectionStore.baseUri.value,
+      path: path,
+      sid: connectionStore.sid.value,
+      mode: 'open',
+    ));
+    if (cover != null) await _writeCache(path, cover);
+  }
   _cache[path] = cover;
   return cover;
+}
+
+/// 封面缓存在应用支持目录，跨会话复用，省掉重复拉 1MB 文件头。
+Future<Uint8List?> _readCache(String path) async {
+  try {
+    final file = await _cacheFile(path);
+    if (!await file.exists()) return null;
+    return await file.readAsBytes();
+  } catch (_) {
+    return null;
+  }
+}
+
+Future<void> _writeCache(String path, Uint8List cover) async {
+  try {
+    await (await _cacheFile(path)).writeAsBytes(cover, flush: false);
+  } catch (_) {
+    // 缓存写不进去不影响显示
+  }
+}
+
+Future<File> _cacheFile(String path) async {
+  final dir =
+      Directory('${(await getApplicationSupportDirectory()).path}/cover_cache');
+  await dir.create(recursive: true);
+  return File('${dir.path}/${_fnv1a(path)}.img');
+}
+
+String _fnv1a(String value) {
+  var hash = 0x811c9dc5;
+  for (final unit in value.codeUnits) {
+    hash = ((hash ^ unit) * 0x01000193) & 0xFFFFFFFF;
+  }
+  return hash.toRadixString(16);
 }
 
 Future<Uint8List?> _fetchCover(String url) async {

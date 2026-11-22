@@ -38,13 +38,12 @@ class MediaLibrary extends HookWidget {
     final tab = useTabController(initialLength: 2);
     final tabIndex = useState(0);
     // 播放器挂在页面这一层，切 tab 不会把正在放的歌掐了
-    final music = useMemoized(() => MusicPlayerController(), const []);
+    final music = musicController;
     useEffect(() {
       void onChange() => tabIndex.value = tab.index;
       tab.addListener(onChange);
       return () => tab.removeListener(onChange);
     }, [tab]);
-    useEffect(() => () => music.dispose(), const []);
 
     final shown = filterAndSortMediaItems(items.value, query.value, sort.value);
     Future<void> openPlayer(MediaItem item) async {

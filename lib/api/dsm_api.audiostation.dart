@@ -194,7 +194,8 @@ Future<Map> dsmAudioStationSongList(
       'offset': offset,
       'sort_by': sortBy,
       'sort_direction': sortDirection,
-      'additional': '["song_tag","song_audio"]',
+      // 必须是裸逗号列表，写成 JSON 数组会被忽略（回不出 additional）
+      'additional': 'song_tag,song_audio',
     });
   final res =
       await _httpGet(endpoint, queryParameters: data, cancelToken: cancelToken);

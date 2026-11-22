@@ -57,3 +57,6 @@ class MusicPlayerController {
 
   Future<void> dispose() async => await _player?.dispose();
 }
+
+/// 全局单例：页面和系统通知栏（audio_service）要共用同一个播放器。
+final MusicPlayerController musicController = MusicPlayerController();
