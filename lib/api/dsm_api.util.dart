@@ -1,18 +1,11 @@
 part of "dsm_api.dart";
 
 extension DioExtension on Dio {
-  /// proxy  "PROXY host:port; PROXY host2:port2; DIRECT"
-  /// browser PAC (proxy auto-config) scripts.
-  _createHttpClient({BadCertificateCallback? callback, String? proxy}) {
+  _createHttpClient({BadCertificateCallback? callback}) {
     if (httpClientAdapter is IOHttpClientAdapter) {
       (httpClientAdapter as IOHttpClientAdapter).createHttpClient = () {
         if (callback != null) {
           _httpClient.badCertificateCallback = callback;
-        }
-        if (proxy != null) {
-          _httpClient.findProxy = (uri) {
-            return proxy;
-          };
         }
         return _httpClient;
       };
@@ -156,8 +149,7 @@ Future<dynamic> _doHttpRequest(
     _dio._createHttpClient(
         callback: (cert, host, port) {
           return !(checkSsl ?? connectionStore.checkSsl.value);
-        },
-        proxy: 'PROXY 192.168.8.102:8899; PROXY 127.0.0.1:8899; DIRECT');
+        });
     response = await _dio.request(endpoint,
         data: data,
         queryParameters: queryParameters,

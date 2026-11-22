@@ -17,18 +17,13 @@ export 'file_types.dart';
 final _httpClient = HttpClient();
 
 extension DioExtension on Dio {
-  /// proxy  "PROXY host:port; PROXY host2:port2; DIRECT"
-  /// browser PAC (proxy auto-config) scripts.
-  _createHttpClient({BadCertificateCallback? callback, String? proxy}) {
+  /// 不要在这里设 findProxy：`_httpClient` 是全局共享的，设一次就一直粘着，
+  /// 曾经把代理写死在这里，导致每个请求先去连一个不存在的代理再回退 DIRECT。
+  _createHttpClient({BadCertificateCallback? callback}) {
     if (httpClientAdapter is IOHttpClientAdapter) {
       (httpClientAdapter as IOHttpClientAdapter).createHttpClient = () {
         if (callback != null) {
           _httpClient.badCertificateCallback = callback;
-        }
-        if (proxy != null) {
-          _httpClient.findProxy = (uri) {
-            return proxy;
-          };
         }
         return _httpClient;
       };
@@ -77,8 +72,7 @@ class HttpUtil {
     dio._createHttpClient(
         callback: (cert, host, port) {
           return !(checkSsl ?? connectionStore.checkSsl.value);
-        },
-        proxy: 'PROXY 192.168.1.73:8899; PROXY 127.0.0.1:8899; DIRECT');
+        });
 
     Response response;
     try {
@@ -187,8 +181,7 @@ class HttpUtil {
     dio._createHttpClient(
         callback: (cert, host, port) {
           return !(checkSsl ?? connectionStore.checkSsl.value);
-        },
-        proxy: 'PROXY 192.168.1.73:8899; PROXY 127.0.0.1:8899; DIRECT');
+        });
     Response response;
     try {
       // Log.debug(
@@ -237,8 +230,7 @@ class HttpUtil {
     dio._createHttpClient(
         callback: (cert, host, port) {
           return !(connectionStore.checkSsl.value);
-        },
-        proxy: 'PROXY 192.168.1.73:8899; PROXY 127.0.0.1:8899; DIRECT');
+        });
     FormData formData = FormData.fromMap(data);
     Response response;
     try {
@@ -278,8 +270,7 @@ class HttpUtil {
       dio._createHttpClient(
           callback: (cert, host, port) {
             return !(connectionStore.checkSsl.value);
-          },
-          proxy: 'PROXY 192.168.1.73:8899; PROXY 127.0.0.1:8899; DIRECT');
+          });
       response = await dio.download(
           url, tempPath + Platform.pathSeparator + saveName,
           deleteOnError: true,

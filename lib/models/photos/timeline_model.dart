@@ -110,8 +110,26 @@ class Day {
   num? startPosition;
   num? endPosition;
   List<PhotoModel>? photos;
+  Future<void>? _fetching;
 
-  Future fetchPhotos(
+  /// 未来一个请求只发一次：FutureBuilder 每次 rebuild 都会重新传 future，
+  /// 不定住就会在还没返回时反复发请求。
+  Future<void> fetchPhotos(
+      {bool isTeam = false,
+      String? type,
+      int? geocodingId,
+      int? generalTagId,
+      bool recentlyAdd = false,
+      List<int> itemTypes = const []}) =>
+      _fetching ??= _fetchPhotos(
+          isTeam: isTeam,
+          type: type,
+          geocodingId: geocodingId,
+          generalTagId: generalTagId,
+          recentlyAdd: recentlyAdd,
+          itemTypes: itemTypes);
+
+  Future<void> _fetchPhotos(
       {bool isTeam = false,
       String? type,
       int? geocodingId,

@@ -15,6 +15,22 @@ import 'package:garden/util/log.dart';
 import 'package:garden/theme/app_colors.dart';
 import 'package:signals_hooks/signals_hooks.dart';
 
+/// 把按天分组的时间线展平并算出每一天在长列表里的位置。
+/// 每行 4 张，日期行高 40，行间距 2。
+List<Day> layoutTimelineDays(List<TimelineModel> timelines, double photoWidth) {
+  final days = <Day>[];
+  for (final timeline in timelines) {
+    days.addAll(timeline.days as Iterable<Day>);
+  }
+  for (int i = 0; i < days.length; i++) {
+    final rowCount = ((days[i].itemCount ?? 0) / 4).ceil();
+    final height = 40 + rowCount * photoWidth + (rowCount - 1) * 2;
+    days[i].startPosition = i == 0 ? 0 : days[i - 1].endPosition;
+    days[i].endPosition = (days[i].startPosition ?? 0) + height;
+  }
+  return days;
+}
+
 class Timeline extends HookWidget {
   const Timeline(this.isTeam,
       {super.key,
@@ -38,19 +54,8 @@ class Timeline extends HookWidget {
     String cacheKey({required bool isTeam}) =>
         'photos|timeline|$isTeam|$type|$geocodingId|$generalTagId|$recentlyAdd';
 
-    List<Day> layout(List<TimelineModel> timelines) {
-      final newDays = <Day>[];
-      for (var timeline in timelines) {
-        newDays.addAll(timeline.days as Iterable<Day>);
-      }
-      for (int i = 0; i < newDays.length; i++) {
-        int rowCount = (newDays[i].itemCount ?? 0 / 4).ceil();
-        double height = 40 + rowCount * photoWidth + (rowCount - 1) * 2;
-        newDays[i].startPosition = i == 0 ? 0 : newDays[i - 1].endPosition;
-        newDays[i].endPosition = newDays[i].startPosition ?? 0 + height;
-      }
-      return newDays;
-    }
+    List<Day> layout(List<TimelineModel> timelines) =>
+        layoutTimelineDays(timelines, photoWidth);
 
     Future getData({bool isTeam = false}) async {
       final key = cacheKey(isTeam: isTeam);
