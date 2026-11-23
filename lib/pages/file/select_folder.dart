@@ -327,7 +327,9 @@ class SelectFolder extends HookWidget {
                           child: OutlinedButton(
                             onPressed: () {
                               if (selectedFiles.isNotEmpty) {
-                                Navigator.of(context).pop(selectedFiles.value);
+                                // 必须给副本：pop 之后 PopScope 会 clear 掉原列表
+                                Navigator.of(context).pop(
+                                    List<String>.from(selectedFiles.value));
                               } else {
                                 if (paths.value.length > 1) {
                                   Navigator.of(context).pop(
